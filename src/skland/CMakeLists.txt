@@ -72,7 +72,7 @@ add_library(skland ${global_header} ${all_source_files})
 target_include_directories(skland PRIVATE "${SKIA_PUBLIC_INCLUDES}")
 
 if (LINUX)
-    target_link_libraries(skland xkbcommon rt ${LIBS} wayland-cursor skia)
+    target_link_libraries(skland rt ${LIBS} wayland-cursor skia)
 else ()
     target_link_libraries(skland ${LIBS} skia)
 endif ()
