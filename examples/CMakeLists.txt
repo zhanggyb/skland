@@ -17,6 +17,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 add_executable(simple simple.cpp)
 target_link_libraries(simple skland)
 
+add_executable(eventdemo eventdemo.cpp)
+target_link_libraries(eventdemo skland)
+
 #add_executable(shadowing shadowing.cpp)
 #target_link_libraries(shadowing skland)
 #target_include_directories(shadowing PRIVATE "${SKIA_PUBLIC_INCLUDES}")

@@ -62,6 +62,8 @@ class Canvas {
 
   void DrawPath(const Path &path, const Paint &paint) const;
 
+  void DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint) const;
+
   void Translate(float dx, float dy) const;
 
   void ResetMatrix() const;
@@ -69,6 +71,10 @@ class Canvas {
   void Clear(uint32_t color = 0x0) const;
 
   void Clear(const Color &color) const;
+
+  void Save() const;
+
+  void Flush() const;
 
   void SetMargin(const Margin &margin = Margin());
 
@@ -82,6 +88,10 @@ class Canvas {
 
   bool is_null() const {
     return sk_canvas_ == nullptr;
+  }
+
+  SkCanvas *sk_canvas() const {
+    return sk_canvas_;
   }
 
  private:

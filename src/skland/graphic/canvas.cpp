@@ -45,6 +45,7 @@ void Canvas::Setup(unsigned char *pixel, int width, int height, int format) {
 
   sk_canvas_ = new SkCanvas(bitmap);
   sk_canvas_->translate(margin_.left, margin_.top);
+  sk_canvas_->save();
 }
 
 void Canvas::Destroy() {
@@ -78,6 +79,10 @@ void Canvas::DrawPath(const Path &path, const Paint &paint) const {
   sk_canvas_->drawPath(*path.sk_path(), *paint.sk_paint());
 }
 
+void Canvas::DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint) const {
+  sk_canvas_->drawText(text, byte_length, x, y, *paint.sk_paint());
+}
+
 void Canvas::Translate(float dx, float dy) const {
   sk_canvas_->translate(dx, dy);
 }
@@ -92,6 +97,14 @@ void Canvas::Clear(uint32_t color) const {
 
 void Canvas::Clear(const Color &color) const {
   sk_canvas_->clear(color.argb());
+}
+
+void Canvas::Save() const {
+  sk_canvas_->save();
+}
+
+void Canvas::Flush() const {
+  sk_canvas_->flush();
 }
 
 void Canvas::SetMargin(const Margin &margin) {

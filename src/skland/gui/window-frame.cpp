@@ -251,6 +251,7 @@ void WindowFrame::Draw(const Canvas *canvas) {
   path.AddRoundRect(window()->geometry(), radii);
 
   canvas->DrawPath(path, paint);
+  canvas->Flush();
 }
 
 int WindowFrame::GetPointerLocation(const MouseEvent *event) const {

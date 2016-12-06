@@ -28,6 +28,14 @@ TEST_F(Test, constructor_2) {
   ASSERT_TRUE(r.x() == 0 && r.y() == 0 && r.width() == 4 && r.height() == 4);
 }
 
+TEST_F(Test, MoveTo_1) {
+  Rect rect = {10, 10, 20, 20};
+
+  rect.MoveTo(20, 20);
+
+  ASSERT_TRUE(rect.l == 20 && rect.t == 20 && rect.r == 30 && rect.b == 30);
+}
+
 TEST_F(Test, set_size_1) {
   Rect r;
 
