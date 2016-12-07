@@ -162,6 +162,9 @@ void Input::OnPointerEnter(uint32_t serial,
   mouse_event_->surface_y_ = wl_fixed_to_double(surface_y);
 
   mouse_event_->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
+  mouse_event_->window_x_ = mouse_event_->surface_x_ - mouse_event_->surface_->canvas().margin().left;
+  mouse_event_->window_y_ = mouse_event_->surface_y_ - mouse_event_->surface_->canvas().margin().top;
+
   AbstractView *view_on_surface = mouse_event_->surface_->view();
 
   mouse_event_->accepted_ = false;
@@ -214,6 +217,9 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
   mouse_event_->surface_y_ = wl_fixed_to_double(surface_y);
 
   if (mouse_event_->surface_) {
+    mouse_event_->window_x_ = mouse_event_->surface_x_ - mouse_event_->surface_->canvas().margin().left;
+    mouse_event_->window_y_ = mouse_event_->surface_y_ - mouse_event_->surface_->canvas().margin().top;
+
     AbstractView *view_on_surface = mouse_event_->surface_->view();
 
     mouse_event_->accepted_ = false;
@@ -221,18 +227,18 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
 
     // The following code check if the mouse enters sub views in this surface:
 
-    MouseTask* task = &view_on_surface->mouse_task_;
-    MouseTask* tail = task;
-    while(tail->next()) {
-      tail = static_cast<MouseTask*>(tail->next());
+    MouseTask *task = &view_on_surface->mouse_task_;
+    MouseTask *tail = task;
+    while (tail->next()) {
+      tail = static_cast<MouseTask *>(tail->next());
     }
 
-    MouseTask* previous = nullptr;
-    while(tail->previous()) {
-      if (tail->view->Contain((int)mouse_event_->surface_x_, (int)mouse_event_->surface_y_)) {
+    MouseTask *previous = nullptr;
+    while (tail->previous()) {
+      if (tail->view->Contain((int) mouse_event_->window_x_, (int) mouse_event_->window_y_)) {
         break;
       }
-      previous = static_cast<MouseTask*>(tail->previous());
+      previous = static_cast<MouseTask *>(tail->previous());
 
       tail->Unlink();
       mouse_event_->accepted_ = false;
@@ -324,7 +330,7 @@ void Input::ProcessMouseEnterOnSubviews(AbstractView *parent, gui::MouseTask *ta
   using gui::MouseTask;
 
   for (AbstractView *subview = parent->first_subview(); subview; subview = subview->next_view()) {
-    if (subview->Contain((int) mouse_event_->surface_x_, (int) mouse_event_->surface_y_)) {
+    if (subview->Contain((int) mouse_event_->window_x_, (int) mouse_event_->window_y_)) {
       mouse_event_->accepted_ = false;
       subview->OnMouseEnter(mouse_event_);
       if (mouse_event_->is_accepted()) {

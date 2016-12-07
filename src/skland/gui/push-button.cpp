@@ -36,14 +36,14 @@ Size PushButton::GetPreferredSize() const {
 }
 
 void PushButton::OnMouseEnter(MouseEvent *event) {
-  fprintf(stderr, "enter: %d %d\n", (int)event->surface_x(), (int)event->surface_y());
+  fprintf(stderr, "enter: %d %d\n", (int)event->window_x(), (int)event->window_y());
   hover_ = true;
   Show();
   event->Accept();
 }
 
 void PushButton::OnMouseLeave(MouseEvent *event) {
-  fprintf(stderr, "leave: %d %d\n", (int)event->surface_x(), (int) event->surface_y());
+  fprintf(stderr, "leave: %d %d\n", (int)event->window_x(), (int) event->window_y());
   hover_ = false;
   Show();
   event->Accept();
