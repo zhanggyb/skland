@@ -155,6 +155,8 @@ void Input::OnPointerEnter(uint32_t serial,
                            struct wl_surface *wl_surface,
                            wl_fixed_t surface_x,
                            wl_fixed_t surface_y) {
+  using gui::MouseTask;
+
   mouse_event_->serial_ = serial;
   mouse_event_->surface_x_ = wl_fixed_to_double(surface_x);
   mouse_event_->surface_y_ = wl_fixed_to_double(surface_y);
@@ -171,6 +173,8 @@ void Input::OnPointerEnter(uint32_t serial,
 }
 
 void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
+  using gui::MouseTask;
+
   mouse_event_->serial_ = serial;
 
   mouse_event_->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
@@ -203,6 +207,8 @@ void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
 }
 
 void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y) {
+  using gui::MouseTask;
+
   mouse_event_->time_ = time;
   mouse_event_->surface_x_ = wl_fixed_to_double(surface_x);
   mouse_event_->surface_y_ = wl_fixed_to_double(surface_y);
@@ -243,6 +249,8 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
 }
 
 void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uint32_t state) {
+  using gui::MouseTask;
+
   mouse_event_->accepted_ = false;
   mouse_event_->serial_ = serial;
   mouse_event_->time_ = time;
@@ -312,7 +320,9 @@ void Input::OnTouchCancel() {
 
 }
 
-void Input::ProcessMouseEnterOnSubviews(AbstractView *parent, MouseTask *task) {
+void Input::ProcessMouseEnterOnSubviews(AbstractView *parent, gui::MouseTask *task) {
+  using gui::MouseTask;
+
   for (AbstractView *subview = parent->first_subview(); subview; subview = subview->next_view()) {
     if (subview->Contain((int) mouse_event_->surface_x_, (int) mouse_event_->surface_y_)) {
       mouse_event_->accepted_ = false;

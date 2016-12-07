@@ -311,6 +311,8 @@ void Display::InitializeIdleTaskList() {
 }
 
 void Display::CleanIdleTaskList() {
+  using gui::TaskNode;
+
   TaskNode *task = idle_task_head_.next();
   TaskNode *next_task = nullptr;
   while (task != &idle_task_tail_) {

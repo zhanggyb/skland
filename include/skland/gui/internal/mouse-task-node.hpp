@@ -14,18 +14,34 @@
  * limitations under the License.
  */
 
-#include <skland/gui/detail/redraw-task-node.hpp>
+#ifndef SKLAND_GUI_INTERNAL_MOUSE_TASK_NODE_HPP_
+#define SKLAND_GUI_INTERNAL_MOUSE_TASK_NODE_HPP_
 
-#include <skland/gui/abstract-view.hpp>
+#include "task-node.hpp"
 
 namespace skland {
 
-RedrawTask::~RedrawTask() {
+class AbstractView;
+class MouseEvent;
+
+namespace gui {
+
+struct MouseTask : public TaskNode {
+
+  MouseTask(const MouseTask &) = delete;
+  MouseTask &operator=(const MouseTask &) = delete;
+
+  MouseTask(AbstractView *view = nullptr)
+      : TaskNode(), view(view) {}
+
+  ~MouseTask() {}
+
+  AbstractView *view;
+
+};
+
 }
 
-void RedrawTask::Run(int events) const {
-  view->OnDraw(canvas);
-  view->visible_ = true;
 }
 
-}
+#endif // SKLAND_GUI_INTERNAL_MOUSE_TASK_NODE_HPP_

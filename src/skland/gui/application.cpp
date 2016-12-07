@@ -26,8 +26,6 @@
 
 #include <skland/stock/theme.hpp>
 #include <skland/core/timer.hpp>
-#include <skland/gui/detail/task-node.hpp>
-
 
 /**
  * Compile-time computation of number of items in a hardcoded array.
@@ -92,6 +90,7 @@ Application::~Application() {
 }
 
 int Application::Run() {
+  using gui::EventTaskNode;
 
   struct sigaction sigint;
   sigint.sa_handler = HandleSignalInt;

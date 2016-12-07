@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_DETAIL_SIDE_SPACE_HPP_
-#define SKLAND_CORE_DETAIL_SIDE_SPACE_HPP_
+#ifndef SKLAND_CORE_INTERNAL_SIDE_SPACE_HPP_
+#define SKLAND_CORE_INTERNAL_SIDE_SPACE_HPP_
 
 namespace skland {
 namespace core {
 
 template<typename T>
-struct SideSpace {
+struct Bounds {
 
-  inline SideSpace()
+  inline Bounds()
       : l(T(0)), t(T(0)), r(T(0)), b(T(0)) {}
 
-  inline SideSpace(T value)
+  inline Bounds(T value)
       : l(value), t(value), r(value), b(value) {}
 
-  inline SideSpace(T l, T t, T r, T b)
+  inline Bounds(T l, T t, T r, T b)
       : l(l), t(t), r(r), b(b) {}
 
-  inline SideSpace(const SideSpace &other)
+  inline Bounds(const Bounds &other)
       : l(other.l), t(other.t), r(other.r), b(other.b) {}
 
-  inline ~SideSpace() {}
+  inline ~Bounds() {}
 
-  inline SideSpace &operator=(const SideSpace &other) {
+  inline Bounds &operator=(const Bounds &other) {
     l = other.l;
     t = other.t;
     r = other.r;
@@ -75,16 +75,16 @@ struct SideSpace {
 };
 
 template<typename T>
-inline bool operator==(const SideSpace<T> &s1, const SideSpace<T> &s2) {
-  return memcmp(&s1, &s2, sizeof(SideSpace<T>)) == 0;
+inline bool operator==(const Bounds<T> &s1, const Bounds<T> &s2) {
+  return memcmp(&s1, &s2, sizeof(Bounds<T>)) == 0;
 }
 
 template<typename T>
-inline bool operator!=(const SideSpace<T> &s1, const SideSpace<T> &s2) {
-  return memcmp(&s1, &s2, sizeof(SideSpace<T>)) != 0;
+inline bool operator!=(const Bounds<T> &s1, const Bounds<T> &s2) {
+  return memcmp(&s1, &s2, sizeof(Bounds<T>)) != 0;
 }
 
 } // namespace core
 } // namespace skland
 
-#endif // SKLAND_CORE_DETAIL_SIDE_SPACE_HPP_
+#endif // SKLAND_CORE_INTERNAL_SIDE_SPACE_HPP_

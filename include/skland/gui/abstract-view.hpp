@@ -21,10 +21,14 @@
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
-#include "detail/redraw-task-node.hpp"
-#include "detail/mouse-task-node.hpp"
+#include "internal/redraw-task-node.hpp"
+#include "internal/mouse-task-node.hpp"
 
 namespace skland {
+
+namespace gui {
+class RedrawTask;
+}
 
 // Forward declaration
 class Canvas;
@@ -43,7 +47,7 @@ class AbstractView : public Object {
   friend class Application;
   friend class Display;
   friend class Surface;
-  friend class RedrawTask;
+  friend class gui::RedrawTask;
 
  public:
 
@@ -151,7 +155,7 @@ class AbstractView : public Object {
 
   static void RedrawSubViewsOnSurface(const AbstractView *parent, Surface *surface);
 
-  static void AddRedrawTask(RedrawTask *task);
+  static void AddRedrawTask(gui::RedrawTask *task);
 
   bool visible_;
 
@@ -159,8 +163,8 @@ class AbstractView : public Object {
 
   Surface *surface_;  /**< The main surface for this window */
 
-  RedrawTask redraw_task_;
-  MouseTask mouse_task_;
+  gui::RedrawTask redraw_task_;
+  gui::MouseTask mouse_task_;
 };
 
 }

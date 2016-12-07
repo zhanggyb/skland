@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_DETAIL_TASK_NODE_HPP_
-#define SKLAND_GUI_DETAIL_TASK_NODE_HPP_
+#ifndef SKLAND_GUI_INTERNAL_TASK_NODE_HPP_
+#define SKLAND_GUI_INTERNAL_TASK_NODE_HPP_
 
 namespace skland {
+namespace gui {
 
 class TaskNode {
 
@@ -56,6 +57,7 @@ class TaskNode {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_DETAIL_TASK_NODE_HPP_

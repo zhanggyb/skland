@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-#include <skland/gui/detail/task-node.hpp>
+#include <skland/gui/internal/task-node.hpp>
 
 namespace skland {
+namespace gui {
 
 TaskNode::~TaskNode() {
   if (previous_) previous_->next_ = next_;
@@ -53,4 +54,5 @@ void TaskNode::Unlink() {
   next_ = nullptr;
 }
 
-}
+} // namespace gui
+} // namespace skland

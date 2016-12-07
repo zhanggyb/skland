@@ -14,31 +14,20 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_EVENT_TASK_HPP
-#define SKLAND_EVENT_TASK_HPP
+#include <skland/gui/internal/redraw-task-node.hpp>
 
-#include "task-node.hpp"
+#include <skland/gui/abstract-view.hpp>
 
 namespace skland {
+namespace gui {
 
-class EventTaskNode : public TaskNode {
-
-  EventTaskNode(const EventTaskNode &) = delete;
-  EventTaskNode &operator=(const EventTaskNode &) = delete;
-
- public:
-
-  inline EventTaskNode()
-      : TaskNode() {}
-
-  virtual ~EventTaskNode() {}
-
-  virtual void Run(int events = 0) const {
-    // override this
-  }
-
-};
-
+RedrawTask::~RedrawTask() {
 }
 
-#endif //SKLAND_EVENT_TASK_HPP
+void RedrawTask::Run(int events) const {
+  view->OnDraw(canvas);
+  view->visible_ = true;
+}
+
+}
+}

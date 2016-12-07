@@ -13,7 +13,7 @@
 # limitations under the License.
 
 file(GLOB core_headers "${PROJECT_SOURCE_DIR}/include/skland/core/*.hpp")
-file(GLOB core_detail_headers "${PROJECT_SOURCE_DIR}/include/skland/core/detail/*.hpp")
+file(GLOB core_internal_headers "${PROJECT_SOURCE_DIR}/include/skland/core/internal/*.hpp")
 file(GLOB core_sources "core/*.cpp")
 
 if (APPLE)
@@ -23,7 +23,7 @@ endif ()
 
 list(APPEND all_source_files
         ${core_headers}
-        ${core_detail_headers}
+        ${core_internal_headers}
         ${core_sources})
 
 file(GLOB graphic_headers "${PROJECT_SOURCE_DIR}/include/skland/graphic/*.hpp")
@@ -42,9 +42,9 @@ if (LINUX)
     file(GLOB wayland_client_sources "wayland/client/*.cpp")
 
     file(GLOB gui_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/*.hpp")
-    file(GLOB gui_detail_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/detail/*.hpp")
+    file(GLOB gui_internal_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/internal/*.hpp")
     file(GLOB gui_sources "gui/*.cpp")
-    file(GLOB gui_detail_sources "gui/detail/*.cpp")
+    file(GLOB gui_internal_sources "gui/internal/*.cpp")
 
     file(GLOB stock_headers "${PROJECT_SOURCE_DIR}/include/skland/stock/*.hpp")
     file(GLOB stock_sources "stock/*.cpp")
@@ -56,8 +56,8 @@ if (LINUX)
             ${wayland_client_sources}
             ${gui_headers}
             ${gui_sources}
-            ${gui_detail_headers}
-            ${gui_detail_sources}
+            ${gui_internal_headers}
+            ${gui_internal_sources}
             ${stock_headers}
             ${stock_sources})
 

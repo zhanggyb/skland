@@ -18,7 +18,7 @@
 #define SKLAND_GUI_DISPLAY_HPP_
 
 #include "cursor.hpp"
-#include "detail/event-task-node.hpp"
+#include "internal/event-task-node.hpp"
 
 //#include <xkbcommon/xkbcommon.h>
 
@@ -111,11 +111,11 @@ class Display : public Object {
 
  private:
 
-  static const EventTaskNode *idle_task_head() {
+  static const gui::EventTaskNode *idle_task_head() {
     return &kDisplay->idle_task_head_;
   }
 
-  static const EventTaskNode *idle_task_tail() {
+  static const gui::EventTaskNode *idle_task_tail() {
     return &kDisplay->idle_task_tail_;
   }
 
@@ -191,8 +191,8 @@ class Display : public Object {
 
   /* idle task list */
 
-  EventTaskNode idle_task_head_;
-  EventTaskNode idle_task_tail_;
+  gui::EventTaskNode idle_task_head_;
+  gui::EventTaskNode idle_task_tail_;
 
   std::list<Global *> globals_;
   std::set<uint32_t> pixel_formats_;

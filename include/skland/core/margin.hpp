@@ -17,11 +17,11 @@
 #ifndef SKLAND_CORE_MARGIN_HPP_
 #define SKLAND_CORE_MARGIN_HPP_
 
-#include "detail/side-space.hpp"
+#include "internal/bounds.hpp"
 
 namespace skland {
 
-typedef core::SideSpace<int> Margin;
+typedef core::Bounds<int> Margin;
 
 }
 

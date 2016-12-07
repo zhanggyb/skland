@@ -17,11 +17,11 @@
 #ifndef SKLAND_CORE_PADDING_HPP_
 #define SKLAND_CORE_PADDING_HPP_
 
-#include "detail/side-space.hpp"
+#include "internal/bounds.hpp"
 
 namespace skland {
 
-typedef core::SideSpace<int> Padding;
+typedef core::Bounds<int> Padding;
 
 }
 
