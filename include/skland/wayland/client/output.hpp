@@ -77,11 +77,11 @@ class Output {
   }
 
   bool IsValid() const {
-    return wl_output_ != nullptr;
+    return nullptr != wl_output_;
   }
 
   bool IsNull() const {
-    return wl_output_ == nullptr;
+    return nullptr == wl_output_;
   }
 
   bool Equal(const void *object) const {

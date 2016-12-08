@@ -138,11 +138,11 @@ class XdgToplevel {
   }
 
   bool IsValid() const {
-    return zxdg_toplevel_ != nullptr;
+    return nullptr != zxdg_toplevel_;
   }
 
   bool IsNull() const {
-    return zxdg_toplevel_ == nullptr;
+    return nullptr == zxdg_toplevel_;
   }
 
   DelegateRef<void(int, int, int)> configure() { return configure_; }

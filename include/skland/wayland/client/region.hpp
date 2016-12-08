@@ -73,11 +73,11 @@ class Region {
   }
 
   bool IsValid() const {
-    return wl_region_ != nullptr;
+    return nullptr != wl_region_;
   }
 
   bool IsNull() const {
-    return wl_region_ == nullptr;
+    return nullptr == wl_region_;
   }
 
  private:

@@ -75,11 +75,11 @@ class Buffer {
   }
 
   bool IsValid() const {
-    return wl_buffer_ != nullptr;
+    return nullptr != wl_buffer_;
   }
 
   bool IsNull() const {
-    return wl_buffer_ == nullptr;
+    return nullptr == wl_buffer_;
   };
 
   bool Equal(const void *object) const {

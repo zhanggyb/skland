@@ -81,7 +81,6 @@ class Window : public AbstractWindow {
   MemoryPool pool_;
   Buffer buffer_;
 
-  bool is_configured_;  // init: false, A XdgShell must be configured first
   bool maximized_;
   bool minimized_;
   bool fullscreened_;

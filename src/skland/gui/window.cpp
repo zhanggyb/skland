@@ -34,7 +34,6 @@ Window::Window(const char *title, int flags)
 
 Window::Window(int width, int height, const char *title, int flags)
     : AbstractWindow(width, height, title, flags),
-      is_configured_(false),
       maximized_(false),
       minimized_(false),
       fullscreened_(false),
@@ -280,7 +279,7 @@ void Window::OnDraw(Canvas *canvas) {
 void Window::OnXdgSurfaceConfigure(uint32_t serial) {
   xdg_surface_.AckConfigure(serial);
 
-  if (!is_configured_) {
+  if (nullptr == surface()->canvas()) {
     int x = AbstractWindowFrame::kShadowMargin.left;
     int y = AbstractWindowFrame::kShadowMargin.top;
     int w = width();
@@ -290,7 +289,6 @@ void Window::OnXdgSurfaceConfigure(uint32_t serial) {
 
     surface()->Attach(buffer_);
     RedrawAll();
-    is_configured_ = true;
   }
 }
 

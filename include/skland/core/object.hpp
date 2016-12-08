@@ -226,28 +226,28 @@ void Object::PushFrontManagedObject(M *_this,
                                     T **last,
                                     int &count) {
   if (*manager) {
-    DBG_ASSERT(object->parent_ == nullptr);
+    DBG_ASSERT(nullptr == object->parent_);
     if ((*manager) == _this) {
       return;
     } else {
       RemoveManagedObject(_this, object, manager, first, last, count);
     }
   } else if (object->parent_) {
-    DBG_ASSERT((*manager) == nullptr);
+    DBG_ASSERT(nullptr == (*manager));
     object->parent_->RemoveChild(object);
   }
 
-  DBG_ASSERT(object->previous_ == nullptr);
-  DBG_ASSERT(object->next_ == nullptr);
-  DBG_ASSERT(object->parent_ == nullptr);
-  DBG_ASSERT((*manager) == nullptr);
+  DBG_ASSERT(nullptr == object->previous_);
+  DBG_ASSERT(nullptr == object->next_);
+  DBG_ASSERT(nullptr == object->parent_);
+  DBG_ASSERT(nullptr == (*manager));
 
   if (*first) {
     (*first)->previous_ = object;
     object->next_ = (*first);
   } else {
-    DBG_ASSERT((*last) == nullptr);
-    DBG_ASSERT(count == 0);
+    DBG_ASSERT(nullptr == (*last));
+    DBG_ASSERT(0 == count);
     // object->next_ = nullptr;
     (*last) = object;
   }
@@ -267,7 +267,7 @@ void Object::InsertManagedObject(M *_this,
                                  int &count,
                                  int index) {
   if (*manager) {
-    DBG_ASSERT(object->parent_ == nullptr);
+    DBG_ASSERT(nullptr == object->parent_);
     if ((*manager) == _this) {
       return;
     } else {
@@ -277,14 +277,14 @@ void Object::InsertManagedObject(M *_this,
     object->parent_->RemoveChild(object);
   }
 
-  DBG_ASSERT(object->previous_ == nullptr);
-  DBG_ASSERT(object->next_ == nullptr);
-  DBG_ASSERT(object->parent_ == nullptr);
-  DBG_ASSERT((*manager) == nullptr);
+  DBG_ASSERT(nullptr == object->previous_);
+  DBG_ASSERT(nullptr == object->next_);
+  DBG_ASSERT(nullptr == object->parent_);
+  DBG_ASSERT(nullptr == (*manager));
 
-  if ((*first) == nullptr) {
-    DBG_ASSERT((*last) == nullptr);
-    DBG_ASSERT(count == 0);
+  if (nullptr == (*first)) {
+    DBG_ASSERT(nullptr == (*last));
+    DBG_ASSERT(0 == count);
     // object->next_ = nullptr;
     // object->previous_ = nullptr;
     (*last) = object;
@@ -342,8 +342,8 @@ void Object::PushBackManagedObject(M *_this,
                                    T **last,
                                    int &count) {
   if (*manager) {
-    DBG_ASSERT(object->parent_ == nullptr);
-    if ((*manager) == _this) {
+    DBG_ASSERT(nullptr == object->parent_);
+    if (_this == (*manager)) {
       return;
     } else {
       RemoveManagedObject(_this, object, manager, first, last, count);
@@ -352,17 +352,17 @@ void Object::PushBackManagedObject(M *_this,
     object->parent_->RemoveChild(object);
   }
 
-  DBG_ASSERT(object->previous_ == nullptr);
-  DBG_ASSERT(object->next_ == nullptr);
-  DBG_ASSERT(object->parent_ == nullptr);
-  DBG_ASSERT((*manager) == nullptr);
+  DBG_ASSERT(nullptr == object->previous_);
+  DBG_ASSERT(nullptr == object->next_);
+  DBG_ASSERT(nullptr == object->parent_);
+  DBG_ASSERT(nullptr == (*manager));
 
   if (*last) {
     (*last)->next_ = object;
     object->previous_ = (*last);
   } else {
-    DBG_ASSERT((*first) == nullptr);
-    DBG_ASSERT(count == 0);
+    DBG_ASSERT(nullptr == (*first));
+    DBG_ASSERT(0 == count);
     // object->previous_ = nullptr;
     (*first) = object;
   }
@@ -382,7 +382,7 @@ T *Object::RemoveManagedObject(M *_this,
                                int &count) {
   if ((*manager) != _this) return nullptr;
 
-  DBG_ASSERT(object->parent_ == nullptr);
+  DBG_ASSERT(nullptr == object->parent_);
   DBG_ASSERT(count > 0);
 
   if (object->previous_) {

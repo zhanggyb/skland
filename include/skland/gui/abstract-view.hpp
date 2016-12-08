@@ -120,11 +120,11 @@ class AbstractView : public Object {
   void RedrawAll();
 
   bool HaveNextMouseTask() const {
-    return mouse_task_.next() != nullptr;
+    return nullptr != mouse_task_.next();
   }
 
   bool HavePreviousMouseTask() const {
-    return mouse_task_.previous() != nullptr;
+    return nullptr != mouse_task_.previous();
   }
 
   void set_visible(bool visible) {

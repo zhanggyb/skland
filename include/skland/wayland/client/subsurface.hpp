@@ -82,11 +82,11 @@ class SubSurface {
   }
 
   bool IsValid() const {
-    return wl_subsurface_ != nullptr;
+    return nullptr != wl_subsurface_;
   }
 
   bool IsNull() const {
-    return wl_subsurface_ == nullptr;
+    return nullptr == wl_subsurface_;
   }
 
  private:

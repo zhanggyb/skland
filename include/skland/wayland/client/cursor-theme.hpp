@@ -55,11 +55,11 @@ class CursorTheme {
   }
 
   bool IsValid() const {
-    return wl_cursor_theme_ != nullptr;
+    return nullptr != wl_cursor_theme_;
   }
 
   bool IsNull() const {
-    return wl_cursor_theme_ == nullptr;
+    return nullptr == wl_cursor_theme_;
   }
 
  private:

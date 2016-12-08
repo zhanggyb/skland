@@ -69,11 +69,11 @@ class SubCompositor {
   }
 
   bool IsValid() const {
-    return wl_subcompositor_ != nullptr;
+    return nullptr != wl_subcompositor_;
   }
 
   bool IsNull() const {
-    return wl_subcompositor_ == nullptr;
+    return nullptr == wl_subcompositor_;
   }
 
   bool Equal(const void *object) const {

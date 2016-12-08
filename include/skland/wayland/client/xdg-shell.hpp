@@ -76,11 +76,11 @@ class XdgShell {
   }
 
   bool IsValid() const {
-    return zxdg_shell_ != nullptr;
+    return nullptr != zxdg_shell_;
   }
 
   bool IsNull() const {
-    return zxdg_shell_ == nullptr;
+    return nullptr == zxdg_shell_;
   }
 
   bool Equal(const void *object) const {

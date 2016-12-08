@@ -67,11 +67,11 @@ class XdgPopup {
   }
 
   bool IsValid() const {
-    return zxdg_popup_ != nullptr;
+    return nullptr != zxdg_popup_;
   }
 
   bool IsNull() const {
-    return zxdg_popup_ == nullptr;
+    return nullptr == zxdg_popup_;
   }
 
   DelegateRef<void(int, int, int, int)> configure() { return configure_; }

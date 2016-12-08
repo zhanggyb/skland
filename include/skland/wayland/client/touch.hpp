@@ -65,11 +65,11 @@ class Touch {
   }
 
   bool IsValid() const {
-    return wl_touch_ != nullptr;
+    return nullptr != wl_touch_;
   }
 
   bool IsNull() const {
-    return wl_touch_ == nullptr;
+    return nullptr == wl_touch_;
   }
 
   DelegateRef<void(uint32_t, uint32_t, struct wl_surface *,

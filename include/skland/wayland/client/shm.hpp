@@ -71,11 +71,11 @@ class Shm {
   }
 
   bool IsValid() const {
-    return wl_shm_ != nullptr;
+    return nullptr != wl_shm_;
   }
 
   bool IsNull() const {
-    return wl_shm_ == nullptr;
+    return nullptr == wl_shm_;
   }
 
   bool Equal(const void *object) const {

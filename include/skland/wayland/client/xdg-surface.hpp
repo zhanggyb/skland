@@ -41,7 +41,8 @@ class XdgSurface {
       : zxdg_surface_(nullptr) {}
 
   ~XdgSurface() {
-    if (zxdg_surface_ != nullptr) zxdg_surface_v6_destroy(zxdg_surface_);
+    if (zxdg_surface_)
+      zxdg_surface_v6_destroy(zxdg_surface_);
   }
 
   void Setup(const XdgShell &xdg_shell, const Surface &surface) {
@@ -106,11 +107,11 @@ class XdgSurface {
   }
 
   bool IsValid() const {
-    return zxdg_surface_ != nullptr;
+    return nullptr != zxdg_surface_;
   }
 
   bool IsNull() const {
-    return zxdg_surface_ == nullptr;
+    return nullptr == zxdg_surface_;
   }
 
   DelegateRef<void(uint32_t)> configure() { return configure_; }

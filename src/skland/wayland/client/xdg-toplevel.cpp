@@ -64,13 +64,13 @@ void XdgToplevel::OnConfigure(void *data,
     }
   }
 
-  _this->configure_.Invoke(width, height, value);
+  _this->configure_(width, height, value);
 }
 
 void XdgToplevel::OnClose(void *data, struct zxdg_toplevel_v6 * /* zxdg_toplevel_v6 */) {
   XdgToplevel *_this = static_cast<XdgToplevel *>(data);
   if (_this->close_)
-    _this->close_.Invoke();
+    _this->close_();
 }
 
 }

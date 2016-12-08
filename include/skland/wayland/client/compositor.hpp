@@ -71,11 +71,11 @@ class Compositor {
   }
 
   bool IsValid() const {
-    return wl_compositor_ != nullptr;
+    return nullptr != wl_compositor_;
   }
 
   bool IsNull() const {
-    return wl_compositor_ == nullptr;
+    return nullptr == wl_compositor_;
   }
 
   bool Equal(const void *object) const {

@@ -76,11 +76,11 @@ class ShmPool {
   }
 
   bool IsValid() const {
-    return wl_shm_pool_ != nullptr;
+    return nullptr != wl_shm_pool_;
   }
 
   bool IsNull() const {
-    return wl_shm_pool_ == nullptr;
+    return nullptr == wl_shm_pool_;
   }
 
  private:

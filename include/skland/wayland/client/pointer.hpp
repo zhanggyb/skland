@@ -69,11 +69,11 @@ class Pointer {
   }
 
   bool IsValid() const {
-    return wl_pointer_ != nullptr;
+    return nullptr != wl_pointer_;
   }
 
   bool IsNull() const {
-    return wl_pointer_ == nullptr;
+    return nullptr == wl_pointer_;
   }
 
   DelegateRef<void(uint32_t, struct wl_surface *,

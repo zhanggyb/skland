@@ -33,7 +33,7 @@ class TaskNode {
   ~TaskNode();
 
   bool IsLinked() const {
-    return (previous_ != nullptr) || (next_ != nullptr);
+    return (nullptr != previous_) || (nullptr != next_);
   }
 
   void AddNext(TaskNode *other);

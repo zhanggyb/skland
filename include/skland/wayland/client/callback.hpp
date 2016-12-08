@@ -73,11 +73,11 @@ class Callback {
   }
 
   bool IsValid() const {
-    return wl_callback_ != nullptr;
+    return nullptr != wl_callback_;
   }
 
   bool IsNull() const {
-    return wl_callback_ == nullptr;
+    return nullptr == wl_callback_;
   }
 
  private:

@@ -72,11 +72,11 @@ class XdgPositioner {
   }
 
   bool IsValid() const {
-    return zxdg_positioner_ != nullptr;
+    return nullptr != zxdg_positioner_;
   }
 
   bool IsNull() const {
-    return zxdg_positioner_ == nullptr;
+    return nullptr == zxdg_positioner_;
   }
 
  private:

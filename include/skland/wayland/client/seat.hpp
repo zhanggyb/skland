@@ -74,11 +74,11 @@ class Seat {
   }
 
   bool IsValid() const {
-    return wl_seat_ != nullptr;
+    return nullptr != wl_seat_;
   }
 
   bool IsNull() const {
-    return wl_seat_ == nullptr;
+    return nullptr == wl_seat_;
   }
 
   bool Equal(const void *object) const {

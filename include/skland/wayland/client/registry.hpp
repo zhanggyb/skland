@@ -69,11 +69,11 @@ class Registry {
   }
 
   bool IsValid() const {
-    return wl_registry_ != nullptr;
+    return nullptr != wl_registry_;
   }
 
   bool IsNull() const {
-    return wl_registry_ == nullptr;
+    return nullptr == wl_registry_;
   }
 
   bool Equal(const void *object) const {

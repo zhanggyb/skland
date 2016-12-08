@@ -62,11 +62,11 @@ class ShellSurface {
   }
 
   bool IsValid() {
-    return wl_shell_surface_ != nullptr;
+    return nullptr != wl_shell_surface_;
   }
 
   bool IsNull() const {
-    return wl_shell_surface_ == nullptr;
+    return nullptr == wl_shell_surface_;
   }
 
   DelegateRef<void(uint32_t)> ping() {

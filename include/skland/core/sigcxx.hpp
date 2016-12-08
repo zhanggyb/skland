@@ -296,7 +296,7 @@ class Trackable {
 
   static inline void link(details::Token *token, details::Binding *binding) {
 #ifdef DEBUG
-    assert((token->binding == nullptr) && (binding->token == nullptr));
+    assert((nullptr == token->binding) && (nullptr == binding->token));
 #endif
 
     token->binding = binding;
@@ -337,7 +337,7 @@ template<typename T, typename ... ParamTypes>
 void Trackable::UnbindAll(void (T::*method)(ParamTypes...), SLOT slot) {
   // (slot && slot->token_->binding->trackable_object == this) is always true
 
-  if (slot == nullptr) {
+  if (nullptr == slot) {
     details::Binding *p = nullptr;
     details::Binding *tmp = nullptr;
     details::DelegateToken<ParamTypes...> *delegate_token = nullptr;
@@ -810,7 +810,7 @@ void Signal<ParamTypes...>::AuditDestroyingToken(details::Token *token) {
 template<typename ... ParamTypes>
 void Signal<ParamTypes...>::PushBackToken(details::Token *token) {
 #ifdef DEBUG
-  assert(token->trackable_object == nullptr);
+  assert(nullptr == token->trackable_object);
 #endif
 
   if (last_token_) {
@@ -818,7 +818,7 @@ void Signal<ParamTypes...>::PushBackToken(details::Token *token) {
     token->previous = last_token_;
   } else {
 #ifdef DEBUG
-    assert(first_token_ == nullptr);
+    assert(nullptr == first_token_);
 #endif
     token->previous = nullptr;
     first_token_ = token;
@@ -831,7 +831,7 @@ void Signal<ParamTypes...>::PushBackToken(details::Token *token) {
 template<typename ... ParamTypes>
 void Signal<ParamTypes...>::PushFrontToken(details::Token *token) {
 #ifdef DEBUG
-  assert(token->trackable_object == nullptr);
+  assert(nullptr == token->trackable_object);
 #endif
 
   if (first_token_) {
@@ -839,7 +839,7 @@ void Signal<ParamTypes...>::PushFrontToken(details::Token *token) {
     token->next = first_token_;
   } else {
 #ifdef DEBUG
-    assert(last_token_ == nullptr);
+    assert(nullptr == last_token_);
 #endif
     token->next = nullptr;
     last_token_ = token;
@@ -853,12 +853,12 @@ void Signal<ParamTypes...>::PushFrontToken(details::Token *token) {
 template<typename ... ParamTypes>
 void Signal<ParamTypes...>::InsertToken(int index, details::Token *token) {
 #ifdef DEBUG
-  assert(token->trackable_object == nullptr);
+  assert(nullptr == token->trackable_object);
 #endif
 
-  if (first_token_ == nullptr) {
+  if (nullptr == first_token_) {
 #ifdef DEBUG
-    assert(last_token_ == nullptr);
+    assert(nullptr == last_token_);
 #endif
     token->next = nullptr;
     last_token_ = token;
