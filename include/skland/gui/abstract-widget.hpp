@@ -61,7 +61,7 @@ class Widget : public AbstractWidget {
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
-  virtual void OnDraw(const Canvas *canvas) override;
+  virtual void OnDraw(Canvas *canvas) override;
 
 };
 

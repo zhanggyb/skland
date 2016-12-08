@@ -84,7 +84,7 @@ class AbstractWindowFrame : public Trackable {
 
   virtual void Resize(int width, int height) = 0;
 
-  virtual void Draw(const Canvas *context) = 0;
+  virtual void Draw(Canvas *context) = 0;
 
   virtual int GetPointerLocation(const MouseEvent *event) const = 0;
 

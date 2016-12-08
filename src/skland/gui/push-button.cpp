@@ -22,7 +22,7 @@
 namespace skland {
 
 PushButton::PushButton()
-    : AbstractButton(), hover_(false) {
+    : AbstractButton() {
   resize(90, 20);
   set_name("CloseButton");
 }
@@ -35,33 +35,26 @@ Size PushButton::GetPreferredSize() const {
   return Size(90, 20);
 }
 
-void PushButton::OnMouseEnter(MouseEvent *event) {
-  fprintf(stderr, "enter: %d %d\n", (int)event->window_x(), (int)event->window_y());
-  hover_ = true;
-  Show();
-  event->Accept();
-}
-
-void PushButton::OnMouseLeave(MouseEvent *event) {
-  fprintf(stderr, "leave: %d %d\n", (int)event->window_x(), (int) event->window_y());
-  hover_ = false;
-  Show();
-  event->Accept();
-}
-
 void PushButton::OnResize(int width, int height) {
   resize(width, height);
   Show();
 }
 
-void PushButton::OnDraw(const Canvas *canvas) {
+void PushButton::OnDraw(Canvas *canvas) {
 
   Paint paint;
 
-  if (hover_) {
-    paint.SetColor(Color(0.75f, 0.75f, 0.75f, 1.f));
-  } else {
-    paint.SetColor(Color(0.85f, 0.85f, 0.15f, 1.f));
+  Color regular(0.85f, 0.85f, 0.15f);
+  Color down = regular - 50;
+  Color hover = regular + 25;
+
+  paint.SetColor(regular);
+  if (IsHovered()) {
+    if (IsPressed()) {
+      paint.SetColor(down);
+    } else {
+      paint.SetColor(hover);
+    }
   }
 
   canvas->DrawRectangle(x(), y(), width(), height(), paint);

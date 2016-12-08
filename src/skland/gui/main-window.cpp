@@ -146,8 +146,8 @@ void MainWindow::OnMouseMove(MouseEvent *event) {
 }
 
 void MainWindow::OnMouseButton(MouseEvent *event) {
-  if ((event->button() == kPointerButtonLeft) &&
-      (event->state() == kPointerButtonPressed)) {
+  if ((event->button() == kMouseButtonLeft) &&
+      (event->state() == kMouseButtonPressed)) {
 
     resize_location_ = window_frame_->GetPointerLocation(event);
 
@@ -257,7 +257,7 @@ void MainWindow::OnResize(int width, int height) {
 //  DeepRedraw();
 }
 
-void MainWindow::OnDraw(const Canvas *context) {
+void MainWindow::OnDraw(Canvas *context) {
 
   /*
   uint32_t *pixel = (uint32_t *) buffer_->pixel();
@@ -305,7 +305,7 @@ void MainWindow::OnDraw(const Canvas *context) {
 //           geometry().height() + window_frame_->kShadowMargin.vsum(),
 //           window_frame_->kShadowBlurRadius,
 //           window_frame_->kShadowMargin);
-  window_frame_->Draw(&surface()->canvas());
+  window_frame_->Draw(surface()->canvas());
 //  double t = Timer::GetIntervalOfMilliseconds();
 //  DBG_PRINT_MSG("blur time: %f\n", t);
 

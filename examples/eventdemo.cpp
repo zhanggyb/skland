@@ -68,14 +68,14 @@ class SimpleWidget : public AbstractWidget {
   }
 
   virtual void OnMouseButton(MouseEvent *event) override {
-    event->Ignore();
+    event->Accept();
   }
 
   virtual void OnKeyboardKey(KeyEvent *event) override {
     event->Ignore();
   }
 
-  virtual void OnDraw(const Canvas *canvas) override {
+  virtual void OnDraw(Canvas *canvas) override {
     Paint paint;
     paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
 

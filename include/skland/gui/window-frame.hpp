@@ -46,7 +46,7 @@ class WindowFrame : public AbstractWindowFrame {
 
   virtual void Resize(int width, int height) final;
 
-  virtual void Draw(const Canvas *canvas) final;
+  virtual void Draw(Canvas *canvas) final;
 
   /**
 * Calculate and return the cursor position at the border of this frame
@@ -78,13 +78,9 @@ class WindowFrame : public AbstractWindowFrame {
 
    protected:
 
-    virtual void OnMouseEnter(MouseEvent *event) final;
-
-    virtual void OnMouseLeave(MouseEvent *event) final;
-
     virtual void OnResize(int width, int height) final;
 
-    virtual void OnDraw(const Canvas *canvas) final;
+    virtual void OnDraw(Canvas *canvas) final;
 
   };
 
@@ -102,7 +98,7 @@ class WindowFrame : public AbstractWindowFrame {
 
     virtual void OnResize(int width, int height) final;
 
-    virtual void OnDraw(const Canvas *canvas) final;
+    virtual void OnDraw(Canvas *canvas) final;
 
   };
 
@@ -120,7 +116,7 @@ class WindowFrame : public AbstractWindowFrame {
 
     virtual void OnResize(int width, int height) final;
 
-    virtual void OnDraw(const Canvas *canvas) final;
+    virtual void OnDraw(Canvas *canvas) final;
 
   };
 

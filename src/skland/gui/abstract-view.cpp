@@ -103,6 +103,13 @@ void AbstractView::SetSurface(Surface *surface) {
   surface_ = surface;
 }
 
+void AbstractView::Damage(const Rect &rect) {
+  Surface *surface = GetSurface();
+  if (surface) {
+    surface->Damage(rect.x(), rect.y(), rect.width(), rect.height());
+  }
+}
+
 void AbstractView::RedrawAll() {
   Surface *surface = GetSurface();
   if (surface) {
@@ -113,8 +120,8 @@ void AbstractView::RedrawAll() {
 }
 
 void AbstractView::RedrawOnSurface(AbstractView *view, Surface *surface) {
-  if (surface->canvas().is_valid()) {
-    view->redraw_task_.canvas = &surface->canvas();
+  if (surface->canvas()) {
+    view->redraw_task_.canvas = surface->canvas();
     AddRedrawTask(&view->redraw_task_);
   }
 }
@@ -131,7 +138,7 @@ void AbstractView::RedrawSubViewsOnSurface(const AbstractView *parent, Surface *
   }
 }
 
-void AbstractView::AddRedrawTask(gui::RedrawTask *task) {
+void AbstractView::AddRedrawTask(gui::RedrawTaskNode *task) {
   using gui::TaskNode;
 
   DBG_ASSERT(task->view != nullptr);

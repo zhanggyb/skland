@@ -27,7 +27,7 @@
 namespace skland {
 
 namespace gui {
-class RedrawTask;
+class RedrawTaskNode;
 }
 
 // Forward declaration
@@ -47,7 +47,7 @@ class AbstractView : public Object {
   friend class Application;
   friend class Display;
   friend class Surface;
-  friend class gui::RedrawTask;
+  friend class gui::RedrawTaskNode;
 
  public:
 
@@ -111,11 +111,21 @@ class AbstractView : public Object {
 
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
-  virtual void OnDraw(const Canvas *canvas) = 0;
+  virtual void OnDraw(Canvas *canvas) = 0;
 
   void SetSurface(Surface *surface);
 
+  void Damage(const Rect &rect);
+
   void RedrawAll();
+
+  bool HaveNextMouseTask() const {
+    return mouse_task_.next() != nullptr;
+  }
+
+  bool HavePreviousMouseTask() const {
+    return mouse_task_.previous() != nullptr;
+  }
 
   void set_visible(bool visible) {
     visible_ = visible;
@@ -155,7 +165,7 @@ class AbstractView : public Object {
 
   static void RedrawSubViewsOnSurface(const AbstractView *parent, Surface *surface);
 
-  static void AddRedrawTask(gui::RedrawTask *task);
+  static void AddRedrawTask(gui::RedrawTaskNode *task);
 
   bool visible_;
 
@@ -163,8 +173,8 @@ class AbstractView : public Object {
 
   Surface *surface_;  /**< The main surface for this window */
 
-  gui::RedrawTask redraw_task_;
-  gui::MouseTask mouse_task_;
+  gui::RedrawTaskNode redraw_task_;
+  gui::MouseTaskNode mouse_task_;
 };
 
 }

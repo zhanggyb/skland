@@ -142,7 +142,7 @@ class Input : public Object {
 
   void OnTouchCancel();
 
-  void ProcessMouseEnterOnSubviews(AbstractView *parent, gui::MouseTask *task);
+  void ProcessMouseEnterOnSubviews(AbstractView *parent, gui::MouseTaskNode *task);
 
   Display *display_;
 

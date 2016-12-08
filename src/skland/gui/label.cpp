@@ -58,26 +58,26 @@ void Label::OnResize(int width, int height) {
 }
 
 void Label::OnMouseEnter(MouseEvent *event) {
-  event->Accept();
+  event->Ignore();
 }
 
 void Label::OnMouseLeave(MouseEvent *event) {
-  event->Accept();
+  event->Ignore();
 }
 
 void Label::OnMouseMove(MouseEvent *event) {
-  event->Accept();
+  event->Ignore();
 }
 
 void Label::OnMouseButton(MouseEvent *event) {
-  event->Accept();
+  event->Ignore();
 }
 
 void Label::OnKeyboardKey(KeyEvent *event) {
-  event->Accept();
+  event->Ignore();
 }
 
-void Label::OnDraw(const Canvas *canvas) {
+void Label::OnDraw(Canvas *canvas) {
 
   Paint paint;
   paint.SetColor(background_);

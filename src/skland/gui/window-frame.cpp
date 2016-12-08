@@ -42,21 +42,11 @@ Size WindowFrame::CloseButton::GetPreferredSize() const {
   return Size(14, 14);
 }
 
-void WindowFrame::CloseButton::OnMouseEnter(MouseEvent *event) {
-  fprintf(stderr, "Enter\n");
-  event->Accept();
-}
-
-void WindowFrame::CloseButton::OnMouseLeave(MouseEvent *event) {
-  fprintf(stderr, "Leave\n");
-  event->Accept();
-}
-
 void WindowFrame::CloseButton::OnResize(int /* width */, int /* height */) {
 
 }
 
-void WindowFrame::CloseButton::OnDraw(const Canvas *canvas) {
+void WindowFrame::CloseButton::OnDraw(Canvas *canvas) {
   Color fill_color(1.f, 0.35f, 0.35f, 1.f);
   Color stroke_color = fill_color - 55;
 
@@ -66,8 +56,13 @@ void WindowFrame::CloseButton::OnDraw(const Canvas *canvas) {
 
   canvas->DrawCircle(center_x(), center_y(), 6.f, paint);
 
-  paint.SetStyle(Paint::kStyleStroke);
   paint.SetColor(stroke_color);
+
+  if (IsHovered()) {
+    canvas->DrawCircle(center_x(), center_y(), 2.f, paint);
+  }
+
+  paint.SetStyle(Paint::kStyleStroke);
   paint.SetStrokeWidth(0.5f);
   canvas->DrawCircle(center_x(), center_y(), 5.5f, paint);
 }
@@ -90,7 +85,7 @@ void WindowFrame::MaximizeButton::OnResize(int /* width */, int /* height */) {
 
 }
 
-void WindowFrame::MaximizeButton::OnDraw(const Canvas *canvas) {
+void WindowFrame::MaximizeButton::OnDraw(Canvas *canvas) {
   Color fill_color(0.25f, 0.8f, 0.25f, 1.f);
   Color stroke_color = fill_color - 55;
 
@@ -100,8 +95,13 @@ void WindowFrame::MaximizeButton::OnDraw(const Canvas *canvas) {
 
   canvas->DrawCircle(center_x(), center_y(), 6.f, paint);
 
-  paint.SetStyle(Paint::kStyleStroke);
   paint.SetColor(stroke_color);
+
+  if (IsHovered()) {
+    canvas->DrawCircle(center_x(), center_y(), 2.f, paint);
+  }
+
+  paint.SetStyle(Paint::kStyleStroke);
   paint.SetStrokeWidth(0.5f);
   canvas->DrawCircle(center_x(), center_y(), 5.5f, paint);
 }
@@ -124,7 +124,7 @@ void WindowFrame::MinimizeButton::OnResize(int /* width */, int /* height */) {
 
 }
 
-void WindowFrame::MinimizeButton::OnDraw(const Canvas *canvas) {
+void WindowFrame::MinimizeButton::OnDraw(Canvas *canvas) {
   Color fill_color(1.f, 0.75f, 0.2f, 1.f);
   Color stroke_color = fill_color - 55;
 
@@ -134,8 +134,13 @@ void WindowFrame::MinimizeButton::OnDraw(const Canvas *canvas) {
 
   canvas->DrawCircle(center_x(), center_y(), 6.f, paint);
 
-  paint.SetStyle(Paint::kStyleStroke);
   paint.SetColor(stroke_color);
+
+  if (IsHovered()) {
+    canvas->DrawCircle(center_x(), center_y(), 2.f, paint);
+  }
+
+  paint.SetStyle(Paint::kStyleStroke);
   paint.SetStrokeWidth(0.5f);
   canvas->DrawCircle(center_x(), center_y(), 5.5f, paint);
 }
@@ -234,7 +239,7 @@ void WindowFrame::LayoutWidgets(int width, int height) {
   }
 }
 
-void WindowFrame::Draw(const Canvas *canvas) {
+void WindowFrame::Draw(Canvas *canvas) {
   canvas->Clear();
 
   Paint paint;

@@ -21,10 +21,10 @@
 namespace skland {
 namespace gui {
 
-RedrawTask::~RedrawTask() {
+RedrawTaskNode::~RedrawTaskNode() {
 }
 
-void RedrawTask::Run(int events) const {
+void RedrawTaskNode::Run(int events) const {
   view->OnDraw(canvas);
   view->visible_ = true;
 }

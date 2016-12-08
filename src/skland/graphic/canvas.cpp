@@ -23,13 +23,8 @@
 
 namespace skland {
 
-Canvas::~Canvas() {
-  if (sk_canvas_) delete sk_canvas_;
-}
-
-void Canvas::Setup(unsigned char *pixel, int width, int height, int format) {
-  Destroy();
-
+Canvas::Canvas(unsigned char *pixel, int width, int height, int format)
+    : sk_canvas_(nullptr) {
   size_t stride = (size_t) width * 4;
 
   // TODO: support more pixel format
@@ -44,73 +39,62 @@ void Canvas::Setup(unsigned char *pixel, int width, int height, int format) {
   }
 
   sk_canvas_ = new SkCanvas(bitmap);
-  sk_canvas_->translate(margin_.left, margin_.top);
-  sk_canvas_->save();
 }
 
-void Canvas::Destroy() {
-  if (sk_canvas_) {
-    delete sk_canvas_;
-    sk_canvas_ = nullptr;
-  }
+Canvas::~Canvas() {
+  if (sk_canvas_) delete sk_canvas_;
 }
 
-void Canvas::DrawRectangle(float x, float y, float width, float height, const Paint &paint) const {
+void Canvas::DrawRectangle(float x, float y, float width, float height, const Paint &paint) {
   sk_canvas_->drawRect(SkRect::MakeXYWH(x, y, width, height), *paint.sk_paint());
 }
 
-void Canvas::DrawRect(const RectF &rect, const Paint &paint) const {
+void Canvas::DrawRect(const RectF &rect, const Paint &paint) {
   sk_canvas_->drawRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom), *paint.sk_paint());
 }
 
-void Canvas::DrawRoundRect(const Rect &rect, float rx, float ry, const Paint &paint) const {
+void Canvas::DrawRoundRect(const Rect &rect, float rx, float ry, const Paint &paint) {
   sk_canvas_->drawRoundRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom), rx, ry, *paint.sk_paint());
 }
 
-void Canvas::DrawRoundRect(const RectF &rect, float rx, float ry, const Paint &paint) const {
+void Canvas::DrawRoundRect(const RectF &rect, float rx, float ry, const Paint &paint) {
   sk_canvas_->drawRoundRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom), rx, ry, *paint.sk_paint());
 }
 
-void Canvas::DrawCircle(float x, float y, float radius, const Paint &paint) const {
+void Canvas::DrawCircle(float x, float y, float radius, const Paint &paint) {
   sk_canvas_->drawCircle(x, y, radius, *paint.sk_paint());
 }
 
-void Canvas::DrawPath(const Path &path, const Paint &paint) const {
+void Canvas::DrawPath(const Path &path, const Paint &paint) {
   sk_canvas_->drawPath(*path.sk_path(), *paint.sk_paint());
 }
 
-void Canvas::DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint) const {
+void Canvas::DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint) {
   sk_canvas_->drawText(text, byte_length, x, y, *paint.sk_paint());
 }
 
-void Canvas::Translate(float dx, float dy) const {
+void Canvas::Translate(float dx, float dy) {
   sk_canvas_->translate(dx, dy);
 }
 
-void Canvas::ResetMatrix() const {
+void Canvas::ResetMatrix() {
   sk_canvas_->resetMatrix();
 }
 
-void Canvas::Clear(uint32_t color) const {
+void Canvas::Clear(uint32_t color) {
   sk_canvas_->clear(color);
 }
 
-void Canvas::Clear(const Color &color) const {
+void Canvas::Clear(const Color &color) {
   sk_canvas_->clear(color.argb());
 }
 
-void Canvas::Save() const {
+void Canvas::Save() {
   sk_canvas_->save();
 }
 
-void Canvas::Flush() const {
+void Canvas::Flush() {
   sk_canvas_->flush();
-}
-
-void Canvas::SetMargin(const Margin &margin) {
-  margin_ = margin;
-  sk_canvas_->resetMatrix();
-  sk_canvas_->translate(margin_.left, margin_.top);
 }
 
 }

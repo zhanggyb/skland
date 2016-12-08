@@ -16,13 +16,15 @@
 
 #include <skland/gui/abstract-button.hpp>
 
+#include <skland/core/numeric.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 
 namespace skland {
 
 AbstractButton::AbstractButton()
-    : AbstractWidget() {
+    : AbstractWidget(),
+      flags_(0x1) {
 
 }
 
@@ -31,14 +33,43 @@ AbstractButton::~AbstractButton() {
 }
 
 void AbstractButton::OnMouseEnter(MouseEvent *event) {
+  set_bit<uint32_t>(flags_, kFlagIndexHovered);
+  if (flags_ && kFlagIndexSensitive) {
+    Damage(geometry());
+    Show();
+  }
   event->Accept();
 }
 
 void AbstractButton::OnMouseLeave(MouseEvent *event) {
+  clear_bit<uint32_t>(flags_, kFlagIndexHovered);
+  clear_bit<uint32_t>(flags_, kFlagIndexClick);
+  if (flags_ && kFlagIndexSensitive) {
+    Damage(geometry());
+    Show();
+  }
   event->Accept();
 }
 
 void AbstractButton::OnMouseButton(MouseEvent *event) {
+  if (event->state() == kMouseButtonPressed) {
+    set_bit<uint32_t>(flags_, kFlagIndexPressed);
+    Damage(geometry());
+    Show();
+  } else {
+    if (flags_ & kFlagIndexPressed) {
+      set_bit<uint32_t>(flags_, kFlagIndexClick);
+    }
+    clear_bit<uint32_t>(flags_, kFlagIndexPressed);
+    Damage(geometry());
+    Show();
+  }
+
+  if (flags_ & kFlagIndexClick) {
+    clear_bit<uint32_t>(flags_, kFlagIndexClick);
+    clicked_.Emit();
+  }
+
   event->Accept();
 }
 
@@ -48,6 +79,14 @@ void AbstractButton::OnMouseMove(MouseEvent *event) {
 
 void AbstractButton::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
+}
+
+void AbstractButton::SetSensitive(bool sensitive) {
+  if (sensitive) {
+    set_bit<uint32_t>(flags_, kFlagIndexSensitive);
+  } else {
+    clear_bit<uint32_t>(flags_, kFlagIndexSensitive);
+  }
 }
 
 }

@@ -33,17 +33,9 @@ class PushButton : public AbstractButton {
 
  protected:
 
-  virtual void OnMouseEnter(MouseEvent *event) override;
-
-  virtual void OnMouseLeave(MouseEvent *event) override;
-
   virtual void OnResize(int width, int height) override;
 
-  virtual void OnDraw(const Canvas *canvas) override;
-
- private:
-
-  bool hover_;
+  virtual void OnDraw(Canvas *canvas) override;
 
 };
 

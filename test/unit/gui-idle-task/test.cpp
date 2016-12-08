@@ -4,10 +4,10 @@
 
 #include "test.hpp"
 
-#include <skland/gui/detail/task-node.hpp>
+#include <skland/gui/internal/task-node.hpp>
 
 
-using namespace skland;
+using namespace skland::gui;
 
 Test::Test()
     : testing::Test() {

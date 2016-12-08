@@ -19,6 +19,8 @@
 
 #include <wayland-client.h>
 
+#include <memory>
+
 #include <skland/core/margin.hpp>
 #include <skland/core/object.hpp>
 
@@ -94,8 +96,12 @@ class Surface : public Object {
     return view_;
   }
 
-  const Canvas &canvas() const {
-    return canvas_;
+  Canvas *canvas() const {
+    return canvas_sp_.get();
+  }
+
+  const Margin &margin() const {
+    return margin_;
   }
 
   const wayland::client::Surface &wl_surface() const {
@@ -116,7 +122,9 @@ class Surface : public Object {
 
   int32_t buffer_scale_;
 
-  Canvas canvas_;
+  std::unique_ptr<Canvas> canvas_sp_;
+
+  Margin margin_;
 
 };
 

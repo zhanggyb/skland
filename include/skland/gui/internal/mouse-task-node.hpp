@@ -26,15 +26,15 @@ class MouseEvent;
 
 namespace gui {
 
-struct MouseTask : public TaskNode {
+struct MouseTaskNode : public TaskNode {
 
-  MouseTask(const MouseTask &) = delete;
-  MouseTask &operator=(const MouseTask &) = delete;
+  MouseTaskNode(const MouseTaskNode &) = delete;
+  MouseTaskNode &operator=(const MouseTaskNode &) = delete;
 
-  MouseTask(AbstractView *view = nullptr)
+  MouseTaskNode(AbstractView *view = nullptr)
       : TaskNode(), view(view) {}
 
-  ~MouseTask() {}
+  ~MouseTaskNode() {}
 
   AbstractView *view;
 

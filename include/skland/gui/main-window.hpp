@@ -63,7 +63,7 @@ class MainWindow : public AbstractWindow {
 
   virtual void OnResize(int width, int height) final;
 
-  virtual void OnDraw(const Canvas *engine) final;
+  virtual void OnDraw(Canvas *engine) final;
 
  private:
 

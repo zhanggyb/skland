@@ -198,12 +198,17 @@ void Window::OnMouseMove(MouseEvent *event) {
 }
 
 void Window::OnMouseButton(MouseEvent *event) {
-  if ((event->button() == kPointerButtonLeft) &&
-      (event->state() == kPointerButtonPressed)) {
+  if ((event->button() == kMouseButtonLeft) &&
+      (event->state() == kMouseButtonPressed)) {
 
     int location = window_frame_->GetPointerLocation(event);
 
     if (location == kTitleBar) {
+      if (HaveNextMouseTask()) {
+        event->Accept();
+        return;
+      }
+
       xdg_toplevel_.Move(event->wl_seat(), event->serial());
       event->Ignore();
       return;
@@ -268,7 +273,7 @@ void Window::OnResize(int width, int height) {
   SetMainWidgetGeometry();
 }
 
-void Window::OnDraw(const Canvas *canvas) {
+void Window::OnDraw(Canvas *canvas) {
   window_frame_->Draw(canvas);
 }
 

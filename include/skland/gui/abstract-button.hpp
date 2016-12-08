@@ -29,11 +29,23 @@ class AbstractButton : public AbstractWidget {
 
   virtual ~AbstractButton();
 
-  inline SignalRef<> clicked() {
+  SignalRef<> clicked() {
     return clicked_;
   }
 
- private:
+  bool IsSensitive() const {
+    return (flags_ & kFlagIndexSensitive) != 0;
+  }
+
+  bool IsHovered() const {
+    return (flags_ & kFlagIndexHovered) != 0;
+  }
+
+  bool IsPressed() const {
+    return (flags_ & kFlagIndexPressed) != 0;
+  }
+
+ protected:
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -44,6 +56,28 @@ class AbstractButton : public AbstractWidget {
   virtual void OnMouseButton(MouseEvent *event) override;
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
+
+  void SetSensitive(bool sensitive);
+
+ private:
+
+  enum FlagIndex {
+
+    /**! if this button is sensitive when mouse enter/leave (need to highlight when hover) */
+        kFlagIndexSensitive = 0x1,
+
+    /**! if the mouse is hovering on this button */
+        kFlagIndexHovered = 0x1 << 1,
+
+    /**! if the mouse is pressing this button */
+        kFlagIndexPressed = 0x1 << 2,
+
+    /**! if the mouse need to emit a click signal */
+        kFlagIndexClick = 0x1 << 3
+
+  };
+
+  uint32_t flags_;
 
   Signal<> clicked_;
 };

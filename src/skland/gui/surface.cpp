@@ -20,6 +20,8 @@
 #include <skland/gui/buffer.hpp>
 #include <skland/gui/output.hpp>
 
+#include "SkCanvas.h"
+
 namespace skland {
 
 Surface::Surface(AbstractView *view, const Margin &margin)
@@ -27,7 +29,7 @@ Surface::Surface(AbstractView *view, const Margin &margin)
       view_(view),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1),
-      canvas_(margin) {
+      margin_(margin) {
   DBG_ASSERT(view_ != nullptr);
   wl_surface_.enter().Set(this, &Surface::OnEnter);
   wl_surface_.leave().Set(this, &Surface::OnLeave);
@@ -39,8 +41,6 @@ Surface::~Surface() {
 
   // clear all sub surfaces
   ClearChildren();
-
-  canvas_.Destroy();
 
   if (view_) {
     // TODO: remove from role
@@ -55,13 +55,14 @@ void Surface::AddSubSurface(Surface *subsurface, int pos) {
 
 void Surface::Attach(const Buffer &buffer, int32_t x, int32_t y) {
   if (buffer.wl_buffer().IsValid()) {
-    canvas_.Setup((unsigned char *) buffer.pixel(),
-                   buffer.size().width,
-                   buffer.size().height);
+    canvas_sp_.reset(new Canvas((unsigned char *) buffer.pixel(),
+                                buffer.size().width,
+                                buffer.size().height));
 
     wl_surface_.Attach(buffer.wl_buffer(), x, y);
+    canvas_sp_->sk_canvas()->translate(margin_.left, margin_.top);
   } else {
-    canvas_.Destroy();
+    canvas_sp_.reset();
     wl_surface_.Attach(NULL, x, y);
   }
 }
@@ -94,7 +95,7 @@ void Surface::Commit() const {
 }
 
 void Surface::Damage(int x, int y, int width, int height) const {
-  wl_surface_.Damage(x, y, width, height);
+  wl_surface_.Damage(x + margin_.l, y + margin_.t, width, height);
 }
 
 void Surface::OnEnter(struct wl_output *wl_output) {

@@ -26,21 +26,21 @@ class Canvas;
 
 namespace gui {
 
-struct RedrawTask : public EventTaskNode {
+struct RedrawTaskNode : public EventTaskNode {
 
-  RedrawTask(const RedrawTask &) = delete;
-  RedrawTask &operator=(const RedrawTask &) = delete;
+  RedrawTaskNode(const RedrawTaskNode &) = delete;
+  RedrawTaskNode &operator=(const RedrawTaskNode &) = delete;
 
-  RedrawTask(AbstractView *view = nullptr, Canvas *canvas = nullptr)
+  RedrawTaskNode(AbstractView *view = nullptr, Canvas *canvas = nullptr)
       : EventTaskNode(), view(view), canvas(canvas) {}
 
-  virtual ~RedrawTask();
+  virtual ~RedrawTaskNode();
 
   virtual void Run(int events = 0) const final;
 
   AbstractView *view;
 
-  const Canvas *canvas;
+  Canvas *canvas;
 };
 
 }

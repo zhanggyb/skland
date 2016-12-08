@@ -39,56 +39,36 @@ class Canvas {
 
  public:
 
-  Canvas(const Margin &margin = Margin())
-      : sk_canvas_(nullptr), margin_(margin) {
-  }
+  Canvas(unsigned char *pixel, int width, int height,
+         int format = kPixelFormatABGR8888);
 
   ~Canvas();
 
-  void Setup(unsigned char *pixel, int width, int height,
-             int format = kPixelFormatABGR8888);
+  void DrawRectangle(float x, float y, float width, float height, const Paint &paint);
 
-  void Destroy();
+  void DrawRect(const RectF &rect, const Paint &paint);
 
-  void DrawRectangle(float x, float y, float width, float height, const Paint &paint) const;
+  void DrawRoundRect(const Rect &rect, float rx, float ry, const Paint &paint);
 
-  void DrawRect(const RectF &rect, const Paint &paint) const;
+  void DrawRoundRect(const RectF &rect, float rx, float ry, const Paint &paint);
 
-  void DrawRoundRect(const Rect &rect, float rx, float ry, const Paint &paint) const;
+  void DrawCircle(float x, float y, float radius, const Paint &paint);
 
-  void DrawRoundRect(const RectF &rect, float rx, float ry, const Paint &paint) const;
+  void DrawPath(const Path &path, const Paint &paint);
 
-  void DrawCircle(float x, float y, float radius, const Paint &paint) const;
+  void DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint);
 
-  void DrawPath(const Path &path, const Paint &paint) const;
+  void Translate(float dx, float dy);
 
-  void DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint) const;
+  void ResetMatrix();
 
-  void Translate(float dx, float dy) const;
+  void Clear(uint32_t color = 0x0);
 
-  void ResetMatrix() const;
+  void Clear(const Color &color);
 
-  void Clear(uint32_t color = 0x0) const;
+  void Save();
 
-  void Clear(const Color &color) const;
-
-  void Save() const;
-
-  void Flush() const;
-
-  void SetMargin(const Margin &margin = Margin());
-
-  const Margin &margin() const {
-    return margin_;
-  }
-
-  bool is_valid() const {
-    return sk_canvas_ != nullptr;
-  }
-
-  bool is_null() const {
-    return sk_canvas_ == nullptr;
-  }
+  void Flush();
 
   SkCanvas *sk_canvas() const {
     return sk_canvas_;
@@ -97,8 +77,6 @@ class Canvas {
  private:
 
   SkCanvas *sk_canvas_;
-
-  Margin margin_;
 
 };
 

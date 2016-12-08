@@ -77,7 +77,7 @@ void Widget::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void Widget::OnDraw(const Canvas *canvas) {
+void Widget::OnDraw(Canvas *canvas) {
   Paint paint;
   paint.SetColor(Color(0.95f, 0.95f, 0.95f, 1.f));
 
