@@ -63,3 +63,14 @@ TEST_F(Test, argb_1) {
 
   ASSERT_TRUE(argb = c.argb());
 }
+
+TEST_F(Test, operator_1) {
+  ColorF color1(0.f, 0.f, 0.f);
+  ColorF color2 = color1 + 15;  // 15 / 255.f
+
+  bool result = ((color2.r - 0.058823f) < 0.001) &&
+      ((color2.g - 0.058823f) < 0.001) &&
+      ((color2.b - 0.058823f) < 0.001);
+
+  ASSERT_TRUE(result);
+}

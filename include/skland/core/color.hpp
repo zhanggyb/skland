@@ -65,7 +65,7 @@ struct Color {
   }
 
   Color()
-      : r(T(0)), g(T(0)), b(T(0)), a(T(0)) {
+      : r(T(0)), g(T(0)), b(T(0)), a(T(1.)) {
   }
 
   Color(T r, T g, T b, T a = T(1.))
@@ -145,9 +145,9 @@ struct Color {
 template<typename T>
 inline Color<T> operator+(const Color<T> &src, short shade) {
   Color<T> color;
-  color.r = src.r + shade / T(255.);
-  color.g = src.g + shade / T(255.);
-  color.b = src.b + shade / T(255.);
+  color.r = clamp(src.r + shade / T(255.), T(0.), T(1.));
+  color.g = clamp(src.g + shade / T(255.), T(0.), T(1.));
+  color.b = clamp(src.b + shade / T(255.), T(0.), T(1.));
   color.a = src.a;
   return color;
 }
@@ -155,19 +155,19 @@ inline Color<T> operator+(const Color<T> &src, short shade) {
 template<typename T>
 inline Color<T> operator+(const Color<T> &color1, const Color<T> &color2) {
   Color<T> color;
-  color.r = color1.r + color2.r;
-  color.g = color1.g + color2.g;
-  color.b = color1.b + color2.b;
-  color.a = color1.a + color2.a;
+  color.r = clamp(color1.r + color2.r, T(0.), T(1.));
+  color.g = clamp(color1.g + color2.g, T(0.), T(1.));
+  color.b = clamp(color1.b + color2.b, T(0.), T(1.));
+  color.a = clamp(color1.a + color2.a, T(0.), T(1.));
   return color;
 }
 
 template<typename T>
 inline Color<T> operator-(const Color<T> &src, short shade) {
   Color<T> color;
-  color.r = src.r - shade / T(255.);
-  color.g = src.g - shade / T(255.);
-  color.b = src.b - shade / T(255.);
+  color.r = clamp(src.r - shade / T(255.), T(0.), T(1.));
+  color.g = clamp(src.g - shade / T(255.), T(0.), T(1.));
+  color.b = clamp(src.b - shade / T(255.), T(0.), T(1.));
   color.a = src.a;
 
   return color;
@@ -176,10 +176,10 @@ inline Color<T> operator-(const Color<T> &src, short shade) {
 template<typename T>
 inline Color<T> operator-(const Color<T> &color1, const Color<T> &color2) {
   Color<T> color;
-  color.r = color1.r - color2.r;
-  color.g = color1.g - color2.g;
-  color.b = color1.b - color2.b;
-  color.a = color1.a - color2.a;
+  color.r = clamp(color1.r - color2.r, T(0.), T(1.));
+  color.g = clamp(color1.g - color2.g, T(0.), T(1.));
+  color.b = clamp(color1.b - color2.b, T(0.), T(1.));
+  color.a = clamp(color1.a - color2.a, T(0.), T(1.));
 
   return color;
 }

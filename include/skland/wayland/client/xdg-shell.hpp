@@ -49,6 +49,7 @@ class XdgShell {
 
     zxdg_shell_ =
         static_cast<struct zxdg_shell_v6 *>(registry.Bind(id, &zxdg_shell_v6_interface, version));
+    zxdg_shell_v6_add_listener(zxdg_shell_, &kListener, this);
   }
 
   void Destroy() {
@@ -56,6 +57,10 @@ class XdgShell {
       zxdg_shell_v6_destroy(zxdg_shell_);
       zxdg_shell_ = nullptr;
     }
+  }
+
+  void Pong(uint32_t serial) const {
+    zxdg_shell_v6_pong(zxdg_shell_, serial);
   }
 
   void SetUserData(void *user_data) {
@@ -82,9 +87,21 @@ class XdgShell {
     return zxdg_shell_ == object;
   }
 
+  DelegateRef<void(uint32_t)> ping() {
+    return ping_;
+  }
+
  private:
 
+  static void OnPing(void *data,
+                     struct zxdg_shell_v6 *zxdg_shell_v6,
+                     uint32_t serial);
+
+  static const struct zxdg_shell_v6_listener kListener;
+
   struct zxdg_shell_v6 *zxdg_shell_;
+
+  Delegate<void(uint32_t)> ping_;
 
 };
 

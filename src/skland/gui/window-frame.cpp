@@ -47,21 +47,25 @@ void WindowFrame::CloseButton::OnResize(int /* width */, int /* height */) {
 }
 
 void WindowFrame::CloseButton::OnDraw(Canvas *canvas) {
-  Color fill_color(1.f, 0.35f, 0.35f, 1.f);
-  Color stroke_color = fill_color - 55;
+  Color regular(1.f, 0.35f, 0.35f, 1.f);
+  Color down = regular - 50;
+  Color hover = regular + 15;
+  Color stroke_color = regular - 55;
 
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(fill_color);
+  paint.SetColor(regular);
 
+  if (IsHovered()) {
+    if (IsPressed()) {
+      paint.SetColor(down);
+    } else {
+      paint.SetColor(hover);
+    }
+  }
   canvas->DrawCircle(center_x(), center_y(), 6.f, paint);
 
   paint.SetColor(stroke_color);
-
-  if (IsHovered()) {
-    canvas->DrawCircle(center_x(), center_y(), 2.f, paint);
-  }
-
   paint.SetStyle(Paint::kStyleStroke);
   paint.SetStrokeWidth(0.5f);
   canvas->DrawCircle(center_x(), center_y(), 5.5f, paint);
@@ -86,21 +90,25 @@ void WindowFrame::MaximizeButton::OnResize(int /* width */, int /* height */) {
 }
 
 void WindowFrame::MaximizeButton::OnDraw(Canvas *canvas) {
-  Color fill_color(0.25f, 0.8f, 0.25f, 1.f);
-  Color stroke_color = fill_color - 55;
+  Color regular(0.25f, 0.8f, 0.25f, 1.f);
+  Color down = regular - 50;
+  Color hover = regular + 15;
+  Color stroke_color = regular - 55;
 
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(fill_color);
+  paint.SetColor(regular);
 
+  if (IsHovered()) {
+    if (IsPressed()) {
+      paint.SetColor(down);
+    } else {
+      paint.SetColor(hover);
+    }
+  }
   canvas->DrawCircle(center_x(), center_y(), 6.f, paint);
 
   paint.SetColor(stroke_color);
-
-  if (IsHovered()) {
-    canvas->DrawCircle(center_x(), center_y(), 2.f, paint);
-  }
-
   paint.SetStyle(Paint::kStyleStroke);
   paint.SetStrokeWidth(0.5f);
   canvas->DrawCircle(center_x(), center_y(), 5.5f, paint);
@@ -125,21 +133,25 @@ void WindowFrame::MinimizeButton::OnResize(int /* width */, int /* height */) {
 }
 
 void WindowFrame::MinimizeButton::OnDraw(Canvas *canvas) {
-  Color fill_color(1.f, 0.75f, 0.2f, 1.f);
-  Color stroke_color = fill_color - 55;
+  Color regular(1.f, 0.75f, 0.2f, 1.f);
+  Color down = regular - 50;
+  Color hover = regular + 15;
+  Color stroke_color = regular - 55;
 
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(fill_color);
+  paint.SetColor(regular);
 
+  if (IsHovered()) {
+    if (IsPressed()) {
+      paint.SetColor(down);
+    } else {
+      paint.SetColor(hover);
+    }
+  }
   canvas->DrawCircle(center_x(), center_y(), 6.f, paint);
 
   paint.SetColor(stroke_color);
-
-  if (IsHovered()) {
-    canvas->DrawCircle(center_x(), center_y(), 2.f, paint);
-  }
-
   paint.SetStyle(Paint::kStyleStroke);
   paint.SetStrokeWidth(0.5f);
   canvas->DrawCircle(center_x(), center_y(), 5.5f, paint);

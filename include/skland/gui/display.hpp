@@ -133,6 +133,8 @@ class Display : public Object {
 
   void OnFormat(uint32_t format);
 
+  void OnXdgShellPing(uint32_t serial);
+
   Display();
 
   virtual ~Display();

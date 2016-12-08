@@ -19,6 +19,7 @@
 
 #include "seat.hpp"
 #include "xdg-surface.hpp"
+#include "output.hpp"
 
 namespace skland {
 namespace wayland {
@@ -72,12 +73,68 @@ class XdgToplevel {
     }
   }
 
+  void SetParent(const XdgToplevel &parent) const {
+    zxdg_toplevel_v6_set_parent(zxdg_toplevel_, parent.zxdg_toplevel_);
+  }
+
+  void SetTitle(const char *title) const {
+    zxdg_toplevel_v6_set_title(zxdg_toplevel_, title);
+  }
+
+  void SetAppId(const char *app_id) const {
+    zxdg_toplevel_v6_set_app_id(zxdg_toplevel_, app_id);
+  }
+
+  void ShowWindowMenu(const Seat &seat, uint32_t serial, int32_t x, int32_t y) const {
+    zxdg_toplevel_v6_show_window_menu(zxdg_toplevel_, seat.wl_seat_, serial, x, y);
+  }
+
   void Move(const Seat &seat, uint32_t serial) const {
     zxdg_toplevel_v6_move(zxdg_toplevel_, seat.wl_seat_, serial);
   }
 
   void Resize(const Seat &seat, uint32_t serial, uint32_t edges) const {
     zxdg_toplevel_v6_resize(zxdg_toplevel_, seat.wl_seat_, serial, edges);
+  }
+
+  void SetMaxSize(int32_t width, int32_t height) const {
+    zxdg_toplevel_v6_set_max_size(zxdg_toplevel_, width, height);
+  }
+
+  void SetMinSize(int width, int height) const {
+    zxdg_toplevel_v6_set_min_size(zxdg_toplevel_, width, height);
+  }
+
+  void SetMaximized() const {
+    zxdg_toplevel_v6_set_maximized(zxdg_toplevel_);
+  }
+
+  void UnsetMaximized() const {
+    zxdg_toplevel_v6_unset_maximized(zxdg_toplevel_);
+  }
+
+  void SetFullscreen(const Output &output) const {
+    zxdg_toplevel_v6_set_fullscreen(zxdg_toplevel_, output.wl_output_);
+  }
+
+  void UnsetFullscreen(const Output &output) const {
+    zxdg_toplevel_v6_unset_fullscreen(zxdg_toplevel_);
+  }
+
+  void SetMinimized() const {
+    zxdg_toplevel_v6_set_minimized(zxdg_toplevel_);
+  }
+
+  void SetUserData(void *user_data) const {
+    zxdg_toplevel_v6_set_user_data(zxdg_toplevel_, user_data);
+  }
+
+  void *GetUserData() const {
+    return zxdg_toplevel_v6_get_user_data(zxdg_toplevel_);
+  }
+
+  uint32_t GetVersion() const {
+    return zxdg_toplevel_v6_get_version(zxdg_toplevel_);
   }
 
   bool IsValid() const {

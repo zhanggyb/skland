@@ -26,7 +26,11 @@ namespace skland {
 namespace wayland {
 namespace client {
 
+class XdgToplevel;
+
 class Output {
+
+  friend class XdgToplevel;
 
   Output(const Output &) = delete;
   Output &operator=(const Output &) = delete;

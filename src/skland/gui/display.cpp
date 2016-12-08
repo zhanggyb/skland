@@ -306,6 +306,10 @@ void Display::OnFormat(uint32_t format) {
   fprintf(stderr, "Possible shmem format %s\n", text);
 }
 
+void Display::OnXdgShellPing(uint32_t serial) {
+  xdg_shell_.Pong(serial);
+}
+
 void Display::InitializeIdleTaskList() {
   idle_task_head_.AddNext(&idle_task_tail_);
 }

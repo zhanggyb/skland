@@ -85,7 +85,7 @@ class SimpleWidget : public AbstractWidget {
 
  private:
 
-  PushButton* btn_;
+  PushButton *btn_;
 
 };
 
