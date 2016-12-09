@@ -19,7 +19,7 @@ Test::~Test() {
 TEST_F(Test, constructor_1) {
   ColorD c;
 
-  ASSERT_TRUE(c.r == 0.0 && c.g == 0.0 && c.b == 0.0 && c.a == 0.0);
+  ASSERT_TRUE(c.r == 0.0 && c.g == 0.0 && c.b == 0.0 && c.a == 1.0);
 }
 
 TEST_F(Test, constructor_2) {

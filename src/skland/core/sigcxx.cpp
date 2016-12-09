@@ -81,7 +81,7 @@ Trackable::~Trackable() {
 
 void Trackable::Unbind(SLOT slot) {
   // (sender && sender->token_->binding->trackable_object == this) is always true
-  if (slot != nullptr) {
+  if (slot) {
     details::Token *tmp = slot->token_;
     const_cast<Slot *>(slot)->token_ = slot->token_->next;
     delete tmp;
@@ -92,7 +92,7 @@ void Trackable::Unbind(SLOT slot) {
 void Trackable::UnbindAll(SLOT slot) {
   // (slot && slot->token_->binding->trackable_object == this) is always true
 
-  if (slot == nullptr) {
+  if (nullptr == slot) {
     details::Binding *tmp = nullptr;
     details::Binding *p = first_binding_;
 
@@ -143,7 +143,7 @@ std::size_t Trackable::CountBindings() const {
 
 void Trackable::PushBackBinding(details::Binding *node) {
 #ifdef DEBUG
-  assert(node->trackable_object == nullptr);
+  assert(nullptr == node->trackable_object);
 #endif
 
   if (last_binding_) {
@@ -151,7 +151,7 @@ void Trackable::PushBackBinding(details::Binding *node) {
     node->previous = last_binding_;
   } else {
 #ifdef DEBUG
-    assert(first_binding_ == nullptr);
+    assert(nullptr == first_binding_);
 #endif
     node->previous = nullptr;
     first_binding_ = node;
@@ -163,7 +163,7 @@ void Trackable::PushBackBinding(details::Binding *node) {
 
 void Trackable::PushFrontBinding(details::Binding *node) {
 #ifdef DEBUG
-  assert(node->trackable_object == nullptr);
+  assert(nullptr == node->trackable_object);
 #endif
 
   if (first_binding_) {
@@ -171,7 +171,7 @@ void Trackable::PushFrontBinding(details::Binding *node) {
     node->next = first_binding_;
   } else {
 #ifdef DEBUG
-    assert(last_binding_ == nullptr);
+    assert(nullptr == last_binding_);
 #endif
     node->next = nullptr;
     last_binding_ = node;
@@ -184,12 +184,12 @@ void Trackable::PushFrontBinding(details::Binding *node) {
 
 void Trackable::InsertBinding(int index, details::Binding *node) {
 #ifdef DEBUG
-  assert(node->trackable_object == nullptr);
+  assert(nullptr == node->trackable_object);
 #endif
 
-  if (first_binding_ == nullptr) {
+  if (nullptr == first_binding_) {
 #ifdef DEBUG
-    assert(last_binding_ == nullptr);
+    assert(nullptr == last_binding_);
 #endif
     node->next = nullptr;
     last_binding_ = node;
@@ -231,7 +231,7 @@ void Trackable::InsertBinding(int index, details::Binding *node) {
 
       details::Binding *p = last_binding_;
 #ifdef DEBUG
-      assert(p != nullptr);
+      assert(p);
 #endif
 
       while (p && (index < -1)) {

@@ -78,6 +78,8 @@ class AbstractWindow : public AbstractView {
 
   virtual ~AbstractWindow();
 
+  void SetTitle(const char *title);
+
   void SetWindowFrame(AbstractWindowFrame *window_frame);
 
   void Close(__SLOT__);
@@ -174,6 +176,8 @@ class AbstractWindow : public AbstractView {
   wayland::client::Region input_region_;
 
   std::string title_;
+
+  Size saved_size_;
 };
 
 }

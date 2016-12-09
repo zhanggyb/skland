@@ -83,7 +83,6 @@ int main(int argc, char *argv[]) {
   Window *win = new Window(800, 600, "Simple");
 
   SimpleWidget *widget = new SimpleWidget;
-//  widget->Resize(400, 300);
   win->SetMainWidget(widget);
 
   win->Show();

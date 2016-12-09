@@ -66,6 +66,8 @@ AbstractWindow::AbstractWindow(int width, int height, const char *title, int fla
     xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
     xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
     xdg_toplevel_.Setup(xdg_surface_);
+
+    if (title) xdg_toplevel_.SetTitle(title);
   }
 
   if (IsPopup()) {
@@ -90,6 +92,13 @@ AbstractWindow::~AbstractWindow() {
   delete window_frame_;
 }
 
+void AbstractWindow::SetTitle(const char *title) {
+  if (title && IsToplevel()) {
+    title_ = title;
+    xdg_toplevel_.SetTitle(title);
+  }
+}
+
 void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
   if (window_frame == window_frame_) return;
 
@@ -107,8 +116,14 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
   }
 }
 
-void AbstractWindow::Close(SLOT) {
+void AbstractWindow::Close(SLOT slot) {
+  Unbind(slot);
 
+  if (Display::windows_count() == 1) {
+    Application::Exit();
+  }
+
+  delete this;
 }
 
 void AbstractWindow::Maximize(SLOT) {
@@ -334,7 +349,7 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
       Rect input_rect(width, height);
       int x = 0, y = 0;
 
-      if (!(flags_ & kWindowFramelessMask)) {
+      if (!IsFrameless()) {
         input_rect.left = surface()->margin().left - AbstractWindowFrame::kResizingMargin.left;
         input_rect.top = surface()->margin().top - AbstractWindowFrame::kResizingMargin.top;
         input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
@@ -356,25 +371,35 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
 }
 
 void AbstractWindow::OnXdgToplevelClose() {
-  DBG_PRINT_MSG("%s\n", "toplevel close");
-  // TODO: close window
+  Close();
 }
 
 void AbstractWindow::OnWindowAction(int action, SLOT slot) {
   switch (action) {
     case kActionClose: {
-      fprintf(stderr, "close\n");
-      // TODO: close this window
+      Close(slot);
       break;
     }
     case kActionMaximize: {
-      fprintf(stderr, "maximize\n");
       // TODO: maximize
+      if (IsToplevel()) {
+        if (IsMaximized()) {
+          clear_bit<int>(flags_, kWindowModeMask);
+          xdg_toplevel_.UnsetMaximized();
+        } else {
+          clear_bit<int>(flags_, kWindowModeMask);
+          set_bit<int>(flags_, kWindowMaximized);
+          xdg_toplevel_.SetMaximized();
+        }
+      }
       break;
     }
     case kActionMinimize: {
       fprintf(stderr, "minimize\n");
       // TODO: minimize
+      if (IsToplevel()) {
+        xdg_toplevel_.SetMinimized();
+      }
       break;
     }
     case kActionMenu: {

@@ -23,10 +23,12 @@
 
 namespace skland {
 
-class AbstractWindowFrame;
 class AbstractWidget;
 
 class Window : public AbstractWindow {
+
+  Window(const Window &) = delete;
+  Window &operator=(const Window &) = delete;
 
  public:
 

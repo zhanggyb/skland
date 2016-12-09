@@ -71,7 +71,6 @@ void Window::OnKeyboardKey(KeyEvent *event) {
   if (event->key() == kKey_ESC) {
     Application::Exit();
   }
-
   event->Accept();
 }
 
