@@ -26,6 +26,11 @@
 #include <skland/core/defines.hpp>
 #include <skland/core/rect.hpp>
 
+#include <skland/wayland/client/xdg-surface.hpp>
+#include <skland/wayland/client/xdg-toplevel.hpp>
+#include <skland/wayland/client/xdg-popup.hpp>
+#include <skland/wayland/client/region.hpp>
+
 namespace skland {
 
 class Display;
@@ -34,14 +39,21 @@ class AbstractWindowFrame;
 
 enum WindowFlagMask {
   kWindowFramelessMask = 0x1,
-  kWindowModeMask = 0x3 << 1
+  kWindowModeMask = 0x3 << 1,
+  kWindowTypeMask = 0x1 << 3
 };
 
 enum WindowFlags {
-  WindowFrameless = 0x1,
-  WindowFullscreen = 0x1 << 1,
-  WindowMaximized = 0x2 << 1,
-  WindowMinimized = 0x3 << 1
+  kWindowFrameless = 0x1,
+
+  // Initial size:
+      kWindowFullscreen = 0x1 << 1,
+  kWindowMaximized = 0x2 << 1,
+  kWindowMinimized = 0x3 << 1,
+
+  // Window type:
+//  kWindowToplevel = 0x0 << 3,
+      kWindowPopup = 0x1 << 3
 };
 
 class AbstractWindow : public AbstractView {
@@ -78,6 +90,26 @@ class AbstractWindow : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
+  bool IsFullscreen() const {
+    return (flags_ & kWindowModeMask) == kWindowFullscreen;
+  }
+
+  bool IsMaximized() const {
+    return (flags_ & kWindowModeMask) == kWindowMaximized;
+  }
+
+  bool IsMinimized() const {
+    return (flags_ & kWindowModeMask) == kWindowMinimized;
+  }
+
+  bool IsToplevel() const {
+    return (flags_ & kWindowTypeMask) == 0;
+  }
+
+  bool IsPopup() const {
+    return (flags_ & kWindowTypeMask) == kWindowPopup;
+  }
+
  protected:
 
   void AddSubView(AbstractView *view, int pos = 0);
@@ -86,9 +118,15 @@ class AbstractWindow : public AbstractView {
 
   Display *display_;  /**< The manager object */
 
-  std::string title_;
-
   int flags_;
+
+  wayland::client::XdgSurface xdg_surface_;
+
+  wayland::client::XdgToplevel xdg_toplevel;
+
+  wayland::client::XdgPopup xdg_popup;
+
+  std::string title_;
 };
 
 }

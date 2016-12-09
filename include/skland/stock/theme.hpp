@@ -51,6 +51,34 @@ class Theme {
     return kTheme->window_frame_;
   }
 
+  static inline int shadow_radius() {
+    return kTheme->shadow_radius_;
+  }
+
+  static inline int shadow_offset_x() {
+    return kTheme->shadow_offset_x_;
+  }
+
+  static inline int shadow_offset_y() {
+    return kTheme->shadow_offset_y_;
+  }
+
+  static inline int shadow_margin_left() {
+    return kTheme->shadow_radius_ - kTheme->shadow_offset_x_;
+  }
+
+  static inline int shadow_margin_right() {
+    return kTheme->shadow_radius_ + kTheme->shadow_offset_x_;
+  }
+
+  static inline int shadow_margin_top() {
+    return kTheme->shadow_radius_ - kTheme->shadow_offset_y_;
+  }
+
+  static inline int shadow_margin_bottom() {
+    return kTheme->shadow_radius_ + kTheme->shadow_offset_y_;
+  }
+
   void Reset();
 
  private:
@@ -60,6 +88,11 @@ class Theme {
   ~Theme();
 
   ColorScheme window_frame_;  // The default window frame
+
+  int shadow_radius_;
+
+  int shadow_offset_x_;
+  int shadow_offset_y_;
 
   static Theme *kTheme;
 

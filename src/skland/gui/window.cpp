@@ -26,6 +26,8 @@
 
 #include <skland/gui/window-frame.hpp>
 
+#include <skland/stock/theme.hpp>
+
 namespace skland {
 
 Window::Window(const char *title, int flags)
@@ -42,11 +44,14 @@ Window::Window(int width, int height, const char *title, int flags)
 
   set_name(title);  // debug only
 
-  Surface *surface = new Surface(this, AbstractWindowFrame::kShadowMargin);
-  SetSurface(surface);
+  Surface *surf = new Surface(this, Margin(Theme::shadow_margin_left(),
+                                           Theme::shadow_margin_top(),
+                                           Theme::shadow_margin_right(),
+                                           Theme::shadow_margin_bottom()));
+  SetSurface(surf);
 
   xdg_surface_.configure().Set(this, &Window::OnXdgSurfaceConfigure);
-  xdg_surface_.Setup(Display::xdg_shell(), surface->wl_surface());
+  xdg_surface_.Setup(Display::xdg_shell(), surf->wl_surface());
 
   xdg_toplevel_.configure().Set(this, &Window::OnXdgToplevelConfigure);
   xdg_toplevel_.close().Set(this, &Window::OnXdgToplevelClose);
@@ -66,17 +71,17 @@ Window::Window(int width, int height, const char *title, int flags)
     window_frame_ = new WindowFrame(this, 0, AbstractWindowFrame::kTitleBarNone);
   } else {
     window_frame_ = new WindowFrame(this, 5);
-    total_width += window_frame_->kShadowMargin.lr();
-    total_height += window_frame_->kShadowMargin.tb();
-    x += window_frame_->kShadowMargin.left - window_frame_->kResizingMargin.left;
-    y += window_frame_->kShadowMargin.top - window_frame_->kResizingMargin.top;
+    total_width += surface()->margin().lr();
+    total_height += surface()->margin().tb();
+    x += surface()->margin().left - window_frame_->kResizingMargin.left;
+    y += surface()->margin().top - window_frame_->kResizingMargin.top;
     w += window_frame_->kResizingMargin.lr();
     h += window_frame_->kResizingMargin.tb();
   }
 
   input_region_.Setup(Display::wl_compositor());
   input_region_.Add(x, y, w, h);
-  surface->SetInputRegion(input_region_);
+  surf->SetInputRegion(input_region_);
 
   pool_.Setup(total_width * 4 * total_height);
   buffer_.Setup(pool_, total_width, total_height, total_width * 4, WL_SHM_FORMAT_ARGB8888);
@@ -241,14 +246,14 @@ void Window::OnResize(int width, int height) {
   int x = 0, y = 0;
 
   if (window_frame_) {
-    total_width += window_frame_->kShadowMargin.lr();
-    total_height += window_frame_->kShadowMargin.tb();
-    input_rect.left = window_frame_->kShadowMargin.left - window_frame_->kResizingMargin.left;
-    input_rect.top = window_frame_->kShadowMargin.top - window_frame_->kResizingMargin.top;
+    total_width += surface()->margin().lr();
+    total_height += surface()->margin().tb();
+    input_rect.left = surface()->margin().left - window_frame_->kResizingMargin.left;
+    input_rect.top = surface()->margin().top - window_frame_->kResizingMargin.top;
     input_rect.Resize(width + window_frame_->kResizingMargin.lr(),
                       height + window_frame_->kResizingMargin.tb());
-    x = AbstractWindowFrame::kShadowMargin.left;
-    y = AbstractWindowFrame::kShadowMargin.top;
+    x = surface()->margin().left;
+    y = surface()->margin().top;
     window_frame_->Resize(width, height);
   }
 
@@ -281,8 +286,8 @@ void Window::OnXdgSurfaceConfigure(uint32_t serial) {
   xdg_surface_.AckConfigure(serial);
 
   if (nullptr == surface()->canvas()) {
-    int x = AbstractWindowFrame::kShadowMargin.left;
-    int y = AbstractWindowFrame::kShadowMargin.top;
+    int x = surface()->margin().left;
+    int y = surface()->margin().top;
     int w = width();
     int h = height();
 

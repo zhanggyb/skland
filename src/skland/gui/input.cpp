@@ -158,12 +158,12 @@ void Input::OnPointerEnter(uint32_t serial,
   using gui::MouseTask;
 
   mouse_event_->serial_ = serial;
-  mouse_event_->surface_x_ = wl_fixed_to_double(surface_x);
-  mouse_event_->surface_y_ = wl_fixed_to_double(surface_y);
+  mouse_event_->surface_xy_.x = wl_fixed_to_double(surface_x);
+  mouse_event_->surface_xy_.y = wl_fixed_to_double(surface_y);
 
   mouse_event_->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
-  mouse_event_->window_x_ = mouse_event_->surface_x_ - mouse_event_->surface_->margin().left;
-  mouse_event_->window_y_ = mouse_event_->surface_y_ - mouse_event_->surface_->margin().top;
+  mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
+  mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
 
   AbstractView *view_on_surface = mouse_event_->surface_->view();
 
@@ -213,12 +213,12 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
   using gui::MouseTask;
 
   mouse_event_->time_ = time;
-  mouse_event_->surface_x_ = wl_fixed_to_double(surface_x);
-  mouse_event_->surface_y_ = wl_fixed_to_double(surface_y);
+  mouse_event_->surface_xy_.x = wl_fixed_to_double(surface_x);
+  mouse_event_->surface_xy_.y = wl_fixed_to_double(surface_y);
 
   if (mouse_event_->surface_) {
-    mouse_event_->window_x_ = mouse_event_->surface_x_ - mouse_event_->surface_->margin().left;
-    mouse_event_->window_y_ = mouse_event_->surface_y_ - mouse_event_->surface_->margin().top;
+    mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
+    mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
 
     AbstractView *view_on_surface = mouse_event_->surface_->view();
 
@@ -235,7 +235,7 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
 
     MouseTask *previous = nullptr;
     while (tail->previous()) {
-      if (tail->view->Contain((int) mouse_event_->window_x_, (int) mouse_event_->window_y_)) {
+      if (tail->view->Contain((int) mouse_event_->window_xy_.x, (int) mouse_event_->window_xy_.y)) {
         break;
       }
       previous = static_cast<MouseTask *>(tail->previous());
@@ -330,7 +330,7 @@ void Input::ProcessMouseEnterOnSubviews(AbstractView *parent, gui::MouseTask *ta
   using gui::MouseTask;
 
   for (AbstractView *subview = parent->first_subview(); subview; subview = subview->next_view()) {
-    if (subview->Contain((int) mouse_event_->window_x_, (int) mouse_event_->window_y_)) {
+    if (subview->Contain((int) mouse_event_->window_xy_.x, (int) mouse_event_->window_xy_.y)) {
       mouse_event_->accepted_ = false;
       subview->OnMouseEnter(mouse_event_);
       if (mouse_event_->is_accepted()) {

@@ -277,24 +277,24 @@ int WindowFrame::GetPointerLocation(const MouseEvent *event) const {
 
   // TODO: maximized or frameless
 
-  if (x < (kShadowMargin.left - kResizingMargin.left))
+  if (x < (Theme::shadow_margin_left() - kResizingMargin.left))
     hlocation = kExterior;
-  else if (x < kShadowMargin.left + kResizingMargin.left)
+  else if (x < Theme::shadow_margin_left() + kResizingMargin.left)
     hlocation = kResizeLeft;
-  else if (x < kShadowMargin.left + window()->width() - kResizingMargin.right)
+  else if (x < Theme::shadow_margin_left() + window()->width() - kResizingMargin.right)
     hlocation = kInterior;
-  else if (x < kShadowMargin.left + window()->width() + kResizingMargin.right)
+  else if (x < Theme::shadow_margin_left() + window()->width() + kResizingMargin.right)
     hlocation = kResizeRight;
   else
     hlocation = kExterior;
 
-  if (y < (kShadowMargin.top - kResizingMargin.top))
+  if (y < (Theme::shadow_margin_top() - kResizingMargin.top))
     vlocation = kExterior;
-  else if (y < kShadowMargin.top + kResizingMargin.top)
+  else if (y < Theme::shadow_margin_top() + kResizingMargin.top)
     vlocation = kResizeTop;
-  else if (y < kShadowMargin.top + window()->height() - kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin_top() + window()->height() - kResizingMargin.bottom)
     vlocation = kInterior;
-  else if (y < kShadowMargin.top + window()->height() + kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin_top() + window()->height() + kResizingMargin.bottom)
     vlocation = kResizeBottom;
   else
     vlocation = kExterior;
@@ -304,7 +304,7 @@ int WindowFrame::GetPointerLocation(const MouseEvent *event) const {
     location = kExterior;
 
   if (location == kInterior &&
-      y < kShadowMargin.top + title_bar_size())
+      y < Theme::shadow_margin_top() + title_bar_size())
     location = kTitleBar;
   else if (location == kInterior)
     location = kClientArea;

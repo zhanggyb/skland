@@ -88,9 +88,6 @@ class AbstractWindowFrame : public Trackable {
 
   virtual int GetPointerLocation(const MouseEvent *event) const = 0;
 
-  /** The shadow margin */
-  static const Margin kShadowMargin;
-
   /** The margin within which the cursor should switch to resizing, the values SHOULD smaller than shadow margin */
   static const Margin kResizingMargin;
 

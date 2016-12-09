@@ -49,10 +49,6 @@ class MouseEvent : public InputEvent {
       : InputEvent(input),
         surface_(nullptr),
         serial_(0),
-        surface_x_(0.0),
-        surface_y_(0.0),
-        window_x_(0.0),
-        window_y_(0.0),
         time_(0),
         button_(0),
         state_(0),
@@ -68,7 +64,7 @@ class MouseEvent : public InputEvent {
    * @return
    */
   double surface_x() const {
-    return surface_x_;
+    return surface_xy_.x;
   }
 
   /**
@@ -76,15 +72,15 @@ class MouseEvent : public InputEvent {
    * @return
    */
   double surface_y() const {
-    return surface_y_;
+    return surface_xy_.y;
   }
 
   double window_x() const {
-    return window_x_;
+    return window_xy_.x;
   }
 
   double window_y() const {
-    return window_y_;
+    return window_xy_.y;
   }
 
   uint32_t button() const {
@@ -108,11 +104,9 @@ class MouseEvent : public InputEvent {
 
   uint32_t serial_;
 
-  double surface_x_;
-  double surface_y_;
+  Point2D surface_xy_;
 
-  double window_x_;
-  double window_y_;
+  Point2D window_xy_;
 
   uint32_t time_;
 

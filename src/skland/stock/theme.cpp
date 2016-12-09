@@ -37,6 +37,11 @@ void Theme::Reset() {
   window_frame_.shaded = true;
   window_frame_.shadetop = 15;
   window_frame_.shadedown = 0;
+
+  shadow_radius_ = 35;
+
+  shadow_offset_x_ = 0;
+  shadow_offset_y_ = 10;
 }
 
 }

@@ -238,8 +238,8 @@ void MainWindow::OnResize(int width, int height) {
 
   surface()->Damage(0, 0, total_width, total_height);
 
-  int x = AbstractWindowFrame::kShadowMargin.left;
-  int y = AbstractWindowFrame::kShadowMargin.top;
+  int x = surface()->margin().left;
+  int y = surface()->margin().top;
   int w = this->width();
   int h = this->height();
 
@@ -313,10 +313,10 @@ void MainWindow::OnDraw(Canvas *context) {
 }
 
 void MainWindow::Initialize() {
-  Surface *surface = new Surface(this);
-  SetSurface(surface);
+  Surface *surf = new Surface(this);
+  SetSurface(surf);
 
-  xdg_surface_.Setup(Display::xdg_shell(), surface->wl_surface());
+  xdg_surface_.Setup(Display::xdg_shell(), surf->wl_surface());
   xdg_surface_.configure().Set(this, &MainWindow::OnXdgSurfaceConfigure);
 
   xdg_toplevel_.Setup(xdg_surface_);
@@ -344,25 +344,25 @@ void MainWindow::Initialize() {
     window_frame_ = new WindowFrame(this, 0, AbstractWindowFrame::kTitleBarNone);
   } else {
     window_frame_ = new WindowFrame(this);
-    total_width += window_frame_->kShadowMargin.lr();
-    total_height += window_frame_->kShadowMargin.tb();
-    input_region_x += window_frame_->kShadowMargin.left - window_frame_->kResizingMargin.left;
-    input_region_y += window_frame_->kShadowMargin.top - window_frame_->kResizingMargin.top;
+    total_width += surface()->margin().lr();
+    total_height += surface()->margin().tb();
+    input_region_x += surface()->margin().left - window_frame_->kResizingMargin.left;
+    input_region_y += surface()->margin().top - window_frame_->kResizingMargin.top;
     input_region_width += window_frame_->kResizingMargin.lr();
     input_region_height += window_frame_->kResizingMargin.tb();
-    opaque_region_x += window_frame_->kShadowMargin.left;
-    opaque_region_y += window_frame_->kShadowMargin.top;
+    opaque_region_x += surface()->margin().left;
+    opaque_region_y += surface()->margin().top;
   }
 
   input_region_.Setup(Display::wl_compositor());
   input_region_.Add(input_region_x, input_region_y, input_region_width, input_region_height);
-  surface->SetInputRegion(input_region_);
+  surf->SetInputRegion(input_region_);
 
   opaque_region_.Setup(Display::wl_compositor());
   opaque_region_.Add(opaque_region_x, opaque_region_y, opaque_region_width, opaque_region_height);
-  surface->SetOpaqueRegion(opaque_region_);
+  surf->SetOpaqueRegion(opaque_region_);
 
-  surface->Commit();
+  surf->Commit();
 
   pool_ = new MemoryPool;
   pool_->Setup(total_width * 4 * total_height);
@@ -394,8 +394,8 @@ void MainWindow::OnXdgSurfaceConfigure(uint32_t serial) {
   xdg_surface_.AckConfigure(serial);
 
   if (redraw_needed_) {
-    int x = AbstractWindowFrame::kShadowMargin.left;
-    int y = AbstractWindowFrame::kShadowMargin.top;
+    int x = surface()->margin().left;
+    int y = surface()->margin().top;
     int w = width();
     int h = height();
 

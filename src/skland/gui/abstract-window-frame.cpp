@@ -20,9 +20,6 @@
 
 namespace skland {
 
- const Margin AbstractWindowFrame::kShadowMargin(25, 35, 45, 35);
-//const Margin AbstractWindowFrame::kShadowMargin(0, 0, 0, 0);
-
 const Margin AbstractWindowFrame::kResizingMargin(5, 5, 5, 5);
 
 const Point AbstractWindowFrame::kShadowOffset(0, 10);
