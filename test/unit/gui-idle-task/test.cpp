@@ -4,7 +4,7 @@
 
 #include "test.hpp"
 
-#include <skland/gui/internal/task-node.hpp>
+#include <skland/gui/internal/task-base.hpp>
 
 
 using namespace skland::gui;
@@ -21,9 +21,9 @@ Test::~Test() {
  *
  */
 TEST_F(Test, SetNext1) {
-  TaskNode* task1 = new TaskNode;
-  TaskNode* task2 = new TaskNode;
-  TaskNode* task3 = new TaskNode;
+  TaskBase* task1 = new TaskBase;
+  TaskBase* task2 = new TaskBase;
+  TaskBase* task3 = new TaskBase;
 
   task3->AddNext(task2);
   task1->AddNext(task2);
@@ -43,9 +43,9 @@ TEST_F(Test, SetNext1) {
  *
  */
 TEST_F(Test, Unlink1) {
-  TaskNode* task1 = new TaskNode;
-  TaskNode* task2 = new TaskNode;
-  TaskNode* task3 = new TaskNode;
+  TaskBase* task1 = new TaskBase;
+  TaskBase* task2 = new TaskBase;
+  TaskBase* task3 = new TaskBase;
 
   task1->AddNext(task2);
   task2->AddNext(task3);
@@ -66,10 +66,10 @@ TEST_F(Test, Unlink1) {
  *
  */
 TEST_F(Test, SetNext2) {
-  TaskNode* task1 = new TaskNode;
-  TaskNode* task2 = new TaskNode;
-  TaskNode* task3 = new TaskNode;
-  TaskNode* task4 = new TaskNode;
+  TaskBase* task1 = new TaskBase;
+  TaskBase* task2 = new TaskBase;
+  TaskBase* task3 = new TaskBase;
+  TaskBase* task4 = new TaskBase;
 
   task1->AddNext(task2);
   task2->AddNext(task3);
@@ -93,9 +93,9 @@ TEST_F(Test, SetNext2) {
  *
  */
 TEST_F(Test, SetPrevious1) {
-  TaskNode* task1 = new TaskNode;
-  TaskNode* task2 = new TaskNode;
-  TaskNode* task3 = new TaskNode;
+  TaskBase* task1 = new TaskBase;
+  TaskBase* task2 = new TaskBase;
+  TaskBase* task3 = new TaskBase;
 
   task3->AddPrevious(task2);
   task1->AddPrevious(task2);
@@ -115,10 +115,10 @@ TEST_F(Test, SetPrevious1) {
  *
  */
 TEST_F(Test, SetPrevious2) {
-  TaskNode* task1 = new TaskNode;
-  TaskNode* task2 = new TaskNode;
-  TaskNode* task3 = new TaskNode;
-  TaskNode* task4 = new TaskNode;
+  TaskBase* task1 = new TaskBase;
+  TaskBase* task2 = new TaskBase;
+  TaskBase* task3 = new TaskBase;
+  TaskBase* task4 = new TaskBase;
 
   task1->AddPrevious(task2);
   task2->AddPrevious(task3);

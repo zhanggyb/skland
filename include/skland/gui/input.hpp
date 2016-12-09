@@ -24,7 +24,7 @@
 #include "../wayland/client/keyboard.hpp"
 #include "../wayland/client/touch.hpp"
 
-#include "internal/mouse-task-node.hpp"
+#include "skland/gui/internal/mouse-task.hpp"
 
 namespace skland {
 
@@ -142,7 +142,7 @@ class Input : public Object {
 
   void OnTouchCancel();
 
-  void ProcessMouseEnterOnSubviews(AbstractView *parent, gui::MouseTaskNode *task);
+  void ProcessMouseEnterOnSubviews(AbstractView *parent, gui::MouseTask *task);
 
   Display *display_;
 

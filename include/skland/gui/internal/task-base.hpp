@@ -20,40 +20,40 @@
 namespace skland {
 namespace gui {
 
-class TaskNode {
+class TaskBase {
 
-  TaskNode(const TaskNode &) = delete;
-  TaskNode &operator=(const TaskNode &) = delete;
+  TaskBase(const TaskBase &) = delete;
+  TaskBase &operator=(const TaskBase &) = delete;
 
  public:
 
-  TaskNode()
+  TaskBase()
       : previous_(nullptr), next_(nullptr) {}
 
-  ~TaskNode();
+  ~TaskBase();
 
   bool IsLinked() const {
     return (nullptr != previous_) || (nullptr != next_);
   }
 
-  void AddNext(TaskNode *other);
+  void AddNext(TaskBase *other);
 
-  void AddPrevious(TaskNode *other);
+  void AddPrevious(TaskBase *other);
 
   void Unlink();
 
-  TaskNode *previous() const {
+  TaskBase *previous() const {
     return previous_;
   }
 
-  TaskNode *next() const {
+  TaskBase *next() const {
     return next_;
   }
 
  private:
 
-  TaskNode *previous_;
-  TaskNode *next_;
+  TaskBase *previous_;
+  TaskBase *next_;
 
 };
 

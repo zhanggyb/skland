@@ -90,7 +90,7 @@ Application::~Application() {
 }
 
 int Application::Run() {
-  using gui::EventTaskNode;
+  using gui::EventTask;
 
   struct sigaction sigint;
   sigint.sa_handler = HandleSignalInt;
@@ -103,13 +103,13 @@ int Application::Run() {
   int ret = 0;
 
   kInstance->running_ = true;
-  EventTaskNode *task = nullptr;
+  EventTask *task = nullptr;
 
   while (true) {
 
     // Process redraw tasks
     while (Display::idle_task_head()->next() != Display::idle_task_tail()) {
-      task = static_cast<EventTaskNode*>(Display::idle_task_head()->next());
+      task = static_cast<EventTask*>(Display::idle_task_head()->next());
       task->Unlink();
       task->Run();
     }

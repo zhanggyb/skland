@@ -315,10 +315,10 @@ void Display::InitializeIdleTaskList() {
 }
 
 void Display::CleanIdleTaskList() {
-  using gui::TaskNode;
+  using gui::TaskBase;
 
-  TaskNode *task = idle_task_head_.next();
-  TaskNode *next_task = nullptr;
+  TaskBase *task = idle_task_head_.next();
+  TaskBase *next_task = nullptr;
   while (task != &idle_task_tail_) {
     next_task = task->next();
     task->Unlink();

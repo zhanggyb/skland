@@ -21,13 +21,13 @@
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
-#include "internal/redraw-task-node.hpp"
-#include "internal/mouse-task-node.hpp"
+#include "skland/gui/internal/redraw-task.hpp"
+#include "skland/gui/internal/mouse-task.hpp"
 
 namespace skland {
 
 namespace gui {
-class RedrawTaskNode;
+class RedrawTask;
 }
 
 // Forward declaration
@@ -47,7 +47,7 @@ class AbstractView : public Object {
   friend class Application;
   friend class Display;
   friend class Surface;
-  friend class gui::RedrawTaskNode;
+  friend class gui::RedrawTask;
 
  public:
 
@@ -119,14 +119,6 @@ class AbstractView : public Object {
 
   void RedrawAll();
 
-  bool HaveNextMouseTask() const {
-    return nullptr != mouse_task_.next();
-  }
-
-  bool HavePreviousMouseTask() const {
-    return nullptr != mouse_task_.previous();
-  }
-
   void set_visible(bool visible) {
     visible_ = visible;
   }
@@ -159,13 +151,21 @@ class AbstractView : public Object {
     return static_cast<AbstractView *>(last_child());
   }
 
+  const gui::RedrawTask &redraw_task() const {
+    return redraw_task_;
+  }
+
+  const gui::MouseTask &mouse_task() const {
+    return mouse_task_;
+  }
+
  private:
 
   static void RedrawOnSurface(AbstractView *view, Surface *surface);
 
   static void RedrawSubViewsOnSurface(const AbstractView *parent, Surface *surface);
 
-  static void AddRedrawTask(gui::RedrawTaskNode *task);
+  static void AddRedrawTask(gui::RedrawTask *task);
 
   bool visible_;
 
@@ -173,8 +173,8 @@ class AbstractView : public Object {
 
   Surface *surface_;  /**< The main surface for this window */
 
-  gui::RedrawTaskNode redraw_task_;
-  gui::MouseTaskNode mouse_task_;
+  gui::RedrawTask redraw_task_;
+  gui::MouseTask mouse_task_;
 };
 
 }

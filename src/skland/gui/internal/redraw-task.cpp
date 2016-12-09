@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-#include <skland/gui/internal/redraw-task-node.hpp>
+#include <skland/gui/internal/redraw-task.hpp>
 
 #include <skland/gui/abstract-view.hpp>
 
 namespace skland {
 namespace gui {
 
-RedrawTaskNode::~RedrawTaskNode() {
+RedrawTask::~RedrawTask() {
 }
 
-void RedrawTaskNode::Run(int events) const {
+void RedrawTask::Run(int events) const {
   view->OnDraw(canvas);
   view->visible_ = true;
 }

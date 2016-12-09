@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-#include <skland/gui/internal/task-node.hpp>
+#include <skland/gui/internal/task-base.hpp>
 
 namespace skland {
 namespace gui {
 
-TaskNode::~TaskNode() {
+TaskBase::~TaskBase() {
   if (previous_) previous_->next_ = next_;
   if (next_) next_->previous_ = previous_;
 }
 
-void TaskNode::AddNext(TaskNode *other) {
+void TaskBase::AddNext(TaskBase *other) {
   if (other == this) return;
 
   other->Unlink();
@@ -35,7 +35,7 @@ void TaskNode::AddNext(TaskNode *other) {
   other->previous_ = this;
 }
 
-void TaskNode::AddPrevious(TaskNode *other) {
+void TaskBase::AddPrevious(TaskBase *other) {
   if (other == this) return;
 
   other->Unlink();
@@ -46,7 +46,7 @@ void TaskNode::AddPrevious(TaskNode *other) {
   other->next_ = this;
 }
 
-void TaskNode::Unlink() {
+void TaskBase::Unlink() {
   if (previous_ != nullptr) previous_->next_ = next_;
   if (next_ != nullptr) next_->previous_ = previous_;
 

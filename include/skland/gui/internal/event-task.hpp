@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_MOUSE_TASK_NODE_HPP_
-#define SKLAND_GUI_INTERNAL_MOUSE_TASK_NODE_HPP_
+#ifndef SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
 
-#include "task-node.hpp"
+#include "task-base.hpp"
 
 namespace skland {
-
-class AbstractView;
-class MouseEvent;
-
 namespace gui {
 
-struct MouseTaskNode : public TaskNode {
+class EventTask : public TaskBase {
 
-  MouseTaskNode(const MouseTaskNode &) = delete;
-  MouseTaskNode &operator=(const MouseTaskNode &) = delete;
+  EventTask(const EventTask &) = delete;
+  EventTask &operator=(const EventTask &) = delete;
 
-  MouseTaskNode(AbstractView *view = nullptr)
-      : TaskNode(), view(view) {}
+ public:
 
-  ~MouseTaskNode() {}
+  inline EventTask()
+      : TaskBase() {}
 
-  AbstractView *view;
+  virtual ~EventTask() {}
+
+  virtual void Run(int events = 0) const {
+    // override this
+  }
 
 };
 
 }
-
 }
 
-#endif // SKLAND_GUI_INTERNAL_MOUSE_TASK_NODE_HPP_
+#endif // SKLAND_GUI_INTERNAL_EVENT_TASK_NODE_HPP_

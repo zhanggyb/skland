@@ -203,7 +203,8 @@ void Window::OnMouseButton(MouseEvent *event) {
     int location = window_frame_->GetPointerLocation(event);
 
     if (location == kTitleBar) {
-      if (HaveNextMouseTask()) {
+      if (mouse_task().next()) {
+        // If the mouse is hover on a sub widget (mostly close/min/max button on title bar).
         event->Accept();
         return;
       }
