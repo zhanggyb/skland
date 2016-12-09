@@ -18,13 +18,15 @@
 
 #include <stdlib.h>
 
-#include <skland/gui/label.hpp>
-#include <skland/gui/mouse-event.hpp>
-
-#include <skland/stock/theme.hpp>
-
+#include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
+
+#include <skland/gui/label.hpp>
+#include <skland/gui/mouse-event.hpp>
+#include <skland/gui/abstract-window.hpp>
+
+#include <skland/stock/theme.hpp>
 
 namespace skland {
 
@@ -187,15 +189,15 @@ WindowFrame::~WindowFrame() {
 }
 
 void WindowFrame::OnCloseButtonClicked(SLOT /* slot */) {
-  EmitAction(kWindowClose);
+  EmitAction(AbstractWindow::kActionClose);
 }
 
 void WindowFrame::OnMaximizeButtonClicked(SLOT /* slot */) {
-  EmitAction(kWindowMaximize);
+  EmitAction(AbstractWindow::kActionMaximize);
 }
 
 void WindowFrame::OnMinimizeButtonClicked(SLOT /* slot */) {
-  EmitAction(kWindowMinimize);
+  EmitAction(AbstractWindow::kActionMinimize);
 }
 
 void WindowFrame::CreateWidgets() {
@@ -271,7 +273,7 @@ void WindowFrame::Draw(Canvas *canvas) {
   canvas->Flush();
 }
 
-int WindowFrame::GetPointerLocation(const MouseEvent *event) const {
+int WindowFrame::GetMouseLocation(const MouseEvent *event) const {
   int vlocation, hlocation, location;
   int x = static_cast<int>(event->surface_x()), y = static_cast<int>(event->surface_y());
 

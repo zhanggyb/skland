@@ -17,13 +17,12 @@
 #ifndef SKLAND_ABSTRACT_WINDOW_FRAME_HPP_
 #define SKLAND_ABSTRACT_WINDOW_FRAME_HPP_
 
+#include <skland/core/sigcxx.hpp>
 #include <skland/core/margin.hpp>
 #include <skland/core/point.hpp>
-#include <skland/core/sigcxx.hpp>
+#include <skland/core/rect.hpp>
 
 #include <vector>
-#include <skland/core/size.hpp>
-#include <skland/skland.hpp>
 
 namespace skland {
 
@@ -60,7 +59,7 @@ class AbstractWindowFrame : public Trackable {
 
   virtual ~AbstractWindowFrame();
 
-  Rect GetLocalClientGeometry() const;
+  Rect GetClientGeometry() const;
 
   AbstractWindow *window() const {
     return window_;
@@ -86,7 +85,7 @@ class AbstractWindowFrame : public Trackable {
 
   virtual void Draw(Canvas *context) = 0;
 
-  virtual int GetPointerLocation(const MouseEvent *event) const = 0;
+  virtual int GetMouseLocation(const MouseEvent *event) const = 0;
 
   /** The margin within which the cursor should switch to resizing, the values SHOULD smaller than shadow margin */
   static const Margin kResizingMargin;

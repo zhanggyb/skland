@@ -68,7 +68,7 @@ void MainWindow::SetMainWidget(AbstractWidget *widget) {
 
 void MainWindow::OnMouseEnter(MouseEvent *event) {
 //  DBG_PRINT_MSG("%s\n", "pointer enter");
-  int location = window_frame_->GetPointerLocation(event);
+  int location = window_frame_->GetMouseLocation(event);
   switch (location) {
     case kResizeTop: {
       event->SetCursor(Display::cursor(kCursorTop));
@@ -103,7 +103,7 @@ void MainWindow::OnMouseLeave(MouseEvent *event) {
 
 void MainWindow::OnMouseMove(MouseEvent *event) {
 
-  int location = window_frame_->GetPointerLocation(event);
+  int location = window_frame_->GetMouseLocation(event);
   switch (location) {
     case kResizeTop: {
       event->SetCursor(Display::cursor(kCursorTop));
@@ -149,7 +149,7 @@ void MainWindow::OnMouseButton(MouseEvent *event) {
   if ((event->button() == kMouseButtonLeft) &&
       (event->state() == kMouseButtonPressed)) {
 
-    resize_location_ = window_frame_->GetPointerLocation(event);
+    resize_location_ = window_frame_->GetMouseLocation(event);
 
     if (resize_location_ == kTitleBar) {
       xdg_toplevel_.Move(event->wl_seat(), event->serial());

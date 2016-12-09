@@ -61,14 +61,6 @@ enum WindowBufferType {
   kWindowBufferEGL
 };
 
-enum WindowActionType {
-  kWindowClose,
-  kWindowMaximize,
-  kWindowMinimize,
-  kWindowMenu,
-  kWindowActionLast
-};
-
 enum PixelFormat {
 
   /**

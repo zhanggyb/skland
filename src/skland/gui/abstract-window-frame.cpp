@@ -39,7 +39,7 @@ AbstractWindowFrame::AbstractWindowFrame(AbstractWindow *window,
 AbstractWindowFrame::~AbstractWindowFrame() {
 }
 
-Rect AbstractWindowFrame::GetLocalClientGeometry() const {
+Rect AbstractWindowFrame::GetClientGeometry() const {
   int x = border_,
       y = border_,
       w = window()->width() - 2 * border_,

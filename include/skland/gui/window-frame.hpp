@@ -60,7 +60,7 @@ class WindowFrame : public AbstractWindowFrame {
 * |        |                 |
 * |        |                 |
 */
-  virtual int GetPointerLocation(const MouseEvent *event) const override;
+  virtual int GetMouseLocation(const MouseEvent *event) const override;
 
  private:
 

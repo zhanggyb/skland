@@ -21,10 +21,6 @@
 #include "memory-pool.hpp"
 #include "buffer.hpp"
 
-#include <skland/wayland/client/xdg-surface.hpp>
-#include <skland/wayland/client/xdg-toplevel.hpp>
-#include <skland/wayland/client/region.hpp>
-
 namespace skland {
 
 class AbstractWindowFrame;
@@ -46,49 +42,22 @@ class Window : public AbstractWindow {
     return main_widget_;
   }
 
-  virtual Size GetMinimalSize() const final;
-
  protected:
-
-  virtual void OnMouseEnter(MouseEvent *event) final;
-
-  virtual void OnMouseLeave(MouseEvent *event) final;
-
-  virtual void OnMouseMove(MouseEvent *event) final;
-
-  virtual void OnMouseButton(MouseEvent *event) final;
 
   virtual void OnKeyboardKey(KeyEvent *event) final;
 
   virtual void OnResize(int width, int height) final;
 
-  virtual void OnDraw(Canvas *canvas) final;
+  virtual void OnConfigureCanvas() final;
 
  private:
 
-  void OnXdgSurfaceConfigure(uint32_t serial);
-
-  void OnXdgToplevelConfigure(int width, int height, int states);
-
-  void OnXdgToplevelClose();
-
   void SetMainWidgetGeometry();
-
-  wayland::client::XdgSurface xdg_surface_;
-  wayland::client::XdgToplevel xdg_toplevel_;
-  wayland::client::Region input_region_;
 
   MemoryPool pool_;
   Buffer buffer_;
 
-  bool maximized_;
-  bool minimized_;
-  bool fullscreened_;
-
-  AbstractWindowFrame *window_frame_;
   AbstractWidget *main_widget_;
-
-  Size saved_size_;
 };
 
 }
