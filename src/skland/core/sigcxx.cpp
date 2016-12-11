@@ -80,57 +80,45 @@ Trackable::~Trackable() {
 }
 
 void Trackable::Unbind(SLOT slot) {
-  // (sender && sender->token_->binding->trackable_object == this) is always true
-  if (slot) {
-    details::Token *tmp = slot->token_;
-    const_cast<Slot *>(slot)->token_ = slot->token_->next;
-    delete tmp;
-    const_cast<Slot *>(slot)->skip_ = true;
+  if ((nullptr == slot) || (slot->token_->binding->trackable_object != this)) return;
+
+  details::Token *tmp = slot->token_;
+  slot->token_ = slot->token_->next;
+  delete tmp;
+  slot->skip_ = true;
+}
+
+void Trackable::UnbindAll() {
+  details::Binding *tmp = nullptr;
+  details::Binding *p = first_binding_;
+
+  while (p) {
+    tmp = p->next;
+    delete p;
+    p = tmp;
   }
 }
 
 void Trackable::UnbindAll(SLOT slot) {
-  // (slot && slot->token_->binding->trackable_object == this) is always true
-
   if (nullptr == slot) {
-    details::Binding *tmp = nullptr;
-    details::Binding *p = first_binding_;
-
-    while (p) {
-      tmp = p->next;
-      delete p;
-      p = tmp;
-    }
-  } else {
-    details::Token *tmp = nullptr;
-    details::Token *p = nullptr;
-
-    p = slot->token_;
-    while (p) {
-      tmp = p->previous;
-      if (p->binding->trackable_object == this) {
-        if (p == slot->token_) {
-          const_cast<Slot *>(slot)->token_ = slot->token_->next;
-          const_cast<Slot *>(slot)->skip_ = true;
-        }
-        delete p;
-      }
-      p = tmp;
-    }
-
-    p = slot->token_;
-    while (p) {
-      tmp = p->next;
-      if (p->binding->trackable_object == this) {
-        if (p == slot->token_) {
-          const_cast<Slot *>(slot)->token_ = slot->token_->next;
-          const_cast<Slot *>(slot)->skip_ = true;
-        }
-        delete p;
-      }
-      p = tmp;
-    }
+    UnbindAll();
+    return;
   }
+
+  /* Check if the slot points to this object is being using, if is,
+   * move the iterator of token to next until it points to another one,
+   * then it's save to remove all bindings to signals
+   */
+  details::Token *tmp = nullptr;
+  while (slot->token_->binding->trackable_object == this) {
+    tmp = slot->token_;
+    slot->token_ = slot->token_->next;
+    delete tmp;
+    slot->skip_ = true;
+    if (nullptr == slot->token_) break;
+  }
+
+  UnbindAll(nullptr);
 }
 
 std::size_t Trackable::CountBindings() const {
