@@ -26,6 +26,11 @@
 #include <skland/gui/mouse-event.hpp>
 
 #include <iostream>
+#include <skland/stock/theme.hpp>
+#include <skia.h>
+
+#include "SkCanvas.h"
+#include "SkPaint.h"
 
 using namespace skland;
 
@@ -68,10 +73,48 @@ class SimpleWidget : public AbstractWidget {
   }
 
   virtual void OnDraw(Canvas *canvas) override {
+    SkCanvas *c = canvas->sk_canvas();
     Paint paint;
-    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
+    paint.SetColor(Color(1.f, 1.f, 1.f));
 
     canvas->DrawRectangle(x(), y(), width(), height(), paint);
+
+    /*
+    std::vector<uint32_t> pixels(250 * 250, 0);
+    SkImageInfo image_info = SkImageInfo::MakeN32Premul(250, 250);
+    SkPixmap pixmap(image_info,
+                    pixels.data(),
+                    250 * 4);
+
+    std::unique_ptr<SkCanvas> canvas2 =
+        SkCanvas::MakeRasterDirectN32(250, 250, pixels.data(), 250 * 4);
+
+    SkPaint paint2;
+    paint2.setAntiAlias(true);
+    paint2.setARGB(255, 0, 0, 0);
+    paint2.setMaskFilter(SkBlurMaskFilter::Make(
+        kNormal_SkBlurStyle, 35.f, 0x2));
+
+    canvas2->drawRect(SkRect::MakeLTRB(35,
+                                      35,
+                                      250 - 35,
+                                      250 - 35),
+                     paint2);
+
+    sk_sp<SkImage> image = SkImage::MakeFromRaster(pixmap, nullptr, nullptr);
+    c->drawImageRect(image, SkRect::MakeLTRB(0, 0, 250, 250),
+                     SkRect::MakeLTRB(100, 100, 350, 350),
+                     &paint2);
+    */
+
+    SkPaint paint2;
+    paint2.setAntiAlias(true);
+    paint2.setStyle(SkPaint::kFill_Style);
+
+    sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::shadow_pixmap(), nullptr, nullptr);
+    c->drawImageRect(image, SkRect::MakeLTRB(0, 0, 250, 250),
+                     SkRect::MakeLTRB(100, 100, 350, 350),
+                     nullptr);
   }
 
 };

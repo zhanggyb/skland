@@ -15,16 +15,24 @@
  */
 
 #include <skland/stock/theme.hpp>
+#include <SkBlurMaskFilter.h>
+
+#include "SkCanvas.h"
+#include "SkPaint.h"
+#include "SkPixmap.h"
 
 namespace skland {
 
 Theme *Theme::kTheme = nullptr;
 
-Theme::Theme() {
+Theme::Theme()
+    : shadow_pixmap_(nullptr) {
+  shadow_pixmap_ = new SkPixmap;
   Reset();
 }
 
 Theme::~Theme() {
+  delete shadow_pixmap_;
 }
 
 void Theme::Reset() {
@@ -42,6 +50,35 @@ void Theme::Reset() {
 
   shadow_offset_x_ = 0;
   shadow_offset_y_ = 10;
+
+  shadow_pixels_.resize(kShadowPixelsWidth * kShadowPixelsHeight, 0);
+  GenerateShadowImage();
+
+  SkImageInfo image_info = SkImageInfo::MakeN32Premul(kShadowPixelsWidth, kShadowPixelsHeight);
+  delete shadow_pixmap_;
+  shadow_pixmap_ = new SkPixmap(image_info,
+                                shadow_pixels_.data(),
+                                kShadowPixelsWidth * 4);
+}
+
+void Theme::GenerateShadowImage() {
+  std::unique_ptr<SkCanvas> canvas =
+      SkCanvas::MakeRasterDirectN32(kShadowPixelsWidth,
+                                    kShadowPixelsHeight,
+                                    shadow_pixels_.data(),
+                                    kShadowPixelsWidth * 4);
+  SkPaint paint;
+  paint.setAntiAlias(true);
+  paint.setARGB(255, 0, 0, 0);
+  paint.setMaskFilter(SkBlurMaskFilter::Make(
+      kNormal_SkBlurStyle, 35 / 2.f - 0.5f, 0x2));
+
+  canvas->drawRoundRect(SkRect::MakeLTRB(shadow_radius_,
+                                    shadow_radius_,
+                                    kShadowPixelsWidth - shadow_radius_,
+                                    kShadowPixelsWidth - shadow_radius_),
+                        35.f, 35.f,
+                   paint);
 }
 
 }

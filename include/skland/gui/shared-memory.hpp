@@ -47,7 +47,7 @@ class SharedMemory {
     return size_;
   }
 
-  void *data() const {
+  const void *data() const {
     return data_;
   }
 
