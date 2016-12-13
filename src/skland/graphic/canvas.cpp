@@ -92,6 +92,10 @@ void Canvas::Clear(const Color &color) {
   sk_canvas_->clear(color.argb());
 }
 
+void Canvas::Clip(const Path &path, bool antilias) {
+  sk_canvas_->clipPath(*path.sk_path(), antilias);
+}
+
 void Canvas::Save() {
   sk_canvas_->save();
 }

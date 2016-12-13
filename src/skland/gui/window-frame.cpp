@@ -28,6 +28,10 @@
 
 #include <skland/stock/theme.hpp>
 
+#include "SkCanvas.h"
+#include "SkPaint.h"
+#include "SkImage.h"
+
 namespace skland {
 
 WindowFrame::CloseButton::CloseButton()
@@ -256,6 +260,8 @@ void WindowFrame::LayoutWidgets(int width, int height) {
 void WindowFrame::Draw(Canvas *canvas) {
   canvas->Clear();
 
+  DrawShadow(canvas);
+
   Paint paint;
   paint.SetColor(background_.argb());
   paint.SetAntiAlias(true);
@@ -312,6 +318,85 @@ int WindowFrame::GetMouseLocation(const MouseEvent *event) const {
     location = kClientArea;
 
   return location;
+}
+
+void WindowFrame::DrawShadow(Canvas *canvas) {
+
+  const float rad = 20.f; // The spread radius
+
+  const float offset_x = Theme::shadow_offset_x();
+  const float offset_y = Theme::shadow_offset_y();
+
+  // shadow map
+  SkCanvas *c = canvas->sk_canvas();
+  sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::shadow_pixmap(), nullptr, nullptr);
+
+  // top-left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 0,
+                                    2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(-rad + offset_x, -rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // top
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
+                                    250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
+                                    window()->width() - 2 * rad, 2 * rad),
+                   nullptr);
+
+  // top-right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
+                                    250, 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(window()->width() - rad + offset_x, -rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
+                                    2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
+                                    2 * rad, window()->height() - 2 * rad),
+                   nullptr);
+
+  // bottom-left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
+                                    2 * Theme::shadow_radius(), 250),
+                   SkRect::MakeXYWH(-rad + offset_x, window()->height() - rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // bottom
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
+                                    250 - 2 * Theme::shadow_radius(), 250),
+                   SkRect::MakeXYWH(rad + offset_x, window()->height() - rad + offset_y,
+                                    window()->width() - 2 * rad, 2 * rad),
+                   nullptr);
+
+  // bottom-right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
+                                    250, 250),
+                   SkRect::MakeXYWH(window()->width() - rad + offset_x,
+                                    window()->height() - rad + offset_y,
+                                    2 * rad,
+                                    2 * rad),
+                   nullptr);
+
+  // right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
+                                    250, 250 - 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(window()->width() - rad + offset_x, rad + offset_y,
+                                    2 * rad, window()->height() - 2 * rad),
+                   nullptr);
+
 }
 
 }

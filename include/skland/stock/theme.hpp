@@ -86,6 +86,10 @@ class Theme {
     return kTheme->shadow_pixmap_;
   }
 
+  static const int kShadowImageWidth = 250;
+
+  static const int kShadowImageHeight = 250;
+
   void Reset();
 
  private:
@@ -106,10 +110,6 @@ class Theme {
   std::vector<uint32_t> shadow_pixels_;
 
   SkPixmap *shadow_pixmap_;
-
-  static const int kShadowPixelsWidth = 250;
-
-  static const int kShadowPixelsHeight = 250;
 
   static Theme *kTheme;
 

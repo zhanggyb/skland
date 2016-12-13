@@ -132,6 +132,8 @@ class WindowFrame : public AbstractWindowFrame {
 
   void LayoutWidgets(int width, int height);
 
+  void DrawShadow(Canvas *canvas);
+
   CloseButton *close_button_;
 
   MaximizeButton *maximize_button_;
