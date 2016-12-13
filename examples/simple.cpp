@@ -29,18 +29,25 @@
 #include <skland/stock/theme.hpp>
 #include <skia.h>
 
+#include "SkTypeface.h"
+
 using namespace skland;
 
 class SimpleWidget : public AbstractWidget {
+
+  sk_sp<SkTypeface> font_;
 
  public:
 
   SimpleWidget()
       : AbstractWidget() {
     set_name("Simple Widget");
+//    font_ = SkTypeface::MakeFromFile("SourceHanSansCN-Regular.otf");
+    font_ = SkTypeface::MakeFromName("Arial", SkFontStyle(400, 5, SkFontStyle::kUpright_Slant));
   }
 
-  virtual ~SimpleWidget() {}
+  virtual ~SimpleWidget() {
+  }
 
  protected:
 
@@ -73,6 +80,17 @@ class SimpleWidget : public AbstractWidget {
     Paint paint;
     paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
     canvas->DrawRectangle(x(), y(), width(), height(), paint);
+
+    SkPaint paint1;
+
+    paint1.setTextSize(64.0f);
+    paint1.setAntiAlias(true);
+    paint1.setColor(0xff4281A4);
+    paint1.setStyle(SkPaint::kFill_Style);
+    paint1.setTypeface(font_);
+
+    const char text[] = "Hello World!";
+    canvas->sk_canvas()->drawText(text, strlen(text), 220.0f, 320.0f,  paint1);
   }
 
 };

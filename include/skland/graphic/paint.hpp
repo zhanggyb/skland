@@ -73,6 +73,8 @@ class Paint {
 
   void SetStrokeWidth(float width);
 
+  void SetTextSize(float size);
+
   SkPaint *sk_paint() const {
     return sk_paint_;
   }

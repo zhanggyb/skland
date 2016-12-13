@@ -94,4 +94,8 @@ void Paint::SetStrokeWidth(float width) {
   sk_paint_->setStrokeWidth(width);
 }
 
+void Paint::SetTextSize(float size) {
+  sk_paint_->setTextSize(size);
+}
+
 }

@@ -16,6 +16,7 @@
 
 #include <skland/stock/theme.hpp>
 #include <SkBlurMaskFilter.h>
+#include <SkPath.h>
 
 #include "SkCanvas.h"
 #include "SkPaint.h"
@@ -49,7 +50,7 @@ void Theme::Reset() {
   shadow_radius_ = 35;
 
   shadow_offset_x_ = 0;
-  shadow_offset_y_ = 8;
+  shadow_offset_y_ = 9;
 
   shadow_pixels_.resize(kShadowImageWidth * kShadowImageHeight, 0);
   GenerateShadowImage();
@@ -69,27 +70,24 @@ void Theme::GenerateShadowImage() {
                                     kShadowImageWidth * 4);
   SkPaint paint;
   paint.setAntiAlias(true);
-  paint.setARGB(95, 0, 0, 0);
+  paint.setARGB(90, 0, 0, 0);
   paint.setMaskFilter(SkBlurMaskFilter::Make(
       kNormal_SkBlurStyle, shadow_radius_ / 2.f - 0.5f, 0x2));  // Use high-quality blur
 
-  canvas->drawRoundRect(SkRect::MakeLTRB(shadow_radius_,
-                                    shadow_radius_,
-                                    kShadowImageWidth - shadow_radius_,
-                                    kShadowImageWidth - shadow_radius_),
-                        shadow_radius_, shadow_radius_,
-                   paint);
+  float radii[] = {
+      shadow_radius_ / 1.f, shadow_radius_ / 1.f, // top-left
+      shadow_radius_ / 1.f, shadow_radius_ / 1.f, // top-right
+      shadow_radius_ / 2.f, shadow_radius_ / 2.f, // bottom-right
+      shadow_radius_ / 2.f, shadow_radius_ / 2.f,  // bottom-left
+  };
 
-//  SkPaint paint2;
-//  paint2.setARGB(255, 255, 0, 0);
-//  paint2.setStyle(SkPaint::kStroke_Style);
-//  canvas->drawRect(SkRect::MakeLTRB(shadow_radius_,
-//                                    shadow_radius_,
-//                                    kShadowPixelsWidth - shadow_radius_,
-//                                    kShadowPixelsWidth - shadow_radius_),
-//                   paint2);
-//  canvas->drawRect(SkRect::MakeLTRB(0.5f, 0.5f, kShadowPixelsWidth - 0.5f, kShadowPixelsWidth - 0.5f),
-//                   paint2);
+  SkPath path;
+  path.addRoundRect(SkRect::MakeLTRB(shadow_radius_,
+                                     shadow_radius_,
+                                     kShadowImageWidth - shadow_radius_,
+                                     kShadowImageWidth - shadow_radius_),
+                    radii, SkPath::kCW_Direction);
+  canvas->drawPath(path, paint);
 }
 
 }

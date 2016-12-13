@@ -84,6 +84,13 @@ void Label::OnDraw(Canvas *canvas) {
 
   canvas->DrawRectangle(x(), y(), width(), height(), paint);
 
+  paint.SetColor(foreground_);
+  paint.SetAntiAlias(true);
+  paint.SetTextSize(12.f);
+  paint.SetStyle(Paint::kStyleFill);
+
+  canvas->DrawText(text_.c_str(), text_.length(), x() + 5.f, y() + 14.f, paint);
+
 //
 //  canvas->set_source_rgba(c);
 //  canvas->rectangle(geometry().left(), geometry().top(), geometry().right(), geometry().bottom());
