@@ -19,11 +19,14 @@
 
 #include <skland/core/color.hpp>
 
+#include <vector>
+
+class SkPixmap;
+
 namespace skland {
 
 // Forward declaration
 class Application;
-class Canvas;
 
 struct ColorScheme {
   ColorD outline;
@@ -79,6 +82,14 @@ class Theme {
     return kTheme->shadow_radius_ + kTheme->shadow_offset_y_;
   }
 
+  static inline const SkPixmap *shadow_pixmap() {
+    return kTheme->shadow_pixmap_;
+  }
+
+  static const int kShadowImageWidth = 250;
+
+  static const int kShadowImageHeight = 250;
+
   void Reset();
 
  private:
@@ -87,12 +98,18 @@ class Theme {
 
   ~Theme();
 
+  void GenerateShadowImage();
+
   ColorScheme window_frame_;  // The default window frame
 
   int shadow_radius_;
 
   int shadow_offset_x_;
   int shadow_offset_y_;
+
+  std::vector<uint32_t> shadow_pixels_;
+
+  SkPixmap *shadow_pixmap_;
 
   static Theme *kTheme;
 

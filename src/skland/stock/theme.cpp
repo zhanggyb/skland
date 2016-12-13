@@ -15,16 +15,24 @@
  */
 
 #include <skland/stock/theme.hpp>
+#include <SkBlurMaskFilter.h>
+
+#include "SkCanvas.h"
+#include "SkPaint.h"
+#include "SkPixmap.h"
 
 namespace skland {
 
 Theme *Theme::kTheme = nullptr;
 
-Theme::Theme() {
+Theme::Theme()
+    : shadow_pixmap_(nullptr) {
+  shadow_pixmap_ = new SkPixmap;
   Reset();
 }
 
 Theme::~Theme() {
+  delete shadow_pixmap_;
 }
 
 void Theme::Reset() {
@@ -41,7 +49,47 @@ void Theme::Reset() {
   shadow_radius_ = 35;
 
   shadow_offset_x_ = 0;
-  shadow_offset_y_ = 10;
+  shadow_offset_y_ = 8;
+
+  shadow_pixels_.resize(kShadowImageWidth * kShadowImageHeight, 0);
+  GenerateShadowImage();
+
+  SkImageInfo image_info = SkImageInfo::MakeN32Premul(kShadowImageWidth, kShadowImageHeight);
+  delete shadow_pixmap_;
+  shadow_pixmap_ = new SkPixmap(image_info,
+                                shadow_pixels_.data(),
+                                kShadowImageWidth * 4);
+}
+
+void Theme::GenerateShadowImage() {
+  std::unique_ptr<SkCanvas> canvas =
+      SkCanvas::MakeRasterDirectN32(kShadowImageWidth,
+                                    kShadowImageHeight,
+                                    shadow_pixels_.data(),
+                                    kShadowImageWidth * 4);
+  SkPaint paint;
+  paint.setAntiAlias(true);
+  paint.setARGB(95, 0, 0, 0);
+  paint.setMaskFilter(SkBlurMaskFilter::Make(
+      kNormal_SkBlurStyle, shadow_radius_ / 2.f - 0.5f, 0x2));  // Use high-quality blur
+
+  canvas->drawRoundRect(SkRect::MakeLTRB(shadow_radius_,
+                                    shadow_radius_,
+                                    kShadowImageWidth - shadow_radius_,
+                                    kShadowImageWidth - shadow_radius_),
+                        shadow_radius_, shadow_radius_,
+                   paint);
+
+//  SkPaint paint2;
+//  paint2.setARGB(255, 255, 0, 0);
+//  paint2.setStyle(SkPaint::kStroke_Style);
+//  canvas->drawRect(SkRect::MakeLTRB(shadow_radius_,
+//                                    shadow_radius_,
+//                                    kShadowPixelsWidth - shadow_radius_,
+//                                    kShadowPixelsWidth - shadow_radius_),
+//                   paint2);
+//  canvas->drawRect(SkRect::MakeLTRB(0.5f, 0.5f, kShadowPixelsWidth - 0.5f, kShadowPixelsWidth - 0.5f),
+//                   paint2);
 }
 
 }

@@ -50,15 +50,18 @@ void Canvas::DrawRectangle(float x, float y, float width, float height, const Pa
 }
 
 void Canvas::DrawRect(const RectF &rect, const Paint &paint) {
-  sk_canvas_->drawRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom), *paint.sk_paint());
+  sk_canvas_->drawRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom),
+                       *paint.sk_paint());
 }
 
 void Canvas::DrawRoundRect(const Rect &rect, float rx, float ry, const Paint &paint) {
-  sk_canvas_->drawRoundRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom), rx, ry, *paint.sk_paint());
+  sk_canvas_->drawRoundRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom),
+                            rx, ry, *paint.sk_paint());
 }
 
 void Canvas::DrawRoundRect(const RectF &rect, float rx, float ry, const Paint &paint) {
-  sk_canvas_->drawRoundRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom), rx, ry, *paint.sk_paint());
+  sk_canvas_->drawRoundRect(SkRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom),
+                            rx, ry, *paint.sk_paint());
 }
 
 void Canvas::DrawCircle(float x, float y, float radius, const Paint &paint) {
@@ -87,6 +90,10 @@ void Canvas::Clear(uint32_t color) {
 
 void Canvas::Clear(const Color &color) {
   sk_canvas_->clear(color.argb());
+}
+
+void Canvas::Clip(const Path &path, bool antilias) {
+  sk_canvas_->clipPath(*path.sk_path(), antilias);
 }
 
 void Canvas::Save() {

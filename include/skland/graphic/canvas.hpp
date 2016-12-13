@@ -66,6 +66,8 @@ class Canvas {
 
   void Clear(const Color &color);
 
+  void Clip(const Path &path, bool antialias);
+
   void Save();
 
   void Flush();
