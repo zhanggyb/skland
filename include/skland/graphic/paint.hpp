@@ -24,6 +24,8 @@ class SkPaint;
 
 namespace skland {
 
+class Font;
+
 class Paint {
 
  public:
@@ -72,6 +74,8 @@ class Paint {
   float GetStrokeWidth() const;
 
   void SetStrokeWidth(float width);
+
+  void SetFont(const Font &font);
 
   void SetTextSize(float size);
 

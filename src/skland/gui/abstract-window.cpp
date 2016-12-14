@@ -66,6 +66,8 @@ AbstractWindow::AbstractWindow(int width, int height, const char *title, int fla
     xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
     xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
     xdg_toplevel_.Setup(xdg_surface_);
+    xdg_toplevel_.SetTitle(title_.c_str());
+    xdg_toplevel_.SetAppId(title_.c_str());
 
     if (title) xdg_toplevel_.SetTitle(title);
   }

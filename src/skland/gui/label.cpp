@@ -22,17 +22,22 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 
+#include "SkTypeface.h"
+#include "SkPaint.h"
+
 namespace skland {
 
-Label::Label(const std::string &text)
-    : Label(text, 200, 24) {
+Label::Label(const std::string &text, const Font &font)
+    : Label(text, 200, 24, font) {
 }
 
-Label::Label(const std::string &text, int width, int height)
-    : AbstractWidget(width, height), text_(text) {
+Label::Label(const std::string &text, int width, int height, const Font &font)
+    : AbstractWidget(width, height),
+      text_(text),
+      foreground_(0.2f, 0.2f, 0.2f),
+      background_(0.f, 0.f, 0.f, 0.f),
+      font_(font) {
   set_name("Label");
-  foreground_ = 0xFF000000; // black
-  background_ = 0x0;  //
 }
 
 Label::~Label() {
@@ -81,26 +86,15 @@ void Label::OnDraw(Canvas *canvas) {
 
   Paint paint;
   paint.SetColor(background_);
-
   canvas->DrawRectangle(x(), y(), width(), height(), paint);
 
   paint.SetColor(foreground_);
   paint.SetAntiAlias(true);
   paint.SetTextSize(12.f);
   paint.SetStyle(Paint::kStyleFill);
+  paint.SetFont(font_);
 
-  canvas->DrawText(text_.c_str(), text_.length(), x() + 5.f, y() + 14.f, paint);
-
-//
-//  canvas->set_source_rgba(c);
-//  canvas->rectangle(geometry().left(), geometry().top(), geometry().right(), geometry().bottom());
-//  canvas->fill();
-
-  /*
-  canvas.SetFontSize(12.);
-  canvas.SetColor(0.1, 0.1, 0.1, 1.);
-  canvas.DrawText(x() + 2, y() + 15, text_.c_str());
-   */
+  canvas->DrawText(text_.c_str(), text_.length(), x() + 5.f, y() + 16.f, paint);
 }
 
 }

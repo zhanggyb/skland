@@ -20,15 +20,17 @@
 #include <skland/gui/abstract-widget.hpp>
 #include <skland/core/color.hpp>
 
+#include <skland/graphic/font.hpp>
+
 namespace skland {
 
 class Label : public AbstractWidget {
 
  public:
 
-  Label(const std::string &text);
+  Label(const std::string &text, const Font &font = Font());
 
-  Label(const std::string &text, int width, int height);
+  Label(const std::string &text, int width, int height, const Font &font = Font());
 
   virtual ~Label();
 
@@ -59,6 +61,8 @@ class Label : public AbstractWidget {
   Color foreground_;
 
   Color background_;
+
+  Font font_;
 
 };
 

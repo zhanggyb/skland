@@ -214,7 +214,7 @@ void WindowFrame::CreateWidgets() {
   maximize_button_ = new MaximizeButton;
   maximize_button_->clicked().Connect(this, &WindowFrame::OnMaximizeButtonClicked);
 
-  title_ = new Label(window()->title());
+  title_ = new Label(window()->title(), Font("Arial", Font::kWeightBold));
   title_->SetForebround(foreground_);
 
   AddWidget(title_);

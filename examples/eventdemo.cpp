@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 
   std::cout << sizeof(SimpleWidget) << std::endl;
 
-  Window *win = new Window(800, 600, "Simple");
+  Window *win = new Window(800, 600, "Event Demo");
 
   SimpleWidget *widget = new SimpleWidget;
   win->SetMainWidget(widget);

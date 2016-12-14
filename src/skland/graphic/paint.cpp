@@ -15,8 +15,11 @@
  */
 
 #include <skland/graphic/paint.hpp>
+#include <skland/graphic/font.hpp>
 
 #include "SkPaint.h"
+
+#include "internal/meta-font.hpp"
 
 namespace skland {
 
@@ -92,6 +95,10 @@ float Paint::GetStrokeWidth() const {
 
 void Paint::SetStrokeWidth(float width) {
   sk_paint_->setStrokeWidth(width);
+}
+
+void Paint::SetFont(const Font &font) {
+  sk_paint_->setTypeface(font.metadata_->sk_typeface);
 }
 
 void Paint::SetTextSize(float size) {
