@@ -27,15 +27,19 @@
 
 #include <iostream>
 #include <skland/stock/theme.hpp>
-#include <skia.h>
 
 #include "SkTypeface.h"
+#include "SkPaint.h"
+#include "SkCanvas.h"
+
+#include <skland/graphic/gradient-shader.hpp>
 
 using namespace skland;
 
 class SimpleWidget : public AbstractWidget {
 
   sk_sp<SkTypeface> font_;
+  Shader linear_shader_;
 
  public:
 
@@ -44,6 +48,24 @@ class SimpleWidget : public AbstractWidget {
     set_name("Simple Widget");
 //    font_ = SkTypeface::MakeFromFile("SourceHanSansCN-Regular.otf");
     font_ = SkTypeface::MakeFromName("Arial", SkFontStyle(400, 5, SkFontStyle::kUpright_Slant));
+
+    Point2F points[2];
+    points[0].x = 100.f;
+    points[0].y = 100.f;
+    points[1].x = 300.f;
+    points[1].y = 300.f;
+
+    Color colors[2];
+    colors[0] = 0xFFF3F80A;
+    colors[1] = 0xFFF52597;
+
+    float pos[2] = {0.2f, 0.8f};
+
+    linear_shader_ = GradientShader::MakeLinear(points,
+                                                colors,
+                                                pos,
+                                                2,
+                                                Shader::kTileModeClamp);
   }
 
   virtual ~SimpleWidget() {
@@ -80,6 +102,11 @@ class SimpleWidget : public AbstractWidget {
     Paint paint;
     paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
     canvas->DrawRectangle(x(), y(), width(), height(), paint);
+
+    Paint p2;
+    p2.SetShader(linear_shader_);
+    canvas->DrawRectangle(100, 100, 200, 200, p2);
+
 
     SkPaint paint1;
 

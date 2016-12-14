@@ -16,10 +16,12 @@
 
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/font.hpp>
+#include <skland/graphic/shader.hpp>
 
 #include "SkPaint.h"
 
 #include "internal/meta-font.hpp"
+#include "internal/meta-shader.hpp"
 
 namespace skland {
 
@@ -103,6 +105,10 @@ void Paint::SetFont(const Font &font) {
 
 void Paint::SetTextSize(float size) {
   sk_paint_->setTextSize(size);
+}
+
+void Paint::SetShader(const Shader &shader) {
+  sk_paint_->setShader(shader.metadata_->sk_shader);
 }
 
 }

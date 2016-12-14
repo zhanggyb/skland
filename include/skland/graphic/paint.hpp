@@ -25,6 +25,7 @@ class SkPaint;
 namespace skland {
 
 class Font;
+class Shader;
 
 class Paint {
 
@@ -78,6 +79,8 @@ class Paint {
   void SetFont(const Font &font);
 
   void SetTextSize(float size);
+
+  void SetShader(const Shader &shader);
 
   SkPaint *sk_paint() const {
     return sk_paint_;

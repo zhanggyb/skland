@@ -6,6 +6,8 @@
 
 #include <skland/core/color.hpp>
 
+#include "SkColor.h"
+
 using namespace skland;
 
 Test::Test()
@@ -73,4 +75,12 @@ TEST_F(Test, operator_1) {
       ((color2.b - 0.058823f) < 0.001);
 
   ASSERT_TRUE(result);
+}
+
+TEST_F(Test, cast_1) {
+  Color c(1.f, 1.f, 1.f, 1.f);
+
+  SkColor4f* sk_color = reinterpret_cast<SkColor4f*>(&c);
+
+  ASSERT_TRUE(sk_color->fR == 1.f && sk_color->fG == 1.f && sk_color->fB == 1.f && sk_color->fA);
 }

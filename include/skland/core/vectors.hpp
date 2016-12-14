@@ -45,6 +45,15 @@ struct Vector2 {
     return this->x == x && this->y == y;
   }
 
+  inline bool IsZero() const {
+    return T(0) == x && T(0) == y;
+  }
+
+  template<typename U>
+  inline Vector2 Dot(const Vector2<U> &other) const {
+    return Vector2(x * other.x, y * other.y);
+  }
+
   union { T x, r, s; };
   union { T y, g, t; };
 };
