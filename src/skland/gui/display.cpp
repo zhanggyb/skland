@@ -237,6 +237,8 @@ void Display::OnDeleteId(uint32_t id) {
 void Display::OnGlobal(uint32_t id,
                        const char *interface,
                        uint32_t version) {
+  using wayland::client::XdgShell;
+
   struct Global *global = new Global;
   global->id = id;
   global->interface = interface;
@@ -255,7 +257,7 @@ void Display::OnGlobal(uint32_t id,
   } else if (strcmp(interface, wl_output_interface.name) == 0) {
     Output *output = new Output(wl_registry_, id, version);
     AddOutput(output);
-  } else if (strcmp(interface, zxdg_shell_v6_interface.name) == 0) {
+  } else if (strcmp(interface, XdgShell::GetInterface()->name) == 0) {
     xdg_shell_.Setup(wl_registry_, id, version);
   } else if (strcmp(interface, wl_shell_interface.name) == 0) {
     wl_shell_.Setup(wl_registry_, id, version);

@@ -64,7 +64,8 @@ list(APPEND SKIA_PUBLIC_INCLUDES
         "${SKIA_SOURCE_DIR}/include/ports"
         "${SKIA_SOURCE_DIR}/include/utils"
         "${SKIA_SOURCE_DIR}/include/private")
-add_subdirectory(lib/skia)
+
+add_subdirectory(lib)
 
 if (LINUX)
 

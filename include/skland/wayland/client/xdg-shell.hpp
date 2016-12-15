@@ -17,7 +17,6 @@
 #ifndef SKLAND_WAYLAND_CLIENT_XDG_SHELL_HPP_
 #define SKLAND_WAYLAND_CLIENT_XDG_SHELL_HPP_
 
-#include "../protocol/xdg-shell-unstable-v6-client-protocol.h"
 #include "registry.hpp"
 
 namespace skland {
@@ -27,65 +26,42 @@ namespace client {
 class XdgSurface;
 class XdgPositioner;
 
+struct MetaXdgShell;
+
 class XdgShell {
 
   friend class XdgSurface;
   friend class XdgPositioner;
+  friend struct MetaXdgShell;
 
   XdgShell(const XdgShell &) = delete;
   XdgShell &operator=(const XdgShell &) = delete;
 
  public:
 
-  XdgShell()
-      : zxdg_shell_(nullptr) {}
+  static const struct wl_interface *GetInterface();
 
-  ~XdgShell() {
-    if (zxdg_shell_) zxdg_shell_v6_destroy(zxdg_shell_);
-  }
+  XdgShell();
 
-  void Setup(const Registry &registry, uint32_t id, uint32_t version) {
-    Destroy();
+  ~XdgShell();
 
-    zxdg_shell_ =
-        static_cast<struct zxdg_shell_v6 *>(registry.Bind(id, &zxdg_shell_v6_interface, version));
-    zxdg_shell_v6_add_listener(zxdg_shell_, &kListener, this);
-  }
+  void Setup(const Registry &registry, uint32_t id, uint32_t version);
 
-  void Destroy() {
-    if (zxdg_shell_) {
-      zxdg_shell_v6_destroy(zxdg_shell_);
-      zxdg_shell_ = nullptr;
-    }
-  }
+  void Destroy();
 
-  void Pong(uint32_t serial) const {
-    zxdg_shell_v6_pong(zxdg_shell_, serial);
-  }
+  void Pong(uint32_t serial) const;
 
-  void SetUserData(void *user_data) {
-    zxdg_shell_v6_set_user_data(zxdg_shell_, user_data);
-  }
+  void SetUserData(void *user_data);
 
-  void *GetUserData() const {
-    return zxdg_shell_v6_get_user_data(zxdg_shell_);
-  }
+  void *GetUserData() const;
 
-  uint32_t GetVersion() const {
-    return zxdg_shell_v6_get_version(zxdg_shell_);
-  }
+  uint32_t GetVersion() const;
 
-  bool IsValid() const {
-    return nullptr != zxdg_shell_;
-  }
+  bool IsValid() const;
 
-  bool IsNull() const {
-    return nullptr == zxdg_shell_;
-  }
+  bool IsNull() const;
 
-  bool Equal(const void *object) const {
-    return zxdg_shell_ == object;
-  }
+  bool Equal(const void *object) const;
 
   DelegateRef<void(uint32_t)> ping() {
     return ping_;
@@ -93,13 +69,7 @@ class XdgShell {
 
  private:
 
-  static void OnPing(void *data,
-                     struct zxdg_shell_v6 *zxdg_shell_v6,
-                     uint32_t serial);
-
-  static const struct zxdg_shell_v6_listener kListener;
-
-  struct zxdg_shell_v6 *zxdg_shell_;
+  MetaXdgShell *metadata_;
 
   Delegate<void(uint32_t)> ping_;
 

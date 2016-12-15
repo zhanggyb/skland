@@ -24,55 +24,31 @@ namespace skland {
 namespace wayland {
 namespace client {
 
-class XdgSurface;
-class XdgPositioner;
+struct MetaXdgPopup;
 
 class XdgPopup {
 
+  friend struct MetaXdgPopup;
+
  public:
 
-  XdgPopup()
-      : zxdg_popup_(nullptr) {
-  }
+  XdgPopup();
 
-  ~XdgPopup() {
-    if (zxdg_popup_) zxdg_popup_v6_destroy(zxdg_popup_);
-  }
+  ~XdgPopup();
 
-  void Setup(const XdgSurface &xdg_surface, const XdgSurface &parent, const XdgPositioner &positioner) {
-    Destroy();
+  void Setup(const XdgSurface &xdg_surface, const XdgSurface &parent, const XdgPositioner &positioner);
 
-    zxdg_popup_ =
-        zxdg_surface_v6_get_popup(xdg_surface.zxdg_surface_, parent.zxdg_surface_, positioner.zxdg_positioner_);
-    zxdg_popup_v6_add_listener(zxdg_popup_, &kListener, this);
-  }
+  void Destroy();
 
-  void Destroy() {
-    if (zxdg_popup_) {
-      zxdg_popup_v6_destroy(zxdg_popup_);
-      zxdg_popup_ = nullptr;
-    }
-  }
+  void SetUserData(void *user_data);
 
-  void SetUserData(void *user_data) {
-    zxdg_popup_v6_set_user_data(zxdg_popup_, user_data);
-  }
+  void *GetUserData() const;
 
-  void *GetUserData() const {
-    return zxdg_popup_v6_get_user_data(zxdg_popup_);
-  }
+  uint32_t GetVersion() const;
 
-  uint32_t GetVersion() const {
-    return zxdg_popup_v6_get_version(zxdg_popup_);
-  }
+  bool IsValid() const;
 
-  bool IsValid() const {
-    return nullptr != zxdg_popup_;
-  }
-
-  bool IsNull() const {
-    return nullptr == zxdg_popup_;
-  }
+  bool IsNull() const;
 
   DelegateRef<void(int, int, int, int)> configure() { return configure_; }
 
@@ -80,19 +56,7 @@ class XdgPopup {
 
  private:
 
-  static void OnConfigure(void *data,
-                          struct zxdg_popup_v6 *zxdg_popup_v6,
-                          int32_t x,
-                          int32_t y,
-                          int32_t width,
-                          int32_t height);
-
-  static void OnPopupDone(void *data,
-                          struct zxdg_popup_v6 *zxdg_popup_v6);
-
-  static const struct zxdg_popup_v6_listener kListener;
-
-  struct zxdg_popup_v6 *zxdg_popup_;
+  MetaXdgPopup *metadata_;
 
   Delegate<void(int, int, int, int)> configure_;
 

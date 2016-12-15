@@ -16,30 +16,58 @@
 
 #include <skland/wayland/client/xdg-popup.hpp>
 
+#include "internal/meta-xdg-popup.hpp"
+#include "internal/meta-xdg-surface.hpp"
+#include "internal/meta-xdg-positioner.hpp"
+
 namespace skland {
 namespace wayland {
 namespace client {
 
-const struct zxdg_popup_v6_listener XdgPopup::kListener = {
-    OnConfigure,
-    OnPopupDone
-};
-
-void XdgPopup::OnConfigure(void *data,
-                           struct zxdg_popup_v6 *zxdg_popup_v6,
-                           int32_t x,
-                           int32_t y,
-                           int32_t width,
-                           int32_t height) {
-  XdgPopup *_this = static_cast<XdgPopup *>(data);
-  if (_this->configure_)
-    _this->configure_(x, y, width, height);
+XdgPopup::XdgPopup()
+    : metadata_(nullptr) {
+  metadata_ = new MetaXdgPopup;
 }
 
-void XdgPopup::OnPopupDone(void *data, struct zxdg_popup_v6 *zxdg_popup_v6) {
-  XdgPopup *_this = static_cast<XdgPopup *>(data);
-  if (_this->done_)
-    _this->done_();
+XdgPopup::~XdgPopup() {
+  delete metadata_;
+}
+
+void XdgPopup::Setup(const XdgSurface &xdg_surface, const XdgSurface &parent, const XdgPositioner &positioner) {
+  Destroy();
+
+  metadata_->zxdg_popup =
+      zxdg_surface_v6_get_popup(xdg_surface.metadata_->zxdg_surface,
+                                parent.metadata_->zxdg_surface,
+                                positioner.metadata_->zxdg_positioner);
+  zxdg_popup_v6_add_listener(metadata_->zxdg_popup, &MetaXdgPopup::kListener, this);
+}
+
+void XdgPopup::Destroy() {
+  if (metadata_->zxdg_popup) {
+    zxdg_popup_v6_destroy(metadata_->zxdg_popup);
+    metadata_->zxdg_popup = nullptr;
+  }
+}
+
+void XdgPopup::SetUserData(void *user_data) {
+  zxdg_popup_v6_set_user_data(metadata_->zxdg_popup, user_data);
+}
+
+void *XdgPopup::GetUserData() const {
+  return zxdg_popup_v6_get_user_data(metadata_->zxdg_popup);
+}
+
+uint32_t XdgPopup::GetVersion() const {
+  return zxdg_popup_v6_get_version(metadata_->zxdg_popup);
+}
+
+bool XdgPopup::IsValid() const {
+  return nullptr != metadata_->zxdg_popup;
+}
+
+bool XdgPopup::IsNull() const {
+  return nullptr == metadata_->zxdg_popup;
 }
 
 }

@@ -25,6 +25,8 @@ namespace client {
 
 class XdgPopup;
 
+struct MetaXdgPositioner;
+
 class XdgPositioner {
 
   friend class XdgPopup;
@@ -34,54 +36,29 @@ class XdgPositioner {
 
  public:
 
-  XdgPositioner()
-      : zxdg_positioner_(nullptr) {
-  }
+  XdgPositioner();
 
-  ~XdgPositioner() {
-    if (zxdg_positioner_) zxdg_positioner_v6_destroy(zxdg_positioner_);
-  }
+  ~XdgPositioner();
 
-  void Setup(const XdgShell &xdg_shell) {
-    Destroy();
+  void Setup(const XdgShell &xdg_shell);
 
-    zxdg_positioner_ = zxdg_shell_v6_create_positioner(xdg_shell.zxdg_shell_);
-  }
+  void Destroy();
 
-  void Destroy() {
-    if (zxdg_positioner_) {
-      zxdg_positioner_v6_destroy(zxdg_positioner_);
-      zxdg_positioner_ = nullptr;
-    }
-  }
+  void SetSize(int width, int height);
 
-  void SetSize(int width, int height) {
-    zxdg_positioner_v6_set_size(zxdg_positioner_, width, height);
-  }
+  void SetUserData(void *user_data);
 
-  void SetUserData(void *user_data) {
-    zxdg_positioner_v6_set_user_data(zxdg_positioner_, user_data);
-  }
+  void *GetUserData() const;
 
-  void *GetUserData() const {
-    return zxdg_positioner_v6_get_user_data(zxdg_positioner_);
-  }
+  uint32_t GetVersion() const;
 
-  uint32_t GetVersion() const {
-    return zxdg_positioner_v6_get_version(zxdg_positioner_);
-  }
+  bool IsValid() const;
 
-  bool IsValid() const {
-    return nullptr != zxdg_positioner_;
-  }
-
-  bool IsNull() const {
-    return nullptr == zxdg_positioner_;
-  }
+  bool IsNull() const;
 
  private:
 
-  struct zxdg_positioner_v6 *zxdg_positioner_;
+  MetaXdgPositioner *metadata_;
 
 };
 

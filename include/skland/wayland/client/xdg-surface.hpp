@@ -18,46 +18,36 @@
 #define SKLAND_WAYLAND_CLIENT_XDG_SURFACE_HPP_
 
 #include "xdg-shell.hpp"
-#include "surface.hpp"
 
 namespace skland {
 namespace wayland {
 namespace client {
 
+class Surface;
 class XdgPopup;
 class XdgToplevel;
+
+struct MetaXdgSurface;
 
 class XdgSurface {
 
   friend class XdgPopup;
   friend class XdgToplevel;
 
+  friend struct MetaXdgSurface;
+
   XdgSurface(const XdgSurface &) = delete;
   XdgSurface &operator=(const XdgSurface &) = delete;
 
  public:
 
-  XdgSurface()
-      : zxdg_surface_(nullptr) {}
+  XdgSurface();
 
-  ~XdgSurface() {
-    if (zxdg_surface_)
-      zxdg_surface_v6_destroy(zxdg_surface_);
-  }
+  ~XdgSurface();
 
-  void Setup(const XdgShell &xdg_shell, const Surface &surface) {
-    Destroy();
+  void Setup(const XdgShell &xdg_shell, const Surface &surface);
 
-    zxdg_surface_ = zxdg_shell_v6_get_xdg_surface(xdg_shell.zxdg_shell_, surface.wl_surface_);
-    zxdg_surface_v6_add_listener(zxdg_surface_, &kListener, this);
-  }
-
-  void Destroy() {
-    if (zxdg_surface_) {
-      zxdg_surface_v6_destroy(zxdg_surface_);
-      zxdg_surface_ = nullptr;
-    }
-  }
+  void Destroy();
 
   /**
  *
@@ -86,45 +76,25 @@ class XdgSurface {
  * combined geometry of the surface of the xdg_surface and the associated
  * subsurfaces.
  */
-  void SetWindowGeometry(int x, int y, int width, int height) {
-    zxdg_surface_v6_set_window_geometry(zxdg_surface_, x, y, width, height);
-  }
+  void SetWindowGeometry(int x, int y, int width, int height);
 
-  void AckConfigure(uint32_t serial) {
-    zxdg_surface_v6_ack_configure(zxdg_surface_, serial);
-  }
+  void AckConfigure(uint32_t serial);
 
-  void SetUserData(void *user_data) {
-    zxdg_surface_v6_set_user_data(zxdg_surface_, user_data);
-  }
+  void SetUserData(void *user_data);
 
-  void *GetUserData() {
-    return zxdg_surface_v6_get_user_data(zxdg_surface_);
-  }
+  void *GetUserData();
 
-  uint32_t GetVersion() const {
-    return zxdg_surface_v6_get_version(zxdg_surface_);
-  }
+  uint32_t GetVersion() const;
 
-  bool IsValid() const {
-    return nullptr != zxdg_surface_;
-  }
+  bool IsValid() const;
 
-  bool IsNull() const {
-    return nullptr == zxdg_surface_;
-  }
+  bool IsNull() const;
 
   DelegateRef<void(uint32_t)> configure() { return configure_; }
 
  private:
 
-  static void OnConfigure(void *data,
-                          struct zxdg_surface_v6 *zxdg_surface_v6,
-                          uint32_t serial);
-
-  static const struct zxdg_surface_v6_listener kListener;
-
-  struct zxdg_surface_v6 *zxdg_surface_;
+  MetaXdgSurface *metadata_;
 
   Delegate<void(uint32_t)> configure_;
 

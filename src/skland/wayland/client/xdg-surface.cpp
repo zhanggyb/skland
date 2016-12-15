@@ -15,19 +15,64 @@
  */
 
 #include <skland/wayland/client/xdg-surface.hpp>
+#include <skland/wayland/client/surface.hpp>
+
+#include "internal/meta-xdg-surface.hpp"
+#include "internal/meta-xdg-shell.hpp"
 
 namespace skland {
 namespace wayland {
 namespace client {
 
-const struct zxdg_surface_v6_listener XdgSurface::kListener = {
-    OnConfigure
-};
+XdgSurface::XdgSurface()
+    : metadata_(nullptr) {
+  metadata_ = new MetaXdgSurface;
+}
 
-void XdgSurface::OnConfigure(void *data, struct zxdg_surface_v6 * /* zxdg_surface_v6 */, uint32_t serial) {
-  XdgSurface *_this = static_cast<XdgSurface *>(data);
-  if (_this->configure_)
-    _this->configure_(serial);
+XdgSurface::~XdgSurface() {
+  delete metadata_;
+}
+
+void XdgSurface::Setup(const XdgShell &xdg_shell, const Surface &surface) {
+  Destroy();
+
+  metadata_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(xdg_shell.metadata_->zxdg_shell, surface.wl_surface_);
+  zxdg_surface_v6_add_listener(metadata_->zxdg_surface, &MetaXdgSurface::kListener, this);
+}
+
+void XdgSurface::Destroy() {
+  if (metadata_->zxdg_surface) {
+    zxdg_surface_v6_destroy(metadata_->zxdg_surface);
+    metadata_->zxdg_surface = nullptr;
+  }
+}
+
+void XdgSurface::SetWindowGeometry(int x, int y, int width, int height) {
+  zxdg_surface_v6_set_window_geometry(metadata_->zxdg_surface, x, y, width, height);
+}
+
+void XdgSurface::AckConfigure(uint32_t serial) {
+  zxdg_surface_v6_ack_configure(metadata_->zxdg_surface, serial);
+}
+
+void XdgSurface::SetUserData(void *user_data) {
+  zxdg_surface_v6_set_user_data(metadata_->zxdg_surface, user_data);
+}
+
+void *XdgSurface::GetUserData() {
+  return zxdg_surface_v6_get_user_data(metadata_->zxdg_surface);
+}
+
+uint32_t XdgSurface::GetVersion() const {
+  return zxdg_surface_v6_get_version(metadata_->zxdg_surface);
+}
+
+bool XdgSurface::IsValid() const {
+  return nullptr != metadata_->zxdg_surface;
+}
+
+bool XdgSurface::IsNull() const {
+  return nullptr == metadata_->zxdg_surface;
 }
 
 }

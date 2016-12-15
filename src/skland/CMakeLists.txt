@@ -39,11 +39,10 @@ list(APPEND all_source_files
 
 if (LINUX)
 
-    file(GLOB wayland_protocol_headers "${PROJECT_SOURCE_DIR}/include/skland/wayland/protocol/*.h")
-    file(GLOB wayland_protocol_sources "wayland/protocol/*.c")
-
     file(GLOB wayland_client_headers "${PROJECT_SOURCE_DIR}/include/skland/wayland/client/*.hpp")
     file(GLOB wayland_client_sources "wayland/client/*.cpp")
+    file(GLOB wayland_client_internal_headers "wayland/client/internal/*.hpp")
+    file(GLOB wayland_client_internal_sources "wayland/client/internal/*.cpp")
 
     file(GLOB gui_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/*.hpp")
     file(GLOB gui_internal_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/internal/*.hpp")
@@ -54,10 +53,10 @@ if (LINUX)
     file(GLOB stock_sources "stock/*.cpp")
 
     list(APPEND all_source_files
-            ${wayland_protocol_headers}
-            ${wayland_protocol_sources}
             ${wayland_client_headers}
             ${wayland_client_sources}
+            ${wayland_client_internal_headers}
+            ${wayland_client_internal_sources}
             ${gui_headers}
             ${gui_sources}
             ${gui_internal_headers}
@@ -73,10 +72,12 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 add_library(skland ${global_header} ${all_source_files})
 
-target_include_directories(skland PRIVATE "${SKIA_PUBLIC_INCLUDES}")
+target_include_directories(skland
+        PRIVATE "${SKIA_PUBLIC_INCLUDES}"
+        PRIVATE "${PROJECT_BINARY_DIR}/lib/wayland-protocols/unstable/xdg-shell")
 
 if (LINUX)
-    target_link_libraries(skland rt ${LIBS} wayland-cursor skia)
+    target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client)
 else ()
     target_link_libraries(skland ${LIBS} skia)
 endif ()
