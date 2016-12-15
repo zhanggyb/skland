@@ -62,7 +62,7 @@ struct Rect {
   }
 
   inline bool Contain(T x, T y) const {
-    return x >= left && y >= top && x <= right && y <= bottom;
+    return left <= x && x < right && top <= y && y < bottom;
   }
 
   inline void MoveTo(T x, T y) {
