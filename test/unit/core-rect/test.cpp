@@ -6,6 +6,8 @@
 
 #include <skland/core/rect.hpp>
 
+#include "SkRect.h"
+
 using namespace skland;
 
 Test::Test()
@@ -88,4 +90,11 @@ TEST_F(Test, vcenter_1) {
   Rect r(0, 0, 4, 4);
 
   ASSERT_TRUE(r.center_y() == 2);
+}
+
+TEST_F(Test, cast_1) {
+  RectF r(0.f, 0.f, 4.f, 4.f);
+  SkRect* sk_rect = reinterpret_cast<SkRect*>(&r);
+
+  ASSERT_TRUE(r.l == sk_rect->fLeft && r.r == sk_rect->fRight && r.t == sk_rect->fTop && r.b == sk_rect->fBottom);
 }

@@ -1,3 +1,6 @@
 [submodule "third_party/skia"]
 	path = third_party/skia
 	url = https://github.com/google/skia.git
+[submodule "third_party/wayland-protocols"]
+	path = third_party/wayland-protocols
+	url = https://github.com/wayland-project/wayland-protocols.git

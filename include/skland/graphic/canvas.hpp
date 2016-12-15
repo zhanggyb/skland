@@ -46,11 +46,9 @@ class Canvas {
 
   void DrawRectangle(float x, float y, float width, float height, const Paint &paint);
 
-  void DrawRect(const RectF &rect, const Paint &paint);
+  void DrawRect(const Rect &rect, const Paint &paint);
 
   void DrawRoundRect(const Rect &rect, float rx, float ry, const Paint &paint);
-
-  void DrawRoundRect(const RectF &rect, float rx, float ry, const Paint &paint);
 
   void DrawCircle(float x, float y, float radius, const Paint &paint);
 

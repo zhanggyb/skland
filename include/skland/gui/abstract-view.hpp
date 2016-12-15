@@ -65,25 +65,25 @@ class AbstractView : public Object {
 
   virtual bool Contain(int x, int y) const;
 
-  int x() const { return geometry_.x(); }
+  float x() const { return geometry_.x(); }
 
-  int y() const { return geometry_.y(); }
+  float y() const { return geometry_.y(); }
 
-  int left() const { return geometry_.left; }
+  float left() const { return geometry_.left; }
 
-  int top() const { return geometry_.top; }
+  float top() const { return geometry_.top; }
 
-  int right() const { return geometry_.right; }
+  float right() const { return geometry_.right; }
 
-  int bottom() const { return geometry_.bottom; }
+  float bottom() const { return geometry_.bottom; }
 
-  int width() const { return geometry_.width(); }
+  float width() const { return geometry_.width(); }
 
-  int height() const { return geometry_.height(); }
+  float height() const { return geometry_.height(); }
 
-  int center_x() const { return geometry_.center_x(); }
+  float center_x() const { return geometry_.center_x(); }
 
-  int center_y() const { return geometry_.center_y(); }
+  float center_y() const { return geometry_.center_y(); }
 
   const Rect &geometry() const {
     return geometry_;

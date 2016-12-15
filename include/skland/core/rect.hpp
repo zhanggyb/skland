@@ -105,7 +105,7 @@ struct Rect {
 
 } // namespace core
 
-typedef core::Rect<int> Rect;
+typedef core::Rect<float> Rect;
 typedef core::Rect<int> RectI;
 typedef core::Rect<float> RectF;
 typedef core::Rect<double> RectD;
