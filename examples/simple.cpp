@@ -40,6 +40,7 @@ class SimpleWidget : public AbstractWidget {
 
   sk_sp<SkTypeface> font_;
   Shader linear_shader_;
+  Shader radial_shader_;
 
  public:
 
@@ -59,13 +60,19 @@ class SimpleWidget : public AbstractWidget {
     colors[0] = 0xFFF3F80A;
     colors[1] = 0xFFF52597;
 
-    float pos[2] = {0.2f, 0.8f};
+    float pos[2] = {0.f, 1.f};
 
-    linear_shader_ = GradientShader::MakeLinear(points,
-                                                colors,
-                                                pos,
-                                                2,
-                                                Shader::kTileModeClamp);
+    linear_shader_ =
+        GradientShader::MakeLinear(points, colors, pos, 2, Shader::kTileModeClamp);
+
+    Point2F center = {350.f, 350.f};
+    Color colors2[2];
+    colors2[0] = 0xFF9F9F9F;
+    colors2[1] = 0xFF444444;
+    float pos2[2] = {0.33f, 1.f};
+
+    radial_shader_ =
+        GradientShader::MakeRadial(center, 50.f, colors2, pos2, 2, Shader::kTileModeClamp);
   }
 
   virtual ~SimpleWidget() {
@@ -107,6 +114,10 @@ class SimpleWidget : public AbstractWidget {
     p2.SetShader(linear_shader_);
     canvas->DrawRectangle(100, 100, 200, 200, p2);
 
+    Paint p3;
+    p3.SetAntiAlias(true);
+    p3.SetShader(radial_shader_);
+    canvas->DrawCircle(350, 350, 50, p3);
 
     SkPaint paint1;
 
@@ -117,7 +128,7 @@ class SimpleWidget : public AbstractWidget {
     paint1.setTypeface(font_);
 
     const char text[] = "Hello World!";
-    canvas->sk_canvas()->drawText(text, strlen(text), 220.0f, 320.0f,  paint1);
+    canvas->sk_canvas()->drawText(text, strlen(text), 220.0f, 320.0f, paint1);
   }
 
 };
