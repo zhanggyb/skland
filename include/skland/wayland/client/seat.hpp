@@ -27,6 +27,7 @@ class Pointer;
 class Keyboard;
 class Touch;
 class XdgToplevel;
+class DataDevice;
 
 class Seat {
 
@@ -34,6 +35,7 @@ class Seat {
   friend class Keyboard;
   friend class Touch;
   friend class XdgToplevel;
+  friend class DataDevice;
 
   Seat(const Seat &) = delete;
   Seat &operator=(const Seat &) = delete;

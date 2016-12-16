@@ -27,6 +27,9 @@ class Canvas;
 
 class Path {
 
+  friend bool operator==(const Path &, const Path &);
+  friend bool operator!=(const Path &, const Path &);
+
  public:
 
   enum Direction {
@@ -34,20 +37,43 @@ class Path {
     kCounterClockwise
   };
 
+  enum FillType {
+    kFillTypeWinding,
+    kFillTypeEvenOdd,
+    kFillTypeInverseWinding,
+    kFillTypeInverseEvenOdd
+  };
+
   Path();
 
+  Path(const Path &other);
+
   ~Path();
+
+  Path &operator=(const Path &other);
+
+  bool IsInterpolatable(const Path &compare) const;
+
+  bool Interpolate(const Path &ending, float weight, Path *out) const;
+
+  void AddRoundRect(const Rect &rect, const float radii[], Direction dir = kClockwise);
+
+  FillType GetFillType() const;
+
+  void SetFillType(FillType fill_type);
 
   SkPath *sk_path() const {
     return sk_path_;
   }
 
-  void AddRoundRect(const Rect &rect, const float radii[], Direction dir = kClockwise);
-
  private:
 
   SkPath *sk_path_;
 };
+
+bool operator==(const Path &path1, const Path &path2);
+
+bool operator!=(const Path &path1, const Path &path2);
 
 }
 

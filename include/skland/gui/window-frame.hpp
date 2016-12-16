@@ -142,9 +142,6 @@ class WindowFrame : public AbstractWindowFrame {
 
   Label *title_;
 
-  Color foreground_;
-
-  Color background_;
 };
 
 }

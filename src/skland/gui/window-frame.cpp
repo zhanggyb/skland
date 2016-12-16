@@ -16,8 +16,6 @@
 
 #include <skland/gui/window-frame.hpp>
 
-#include <stdlib.h>
-
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
@@ -36,7 +34,7 @@ namespace skland {
 
 WindowFrame::CloseButton::CloseButton()
     : AbstractButton() {
-  resize(14, 14);
+  resize(22, 17);
   set_name("CloseButton");
 }
 
@@ -45,7 +43,7 @@ WindowFrame::CloseButton::~CloseButton() {
 }
 
 Size WindowFrame::CloseButton::GetPreferredSize() const {
-  return Size(14, 14);
+  return Size(22, 17);
 }
 
 void WindowFrame::CloseButton::OnResize(int /* width */, int /* height */) {
@@ -53,10 +51,9 @@ void WindowFrame::CloseButton::OnResize(int /* width */, int /* height */) {
 }
 
 void WindowFrame::CloseButton::OnDraw(Canvas *canvas) {
-  Color regular(1.f, 0.35f, 0.35f, 1.f);
+  Color regular(0.9f, 0.33f, 0.33f, 1.f);
   Color down = regular - 50;
   Color hover = regular + 15;
-  Color stroke_color = regular - 55;
 
   Paint paint;
   paint.SetAntiAlias(true);
@@ -69,12 +66,24 @@ void WindowFrame::CloseButton::OnDraw(Canvas *canvas) {
       paint.SetColor(hover);
     }
   }
-  canvas->DrawCircle(center_x(), center_y(), 6.f, paint);
 
-  paint.SetColor(stroke_color);
-  paint.SetStyle(Paint::kStyleStroke);
-  paint.SetStrokeWidth(0.5f);
-  canvas->DrawCircle(center_x(), center_y(), 5.5f, paint);
+  float radii[] = {
+      0.f, 0.f, // top-left
+      0.f, 0.f, // top-right
+      4.f, 4.f, // bottom-right
+      4.f, 4.f  // bottom-left
+  };
+  Path path;
+  path.AddRoundRect(geometry(), radii);
+
+  canvas->DrawPath(path, paint);
+
+  if (IsHovered()) {
+    paint.SetStrokeWidth(1.75f);
+    paint.SetColor(0xFFCCCCCC);
+    canvas->DrawLine(center_x() - 2.75f, center_y() - 2.75f, center_x() + 2.75f, center_y() + 2.75f, paint);
+    canvas->DrawLine(center_x() + 2.75f, center_y() - 2.75f, center_x() - 2.75f, center_y() + 2.75f, paint);
+  }
 }
 
 WindowFrame::MaximizeButton::MaximizeButton()
@@ -174,14 +183,6 @@ WindowFrame::WindowFrame(AbstractWindow *window,
       maximize_button_(nullptr),
       minimize_button_(nullptr),
       title_(nullptr) {
-  srand(time(NULL));
-  unsigned char r = rand() % 127 + 128;
-  unsigned char g = rand() % 127 + 128;
-  unsigned char b = rand() % 127 + 128;
-
-  background_ = Color::FromUCharRGBA(r, g, b);
-  foreground_ = Color::ReverseRGBFrom(background_);
-
   if (title_bar_position != kTitleBarNone) {
     CreateWidgets();
   }
@@ -208,19 +209,19 @@ void WindowFrame::CreateWidgets() {
   close_button_ = new CloseButton;
   close_button_->clicked().Connect(this, &WindowFrame::OnCloseButtonClicked);
 
-  minimize_button_ = new MinimizeButton;
-  minimize_button_->clicked().Connect(this, &WindowFrame::OnMinimizeButtonClicked);
+//  minimize_button_ = new MinimizeButton;
+//  minimize_button_->clicked().Connect(this, &WindowFrame::OnMinimizeButtonClicked);
 
-  maximize_button_ = new MaximizeButton;
-  maximize_button_->clicked().Connect(this, &WindowFrame::OnMaximizeButtonClicked);
+//  maximize_button_ = new MaximizeButton;
+//  maximize_button_->clicked().Connect(this, &WindowFrame::OnMaximizeButtonClicked);
 
   title_ = new Label(window()->title(), Font("Arial", Font::kWeightBold));
-  title_->SetForebround(foreground_);
+//  title_->SetForebround(0xFFCCCCCC);
 
-  AddWidget(title_);
-  AddWidget(maximize_button_);
-  AddWidget(minimize_button_);
   AddWidget(close_button_);
+  AddWidget(title_);
+//  AddWidget(maximize_button_);
+//  AddWidget(minimize_button_);
 
   LayoutWidgets(window()->width(), window()->height());
 }
@@ -230,31 +231,30 @@ void WindowFrame::Resize(int width, int height) {
 }
 
 void WindowFrame::LayoutWidgets(int width, int height) {
-  int x = 0;
+  int x = 11;
   int y = 0;
 
   const int space = 5;
 
-  x += space;
-  y = (title_bar_size() - close_button_->height()) / 2;
   close_button_->SetPosition(x, y);
 
-  x += space + close_button_->width();
-  y = (title_bar_size() - minimize_button_->height()) / 2;
-  minimize_button_->SetPosition(x, y);
+//  x += space + close_button_->width();
+//  y = (title_bar_size() - minimize_button_->height()) / 2;
+//  minimize_button_->SetPosition(x, y);
 
-  x += space + minimize_button_->width();
-  y = (title_bar_size() - maximize_button_->height()) / 2;
-  maximize_button_->SetPosition(x, y);
+//  x += space + minimize_button_->width();
+//  y = (title_bar_size() - maximize_button_->height()) / 2;
+//  maximize_button_->SetPosition(x, y);
 
-  x += space + maximize_button_->width();
-  y = 0;
-  int w = width - x;
+//  x += space + maximize_button_->width();
+//  y = 0;
+//  int w = width - x;
 
-  if (w > 0) {
-    title_->SetPosition(x, y);
-    title_->Resize(w, title_bar_size());
-  }
+  x += close_button_->width() + 5;
+//  if (w > 0) {
+    title_->SetPosition(x, 0);
+    title_->Resize((int)window()->width() - x, title_bar_size());
+//  }
 }
 
 void WindowFrame::Draw(Canvas *canvas) {
@@ -263,7 +263,7 @@ void WindowFrame::Draw(Canvas *canvas) {
   DrawShadow(canvas);
 
   Paint paint;
-  paint.SetColor(background_.argb());
+  paint.SetColor(0xFFC9C9CB);
   paint.SetAntiAlias(true);
 
   float radii[] = {
@@ -276,6 +276,10 @@ void WindowFrame::Draw(Canvas *canvas) {
   path.AddRoundRect(window()->geometry(), radii);
 
   canvas->DrawPath(path, paint);
+
+  paint.SetColor(0xFFEBEBEB);
+  canvas->DrawRect(GetClientGeometry(), paint);
+
   canvas->Flush();
 }
 

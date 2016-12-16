@@ -86,7 +86,7 @@ void Label::OnDraw(Canvas *canvas) {
 
   Paint paint;
   paint.SetColor(background_);
-  canvas->DrawRectangle(x(), y(), width(), height(), paint);
+  canvas->DrawRect(geometry(), paint);
 
   paint.SetColor(foreground_);
   paint.SetAntiAlias(true);

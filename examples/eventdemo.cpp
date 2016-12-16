@@ -76,11 +76,11 @@ class SimpleWidget : public AbstractWidget {
   }
 
   virtual void OnDraw(Canvas *canvas) override {
-    Paint paint;
-    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
+//    Paint paint;
+//    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
 
-    canvas->DrawRectangle(x(), y(), width(), height(), paint);
-    canvas->Flush();
+//    canvas->DrawRectangle(x(), y(), width(), height(), paint);
+//    canvas->Flush();
   }
 
  private:

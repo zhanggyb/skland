@@ -107,12 +107,12 @@ class SimpleWidget : public AbstractWidget {
 
   virtual void OnDraw(Canvas *canvas) override {
     Paint paint;
-    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
-    canvas->DrawRectangle(x(), y(), width(), height(), paint);
+//    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
+//    canvas->DrawRectangle(x(), y(), width(), height(), paint);
 
     Paint p2;
     p2.SetShader(linear_shader_);
-    canvas->DrawRectangle(100, 100, 200, 200, p2);
+    canvas->DrawRect(Rect(100, 100, 200, 200), p2);
 
     Paint p3;
     p3.SetAntiAlias(true);

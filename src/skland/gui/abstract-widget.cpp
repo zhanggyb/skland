@@ -81,7 +81,7 @@ void Widget::OnDraw(Canvas *canvas) {
   Paint paint;
   paint.SetColor(Color(0.95f, 0.95f, 0.95f, 1.f));
 
-  canvas->DrawRectangle(x(), y(), width(), height(), paint);
+  canvas->DrawRect(geometry(), paint);
 }
 
 }

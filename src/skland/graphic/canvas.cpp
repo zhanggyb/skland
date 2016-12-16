@@ -45,8 +45,8 @@ Canvas::~Canvas() {
   if (sk_canvas_) delete sk_canvas_;
 }
 
-void Canvas::DrawRectangle(float x, float y, float width, float height, const Paint &paint) {
-  sk_canvas_->drawRect(SkRect::MakeXYWH(x, y, width, height), *paint.sk_paint());
+void Canvas::DrawLine(float x0, float y0, float x1, float y1, const Paint &paint) {
+  sk_canvas_->drawLine(x0, y0, x1, y1, *paint.sk_paint());
 }
 
 void Canvas::DrawRect(const Rect &rect, const Paint &paint) {

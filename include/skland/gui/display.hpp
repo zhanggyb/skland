@@ -37,6 +37,7 @@
 #include <skland/wayland/client/shell.hpp>
 #include <skland/wayland/client/xdg-shell.hpp>
 #include <skland/wayland/client/cursor-theme.hpp>
+#include <skland/wayland/client/data-device-manager.hpp>
 
 namespace skland {
 
@@ -109,6 +110,10 @@ class Display : public Object {
     return kDisplay->wl_shell_;
   }
 
+  static const wayland::client::DataDeviceManager &wl_data_device_manager() {
+    return kDisplay->wl_data_device_manager_;
+  }
+
  private:
 
   static const gui::EventTask *idle_task_head() {
@@ -171,6 +176,7 @@ class Display : public Object {
   wayland::client::Shell wl_shell_;
   wayland::client::XdgShell xdg_shell_;  /* xdg shell v6 */
   wayland::client::CursorTheme wl_cursor_theme_;
+  wayland::client::DataDeviceManager wl_data_device_manager_;
 
 //  struct xkb_context *xkb_context_;
 

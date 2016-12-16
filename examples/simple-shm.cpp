@@ -69,10 +69,10 @@ class ShmWidget : public AbstractWidget {
   }
 
   virtual void OnDraw(Canvas *canvas) override {
-    Paint paint;
-    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
-
-    canvas->DrawRectangle(x(), y(), width(), height(), paint);
+//    Paint paint;
+//    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
+//
+//    canvas->DrawRectangle(x(), y(), width(), height(), paint);
   }
 
 };

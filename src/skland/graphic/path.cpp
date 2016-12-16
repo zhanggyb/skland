@@ -25,13 +25,47 @@ Path::Path()
   sk_path_ = new SkPath;
 }
 
+Path::Path(const Path &other)
+    : sk_path_(nullptr) {
+  sk_path_ = new SkPath(*other.sk_path_);
+}
+
 Path::~Path() {
   delete sk_path_;
 }
 
+Path &Path::operator=(const Path &other) {
+  *sk_path_ = *other.sk_path_;
+  return *this;
+}
+
+bool Path::IsInterpolatable(const Path &compare) const {
+  return sk_path_->isInterpolatable(*compare.sk_path_);
+}
+
+bool Path::Interpolate(const Path &ending, float weight, Path *out) const {
+  return sk_path_->interpolate(*ending.sk_path_, weight, out->sk_path_);
+}
+
 void Path::AddRoundRect(const Rect &rect, const float radii[], Direction dir) {
-  sk_path_->addRoundRect(SkRect::MakeLTRB(rect.l, rect.t, rect.r, rect.b),
+  sk_path_->addRoundRect(reinterpret_cast<const SkRect &>(rect),
                          radii, static_cast<SkPath::Direction>(dir));
+}
+
+Path::FillType Path::GetFillType() const {
+  return (FillType) sk_path_->getFillType();
+}
+
+void Path::SetFillType(FillType fill_type) {
+  sk_path_->setFillType((SkPath::FillType) fill_type);
+}
+
+bool operator==(const Path &path1, const Path &path2) {
+  return (*path1.sk_path_) == (*path2.sk_path_);
+}
+
+bool operator!=(const Path &path1, const Path &path2) {
+  return (*path1.sk_path_) != (*path2.sk_path_);
 }
 
 }

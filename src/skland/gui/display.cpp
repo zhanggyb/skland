@@ -264,6 +264,8 @@ void Display::OnGlobal(uint32_t id,
   } else if (strcmp(interface, wl_seat_interface.name) == 0) {
     Input *input = new Input(wl_registry_, id, version);
     AddInput(input);
+  } else if (strcmp(interface, wl_data_device_manager_interface.name) == 0) {
+    wl_data_device_manager_.Setup(wl_registry_, id, version);
   }
 }
 

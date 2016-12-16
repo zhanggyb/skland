@@ -57,7 +57,7 @@ void PushButton::OnDraw(Canvas *canvas) {
     }
   }
 
-  canvas->DrawRectangle(x(), y(), width(), height(), paint);
+  canvas->DrawRect(geometry(), paint);
 
   /*
   canvas.SetOperator(CAIRO_OPERATOR_SOURCE);

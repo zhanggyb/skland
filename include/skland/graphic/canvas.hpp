@@ -44,7 +44,7 @@ class Canvas {
 
   ~Canvas();
 
-  void DrawRectangle(float x, float y, float width, float height, const Paint &paint);
+  void DrawLine(float x0, float y0, float x1, float y1, const Paint &paint);
 
   void DrawRect(const Rect &rect, const Paint &paint);
 
