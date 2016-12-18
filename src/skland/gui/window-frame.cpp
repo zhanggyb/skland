@@ -27,8 +27,6 @@
 #include <skland/stock/theme.hpp>
 
 #include "SkCanvas.h"
-#include "SkPaint.h"
-#include "SkImage.h"
 
 namespace skland {
 
@@ -80,7 +78,7 @@ void WindowFrame::CloseButton::OnDraw(Canvas *canvas) {
 
   if (IsHovered()) {
     paint.SetStrokeWidth(1.75f);
-    paint.SetColor(0xFFCCCCCC);
+    paint.SetColor(0xFFEBEBEB);
     canvas->DrawLine(center_x() - 2.75f, center_y() - 2.75f, center_x() + 2.75f, center_y() + 2.75f, paint);
     canvas->DrawLine(center_x() + 2.75f, center_y() - 2.75f, center_x() - 2.75f, center_y() + 2.75f, paint);
   }
@@ -216,7 +214,7 @@ void WindowFrame::CreateWidgets() {
 //  maximize_button_->clicked().Connect(this, &WindowFrame::OnMaximizeButtonClicked);
 
   title_ = new Label(window()->title(), Font("Arial", Font::kWeightBold));
-//  title_->SetForebround(0xFFCCCCCC);
+  title_->SetForebround(0xFFEBEBEB);
 
   AddWidget(close_button_);
   AddWidget(title_);
@@ -263,7 +261,7 @@ void WindowFrame::Draw(Canvas *canvas) {
   DrawShadow(canvas);
 
   Paint paint;
-  paint.SetColor(0xFFC9C9CB);
+  paint.SetColor(0xE0393939);
   paint.SetAntiAlias(true);
 
   float radii[] = {

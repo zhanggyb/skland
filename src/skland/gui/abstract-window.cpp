@@ -118,9 +118,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
   }
 }
 
-void AbstractWindow::Close(SLOT slot) {
-  UnbindAll(slot);
-
+void AbstractWindow::Close(SLOT) {
   if (Display::windows_count() == 1) {
     Application::Exit();
   }
