@@ -216,12 +216,12 @@ void WindowFrame::CreateWidgets() {
   title_ = new Label(window()->title(), Font("Arial", Font::kWeightBold));
   title_->SetForebround(0xFFEBEBEB);
 
-  AddWidget(close_button_);
   AddWidget(title_);
+  AddWidget(close_button_);
 //  AddWidget(maximize_button_);
 //  AddWidget(minimize_button_);
 
-  LayoutWidgets(window()->width(), window()->height());
+  LayoutWidgets((int)window()->width(), (int)window()->height());
 }
 
 void WindowFrame::Resize(int width, int height) {
@@ -248,10 +248,9 @@ void WindowFrame::LayoutWidgets(int width, int height) {
 //  y = 0;
 //  int w = width - x;
 
-  x += close_button_->width() + 5;
 //  if (w > 0) {
-    title_->SetPosition(x, 0);
-    title_->Resize((int)window()->width() - x, title_bar_size());
+    title_->SetPosition(0, 0);
+    title_->Resize((int)window()->width(), title_bar_size());
 //  }
 }
 
@@ -261,7 +260,7 @@ void WindowFrame::Draw(Canvas *canvas) {
   DrawShadow(canvas);
 
   Paint paint;
-  paint.SetColor(0xE0393939);
+  paint.SetColor(0xFF555555);
   paint.SetAntiAlias(true);
 
   float radii[] = {

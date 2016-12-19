@@ -24,6 +24,7 @@
 
 #include "SkTypeface.h"
 #include "SkPaint.h"
+#include "SkTextBox.h"
 
 namespace skland {
 
@@ -94,7 +95,16 @@ void Label::OnDraw(Canvas *canvas) {
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font_);
 
-  canvas->DrawText(text_.c_str(), text_.length(), x() + 5.f, y() + 16.f, paint);
+  float text_width = paint.sk_paint()->measureText(text_.c_str(), text_.length());
+
+  SkTextBox text_box;
+  text_box.setBox(geometry().l + geometry().width() / 2.f - text_width / 2.f,
+                  geometry().t + 1.f,
+                  geometry().r - geometry().width() / 2.f + text_width / 2.f,
+                  geometry().b);
+  text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
+  text_box.setText(text_.c_str(), text_.length(), *paint.sk_paint());
+  text_box.draw(canvas->sk_canvas());
 }
 
 }
