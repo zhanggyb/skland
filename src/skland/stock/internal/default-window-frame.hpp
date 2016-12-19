@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_WINDOW_FRAME_HPP_
-#define SKLAND_GUI_WINDOW_FRAME_HPP_
+#ifndef SKLAND_STOCK_DEFAULT_WINDOW_FRAME_HPP_
+#define SKLAND_STOCK_DEFAULT_WINDOW_FRAME_HPP_
 
-#include "abstract-window-frame.hpp"
+#include <skland/gui/abstract-window-frame.hpp>
 
-#include "../core/color.hpp"
-#include "abstract-button.hpp"
+#include <skland/core/color.hpp>
+#include <skland/gui/abstract-button.hpp>
 
 namespace skland {
 
@@ -29,24 +29,20 @@ class Label;
 /**
  * @brief The default window frame
  */
-class WindowFrame : public AbstractWindowFrame {
+class DefaultWindowFrame : public AbstractWindowFrame {
 
-  WindowFrame() = delete;
-  WindowFrame(const WindowFrame &orig) = delete;
-  WindowFrame &operator=(const WindowFrame &other) = delete;
+  DefaultWindowFrame(const DefaultWindowFrame &orig) = delete;
+  DefaultWindowFrame &operator=(const DefaultWindowFrame &other) = delete;
 
  public:
 
-  WindowFrame(AbstractWindow *window,
-              int border = 0,
-              TitleBarPosition title_bar_position = kTitleBarTop,
-              int title_bar_size = 22);
+  DefaultWindowFrame();
 
-  virtual ~WindowFrame();
+  virtual ~DefaultWindowFrame();
 
-  virtual void Resize(int width, int height) final;
+  virtual void OnResize(int width, int height) final;
 
-  virtual void Draw(Canvas *canvas) final;
+  virtual void OnDraw(Canvas *canvas) final;
 
   /**
 * Calculate and return the cursor position at the border of this frame
@@ -61,6 +57,10 @@ class WindowFrame : public AbstractWindowFrame {
 * |        |                 |
 */
   virtual int GetMouseLocation(const MouseEvent *event) const override;
+
+ protected:
+
+  virtual void OnSetup() final;
 
  private:
 

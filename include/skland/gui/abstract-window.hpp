@@ -28,8 +28,9 @@
 
 #include <skland/wayland/client/xdg-surface.hpp>
 #include <skland/wayland/client/xdg-toplevel.hpp>
-#include <skland/wayland/client/xdg-popup.hpp>
 #include <skland/wayland/client/region.hpp>
+
+#include <skland/stock/theme.hpp>
 
 namespace skland {
 
@@ -37,23 +38,10 @@ class Display;
 class Application;
 class AbstractWindowFrame;
 
-enum WindowFlagMask {
-  kWindowFramelessMask = 0x1,
-  kWindowModeMask = 0x3 << 1,
-  kWindowTypeMask = 0x1 << 3
-};
-
 enum WindowFlags {
-  kWindowFrameless = 0x1,
-
-  /* Initial size: */
-      kWindowFullscreen = 0x1 << 1,
-  kWindowMaximized = 0x2 << 1,
-  kWindowMinimized = 0x3 << 1,
-
-  /* Window type: */
-  /*  kWindowToplevel = 0x0 << 3, */
-      kWindowPopup = 0x1 << 3
+  kWindowFullscreen = 0x1,
+  kWindowMaximized = 0x2,
+  kWindowMinimized = 0x3,
 };
 
 class AbstractWindow : public AbstractView {
@@ -72,9 +60,12 @@ class AbstractWindow : public AbstractView {
     kActionLast
   };
 
-  AbstractWindow(const char *title, int flags = 0);
+  AbstractWindow(const char *title,
+                 AbstractWindowFrame *frame = Theme::CreateWindowFrame());
 
-  AbstractWindow(int width, int height, const char *title, int flags = 0);
+  AbstractWindow(int width, int height,
+                 const char *title,
+                 AbstractWindowFrame *frame = Theme::CreateWindowFrame());
 
   virtual ~AbstractWindow();
 
@@ -103,27 +94,19 @@ class AbstractWindow : public AbstractView {
   virtual Size GetMaximalSize() const override;
 
   bool IsFullscreen() const {
-    return (flags_ & kWindowModeMask) == kWindowFullscreen;
+    return flags_ == kWindowFullscreen;
   }
 
   bool IsMaximized() const {
-    return (flags_ & kWindowModeMask) == kWindowMaximized;
+    return flags_ == kWindowMaximized;
   }
 
   bool IsMinimized() const {
-    return (flags_ & kWindowModeMask) == kWindowMinimized;
-  }
-
-  bool IsToplevel() const {
-    return (flags_ & kWindowTypeMask) == 0;
-  }
-
-  bool IsPopup() const {
-    return (flags_ & kWindowTypeMask) == kWindowPopup;
+    return flags_ == kWindowMinimized;
   }
 
   bool IsFrameless() const {
-    return (flags_ & kWindowFramelessMask) == kWindowFrameless;
+    return window_frame_ == nullptr;
   }
 
   int GetMouseLocation(const MouseEvent *event) const;
@@ -170,8 +153,6 @@ class AbstractWindow : public AbstractView {
   wayland::client::XdgSurface xdg_surface_;
 
   wayland::client::XdgToplevel xdg_toplevel_;
-
-  wayland::client::XdgPopup xdg_popup_;
 
   wayland::client::Region input_region_;
 

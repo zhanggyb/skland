@@ -51,6 +51,8 @@ if (LINUX)
 
     file(GLOB stock_headers "${PROJECT_SOURCE_DIR}/include/skland/stock/*.hpp")
     file(GLOB stock_sources "stock/*.cpp")
+    file(GLOB stock_internal_headers "stock/internal/*.hpp")
+    file(GLOB stock_internal_sources "stock/internal/*.cpp")
 
     list(APPEND all_source_files
             ${wayland_client_headers}
@@ -62,7 +64,9 @@ if (LINUX)
             ${gui_internal_headers}
             ${gui_internal_sources}
             ${stock_headers}
-            ${stock_sources})
+            ${stock_sources}
+            ${stock_internal_headers}
+            ${stock_internal_sources})
 
 endif ()
 

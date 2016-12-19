@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_ABSTRACT_WINDOW_FRAME_HPP_
-#define SKLAND_ABSTRACT_WINDOW_FRAME_HPP_
+#ifndef SKLAND_GUI_ABSTRACT_WINDOW_FRAME_HPP_
+#define SKLAND_GUI_ABSTRACT_WINDOW_FRAME_HPP_
 
 #include <skland/core/sigcxx.hpp>
 #include <skland/core/margin.hpp>
@@ -38,7 +38,8 @@ class Canvas;
  */
 class AbstractWindowFrame : public Trackable {
 
-  AbstractWindowFrame() = delete;
+  friend class AbstractWindow;
+
   AbstractWindowFrame(const AbstractWindowFrame &) = delete;
   AbstractWindowFrame &operator=(const AbstractWindowFrame &) = delete;
 
@@ -52,10 +53,7 @@ class AbstractWindowFrame : public Trackable {
     kTitleBarLeft
   };
 
-  AbstractWindowFrame(AbstractWindow *window,
-                      int border = 5,
-                      TitleBarPosition title_bar_position = kTitleBarTop,
-                      int title_bar_size = 30);
+  AbstractWindowFrame();
 
   virtual ~AbstractWindowFrame();
 
@@ -81,20 +79,19 @@ class AbstractWindowFrame : public Trackable {
     return window_action_;
   }
 
-  virtual void Resize(int width, int height) = 0;
-
-  virtual void Draw(Canvas *context) = 0;
-
-  virtual int GetMouseLocation(const MouseEvent *event) const = 0;
-
-  /** The margin within which the cursor should switch to resizing, the values SHOULD smaller than shadow margin */
+  /** The margin within which the cursor should switch to resizing,
+   * the values SHOULD smaller than shadow margin */
   static const Margin kResizingMargin;
 
-  static const Point kShadowOffset;
-
-  static const int kShadowBlurRadius;
-
  protected:
+
+  virtual void OnSetup() = 0;
+
+  virtual void OnResize(int width, int height) = 0;
+
+  virtual void OnDraw(Canvas *context) = 0;
+
+  virtual int GetMouseLocation(const MouseEvent *event) const = 0;
 
   void AddWidget(AbstractWidget *widget, int pos = 0);
 
@@ -102,9 +99,22 @@ class AbstractWindowFrame : public Trackable {
     window_action_.Emit(action);
   }
 
+  void set_border(int border) {
+    border_ = border;
+  }
+
+  void set_title_bar_size(int title_bar_size) {
+    title_bar_size_ = title_bar_size;
+  }
+
+  void set_title_bar_position(TitleBarPosition position) {
+    title_bar_position_ = position;
+  }
+
  private:
 
   AbstractWindow *window_;
+
   int border_;
   int title_bar_size_;
   TitleBarPosition title_bar_position_;

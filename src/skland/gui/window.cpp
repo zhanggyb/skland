@@ -27,12 +27,12 @@
 
 namespace skland {
 
-Window::Window(const char *title, int flags)
-    : Window(640, 480, title, flags) {
+Window::Window(const char *title)
+    : Window(640, 480, title) {
 }
 
-Window::Window(int width, int height, const char *title, int flags)
-    : AbstractWindow(width, height, title, flags),
+Window::Window(int width, int height, const char *title)
+    : AbstractWindow(width, height, title),
       main_widget_(nullptr) {
 
   set_name(title);  // debug only

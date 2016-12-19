@@ -22,18 +22,12 @@ namespace skland {
 
 const Margin AbstractWindowFrame::kResizingMargin(5, 5, 5, 5);
 
-const Point AbstractWindowFrame::kShadowOffset(0, 10);
-
-const int AbstractWindowFrame::kShadowBlurRadius = 30;
-
-AbstractWindowFrame::AbstractWindowFrame(AbstractWindow *window,
-                                         int border,
-                                         TitleBarPosition title_bar_position,
-                                         int title_bar_size)
-    : window_(window),
-      border_(border),
-      title_bar_size_(title_bar_size),
-      title_bar_position_(title_bar_position) {
+AbstractWindowFrame::AbstractWindowFrame()
+    : Trackable(),
+      window_(nullptr),
+      border_(0),
+      title_bar_size_(0),
+      title_bar_position_(kTitleBarNone) {
 }
 
 AbstractWindowFrame::~AbstractWindowFrame() {
@@ -42,8 +36,8 @@ AbstractWindowFrame::~AbstractWindowFrame() {
 Rect AbstractWindowFrame::GetClientGeometry() const {
   int x = border_,
       y = border_,
-      w = window()->width() - 2 * border_,
-      h = window()->height() - 2 * border_;
+      w = (int) window()->width() - 2 * border_,
+      h = (int) window()->height() - 2 * border_;
 
   switch (title_bar_position_) {
     case kTitleBarLeft: {

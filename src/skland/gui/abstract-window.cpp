@@ -19,38 +19,41 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/surface.hpp>
 #include <skland/gui/mouse-event.hpp>
-#include <skland/gui/window-frame.hpp>
-
-#include <skland/stock/theme.hpp>
+#include <skland/gui/abstract-window-frame.hpp>
 
 namespace skland {
 
-AbstractWindow::AbstractWindow(const char *title, int flags)
-    : AbstractWindow(400, 300, title, flags) {
+AbstractWindow::AbstractWindow(const char *title,
+                               AbstractWindowFrame *frame)
+    : AbstractWindow(400, 300, title, frame) {
 }
 
-AbstractWindow::AbstractWindow(int width, int height, const char *title, int flags)
+AbstractWindow::AbstractWindow(int width,
+                               int height,
+                               const char *title,
+                               AbstractWindowFrame *frame)
     : AbstractView(width, height),
       display_(nullptr),
       window_frame_(nullptr),
-      flags_(flags) {
+      flags_(0) {
   if (title) title_ = title;
 
   int x = 0, y = 0;  // The input region
 
   Surface *surface = nullptr;
-  if (IsFrameless()) {
-    surface = new Surface(this);
-  } else {
-    SetWindowFrame(new WindowFrame(this, 5));
+
+  if (frame) {
     surface = new Surface(this, Margin(Theme::shadow_margin_left(),
                                        Theme::shadow_margin_top(),
                                        Theme::shadow_margin_right(),
                                        Theme::shadow_margin_bottom()));
+    SetWindowFrame(frame);
     x += surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
     y += surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
+  } else {
+    surface = new Surface(this);
   }
 
   SetSurface(surface);
@@ -61,21 +64,13 @@ AbstractWindow::AbstractWindow(int width, int height, const char *title, int fla
   xdg_surface_.configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
   xdg_surface_.Setup(Display::xdg_shell(), surface->wl_surface());
 
-  if (IsToplevel()) {
-    DBG_ASSERT(xdg_popup_.IsNull());
-    xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
-    xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
-    xdg_toplevel_.Setup(xdg_surface_);
-    xdg_toplevel_.SetTitle(title_.c_str());
-    xdg_toplevel_.SetAppId(title_.c_str());
+  xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
+  xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
+  xdg_toplevel_.Setup(xdg_surface_);
+  xdg_toplevel_.SetTitle(title_.c_str());
+  xdg_toplevel_.SetAppId(title_.c_str());
 
-    if (title) xdg_toplevel_.SetTitle(title);
-  }
-
-  if (IsPopup()) {
-    DBG_ASSERT(xdg_toplevel_.IsNull());
-    // TODO: create popup object
-  }
+  if (title) xdg_toplevel_.SetTitle(title);
 
   Display::AddWindow(this);
   // TODO: layout in display
@@ -95,10 +90,8 @@ AbstractWindow::~AbstractWindow() {
 }
 
 void AbstractWindow::SetTitle(const char *title) {
-  if (title && IsToplevel()) {
-    title_ = title;
-    xdg_toplevel_.SetTitle(title);
-  }
+  title_ = title;
+  xdg_toplevel_.SetTitle(title);
 }
 
 void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
@@ -109,12 +102,13 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
     window_frame_ = nullptr;
   }
 
-  if (nullptr == window_frame) {
-    set_bit<int>(flags_, kWindowFramelessMask);
-  } else {
+  if (window_frame) {
+    // TODO: check the original window use the window frame
+
     window_frame_ = window_frame;
-    clear_bit<int>(flags_, kWindowFramelessMask);
+    window_frame_->window_ = this;
     window_frame_->window_action().Connect(this, &AbstractWindow::OnWindowAction);
+    window_frame_->OnSetup();
   }
 }
 
@@ -135,10 +129,7 @@ void AbstractWindow::Minimize(SLOT) {
 }
 
 Size AbstractWindow::GetMinimalSize() const {
-  if (IsFrameless()) {
-    DBG_ASSERT(nullptr == window_frame_);
-    return Size(100, 100);
-  }
+  if (IsFrameless()) return Size(100, 100);
 
   int w = 160, h = 120;
   switch (window_frame_->title_bar_position()) {
@@ -293,7 +284,7 @@ void AbstractWindow::OnMouseButton(MouseEvent *event) {
 }
 
 void AbstractWindow::OnDraw(Canvas *canvas) {
-  if (window_frame_) window_frame_->Draw(canvas);
+  if (window_frame_) window_frame_->OnDraw(canvas);
 }
 
 void AbstractWindow::AddSubView(AbstractView *view, int pos) {
@@ -301,17 +292,11 @@ void AbstractWindow::AddSubView(AbstractView *view, int pos) {
 }
 
 void AbstractWindow::MoveWithMouse(MouseEvent *event) const {
-  if (IsToplevel()) {
-    DBG_ASSERT(xdg_toplevel_.IsValid());
-    xdg_toplevel_.Move(event->wl_seat(), event->serial());
-  }
+  xdg_toplevel_.Move(event->wl_seat(), event->serial());
 }
 
 void AbstractWindow::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
-  if (IsToplevel()) {
-    DBG_ASSERT(xdg_toplevel_.IsValid());
-    xdg_toplevel_.Resize(event->wl_seat(), event->serial(), edges);
-  }
+  xdg_toplevel_.Resize(event->wl_seat(), event->serial(), edges);
 }
 
 void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
@@ -320,8 +305,8 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
   if (nullptr == surface()->canvas()) {
     int x = surface()->margin().left;
     int y = surface()->margin().top;
-    int w = width();
-    int h = height();
+    int w = (int) width();
+    int h = (int) height();
 
     xdg_surface_.SetWindowGeometry(x, y, w, h);
     OnConfigureCanvas();
@@ -359,12 +344,15 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
       }
 
       input_region_.Setup(Display::wl_compositor());
-      input_region_.Add(input_rect.x(), input_rect.y(), input_rect.width(), input_rect.height());
+      input_region_.Add((int) input_rect.x(),
+                        (int) input_rect.y(),
+                        (int) input_rect.width(),
+                        (int) input_rect.height());
       surface()->SetInputRegion(input_region_);
 
       xdg_surface_.SetWindowGeometry(x, y, width, height);
 
-      if (!IsFrameless()) window_frame_->Resize(width, height);
+      if (!IsFrameless()) window_frame_->OnResize(width, height);
       OnResize(width, height);
     }
   }
@@ -382,24 +370,20 @@ void AbstractWindow::OnWindowAction(int action, SLOT slot) {
     }
     case kActionMaximize: {
       // TODO: maximize
-      if (IsToplevel()) {
-        if (IsMaximized()) {
-          clear_bit<int>(flags_, kWindowModeMask);
-          xdg_toplevel_.UnsetMaximized();
-        } else {
-          clear_bit<int>(flags_, kWindowModeMask);
-          set_bit<int>(flags_, kWindowMaximized);
-          xdg_toplevel_.SetMaximized();
-        }
+      if (IsMaximized()) {
+        clear_bit<int>(flags_, 0x3);
+        xdg_toplevel_.UnsetMaximized();
+      } else {
+        clear_bit<int>(flags_, 0x3);
+        set_bit<int>(flags_, kWindowMaximized);
+        xdg_toplevel_.SetMaximized();
       }
       break;
     }
     case kActionMinimize: {
       fprintf(stderr, "minimize\n");
       // TODO: minimize
-      if (IsToplevel()) {
-        xdg_toplevel_.SetMinimized();
-      }
+      xdg_toplevel_.SetMinimized();
       break;
     }
     case kActionMenu: {

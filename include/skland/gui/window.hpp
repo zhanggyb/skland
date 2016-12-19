@@ -32,9 +32,9 @@ class Window : public AbstractWindow {
 
  public:
 
-  Window(const char *title, int flags = 0);
+  Window(const char *title);
 
-  Window(int width, int height, const char *title, int flags = 0);
+  Window(int width, int height, const char *title);
 
   virtual ~Window();
 

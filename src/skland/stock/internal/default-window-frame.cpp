@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <skland/gui/window-frame.hpp>
+#include "default-window-frame.hpp"
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
@@ -30,25 +30,25 @@
 
 namespace skland {
 
-WindowFrame::CloseButton::CloseButton()
+DefaultWindowFrame::CloseButton::CloseButton()
     : AbstractButton() {
   resize(22, 17);
   set_name("CloseButton");
 }
 
-WindowFrame::CloseButton::~CloseButton() {
+DefaultWindowFrame::CloseButton::~CloseButton() {
 
 }
 
-Size WindowFrame::CloseButton::GetPreferredSize() const {
+Size DefaultWindowFrame::CloseButton::GetPreferredSize() const {
   return Size(22, 17);
 }
 
-void WindowFrame::CloseButton::OnResize(int /* width */, int /* height */) {
+void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */) {
 
 }
 
-void WindowFrame::CloseButton::OnDraw(Canvas *canvas) {
+void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
   Color regular(0.9f, 0.33f, 0.33f, 1.f);
   Color down = regular - 50;
   Color hover = regular + 15;
@@ -84,25 +84,25 @@ void WindowFrame::CloseButton::OnDraw(Canvas *canvas) {
   }
 }
 
-WindowFrame::MaximizeButton::MaximizeButton()
+DefaultWindowFrame::MaximizeButton::MaximizeButton()
     : AbstractButton() {
   resize(14, 14);
   set_name("MaximizeButton");
 }
 
-WindowFrame::MaximizeButton::~MaximizeButton() {
+DefaultWindowFrame::MaximizeButton::~MaximizeButton() {
 
 }
 
-Size WindowFrame::MaximizeButton::GetPreferredSize() const {
+Size DefaultWindowFrame::MaximizeButton::GetPreferredSize() const {
   return Size(14, 14);
 }
 
-void WindowFrame::MaximizeButton::OnResize(int /* width */, int /* height */) {
+void DefaultWindowFrame::MaximizeButton::OnResize(int /* width */, int /* height */) {
 
 }
 
-void WindowFrame::MaximizeButton::OnDraw(Canvas *canvas) {
+void DefaultWindowFrame::MaximizeButton::OnDraw(Canvas *canvas) {
   Color regular(0.25f, 0.8f, 0.25f, 1.f);
   Color down = regular - 50;
   Color hover = regular + 15;
@@ -127,25 +127,25 @@ void WindowFrame::MaximizeButton::OnDraw(Canvas *canvas) {
   canvas->DrawCircle(center_x(), center_y(), 5.5f, paint);
 }
 
-WindowFrame::MinimizeButton::MinimizeButton()
+DefaultWindowFrame::MinimizeButton::MinimizeButton()
     : AbstractButton() {
   resize(14, 14);
   set_name("MinimizeButton");
 }
 
-WindowFrame::MinimizeButton::~MinimizeButton() {
+DefaultWindowFrame::MinimizeButton::~MinimizeButton() {
 
 }
 
-Size WindowFrame::MinimizeButton::GetPreferredSize() const {
+Size DefaultWindowFrame::MinimizeButton::GetPreferredSize() const {
   return Size(14, 14);
 }
 
-void WindowFrame::MinimizeButton::OnResize(int /* width */, int /* height */) {
+void DefaultWindowFrame::MinimizeButton::OnResize(int /* width */, int /* height */) {
 
 }
 
-void WindowFrame::MinimizeButton::OnDraw(Canvas *canvas) {
+void DefaultWindowFrame::MinimizeButton::OnDraw(Canvas *canvas) {
   Color regular(1.f, 0.75f, 0.2f, 1.f);
   Color down = regular - 50;
   Color hover = regular + 15;
@@ -172,46 +172,43 @@ void WindowFrame::MinimizeButton::OnDraw(Canvas *canvas) {
 
 //-------------------------
 
-WindowFrame::WindowFrame(AbstractWindow *window,
-                         int border,
-                         TitleBarPosition title_bar_position,
-                         int title_bar_size)
-    : AbstractWindowFrame(window, border, title_bar_position, title_bar_size),
+DefaultWindowFrame::DefaultWindowFrame()
+    : AbstractWindowFrame(),
       close_button_(nullptr),
       maximize_button_(nullptr),
       minimize_button_(nullptr),
       title_(nullptr) {
-  if (title_bar_position != kTitleBarNone) {
-    CreateWidgets();
-  }
+  set_border(5);
+  set_title_bar_size(22);
+  set_title_bar_position(kTitleBarTop);
 }
 
-WindowFrame::~WindowFrame() {
+DefaultWindowFrame::~DefaultWindowFrame() {
   delete title_;
   delete close_button_;
 }
 
-void WindowFrame::OnCloseButtonClicked(SLOT /* slot */) {
+void DefaultWindowFrame::OnCloseButtonClicked(SLOT /* slot */) {
   EmitAction(AbstractWindow::kActionClose);
 }
 
-void WindowFrame::OnMaximizeButtonClicked(SLOT /* slot */) {
+void DefaultWindowFrame::OnMaximizeButtonClicked(SLOT /* slot */) {
   EmitAction(AbstractWindow::kActionMaximize);
 }
 
-void WindowFrame::OnMinimizeButtonClicked(SLOT /* slot */) {
+void DefaultWindowFrame::OnMinimizeButtonClicked(SLOT /* slot */) {
   EmitAction(AbstractWindow::kActionMinimize);
 }
 
-void WindowFrame::CreateWidgets() {
+void DefaultWindowFrame::CreateWidgets() {
   close_button_ = new CloseButton;
-  close_button_->clicked().Connect(this, &WindowFrame::OnCloseButtonClicked);
+  close_button_->clicked().Connect(this, &DefaultWindowFrame::OnCloseButtonClicked);
 
 //  minimize_button_ = new MinimizeButton;
-//  minimize_button_->clicked().Connect(this, &WindowFrame::OnMinimizeButtonClicked);
+//  minimize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMinimizeButtonClicked);
 
 //  maximize_button_ = new MaximizeButton;
-//  maximize_button_->clicked().Connect(this, &WindowFrame::OnMaximizeButtonClicked);
+//  maximize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMaximizeButtonClicked);
 
   title_ = new Label(window()->title(), Font("Arial", Font::kWeightBold));
   title_->SetForebround(0xFFEBEBEB);
@@ -221,14 +218,14 @@ void WindowFrame::CreateWidgets() {
 //  AddWidget(maximize_button_);
 //  AddWidget(minimize_button_);
 
-  LayoutWidgets((int)window()->width(), (int)window()->height());
+  LayoutWidgets((int) window()->width(), (int) window()->height());
 }
 
-void WindowFrame::Resize(int width, int height) {
+void DefaultWindowFrame::OnResize(int width, int height) {
   LayoutWidgets(width, height);
 }
 
-void WindowFrame::LayoutWidgets(int width, int height) {
+void DefaultWindowFrame::LayoutWidgets(int width, int height) {
   int x = 11;
   int y = 0;
 
@@ -249,12 +246,12 @@ void WindowFrame::LayoutWidgets(int width, int height) {
 //  int w = width - x;
 
 //  if (w > 0) {
-    title_->SetPosition(0, 0);
-    title_->Resize((int)window()->width(), title_bar_size());
+  title_->SetPosition(0, 0);
+  title_->Resize((int) window()->width(), title_bar_size());
 //  }
 }
 
-void WindowFrame::Draw(Canvas *canvas) {
+void DefaultWindowFrame::OnDraw(Canvas *canvas) {
   canvas->Clear();
 
   DrawShadow(canvas);
@@ -280,7 +277,11 @@ void WindowFrame::Draw(Canvas *canvas) {
   canvas->Flush();
 }
 
-int WindowFrame::GetMouseLocation(const MouseEvent *event) const {
+void DefaultWindowFrame::OnSetup() {
+  CreateWidgets();
+}
+
+int DefaultWindowFrame::GetMouseLocation(const MouseEvent *event) const {
   int vlocation, hlocation, location;
   int x = static_cast<int>(event->surface_x()), y = static_cast<int>(event->surface_y());
 
@@ -321,9 +322,9 @@ int WindowFrame::GetMouseLocation(const MouseEvent *event) const {
   return location;
 }
 
-void WindowFrame::DrawShadow(Canvas *canvas) {
+void DefaultWindowFrame::DrawShadow(Canvas *canvas) {
 
-  const float rad = 20.f; // The spread radius
+  const float rad = Theme::shadow_radius() - 1.f; // The spread radius
 
   const float offset_x = Theme::shadow_offset_x();
   const float offset_y = Theme::shadow_offset_y();

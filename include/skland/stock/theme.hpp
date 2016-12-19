@@ -27,6 +27,7 @@ namespace skland {
 
 // Forward declaration
 class Application;
+class AbstractWindowFrame;
 
 struct ColorScheme {
   ColorD outline;
@@ -49,6 +50,8 @@ class Theme {
   Theme &operator=(const Theme &other) = delete;
 
  public:
+
+  static AbstractWindowFrame *CreateWindowFrame();
 
   static inline const ColorScheme &window_frame() {
     return kTheme->window_frame_;

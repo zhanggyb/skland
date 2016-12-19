@@ -84,7 +84,6 @@ void Label::OnKeyboardKey(KeyEvent *event) {
 }
 
 void Label::OnDraw(Canvas *canvas) {
-
   Paint paint;
   paint.SetColor(background_);
   canvas->DrawRect(geometry(), paint);
@@ -98,9 +97,10 @@ void Label::OnDraw(Canvas *canvas) {
   float text_width = paint.sk_paint()->measureText(text_.c_str(), text_.length());
 
   SkTextBox text_box;
-  text_box.setBox(geometry().l + geometry().width() / 2.f - text_width / 2.f,
-                  geometry().t + 1.f,
-                  geometry().r - geometry().width() / 2.f + text_width / 2.f,
+  // Put the text at the center
+  text_box.setBox((geometry().l + geometry().r - text_width) / 2.f,
+                  geometry().t + 1.f, // move down a little for better look
+                  (geometry().r - geometry().l + text_width) / 2.f,
                   geometry().b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
   text_box.setText(text_.c_str(), text_.length(), *paint.sk_paint());

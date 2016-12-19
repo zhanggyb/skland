@@ -22,6 +22,8 @@
 #include "SkPaint.h"
 #include "SkPixmap.h"
 
+#include "internal/default-window-frame.hpp"
+
 namespace skland {
 
 Theme *Theme::kTheme = nullptr;
@@ -36,6 +38,10 @@ Theme::~Theme() {
   delete shadow_pixmap_;
 }
 
+AbstractWindowFrame *Theme::CreateWindowFrame() {
+  return new DefaultWindowFrame;
+}
+
 void Theme::Reset() {
   window_frame_.outline = 0x303030;
   window_frame_.inner = 0x414141FF;
@@ -47,10 +53,10 @@ void Theme::Reset() {
   window_frame_.shadetop = 15;
   window_frame_.shadedown = 0;
 
-  shadow_radius_ = 35;
+  shadow_radius_ = 33;
 
   shadow_offset_x_ = 0;
-  shadow_offset_y_ = 9;
+  shadow_offset_y_ = 11;
 
   shadow_pixels_.resize(kShadowImageWidth * kShadowImageHeight, 0);
   GenerateShadowImage();
@@ -70,7 +76,7 @@ void Theme::GenerateShadowImage() {
                                     kShadowImageWidth * 4);
   SkPaint paint;
   paint.setAntiAlias(true);
-  paint.setARGB(90, 0, 0, 0);
+  paint.setARGB(99, 0, 0, 0);
   paint.setMaskFilter(SkBlurMaskFilter::Make(
       kNormal_SkBlurStyle, shadow_radius_ / 2.f - 0.5f, 0x2));  // Use high-quality blur
 
