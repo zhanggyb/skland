@@ -106,7 +106,10 @@ void AbstractView::SetSurface(Surface *surface) {
 void AbstractView::Damage(const Rect &rect) {
   Surface *surface = GetSurface();
   if (surface) {
-    surface->Damage(rect.x(), rect.y(), rect.width(), rect.height());
+    surface->Damage((int) rect.x(),
+                    (int) rect.y(),
+                    (int) rect.width(),
+                    (int) rect.height());
   }
 }
 

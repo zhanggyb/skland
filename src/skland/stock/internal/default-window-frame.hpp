@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_STOCK_DEFAULT_WINDOW_FRAME_HPP_
-#define SKLAND_STOCK_DEFAULT_WINDOW_FRAME_HPP_
+#ifndef SKLAND_STOCK_INTERNAL_DEFAULT_WINDOW_FRAME_HPP_
+#define SKLAND_STOCK_INTERNAL_DEFAULT_WINDOW_FRAME_HPP_
 
 #include <skland/gui/abstract-window-frame.hpp>
 
@@ -29,7 +29,7 @@ class Label;
 /**
  * @brief The default window frame
  */
-class DefaultWindowFrame : public AbstractWindowFrame {
+class DefaultWindowFrame final : public AbstractWindowFrame {
 
   DefaultWindowFrame(const DefaultWindowFrame &orig) = delete;
   DefaultWindowFrame &operator=(const DefaultWindowFrame &other) = delete;
@@ -40,33 +40,33 @@ class DefaultWindowFrame : public AbstractWindowFrame {
 
   virtual ~DefaultWindowFrame();
 
-  virtual void OnResize(int width, int height) final;
-
-  virtual void OnDraw(Canvas *canvas) final;
-
-  /**
-* Calculate and return the cursor position at the border of this frame
-* @param x
-* @param y
-* @return
-*
-* |        |                 |
-* |        |                 |
-* | shadow | resizing border | resizing border
-* |        |                 |
-* |        |                 |
-*/
-  virtual int GetMouseLocation(const MouseEvent *event) const override;
-
  protected:
 
-  virtual void OnSetup() final;
+  virtual void OnSetup();
+
+  virtual void OnResize(int width, int height);
+
+  virtual void OnDraw(Canvas *canvas);
+
+  /**
+    * Calculate and return the cursor position at the border of this frame
+    * @param x
+    * @param y
+    * @return
+    *
+    * |        |                 |
+    * |        |                 |
+    * | shadow | resizing border | resizing border
+    * |        |                 |
+    * |        |                 |
+    */
+  virtual int GetMouseLocation(const MouseEvent *event) const;
 
  private:
 
 /// @cond IGNORE
 
-  class CloseButton : public AbstractButton {
+  class CloseButton final : public AbstractButton {
 
    public:
 
@@ -84,7 +84,7 @@ class DefaultWindowFrame : public AbstractWindowFrame {
 
   };
 
-  class MaximizeButton : public AbstractButton {
+  class MaximizeButton final : public AbstractButton {
 
    public:
 
@@ -102,7 +102,7 @@ class DefaultWindowFrame : public AbstractWindowFrame {
 
   };
 
-  class MinimizeButton : public AbstractButton {
+  class MinimizeButton final : public AbstractButton {
 
    public:
 

@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
   Application app(argc, argv);
 
   Window *win = new Window(480, 480, "Simple Shm");
+  win->SetAppId("Simple-Shm");
 
   ShmWidget *widget = new ShmWidget;
   win->SetMainWidget(widget);

@@ -71,6 +71,8 @@ class AbstractWindow : public AbstractView {
 
   void SetTitle(const char *title);
 
+  void SetAppId(const char *app_id);
+
   void SetWindowFrame(AbstractWindowFrame *window_frame);
 
   void Close(__SLOT__);
@@ -79,13 +81,9 @@ class AbstractWindow : public AbstractView {
 
   void Minimize(__SLOT__);
 
-  const std::string &title() const {
-    return title_;
-  }
+  const std::string &title() const { return title_; }
 
-  int flags() const {
-    return flags_;
-  }
+  int flags() const { return flags_; }
 
   virtual Size GetMinimalSize() const override;
 
@@ -93,21 +91,13 @@ class AbstractWindow : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
-  bool IsFullscreen() const {
-    return flags_ == kWindowFullscreen;
-  }
+  bool IsFullscreen() const { return flags_ == kWindowFullscreen; }
 
-  bool IsMaximized() const {
-    return flags_ == kWindowMaximized;
-  }
+  bool IsMaximized() const { return flags_ == kWindowMaximized; }
 
-  bool IsMinimized() const {
-    return flags_ == kWindowMinimized;
-  }
+  bool IsMinimized() const { return flags_ == kWindowMinimized; }
 
-  bool IsFrameless() const {
-    return window_frame_ == nullptr;
-  }
+  bool IsFrameless() const { return window_frame_ == nullptr; }
 
   int GetMouseLocation(const MouseEvent *event) const;
 
@@ -125,8 +115,7 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnDraw(Canvas *canvas) override;
 
-  // TODO: maybe need a better method name
-  virtual void OnConfigureCanvas() = 0;
+  virtual void OnCanvasSetup() = 0;
 
   void AddSubView(AbstractView *view, int pos = 0);
 
@@ -157,6 +146,8 @@ class AbstractWindow : public AbstractView {
   wayland::client::Region input_region_;
 
   std::string title_;
+
+  std::string app_id_;
 
   Size saved_size_;
 };

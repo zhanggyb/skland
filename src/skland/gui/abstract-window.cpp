@@ -68,9 +68,6 @@ AbstractWindow::AbstractWindow(int width,
   xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
   xdg_toplevel_.Setup(xdg_surface_);
   xdg_toplevel_.SetTitle(title_.c_str());
-  xdg_toplevel_.SetAppId(title_.c_str());
-
-  if (title) xdg_toplevel_.SetTitle(title);
 
   Display::AddWindow(this);
   // TODO: layout in display
@@ -92,6 +89,11 @@ AbstractWindow::~AbstractWindow() {
 void AbstractWindow::SetTitle(const char *title) {
   title_ = title;
   xdg_toplevel_.SetTitle(title);
+}
+
+void AbstractWindow::SetAppId(const char *app_id) {
+  app_id_ = app_id;
+  xdg_toplevel_.SetAppId(app_id);
 }
 
 void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
@@ -309,7 +311,7 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
     int h = (int) height();
 
     xdg_surface_.SetWindowGeometry(x, y, w, h);
-    OnConfigureCanvas();
+    OnCanvasSetup();
   }
 }
 

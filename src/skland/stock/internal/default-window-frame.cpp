@@ -178,7 +178,7 @@ DefaultWindowFrame::DefaultWindowFrame()
       maximize_button_(nullptr),
       minimize_button_(nullptr),
       title_(nullptr) {
-  set_border(5);
+  set_border(0);
   set_title_bar_size(22);
   set_title_bar_position(kTitleBarTop);
 }
@@ -213,7 +213,7 @@ void DefaultWindowFrame::CreateWidgets() {
   title_ = new Label(window()->title(), Font("Arial", Font::kWeightBold));
   title_->SetForebround(0xFFEBEBEB);
 
-  AddWidget(title_);
+  AddWidget(title_);  // put the title below other widgets
   AddWidget(close_button_);
 //  AddWidget(maximize_button_);
 //  AddWidget(minimize_button_);
@@ -226,29 +226,10 @@ void DefaultWindowFrame::OnResize(int width, int height) {
 }
 
 void DefaultWindowFrame::LayoutWidgets(int width, int height) {
-  int x = 11;
-  int y = 0;
-
-  const int space = 5;
-
-  close_button_->SetPosition(x, y);
-
-//  x += space + close_button_->width();
-//  y = (title_bar_size() - minimize_button_->height()) / 2;
-//  minimize_button_->SetPosition(x, y);
-
-//  x += space + minimize_button_->width();
-//  y = (title_bar_size() - maximize_button_->height()) / 2;
-//  maximize_button_->SetPosition(x, y);
-
-//  x += space + maximize_button_->width();
-//  y = 0;
-//  int w = width - x;
-
-//  if (w > 0) {
   title_->SetPosition(0, 0);
   title_->Resize((int) window()->width(), title_bar_size());
-//  }
+
+  close_button_->SetPosition(11, 0);
 }
 
 void DefaultWindowFrame::OnDraw(Canvas *canvas) {
@@ -257,22 +238,46 @@ void DefaultWindowFrame::OnDraw(Canvas *canvas) {
   DrawShadow(canvas);
 
   Paint paint;
-  paint.SetColor(0xFF555555);
   paint.SetAntiAlias(true);
 
-  float radii[] = {
+  float radii_up[] = {
       7.f, 7.f, // top-left
       7.f, 7.f, // top-right
+      0.f, 0.f, // bottom-right
+      0.f, 0.f  // bottom-left
+  };
+
+  Path path;
+  path.AddRoundRect(Rect(window()->left(),
+                         window()->top(),
+                         window()->right(),
+                         window()->top() + title_bar_size()),
+                    radii_up);
+  paint.SetColor(0xFF555555);
+  canvas->DrawPath(path, paint);
+
+  float radii_down[] = {
+      0.f, 0.f, // top-left
+      0.f, 0.f, // top-right
       4.f, 4.f, // bottom-right
       4.f, 4.f  // bottom-left
   };
-  Path path;
-  path.AddRoundRect(window()->geometry(), radii);
 
-  canvas->DrawPath(path, paint);
+  path.Reset();
+  path.AddRoundRect(Rect(window()->left(),
+                         window()->top() + title_bar_size(),
+                         window()->right(),
+                         window()->bottom()),
+                    radii_down);
 
-  paint.SetColor(0xFFEBEBEB);
-  canvas->DrawRect(GetClientGeometry(), paint);
+  if (border() > 0) {
+    canvas->DrawPath(path, paint);
+    paint.SetColor(0xFFEBEBEB);
+    canvas->DrawRect(GetClientGeometry(), paint);
+  } else {
+    paint.SetColor(0xFFEBEBEB);
+    canvas->DrawPath(path, paint);
+  }
 
   canvas->Flush();
 }
