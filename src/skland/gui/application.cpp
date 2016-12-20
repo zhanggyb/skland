@@ -24,8 +24,8 @@
 #include <iostream>
 #include <stdlib.h>
 
+#include <skland/gui/timer.hpp>
 #include <skland/stock/theme.hpp>
-#include <skland/core/timer.hpp>
 
 /**
  * Compile-time computation of number of items in a hardcoded array.
@@ -90,8 +90,6 @@ Application::~Application() {
 }
 
 int Application::Run() {
-  using gui::EventTask;
-
   struct sigaction sigint;
   sigint.sa_handler = HandleSignalInt;
   sigemptyset(&sigint.sa_mask);

@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INTERNAL_REDRAW_TASK_HPP_
 #define SKLAND_GUI_INTERNAL_REDRAW_TASK_HPP_
 
-#include "event-task.hpp"
+#include "skland/core/event-task.hpp"
 
 namespace skland {
 

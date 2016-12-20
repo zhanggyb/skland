@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INTERNAL_MOUSE_TASK_HPP_
 #define SKLAND_GUI_INTERNAL_MOUSE_TASK_HPP_
 
-#include "task-base.hpp"
+#include "skland/core/task-base.hpp"
 
 namespace skland {
 

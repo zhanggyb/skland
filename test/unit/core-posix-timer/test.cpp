@@ -4,10 +4,10 @@
 
 #include "test.hpp"
 
-#include <skland/core/timer.hpp>
+#include <skland/core/posix-timer.hpp>
 #include <iostream>
 
-using skland::Timer;
+using skland::PosixTimer;
 
 Test::Test()
     : testing::Test() {
@@ -23,14 +23,14 @@ class Response {
   inline Response (): count_(10) {}
   inline ~Response() {}
 
-  void OnTimeout (Timer* timer);
+  void OnTimeout (PosixTimer* timer);
 
  private:
 
   int count_;
 };
 
-void Response::OnTimeout(Timer* timer) {
+void Response::OnTimeout(PosixTimer* timer) {
   std::cout << "Timeout count #" << count_ << std::endl;
   count_--;
   if (count_ == 0)
@@ -40,7 +40,7 @@ void Response::OnTimeout(Timer* timer) {
 TEST_F(Test, timeout_1) {
   Response response;
 
-  Timer timer;
+  PosixTimer timer;
   timer.timeout().Set(&response, &Response::OnTimeout);
   timer.SetInterval(1000);
 

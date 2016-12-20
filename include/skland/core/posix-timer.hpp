@@ -25,16 +25,16 @@
 
 namespace skland {
 
-class Timer {
+class PosixTimer {
 
-  Timer(const Timer &orig) = delete;
-  Timer &operator=(const Timer &other) = delete;
+  PosixTimer(const PosixTimer &orig) = delete;
+  PosixTimer &operator=(const PosixTimer &other) = delete;
 
  public:
 
-  Timer(unsigned int interval = 100);
+  PosixTimer();
 
-  ~Timer();
+  ~PosixTimer();
 
   void Start();
 
@@ -56,34 +56,8 @@ class Timer {
    *
    * @warning This delegate was called in thread
    */
-  DelegateRef<void(Timer *)> timeout() {
+  DelegateRef<void(PosixTimer *)> timeout() {
     return timeout_;
-  }
-
-  static double GetIntervalInSeconds();
-
-  static double GetIntervalInMilliseconds();
-
-  static double GetIntervalInMicroseconds();
-
-  static double GetProgramTimeInSeconds();
-
-  static double GetProgramTimeInMilliseconds();
-
-  static double GetProgramTimeInMicroseconds();
-
-  static uint64_t GetMicroSeconds();
-
-  static void SaveCurrentTime();
-
-  static void SaveProgramTime();
-
-  static inline uint64_t saved_time() {
-    return kSavedTime;
-  }
-
-  static inline uint64_t program_time() {
-    return kProgramTime;
   }
 
  protected:
@@ -92,7 +66,7 @@ class Timer {
 
  private:
 
-  void Create();
+  bool Create();
 
   timer_t id_;
 
@@ -100,10 +74,7 @@ class Timer {
 
   bool is_armed_;
 
-  Delegate<void(Timer *)> timeout_;
-
-  static uint64_t kSavedTime;
-  static uint64_t kProgramTime;
+  Delegate<void(PosixTimer *)> timeout_;
 
 };
 

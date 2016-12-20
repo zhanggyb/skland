@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
-#define SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
+#ifndef SKLAND_CORE_EVENT_TASK_HPP_
+#define SKLAND_CORE_EVENT_TASK_HPP_
 
 #include "task-base.hpp"
 
 namespace skland {
-namespace gui {
 
 class EventTask : public TaskBase {
 
@@ -29,7 +28,7 @@ class EventTask : public TaskBase {
 
  public:
 
-  inline EventTask()
+  EventTask()
       : TaskBase() {}
 
   virtual ~EventTask() {}
@@ -40,7 +39,6 @@ class EventTask : public TaskBase {
 
 };
 
-}
 }
 
 #endif // SKLAND_GUI_INTERNAL_EVENT_TASK_NODE_HPP_

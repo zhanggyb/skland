@@ -319,8 +319,6 @@ void Display::InitializeIdleTaskList() {
 }
 
 void Display::CleanIdleTaskList() {
-  using gui::TaskBase;
-
   TaskBase *task = idle_task_head_.next();
   TaskBase *next_task = nullptr;
   while (task != &idle_task_tail_) {

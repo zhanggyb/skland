@@ -22,7 +22,7 @@ add_subdirectory(core-object)
 add_subdirectory(core-vectors)
 
 if (LINUX)
-    add_subdirectory(core-timer)
+    add_subdirectory(core-posix-timer)
 endif ()
 
 if (LINUX)

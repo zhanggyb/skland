@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_TASK_NODE_HPP_
-#define SKLAND_GUI_INTERNAL_TASK_NODE_HPP_
+#ifndef SKLAND_CORE_TASK_NODE_HPP_
+#define SKLAND_CORE_TASK_NODE_HPP_
 
 namespace skland {
-namespace gui {
 
 class TaskBase {
 
@@ -30,7 +29,7 @@ class TaskBase {
   TaskBase()
       : previous_(nullptr), next_(nullptr) {}
 
-  ~TaskBase();
+  virtual ~TaskBase();
 
   bool IsLinked() const {
     return (nullptr != previous_) || (nullptr != next_);
@@ -57,7 +56,6 @@ class TaskBase {
 
 };
 
-} // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_DETAIL_TASK_NODE_HPP_
+#endif // SKLAND_CORE_TASK_NODE_HPP_

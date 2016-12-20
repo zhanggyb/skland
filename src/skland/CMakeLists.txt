@@ -17,8 +17,8 @@ file(GLOB core_internal_headers "${PROJECT_SOURCE_DIR}/include/skland/core/inter
 file(GLOB core_sources "core/*.cpp")
 
 if (APPLE)
-    list(REMOVE_ITEM core_headers "${PROJECT_SOURCE_DIR}/include/skland/core/timer.hpp")
-    list(REMOVE_ITEM core_sources "${PROJECT_SOURCE_DIR}/src/skland/core/timer.cpp")
+    list(REMOVE_ITEM core_headers "${PROJECT_SOURCE_DIR}/include/skland/core/posix-timer.hpp")
+    list(REMOVE_ITEM core_sources "${PROJECT_SOURCE_DIR}/src/skland/core/posix-timer.cpp")
 endif ()
 
 list(APPEND all_source_files

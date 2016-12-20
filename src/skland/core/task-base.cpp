@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-#include <skland/gui/internal/task-base.hpp>
+#include <skland/core/task-base.hpp>
 
 namespace skland {
-namespace gui {
 
 TaskBase::~TaskBase() {
   if (previous_) previous_->next_ = next_;
@@ -54,5 +53,4 @@ void TaskBase::Unlink() {
   next_ = nullptr;
 }
 
-} // namespace gui
 } // namespace skland

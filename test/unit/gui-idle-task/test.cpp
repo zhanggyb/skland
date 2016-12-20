@@ -4,10 +4,9 @@
 
 #include "test.hpp"
 
-#include <skland/gui/internal/task-base.hpp>
+#include <skland/core/task-base.hpp>
 
-
-using namespace skland::gui;
+using namespace skland;
 
 Test::Test()
     : testing::Test() {

@@ -142,8 +142,6 @@ void AbstractView::RedrawSubViewsOnSurface(const AbstractView *parent, Surface *
 }
 
 void AbstractView::AddRedrawTask(gui::RedrawTask *task) {
-  using gui::TaskBase;
-
   DBG_ASSERT(task->view != nullptr);
 
   // The task node after which insert the new one

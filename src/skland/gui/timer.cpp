@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-#include <skland/core/timer.hpp>
-
+#include <skland/gui/timer.hpp>
 #include <sys/time.h>
-#include <errno.h>
-#include <iostream>
 
 namespace skland {
 
@@ -26,58 +23,28 @@ uint64_t Timer::kSavedTime = 0;
 
 uint64_t Timer::kProgramTime = 0;
 
-Timer::Timer(unsigned int interval)
-    : id_(0),
-      interval_(interval),
-      is_armed_(false) {
-  Create();
+Timer::Timer() {
+
 }
 
 Timer::~Timer() {
-  timer_delete(id_);
+
 }
 
 void Timer::Start() {
-  int ret = -1;
 
-  struct itimerspec ts;
-
-  unsigned int sec = interval_ / 1000;
-  long nsec = (interval_ % 1000) * 1000 * 1000;
-
-  ts.it_interval.tv_sec = sec;
-  ts.it_interval.tv_nsec = nsec;
-  ts.it_value.tv_sec = sec;
-  ts.it_value.tv_nsec = nsec;
-
-  ret = timer_settime(id_, 0, &ts, 0);
-  if (ret < 0) {
-    std::cerr << "Fail to start timer in " << __func__ << std::endl;
-    is_armed_ = false;
-  } else {
-    is_armed_ = true;
-  }
 }
 
 void Timer::Stop() {
-  if (!is_armed_) return;
 
-  int ret = -1;
-  struct itimerspec ts;
-  memset(&ts, 0, sizeof(ts));
-
-  ret = timer_settime(id_, 0, &ts, 0);
-  if (ret < 0) {
-    std::cerr << "Fail to stop timer in " << __func__ << std::endl;
-  }
-
-  is_armed_ = false;
 }
 
 void Timer::SetInterval(unsigned int interval) {
-  if (interval_ == interval) return;
-  interval_ = interval;
-  if (is_armed_) Start();
+
+}
+
+void Timer::OnTimeout(PosixTimer *posix_timer) {
+
 }
 
 double Timer::GetIntervalInSeconds() {
@@ -134,27 +101,4 @@ void Timer::SaveProgramTime() {
   kProgramTime = GetMicroSeconds();
 }
 
-void Timer::Create() {
-  struct sigevent sev;
-  sev.sigev_notify = SIGEV_THREAD;
-  sev.sigev_value.sival_ptr = this;
-  sev.sigev_notify_function = OnExpire;
-  sev.sigev_notify_attributes = 0;
-
-  int ret = timer_create(CLOCK_REALTIME, &sev, &id_);
-  if (ret < 0) {
-    // do error
-    std::cerr << "Fail to create timer in " << __func__ << std::endl;
-    if (ret == EAGAIN) {
-      std::cerr << "The calling process has already created all of the timers it is allowed by this implementation"
-                << std::endl;
-    }
-  }
-}
-
-void Timer::OnExpire(union sigval sigev_value) {
-  Timer *_this = static_cast<Timer *>(sigev_value.sival_ptr);
-  if (_this->timeout_) _this->timeout_.Invoke(_this);
-}
-
-}
+} // namespace skland
