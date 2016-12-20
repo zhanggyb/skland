@@ -49,33 +49,6 @@ class XdgSurface {
 
   void Destroy();
 
-  /**
- *
- * The window geometry of a surface is its "visible bounds" from the
- * user's perspective. Client-side decorations often have invisible
- * portions like drop-shadows which should be ignored for the
- * purposes of aligning, placing and constraining windows.
- *
- * The window geometry is double buffered, and will be applied at the
- * time wl_surface.commit of the corresponding wl_surface is called.
- *
- * Once the window geometry of the surface is set, it is not possible to
- * unset it, and it will remain the same until set_window_geometry is
- * called again, even if a new subsurface or buffer is attached.
- *
- * If never set, the value is the full bounds of the surface,
- * including any subsurfaces. This updates dynamically on every
- * commit. This unset is meant for extremely simple clients.
- *
- * The arguments are given in the surface-local coordinate space of
- * the wl_surface associated with this xdg_surface.
- *
- * The width and height must be greater than zero. Setting an invalid size
- * will raise an error. When applied, the effective window geometry will be
- * the set window geometry clamped to the bounding rectangle of the
- * combined geometry of the surface of the xdg_surface and the associated
- * subsurfaces.
- */
   void SetWindowGeometry(int x, int y, int width, int height);
 
   void AckConfigure(uint32_t serial);

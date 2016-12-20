@@ -106,6 +106,8 @@ class SimpleWidget : public AbstractWidget {
   }
 
   virtual void OnDraw(Canvas *canvas) override {
+    canvas->Save();
+    canvas->ClipRect(geometry());
     Paint paint;
 //    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
 //    canvas->DrawRectangle(x(), y(), width(), height(), paint);
@@ -129,6 +131,7 @@ class SimpleWidget : public AbstractWidget {
 
     const char text[] = "Hello World!";
     canvas->sk_canvas()->drawText(text, strlen(text), 220.0f, 320.0f, paint1);
+    canvas->Restore();
   }
 
 };

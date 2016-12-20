@@ -85,12 +85,20 @@ void Canvas::Clear(const Color &color) {
   sk_canvas_->clear(color.argb());
 }
 
-void Canvas::Clip(const Path &path, bool antilias) {
+void Canvas::ClipRect(const Rect &rect, bool antialias) {
+  sk_canvas_->clipRect(reinterpret_cast<const SkRect &>(rect), antialias);
+}
+
+void Canvas::ClipPath(const Path &path, bool antilias) {
   sk_canvas_->clipPath(*path.sk_path(), antilias);
 }
 
 void Canvas::Save() {
   sk_canvas_->save();
+}
+
+void Canvas::Restore() {
+  sk_canvas_->restore();
 }
 
 void Canvas::Flush() {

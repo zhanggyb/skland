@@ -26,6 +26,9 @@ namespace client {
 
 class Callback {
 
+  Callback(const Callback &) = delete;
+  Callback &operator=(const Callback &) = delete;
+
  public:
 
   Callback()

@@ -96,7 +96,7 @@ class Path {
 
   void Swap(Path &other);
 
-  const RectF& GetBounds() const;
+  const RectF &GetBounds() const;
 
   void UpdateBoundsCache() const;
 

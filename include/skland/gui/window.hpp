@@ -32,9 +32,10 @@ class Window : public AbstractWindow {
 
  public:
 
-  Window(const char *title);
+  Window(const char *title, AbstractWindowFrame *frame = Theme::CreateWindowFrame());
 
-  Window(int width, int height, const char *title);
+  Window(int width, int height, const char *title,
+         AbstractWindowFrame *frame = Theme::CreateWindowFrame());
 
   virtual ~Window();
 

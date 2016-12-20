@@ -77,7 +77,7 @@ void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
   canvas->DrawPath(path, paint);
 
   if (IsHovered()) {
-    paint.SetStrokeWidth(1.75f);
+    paint.SetStrokeWidth(2.f);
     paint.SetColor(0xFFEBEBEB);
     canvas->DrawLine(center_x() - 2.75f, center_y() - 2.75f, center_x() + 2.75f, center_y() + 2.75f, paint);
     canvas->DrawLine(center_x() + 2.75f, center_y() - 2.75f, center_x() - 2.75f, center_y() + 2.75f, paint);
