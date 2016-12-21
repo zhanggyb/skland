@@ -24,7 +24,7 @@ namespace gui {
 RedrawTask::~RedrawTask() {
 }
 
-void RedrawTask::Run(int events) const {
+void RedrawTask::Run() const {
   view->OnDraw(canvas);
   view->visible_ = true;
 }

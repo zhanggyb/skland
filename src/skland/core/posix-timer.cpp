@@ -111,7 +111,7 @@ bool PosixTimer::SetTime() {
 
 void PosixTimer::OnExpire(union sigval sigev_value) {
   PosixTimer *_this = static_cast<PosixTimer *>(sigev_value.sival_ptr);
-  if (_this->timeout_) _this->timeout_.Invoke();
+  if (_this->expire_) _this->expire_.Invoke();
 }
 
 }

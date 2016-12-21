@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INTERNAL_REDRAW_TASK_HPP_
 #define SKLAND_GUI_INTERNAL_REDRAW_TASK_HPP_
 
-#include "skland/core/event-task.hpp"
+#include "task.hpp"
 
 namespace skland {
 
@@ -26,17 +26,17 @@ class Canvas;
 
 namespace gui {
 
-struct RedrawTask : public EventTask {
+struct RedrawTask : public Task {
 
   RedrawTask(const RedrawTask &) = delete;
   RedrawTask &operator=(const RedrawTask &) = delete;
 
   RedrawTask(AbstractView *view = nullptr, Canvas *canvas = nullptr)
-      : EventTask(), view(view), canvas(canvas) {}
+      : Task(), view(view), canvas(canvas) {}
 
   virtual ~RedrawTask();
 
-  virtual void Run(int events = 0) const final;
+  virtual void Run() const final;
 
   AbstractView *view;
 

@@ -18,7 +18,8 @@
 #define SKLAND_GUI_DISPLAY_HPP_
 
 #include "cursor.hpp"
-#include "../core/event-task.hpp"
+
+#include "internal/task.hpp"
 
 //#include <xkbcommon/xkbcommon.h>
 
@@ -116,11 +117,11 @@ class Display : public Object {
 
  private:
 
-  static const EventTask *idle_task_head() {
+  static const gui::Task *idle_task_head() {
     return &kDisplay->idle_task_head_;
   }
 
-  static const EventTask *idle_task_tail() {
+  static const gui::Task *idle_task_tail() {
     return &kDisplay->idle_task_tail_;
   }
 
@@ -162,7 +163,7 @@ class Display : public Object {
   /**
    * @brief Destroy the redraw task list
    */
-  void CleanIdleTaskList();
+  void ClearIdleTaskList();
 
   void InitializeCursors();
 
@@ -199,8 +200,8 @@ class Display : public Object {
 
   /* idle task list */
 
-  EventTask idle_task_head_;
-  EventTask idle_task_tail_;
+  gui::Task idle_task_head_;
+  gui::Task idle_task_tail_;
 
   std::list<Global *> globals_;
   std::set<uint32_t> pixel_formats_;

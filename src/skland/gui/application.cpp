@@ -90,6 +90,8 @@ Application::~Application() {
 }
 
 int Application::Run() {
+  using gui::Task;
+
   struct sigaction sigint;
   sigint.sa_handler = HandleSignalInt;
   sigemptyset(&sigint.sa_mask);
@@ -101,13 +103,13 @@ int Application::Run() {
   int ret = 0;
 
   kInstance->running_ = true;
-  EventTask *task = nullptr;
+  Task *task = nullptr;
 
   while (true) {
 
     // Process redraw tasks
     while (Display::idle_task_head()->next() != Display::idle_task_tail()) {
-      task = static_cast<EventTask*>(Display::idle_task_head()->next());
+      task = Display::idle_task_head()->next();
       task->Unlink();
       task->Run();
     }

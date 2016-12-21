@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INTERNAL_MOUSE_TASK_HPP_
 #define SKLAND_GUI_INTERNAL_MOUSE_TASK_HPP_
 
-#include "skland/core/task-base.hpp"
+#include "task.hpp"
 
 namespace skland {
 
@@ -26,13 +26,13 @@ class MouseEvent;
 
 namespace gui {
 
-struct MouseTask : public TaskBase {
+struct MouseTask : public Task {
 
   MouseTask(const MouseTask &) = delete;
   MouseTask &operator=(const MouseTask &) = delete;
 
   MouseTask(AbstractView *view = nullptr)
-      : TaskBase(), view(view) {}
+      : Task(), view(view) {}
 
   ~MouseTask() {}
 

@@ -43,7 +43,7 @@ void Timer::SetInterval(unsigned int interval) {
 
 }
 
-void Timer::OnTimeout(PosixTimer *posix_timer) {
+void Timer::OnExpire() {
 
 }
 

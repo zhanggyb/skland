@@ -71,7 +71,7 @@ class Timer {
 
  private:
 
-  void OnTimeout(PosixTimer *posix_timer);
+  void OnExpire();
 
   Signal<> timeout_;
   PosixTimer posix_timer_;

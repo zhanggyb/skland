@@ -41,14 +41,14 @@ void Pointer::OnEnter(void *data,
                       wl_fixed_t surface_y) {
   Pointer *_this = static_cast<Pointer *>(data);
   if (_this->enter_) {
-    _this->enter_.Invoke(serial, wl_surface, surface_x, surface_y);
+    _this->enter_(serial, wl_surface, surface_x, surface_y);
   }
 }
 
 void Pointer::OnLeave(void *data, struct wl_pointer *wl_pointer, uint32_t serial, struct wl_surface *wl_surface) {
   Pointer *_this = static_cast<Pointer *>(data);
   if (_this->leave_) {
-    _this->leave_.Invoke(serial, wl_surface);
+    _this->leave_(serial, wl_surface);
   }
 }
 
@@ -59,7 +59,7 @@ void Pointer::OnMotion(void *data,
                        wl_fixed_t surface_y) {
   Pointer *_this = static_cast<Pointer *>(data);
   if (_this->motion_) {
-    _this->motion_.Invoke(time, surface_x, surface_y);
+    _this->motion_(time, surface_x, surface_y);
   }
 }
 
@@ -71,42 +71,42 @@ void Pointer::OnButton(void *data,
                        uint32_t state) {
   Pointer *_this = static_cast<Pointer *>(data);
   if (_this->button_) {
-    _this->button_.Invoke(serial, time, button, state);
+    _this->button_(serial, time, button, state);
   }
 }
 
 void Pointer::OnAxis(void *data, struct wl_pointer *wl_pointer, uint32_t time, uint32_t axis, wl_fixed_t value) {
   Pointer *_this = static_cast<Pointer *>(data);
   if (_this->axis_) {
-    _this->axis_.Invoke(time, axis, value);
+    _this->axis_(time, axis, value);
   }
 }
 
 void Pointer::OnFrame(void *data, struct wl_pointer *wl_pointer) {
   Pointer *_this = static_cast<Pointer *>(data);
   if (_this->frame_) {
-    _this->frame_.Invoke();
+    _this->frame_();
   }
 }
 
 void Pointer::OnAxisSource(void *data, struct wl_pointer *wl_pointer, uint32_t axis_source) {
   Pointer *_this = static_cast<Pointer *>(data);
   if (_this->axis_source_) {
-    _this->axis_source_.Invoke(axis_source);
+    _this->axis_source_(axis_source);
   }
 }
 
 void Pointer::OnAxisStop(void *data, struct wl_pointer *wl_pointer, uint32_t time, uint32_t axis) {
   Pointer *_this = static_cast<Pointer *>(data);
   if (_this->axis_stop_) {
-    _this->axis_stop_.Invoke(time, axis);
+    _this->axis_stop_(time, axis);
   }
 }
 
 void Pointer::OnAxisDiscrete(void *data, struct wl_pointer *wl_pointer, uint32_t axis, int32_t discrete) {
   Pointer *_this = static_cast<Pointer *>(data);
   if (_this->axis_discrete_) {
-    _this->axis_discrete_.Invoke(axis, discrete);
+    _this->axis_discrete_(axis, discrete);
   }
 }
 

@@ -142,10 +142,12 @@ void AbstractView::RedrawSubViewsOnSurface(const AbstractView *parent, Surface *
 }
 
 void AbstractView::AddRedrawTask(gui::RedrawTask *task) {
+  using gui::Task;
+
   DBG_ASSERT(task->view != nullptr);
 
   // The task node after which insert the new one
-  TaskBase *insert_task = Display::idle_task_tail()->previous();
+  Task *insert_task = Display::idle_task_tail()->previous();
 
   AbstractView *view = task->view->next_view();
   if (view && view->redraw_task_.IsLinked()) { // the next sibling is waiting for redraw, insert after
@@ -167,7 +169,7 @@ void AbstractView::AddRedrawTask(gui::RedrawTask *task) {
 
   insert:
   task->Unlink();
-  insert_task->AddNext(task);
+  insert_task->PushBack(task);
 }
 
 }

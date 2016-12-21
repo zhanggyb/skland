@@ -59,8 +59,8 @@ class PosixTimer {
    *
    * @warning This delegate was called in thread, and SHOULD not be reset when the timer is armed.
    */
-  DelegateRef<void()> timeout() {
-    return timeout_;
+  DelegateRef<void()> expire() {
+    return expire_;
   }
 
  protected:
@@ -79,7 +79,7 @@ class PosixTimer {
 
   bool is_armed_;
 
-  Delegate<void()> timeout_;
+  Delegate<void()> expire_;
 
 };
 

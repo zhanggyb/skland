@@ -119,6 +119,7 @@ void AbstractWindow::Close(SLOT) {
     Application::Exit();
   }
 
+  // FIXME: the close button on title bar cause segment fault
   delete this;
 }
 

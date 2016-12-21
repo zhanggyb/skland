@@ -14,31 +14,54 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_EVENT_TASK_HPP_
-#define SKLAND_CORE_EVENT_TASK_HPP_
-
-#include "task-base.hpp"
+#ifndef SKLAND_GUI_INTERNAL_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_TASK_HPP_
 
 namespace skland {
+namespace gui {
 
-class EventTask : public TaskBase {
+class Task {
 
-  EventTask(const EventTask &) = delete;
-  EventTask &operator=(const EventTask &) = delete;
+  Task(const Task &) = delete;
+  Task &operator=(const Task &) = delete;
 
  public:
 
-  EventTask()
-      : TaskBase() {}
+  Task()
+      : previous_(nullptr), next_(nullptr) {}
 
-  virtual ~EventTask() {}
+  virtual ~Task();
 
-  virtual void Run(int events = 0) const {
+  bool IsLinked() const {
+    return (nullptr != previous_) || (nullptr != next_);
+  }
+
+  void PushBack(Task *other);
+
+  void PushFront(Task *other);
+
+  void Unlink();
+
+  virtual void Run() const {
     // override this
   }
 
+  Task *previous() const {
+    return previous_;
+  }
+
+  Task *next() const {
+    return next_;
+  }
+
+ private:
+
+  Task *previous_;
+  Task *next_;
+
 };
 
-}
+} // namespace gui
+} // namespace skland
 
-#endif // SKLAND_GUI_INTERNAL_EVENT_TASK_NODE_HPP_
+#endif // SKLAND_GUI_INTERNAL_TASK_HPP_

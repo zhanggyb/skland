@@ -50,7 +50,7 @@ class InputEvent {
     accepted_ = false;
   }
 
-  bool is_accepted() const {
+  bool accepted() const {
     return accepted_;
   }
 

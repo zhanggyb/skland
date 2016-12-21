@@ -51,7 +51,7 @@ Display::Display()
 }
 
 Display::~Display() {
-  CleanIdleTaskList();
+  ClearIdleTaskList();
 }
 
 void Display::Connect(const char *name) {
@@ -315,12 +315,14 @@ void Display::OnXdgShellPing(uint32_t serial) {
 }
 
 void Display::InitializeIdleTaskList() {
-  idle_task_head_.AddNext(&idle_task_tail_);
+  idle_task_head_.PushBack(&idle_task_tail_);
 }
 
-void Display::CleanIdleTaskList() {
-  TaskBase *task = idle_task_head_.next();
-  TaskBase *next_task = nullptr;
+void Display::ClearIdleTaskList() {
+  using gui::Task;
+
+  Task *task = idle_task_head_.next();
+  Task *next_task = nullptr;
   while (task != &idle_task_tail_) {
     next_task = task->next();
     task->Unlink();

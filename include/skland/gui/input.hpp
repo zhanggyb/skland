@@ -24,7 +24,7 @@
 #include "../wayland/client/keyboard.hpp"
 #include "../wayland/client/touch.hpp"
 
-#include "skland/gui/internal/mouse-task.hpp"
+#include "internal/mouse-task.hpp"
 
 namespace skland {
 
@@ -56,6 +56,10 @@ class Input : public Object {
 
  private:
 
+  /**
+   * @brief Callback function for delegate in wl_seat_
+   * @param capabilities A bitmask of capabilities the wayland seat has
+   */
   void OnSeatCapabilities(uint32_t capabilities);
 
   void OnSeatName(const char *name);

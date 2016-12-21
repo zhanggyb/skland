@@ -169,7 +169,7 @@ void Input::OnPointerEnter(uint32_t serial,
 
   mouse_event_->accepted_ = false;
   view_on_surface->OnMouseEnter(mouse_event_);
-  if (mouse_event_->is_accepted()) {
+  if (mouse_event_->accepted()) {
     MouseTask *task = &view_on_surface->mouse_task_;
     ProcessMouseEnterOnSubviews(view_on_surface, task);
   }
@@ -185,7 +185,7 @@ void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
 
   mouse_event_->accepted_ = false;
   view_on_surface->OnMouseLeave(mouse_event_);
-  if (mouse_event_->is_accepted()) {
+  if (mouse_event_->accepted()) {
     MouseTask *task = &view_on_surface->mouse_task_;
     MouseTask *next = nullptr;
     bool need_call = true;
@@ -198,7 +198,7 @@ void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
       if (need_call) {
         mouse_event_->accepted_ = false;
         task->view->OnMouseLeave(mouse_event_);
-        if (!mouse_event_->is_accepted()) {
+        if (!mouse_event_->accepted()) {
           need_call = false;
         }
       }
@@ -267,12 +267,12 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
     AbstractView *view_on_surface = mouse_event_->surface_->view();
 
     view_on_surface->OnMouseButton(mouse_event_);
-    if (mouse_event_->is_accepted()) {
+    if (mouse_event_->accepted()) {
       MouseTask *task = &view_on_surface->mouse_task_;
       task = static_cast<MouseTask *>(task->next());
       while (task) {
         task->view->OnMouseButton(mouse_event_);
-        if (!mouse_event_->is_accepted()) {
+        if (!mouse_event_->accepted()) {
           break;
         }
         task = static_cast<MouseTask *>(task->next());
@@ -333,8 +333,8 @@ void Input::ProcessMouseEnterOnSubviews(AbstractView *parent, gui::MouseTask *ta
     if (subview->Contain((int) mouse_event_->window_xy_.x, (int) mouse_event_->window_xy_.y)) {
       mouse_event_->accepted_ = false;
       subview->OnMouseEnter(mouse_event_);
-      if (mouse_event_->is_accepted()) {
-        task->AddNext(&subview->mouse_task_);
+      if (mouse_event_->accepted()) {
+        task->PushBack(&subview->mouse_task_);
         task = static_cast<MouseTask *>(task->next());
         ProcessMouseEnterOnSubviews(subview, task);
       }

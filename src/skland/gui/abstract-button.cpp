@@ -67,10 +67,10 @@ void AbstractButton::OnMouseButton(MouseEvent *event) {
 
   if (flags_ & kFlagIndexClick) {
     clear_bit<uint32_t>(flags_, kFlagIndexClick);
-    clicked_.Emit();
+    event->Accept();
+    clicked_();
+    return;
   }
-
-  event->Accept();
 }
 
 void AbstractButton::OnMouseMove(MouseEvent *event) {
