@@ -17,7 +17,7 @@
 #include <skland/core/posix-timer.hpp>
 
 #include <errno.h>
-#include <iostream>
+#include <skland/core/defines.hpp>
 
 namespace skland {
 
@@ -25,16 +25,72 @@ PosixTimer::PosixTimer()
     : id_(0),
       interval_(0),
       is_armed_(false) {
+  id_ = Create();
 }
 
 PosixTimer::~PosixTimer() {
-  timer_delete(id_);
+  if (0 != id_) {
+    if (0 != timer_delete(id_)) {
+      DBG_PRINT_MSG("%s\n", "Not a valid POSIX timer id");
+    }
+  }
 }
 
 void PosixTimer::Start() {
-  if (0 == interval_) return;
+  if (0 == id_) return;
+  is_armed_ = SetTime();
+}
 
-  int ret = -1;
+void PosixTimer::Stop() {
+  if (!is_armed_) return;
+
+  int ret = 0;
+  struct itimerspec ts;
+  memset(&ts, 0, sizeof(ts));
+
+  ret = timer_settime(id_, 0, &ts, 0);
+  if (ret < 0) {
+    DBG_PRINT_MSG("%s\n", "Fail to stop timer");
+  }
+
+  is_armed_ = false;
+}
+
+void PosixTimer::SetInterval(unsigned int interval) {
+  if ((0 == id_) || (interval_ == interval)) return;
+
+  interval_ = interval;
+
+  if (is_armed_) is_armed_ = SetTime();
+}
+
+timer_t PosixTimer::Create() {
+  struct sigevent sev;
+  sev.sigev_notify = SIGEV_THREAD;
+  sev.sigev_value.sival_ptr = this;
+  sev.sigev_notify_function = OnExpire;
+  sev.sigev_notify_attributes = 0;
+
+  timer_t timer = 0;
+
+  int ret = timer_create(CLOCK_REALTIME, &sev, &timer);
+  if (ret < 0) {
+    DBG_PRINT_MSG("%s\n", "Fail to create timer");
+    if (ret == EAGAIN) {
+      DBG_PRINT_MSG("%s\n", "Temporary error during kernel allocation of timer structures.");
+    } else if (ret == EINVAL) {
+      DBG_PRINT_MSG("%s\n", "Clock ID, sigev_notify, sigev_signo, or sigev_notify_thread_id is invalid.");
+    } else if (ret == ENOMEM) {
+      DBG_PRINT_MSG("%s\n", "Could not allocate memory.");
+    }
+    return 0;
+  }
+
+  return timer;
+}
+
+bool PosixTimer::SetTime() {
+  int ret = 0;
   struct itimerspec ts;
   unsigned int sec = interval_ / 1000;
   long nsec = (interval_ % 1000) * 1000 * 1000;
@@ -46,60 +102,16 @@ void PosixTimer::Start() {
 
   ret = timer_settime(id_, 0, &ts, 0);
   if (ret < 0) {
-    std::cerr << "Fail to start timer in " << __func__ << std::endl;
-    is_armed_ = false;
-  } else {
-    is_armed_ = true;
-  }
-}
-
-void PosixTimer::Stop() {
-  if (!is_armed_) return;
-
-  int ret = -1;
-  struct itimerspec ts;
-  memset(&ts, 0, sizeof(ts));
-
-  ret = timer_settime(id_, 0, &ts, 0);
-  if (ret < 0) {
-    std::cerr << "Fail to stop timer in " << __func__ << std::endl;
-  }
-
-  is_armed_ = false;
-}
-
-void PosixTimer::SetInterval(unsigned int interval) {
-  if ((0 == id_) && (!Create())) return;
-
-  if (interval_ == interval) return;
-  interval_ = interval;
-  if (is_armed_) Start();
-}
-
-bool PosixTimer::Create() {
-  struct sigevent sev;
-  sev.sigev_notify = SIGEV_THREAD;
-  sev.sigev_value.sival_ptr = this;
-  sev.sigev_notify_function = OnExpire;
-  sev.sigev_notify_attributes = 0;
-
-  int ret = timer_create(CLOCK_REALTIME, &sev, &id_);
-  if (ret < 0) {
-    // do error
-    std::cerr << "Fail to create timer in " << __func__ << std::endl;
-    if (ret == EAGAIN) {
-      std::cerr << "The calling process has already created all of the timers it is allowed by this implementation"
-                << std::endl;
-    }
+    DBG_PRINT_MSG("%s\n", "Fail to set timer");
     return false;
+  } else {
+    return true;
   }
-
-  return true;
 }
 
 void PosixTimer::OnExpire(union sigval sigev_value) {
   PosixTimer *_this = static_cast<PosixTimer *>(sigev_value.sival_ptr);
-  if (_this->timeout_) _this->timeout_.Invoke(_this);
+  if (_this->timeout_) _this->timeout_.Invoke();
 }
 
 }

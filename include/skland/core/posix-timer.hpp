@@ -36,6 +36,9 @@ class PosixTimer {
 
   ~PosixTimer();
 
+  /**
+   * @brief Start the posix timer
+   */
   void Start();
 
   void Stop();
@@ -54,9 +57,9 @@ class PosixTimer {
    * Timeout delegate
    * @return Delegate reference
    *
-   * @warning This delegate was called in thread
+   * @warning This delegate was called in thread, and SHOULD not be reset when the timer is armed.
    */
-  DelegateRef<void(PosixTimer *)> timeout() {
+  DelegateRef<void()> timeout() {
     return timeout_;
   }
 
@@ -66,7 +69,9 @@ class PosixTimer {
 
  private:
 
-  bool Create();
+  timer_t Create();
+
+  bool SetTime();
 
   timer_t id_;
 
@@ -74,7 +79,7 @@ class PosixTimer {
 
   bool is_armed_;
 
-  Delegate<void(PosixTimer *)> timeout_;
+  Delegate<void()> timeout_;
 
 };
 

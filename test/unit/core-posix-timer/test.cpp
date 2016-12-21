@@ -20,35 +20,50 @@ Test::~Test() {
 class Response {
  public:
 
-  inline Response (): count_(10) {}
-  inline ~Response() {}
+  Response()
+      : count_(10) {
+    timer_.SetInterval(1000);
+    timer_.timeout().Set(this, &Response::OnTimeout);
+  }
 
-  void OnTimeout (PosixTimer* timer);
+  ~Response() {}
+
+  void Start() {
+    timer_.Start();
+  }
+
+  void Stop() {
+    timer_.Stop();
+  }
+
+  bool IsArmed() const {
+    return timer_.is_armed();
+  }
 
  private:
 
+  void OnTimeout();
+
   int count_;
+
+  PosixTimer timer_;
 };
 
-void Response::OnTimeout(PosixTimer* timer) {
+void Response::OnTimeout() {
   std::cout << "Timeout count #" << count_ << std::endl;
   count_--;
   if (count_ == 0)
-    timer->Stop();
+    timer_.Stop();
 }
 
 TEST_F(Test, timeout_1) {
   Response response;
 
-  PosixTimer timer;
-  timer.timeout().Set(&response, &Response::OnTimeout);
-  timer.SetInterval(1000);
+  response.Start();
 
-  timer.Start();
-
-  while(true) {
+  while (true) {
     sleep(1);
-    if (!timer.is_armed()) break;
+    if (!response.IsArmed()) break;
   }
 
   ASSERT_TRUE(true);
