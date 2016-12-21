@@ -24,8 +24,6 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window.hpp>
 
-#include <skland/stock/theme.hpp>
-
 #include "SkCanvas.h"
 
 namespace skland {
@@ -37,7 +35,6 @@ DefaultWindowFrame::CloseButton::CloseButton()
 }
 
 DefaultWindowFrame::CloseButton::~CloseButton() {
-
 }
 
 Size DefaultWindowFrame::CloseButton::GetPreferredSize() const {
