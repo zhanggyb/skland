@@ -139,7 +139,7 @@ int Application::Run() {
 void Application::Exit() {
   kInstance->running_ = false;
 
-  // TODO: clean other resources
+  // TODO: check if need to clean other resources
 }
 
 int Application::CreateEpollFd() {

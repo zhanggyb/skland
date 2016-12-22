@@ -91,6 +91,10 @@ class Display : public Object {
     return kDisplay->cursors_[cursor_type];
   }
 
+  static const wayland::client::Display &wl_display() {
+    return kDisplay->wl_display_;
+  }
+
   static const wayland::client::Compositor &wl_compositor() {
     return kDisplay->wl_compositor_;
   }

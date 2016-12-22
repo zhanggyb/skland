@@ -48,6 +48,7 @@ if (LINUX)
     add_subdirectory(gui-application)
     add_subdirectory(gui-abstract-widget)
     add_subdirectory(gui-abstract-window)
+    add_subdirectory(gui-timer)
     add_subdirectory(gui-window)
     add_subdirectory(gui-main-window)
 

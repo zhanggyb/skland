@@ -24,7 +24,7 @@ uint64_t Timer::kSavedTime = 0;
 uint64_t Timer::kProgramTime = 0;
 
 Timer::Timer() {
-
+  posix_timer_.expire().Set(this, &Timer::OnExpire);
 }
 
 Timer::~Timer() {
@@ -32,15 +32,15 @@ Timer::~Timer() {
 }
 
 void Timer::Start() {
-
+  posix_timer_.Start();
 }
 
 void Timer::Stop() {
-
+  posix_timer_.Stop();
 }
 
 void Timer::SetInterval(unsigned int interval) {
-
+  posix_timer_.SetInterval(interval);
 }
 
 void Timer::OnExpire() {
