@@ -64,8 +64,8 @@ Application::Application(int argc, char *argv[])
   Theme::kTheme->Reset();
 
   epoll_fd_ = CreateEpollFd();
-  WatchEpollFd(epoll_fd_, Display::kDisplay->display_fd_, EPOLLIN | EPOLLERR | EPOLLHUP, NULL);
-  // TODO: replace NULL with task pointer
+  WatchEpollFd(epoll_fd_, Display::kDisplay->display_fd_,
+               EPOLLIN | EPOLLERR | EPOLLHUP, NULL);
 
   // Set log handler to a lambda function
   wl_log_set_handler_client([](const char *format, va_list args) {
@@ -106,8 +106,6 @@ int Application::Run() {
   Task *task = nullptr;
 
   while (true) {
-
-    // Process redraw tasks
     while (Display::idle_task_head()->next() != Display::idle_task_tail()) {
       task = Display::idle_task_head()->next();
       task->Unlink();
@@ -121,17 +119,17 @@ int Application::Run() {
     ret = Display::kDisplay->wl_display_.Flush();
     if (ret < 0 && errno == EAGAIN) {
       DBG_PRINT_MSG("%s\n", "Error when flush display");
-      // ep[0].events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
+      ep[0].events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
+      ep[0].data.ptr = NULL;
+      epoll_ctl(kInstance->epoll_fd_, EPOLL_CTL_MOD,
+                Display::kDisplay->display_fd_, &ep[0]);
     } else if (ret < 0) {
       break;
     }
 
     count = epoll_wait(kInstance->epoll_fd_, ep, kMaxEpollEvents, -1);
     for (int i = 0; i < count; i++) {
-      if (ep[i].events & EPOLLIN) {
-        Display::kDisplay->wl_display_.Dispatch();
-      }
-      // TODO: call task in the event struct
+      HandleEpollEvents(ep[i].events);
     }
   }
 
@@ -192,6 +190,32 @@ void Application::WatchEpollFd(int epoll_fd, int fd, uint32_t events, void *data
 
 void Application::UnwatchEpollFd(int epoll_fd, int fd) {
   epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+}
+
+void Application::HandleEpollEvents(uint32_t events) {
+  if (events & EPOLLERR || events & EPOLLHUP) {
+    Exit();
+    return;
+  }
+  if (events & EPOLLIN) {
+    if (Display::kDisplay->wl_display_.Dispatch() == -1) {
+      Exit();
+      return;
+    }
+  }
+  if (events & EPOLLOUT) {
+    struct epoll_event ep;
+    int ret = Display::kDisplay->wl_display_.Flush();
+    if (ret == 0) {
+      ep.events = EPOLLIN | EPOLLERR | EPOLLHUP;
+      ep.data.ptr = NULL;
+      epoll_ctl(kInstance->epoll_fd_, EPOLL_CTL_MOD,
+                Display::kDisplay->display_fd_, &ep);
+    } else if (ret == -1 && errno != EAGAIN) {
+      Exit();
+      return;
+    }
+  }
 }
 
 void Application::HandleSignalInt(int) {

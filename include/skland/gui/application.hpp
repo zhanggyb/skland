@@ -18,6 +18,7 @@
 #define SKLAND_GUI_APPLICATION_HPP_
 
 #include <cstdint>
+
 #include "display.hpp"
 
 namespace skland {
@@ -32,13 +33,13 @@ class Application {
 
   ~Application();
 
-  static int Run();
-
-  static void Exit();
-
   Display *display() const {
     return Display::kDisplay;
   }
+
+  static int Run();
+
+  static void Exit();
 
   static inline Application *instance() {
     return Application::kInstance;
@@ -71,6 +72,8 @@ class Application {
   static void WatchEpollFd(int epoll_fd, int fd, uint32_t events, void *data);
 
   static void UnwatchEpollFd(int epoll_fd, int fd);
+
+  static void HandleEpollEvents(uint32_t events);
 
   static void HandleSignalInt(int);
 
