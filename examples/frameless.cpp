@@ -73,6 +73,7 @@ class MainWidget : public AbstractWidget {
 };
 
 int main(int argc, char *argv[]) {
+  using skland::Window;
 
   Application app(argc, argv);
 

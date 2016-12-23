@@ -69,17 +69,17 @@ add_subdirectory(lib)
 
 if (LINUX)
 
-    find_package(Wayland REQUIRED)
-    if (WAYLAND_FOUND)
-        include_directories(${WAYLAND_CLIENT_INCLUDE_DIR})
-        set(LIBS ${LIBS} ${WAYLAND_CLIENT_LIBRARIES})
-    endif ()
-
     find_package(EGL)
     if (EGL_FOUND)
-        set(HAVE_EGL 1)
+        # set(HAVE_EGL 1)
         include_directories(${EGL_INCLUDE_DIRS})
         set(LIBS ${LIBS} ${EGL_LIBRARIES})
+    endif ()
+
+    find_package(Wayland REQUIRED)
+    if (WAYLAND_FOUND)
+        include_directories(${WAYLAND_CLIENT_INCLUDE_DIR} ${WAYLAND_EGL_INCLUDE_DIR})
+        set(LIBS ${LIBS} ${WAYLAND_CLIENT_LIBRARIES} ${WAYLAND_EGL_LIBRARIES})
     endif ()
 
     #add_definitions(-D__UNIX__)

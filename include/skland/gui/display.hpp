@@ -19,6 +19,11 @@
 
 #include "cursor.hpp"
 
+#include "../core/object.hpp"
+#include "../core/types.hpp"
+
+#include "../egl/display.hpp"
+
 #include "internal/task.hpp"
 
 //#include <xkbcommon/xkbcommon.h>
@@ -26,9 +31,6 @@
 #include <list>
 #include <set>
 #include <vector>
-
-#include <skland/core/object.hpp>
-#include <skland/core/types.hpp>
 
 #include <skland/wayland/client/display.hpp>
 #include <skland/wayland/client/registry.hpp>
@@ -39,6 +41,8 @@
 #include <skland/wayland/client/xdg-shell.hpp>
 #include <skland/wayland/client/cursor-theme.hpp>
 #include <skland/wayland/client/data-device-manager.hpp>
+
+#include <EGL/egl.h>
 
 namespace skland {
 
@@ -119,15 +123,11 @@ class Display : public Object {
     return kDisplay->wl_data_device_manager_;
   }
 
+  static const egl::Display &egl_display() {
+    return kDisplay->egl_display_;
+  }
+
  private:
-
-  static const gui::Task *idle_task_head() {
-    return &kDisplay->idle_task_head_;
-  }
-
-  static const gui::Task *idle_task_tail() {
-    return &kDisplay->idle_task_tail_;
-  }
 
   void OnError(void *object_id,
                uint32_t code,
@@ -173,6 +173,14 @@ class Display : public Object {
 
   void ReleaseCursors();
 
+  static const gui::Task *idle_task_head() {
+    return &kDisplay->idle_task_head_;
+  }
+
+  static const gui::Task *idle_task_tail() {
+    return &kDisplay->idle_task_tail_;
+  }
+
   wayland::client::Display wl_display_;
   wayland::client::Registry wl_registry_;
   wayland::client::Compositor wl_compositor_;
@@ -186,6 +194,8 @@ class Display : public Object {
 //  struct xkb_context *xkb_context_;
 
   int display_fd_;
+
+  egl::Display egl_display_;
 
   /* output list */
   Output *first_output_;

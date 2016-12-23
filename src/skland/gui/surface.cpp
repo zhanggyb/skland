@@ -93,10 +93,6 @@ void Surface::Commit() const {
   }
 }
 
-void Surface::Damage(int x, int y, int width, int height) const {
-  wl_surface_.Damage(x + margin_.l, y + margin_.t, width, height);
-}
-
 void Surface::OnEnter(struct wl_output *wl_output) {
 }
 

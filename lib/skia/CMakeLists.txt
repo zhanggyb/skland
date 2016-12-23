@@ -86,9 +86,9 @@ endif ()
 if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL ARM)
     remove_srcs(${SKIA_SOURCE_DIR}/src/*arm* ${SKIA_SOURCE_DIR}/src/*ARM* ${SKIA_SOURCE_DIR}/src/*neon* ${SKIA_SOURCE_DIR}/src/*NEON*)
 endif ()
-if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL MIPS)
-    remove_srcs(${SKIA_SOURCE_DIR}/src/*mips* ${SKIA_SOURCE_DIR}/src/*MIPS*)
-endif ()
+#if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL MIPS)
+#    remove_srcs(${SKIA_SOURCE_DIR}/src/*mips* ${SKIA_SOURCE_DIR}/src/*MIPS*)
+#endif ()
 
 # Make our ports choices.
 remove_srcs(

@@ -75,13 +75,12 @@ bool AbstractView::Contain(int x, int y) const {
 }
 
 Surface *AbstractView::GetSurface() const {
-  if (surface_ != nullptr)
-    return surface_;
+  if (surface_) return surface_;
 
   Surface *surface = nullptr;
   AbstractView *p = static_cast<AbstractView *>(parent());
   while (p) {
-    if (p->surface_ != nullptr) {
+    if (p->surface_) {
       surface = p->surface_;
       break;
     }
@@ -106,8 +105,8 @@ void AbstractView::SetSurface(Surface *surface) {
 void AbstractView::Damage(const Rect &rect) {
   Surface *surface = GetSurface();
   if (surface) {
-    surface->Damage((int) rect.x(),
-                    (int) rect.y(),
+    surface->Damage((int) rect.x() + surface->margin().left,
+                    (int) rect.y() + surface->margin().top,
                     (int) rect.width(),
                     (int) rect.height());
   }

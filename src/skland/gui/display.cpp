@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
+#include <skland/core/exceptions.hpp>
+
 #include <skland/gui/display.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
 #include <skland/gui/abstract-window.hpp>
-
 #include <skland/gui/surface.hpp>
 
-#include <skland/core/exceptions.hpp>
+#include <EGL/eglext.h>
 
 #include <iostream>
 
@@ -66,6 +67,7 @@ void Display::Connect(const char *name) {
   }
 
   display_fd_ = wl_display_.GetFd();
+  egl_display_.Setup(wl_display_);
 
 //  xkb_context_ = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
 //  if (xkb_context_ == NULL) {
@@ -151,6 +153,8 @@ void Display::Disconnect() noexcept {
   wl_subcompositor_.Destroy();
   wl_compositor_.Destroy();
   wl_registry_.Destroy();
+
+  egl_display_.Destroy();
   wl_display_.Disconnect();
 }
 

@@ -88,8 +88,6 @@ void Window::OnResize(int width, int height) {
   buffer_.Setup(pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   surface()->Attach(buffer_);
 
-  surface()->Damage(0, 0, width, height);
-
   RedrawAll();
 
   SetMainWidgetGeometry();

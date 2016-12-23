@@ -90,6 +90,7 @@ class SimpleWidget : public AbstractWidget {
 };
 
 int main(int argc, char *argv[]) {
+  using skland::Window;
 
   Application app(argc, argv);
 

@@ -26,6 +26,8 @@ Test::~Test() {
  *
  */
 TEST_F(Test, application) {
+  using skland::Display;
+
   int argc = 1;
   char argv1[] = "application";  // to avoid compile warning
   char *argv[] = {argv1};

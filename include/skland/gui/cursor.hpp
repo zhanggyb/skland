@@ -19,7 +19,7 @@
 
 #include <wayland-cursor.h>
 
-#include <skland/wayland/client/surface.hpp>
+#include "../wayland/client/surface.hpp"
 
 namespace skland {
 

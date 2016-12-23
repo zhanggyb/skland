@@ -90,7 +90,9 @@ class Surface : public Object {
 
   void Commit() const;
 
-  void Damage(int x, int y, int width, int height) const;
+  void Damage(int surface_x, int surface_y, int width, int height) const {
+    wl_surface_.Damage(surface_x, surface_y, width, height);
+  }
 
   AbstractView *view() const {
     return view_;

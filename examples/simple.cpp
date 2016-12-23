@@ -25,9 +25,6 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 
-#include <iostream>
-#include <skland/stock/theme.hpp>
-
 #include "SkTypeface.h"
 #include "SkPaint.h"
 #include "SkCanvas.h"
@@ -137,6 +134,7 @@ class SimpleWidget : public AbstractWidget {
 };
 
 int main(int argc, char *argv[]) {
+  using skland::Window;
 
   Application app(argc, argv);
 

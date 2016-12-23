@@ -22,6 +22,8 @@ Test::~Test() {
  *
  */
 TEST_F(Test, resize_1) {
+  using skland::Window;
+
   int argc = 1;
   char argv1[] = "resize_1";  // to avoid compile warning
   char *argv[] = {argv1};

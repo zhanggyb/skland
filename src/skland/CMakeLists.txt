@@ -44,6 +44,9 @@ if (LINUX)
     file(GLOB wayland_client_internal_headers "wayland/client/internal/*.hpp")
     file(GLOB wayland_client_internal_sources "wayland/client/internal/*.cpp")
 
+    file(GLOB egl_headers "${PROJECT_SOURCE_DIR}/include/skland/egl/*.hpp")
+    file(GLOB egl_sources "egl/*.cpp")
+
     file(GLOB gui_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/*.hpp")
     file(GLOB gui_internal_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/internal/*.hpp")
     file(GLOB gui_sources "gui/*.cpp")
@@ -59,6 +62,8 @@ if (LINUX)
             ${wayland_client_sources}
             ${wayland_client_internal_headers}
             ${wayland_client_internal_sources}
+            ${egl_headers}
+            ${egl_sources}
             ${gui_headers}
             ${gui_sources}
             ${gui_internal_headers}

@@ -14,8 +14,7 @@ and [Wayland](https://wayland.freedesktop.org).
 
 - C++11
 - Use Wayland only to display windows.
-- Use Skia as the 2D graphic engine, and will provide EGL/OpenGL/Vulkan support
-  later.
+- Use Skia as the 2D graphic engine, and EGL/OpenGL/Vulkan support.
 - Use a new [Signal and Slot implementation](https://github.com/zhanggyb/sigcxx)
   based on fast C++ delegates..
 
@@ -24,4 +23,3 @@ and [Wayland](https://wayland.freedesktop.org).
 - [Build on Fedora 25](doc/build.md)
 
 **More details will be described later...**
-

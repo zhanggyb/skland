@@ -21,6 +21,11 @@
 #include <wayland-client.h>
 
 namespace skland {
+
+namespace egl {
+class Display;
+}
+
 namespace wayland {
 namespace client {
 
@@ -31,6 +36,7 @@ class Display {
 
   friend class Registry;
   friend class Callback;
+  friend class skland::egl::Display;
 
   Display(const Display &) = delete;
   Display &operator=(const Display &) = delete;
