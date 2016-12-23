@@ -44,6 +44,8 @@ class Canvas {
 
   ~Canvas();
 
+  void SetOrigin(float x, float y);
+
   void DrawLine(float x0, float y0, float x1, float y1, const Paint &paint);
 
   void DrawRect(const Rect &rect, const Paint &paint);
@@ -58,6 +60,9 @@ class Canvas {
 
   void Translate(float dx, float dy);
 
+  /**
+   * @brief Reset matrix and translate to origin
+   */
   void ResetMatrix();
 
   void Clear(uint32_t color = 0x0);
@@ -74,6 +79,10 @@ class Canvas {
 
   void Flush();
 
+  const Point2F &origin() const {
+    return origin_;
+  }
+
   SkCanvas *sk_canvas() const {
     return sk_canvas_;
   }
@@ -81,6 +90,7 @@ class Canvas {
  private:
 
   SkCanvas *sk_canvas_;
+  Point2F origin_;
 
 };
 

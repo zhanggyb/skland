@@ -45,6 +45,12 @@ Canvas::~Canvas() {
   if (sk_canvas_) delete sk_canvas_;
 }
 
+void Canvas::SetOrigin(float x, float y) {
+  sk_canvas_->translate(x - origin_.x, y - origin_.y);
+  origin_.x = x;
+  origin_.y = y;
+}
+
 void Canvas::DrawLine(float x0, float y0, float x1, float y1, const Paint &paint) {
   sk_canvas_->drawLine(x0, y0, x1, y1, *paint.sk_paint());
 }
@@ -75,6 +81,7 @@ void Canvas::Translate(float dx, float dy) {
 
 void Canvas::ResetMatrix() {
   sk_canvas_->resetMatrix();
+  sk_canvas_->translate(origin_.x, origin_.y);
 }
 
 void Canvas::Clear(uint32_t color) {

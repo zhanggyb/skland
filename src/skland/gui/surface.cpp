@@ -58,9 +58,8 @@ void Surface::Attach(const Buffer &buffer, int32_t x, int32_t y) {
     canvas_sp_.reset(new Canvas((unsigned char *) buffer.pixel(),
                                 buffer.size().width,
                                 buffer.size().height));
-
+    canvas_sp_->SetOrigin((float) margin_.left, (float) margin_.top);
     wl_surface_.Attach(buffer.wl_buffer(), x, y);
-    canvas_sp_->sk_canvas()->translate(margin_.left, margin_.top);
   } else {
     canvas_sp_.reset();
     wl_surface_.Attach(NULL, x, y);
