@@ -24,7 +24,7 @@
 
 #include "../egl/display.hpp"
 
-#include "internal/task.hpp"
+#include "task.hpp"
 
 //#include <xkbcommon/xkbcommon.h>
 
@@ -32,15 +32,15 @@
 #include <set>
 #include <vector>
 
-#include <skland/wayland/client/display.hpp>
-#include <skland/wayland/client/registry.hpp>
-#include <skland/wayland/client/compositor.hpp>
-#include <skland/wayland/client/subcompositor.hpp>
-#include <skland/wayland/client/shm.hpp>
-#include <skland/wayland/client/shell.hpp>
-#include <skland/wayland/client/xdg-shell.hpp>
-#include <skland/wayland/client/cursor-theme.hpp>
-#include <skland/wayland/client/data-device-manager.hpp>
+#include <skland/wayland/display.hpp>
+#include <skland/wayland/registry.hpp>
+#include <skland/wayland/compositor.hpp>
+#include <skland/wayland/subcompositor.hpp>
+#include <skland/wayland/shm.hpp>
+#include <skland/wayland/shell.hpp>
+#include <skland/wayland/xdg-shell.hpp>
+#include <skland/wayland/cursor-theme.hpp>
+#include <skland/wayland/data-device-manager.hpp>
 
 #include <EGL/egl.h>
 
@@ -95,31 +95,31 @@ class Display : public Object {
     return kDisplay->cursors_[cursor_type];
   }
 
-  static const wayland::client::Display &wl_display() {
+  static const wayland::Display &wl_display() {
     return kDisplay->wl_display_;
   }
 
-  static const wayland::client::Compositor &wl_compositor() {
+  static const wayland::Compositor &wl_compositor() {
     return kDisplay->wl_compositor_;
   }
 
-  static const wayland::client::SubCompositor &wl_subcompositor() {
+  static const wayland::SubCompositor &wl_subcompositor() {
     return kDisplay->wl_subcompositor_;
   }
 
-  static const wayland::client::Shm &wl_shm() {
+  static const wayland::Shm &wl_shm() {
     return kDisplay->wl_shm_;
   }
 
-  static const wayland::client::XdgShell &xdg_shell() {
+  static const wayland::XdgShell &xdg_shell() {
     return kDisplay->xdg_shell_;
   }
 
-  static const wayland::client::Shell &wl_shell() {
+  static const wayland::Shell &wl_shell() {
     return kDisplay->wl_shell_;
   }
 
-  static const wayland::client::DataDeviceManager &wl_data_device_manager() {
+  static const wayland::DataDeviceManager &wl_data_device_manager() {
     return kDisplay->wl_data_device_manager_;
   }
 
@@ -173,23 +173,23 @@ class Display : public Object {
 
   void ReleaseCursors();
 
-  static const gui::Task *idle_task_head() {
+  static const Task *idle_task_head() {
     return &kDisplay->idle_task_head_;
   }
 
-  static const gui::Task *idle_task_tail() {
+  static const Task *idle_task_tail() {
     return &kDisplay->idle_task_tail_;
   }
 
-  wayland::client::Display wl_display_;
-  wayland::client::Registry wl_registry_;
-  wayland::client::Compositor wl_compositor_;
-  wayland::client::SubCompositor wl_subcompositor_;
-  wayland::client::Shm wl_shm_;
-  wayland::client::Shell wl_shell_;
-  wayland::client::XdgShell xdg_shell_;  /* xdg shell v6 */
-  wayland::client::CursorTheme wl_cursor_theme_;
-  wayland::client::DataDeviceManager wl_data_device_manager_;
+  wayland::Display wl_display_;
+  wayland::Registry wl_registry_;
+  wayland::Compositor wl_compositor_;
+  wayland::SubCompositor wl_subcompositor_;
+  wayland::Shm wl_shm_;
+  wayland::Shell wl_shell_;
+  wayland::XdgShell xdg_shell_;  /* xdg shell v6 */
+  wayland::CursorTheme wl_cursor_theme_;
+  wayland::DataDeviceManager wl_data_device_manager_;
 
 //  struct xkb_context *xkb_context_;
 
@@ -214,8 +214,8 @@ class Display : public Object {
 
   /* idle task list */
 
-  gui::Task idle_task_head_;
-  gui::Task idle_task_tail_;
+  Task idle_task_head_;
+  Task idle_task_tail_;
 
   std::list<Global *> globals_;
   std::set<uint32_t> pixel_formats_;

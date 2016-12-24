@@ -19,7 +19,7 @@
 
 namespace skland {
 
-Output::Output(const wayland::client::Registry &registry, uint32_t id, uint32_t version)
+Output::Output(const wayland::Registry &registry, uint32_t id, uint32_t version)
     : Object(),
       display_(nullptr),
       current_refresh_rate_(0),

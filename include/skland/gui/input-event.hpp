@@ -38,7 +38,7 @@ class InputEvent {
     input_->SetCursor(cursor);
   }
 
-  const wayland::client::Seat &wl_seat() const {
+  const wayland::Seat &wl_seat() const {
     return input_->wl_seat();
   }
 

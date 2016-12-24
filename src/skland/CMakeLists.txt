@@ -39,10 +39,10 @@ list(APPEND all_source_files
 
 if (LINUX)
 
-    file(GLOB wayland_client_headers "${PROJECT_SOURCE_DIR}/include/skland/wayland/client/*.hpp")
-    file(GLOB wayland_client_sources "wayland/client/*.cpp")
-    file(GLOB wayland_client_internal_headers "wayland/client/internal/*.hpp")
-    file(GLOB wayland_client_internal_sources "wayland/client/internal/*.cpp")
+    file(GLOB wayland_headers "${PROJECT_SOURCE_DIR}/include/skland/wayland/*.hpp")
+    file(GLOB wayland_sources "wayland/*.cpp")
+    file(GLOB wayland_internal_headers "wayland/internal/*.hpp")
+    file(GLOB wayland_internal_sources "wayland/internal/*.cpp")
 
     file(GLOB egl_headers "${PROJECT_SOURCE_DIR}/include/skland/egl/*.hpp")
     file(GLOB egl_sources "egl/*.cpp")
@@ -58,10 +58,10 @@ if (LINUX)
     file(GLOB stock_internal_sources "stock/internal/*.cpp")
 
     list(APPEND all_source_files
-            ${wayland_client_headers}
-            ${wayland_client_sources}
-            ${wayland_client_internal_headers}
-            ${wayland_client_internal_sources}
+            ${wayland_headers}
+            ${wayland_sources}
+            ${wayland_internal_headers}
+            ${wayland_internal_sources}
             ${egl_headers}
             ${egl_sources}
             ${gui_headers}

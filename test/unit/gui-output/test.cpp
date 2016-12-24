@@ -6,11 +6,10 @@
 
 #include <skland/gui/output.hpp>
 
-#include <skland/wayland/client/display.hpp>
-#include <skland/wayland/client/registry.hpp>
+#include <skland/wayland/display.hpp>
+#include <skland/wayland/registry.hpp>
 
 using namespace skland;
-using namespace skland::wayland;
 
 Test::Test()
     : testing::Test() {
@@ -39,8 +38,8 @@ class Case1 {
   void OnGlobal(uint32_t id, const char *interface, uint32_t version);
   void OnGlobalRemove(uint32_t id);
 
-  client::Display display_;
-  client::Registry registry_;
+  wayland::Display display_;
+  wayland::Registry registry_;
   Output* output_;
 };
 

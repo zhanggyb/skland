@@ -17,10 +17,10 @@
 #ifndef SKLAND_GUI_LABEL_HPP_
 #define SKLAND_GUI_LABEL_HPP_
 
-#include <skland/gui/abstract-widget.hpp>
-#include <skland/core/color.hpp>
+#include "abstract-widget.hpp"
 
-#include <skland/graphic/font.hpp>
+#include "../core/color.hpp"
+#include "../graphic/font.hpp"
 
 namespace skland {
 

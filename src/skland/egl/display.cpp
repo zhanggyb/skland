@@ -1,12 +1,24 @@
-//
-// Created by zhanggyb on 16-12-23.
-//
+/*
+ * Copyright 2016 Freeman Zhang <zhanggyb@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include <skland/egl/display.hpp>
 
 #include <EGL/eglext.h>
 
-#include <skland/wayland/client/display.hpp>
+#include <skland/wayland/display.hpp>
 
 #include <skland/core/defines.hpp>
 #include <malloc.h>
@@ -14,10 +26,10 @@
 namespace skland {
 namespace egl {
 
-void Display::Setup(const wayland::client::Display &wl_display) {
+void Display::Setup(const wayland::Display &wl_display) {
   Destroy();
 
-  EGLint major, minor, count, n, size;
+  EGLint count, n, size;
   EGLBoolean ret;
 
   EGLint config_attribs[] = {
@@ -38,7 +50,7 @@ void Display::Setup(const wayland::client::Display &wl_display) {
                                wl_display.wl_display_, NULL);
   DBG_ASSERT(egl_display_);
 
-  ret = eglInitialize(egl_display_, &major, &minor);
+  ret = eglInitialize(egl_display_, &major_, &minor_);
   DBG_ASSERT(ret == EGL_TRUE);
 
   ret = eglBindAPI(EGL_OPENGL_ES_API);
@@ -67,7 +79,12 @@ void Display::Destroy() {
   if (egl_display_) {
     eglTerminate(egl_display_);
     eglReleaseThread();
+
     egl_display_ = nullptr;
+    egl_context_ = nullptr;
+    egl_config_ = nullptr;
+    major_ = 0;
+    minor_ = 0;
   }
 }
 

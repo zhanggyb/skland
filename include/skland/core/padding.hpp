@@ -17,7 +17,7 @@
 #ifndef SKLAND_CORE_PADDING_HPP_
 #define SKLAND_CORE_PADDING_HPP_
 
-#include "internal/bounds.hpp"
+#include "bounds.hpp"
 
 namespace skland {
 

@@ -22,6 +22,11 @@
 
 namespace skland {
 
+void AbstractView::RedrawTask::Run() const {
+  view->OnDraw(canvas);
+  view->visible_ = true;
+}
+
 AbstractView::AbstractView()
     : AbstractView(400, 300) {
 
@@ -140,9 +145,7 @@ void AbstractView::RedrawSubViewsOnSurface(const AbstractView *parent, Surface *
   }
 }
 
-void AbstractView::AddRedrawTask(gui::RedrawTask *task) {
-  using gui::Task;
-
+void AbstractView::AddRedrawTask(RedrawTask *task) {
   DBG_ASSERT(task->view != nullptr);
 
   // The task node after which insert the new one

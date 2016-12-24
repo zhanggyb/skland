@@ -6,8 +6,8 @@ and it may not function as you expect.**
 
 ## What is SkLand
 
-**SkLand** aims to be a new C++ GUI toolkit for Linux only under Apache 2.0
-license, based on [Google Skia](https://skia.org)
+**SkLand** aims to be a new simple C++ GUI toolkit for Linux only under Apache
+2.0 license, based on [Google Skia](https://skia.org)
 and [Wayland](https://wayland.freedesktop.org).
 
 ## Features

@@ -21,14 +21,9 @@
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
-#include "skland/gui/internal/redraw-task.hpp"
-#include "skland/gui/internal/mouse-task.hpp"
+#include "task.hpp"
 
 namespace skland {
-
-namespace gui {
-class RedrawTask;
-}
 
 // Forward declaration
 class Canvas;
@@ -47,9 +42,36 @@ class AbstractView : public Object {
   friend class Application;
   friend class Display;
   friend class Surface;
-  friend class gui::RedrawTask;
 
  public:
+
+  struct MouseTask : public Task {
+    MouseTask(const MouseTask &) = delete;
+    MouseTask &operator=(const MouseTask &) = delete;
+
+    MouseTask(AbstractView *view = nullptr)
+        : Task(), view(view) {}
+
+    ~MouseTask() {}
+
+    AbstractView *view;
+  };
+
+  struct RedrawTask : public Task {
+    RedrawTask(const RedrawTask &) = delete;
+    RedrawTask &operator=(const RedrawTask &) = delete;
+
+    RedrawTask(AbstractView *view = nullptr, Canvas *canvas = nullptr)
+        : Task(), view(view), canvas(canvas) {}
+
+    virtual ~RedrawTask() {}
+
+    virtual void Run() const final;
+
+    AbstractView *view;
+
+    Canvas *canvas;
+  };
 
   AbstractView();
 
@@ -151,11 +173,11 @@ class AbstractView : public Object {
     return static_cast<AbstractView *>(last_child());
   }
 
-  const gui::RedrawTask &redraw_task() const {
+  const RedrawTask &redraw_task() const {
     return redraw_task_;
   }
 
-  const gui::MouseTask &mouse_task() const {
+  const MouseTask &mouse_task() const {
     return mouse_task_;
   }
 
@@ -165,7 +187,7 @@ class AbstractView : public Object {
 
   static void RedrawSubViewsOnSurface(const AbstractView *parent, Surface *surface);
 
-  static void AddRedrawTask(gui::RedrawTask *task);
+  static void AddRedrawTask(RedrawTask *task);
 
   bool visible_;
 
@@ -173,8 +195,8 @@ class AbstractView : public Object {
 
   Surface *surface_;  /**< The main surface for this window */
 
-  gui::RedrawTask redraw_task_;
-  gui::MouseTask mouse_task_;
+  RedrawTask redraw_task_;
+  MouseTask mouse_task_;
 };
 
 }

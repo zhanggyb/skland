@@ -17,17 +17,15 @@
 #ifndef SKLAND_GUI_SURFACE_HPP_
 #define SKLAND_GUI_SURFACE_HPP_
 
-#include <wayland-client.h>
+#include "../core/margin.hpp"
+#include "../core/object.hpp"
+
+#include "../wayland/surface.hpp"
+#include "../wayland/region.hpp"
+
+#include "../graphic/canvas.hpp"
 
 #include <memory>
-
-#include <skland/core/margin.hpp>
-#include <skland/core/object.hpp>
-
-#include <skland/wayland/client/surface.hpp>
-#include <skland/wayland/client/region.hpp>
-
-#include <skland/graphic/canvas.hpp>
 
 namespace skland {
 
@@ -80,9 +78,9 @@ class Surface : public Object {
    *
    * If the parameter of region is nullptr, remove the current loaded input region.
    */
-  void SetInputRegion(const wayland::client::Region &region);
+  void SetInputRegion(const wayland::Region &region);
 
-  void SetOpaqueRegion(const wayland::client::Region &region);
+  void SetOpaqueRegion(const wayland::Region &region);
 
   Surface *GetSubSurfaceAt(int index) const;
 
@@ -106,7 +104,7 @@ class Surface : public Object {
     return margin_;
   }
 
-  const wayland::client::Surface &wl_surface() const {
+  const wayland::Surface &wl_surface() const {
     return wl_surface_;
   }
 
@@ -116,7 +114,7 @@ class Surface : public Object {
 
   void OnLeave(struct wl_output *wl_output);
 
-  wayland::client::Surface wl_surface_;
+  wayland::Surface wl_surface_;
 
   AbstractView *view_;
 

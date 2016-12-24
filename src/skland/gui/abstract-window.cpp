@@ -317,7 +317,7 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
 }
 
 void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
-  using wayland::client::XdgToplevel;
+  using wayland::XdgToplevel;
 
   bool maximized = ((states & XdgToplevel::kStateMaskMaximized) != 0);
   bool fullscreen = ((states & XdgToplevel::kStateMaskFullscreen) != 0);

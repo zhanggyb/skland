@@ -66,11 +66,11 @@ void Surface::Attach(const Buffer &buffer, int32_t x, int32_t y) {
   }
 }
 
-void Surface::SetInputRegion(const wayland::client::Region &region) {
+void Surface::SetInputRegion(const wayland::Region &region) {
   wl_surface_.SetInputRegion(region);
 }
 
-void Surface::SetOpaqueRegion(const wayland::client::Region &region) {
+void Surface::SetOpaqueRegion(const wayland::Region &region) {
   wl_surface_.SetOpaqueRegion(region);
 }
 

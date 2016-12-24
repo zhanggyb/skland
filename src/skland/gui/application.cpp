@@ -90,8 +90,6 @@ Application::~Application() {
 }
 
 int Application::Run() {
-  using gui::Task;
-
   struct sigaction sigint;
   sigint.sa_handler = HandleSignalInt;
   sigemptyset(&sigint.sa_mask);

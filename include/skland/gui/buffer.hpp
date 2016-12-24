@@ -20,7 +20,7 @@
 #include "shared-memory.hpp"
 
 #include <skland/core/size.hpp>
-#include <skland/wayland/client/buffer.hpp>
+#include <skland/wayland/buffer.hpp>
 
 namespace skland {
 
@@ -58,7 +58,7 @@ class Buffer {
 
   void Destroy();
 
-  const wayland::client::Buffer &wl_buffer() const {
+  const wayland::Buffer &wl_buffer() const {
     return wl_buffer_;
   }
 
@@ -80,7 +80,7 @@ class Buffer {
 
  private:
 
-  wayland::client::Buffer wl_buffer_;
+  wayland::Buffer wl_buffer_;
 
   Size size_;
 

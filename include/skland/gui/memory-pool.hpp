@@ -21,7 +21,7 @@
 
 #include <sys/types.h>
 
-#include <skland/wayland/client/shm-pool.hpp>
+#include <skland/wayland/shm-pool.hpp>
 
 namespace skland {
 
@@ -53,7 +53,7 @@ class MemoryPool {
     return size_;
   }
 
-  const wayland::client::ShmPool &wl_shm_pool() const {
+  const wayland::ShmPool &wl_shm_pool() const {
     return wl_shm_pool_;
   }
 
@@ -67,7 +67,7 @@ class MemoryPool {
 
   static int CreateTmpfileCloexec(char *tmpname);
 
-  wayland::client::ShmPool wl_shm_pool_;
+  wayland::ShmPool wl_shm_pool_;
 
   int32_t size_;
   SharedMemory::SharedPtr data_;

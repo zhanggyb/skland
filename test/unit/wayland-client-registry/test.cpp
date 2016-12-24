@@ -4,12 +4,12 @@
 
 #include "test.hpp"
 
-#include <skland/wayland/client/display.hpp>
-#include <skland/wayland/client/registry.hpp>
+#include <skland/wayland/display.hpp>
+#include <skland/wayland/registry.hpp>
 
 #include <iostream>
 
-using namespace skland::wayland::client;
+using namespace skland::wayland;
 
 Test::Test()
     : testing::Test() {

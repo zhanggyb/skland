@@ -26,9 +26,9 @@
 #include <skland/core/defines.hpp>
 #include <skland/core/rect.hpp>
 
-#include <skland/wayland/client/xdg-surface.hpp>
-#include <skland/wayland/client/xdg-toplevel.hpp>
-#include <skland/wayland/client/region.hpp>
+#include <skland/wayland/xdg-surface.hpp>
+#include <skland/wayland/xdg-toplevel.hpp>
+#include <skland/wayland/region.hpp>
 
 #include <skland/stock/theme.hpp>
 
@@ -139,11 +139,11 @@ class AbstractWindow : public AbstractView {
 
   int flags_;
 
-  wayland::client::XdgSurface xdg_surface_;
+  wayland::XdgSurface xdg_surface_;
 
-  wayland::client::XdgToplevel xdg_toplevel_;
+  wayland::XdgToplevel xdg_toplevel_;
 
-  wayland::client::Region input_region_;
+  wayland::Region input_region_;
 
   std::string title_;
 

@@ -22,8 +22,6 @@
 #include <skland/gui/abstract-window.hpp>
 #include <skland/gui/surface.hpp>
 
-#include <EGL/eglext.h>
-
 #include <iostream>
 
 using std::cout;
@@ -68,15 +66,12 @@ void Display::Connect(const char *name) {
 
   display_fd_ = wl_display_.GetFd();
   egl_display_.Setup(wl_display_);
+  fprintf(stdout, "Use EGL version: %d.%d\n", egl_display_.major(), egl_display_.minor());
 
 //  xkb_context_ = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
 //  if (xkb_context_ == NULL) {
 //    throw std::runtime_error("Cannot create xkb_context!");
 //  }
-
-  // TODO: check if create epoll fd here
-
-  // TODO: set task/list/epoll fd
 
   wl_registry_.global().Set(this, &Display::OnGlobal);
   wl_registry_.global_remove().Set(this, &Display::OnGlobalRemove);
@@ -241,7 +236,7 @@ void Display::OnDeleteId(uint32_t id) {
 void Display::OnGlobal(uint32_t id,
                        const char *interface,
                        uint32_t version) {
-  using wayland::client::XdgShell;
+  using wayland::XdgShell;
 
   struct Global *global = new Global;
   global->id = id;
@@ -323,8 +318,6 @@ void Display::InitializeIdleTaskList() {
 }
 
 void Display::ClearIdleTaskList() {
-  using gui::Task;
-
   Task *task = idle_task_head_.next();
   Task *next_task = nullptr;
   while (task != &idle_task_tail_) {

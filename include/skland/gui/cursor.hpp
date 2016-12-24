@@ -19,7 +19,7 @@
 
 #include <wayland-cursor.h>
 
-#include "../wayland/client/surface.hpp"
+#include "skland/wayland/surface.hpp"
 
 namespace skland {
 
@@ -38,7 +38,7 @@ class Cursor {
     wl_surface_.Commit();
   }
 
-  const wayland::client::Surface &wl_surface() const {
+  const wayland::Surface &wl_surface() const {
     return wl_surface_;
   }
 
@@ -54,7 +54,7 @@ class Cursor {
 
   Cursor() : wl_cursor_(nullptr) {}
 
-  wayland::client::Surface wl_surface_;
+  wayland::Surface wl_surface_;
 
   struct wl_cursor *wl_cursor_;
 

@@ -19,12 +19,12 @@
 
 #include "../core/object.hpp"
 
-#include "../wayland/client/seat.hpp"
-#include "../wayland/client/pointer.hpp"
-#include "../wayland/client/keyboard.hpp"
-#include "../wayland/client/touch.hpp"
+#include "../wayland/seat.hpp"
+#include "../wayland/pointer.hpp"
+#include "../wayland/keyboard.hpp"
+#include "../wayland/touch.hpp"
 
-#include "internal/mouse-task.hpp"
+#include "abstract-view.hpp"
 
 namespace skland {
 
@@ -44,13 +44,13 @@ class Input : public Object {
 
  public:
 
-  Input(const wayland::client::Registry &registry, uint32_t id, uint32_t version);
+  Input(const wayland::Registry &registry, uint32_t id, uint32_t version);
 
   virtual ~Input();
 
   void SetCursor(const Cursor *cursor) const;
 
-  const wayland::client::Seat &wl_seat() const {
+  const wayland::Seat &wl_seat() const {
     return wl_seat_;
   }
 
@@ -146,14 +146,14 @@ class Input : public Object {
 
   void OnTouchCancel();
 
-  void ProcessMouseEnterOnSubviews(AbstractView *parent, gui::MouseTask *task);
+  void ProcessMouseEnterOnSubviews(AbstractView *parent, AbstractView::MouseTask *task);
 
   Display *display_;
 
-  wayland::client::Seat wl_seat_;
-  wayland::client::Keyboard wl_keyboard_;
-  wayland::client::Pointer wl_pointer_;
-  wayland::client::Touch wl_touch_;
+  wayland::Seat wl_seat_;
+  wayland::Keyboard wl_keyboard_;
+  wayland::Pointer wl_pointer_;
+  wayland::Touch wl_touch_;
 
   KeyEvent *key_event_;
   MouseEvent *mouse_event_;

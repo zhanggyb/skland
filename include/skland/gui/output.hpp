@@ -17,13 +17,13 @@
 #ifndef SKLAND_GUI_OUTPUT_HPP_
 #define SKLAND_GUI_OUTPUT_HPP_
 
-#include <skland/core/rect.hpp>
-#include <skland/core/object.hpp>
-#include <skland/core/size.hpp>
+#include "../core/rect.hpp"
+#include "../core/object.hpp"
+#include "../core/size.hpp"
+#include "../wayland/output.hpp"
 
 #include <string>
 
-#include <skland/wayland/client/output.hpp>
 
 namespace skland {
 
@@ -39,7 +39,7 @@ class Output : public Object {
 
  public:
 
-  Output(const wayland::client::Registry &registry, uint32_t id, uint32_t version);
+  Output(const wayland::Registry &registry, uint32_t id, uint32_t version);
 
   virtual ~Output();
 
@@ -81,7 +81,7 @@ class Output : public Object {
 
   Display *display_;  // manager object
 
-  wayland::client::Output wl_output_;
+  wayland::Output wl_output_;
 
   /** position within the global compositor space */
   Point position_;
