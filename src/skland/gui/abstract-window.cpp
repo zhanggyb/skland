@@ -22,6 +22,7 @@
 #include <skland/gui/abstract-window-frame.hpp>
 
 #include "internal/mouse-task.hpp"
+#include "internal/redraw-task.hpp"
 
 namespace skland {
 
@@ -179,6 +180,16 @@ Rect AbstractWindow::GetClientGeometry() const {
   }
 
   return window_frame_->GetClientGeometry();
+}
+
+void AbstractWindow::OnShow() {
+  AbstractSurface *surf = surface();
+
+  if (surf->canvas()) {
+    redraw_task()->canvas = surf->canvas().get();
+    AddRedrawTask(redraw_task().get());
+  }
+  surf->Commit();
 }
 
 void AbstractWindow::OnMouseEnter(MouseEvent *event) {

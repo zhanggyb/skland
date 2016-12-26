@@ -21,7 +21,13 @@
 
 namespace skland {
 
+/**
+ * @brief A surface using raster canvas
+ */
 class RasterSurface : public AbstractSurface {
+
+  RasterSurface(const RasterSurface &) = delete;
+  RasterSurface &operator=(const RasterSurface &) = delete;
 
  public:
 

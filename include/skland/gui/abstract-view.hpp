@@ -97,6 +97,8 @@ class AbstractView : public Object {
 
  protected:
 
+  virtual void OnShow() = 0;
+
   virtual void OnResize(int width, int height) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) = 0;
@@ -159,13 +161,13 @@ class AbstractView : public Object {
     return mouse_task_;
   }
 
+  static void AddRedrawTask(RedrawTask *task);
+
  private:
 
   static void RedrawOnSurface(AbstractView *view, AbstractSurface *surface);
 
   static void RedrawSubViewsOnSurface(const AbstractView *parent, AbstractSurface *surface);
-
-  static void AddRedrawTask(RedrawTask *task);
 
   bool visible_;
 

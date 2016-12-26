@@ -44,13 +44,12 @@ AbstractView::~AbstractView() {
 }
 
 void AbstractView::Show() {
-  if (redraw_task_->IsLinked()) return;
-
-  AbstractSurface *surface = GetSurface();
-  if (surface) {
-    RedrawOnSurface(this, surface);
-    surface->Commit();
+  if (redraw_task_->IsLinked()) {
+    // TODO: check if the redraw task of this view is in correct order
+    return;
   }
+
+  OnShow();
 }
 
 void AbstractView::SetPosition(int x, int y) {

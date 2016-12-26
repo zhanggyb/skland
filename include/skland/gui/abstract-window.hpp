@@ -105,6 +105,8 @@ class AbstractWindow : public AbstractView {
 
  protected:
 
+  virtual void OnShow() final;
+
   virtual void OnMouseEnter(MouseEvent *event) override;
 
   virtual void OnMouseLeave(MouseEvent *event) override;

@@ -37,6 +37,9 @@ class AbstractWidget : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
+ protected:
+
+  virtual void OnShow() override;
 };
 
 class Widget : public AbstractWidget {
