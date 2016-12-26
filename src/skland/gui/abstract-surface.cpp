@@ -15,13 +15,17 @@
  */
 
 #include <skland/gui/abstract-surface.hpp>
-#include <skland/core/defines.hpp>
 #include <skland/gui/display.hpp>
+#include <skland/gui/buffer.hpp>
+
+#include <skland/graphic/canvas.hpp>
 
 namespace skland {
 
-AbstractSurface::AbstractSurface(AbstractView *view)
-    : view_(view) {
+AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
+    : view_(view), margin_(margin),
+      buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
+      buffer_scale_(1) {
   DBG_ASSERT(view_);
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);
   wl_surface_.leave().Set(this, &AbstractSurface::OnLeave);
@@ -52,11 +56,27 @@ AbstractSurface *AbstractSurface::RemoveSubSurface(AbstractSurface *subsurface) 
   return nullptr;
 }
 
+void AbstractSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
+  if (nullptr == buffer || buffer->wl_buffer().IsNull()) {
+    wl_surface_.Attach(NULL, x, y);
+  } else {
+    buffer->position_.x = x;
+    buffer->position_.y = y;
+    wl_surface_.Attach(buffer->wl_buffer(), x, y);
+  }
+
+  OnAttach(buffer);
+}
+
 void AbstractSurface::Commit() const {
   wl_surface_.Commit();
   if (parent()) {
     static_cast<AbstractSurface *>(parent())->Commit();
   }
+}
+
+void AbstractSurface::SetCanvas(Canvas *canvas) {
+  canvas_.reset(canvas);
 }
 
 void AbstractSurface::OnEnter(struct wl_output *wl_output) {

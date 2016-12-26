@@ -17,16 +17,22 @@
 #ifndef SKLAND_ABSTRACT_SURFACE_HPP
 #define SKLAND_ABSTRACT_SURFACE_HPP
 
+#include "task.hpp"
+
 #include "../core/object.hpp"
+#include "../core/margin.hpp"
+#include "../core/point.hpp"
+
 #include "../wayland/surface.hpp"
 #include "../wayland/region.hpp"
-#include "task.hpp"
 
 #include <memory>
 
 namespace skland {
 
 class AbstractView;
+class Canvas;
+class Buffer;
 
 /**
  * @brief A surface represents a drawing rectangle
@@ -44,7 +50,7 @@ class AbstractSurface : public Object {
 
  public:
 
-  AbstractSurface(AbstractView *view);
+  AbstractSurface(AbstractView *view, const Margin &margin = Margin());
 
   virtual ~AbstractSurface();
 
@@ -53,6 +59,8 @@ class AbstractSurface : public Object {
   AbstractSurface *GetSubSurfaceAt(int index) const;
 
   AbstractSurface *RemoveSubSurface(AbstractSurface *subsurface);
+
+  void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
   void Commit() const;
 
@@ -68,24 +76,46 @@ class AbstractSurface : public Object {
     wl_surface_.SetOpaqueRegion(region);
   }
 
-  virtual std::unique_ptr<Task> CreateRenderTask() = 0;
+  const wayland::Surface &wl_surface() const {
+    return wl_surface_;
+  }
 
   AbstractView *view() const {
     return view_;
   }
 
+  const Margin &margin() const {
+    return margin_;
+  }
+
+  const Point &position() const {
+    return position_;
+  }
+
+  const std::unique_ptr<Canvas> &canvas() const {
+    return canvas_;
+  }
+
  protected:
 
-  static void Attach(AbstractSurface *surface, const wayland::Buffer &wl_buffer, int32_t x = 0, int32_t y = 0) {
-    surface->wl_surface_.Attach(wl_buffer, x, y);
-  }
+  /**
+   * @brief Setup this surface
+   *
+   * This virtual method is called when a surface is set in a view.
+   */
+  virtual void OnSetup() = 0;
 
-  static void Attach(AbstractSurface *surface, struct wl_buffer *wl_buffer, int32_t x = 0, int32_t y = 0) {
-    surface->wl_surface_.Attach(wl_buffer, x, y);
-  }
+  /**
+   * @brief Attach a buffer on this surface
+   * @param buffer
+   */
+  virtual void OnAttach(const Buffer *buffer) = 0;
 
-  const wayland::Surface &wl_surface() const {
-    return wl_surface_;
+  void SetCanvas(Canvas *canvas);
+
+  void set_position(int x, int y) {
+    position_.x = x;
+    position_.y = y;
   }
 
  private:
@@ -97,6 +127,21 @@ class AbstractSurface : public Object {
   wayland::Surface wl_surface_;
 
   AbstractView *view_;
+
+  Margin margin_;
+
+  /**
+   * Position in parent surface
+   *
+   * For root surface, this should always be (0, 0)
+   */
+  Point position_;
+
+  std::unique_ptr<Canvas> canvas_;
+
+  enum wl_output_transform buffer_transform_;
+
+  int32_t buffer_scale_;
 
 };
 

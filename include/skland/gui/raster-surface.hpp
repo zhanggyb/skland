@@ -1,18 +1,25 @@
-//
-// Created by zhanggyb on 16-12-26.
-//
+/*
+ * Copyright 2016 Freeman Zhang <zhanggyb@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-#ifndef SKLAND_RASTER_SURFACE_HPP
-#define SKLAND_RASTER_SURFACE_HPP
+#ifndef SKLAND_GUI_RASTER_SURFACE_HPP_
+#define SKLAND_GUI_RASTER_SURFACE_HPP_
 
 #include "abstract-surface.hpp"
 
-#include "../core/margin.hpp"
-#include "../graphic/canvas.hpp"
-
 namespace skland {
-
-class Buffer;
 
 class RasterSurface : public AbstractSurface {
 
@@ -22,18 +29,14 @@ class RasterSurface : public AbstractSurface {
 
   virtual ~RasterSurface();
 
-  void Attach(const Buffer &buffer, int32_t x = 0, int32_t y = 0);
+ protected:
 
-  virtual std::unique_ptr<Task> CreateRenderTask() final;
+  virtual void OnSetup() final;
 
- private:
-
-  std::unique_ptr<Canvas> canvas_;
-
-  Margin margin_;
+  virtual void OnAttach(const Buffer *buffer) final;
 
 };
 
 }
 
-#endif //SKLAND_RASTER_SURFACE_HPP
+#endif // SKLAND_GUI_RASTER_SURFACE_HPP_

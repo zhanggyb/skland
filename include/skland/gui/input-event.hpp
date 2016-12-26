@@ -32,7 +32,7 @@ class InputEvent {
   InputEvent(Input *input)
       : input_(input), accepted_(false) {}
 
-  ~InputEvent() {}
+  virtual ~InputEvent() {}
 
   void SetCursor(const Cursor *cursor) const {
     input_->SetCursor(cursor);

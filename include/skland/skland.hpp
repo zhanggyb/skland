@@ -28,7 +28,6 @@
 #include "gui/application.hpp"
 #include "gui/display.hpp"
 #include "gui/output.hpp"
-#include "gui/surface.hpp"
 #include "gui/abstract-widget.hpp"
 #include "gui/abstract-window.hpp"
 #include "skland/gui/main-window.hpp"

@@ -34,8 +34,8 @@ class MouseEvent;
 class TouchEvent;
 class Output;
 class Application;
-class Surface;
-class Task;
+class AbstractSurface;
+
 struct MouseTask;
 struct RedrawTask;
 
@@ -44,7 +44,7 @@ class AbstractView : public Object {
   friend class Input;
   friend class Application;
   friend class Display;
-  friend class Surface;
+  friend class AbstractSurface;
   friend struct RedrawTask;
 
  public:
@@ -56,6 +56,8 @@ class AbstractView : public Object {
   virtual ~AbstractView();
 
   void Show();
+
+  void Hide();  // TODO: implement Hide()
 
   void SetPosition(int x, int y);
 
@@ -87,8 +89,6 @@ class AbstractView : public Object {
     return geometry_;
   }
 
-  Surface *GetSurface() const;
-
   virtual Size GetMinimalSize() const = 0;
 
   virtual Size GetPreferredSize() const = 0;
@@ -111,7 +111,9 @@ class AbstractView : public Object {
 
   virtual void OnDraw(Canvas *canvas) = 0;
 
-  void SetSurface(Surface *surface);
+  AbstractSurface *GetSurface() const;
+
+  void SetSurface(AbstractSurface *surface);
 
   void Damage(const Rect &rect);
 
@@ -129,7 +131,7 @@ class AbstractView : public Object {
     geometry_.Resize(width, height);
   }
 
-  Surface *surface() const {
+  AbstractSurface *surface() const {
     return surface_;
   }
 
@@ -149,19 +151,19 @@ class AbstractView : public Object {
     return static_cast<AbstractView *>(last_child());
   }
 
-  const std::unique_ptr<Task> &redraw_task() const {
+  const std::unique_ptr<RedrawTask> &redraw_task() const {
     return redraw_task_;
   }
 
-  const std::unique_ptr<Task> &mouse_task() const {
+  const std::unique_ptr<MouseTask> &mouse_task() const {
     return mouse_task_;
   }
 
  private:
 
-  static void RedrawOnSurface(AbstractView *view, Surface *surface);
+  static void RedrawOnSurface(AbstractView *view, AbstractSurface *surface);
 
-  static void RedrawSubViewsOnSurface(const AbstractView *parent, Surface *surface);
+  static void RedrawSubViewsOnSurface(const AbstractView *parent, AbstractSurface *surface);
 
   static void AddRedrawTask(RedrawTask *task);
 
@@ -172,17 +174,17 @@ class AbstractView : public Object {
   /**
    * The main surface for this window
    */
-  Surface *surface_;
+  AbstractSurface *surface_;
 
   /**
    * This property should only be assigned with RedrawTask
    */
-  std::unique_ptr<Task> redraw_task_;
+  std::unique_ptr<RedrawTask> redraw_task_;
 
   /**
    * This property should only be assigned with MouseTask
    */
-  std::unique_ptr<Task> mouse_task_;
+  std::unique_ptr<MouseTask> mouse_task_;
 };
 
 }

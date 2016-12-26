@@ -16,7 +16,7 @@
 
 #include <skland/gui/input.hpp>
 #include <skland/gui/display.hpp>
-#include <skland/gui/surface.hpp>
+#include <skland/gui/abstract-surface.hpp>
 
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
@@ -160,7 +160,7 @@ void Input::OnPointerEnter(uint32_t serial,
   mouse_event_->surface_xy_.x = wl_fixed_to_double(surface_x);
   mouse_event_->surface_xy_.y = wl_fixed_to_double(surface_y);
 
-  mouse_event_->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
+  mouse_event_->surface_ = static_cast<AbstractSurface *>(wl_surface_get_user_data(wl_surface));
   mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
   mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
 
@@ -169,7 +169,7 @@ void Input::OnPointerEnter(uint32_t serial,
   mouse_event_->accepted_ = false;
   view_on_surface->OnMouseEnter(mouse_event_);
   if (mouse_event_->accepted()) {
-    MouseTask *task = static_cast<MouseTask *>(view_on_surface->mouse_task_.get());
+    MouseTask *task = view_on_surface->mouse_task_.get();
     ProcessMouseEnterOnSubviews(view_on_surface, task);
   }
 }
@@ -177,13 +177,13 @@ void Input::OnPointerEnter(uint32_t serial,
 void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
   mouse_event_->serial_ = serial;
 
-  mouse_event_->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
+  mouse_event_->surface_ = static_cast<AbstractSurface *>(wl_surface_get_user_data(wl_surface));
   AbstractView *view_on_surface = mouse_event_->surface_->view();
 
   mouse_event_->accepted_ = false;
   view_on_surface->OnMouseLeave(mouse_event_);
   if (mouse_event_->accepted()) {
-    MouseTask *task = static_cast<MouseTask *>(view_on_surface->mouse_task_.get());
+    MouseTask *task = view_on_surface->mouse_task_.get();
     MouseTask *next = nullptr;
     bool need_call = true;
 
@@ -222,7 +222,7 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
 
     // The following code check if the mouse enters sub views in this surface:
 
-    MouseTask *task = static_cast<MouseTask *>(view_on_surface->mouse_task_.get());
+    MouseTask *task = view_on_surface->mouse_task_.get();
     MouseTask *tail = task;
     while (tail->next()) {
       tail = static_cast<MouseTask *>(tail->next());
@@ -261,7 +261,7 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
 
     view_on_surface->OnMouseButton(mouse_event_);
     if (mouse_event_->accepted()) {
-      MouseTask *task = static_cast<MouseTask *>(view_on_surface->mouse_task_.get());
+      MouseTask *task = view_on_surface->mouse_task_.get();
       task = static_cast<MouseTask *>(task->next());
       while (task) {
         task->view->OnMouseButton(mouse_event_);

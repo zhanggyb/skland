@@ -17,9 +17,11 @@
 #include <skland/gui/abstract-window.hpp>
 
 #include <skland/gui/application.hpp>
-#include <skland/gui/surface.hpp>
+#include <skland/gui/raster-surface.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
+
+#include "internal/mouse-task.hpp"
 
 namespace skland {
 
@@ -40,20 +42,20 @@ AbstractWindow::AbstractWindow(int width,
 
   int x = 0, y = 0;  // The input region
 
-  Surface *surface = nullptr;
+  RasterSurface *surface = nullptr;
 
   if (frame) {
-    surface = new Surface(this, Margin(Theme::shadow_margin_left(),
-                                       Theme::shadow_margin_top(),
-                                       Theme::shadow_margin_right(),
-                                       Theme::shadow_margin_bottom()));
+    surface = new RasterSurface(this, Margin(Theme::shadow_margin_left(),
+                                             Theme::shadow_margin_top(),
+                                             Theme::shadow_margin_right(),
+                                             Theme::shadow_margin_bottom()));
     SetWindowFrame(frame);
     x += surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
     y += surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
   } else {
-    surface = new Surface(this);
+    surface = new RasterSurface(this);
   }
 
   SetSurface(surface);

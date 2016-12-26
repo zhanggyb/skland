@@ -17,7 +17,7 @@
 #include <skland/gui/abstract-view.hpp>
 
 #include <skland/core/numeric.hpp>
-#include <skland/gui/surface.hpp>
+#include <skland/gui/abstract-surface.hpp>
 #include <skland/gui/display.hpp>
 
 #include "internal/mouse-task.hpp"
@@ -46,7 +46,7 @@ AbstractView::~AbstractView() {
 void AbstractView::Show() {
   if (redraw_task_->IsLinked()) return;
 
-  Surface *surface = GetSurface();
+  AbstractSurface *surface = GetSurface();
   if (surface) {
     RedrawOnSurface(this, surface);
     surface->Commit();
@@ -77,10 +77,10 @@ bool AbstractView::Contain(int x, int y) const {
   return geometry_.Contain(x, y);
 }
 
-Surface *AbstractView::GetSurface() const {
+AbstractSurface *AbstractView::GetSurface() const {
   if (surface_) return surface_;
 
-  Surface *surface = nullptr;
+  AbstractSurface *surface = nullptr;
   AbstractView *p = static_cast<AbstractView *>(parent());
   while (p) {
     if (p->surface_) {
@@ -93,7 +93,7 @@ Surface *AbstractView::GetSurface() const {
   return surface;
 }
 
-void AbstractView::SetSurface(Surface *surface) {
+void AbstractView::SetSurface(AbstractSurface *surface) {
   if (surface_ == surface) {
     DBG_ASSERT(surface->view() == this);
     return;
@@ -103,10 +103,11 @@ void AbstractView::SetSurface(Surface *surface) {
 
   surface->view_ = this;
   surface_ = surface;
+  surface_->OnSetup();
 }
 
 void AbstractView::Damage(const Rect &rect) {
-  Surface *surface = GetSurface();
+  AbstractSurface *surface = GetSurface();
   if (surface) {
     surface->Damage((int) rect.x() + surface->margin().left,
                     (int) rect.y() + surface->margin().top,
@@ -116,7 +117,7 @@ void AbstractView::Damage(const Rect &rect) {
 }
 
 void AbstractView::RedrawAll() {
-  Surface *surface = GetSurface();
+  AbstractSurface *surface = GetSurface();
   if (surface) {
     RedrawOnSurface(this, surface);
     RedrawSubViewsOnSurface(this, surface_);
@@ -124,15 +125,14 @@ void AbstractView::RedrawAll() {
   }
 }
 
-void AbstractView::RedrawOnSurface(AbstractView *view, Surface *surface) {
+void AbstractView::RedrawOnSurface(AbstractView *view, AbstractSurface *surface) {
   if (surface->canvas()) {
-    RedrawTask *t = static_cast<RedrawTask *>(view->redraw_task_.get());
-    t->canvas = surface->canvas();
-    AddRedrawTask(t);
+    view->redraw_task_->canvas = surface->canvas().get();
+    AddRedrawTask(view->redraw_task_.get());
   }
 }
 
-void AbstractView::RedrawSubViewsOnSurface(const AbstractView *parent, Surface *surface) {
+void AbstractView::RedrawSubViewsOnSurface(const AbstractView *parent, AbstractSurface *surface) {
   for (AbstractView *subview = parent->last_subview(); subview;
        subview = subview->previous_view()) {
     if (subview->surface_ != nullptr) {

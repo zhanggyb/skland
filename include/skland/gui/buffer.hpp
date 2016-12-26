@@ -19,12 +19,15 @@
 
 #include "shared-memory.hpp"
 
-#include <skland/core/size.hpp>
-#include <skland/wayland/buffer.hpp>
+#include "../core/point.hpp"
+#include "../core/size.hpp"
+
+#include "../wayland/buffer.hpp"
 
 namespace skland {
 
 class MemoryPool;
+class AbstractSurface;
 
 /**
  * @brief Buffer in wayland compositor
@@ -35,6 +38,7 @@ class MemoryPool;
 class Buffer {
 
   friend class MemoryPool;
+  friend class AbstractSurface;
 
   Buffer(const Buffer &) = delete;
   Buffer &operator=(const Buffer &) = delete;
@@ -70,6 +74,10 @@ class Buffer {
     return stride_;
   }
 
+  const Point &position() const {
+    return position_;
+  }
+
   const Size &size() const {
     return size_;
   }
@@ -81,6 +89,11 @@ class Buffer {
  private:
 
   wayland::Buffer wl_buffer_;
+
+  /**
+   * @brief Position on surface
+   */
+  Point position_;
 
   Size size_;
 
