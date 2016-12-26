@@ -21,7 +21,7 @@
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
-#include "task.hpp"
+#include <memory>
 
 namespace skland {
 
@@ -35,6 +35,9 @@ class TouchEvent;
 class Output;
 class Application;
 class Surface;
+class Task;
+struct MouseTask;
+struct RedrawTask;
 
 class AbstractView : public Object {
 
@@ -42,36 +45,9 @@ class AbstractView : public Object {
   friend class Application;
   friend class Display;
   friend class Surface;
+  friend struct RedrawTask;
 
  public:
-
-  struct MouseTask : public Task {
-    MouseTask(const MouseTask &) = delete;
-    MouseTask &operator=(const MouseTask &) = delete;
-
-    MouseTask(AbstractView *view = nullptr)
-        : Task(), view(view) {}
-
-    ~MouseTask() {}
-
-    AbstractView *view;
-  };
-
-  struct RedrawTask : public Task {
-    RedrawTask(const RedrawTask &) = delete;
-    RedrawTask &operator=(const RedrawTask &) = delete;
-
-    RedrawTask(AbstractView *view = nullptr, Canvas *canvas = nullptr)
-        : Task(), view(view), canvas(canvas) {}
-
-    virtual ~RedrawTask() {}
-
-    virtual void Run() const final;
-
-    AbstractView *view;
-
-    Canvas *canvas;
-  };
 
   AbstractView();
 
@@ -173,11 +149,11 @@ class AbstractView : public Object {
     return static_cast<AbstractView *>(last_child());
   }
 
-  const RedrawTask &redraw_task() const {
+  const std::unique_ptr<Task> &redraw_task() const {
     return redraw_task_;
   }
 
-  const MouseTask &mouse_task() const {
+  const std::unique_ptr<Task> &mouse_task() const {
     return mouse_task_;
   }
 
@@ -193,10 +169,20 @@ class AbstractView : public Object {
 
   Rect geometry_;
 
-  Surface *surface_;  /**< The main surface for this window */
+  /**
+   * The main surface for this window
+   */
+  Surface *surface_;
 
-  RedrawTask redraw_task_;
-  MouseTask mouse_task_;
+  /**
+   * This property should only be assigned with RedrawTask
+   */
+  std::unique_ptr<Task> redraw_task_;
+
+  /**
+   * This property should only be assigned with MouseTask
+   */
+  std::unique_ptr<Task> mouse_task_;
 };
 
 }

@@ -33,6 +33,7 @@ class Cursor;
 class KeyEvent;
 class MouseEvent;
 class TouchEvent;
+struct MouseTask;
 
 class Input : public Object {
 
@@ -146,7 +147,7 @@ class Input : public Object {
 
   void OnTouchCancel();
 
-  void ProcessMouseEnterOnSubviews(AbstractView *parent, AbstractView::MouseTask *task);
+  void ProcessMouseEnterOnSubviews(AbstractView *parent, MouseTask *task);
 
   Display *display_;
 

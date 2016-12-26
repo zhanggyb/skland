@@ -35,7 +35,7 @@ class Display {
 
   friend class Registry;
   friend class Callback;
-  friend class skland::egl::Display;
+  friend class egl::Display;
 
   Display(const Display &) = delete;
   Display &operator=(const Display &) = delete;

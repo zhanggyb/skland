@@ -20,8 +20,6 @@
 #include <skland/gui/buffer.hpp>
 #include <skland/gui/output.hpp>
 
-#include "SkCanvas.h"
-
 namespace skland {
 
 Surface::Surface(AbstractView *view, const Margin &margin)

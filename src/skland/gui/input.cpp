@@ -17,11 +17,12 @@
 #include <skland/gui/input.hpp>
 #include <skland/gui/display.hpp>
 #include <skland/gui/surface.hpp>
-#include <skland/gui/abstract-view.hpp>
 
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/touch-event.hpp>
+
+#include "internal/mouse-task.hpp"
 
 namespace skland {
 
@@ -168,7 +169,7 @@ void Input::OnPointerEnter(uint32_t serial,
   mouse_event_->accepted_ = false;
   view_on_surface->OnMouseEnter(mouse_event_);
   if (mouse_event_->accepted()) {
-    AbstractView::MouseTask *task = &view_on_surface->mouse_task_;
+    MouseTask *task = static_cast<MouseTask *>(view_on_surface->mouse_task_.get());
     ProcessMouseEnterOnSubviews(view_on_surface, task);
   }
 }
@@ -182,13 +183,13 @@ void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
   mouse_event_->accepted_ = false;
   view_on_surface->OnMouseLeave(mouse_event_);
   if (mouse_event_->accepted()) {
-    AbstractView::MouseTask *task = &view_on_surface->mouse_task_;
-    AbstractView::MouseTask *next = nullptr;
+    MouseTask *task = static_cast<MouseTask *>(view_on_surface->mouse_task_.get());
+    MouseTask *next = nullptr;
     bool need_call = true;
 
-    task = static_cast<AbstractView::MouseTask *>(task->next());
+    task = static_cast<MouseTask *>(task->next());
     while (task) {
-      next = static_cast<AbstractView::MouseTask *>(task->next());
+      next = static_cast<MouseTask *>(task->next());
       task->Unlink();
 
       if (need_call) {
@@ -221,18 +222,18 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
 
     // The following code check if the mouse enters sub views in this surface:
 
-    AbstractView::MouseTask *task = &view_on_surface->mouse_task_;
-    AbstractView::MouseTask *tail = task;
+    MouseTask *task = static_cast<MouseTask *>(view_on_surface->mouse_task_.get());
+    MouseTask *tail = task;
     while (tail->next()) {
-      tail = static_cast<AbstractView::MouseTask *>(tail->next());
+      tail = static_cast<MouseTask *>(tail->next());
     }
 
-    AbstractView::MouseTask *previous = nullptr;
+    MouseTask *previous = nullptr;
     while (tail->previous()) {
       if (tail->view->Contain((int) mouse_event_->window_xy_.x, (int) mouse_event_->window_xy_.y)) {
         break;
       }
-      previous = static_cast<AbstractView::MouseTask *>(tail->previous());
+      previous = static_cast<MouseTask *>(tail->previous());
 
       tail->Unlink();
       mouse_event_->accepted_ = false;
@@ -260,14 +261,14 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
 
     view_on_surface->OnMouseButton(mouse_event_);
     if (mouse_event_->accepted()) {
-      AbstractView::MouseTask *task = &view_on_surface->mouse_task_;
-      task = static_cast<AbstractView::MouseTask *>(task->next());
+      MouseTask *task = static_cast<MouseTask *>(view_on_surface->mouse_task_.get());
+      task = static_cast<MouseTask *>(task->next());
       while (task) {
         task->view->OnMouseButton(mouse_event_);
         if (!mouse_event_->accepted()) {
           break;
         }
-        task = static_cast<AbstractView::MouseTask *>(task->next());
+        task = static_cast<MouseTask *>(task->next());
       }
     }
   }
@@ -318,14 +319,14 @@ void Input::OnTouchCancel() {
 
 }
 
-void Input::ProcessMouseEnterOnSubviews(AbstractView *parent, AbstractView::MouseTask *task) {
+void Input::ProcessMouseEnterOnSubviews(AbstractView *parent, MouseTask *task) {
   for (AbstractView *subview = parent->first_subview(); subview; subview = subview->next_view()) {
     if (subview->Contain((int) mouse_event_->window_xy_.x, (int) mouse_event_->window_xy_.y)) {
       mouse_event_->accepted_ = false;
       subview->OnMouseEnter(mouse_event_);
       if (mouse_event_->accepted()) {
-        task->PushBack(&subview->mouse_task_);
-        task = static_cast<AbstractView::MouseTask *>(task->next());
+        task->PushBack(subview->mouse_task_.get());
+        task = static_cast<MouseTask *>(task->next());
         ProcessMouseEnterOnSubviews(subview, task);
       }
       break;

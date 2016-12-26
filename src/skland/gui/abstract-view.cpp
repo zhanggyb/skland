@@ -20,12 +20,10 @@
 #include <skland/gui/surface.hpp>
 #include <skland/gui/display.hpp>
 
-namespace skland {
+#include "internal/mouse-task.hpp"
+#include "internal/redraw-task.hpp"
 
-void AbstractView::RedrawTask::Run() const {
-  view->OnDraw(canvas);
-  view->visible_ = true;
-}
+namespace skland {
 
 AbstractView::AbstractView()
     : AbstractView(400, 300) {
@@ -36,9 +34,9 @@ AbstractView::AbstractView(int width, int height)
     : Object(),
       visible_(false),
       geometry_(width, height),
-      surface_(nullptr),
-      redraw_task_(this, nullptr),
-      mouse_task_(this) {
+      surface_(nullptr) {
+  redraw_task_.reset(new RedrawTask(this, nullptr));
+  mouse_task_.reset(new MouseTask(this));
 }
 
 AbstractView::~AbstractView() {
@@ -46,7 +44,7 @@ AbstractView::~AbstractView() {
 }
 
 void AbstractView::Show() {
-  if (redraw_task_.IsLinked()) return;
+  if (redraw_task_->IsLinked()) return;
 
   Surface *surface = GetSurface();
   if (surface) {
@@ -128,8 +126,9 @@ void AbstractView::RedrawAll() {
 
 void AbstractView::RedrawOnSurface(AbstractView *view, Surface *surface) {
   if (surface->canvas()) {
-    view->redraw_task_.canvas = surface->canvas();
-    AddRedrawTask(&view->redraw_task_);
+    RedrawTask *t = static_cast<RedrawTask *>(view->redraw_task_.get());
+    t->canvas = surface->canvas();
+    AddRedrawTask(t);
   }
 }
 
@@ -152,20 +151,20 @@ void AbstractView::AddRedrawTask(RedrawTask *task) {
   Task *insert_task = Display::idle_task_tail()->previous();
 
   AbstractView *view = task->view->next_view();
-  if (view && view->redraw_task_.IsLinked()) { // the next sibling is waiting for redraw, insert after
-    insert_task = &view->redraw_task_;
+  if (view && view->redraw_task_->IsLinked()) { // the next sibling is waiting for redraw, insert after
+    insert_task = view->redraw_task_.get();
     goto insert;
   }
 
   view = task->view->previous_view();
-  if (view && view->redraw_task_.IsLinked()) { // the previous sibling is waiting for redraw, insert after
-    insert_task = view->redraw_task_.previous();
+  if (view && view->redraw_task_->IsLinked()) { // the previous sibling is waiting for redraw, insert after
+    insert_task = view->redraw_task_->previous();
     goto insert;
   }
 
   view = static_cast<AbstractView *>(task->view->parent());
-  if (view && view->redraw_task_.IsLinked()) { // the parent is waiting for redraw, insert after
-    insert_task = &view->redraw_task_;
+  if (view && view->redraw_task_->IsLinked()) { // the parent is waiting for redraw, insert after
+    insert_task = view->redraw_task_.get();
     goto insert;
   }
 
