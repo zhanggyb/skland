@@ -22,24 +22,23 @@
 #include "SkTypeface.h"
 
 namespace skland {
-namespace graphic {
 
-struct MetaFont {
+struct FontMeta {
 
-  MetaFont()
+  FontMeta()
       : sk_font_style() {
   }
 
-  MetaFont(const char *name, int weight, int width, SkFontStyle::Slant slant)
+  FontMeta(const char *name, int weight, int width, SkFontStyle::Slant slant)
       : sk_font_style(weight, width, slant) {
     sk_typeface = SkTypeface::MakeFromName(name, sk_font_style);
   }
 
-  MetaFont(const MetaFont &other)
+  FontMeta(const FontMeta &other)
       : sk_font_style(other.sk_font_style), sk_typeface(other.sk_typeface) {
   }
 
-  MetaFont &operator=(const MetaFont &other) {
+  FontMeta &operator=(const FontMeta &other) {
     sk_typeface = other.sk_typeface;
     sk_font_style = other.sk_font_style;
     return *this;
@@ -50,7 +49,6 @@ struct MetaFont {
 
 };
 
-}
 }
 
 #endif //SKLAND_META_FONT_HPP

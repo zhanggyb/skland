@@ -22,9 +22,7 @@
 namespace skland {
 
 class Paint;
-namespace graphic {
-struct MetaShader;
-}
+struct ShaderMeta;
 
 class Shader {
 
@@ -40,7 +38,7 @@ class Shader {
 
   Shader();
 
-  Shader(graphic::MetaShader *metadata);
+  Shader(ShaderMeta *metadata);
 
   Shader(const Shader &other);
 
@@ -48,17 +46,17 @@ class Shader {
 
   Shader &operator=(const Shader &other);
 
-  const graphic::MetaShader *metadata() {
+  const ShaderMeta *metadata() {
     return metadata_.get();
   }
 
- protected:
-
-  void SetMetadata(graphic::MetaShader *metashader);
+  explicit operator bool() const noexcept {
+    return metadata_.operator bool();
+  }
 
  private:
 
-  std::shared_ptr<graphic::MetaShader> metadata_;
+  std::unique_ptr<ShaderMeta> metadata_;
 
 };
 

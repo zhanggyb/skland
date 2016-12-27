@@ -20,8 +20,8 @@
 
 #include "SkPaint.h"
 
-#include "internal/meta-font.hpp"
-#include "internal/meta-shader.hpp"
+#include "internal/font-meta.hpp"
+#include "internal/shader-meta.hpp"
 
 namespace skland {
 

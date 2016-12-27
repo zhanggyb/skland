@@ -16,32 +16,36 @@
 
 #include <skland/graphic/shader.hpp>
 
-#include "internal/meta-shader.hpp"
+#include "internal/shader-meta.hpp"
 
 namespace skland {
 
 Shader::Shader() {
-
 }
 
-Shader::Shader(graphic::MetaShader *metadata)
+Shader::Shader(ShaderMeta *metadata)
     : metadata_(metadata) {
 }
 
-Shader::Shader(const Shader &other)
-    : metadata_(other.metadata_) {
+Shader::Shader(const Shader &other) {
+  other ? metadata_.reset(new ShaderMeta(other.metadata_->sk_shader)) : metadata_.reset();
 }
 
 Shader::~Shader() {
 }
 
 Shader &Shader::operator=(const Shader &other) {
-  metadata_ = other.metadata_;
-  return *this;
-}
+  if (other) {
+    if (metadata_) {
+      *metadata_ = *other.metadata_;
+    } else {
+      metadata_.reset(new ShaderMeta(other.metadata_->sk_shader));
+    }
+  } else {
+    metadata_.reset();
+  }
 
-void Shader::SetMetadata(graphic::MetaShader *metashader) {
-  metadata_.reset(metashader);
+  return *this;
 }
 
 }

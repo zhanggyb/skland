@@ -16,22 +16,19 @@
 
 #include <skland/graphic/font.hpp>
 
-#include "internal/meta-font.hpp"
+#include "internal/font-meta.hpp"
 
 namespace skland {
 
-Font::Font(const char *name, Weight weight, Width width, Slant slant)
-    : metadata_(nullptr) {
-  metadata_ = new graphic::MetaFont(name, (int) weight, (int) width, (SkFontStyle::Slant) slant);
+Font::Font(const char *name, Weight weight, Width width, Slant slant) {
+  metadata_.reset(new FontMeta(name, (int) weight, (int) width, (SkFontStyle::Slant) slant));
 }
 
-Font::Font(const Font &other)
-    : metadata_(nullptr) {
-  metadata_ = new graphic::MetaFont(*other.metadata_);
+Font::Font(const Font &other) {
+  metadata_.reset(new FontMeta(*other.metadata_));
 }
 
 Font::~Font() {
-  delete metadata_;
 }
 
 Font &Font::operator=(const Font &other) {
