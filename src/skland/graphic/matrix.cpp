@@ -16,26 +16,23 @@
 
 #include <skland/graphic/matrix.hpp>
 
-#include "internal/meta-matrix.hpp"
+#include "SkMatrix.h"
 
 namespace skland {
 
 Matrix::Matrix() {
+  metadata_.reset(new SkMatrix);
 }
 
-Matrix::Matrix(graphic::MetaMatrix *matrix)
-    : metadata_(matrix) {
-}
-
-Matrix::Matrix(const Matrix &other)
-    : metadata_(other.metadata_) {
+Matrix::Matrix(const Matrix &other) {
+  metadata_.reset(new SkMatrix(*other.metadata_));
 }
 
 Matrix::~Matrix() {
 }
 
 Matrix &Matrix::operator=(const Matrix &other) {
-  metadata_ = other.metadata_;
+  *metadata_ = *other.metadata_;
   return *this;
 }
 

@@ -19,6 +19,8 @@
 
 #include "../core/rect.hpp"
 
+#include <memory>
+
 class SkPath;
 
 namespace skland {
@@ -121,12 +123,12 @@ class Path {
   void Close();
 
   SkPath *sk_path() const {
-    return sk_path_;
+    return metadata_.get();
   }
 
  private:
 
-  SkPath *sk_path_;
+  std::unique_ptr<SkPath> metadata_;
 };
 
 bool operator==(const Path &path1, const Path &path2);

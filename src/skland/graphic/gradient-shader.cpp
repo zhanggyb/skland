@@ -17,7 +17,6 @@
 #include <skland/graphic/gradient-shader.hpp>
 #include <skland/graphic/matrix.hpp>
 
-#include "internal/meta-matrix.hpp"
 #include "internal/meta-shader.hpp"
 
 #include "SkGradientShader.h"
@@ -38,7 +37,7 @@ Shader GradientShader::MakeLinear(const Point2F *points,
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : &local_matrix->metadata()->sk_matrix);
+                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
 
   return Shader(new graphic::MetaShader(sk_shader));
 }
@@ -58,7 +57,7 @@ Shader GradientShader::MakeLinear(const Point2F points[],
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : &local_matrix->metadata()->sk_matrix);
+                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
 
   return Shader(new graphic::MetaShader(sk_shader));
 }
@@ -79,7 +78,7 @@ Shader GradientShader::MakeRadial(const Point2F &center,
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : &local_matrix->metadata()->sk_matrix);
+                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
   return Shader(new graphic::MetaShader(sk_shader));
 }
 
@@ -100,7 +99,7 @@ Shader GradientShader::MakeRadial(const Point2F &center,
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : &local_matrix->metadata()->sk_matrix);
+                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
 
   return Shader(new graphic::MetaShader(sk_shader));
 }

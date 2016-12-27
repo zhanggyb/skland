@@ -25,55 +25,52 @@
 
 namespace skland {
 
-Paint::Paint()
-    : sk_paint_(nullptr) {
-  sk_paint_ = new SkPaint;
+Paint::Paint() {
+  metadata_.reset(new SkPaint);
 }
 
-Paint::Paint(const Paint &orig)
-    : sk_paint_(nullptr) {
-  sk_paint_ = new SkPaint(*orig.sk_paint_);
+Paint::Paint(const Paint &orig) {
+  metadata_.reset(new SkPaint(*orig.metadata_));
 }
 
 Paint::~Paint() {
-  delete sk_paint_;
 }
 
 Paint &Paint::operator=(const Paint &other) {
-  *sk_paint_ = *other.sk_paint_;
+  *metadata_ = *other.metadata_;
   return *this;
 }
 
 uint32_t Paint::GetHash() const {
-  return sk_paint_->getHash();
+  return metadata_->getHash();
 }
 
 void Paint::Reset() {
-  sk_paint_->reset();
+  metadata_->reset();
 }
 
 Paint::Hinting Paint::GetHinting() const {
-  return static_cast<Hinting>(sk_paint_->getHinting());
+  return static_cast<Hinting>(metadata_->getHinting());
 }
 
 void Paint::SetHinting(Hinting hinting) {
-  sk_paint_->setHinting(static_cast<SkPaint::Hinting >(hinting));
+  metadata_->setHinting(static_cast<SkPaint::Hinting >(hinting));
 }
 
 bool Paint::IsAntiAlias() const {
-  return sk_paint_->isAntiAlias();
+  return metadata_->isAntiAlias();
 }
 
 void Paint::SetAntiAlias(bool aa) {
-  sk_paint_->setAntiAlias(aa);
+  metadata_->setAntiAlias(aa);
 }
 
 void Paint::SetStyle(Style style) {
-  sk_paint_->setStyle(static_cast<SkPaint::Style>(style));
+  metadata_->setStyle(static_cast<SkPaint::Style>(style));
 }
 
 Color Paint::GetColor() const {
-  uint32_t value = sk_paint_->getColor();
+  uint32_t value = metadata_->getColor();
   return Color::FromUCharRGBA(SkToU8(SkColorGetR(value)),
                               SkToU8(SkColorGetG(value)),
                               SkToU8(SkColorGetB(value)),
@@ -81,34 +78,34 @@ Color Paint::GetColor() const {
 }
 
 void Paint::SetColor(uint32_t argb) {
-  sk_paint_->setColor(argb);
+  metadata_->setColor(argb);
 }
 
 void Paint::SetColor(const Color &color) {
-  sk_paint_->setARGB(color.uchar_alpha(),
+  metadata_->setARGB(color.uchar_alpha(),
                      color.uchar_red(),
                      color.uchar_green(),
                      color.uchar_blue());
 }
 
 float Paint::GetStrokeWidth() const {
-  return sk_paint_->getStrokeWidth();
+  return metadata_->getStrokeWidth();
 }
 
 void Paint::SetStrokeWidth(float width) {
-  sk_paint_->setStrokeWidth(width);
+  metadata_->setStrokeWidth(width);
 }
 
 void Paint::SetFont(const Font &font) {
-  sk_paint_->setTypeface(font.metadata_->sk_typeface);
+  metadata_->setTypeface(font.metadata_->sk_typeface);
 }
 
 void Paint::SetTextSize(float size) {
-  sk_paint_->setTextSize(size);
+  metadata_->setTextSize(size);
 }
 
 void Paint::SetShader(const Shader &shader) {
-  sk_paint_->setShader(shader.metadata_->sk_shader);
+  metadata_->setShader(shader.metadata_->sk_shader);
 }
 
 }
