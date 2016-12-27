@@ -16,20 +16,18 @@
 
 #include <skland/wayland/xdg-popup.hpp>
 
-#include "internal/meta-xdg-popup.hpp"
-#include "internal/meta-xdg-surface.hpp"
-#include "internal/meta-xdg-positioner.hpp"
+#include "internal/xdg-popup-meta.hpp"
+#include "internal/xdg-surface-meta.hpp"
+#include "internal/xdg-positioner-meta.hpp"
 
 namespace skland {
 namespace wayland {
 
-XdgPopup::XdgPopup()
-    : metadata_(nullptr) {
-  metadata_ = new MetaXdgPopup;
+XdgPopup::XdgPopup() {
+  metadata_.reset(new XdgPopupMeta);
 }
 
 XdgPopup::~XdgPopup() {
-  delete metadata_;
 }
 
 void XdgPopup::Setup(const XdgSurface &xdg_surface, const XdgSurface &parent, const XdgPositioner &positioner) {
@@ -39,7 +37,7 @@ void XdgPopup::Setup(const XdgSurface &xdg_surface, const XdgSurface &parent, co
       zxdg_surface_v6_get_popup(xdg_surface.metadata_->zxdg_surface,
                                 parent.metadata_->zxdg_surface,
                                 positioner.metadata_->zxdg_positioner);
-  zxdg_popup_v6_add_listener(metadata_->zxdg_popup, &MetaXdgPopup::kListener, this);
+  zxdg_popup_v6_add_listener(metadata_->zxdg_popup, &XdgPopupMeta::kListener, this);
 }
 
 void XdgPopup::Destroy() {

@@ -23,7 +23,7 @@ Surface::~Surface() {
   }
 }
 
-void Surface::Setup(const Display &egl_display,
+void Surface::Setup(const egl::Display &egl_display,
                     const wayland::Surface &wl_surface,
                     int width, int height) {
   Destroy();

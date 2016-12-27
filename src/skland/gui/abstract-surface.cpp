@@ -22,11 +22,10 @@
 
 namespace skland {
 
-AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
-    : view_(view), margin_(margin),
+AbstractSurface::AbstractSurface(const Margin &margin)
+    : view_(nullptr), margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1) {
-  DBG_ASSERT(view_);
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);
   wl_surface_.leave().Set(this, &AbstractSurface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
@@ -40,20 +39,29 @@ AbstractSurface::~AbstractSurface() {
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
-  if ((nullptr == subsurface) || (subsurface->parent() == this)) return;
+  if (nullptr == subsurface || subsurface == this) return;
+
+  if (subsurface->parent()) {
+    subsurface->parent_surface()->RemoveSubSurface(subsurface);
+  }
+
+  DBG_ASSERT(nullptr == subsurface->parent());
 
   InsertChild(subsurface, pos);
+  subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(), subsurface->wl_surface_, this->wl_surface_);
+}
+
+AbstractSurface *AbstractSurface::RemoveSubSurface(AbstractSurface *subsurface) {
+  if (RemoveChild(subsurface)) {
+    subsurface->wl_sub_surface_.Destroy();
+    return subsurface;
+  }
+
+  return nullptr;
 }
 
 AbstractSurface *AbstractSurface::GetSubSurfaceAt(int index) const {
   return static_cast<AbstractSurface *>(GetChildAt(index));
-}
-
-AbstractSurface *AbstractSurface::RemoveSubSurface(AbstractSurface *subsurface) {
-  if (RemoveChild(subsurface))
-    return subsurface;
-
-  return nullptr;
 }
 
 void AbstractSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
@@ -73,6 +81,12 @@ void AbstractSurface::Commit() const {
   if (parent()) {
     static_cast<AbstractSurface *>(parent())->Commit();
   }
+}
+
+void AbstractSurface::SetPosition(int x, int y) {
+  if (wl_sub_surface_.IsNull()) return;
+
+  wl_sub_surface_.SetPosition(x, y);
 }
 
 void AbstractSurface::SetCanvas(Canvas *canvas) {

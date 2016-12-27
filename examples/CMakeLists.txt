@@ -20,6 +20,9 @@ target_link_libraries(simple skland)
 add_executable(simple-shm simple-shm.cpp)
 target_link_libraries(simple-shm skland)
 
+add_executable(simple-egl simple-egl.cpp)
+target_link_libraries(simple-egl skland)
+
 add_executable(eventdemo eventdemo.cpp)
 target_link_libraries(eventdemo skland)
 

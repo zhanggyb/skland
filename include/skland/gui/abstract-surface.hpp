@@ -25,6 +25,7 @@
 
 #include "../wayland/surface.hpp"
 #include "../wayland/region.hpp"
+#include "../wayland/subsurface.hpp"
 
 #include <memory>
 
@@ -44,21 +45,20 @@ class AbstractSurface : public Object {
 
   friend class AbstractView;
 
-  AbstractSurface() = delete;
   AbstractSurface(const AbstractSurface &) = delete;
   AbstractSurface &operator=(const AbstractSurface &) = delete;
 
  public:
 
-  AbstractSurface(AbstractView *view, const Margin &margin = Margin());
+  AbstractSurface(const Margin &margin = Margin());
 
   virtual ~AbstractSurface();
 
   void AddSubSurface(AbstractSurface *subsurface, int pos = 0);
 
-  AbstractSurface *GetSubSurfaceAt(int index) const;
-
   AbstractSurface *RemoveSubSurface(AbstractSurface *subsurface);
+
+  AbstractSurface *GetSubSurfaceAt(int index) const;
 
   void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
@@ -76,8 +76,21 @@ class AbstractSurface : public Object {
     wl_surface_.SetOpaqueRegion(region);
   }
 
+  /**
+   * @brief Set sub surface position
+   * @param x
+   * @param y
+   *
+   * If this surface is a sub surface (whose wl_sub_surface_ is valid)
+   */
+  void SetPosition(int x, int y);
+
   const wayland::Surface &wl_surface() const {
     return wl_surface_;
+  }
+
+  const wayland::SubSurface &wl_sub_surface() const {
+    return wl_sub_surface_;
   }
 
   AbstractView *view() const {
@@ -94,6 +107,10 @@ class AbstractSurface : public Object {
 
   const std::unique_ptr<Canvas> &canvas() const {
     return canvas_;
+  }
+
+  AbstractSurface *parent_surface() const {
+    return static_cast<AbstractSurface *>(parent());
   }
 
  protected:
@@ -125,6 +142,8 @@ class AbstractSurface : public Object {
   void OnLeave(struct wl_output *wl_output);
 
   wayland::Surface wl_surface_;
+
+  wayland::SubSurface wl_sub_surface_;
 
   AbstractView *view_;
 

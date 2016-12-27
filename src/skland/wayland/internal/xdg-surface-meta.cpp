@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-#include "meta-xdg-surface.hpp"
+#include "xdg-surface-meta.hpp"
 
 #include <skland/wayland/xdg-surface.hpp>
 
 namespace skland {
 namespace wayland {
 
-const struct zxdg_surface_v6_listener MetaXdgSurface::kListener = {
+const struct zxdg_surface_v6_listener XdgSurfaceMeta::kListener = {
     OnConfigure
 };
 
-void MetaXdgSurface::OnConfigure(void *data, struct zxdg_surface_v6 * /* zxdg_surface_v6 */, uint32_t serial) {
+void XdgSurfaceMeta::OnConfigure(void *data, struct zxdg_surface_v6 * /* zxdg_surface_v6 */, uint32_t serial) {
   XdgSurface *_this = static_cast<XdgSurface *>(data);
   if (_this->configure_)
     _this->configure_(serial);

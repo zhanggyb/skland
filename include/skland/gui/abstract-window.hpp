@@ -91,7 +91,7 @@ class AbstractWindow : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
-  bool IsFullscreen() const { return flags_ == kWindowFullscreen; }
+  bool IsFullscreened() const { return flags_ == kWindowFullscreen; }
 
   bool IsMaximized() const { return flags_ == kWindowMaximized; }
 
@@ -117,7 +117,7 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnDraw(Canvas *canvas) override;
 
-  virtual void OnCanvasSetup() = 0;
+  virtual void OnSetupSurface() = 0;
 
   void AddSubView(AbstractView *view, int pos = 0);
 
@@ -152,6 +152,9 @@ class AbstractWindow : public AbstractView {
   std::string app_id_;
 
   Size saved_size_;
+
+  bool is_xdg_surface_configured_;
+
 };
 
 }

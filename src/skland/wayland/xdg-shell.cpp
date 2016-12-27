@@ -16,7 +16,7 @@
 
 #include <skland/wayland/xdg-shell.hpp>
 
-#include "internal/meta-xdg-shell.hpp"
+#include "internal/xdg-shell-meta.hpp"
 
 namespace skland {
 namespace wayland {
@@ -25,13 +25,11 @@ const struct wl_interface *XdgShell::GetInterface() {
   return &zxdg_shell_v6_interface;
 }
 
-XdgShell::XdgShell()
-    : metadata_(nullptr) {
-  metadata_ = new MetaXdgShell;
+XdgShell::XdgShell() {
+  metadata_.reset(new XdgShellMeta);
 }
 
 XdgShell::~XdgShell() {
-  delete metadata_;
 }
 
 void XdgShell::Setup(const Registry &registry, uint32_t id, uint32_t version) {
@@ -39,7 +37,7 @@ void XdgShell::Setup(const Registry &registry, uint32_t id, uint32_t version) {
 
   metadata_->zxdg_shell =
       static_cast<struct zxdg_shell_v6 *>(registry.Bind(id, &zxdg_shell_v6_interface, version));
-  zxdg_shell_v6_add_listener(metadata_->zxdg_shell, &MetaXdgShell::kListener, this);
+  zxdg_shell_v6_add_listener(metadata_->zxdg_shell, &XdgShellMeta::kListener, this);
 }
 
 void XdgShell::Destroy() {

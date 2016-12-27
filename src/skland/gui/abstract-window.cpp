@@ -38,7 +38,8 @@ AbstractWindow::AbstractWindow(int width,
     : AbstractView(width, height),
       display_(nullptr),
       window_frame_(nullptr),
-      flags_(0) {
+      flags_(0),
+      is_xdg_surface_configured_(false) {
   if (title) title_ = title;
 
   int x = 0, y = 0;  // The input region
@@ -46,17 +47,17 @@ AbstractWindow::AbstractWindow(int width,
   RasterSurface *surface = nullptr;
 
   if (frame) {
-    surface = new RasterSurface(this, Margin(Theme::shadow_margin_left(),
-                                             Theme::shadow_margin_top(),
-                                             Theme::shadow_margin_right(),
-                                             Theme::shadow_margin_bottom()));
+    surface = new RasterSurface(Margin(Theme::shadow_margin_left(),
+                                       Theme::shadow_margin_top(),
+                                       Theme::shadow_margin_right(),
+                                       Theme::shadow_margin_bottom()));
     SetWindowFrame(frame);
     x += surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
     y += surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
   } else {
-    surface = new RasterSurface(this);
+    surface = new RasterSurface();
   }
 
   SetSurface(surface);
@@ -318,14 +319,16 @@ void AbstractWindow::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
 void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
   xdg_surface_.AckConfigure(serial);
 
-  if (nullptr == surface()->canvas()) {
+  if (!is_xdg_surface_configured_) {
+    is_xdg_surface_configured_ = true;
+
     int x = surface()->margin().left;
     int y = surface()->margin().top;
     int w = (int) width();
     int h = (int) height();
-
     xdg_surface_.SetWindowGeometry(x, y, w, h);
-    OnCanvasSetup();
+
+    OnSetupSurface();
   }
 }
 

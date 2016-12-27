@@ -50,7 +50,7 @@ class MainWindow : public AbstractWindow {
 
   virtual void OnResize(int width, int height) final;
 
-  virtual void OnCanvasSetup() final;
+  virtual void OnSetupSurface() final;
 
  private:
 

@@ -18,6 +18,7 @@
 #define SKLAND_WAYLAND_XDG_SHELL_HPP_
 
 #include "registry.hpp"
+#include <memory>
 
 namespace skland {
 namespace wayland {
@@ -25,13 +26,13 @@ namespace wayland {
 class XdgSurface;
 class XdgPositioner;
 
-struct MetaXdgShell;
+struct XdgShellMeta;
 
 class XdgShell {
 
   friend class XdgSurface;
   friend class XdgPositioner;
-  friend struct MetaXdgShell;
+  friend struct XdgShellMeta;
 
   XdgShell(const XdgShell &) = delete;
   XdgShell &operator=(const XdgShell &) = delete;
@@ -68,7 +69,7 @@ class XdgShell {
 
  private:
 
-  MetaXdgShell *metadata_;
+  std::unique_ptr<XdgShellMeta> metadata_;
 
   Delegate<void(uint32_t)> ping_;
 

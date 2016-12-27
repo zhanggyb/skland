@@ -29,7 +29,7 @@ class Surface {
 
   ~Surface();
 
-  void Setup(const Display &egl_display,
+  void Setup(const egl::Display &egl_display,
              const wayland::Surface &wl_surface,
              int width, int height);
 

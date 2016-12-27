@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_POSITIONER_HPP_
-#define SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_POSITIONER_HPP_
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_POSITIONER_META_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_POSITIONER_META_HPP_
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-struct MetaXdgPositioner {
+struct XdgPositionerMeta {
 
-  MetaXdgPositioner(const MetaXdgPositioner &) = delete;
-  MetaXdgPositioner &operator=(const MetaXdgPositioner &) = delete;
+  XdgPositionerMeta(const XdgPositionerMeta &) = delete;
+  XdgPositionerMeta &operator=(const XdgPositionerMeta &) = delete;
 
-  MetaXdgPositioner()
+  XdgPositionerMeta()
       : zxdg_positioner(nullptr) {}
 
-  ~MetaXdgPositioner() {
+  ~XdgPositionerMeta() {
     if (zxdg_positioner) zxdg_positioner_v6_destroy(zxdg_positioner);
   }
 

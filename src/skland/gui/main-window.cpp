@@ -92,7 +92,7 @@ void MainWindow::OnResize(int width, int height) {
   SetMainWidgetGeometry();
 }
 
-void MainWindow::OnCanvasSetup() {
+void MainWindow::OnSetupSurface() {
   surface()->Attach(&buffer_);
   RedrawAll();
 }

@@ -14,35 +14,22 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_RASTER_SURFACE_HPP_
-#define SKLAND_GUI_RASTER_SURFACE_HPP_
-
-#include "abstract-surface.hpp"
+#include "xdg-shell-meta.hpp"
+#include <skland/wayland/xdg-shell.hpp>
 
 namespace skland {
+namespace wayland {
 
-/**
- * @brief A surface using raster canvas
- */
-class RasterSurface : public AbstractSurface {
-
-  RasterSurface(const RasterSurface &) = delete;
-  RasterSurface &operator=(const RasterSurface &) = delete;
-
- public:
-
-  RasterSurface(const Margin &margin = Margin());
-
-  virtual ~RasterSurface();
-
- protected:
-
-  virtual void OnSetup() final;
-
-  virtual void OnAttach(const Buffer *buffer) final;
-
+const struct zxdg_shell_v6_listener XdgShellMeta::kListener = {
+    OnPing
 };
 
+void XdgShellMeta::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, uint32_t serial) {
+  XdgShell *_this = static_cast<XdgShell *>(data);
+  if (_this->ping_) {
+    _this->ping_(serial);
+  }
 }
 
-#endif // SKLAND_GUI_RASTER_SURFACE_HPP_
+}
+}

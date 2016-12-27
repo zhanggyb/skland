@@ -24,7 +24,7 @@ namespace wayland {
 
 class XdgPopup;
 
-struct MetaXdgPositioner;
+struct XdgPositionerMeta;
 
 class XdgPositioner {
 
@@ -57,7 +57,7 @@ class XdgPositioner {
 
  private:
 
-  MetaXdgPositioner *metadata_;
+  std::unique_ptr<XdgPositionerMeta> metadata_;
 
 };
 

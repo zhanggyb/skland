@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "meta-xdg-toplevel.hpp"
+#include "xdg-toplevel-meta.hpp"
 
 #include <skland/wayland/xdg-toplevel.hpp>
 #include <skland/core/numeric.hpp>
@@ -22,12 +22,12 @@
 namespace skland {
 namespace wayland {
 
-const struct zxdg_toplevel_v6_listener MetaXdgToplevel::kListener = {
+const struct zxdg_toplevel_v6_listener XdgToplevelMeta::kListener = {
     OnConfigure,
     OnClose
 };
 
-void MetaXdgToplevel::OnConfigure(void *data,
+void XdgToplevelMeta::OnConfigure(void *data,
                                   struct zxdg_toplevel_v6 * /* zxdg_toplevel_v6 */,
                                   int32_t width,
                                   int32_t height,
@@ -67,7 +67,7 @@ void MetaXdgToplevel::OnConfigure(void *data,
   _this->configure_(width, height, value);
 }
 
-void MetaXdgToplevel::OnClose(void *data, struct zxdg_toplevel_v6 * /* zxdg_toplevel_v6 */) {
+void XdgToplevelMeta::OnClose(void *data, struct zxdg_toplevel_v6 * /* zxdg_toplevel_v6 */) {
   XdgToplevel *_this = static_cast<XdgToplevel *>(data);
   if (_this->close_)
     _this->close_();

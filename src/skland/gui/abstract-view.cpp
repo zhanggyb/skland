@@ -45,7 +45,6 @@ AbstractView::~AbstractView() {
 
 void AbstractView::Show() {
   if (redraw_task_->IsLinked()) {
-    // TODO: check if the redraw task of this view is in correct order
     return;
   }
 
@@ -100,9 +99,12 @@ void AbstractView::SetSurface(AbstractSurface *surface) {
 
   // TODO: inform original view
 
-  surface->view_ = this;
   surface_ = surface;
-  surface_->OnSetup();
+
+  if (surface_) {
+    surface_->view_ = this;
+    surface_->OnSetup();
+  }
 }
 
 void AbstractView::Damage(const Rect &rect) {
@@ -112,6 +114,11 @@ void AbstractView::Damage(const Rect &rect) {
                     (int) rect.y() + surface->margin().top,
                     (int) rect.width(),
                     (int) rect.height());
+    if (surface->canvas()) {
+      static_cast<RedrawTask*>(redraw_task_.get())->canvas = surface->canvas().get();
+      AddRedrawTask(redraw_task_.get());
+    }
+    surface->Commit();
   }
 }
 

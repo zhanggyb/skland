@@ -95,6 +95,8 @@ class AbstractView : public Object {
 
   virtual Size GetMaximalSize() const = 0;
 
+  AbstractSurface *GetSurface() const;
+
  protected:
 
   virtual void OnShow() = 0;
@@ -112,8 +114,6 @@ class AbstractView : public Object {
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
   virtual void OnDraw(Canvas *canvas) = 0;
-
-  AbstractSurface *GetSurface() const;
 
   void SetSurface(AbstractSurface *surface);
 
@@ -135,6 +135,10 @@ class AbstractView : public Object {
 
   AbstractSurface *surface() const {
     return surface_;
+  }
+
+  AbstractView *parent_view() const {
+    return static_cast<AbstractView *>(parent());
   }
 
   AbstractView *previous_view() const {

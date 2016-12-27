@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-#include "meta-xdg-shell.hpp"
-#include <skland/wayland/xdg-shell.hpp>
 
-namespace skland {
-namespace wayland {
+#include <skland/gui/application.hpp>
+#include <skland/gui/window.hpp>
+#include <skland/gui/egl-widget.hpp>
+#include <skland/gui/abstract-surface.hpp>
 
-const struct zxdg_shell_v6_listener MetaXdgShell::kListener = {
-    OnPing
-};
+using namespace skland;
 
-void MetaXdgShell::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, uint32_t serial) {
-  XdgShell *_this = static_cast<XdgShell *>(data);
-  if (_this->ping_) {
-    _this->ping_(serial);
-  }
-}
+int main(int argc, char *argv[]) {
+  using skland::Window;
 
-}
+  Application app(argc, argv);
+
+  Window *win = new Window(480, 360, "Simple EGL");
+  win->SetAppId("Simple-EGL");
+
+  EGLWidget *widget = new EGLWidget;
+  win->SetMainWidget(widget);
+
+  win->Show();
+
+  return app.Run();
 }

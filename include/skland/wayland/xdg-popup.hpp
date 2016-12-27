@@ -23,11 +23,11 @@
 namespace skland {
 namespace wayland {
 
-struct MetaXdgPopup;
+struct XdgPopupMeta;
 
 class XdgPopup {
 
-  friend struct MetaXdgPopup;
+  friend struct XdgPopupMeta;
 
  public:
 
@@ -55,7 +55,7 @@ class XdgPopup {
 
  private:
 
-  MetaXdgPopup *metadata_;
+  std::unique_ptr<XdgPopupMeta> metadata_;
 
   Delegate<void(int, int, int, int)> configure_;
 
