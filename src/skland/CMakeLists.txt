@@ -28,8 +28,8 @@ list(APPEND all_source_files
 
 file(GLOB graphic_headers "${PROJECT_SOURCE_DIR}/include/skland/graphic/*.hpp")
 file(GLOB graphic_sources "graphic/*.cpp")
-file(GLOB graphic_internal_headers "graphic/*.hpp")
-file(GLOB graphic_internal_sources "graphic/*.cpp")
+file(GLOB graphic_internal_headers "graphic/internal/*.hpp")
+file(GLOB graphic_internal_sources "graphic/internal/*.cpp")
 
 list(APPEND all_source_files
         ${graphic_headers}
