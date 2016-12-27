@@ -36,7 +36,7 @@ class Output;
 class Application;
 class AbstractSurface;
 
-struct MouseTask;
+struct ViewTask;
 struct RedrawTask;
 
 class AbstractView : public Object {
@@ -153,15 +153,15 @@ class AbstractView : public Object {
     return static_cast<AbstractView *>(last_child());
   }
 
-  const std::unique_ptr<RedrawTask> &redraw_task() const {
+  const std::unique_ptr<ViewTask> &redraw_task() const {
     return redraw_task_;
   }
 
-  const std::unique_ptr<MouseTask> &mouse_task() const {
+  const std::unique_ptr<ViewTask> &mouse_task() const {
     return mouse_task_;
   }
 
-  static void AddRedrawTask(RedrawTask *task);
+  static void AddRedrawTask(ViewTask *task);
 
  private:
 
@@ -181,12 +181,12 @@ class AbstractView : public Object {
   /**
    * This property should only be assigned with RedrawTask
    */
-  std::unique_ptr<RedrawTask> redraw_task_;
+  std::unique_ptr<ViewTask> redraw_task_;
 
   /**
    * This property should only be assigned with MouseTask
    */
-  std::unique_ptr<MouseTask> mouse_task_;
+  std::unique_ptr<ViewTask> mouse_task_;
 };
 
 }

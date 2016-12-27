@@ -56,7 +56,7 @@ Size AbstractWidget::GetMaximalSize() const {
 void AbstractWidget::OnShow() {
   AbstractSurface *surface = GetSurface();
   if (surface && surface->canvas()) {
-    redraw_task()->canvas = surface->canvas().get();
+    static_cast<RedrawTask *>(redraw_task().get())->canvas = surface->canvas().get();
     AddRedrawTask(redraw_task().get());
     surface->Commit();
   }

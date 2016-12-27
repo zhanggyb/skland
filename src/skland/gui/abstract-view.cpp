@@ -20,7 +20,7 @@
 #include <skland/gui/abstract-surface.hpp>
 #include <skland/gui/display.hpp>
 
-#include "internal/mouse-task.hpp"
+#include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
 
 namespace skland {
@@ -36,7 +36,7 @@ AbstractView::AbstractView(int width, int height)
       geometry_(width, height),
       surface_(nullptr) {
   redraw_task_.reset(new RedrawTask(this, nullptr));
-  mouse_task_.reset(new MouseTask(this));
+  mouse_task_.reset(new ViewTask(this));
 }
 
 AbstractView::~AbstractView() {
@@ -126,7 +126,7 @@ void AbstractView::RedrawAll() {
 
 void AbstractView::RedrawOnSurface(AbstractView *view, AbstractSurface *surface) {
   if (surface->canvas()) {
-    view->redraw_task_->canvas = surface->canvas().get();
+    static_cast<RedrawTask *>(view->redraw_task_.get())->canvas = surface->canvas().get();
     AddRedrawTask(view->redraw_task_.get());
   }
 }
@@ -143,7 +143,7 @@ void AbstractView::RedrawSubViewsOnSurface(const AbstractView *parent, AbstractS
   }
 }
 
-void AbstractView::AddRedrawTask(RedrawTask *task) {
+void AbstractView::AddRedrawTask(ViewTask *task) {
   DBG_ASSERT(task->view != nullptr);
 
   // The task node after which insert the new one

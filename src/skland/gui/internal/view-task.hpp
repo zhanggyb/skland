@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_MOUSE_TASK_HPP_
-#define SKLAND_GUI_MOUSE_TASK_HPP_
+#ifndef SKLAND_GUI_VIEW_TASK_HPP_
+#define SKLAND_GUI_VIEW_TASK_HPP_
 
 #include <skland/gui/task.hpp>
 
@@ -23,18 +23,18 @@ namespace skland {
 
 class AbstractView;
 
-struct MouseTask : public Task {
-  MouseTask(const MouseTask &) = delete;
-  MouseTask &operator=(const MouseTask &) = delete;
+struct ViewTask : public Task {
+  ViewTask(const ViewTask &) = delete;
+  ViewTask &operator=(const ViewTask &) = delete;
 
-  MouseTask(AbstractView *view = nullptr)
+  ViewTask(AbstractView *view = nullptr)
       : Task(), view(view) {}
 
-  ~MouseTask() {}
+  ~ViewTask() {}
 
   AbstractView *view;
 };
 
 }
 
-#endif  // SKLAND_GUI_MOUSE_TASK_HPP_
+#endif  // SKLAND_GUI_VIEW_TASK_HPP_
