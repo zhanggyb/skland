@@ -46,8 +46,8 @@ void Task::PushFront(Task *other) {
 }
 
 void Task::Unlink() {
-  if (previous_ != nullptr) previous_->next_ = next_;
-  if (next_ != nullptr) next_->previous_ = previous_;
+  if (previous_) previous_->next_ = next_;
+  if (next_) next_->previous_ = previous_;
 
   previous_ = nullptr;
   next_ = nullptr;

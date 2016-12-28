@@ -48,8 +48,8 @@ if (LINUX)
     file(GLOB egl_sources "egl/*.cpp")
 
     file(GLOB gui_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/*.hpp")
-    file(GLOB gui_internal_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/internal/*.hpp")
     file(GLOB gui_sources "gui/*.cpp")
+    file(GLOB gui_internal_headers "gui/internal/*.hpp")
     file(GLOB gui_internal_sources "gui/internal/*.cpp")
 
     file(GLOB stock_headers "${PROJECT_SOURCE_DIR}/include/skland/stock/*.hpp")

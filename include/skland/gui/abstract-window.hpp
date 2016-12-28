@@ -37,6 +37,7 @@ namespace skland {
 class Display;
 class Application;
 class AbstractWindowFrame;
+class Input;
 
 enum WindowFlags {
   kWindowFullscreen = 0x1,
@@ -49,6 +50,7 @@ class AbstractWindow : public AbstractView {
   friend class Display;
   friend class Application;
   friend class AbstractWindowFrame;
+  friend class Input;
 
  public:
 
@@ -118,6 +120,8 @@ class AbstractWindow : public AbstractView {
   virtual void OnDraw(Canvas *canvas) override;
 
   virtual void OnSetupSurface() = 0;
+
+  void SetSurface(AbstractSurface *surface);
 
   void AddSubView(AbstractView *view, int pos = 0);
 

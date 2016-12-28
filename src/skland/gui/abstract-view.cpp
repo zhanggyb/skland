@@ -91,22 +91,6 @@ AbstractSurface *AbstractView::GetSurface() const {
   return surface;
 }
 
-void AbstractView::SetSurface(AbstractSurface *surface) {
-  if (surface_ == surface) {
-    DBG_ASSERT(surface->view() == this);
-    return;
-  }
-
-  // TODO: inform original view
-
-  surface_ = surface;
-
-  if (surface_) {
-    surface_->view_ = this;
-    surface_->OnSetup();
-  }
-}
-
 void AbstractView::Damage(const Rect &rect) {
   AbstractSurface *surface = GetSurface();
   if (surface) {

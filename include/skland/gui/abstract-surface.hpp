@@ -31,7 +31,7 @@
 
 namespace skland {
 
-class AbstractView;
+class AbstractWindow;
 class Canvas;
 class Buffer;
 
@@ -43,7 +43,7 @@ class Buffer;
  */
 class AbstractSurface : public Object {
 
-  friend class AbstractView;
+  friend class AbstractWindow;
 
   AbstractSurface(const AbstractSurface &) = delete;
   AbstractSurface &operator=(const AbstractSurface &) = delete;
@@ -93,8 +93,8 @@ class AbstractSurface : public Object {
     return wl_sub_surface_;
   }
 
-  AbstractView *view() const {
-    return view_;
+  AbstractWindow *window() const {
+    return window_;
   }
 
   const Margin &margin() const {
@@ -118,7 +118,7 @@ class AbstractSurface : public Object {
   /**
    * @brief Setup this surface
    *
-   * This virtual method is called when a surface is set in a view.
+   * This virtual method is called when a surface is set in a window.
    */
   virtual void OnSetup() = 0;
 
@@ -145,7 +145,7 @@ class AbstractSurface : public Object {
 
   wayland::SubSurface wl_sub_surface_;
 
-  AbstractView *view_;
+  AbstractWindow *window_;
 
   Margin margin_;
 

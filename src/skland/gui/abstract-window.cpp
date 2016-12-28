@@ -304,6 +304,22 @@ void AbstractWindow::OnDraw(Canvas *canvas) {
   if (window_frame_) window_frame_->OnDraw(canvas);
 }
 
+void AbstractWindow::SetSurface(AbstractSurface *surface) {
+  if (surface_ == surface) {
+    DBG_ASSERT(surface->window() == this);
+    return;
+  }
+
+  // TODO: inform original view
+
+  surface_ = surface;
+
+  if (surface_) {
+    surface_->window_ = this;
+    surface_->OnSetup();
+  }
+}
+
 void AbstractWindow::AddSubView(AbstractView *view, int pos) {
   if (view) InsertChild(view, pos);
 }

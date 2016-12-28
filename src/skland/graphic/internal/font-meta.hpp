@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_META_FONT_HPP
-#define SKLAND_META_FONT_HPP
+#ifndef SKLAND_GRAPHIC_INTERNAL_FONT_META_HPP_
+#define SKLAND_GRAPHIC_INTERNAL_FONT_META_HPP_
 
 #include <skland/graphic/font.hpp>
 
@@ -51,4 +51,4 @@ struct FontMeta {
 
 }
 
-#endif //SKLAND_META_FONT_HPP
+#endif // SKLAND_GRAPHIC_INTERNAL_FONT_META_HPP_

@@ -35,10 +35,15 @@ class TouchEvent;
 class Output;
 class Application;
 class AbstractSurface;
+class AbstractWindow;
 
 struct ViewTask;
 struct RedrawTask;
 
+/**
+ * @brief A View represents an area on screen
+ *
+ */
 class AbstractView : public Object {
 
   friend class Input;
@@ -46,6 +51,7 @@ class AbstractView : public Object {
   friend class Display;
   friend class AbstractSurface;
   friend struct RedrawTask;
+  friend class AbstractWindow;
 
  public:
 
@@ -56,8 +62,6 @@ class AbstractView : public Object {
   virtual ~AbstractView();
 
   void Show();
-
-  void Hide();  // TODO: implement Hide()
 
   void SetPosition(int x, int y);
 
@@ -114,8 +118,6 @@ class AbstractView : public Object {
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
   virtual void OnDraw(Canvas *canvas) = 0;
-
-  void SetSurface(AbstractSurface *surface);
 
   void Damage(const Rect &rect);
 

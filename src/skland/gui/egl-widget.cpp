@@ -64,8 +64,8 @@ EGLWidget::EGLWidget()
 
 EGLWidget::EGLWidget(int width, int height)
     : AbstractWidget(width, height) {
-  EGLSurface *surf = new EGLSurface;
-  SetSurface(surf);
+//  EGLSurface *surf = new EGLSurface;
+//  SetSurface(surf);
 
   InitializeGL();
 }
