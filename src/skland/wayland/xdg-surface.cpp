@@ -17,26 +17,24 @@
 #include <skland/wayland/xdg-surface.hpp>
 #include <skland/wayland/surface.hpp>
 
-#include "internal/meta-xdg-surface.hpp"
-#include "internal/meta-xdg-shell.hpp"
+#include "internal/xdg-surface-meta.hpp"
+#include "internal/xdg-shell-meta.hpp"
 
 namespace skland {
 namespace wayland {
 
-XdgSurface::XdgSurface()
-    : metadata_(nullptr) {
-  metadata_ = new MetaXdgSurface;
+XdgSurface::XdgSurface() {
+  metadata_.reset(new XdgSurfaceMeta);
 }
 
 XdgSurface::~XdgSurface() {
-  delete metadata_;
 }
 
 void XdgSurface::Setup(const XdgShell &xdg_shell, const Surface &surface) {
   Destroy();
 
   metadata_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(xdg_shell.metadata_->zxdg_shell, surface.wl_surface_);
-  zxdg_surface_v6_add_listener(metadata_->zxdg_surface, &MetaXdgSurface::kListener, this);
+  zxdg_surface_v6_add_listener(metadata_->zxdg_surface, &XdgSurfaceMeta::kListener, this);
 }
 
 void XdgSurface::Destroy() {

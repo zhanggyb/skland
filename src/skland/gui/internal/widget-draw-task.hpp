@@ -14,38 +14,29 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/shader.hpp>
+#ifndef SKLAND_GUI_WIDGET_DRAW_TASK_HPP_
+#define SKLAND_GUI_WIDGET_DRAW_TASK_HPP_
 
-#include "internal/shader-meta.hpp"
+#include "view-task.hpp"
 
 namespace skland {
 
-Shader::Shader() {
-}
+class AbstractWidget;
+class Canvas;
 
-Shader::Shader(ShaderMeta *metadata)
-    : metadata_(metadata) {
-}
+struct WidgetDrawTask : public ViewTask {
+  WidgetDrawTask(const WidgetDrawTask &) = delete;
+  WidgetDrawTask &operator=(const WidgetDrawTask &) = delete;
 
-Shader::Shader(const Shader &other) {
-  other ? metadata_.reset(new ShaderMeta(other.metadata_->sk_shader)) : metadata_.reset();
-}
+  WidgetDrawTask(AbstractWidget *widget = nullptr, Canvas *canvas = nullptr);
 
-Shader::~Shader() {
-}
+  virtual ~WidgetDrawTask() {}
 
-Shader &Shader::operator=(const Shader &other) {
-  if (other) {
-    if (metadata_) {
-      *metadata_ = *other.metadata_;
-    } else {
-      metadata_.reset(new ShaderMeta(other.metadata_->sk_shader));
-    }
-  } else {
-    metadata_.reset();
-  }
+  virtual void Run() const final;
 
-  return *this;
-}
+  Canvas *canvas;
+};
 
 }
+
+#endif // SKLAND_GUI_WIDGET_DRAW_TASK_HPP_

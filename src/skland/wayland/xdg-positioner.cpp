@@ -16,19 +16,17 @@
 
 #include <skland/wayland/xdg-positioner.hpp>
 
-#include "internal/meta-xdg-positioner.hpp"
-#include "internal/meta-xdg-shell.hpp"
+#include "internal/xdg-positioner-meta.hpp"
+#include "internal/xdg-shell-meta.hpp"
 
 namespace skland {
 namespace wayland {
 
-XdgPositioner::XdgPositioner()
-    : metadata_(nullptr) {
-  metadata_ = new MetaXdgPositioner;
+XdgPositioner::XdgPositioner() {
+  metadata_.reset(new XdgPositionerMeta);
 }
 
 XdgPositioner::~XdgPositioner() {
-  delete metadata_;
 }
 
 void XdgPositioner::Setup(const XdgShell &xdg_shell) {

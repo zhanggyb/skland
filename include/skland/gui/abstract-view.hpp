@@ -21,7 +21,7 @@
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
-#include "task.hpp"
+#include <memory>
 
 namespace skland {
 
@@ -34,44 +34,26 @@ class MouseEvent;
 class TouchEvent;
 class Output;
 class Application;
-class Surface;
+class AbstractSurface;
+class AbstractWindow;
 
+struct ViewTask;
+struct RedrawTask;
+
+/**
+ * @brief A View represents an area on screen
+ *
+ */
 class AbstractView : public Object {
 
   friend class Input;
   friend class Application;
   friend class Display;
-  friend class Surface;
+  friend class AbstractSurface;
+  friend struct RedrawTask;
+  friend class AbstractWindow;
 
  public:
-
-  struct MouseTask : public Task {
-    MouseTask(const MouseTask &) = delete;
-    MouseTask &operator=(const MouseTask &) = delete;
-
-    MouseTask(AbstractView *view = nullptr)
-        : Task(), view(view) {}
-
-    ~MouseTask() {}
-
-    AbstractView *view;
-  };
-
-  struct RedrawTask : public Task {
-    RedrawTask(const RedrawTask &) = delete;
-    RedrawTask &operator=(const RedrawTask &) = delete;
-
-    RedrawTask(AbstractView *view = nullptr, Canvas *canvas = nullptr)
-        : Task(), view(view), canvas(canvas) {}
-
-    virtual ~RedrawTask() {}
-
-    virtual void Run() const final;
-
-    AbstractView *view;
-
-    Canvas *canvas;
-  };
 
   AbstractView();
 
@@ -111,15 +93,17 @@ class AbstractView : public Object {
     return geometry_;
   }
 
-  Surface *GetSurface() const;
-
   virtual Size GetMinimalSize() const = 0;
 
   virtual Size GetPreferredSize() const = 0;
 
   virtual Size GetMaximalSize() const = 0;
 
+  AbstractSurface *GetSurface() const;
+
  protected:
+
+  virtual void OnShow() = 0;
 
   virtual void OnResize(int width, int height) = 0;
 
@@ -134,8 +118,6 @@ class AbstractView : public Object {
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
   virtual void OnDraw(Canvas *canvas) = 0;
-
-  void SetSurface(Surface *surface);
 
   void Damage(const Rect &rect);
 
@@ -153,8 +135,12 @@ class AbstractView : public Object {
     geometry_.Resize(width, height);
   }
 
-  Surface *surface() const {
+  AbstractSurface *surface() const {
     return surface_;
+  }
+
+  AbstractView *parent_view() const {
+    return static_cast<AbstractView *>(parent());
   }
 
   AbstractView *previous_view() const {
@@ -173,30 +159,40 @@ class AbstractView : public Object {
     return static_cast<AbstractView *>(last_child());
   }
 
-  const RedrawTask &redraw_task() const {
+  const std::unique_ptr<ViewTask> &redraw_task() const {
     return redraw_task_;
   }
 
-  const MouseTask &mouse_task() const {
+  const std::unique_ptr<ViewTask> &mouse_task() const {
     return mouse_task_;
   }
 
+  static void AddRedrawTask(ViewTask *task);
+
  private:
 
-  static void RedrawOnSurface(AbstractView *view, Surface *surface);
+  static void RedrawOnSurface(AbstractView *view, AbstractSurface *surface);
 
-  static void RedrawSubViewsOnSurface(const AbstractView *parent, Surface *surface);
-
-  static void AddRedrawTask(RedrawTask *task);
+  static void RedrawSubViewsOnSurface(const AbstractView *parent, AbstractSurface *surface);
 
   bool visible_;
 
   Rect geometry_;
 
-  Surface *surface_;  /**< The main surface for this window */
+  /**
+   * The main surface for this window
+   */
+  AbstractSurface *surface_;
 
-  RedrawTask redraw_task_;
-  MouseTask mouse_task_;
+  /**
+   * This property should only be assigned with RedrawTask
+   */
+  std::unique_ptr<ViewTask> redraw_task_;
+
+  /**
+   * This property should only be assigned with MouseTask
+   */
+  std::unique_ptr<ViewTask> mouse_task_;
 };
 
 }

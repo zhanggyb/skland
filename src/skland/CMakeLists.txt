@@ -28,8 +28,8 @@ list(APPEND all_source_files
 
 file(GLOB graphic_headers "${PROJECT_SOURCE_DIR}/include/skland/graphic/*.hpp")
 file(GLOB graphic_sources "graphic/*.cpp")
-file(GLOB graphic_internal_headers "graphic/*.hpp")
-file(GLOB graphic_internal_sources "graphic/*.cpp")
+file(GLOB graphic_internal_headers "graphic/internal/*.hpp")
+file(GLOB graphic_internal_sources "graphic/internal/*.cpp")
 
 list(APPEND all_source_files
         ${graphic_headers}
@@ -48,8 +48,8 @@ if (LINUX)
     file(GLOB egl_sources "egl/*.cpp")
 
     file(GLOB gui_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/*.hpp")
-    file(GLOB gui_internal_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/internal/*.hpp")
     file(GLOB gui_sources "gui/*.cpp")
+    file(GLOB gui_internal_headers "gui/internal/*.hpp")
     file(GLOB gui_internal_sources "gui/internal/*.cpp")
 
     file(GLOB stock_headers "${PROJECT_SOURCE_DIR}/include/skland/stock/*.hpp")

@@ -17,9 +17,12 @@
 #include <skland/gui/abstract-window.hpp>
 
 #include <skland/gui/application.hpp>
-#include <skland/gui/surface.hpp>
+#include <skland/gui/raster-surface.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
+
+#include "internal/view-task.hpp"
+#include "internal/redraw-task.hpp"
 
 namespace skland {
 
@@ -35,15 +38,16 @@ AbstractWindow::AbstractWindow(int width,
     : AbstractView(width, height),
       display_(nullptr),
       window_frame_(nullptr),
-      flags_(0) {
+      flags_(0),
+      is_xdg_surface_configured_(false) {
   if (title) title_ = title;
 
   int x = 0, y = 0;  // The input region
 
-  Surface *surface = nullptr;
+  RasterSurface *surface = nullptr;
 
   if (frame) {
-    surface = new Surface(this, Margin(Theme::shadow_margin_left(),
+    surface = new RasterSurface(Margin(Theme::shadow_margin_left(),
                                        Theme::shadow_margin_top(),
                                        Theme::shadow_margin_right(),
                                        Theme::shadow_margin_bottom()));
@@ -53,7 +57,7 @@ AbstractWindow::AbstractWindow(int width,
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
   } else {
-    surface = new Surface(this);
+    surface = new RasterSurface();
   }
 
   SetSurface(surface);
@@ -179,6 +183,16 @@ Rect AbstractWindow::GetClientGeometry() const {
   return window_frame_->GetClientGeometry();
 }
 
+void AbstractWindow::OnShow() {
+  AbstractSurface *surf = surface();
+
+  if (surf->canvas()) {
+    static_cast<RedrawTask *>(redraw_task().get())->canvas = surf->canvas().get();
+    AddRedrawTask(redraw_task().get());
+  }
+  surf->Commit();
+}
+
 void AbstractWindow::OnMouseEnter(MouseEvent *event) {
   if (!IsFrameless()) {
     switch (window_frame_->GetMouseLocation(event)) {
@@ -264,7 +278,7 @@ void AbstractWindow::OnMouseButton(MouseEvent *event) {
       int location = window_frame_->GetMouseLocation(event);
 
       if (location == kTitleBar) {
-        if (mouse_task().next()) {
+        if (mouse_task()->next()) {
           // If the mouse is hover on a sub widget (mostly close/min/max button on title bar).
           event->Accept();
           return;
@@ -290,6 +304,22 @@ void AbstractWindow::OnDraw(Canvas *canvas) {
   if (window_frame_) window_frame_->OnDraw(canvas);
 }
 
+void AbstractWindow::SetSurface(AbstractSurface *surface) {
+  if (surface_ == surface) {
+    DBG_ASSERT(surface->window() == this);
+    return;
+  }
+
+  // TODO: inform original view
+
+  surface_ = surface;
+
+  if (surface_) {
+    surface_->window_ = this;
+    surface_->OnSetup();
+  }
+}
+
 void AbstractWindow::AddSubView(AbstractView *view, int pos) {
   if (view) InsertChild(view, pos);
 }
@@ -305,14 +335,16 @@ void AbstractWindow::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
 void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
   xdg_surface_.AckConfigure(serial);
 
-  if (nullptr == surface()->canvas()) {
+  if (!is_xdg_surface_configured_) {
+    is_xdg_surface_configured_ = true;
+
     int x = surface()->margin().left;
     int y = surface()->margin().top;
     int w = (int) width();
     int h = (int) height();
-
     xdg_surface_.SetWindowGeometry(x, y, w, h);
-    OnCanvasSetup();
+
+    OnSetupSurface();
   }
 }
 

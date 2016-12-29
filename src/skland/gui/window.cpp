@@ -18,7 +18,7 @@
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/output.hpp>
-#include <skland/gui/surface.hpp>
+#include <skland/gui/abstract-surface.hpp>
 #include <skland/gui/abstract-widget.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
@@ -86,15 +86,15 @@ void Window::OnResize(int width, int height) {
     pool_.Setup(total_size);
   }
   buffer_.Setup(pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-  surface()->Attach(buffer_);
+  surface()->Attach(&buffer_);
 
   RedrawAll();
 
   SetMainWidgetGeometry();
 }
 
-void Window::OnCanvasSetup() {
-  surface()->Attach(buffer_);
+void Window::OnSetupSurface() {
+  surface()->Attach(&buffer_);
   RedrawAll();
 }
 

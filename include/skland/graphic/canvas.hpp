@@ -21,9 +21,9 @@
 #include "../core/margin.hpp"
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
+#include "../core/color.hpp"
 
 #include <memory>
-#include <skland/core/color.hpp>
 
 class SkCanvas;
 
@@ -34,6 +34,7 @@ class Path;
 
 class Canvas {
 
+  Canvas() = delete;
   Canvas(const Canvas &) = delete;
   Canvas &operator=(const Canvas &) = delete;
 
@@ -84,12 +85,12 @@ class Canvas {
   }
 
   SkCanvas *sk_canvas() const {
-    return sk_canvas_;
+    return metadata_.get();
   }
 
  private:
 
-  SkCanvas *sk_canvas_;
+  std::unique_ptr<SkCanvas> metadata_;
   Point2F origin_;
 
 };

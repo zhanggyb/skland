@@ -22,6 +22,10 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 
+#include <skland/gui/abstract-surface.hpp>
+
+#include "internal/redraw-task.hpp"
+
 namespace skland {
 
 AbstractWidget::AbstractWidget()
@@ -47,6 +51,15 @@ Size AbstractWidget::GetPreferredSize() const {
 
 Size AbstractWidget::GetMaximalSize() const {
   return Size(65536, 65536);
+}
+
+void AbstractWidget::OnShow() {
+  AbstractSurface *surface = GetSurface();
+  if (surface && surface->canvas()) {
+    static_cast<RedrawTask *>(redraw_task().get())->canvas = surface->canvas().get();
+    AddRedrawTask(redraw_task().get());
+    surface->Commit();
+  }
 }
 
 Widget::~Widget() {

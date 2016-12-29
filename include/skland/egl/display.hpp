@@ -27,7 +27,11 @@ class Display;
 
 namespace egl {
 
+class Surface;
+
 class Display {
+
+  friend class Surface;
 
   Display(const Display &) = delete;
   Display &operator=(const Display &) = delete;

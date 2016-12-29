@@ -26,14 +26,13 @@ class Surface;
 class XdgPopup;
 class XdgToplevel;
 
-struct MetaXdgSurface;
+struct XdgSurfaceMeta;
 
 class XdgSurface {
 
   friend class XdgPopup;
   friend class XdgToplevel;
-
-  friend struct MetaXdgSurface;
+  friend struct XdgSurfaceMeta;
 
   XdgSurface(const XdgSurface &) = delete;
   XdgSurface &operator=(const XdgSurface &) = delete;
@@ -66,7 +65,7 @@ class XdgSurface {
 
  private:
 
-  MetaXdgSurface *metadata_;
+  std::unique_ptr<XdgSurfaceMeta> metadata_;
 
   Delegate<void(uint32_t)> configure_;
 

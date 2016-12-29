@@ -19,9 +19,22 @@
 
 #include "abstract-view.hpp"
 
+struct WidgetDrawTask;
+
 namespace skland {
 
+/**
+ * @brief The base class for widgets
+ *
+ * Widgets are the main GUI elements in SkLand to display something in a window.
+ *
+ * A widget in skland does not contain a root surface (the surface which have no
+ * parent surface), it always use Skia to draw itself on a raster surface
+ * provided by a window.
+ */
 class AbstractWidget : public AbstractView {
+
+  friend struct WidgetDrawTask;
 
  public:
 
@@ -37,6 +50,11 @@ class AbstractWidget : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
+ protected:
+
+  virtual void OnDraw(Canvas *canvas) = 0;
+
+  virtual void OnShow() override;
 };
 
 class Widget : public AbstractWidget {

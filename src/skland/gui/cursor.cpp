@@ -15,7 +15,6 @@
  */
 
 #include <skland/gui/cursor.hpp>
-#include <skland/gui/surface.hpp>
 #include <skland/gui/display.hpp>
 
 namespace skland {

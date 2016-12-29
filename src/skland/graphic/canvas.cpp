@@ -23,8 +23,7 @@
 
 namespace skland {
 
-Canvas::Canvas(unsigned char *pixel, int width, int height, int format)
-    : sk_canvas_(nullptr) {
+Canvas::Canvas(unsigned char *pixel, int width, int height, int format) {
   size_t stride = (size_t) width * 4;
 
   // TODO: support more pixel format
@@ -38,78 +37,77 @@ Canvas::Canvas(unsigned char *pixel, int width, int height, int format)
     throw std::runtime_error("ERROR! Invalid bitmap format for Canvas!");
   }
 
-  sk_canvas_ = new SkCanvas(bitmap);
+  metadata_.reset(new SkCanvas(bitmap));
 }
 
 Canvas::~Canvas() {
-  if (sk_canvas_) delete sk_canvas_;
 }
 
 void Canvas::SetOrigin(float x, float y) {
-  sk_canvas_->translate(x - origin_.x, y - origin_.y);
+  metadata_->translate(x - origin_.x, y - origin_.y);
   origin_.x = x;
   origin_.y = y;
 }
 
 void Canvas::DrawLine(float x0, float y0, float x1, float y1, const Paint &paint) {
-  sk_canvas_->drawLine(x0, y0, x1, y1, *paint.sk_paint());
+  metadata_->drawLine(x0, y0, x1, y1, *paint.sk_paint());
 }
 
 void Canvas::DrawRect(const Rect &rect, const Paint &paint) {
-  sk_canvas_->drawRect(*reinterpret_cast<const SkRect *>(&rect), *paint.sk_paint());
+  metadata_->drawRect(*reinterpret_cast<const SkRect *>(&rect), *paint.sk_paint());
 }
 
 void Canvas::DrawRoundRect(const Rect &rect, float rx, float ry, const Paint &paint) {
-  sk_canvas_->drawRoundRect(*reinterpret_cast<const SkRect *>(&rect), rx, ry, *paint.sk_paint());
+  metadata_->drawRoundRect(*reinterpret_cast<const SkRect *>(&rect), rx, ry, *paint.sk_paint());
 }
 
 void Canvas::DrawCircle(float x, float y, float radius, const Paint &paint) {
-  sk_canvas_->drawCircle(x, y, radius, *paint.sk_paint());
+  metadata_->drawCircle(x, y, radius, *paint.sk_paint());
 }
 
 void Canvas::DrawPath(const Path &path, const Paint &paint) {
-  sk_canvas_->drawPath(*path.sk_path(), *paint.sk_paint());
+  metadata_->drawPath(*path.sk_path(), *paint.sk_paint());
 }
 
 void Canvas::DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint) {
-  sk_canvas_->drawText(text, byte_length, x, y, *paint.sk_paint());
+  metadata_->drawText(text, byte_length, x, y, *paint.sk_paint());
 }
 
 void Canvas::Translate(float dx, float dy) {
-  sk_canvas_->translate(dx, dy);
+  metadata_->translate(dx, dy);
 }
 
 void Canvas::ResetMatrix() {
-  sk_canvas_->resetMatrix();
-  sk_canvas_->translate(origin_.x, origin_.y);
+  metadata_->resetMatrix();
+  metadata_->translate(origin_.x, origin_.y);
 }
 
 void Canvas::Clear(uint32_t color) {
-  sk_canvas_->clear(color);
+  metadata_->clear(color);
 }
 
 void Canvas::Clear(const Color &color) {
-  sk_canvas_->clear(color.argb());
+  metadata_->clear(color.argb());
 }
 
 void Canvas::ClipRect(const Rect &rect, bool antialias) {
-  sk_canvas_->clipRect(reinterpret_cast<const SkRect &>(rect), antialias);
+  metadata_->clipRect(reinterpret_cast<const SkRect &>(rect), antialias);
 }
 
 void Canvas::ClipPath(const Path &path, bool antilias) {
-  sk_canvas_->clipPath(*path.sk_path(), antilias);
+  metadata_->clipPath(*path.sk_path(), antilias);
 }
 
 void Canvas::Save() {
-  sk_canvas_->save();
+  metadata_->save();
 }
 
 void Canvas::Restore() {
-  sk_canvas_->restore();
+  metadata_->restore();
 }
 
 void Canvas::Flush() {
-  sk_canvas_->flush();
+  metadata_->flush();
 }
 
 }

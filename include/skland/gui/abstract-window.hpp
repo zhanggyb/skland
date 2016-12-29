@@ -37,6 +37,7 @@ namespace skland {
 class Display;
 class Application;
 class AbstractWindowFrame;
+class Input;
 
 enum WindowFlags {
   kWindowFullscreen = 0x1,
@@ -49,6 +50,7 @@ class AbstractWindow : public AbstractView {
   friend class Display;
   friend class Application;
   friend class AbstractWindowFrame;
+  friend class Input;
 
  public:
 
@@ -91,7 +93,7 @@ class AbstractWindow : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
-  bool IsFullscreen() const { return flags_ == kWindowFullscreen; }
+  bool IsFullscreened() const { return flags_ == kWindowFullscreen; }
 
   bool IsMaximized() const { return flags_ == kWindowMaximized; }
 
@@ -105,6 +107,8 @@ class AbstractWindow : public AbstractView {
 
  protected:
 
+  virtual void OnShow() final;
+
   virtual void OnMouseEnter(MouseEvent *event) override;
 
   virtual void OnMouseLeave(MouseEvent *event) override;
@@ -115,7 +119,9 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnDraw(Canvas *canvas) override;
 
-  virtual void OnCanvasSetup() = 0;
+  virtual void OnSetupSurface() = 0;
+
+  void SetSurface(AbstractSurface *surface);
 
   void AddSubView(AbstractView *view, int pos = 0);
 
@@ -150,6 +156,9 @@ class AbstractWindow : public AbstractView {
   std::string app_id_;
 
   Size saved_size_;
+
+  bool is_xdg_surface_configured_;
+
 };
 
 }

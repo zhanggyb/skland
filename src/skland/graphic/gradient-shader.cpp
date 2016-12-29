@@ -17,8 +17,7 @@
 #include <skland/graphic/gradient-shader.hpp>
 #include <skland/graphic/matrix.hpp>
 
-#include "internal/meta-matrix.hpp"
-#include "internal/meta-shader.hpp"
+#include "internal/shader-meta.hpp"
 
 #include "SkGradientShader.h"
 
@@ -38,9 +37,9 @@ Shader GradientShader::MakeLinear(const Point2F *points,
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : &local_matrix->metadata()->sk_matrix);
+                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
 
-  return Shader(new graphic::MetaShader(sk_shader));
+  return Shader(new ShaderMeta(sk_shader));
 }
 
 Shader GradientShader::MakeLinear(const Point2F points[],
@@ -58,9 +57,9 @@ Shader GradientShader::MakeLinear(const Point2F points[],
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : &local_matrix->metadata()->sk_matrix);
+                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
 
-  return Shader(new graphic::MetaShader(sk_shader));
+  return Shader(new ShaderMeta(sk_shader));
 }
 
 Shader GradientShader::MakeRadial(const Point2F &center,
@@ -79,8 +78,8 @@ Shader GradientShader::MakeRadial(const Point2F &center,
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : &local_matrix->metadata()->sk_matrix);
-  return Shader(new graphic::MetaShader(sk_shader));
+                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
+  return Shader(new ShaderMeta(sk_shader));
 }
 
 Shader GradientShader::MakeRadial(const Point2F &center,
@@ -100,9 +99,9 @@ Shader GradientShader::MakeRadial(const Point2F &center,
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : &local_matrix->metadata()->sk_matrix);
+                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
 
-  return Shader(new graphic::MetaShader(sk_shader));
+  return Shader(new ShaderMeta(sk_shader));
 }
 
 }

@@ -18,26 +18,24 @@
 #include <skland/wayland/seat.hpp>
 #include <skland/wayland/output.hpp>
 
-#include "internal/meta-xdg-toplevel.hpp"
-#include "internal/meta-xdg-surface.hpp"
+#include "internal/xdg-toplevel-meta.hpp"
+#include "internal/xdg-surface-meta.hpp"
 
 namespace skland {
 namespace wayland {
 
-XdgToplevel::XdgToplevel()
-    : metadata_(nullptr) {
-  metadata_ = new MetaXdgToplevel;
+XdgToplevel::XdgToplevel() {
+  metadata_.reset(new XdgToplevelMeta);
 }
 
 XdgToplevel::~XdgToplevel() {
-  delete metadata_;
 }
 
 void XdgToplevel::Setup(const XdgSurface &xdg_surface) {
   Destroy();
 
   metadata_->zxdg_toplevel = zxdg_surface_v6_get_toplevel(xdg_surface.metadata_->zxdg_surface);
-  zxdg_toplevel_v6_add_listener(metadata_->zxdg_toplevel, &MetaXdgToplevel::kListener, this);
+  zxdg_toplevel_v6_add_listener(metadata_->zxdg_toplevel, &XdgToplevelMeta::kListener, this);
 }
 
 void XdgToplevel::Destroy() {

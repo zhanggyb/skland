@@ -19,11 +19,9 @@
 
 #include <memory>
 
-namespace skland {
+class SkMatrix;
 
-namespace graphic {
-struct MetaMatrix;
-}
+namespace skland {
 
 class Matrix {
 
@@ -31,21 +29,19 @@ class Matrix {
 
   Matrix();
 
-  Matrix(graphic::MetaMatrix *matrix);
-
   Matrix(const Matrix &other);
 
   ~Matrix();
 
   Matrix &operator=(const Matrix &other);
 
-  const graphic::MetaMatrix *metadata() const {
+  SkMatrix *sk_matrix() const {
     return metadata_.get();
   }
 
  private:
 
-  std::shared_ptr<graphic::MetaMatrix> metadata_;
+  std::unique_ptr<SkMatrix> metadata_;
 
 };
 

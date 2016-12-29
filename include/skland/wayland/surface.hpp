@@ -22,6 +22,11 @@
 #include "region.hpp"
 
 namespace skland {
+
+namespace egl {
+class Surface;
+}
+
 namespace wayland {
 
 class ShellSurface;
@@ -37,6 +42,7 @@ class Surface {
   friend class XdgSurface;
   friend class Callback;
   friend class Pointer;
+  friend class egl::Surface;
 
   Surface(const Surface &) = delete;
 

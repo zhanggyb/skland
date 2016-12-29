@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_POSITIONER_HPP_
-#define SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_POSITIONER_HPP_
+#ifndef SKLAND_GUI_REDRAW_TASK_HPP_
+#define SKLAND_GUI_REDRAW_TASK_HPP_
 
-#include "xdg-shell-unstable-v6-client-protocol.h"
+#include "view-task.hpp"
 
 namespace skland {
-namespace wayland {
 
-struct MetaXdgPositioner {
+class AbstractView;
+class Canvas;
 
-  MetaXdgPositioner(const MetaXdgPositioner &) = delete;
-  MetaXdgPositioner &operator=(const MetaXdgPositioner &) = delete;
+struct RedrawTask : public ViewTask {
+  RedrawTask(const RedrawTask &) = delete;
+  RedrawTask &operator=(const RedrawTask &) = delete;
 
-  MetaXdgPositioner()
-      : zxdg_positioner(nullptr) {}
+  RedrawTask(AbstractView *view = nullptr, Canvas *canvas = nullptr)
+      : ViewTask(view), canvas(canvas) {}
 
-  ~MetaXdgPositioner() {
-    if (zxdg_positioner) zxdg_positioner_v6_destroy(zxdg_positioner);
-  }
+  virtual ~RedrawTask() {}
 
-  struct zxdg_positioner_v6 *zxdg_positioner;
+  virtual void Run() const final;
 
+  Canvas *canvas;
 };
 
 }
-}
 
-#endif // SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_POSITIONER_HPP_
+#endif // SKLAND_GUI_REDRAW_TASK_HPP_

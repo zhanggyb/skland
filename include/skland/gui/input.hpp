@@ -24,8 +24,6 @@
 #include "../wayland/keyboard.hpp"
 #include "../wayland/touch.hpp"
 
-#include "abstract-view.hpp"
-
 namespace skland {
 
 class Display;
@@ -33,6 +31,8 @@ class Cursor;
 class KeyEvent;
 class MouseEvent;
 class TouchEvent;
+class AbstractView;
+struct ViewTask;
 
 class Input : public Object {
 
@@ -146,7 +146,7 @@ class Input : public Object {
 
   void OnTouchCancel();
 
-  void ProcessMouseEnterOnSubviews(AbstractView *parent, AbstractView::MouseTask *task);
+  void ProcessMouseEnterOnSubviews(AbstractView *parent, ViewTask *task);
 
   Display *display_;
 

@@ -14,37 +14,31 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_SURFACE_HPP_
-#define SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_SURFACE_HPP_
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_POSITIONER_META_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_POSITIONER_META_HPP_
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-struct MetaXdgSurface {
+struct XdgPositionerMeta {
 
-  MetaXdgSurface(const MetaXdgSurface &) = delete;
-  MetaXdgSurface &operator=(const MetaXdgSurface &) = delete;
+  XdgPositionerMeta(const XdgPositionerMeta &) = delete;
+  XdgPositionerMeta &operator=(const XdgPositionerMeta &) = delete;
 
-  MetaXdgSurface()
-      : zxdg_surface(nullptr) {}
+  XdgPositionerMeta()
+      : zxdg_positioner(nullptr) {}
 
-  ~MetaXdgSurface() {
-    if (zxdg_surface) zxdg_surface_v6_destroy(zxdg_surface);
+  ~XdgPositionerMeta() {
+    if (zxdg_positioner) zxdg_positioner_v6_destroy(zxdg_positioner);
   }
 
-  struct zxdg_surface_v6 *zxdg_surface;
-
-  static const struct zxdg_surface_v6_listener kListener;
-
-  static void OnConfigure(void *data,
-                          struct zxdg_surface_v6 *zxdg_surface_v6,
-                          uint32_t serial);
+  struct zxdg_positioner_v6 *zxdg_positioner;
 
 };
 
 }
 }
 
-#endif // SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_SURFACE_HPP_
+#endif // SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_POSITIONER_HPP_

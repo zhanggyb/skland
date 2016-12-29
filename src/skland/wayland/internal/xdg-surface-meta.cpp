@@ -14,35 +14,22 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GRAPHIC_INTERNAL_META_SHADER_HPP_
-#define SKLAND_GRAPHIC_INTERNAL_META_SHADER_HPP_
+#include "xdg-surface-meta.hpp"
 
-#include "SkShader.h"
+#include <skland/wayland/xdg-surface.hpp>
 
 namespace skland {
-namespace graphic {
+namespace wayland {
 
-struct MetaShader {
-
-  MetaShader() {}
-
-  MetaShader(const sk_sp<SkShader> &shader)
-      : sk_shader(shader) {
-  }
-
-  MetaShader(const MetaShader &other)
-      : sk_shader(other.sk_shader) {}
-
-  MetaShader &operator=(const MetaShader &other) {
-    sk_shader = other.sk_shader;
-    return *this;
-  }
-
-  sk_sp<SkShader> sk_shader;
-
+const struct zxdg_surface_v6_listener XdgSurfaceMeta::kListener = {
+    OnConfigure
 };
 
-}
+void XdgSurfaceMeta::OnConfigure(void *data, struct zxdg_surface_v6 * /* zxdg_surface_v6 */, uint32_t serial) {
+  XdgSurface *_this = static_cast<XdgSurface *>(data);
+  if (_this->configure_)
+    _this->configure_(serial);
 }
 
-#endif  // SKLAND_GRAPHIC_INTERNAL_META_SHADER_HPP_
+}
+}

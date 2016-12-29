@@ -14,38 +14,26 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/shader.hpp>
 
-#include "internal/shader-meta.hpp"
+#include <skland/gui/application.hpp>
+#include <skland/gui/window.hpp>
+#include <skland/gui/egl-widget.hpp>
+#include <skland/gui/abstract-surface.hpp>
 
-namespace skland {
+using namespace skland;
 
-Shader::Shader() {
-}
+int main(int argc, char *argv[]) {
+  using skland::Window;
 
-Shader::Shader(ShaderMeta *metadata)
-    : metadata_(metadata) {
-}
+  Application app(argc, argv);
 
-Shader::Shader(const Shader &other) {
-  other ? metadata_.reset(new ShaderMeta(other.metadata_->sk_shader)) : metadata_.reset();
-}
+  Window *win = new Window(480, 360, "Simple EGL");
+  win->SetAppId("Simple-EGL");
 
-Shader::~Shader() {
-}
+  EGLWidget *widget = new EGLWidget;
+  win->SetMainWidget(widget);
 
-Shader &Shader::operator=(const Shader &other) {
-  if (other) {
-    if (metadata_) {
-      *metadata_ = *other.metadata_;
-    } else {
-      metadata_.reset(new ShaderMeta(other.metadata_->sk_shader));
-    }
-  } else {
-    metadata_.reset();
-  }
+  win->Show();
 
-  return *this;
-}
-
+  return app.Run();
 }

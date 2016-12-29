@@ -14,38 +14,35 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/shader.hpp>
+#ifndef SKLAND_GUI_RASTER_SURFACE_HPP_
+#define SKLAND_GUI_RASTER_SURFACE_HPP_
 
-#include "internal/shader-meta.hpp"
+#include "abstract-surface.hpp"
 
 namespace skland {
 
-Shader::Shader() {
-}
+/**
+ * @brief A surface using raster canvas
+ */
+class RasterSurface : public AbstractSurface {
 
-Shader::Shader(ShaderMeta *metadata)
-    : metadata_(metadata) {
-}
+  RasterSurface(const RasterSurface &) = delete;
+  RasterSurface &operator=(const RasterSurface &) = delete;
 
-Shader::Shader(const Shader &other) {
-  other ? metadata_.reset(new ShaderMeta(other.metadata_->sk_shader)) : metadata_.reset();
-}
+ public:
 
-Shader::~Shader() {
-}
+  RasterSurface(const Margin &margin = Margin());
 
-Shader &Shader::operator=(const Shader &other) {
-  if (other) {
-    if (metadata_) {
-      *metadata_ = *other.metadata_;
-    } else {
-      metadata_.reset(new ShaderMeta(other.metadata_->sk_shader));
-    }
-  } else {
-    metadata_.reset();
-  }
+  virtual ~RasterSurface();
 
-  return *this;
-}
+ protected:
+
+  virtual void OnSetup() final;
+
+  virtual void OnAttach(const Buffer *buffer) final;
+
+};
 
 }
+
+#endif // SKLAND_GUI_RASTER_SURFACE_HPP_

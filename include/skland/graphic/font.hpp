@@ -17,13 +17,13 @@
 #ifndef SKLAND_GRAPHIC_FONT_HPP_
 #define SKLAND_GRAPHIC_FONT_HPP_
 
+#include <memory>
+
 namespace skland {
 
 // Foreward declaration
 class Paint;
-namespace graphic {
-class MetaFont;
-}
+class FontMeta;
 
 class Font {
 
@@ -89,7 +89,7 @@ class Font {
 
  private:
 
-  graphic::MetaFont *metadata_;
+  std::unique_ptr<FontMeta> metadata_;
 
 };
 

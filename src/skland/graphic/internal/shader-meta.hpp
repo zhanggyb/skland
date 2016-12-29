@@ -14,38 +14,33 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/shader.hpp>
+#ifndef SKLAND_GRAPHIC_INTERNAL_SHADER_META_HPP_
+#define SKLAND_GRAPHIC_INTERNAL_SHADER_META_HPP_
 
-#include "internal/shader-meta.hpp"
+#include "SkShader.h"
 
 namespace skland {
 
-Shader::Shader() {
-}
+struct ShaderMeta {
 
-Shader::Shader(ShaderMeta *metadata)
-    : metadata_(metadata) {
-}
+  ShaderMeta() = delete;
 
-Shader::Shader(const Shader &other) {
-  other ? metadata_.reset(new ShaderMeta(other.metadata_->sk_shader)) : metadata_.reset();
-}
-
-Shader::~Shader() {
-}
-
-Shader &Shader::operator=(const Shader &other) {
-  if (other) {
-    if (metadata_) {
-      *metadata_ = *other.metadata_;
-    } else {
-      metadata_.reset(new ShaderMeta(other.metadata_->sk_shader));
-    }
-  } else {
-    metadata_.reset();
+  ShaderMeta(const sk_sp<SkShader> &shader)
+      : sk_shader(shader) {
   }
 
-  return *this;
-}
+  ShaderMeta(const ShaderMeta &other)
+      : sk_shader(other.sk_shader) {}
+
+  ShaderMeta &operator=(const ShaderMeta &other) {
+    sk_shader = other.sk_shader;
+    return *this;
+  }
+
+  sk_sp<SkShader> sk_shader;
+
+};
 
 }
+
+#endif  // SKLAND_GRAPHIC_INTERNAL_SHADER_META_HPP_

@@ -14,37 +14,37 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_SHELL_HPP_
-#define SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_SHELL_HPP_
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_META_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_META_HPP_
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-struct MetaXdgShell {
+struct XdgSurfaceMeta {
 
-  MetaXdgShell(const MetaXdgShell &) = delete;
-  MetaXdgShell &operator=(const MetaXdgShell &) = delete;
+  XdgSurfaceMeta(const XdgSurfaceMeta &) = delete;
+  XdgSurfaceMeta &operator=(const XdgSurfaceMeta &) = delete;
 
-  MetaXdgShell()
-      : zxdg_shell(nullptr) {}
+  XdgSurfaceMeta()
+      : zxdg_surface(nullptr) {}
 
-  ~MetaXdgShell() {
-    if (zxdg_shell) zxdg_shell_v6_destroy(zxdg_shell);
+  ~XdgSurfaceMeta() {
+    if (zxdg_surface) zxdg_surface_v6_destroy(zxdg_surface);
   }
 
-  struct zxdg_shell_v6 *zxdg_shell;
+  struct zxdg_surface_v6 *zxdg_surface;
 
-  static void OnPing(void *data,
-                     struct zxdg_shell_v6 *zxdg_shell_v6,
-                     uint32_t serial);
+  static const struct zxdg_surface_v6_listener kListener;
 
-  static const struct zxdg_shell_v6_listener kListener;
+  static void OnConfigure(void *data,
+                          struct zxdg_surface_v6 *zxdg_surface_v6,
+                          uint32_t serial);
 
 };
 
 }
 }
 
-#endif // SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_SHELL_HPP_
+#endif // SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_SURFACE_HPP_

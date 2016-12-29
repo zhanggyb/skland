@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-#include "meta-xdg-shell.hpp"
-#include <skland/wayland/xdg-shell.hpp>
+#include "redraw-task.hpp"
+#include <skland/gui/abstract-view.hpp>
 
 namespace skland {
-namespace wayland {
 
-const struct zxdg_shell_v6_listener MetaXdgShell::kListener = {
-    OnPing
-};
-
-void MetaXdgShell::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, uint32_t serial) {
-  XdgShell *_this = static_cast<XdgShell *>(data);
-  if (_this->ping_) {
-    _this->ping_(serial);
-  }
+void RedrawTask::Run() const {
+  view->OnDraw(canvas);
+  view->visible_ = true;
 }
 
-}
 }

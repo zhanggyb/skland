@@ -14,38 +14,22 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/shader.hpp>
-
-#include "internal/shader-meta.hpp"
+#include "xdg-shell-meta.hpp"
+#include <skland/wayland/xdg-shell.hpp>
 
 namespace skland {
+namespace wayland {
 
-Shader::Shader() {
-}
+const struct zxdg_shell_v6_listener XdgShellMeta::kListener = {
+    OnPing
+};
 
-Shader::Shader(ShaderMeta *metadata)
-    : metadata_(metadata) {
-}
-
-Shader::Shader(const Shader &other) {
-  other ? metadata_.reset(new ShaderMeta(other.metadata_->sk_shader)) : metadata_.reset();
-}
-
-Shader::~Shader() {
-}
-
-Shader &Shader::operator=(const Shader &other) {
-  if (other) {
-    if (metadata_) {
-      *metadata_ = *other.metadata_;
-    } else {
-      metadata_.reset(new ShaderMeta(other.metadata_->sk_shader));
-    }
-  } else {
-    metadata_.reset();
+void XdgShellMeta::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, uint32_t serial) {
+  XdgShell *_this = static_cast<XdgShell *>(data);
+  if (_this->ping_) {
+    _this->ping_(serial);
   }
-
-  return *this;
 }
 
+}
 }

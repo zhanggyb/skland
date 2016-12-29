@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 
-#include "meta-xdg-surface.hpp"
+#ifndef SKLAND_GUI_VIEW_TASK_HPP_
+#define SKLAND_GUI_VIEW_TASK_HPP_
 
-#include <skland/wayland/xdg-surface.hpp>
+#include <skland/gui/task.hpp>
 
 namespace skland {
-namespace wayland {
 
-const struct zxdg_surface_v6_listener MetaXdgSurface::kListener = {
-    OnConfigure
+class AbstractView;
+
+struct ViewTask : public Task {
+  ViewTask(const ViewTask &) = delete;
+  ViewTask &operator=(const ViewTask &) = delete;
+
+  ViewTask(AbstractView *view = nullptr)
+      : Task(), view(view) {}
+
+  ~ViewTask() {}
+
+  AbstractView *view;
 };
 
-void MetaXdgSurface::OnConfigure(void *data, struct zxdg_surface_v6 * /* zxdg_surface_v6 */, uint32_t serial) {
-  XdgSurface *_this = static_cast<XdgSurface *>(data);
-  if (_this->configure_)
-    _this->configure_(serial);
 }
 
-}
-}
+#endif  // SKLAND_GUI_VIEW_TASK_HPP_

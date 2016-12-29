@@ -20,157 +20,154 @@
 
 namespace skland {
 
-Path::Path()
-    : sk_path_(nullptr) {
-  sk_path_ = new SkPath;
+Path::Path() {
+  metadata_.reset(new SkPath);
 }
 
-Path::Path(const Path &other)
-    : sk_path_(nullptr) {
-  sk_path_ = new SkPath(*other.sk_path_);
+Path::Path(const Path &other) {
+  metadata_.reset(new SkPath(*other.metadata_));
 }
 
 Path::~Path() {
-  delete sk_path_;
 }
 
 Path &Path::operator=(const Path &other) {
-  *sk_path_ = *other.sk_path_;
+  *metadata_ = *other.metadata_;
   return *this;
 }
 
 bool Path::IsInterpolatable(const Path &compare) const {
-  return sk_path_->isInterpolatable(*compare.sk_path_);
+  return metadata_->isInterpolatable(*compare.metadata_);
 }
 
 bool Path::Interpolate(const Path &ending, float weight, Path *out) const {
-  return sk_path_->interpolate(*ending.sk_path_, weight, out->sk_path_);
+  return metadata_->interpolate(*ending.metadata_, weight, out->metadata_.get());
 }
 
 void Path::AddRoundRect(const Rect &rect, const float radii[], Direction dir) {
-  sk_path_->addRoundRect(reinterpret_cast<const SkRect &>(rect),
+  metadata_->addRoundRect(reinterpret_cast<const SkRect &>(rect),
                          radii, static_cast<SkPath::Direction>(dir));
 }
 
 Path::FillType Path::GetFillType() const {
-  return (FillType) sk_path_->getFillType();
+  return (FillType) metadata_->getFillType();
 }
 
 void Path::SetFillType(FillType fill_type) {
-  sk_path_->setFillType((SkPath::FillType) fill_type);
+  metadata_->setFillType((SkPath::FillType) fill_type);
 }
 
 bool Path::IsInverseFillType() const {
-  return sk_path_->isInverseFillType();
+  return metadata_->isInverseFillType();
 }
 
 void Path::ToggleInverseFillType() {
-  sk_path_->toggleInverseFillType();
+  metadata_->toggleInverseFillType();
 }
 
 Path::Convexity Path::GetConvexity() const {
-  return (Convexity) sk_path_->getConvexity();
+  return (Convexity) metadata_->getConvexity();
 }
 
 Path::Convexity Path::GetConvexityOrUnknown() const {
-  return (Convexity) sk_path_->getConvexityOrUnknown();
+  return (Convexity) metadata_->getConvexityOrUnknown();
 }
 
 void Path::SetConvexity(Convexity convexity) {
-  sk_path_->setConvexity((SkPath::Convexity) convexity);
+  metadata_->setConvexity((SkPath::Convexity) convexity);
 }
 
 bool Path::IsConvex() const {
-  return sk_path_->isConvex();
+  return metadata_->isConvex();
 }
 
 void Path::Reset() {
-  sk_path_->reset();
+  metadata_->reset();
 }
 
 void Path::Rewind() {
-  sk_path_->rewind();
+  metadata_->rewind();
 }
 
 bool Path::IsEmpty() const {
-  return sk_path_->isEmpty();
+  return metadata_->isEmpty();
 }
 
 int Path::CountPoints() const {
-  return sk_path_->countPoints();
+  return metadata_->countPoints();
 }
 
 Point2F Path::GetPoint(int index) const {
-  SkPoint p = sk_path_->getPoint(index);
+  SkPoint p = metadata_->getPoint(index);
   return Point2F(p.fX, p.fY);
 }
 
 int Path::GetPoints(Point2F points[], int max) const {
-  return sk_path_->getPoints(reinterpret_cast<SkPoint *>(points), max);
+  return metadata_->getPoints(reinterpret_cast<SkPoint *>(points), max);
 }
 
 int Path::CountVerbs() const {
-  return sk_path_->countVerbs();
+  return metadata_->countVerbs();
 }
 
 void Path::Swap(Path &other) {
-  sk_path_->swap(*other.sk_path_);
+  metadata_->swap(*other.metadata_);
 }
 
 const RectF &Path::GetBounds() const {
-  return reinterpret_cast<const RectF &>(sk_path_->getBounds());
+  return reinterpret_cast<const RectF &>(metadata_->getBounds());
 }
 
 void Path::UpdateBoundsCache() const {
-  sk_path_->updateBoundsCache();
+  metadata_->updateBoundsCache();
 }
 
 void Path::MoveTo(float x, float y) {
-  sk_path_->moveTo(x, y);
+  metadata_->moveTo(x, y);
 }
 
 void Path::MoveTo(const Point2F &p) {
-  sk_path_->moveTo(reinterpret_cast<const SkPoint &>(p));
+  metadata_->moveTo(reinterpret_cast<const SkPoint &>(p));
 }
 
 void Path::RelativeMoveTo(float dx, float dy) {
-  sk_path_->rMoveTo(dx, dy);
+  metadata_->rMoveTo(dx, dy);
 }
 
 void Path::LineTo(float x, float y) {
-  sk_path_->lineTo(x, y);
+  metadata_->lineTo(x, y);
 }
 
 void Path::LineTo(const Point2F &p) {
-  sk_path_->lineTo(reinterpret_cast<const SkPoint &>(p));
+  metadata_->lineTo(reinterpret_cast<const SkPoint &>(p));
 }
 
 void Path::RelativeLineTo(float dx, float dy) {
-  sk_path_->rLineTo(dx, dy);
+  metadata_->rLineTo(dx, dy);
 }
 
 void Path::QuadTo(float x1, float y1, float x2, float y2) {
-  sk_path_->quadTo(x1, y1, x2, y2);
+  metadata_->quadTo(x1, y1, x2, y2);
 }
 
 void Path::QuadTo(const Point2F &p1, const Point2F &p2) {
-  sk_path_->quadTo(reinterpret_cast<const SkPoint &>(p1), reinterpret_cast<const SkPoint &>(p2));
+  metadata_->quadTo(reinterpret_cast<const SkPoint &>(p1), reinterpret_cast<const SkPoint &>(p2));
 }
 
 void Path::RelativeQuadTo(float dx1, float dy1, float dx2, float dy2) {
-  sk_path_->rQuadTo(dx1, dy1, dx2, dy2);
+  metadata_->rQuadTo(dx1, dy1, dx2, dy2);
 }
 
 void Path::Close() {
-  sk_path_->close();
+  metadata_->close();
 }
 
 bool operator==(const Path &path1, const Path &path2) {
-  return (*path1.sk_path_) == (*path2.sk_path_);
+  return (*path1.metadata_) == (*path2.metadata_);
 }
 
 bool operator!=(const Path &path1, const Path &path2) {
-  return (*path1.sk_path_) != (*path2.sk_path_);
+  return (*path1.metadata_) != (*path2.metadata_);
 }
 
 }

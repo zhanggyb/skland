@@ -17,8 +17,10 @@
 #ifndef SKLAND_GRAPHIC_PAINT_HPP_
 #define SKLAND_GRAPHIC_PAINT_HPP_
 
+#include "../core/color.hpp"
+
 #include <cstdint>
-#include <skland/core/color.hpp>
+#include <memory>
 
 class SkPaint;
 
@@ -83,12 +85,12 @@ class Paint {
   void SetShader(const Shader &shader);
 
   SkPaint *sk_paint() const {
-    return sk_paint_;
+    return metadata_.get();
   }
 
  private:
 
-  SkPaint *sk_paint_;
+  std::unique_ptr<SkPaint> metadata_;
 };
 
 }
