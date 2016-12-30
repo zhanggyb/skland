@@ -104,8 +104,8 @@ int Application::Run() {
   Task *task = nullptr;
 
   while (true) {
-    while (Display::idle_task_head()->next() != Display::idle_task_tail()) {
-      task = Display::idle_task_head()->next();
+    while (Display::surface_task_head()->next() != Display::surface_task_tail()) {
+      task = Display::surface_task_head()->next();
       task->Unlink();
       task->Run();
     }

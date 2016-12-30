@@ -162,23 +162,23 @@ class Display : public Object {
   /**
     * @brief Initialize the idle task list
     */
-  void InitializeIdleTaskList();
+  void InitializeSurfaceTaskList();
 
   /**
    * @brief Destroy the redraw task list
    */
-  void ClearIdleTaskList();
+  void ClearSurfaceTaskList();
 
   void InitializeCursors();
 
   void ReleaseCursors();
 
-  static const Task *idle_task_head() {
-    return &kDisplay->idle_task_head_;
+  static const Task *surface_task_head() {
+    return &kDisplay->surface_task_head_;
   }
 
-  static const Task *idle_task_tail() {
-    return &kDisplay->idle_task_tail_;
+  static const Task *surface_task_tail() {
+    return &kDisplay->surface_task_tail_;
   }
 
   wayland::Display wl_display_;
@@ -214,8 +214,8 @@ class Display : public Object {
 
   /* idle task list */
 
-  Task idle_task_head_;
-  Task idle_task_tail_;
+  Task surface_task_head_;
+  Task surface_task_tail_;
 
   std::list<Global *> globals_;
   std::set<uint32_t> pixel_formats_;

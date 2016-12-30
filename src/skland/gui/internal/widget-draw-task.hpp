@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_WIDGET_DRAW_TASK_HPP_
-#define SKLAND_GUI_WIDGET_DRAW_TASK_HPP_
+#ifndef SKLAND_GUI_INTERNAL_WIDGET_DRAW_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_WIDGET_DRAW_TASK_HPP_
 
 #include "view-task.hpp"
 
@@ -39,4 +39,4 @@ struct WidgetDrawTask : public ViewTask {
 
 }
 
-#endif // SKLAND_GUI_WIDGET_DRAW_TASK_HPP_
+#endif // SKLAND_GUI_INTERNAL_WIDGET_DRAW_TASK_HPP_

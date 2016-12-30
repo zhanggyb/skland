@@ -17,10 +17,10 @@
 #ifndef SKLAND_GUI_ABSTRACT_WINDOW_FRAME_HPP_
 #define SKLAND_GUI_ABSTRACT_WINDOW_FRAME_HPP_
 
-#include <skland/core/sigcxx.hpp>
-#include <skland/core/margin.hpp>
-#include <skland/core/point.hpp>
-#include <skland/core/rect.hpp>
+#include "../core/sigcxx.hpp"
+#include "../core/margin.hpp"
+#include "../core/point.hpp"
+#include "../core/rect.hpp"
 
 #include <vector>
 

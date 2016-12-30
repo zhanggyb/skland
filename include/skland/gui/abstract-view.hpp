@@ -93,13 +93,19 @@ class AbstractView : public Object {
     return geometry_;
   }
 
+  AbstractSurface *GetSurface() const;
+
+  AbstractWindow *GetWindow() const;
+
   virtual Size GetMinimalSize() const = 0;
 
   virtual Size GetPreferredSize() const = 0;
 
   virtual Size GetMaximalSize() const = 0;
 
-  AbstractSurface *GetSurface() const;
+  const AbstractWindow *window() const {
+    return window_;
+  }
 
  protected:
 
@@ -183,6 +189,8 @@ class AbstractView : public Object {
    * The main surface for this window
    */
   AbstractSurface *surface_;
+
+  AbstractWindow *window_;
 
   /**
    * This property should only be assigned with RedrawTask

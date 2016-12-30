@@ -141,8 +141,8 @@ int main(int argc, char *argv[]) {
   Window *win = new Window(800, 600, "Simple");
   win->SetAppId("Simple");
 
-  SimpleWidget *widget = new SimpleWidget;
-  win->SetMainWidget(widget);
+//  SimpleWidget *widget = new SimpleWidget;
+//  win->SetMainWidget(widget);
 
   win->Show();
 

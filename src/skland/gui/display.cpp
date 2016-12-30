@@ -45,11 +45,11 @@ Display::Display()
       last_window_(nullptr),
       windows_count_(0) {
   cursors_.resize(kCursorBlank, nullptr);
-  InitializeIdleTaskList();
+  InitializeSurfaceTaskList();
 }
 
 Display::~Display() {
-  ClearIdleTaskList();
+  ClearSurfaceTaskList();
 }
 
 void Display::Connect(const char *name) {
@@ -312,14 +312,14 @@ void Display::OnXdgShellPing(uint32_t serial) {
   xdg_shell_.Pong(serial);
 }
 
-void Display::InitializeIdleTaskList() {
-  idle_task_head_.PushBack(&idle_task_tail_);
+void Display::InitializeSurfaceTaskList() {
+  surface_task_head_.PushBack(&surface_task_tail_);
 }
 
-void Display::ClearIdleTaskList() {
-  Task *task = idle_task_head_.next();
+void Display::ClearSurfaceTaskList() {
+  Task *task = surface_task_head_.next();
   Task *next_task = nullptr;
-  while (task != &idle_task_tail_) {
+  while (task != &surface_task_tail_) {
     next_task = task->next();
     task->Unlink();
     task = next_task;

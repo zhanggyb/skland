@@ -35,7 +35,7 @@ AbstractSurface::AbstractSurface(const Margin &margin)
 AbstractSurface::~AbstractSurface() {
   ClearChildren();
 
-  // TODO: check if need to do sth for view_
+  // TODO: check if need to do sth for window_
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {

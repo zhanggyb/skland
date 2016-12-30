@@ -34,7 +34,8 @@ AbstractView::AbstractView(int width, int height)
     : Object(),
       visible_(false),
       geometry_(width, height),
-      surface_(nullptr) {
+      surface_(nullptr),
+      window_(nullptr) {
   redraw_task_.reset(new RedrawTask(this, nullptr));
   mouse_task_.reset(new ViewTask(this));
 }
@@ -91,6 +92,17 @@ AbstractSurface *AbstractView::GetSurface() const {
   return surface;
 }
 
+AbstractWindow *AbstractView::GetWindow() const {
+  AbstractWindow *window = nullptr;
+  const AbstractView *p = this;
+  while (p) {
+    window = p->window_;
+    if (window) break;
+    p = p->parent_view();
+  }
+  return window;
+}
+
 void AbstractView::Damage(const Rect &rect) {
   AbstractSurface *surface = GetSurface();
   if (surface) {
@@ -99,7 +111,7 @@ void AbstractView::Damage(const Rect &rect) {
                     (int) rect.width(),
                     (int) rect.height());
     if (surface->canvas()) {
-      static_cast<RedrawTask*>(redraw_task_.get())->canvas = surface->canvas().get();
+      static_cast<RedrawTask *>(redraw_task_.get())->canvas = surface->canvas().get();
       AddRedrawTask(redraw_task_.get());
     }
     surface->Commit();
@@ -138,7 +150,7 @@ void AbstractView::AddRedrawTask(ViewTask *task) {
   DBG_ASSERT(task->view != nullptr);
 
   // The task node after which insert the new one
-  Task *insert_task = Display::idle_task_tail()->previous();
+  Task *insert_task = Display::surface_task_tail()->previous();
 
   AbstractView *view = task->view->next_view();
   if (view && view->redraw_task_->IsLinked()) { // the next sibling is waiting for redraw, insert after

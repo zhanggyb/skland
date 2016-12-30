@@ -23,6 +23,7 @@
 
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
+#include "internal/widget-draw-task.hpp"
 
 namespace skland {
 
@@ -40,6 +41,9 @@ AbstractWindow::AbstractWindow(int width,
       window_frame_(nullptr),
       flags_(0),
       is_xdg_surface_configured_(false) {
+  window_ = this;
+  widget_draw_task_head_.PushBack(&widget_draw_task_tail_);
+
   if (title) title_ = title;
 
   int x = 0, y = 0;  // The input region

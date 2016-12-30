@@ -25,17 +25,18 @@
 #include <skland/gui/abstract-surface.hpp>
 
 #include "internal/redraw-task.hpp"
+#include "internal/widget-draw-task.hpp"
 
 namespace skland {
 
 AbstractWidget::AbstractWidget()
-    : AbstractView(200, 200) {
+    : AbstractWidget(200, 200) {
 
 }
 
 AbstractWidget::AbstractWidget(int width, int height)
-    : AbstractWidget() {
-  resize(width, height);
+    : AbstractView(width, height) {
+  widget_draw_task_.reset(new WidgetDrawTask(this));
 }
 
 AbstractWidget::~AbstractWidget() {
@@ -51,6 +52,29 @@ Size AbstractWidget::GetPreferredSize() const {
 
 Size AbstractWidget::GetMaximalSize() const {
   return Size(65536, 65536);
+}
+
+void AbstractWidget::Update() {
+  if (nullptr == parent()) return;
+
+  if (parent_view()->window()) {
+    //  TODO: call window to add this draw task
+    return;
+  }
+
+  AbstractWidget *parent = static_cast<AbstractWidget *>(this->parent());
+  parent->OnUpdate(widget_draw_task_.get());
+}
+
+void AbstractWidget::OnUpdate(WidgetDrawTask *task) {
+  if (nullptr == parent()) return;
+
+  if (parent_view()->window()) {
+    // TODO:: call window to add this draw task
+  }
+
+  AbstractWidget *parent = static_cast<AbstractWidget *>(this->parent());
+  parent->OnUpdate(task);
 }
 
 void AbstractWidget::OnShow() {

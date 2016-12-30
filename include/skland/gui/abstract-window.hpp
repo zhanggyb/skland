@@ -31,6 +31,7 @@
 #include <skland/wayland/region.hpp>
 
 #include <skland/stock/theme.hpp>
+#include <skland/gui/task.hpp>
 
 namespace skland {
 
@@ -159,6 +160,8 @@ class AbstractWindow : public AbstractView {
 
   bool is_xdg_surface_configured_;
 
+  Task widget_draw_task_head_;
+  Task widget_draw_task_tail_;
 };
 
 }
