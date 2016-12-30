@@ -48,14 +48,14 @@ Label::~Label() {
 void Label::SetForebround(const Color &color) {
   if (foreground_ != color) {
     foreground_ = color;
-    Show();
+    Update();
   }
 }
 
 void Label::SetBackground(const Color &color) {
   if (background_ != color) {
     background_ = color;
-    Show();
+    Update();
   }
 }
 

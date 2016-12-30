@@ -19,6 +19,7 @@
 #include <skland/core/numeric.hpp>
 #include <skland/gui/abstract-surface.hpp>
 #include <skland/gui/display.hpp>
+#include <skland/gui/abstract-window.hpp>
 
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
@@ -42,14 +43,6 @@ AbstractView::AbstractView(int width, int height)
 
 AbstractView::~AbstractView() {
   delete surface_;
-}
-
-void AbstractView::Show() {
-  if (redraw_task_->IsLinked()) {
-    return;
-  }
-
-  OnShow();
 }
 
 void AbstractView::SetPosition(int x, int y) {
@@ -110,69 +103,46 @@ void AbstractView::Damage(const Rect &rect) {
                     (int) rect.y() + surface->margin().top,
                     (int) rect.width(),
                     (int) rect.height());
-    if (surface->canvas()) {
-      static_cast<RedrawTask *>(redraw_task_.get())->canvas = surface->canvas().get();
-      AddRedrawTask(redraw_task_.get());
-    }
     surface->Commit();
   }
 }
 
-void AbstractView::RedrawAll() {
-  AbstractSurface *surface = GetSurface();
-  if (surface) {
-    RedrawOnSurface(this, surface);
-    RedrawSubViewsOnSurface(this, surface_);
-    surface->Commit();
-  }
-}
+void AbstractView::Update() {
+  if (this == window_) {
+    DBG_ASSERT(surface_);
 
-void AbstractView::RedrawOnSurface(AbstractView *view, AbstractSurface *surface) {
-  if (surface->canvas()) {
-    static_cast<RedrawTask *>(view->redraw_task_.get())->canvas = surface->canvas().get();
-    AddRedrawTask(view->redraw_task_.get());
-  }
-}
-
-void AbstractView::RedrawSubViewsOnSurface(const AbstractView *parent, AbstractSurface *surface) {
-  for (AbstractView *subview = parent->last_subview(); subview;
-       subview = subview->previous_view()) {
-    if (subview->surface_ != nullptr) {
-      surface = subview->surface_;
-      surface->Commit();
+    if (!redraw_task_->IsLinked()) {
+      redraw_task_->canvas = surface_->canvas().get();
+      Task *task = &Display::kDisplay->redraw_task_tail_;
+      task->PushFront(redraw_task_.get());
+      redraw_task_->canvas = surface_->canvas().get();
+      Damage(geometry());
+      surface_->Commit();
     }
-    RedrawOnSurface(subview, surface);
-    RedrawSubViewsOnSurface(subview, surface);
+  }
+
+  if (parent()) {
+    parent_view()->OnUpdate(this);
   }
 }
 
-void AbstractView::AddRedrawTask(ViewTask *task) {
-  DBG_ASSERT(task->view != nullptr);
+void AbstractView::UpdateAll() {
+  Update();
+  for (AbstractView *sub = last_subview(); sub; sub = sub->previous_view()) {
+    sub->UpdateAll();
+  }
+}
 
-  // The task node after which insert the new one
-  Task *insert_task = Display::surface_task_tail()->previous();
-
-  AbstractView *view = task->view->next_view();
-  if (view && view->redraw_task_->IsLinked()) { // the next sibling is waiting for redraw, insert after
-    insert_task = view->redraw_task_.get();
-    goto insert;
+void AbstractView::OnUpdate(AbstractView *view) {
+  if (redraw_task_->IsLinked()) {
+    // This view is going to be redrawn, just push back the task of the sub view
+    redraw_task_->PushBack(view->redraw_task_.get());
+    view->redraw_task_->canvas = redraw_task_->canvas;
+    return;
   }
 
-  view = task->view->previous_view();
-  if (view && view->redraw_task_->IsLinked()) { // the previous sibling is waiting for redraw, insert after
-    insert_task = view->redraw_task_->previous();
-    goto insert;
-  }
-
-  view = static_cast<AbstractView *>(task->view->parent());
-  if (view && view->redraw_task_->IsLinked()) { // the parent is waiting for redraw, insert after
-    insert_task = view->redraw_task_.get();
-    goto insert;
-  }
-
-  insert:
-  task->Unlink();
-  insert_task->PushBack(task);
+  if (parent())
+    parent_view()->OnUpdate(view);
 }
 
 }

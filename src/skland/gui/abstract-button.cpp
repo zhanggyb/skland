@@ -35,7 +35,7 @@ AbstractButton::~AbstractButton() {
 void AbstractButton::OnMouseEnter(MouseEvent *event) {
   set_bit<uint32_t>(flags_, kFlagIndexHovered);
   if (flags_ && kFlagIndexSensitive) {
-    Damage(geometry());
+    Update();
   }
   event->Accept();
 }
@@ -44,7 +44,7 @@ void AbstractButton::OnMouseLeave(MouseEvent *event) {
   clear_bit<uint32_t>(flags_, kFlagIndexHovered);
   clear_bit<uint32_t>(flags_, kFlagIndexClick);
   if (flags_ && kFlagIndexSensitive) {
-    Damage(geometry());
+    Update();
   }
   event->Accept();
 }
@@ -52,13 +52,13 @@ void AbstractButton::OnMouseLeave(MouseEvent *event) {
 void AbstractButton::OnMouseButton(MouseEvent *event) {
   if (event->state() == kMouseButtonPressed) {
     set_bit<uint32_t>(flags_, kFlagIndexPressed);
-    Damage(geometry());
+    Update();
   } else {
     if (flags_ & kFlagIndexPressed) {
       set_bit<uint32_t>(flags_, kFlagIndexClick);
     }
     clear_bit<uint32_t>(flags_, kFlagIndexPressed);
-    Damage(geometry());
+    Update();
   }
 
   if (flags_ & kFlagIndexClick) {

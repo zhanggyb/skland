@@ -20,10 +20,10 @@
 #include <skland/gui/raster-surface.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
+#include <skland/gui/display.hpp>
 
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
-#include "internal/widget-draw-task.hpp"
 
 namespace skland {
 
@@ -122,6 +122,13 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
   }
 }
 
+void AbstractWindow::Show() {
+  if (!is_xdg_surface_configured_) {
+    AbstractSurface *surf = surface();
+    surf->Commit();
+  }
+}
+
 void AbstractWindow::Close(SLOT) {
   if (Display::windows_count() == 1) {
     Application::Exit();
@@ -187,14 +194,12 @@ Rect AbstractWindow::GetClientGeometry() const {
   return window_frame_->GetClientGeometry();
 }
 
-void AbstractWindow::OnShow() {
-  AbstractSurface *surf = surface();
-
-  if (surf->canvas()) {
-    static_cast<RedrawTask *>(redraw_task().get())->canvas = surf->canvas().get();
-    AddRedrawTask(redraw_task().get());
-  }
-  surf->Commit();
+void AbstractWindow::OnUpdate(AbstractView *view) {
+  Task *task = &Display::kDisplay->redraw_task_tail_;
+  task->PushFront(view->redraw_task_.get());
+  view->redraw_task_->canvas = surface_->canvas().get();
+  Damage(view->geometry());
+  surface_->Commit();
 }
 
 void AbstractWindow::OnMouseEnter(MouseEvent *event) {

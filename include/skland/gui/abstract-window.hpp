@@ -78,6 +78,8 @@ class AbstractWindow : public AbstractView {
 
   void SetWindowFrame(AbstractWindowFrame *window_frame);
 
+  void Show();
+
   void Close(__SLOT__);
 
   void Maximize(__SLOT__);
@@ -108,7 +110,7 @@ class AbstractWindow : public AbstractView {
 
  protected:
 
-  virtual void OnShow() final;
+  virtual void OnUpdate(AbstractView *view) override;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

@@ -162,8 +162,6 @@ class AbstractSurface : public Object {
 
   int32_t buffer_scale_;
 
-  std::unique_ptr<Task> render_task_;
-
 };
 
 }

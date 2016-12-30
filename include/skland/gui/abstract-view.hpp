@@ -61,8 +61,6 @@ class AbstractView : public Object {
 
   virtual ~AbstractView();
 
-  void Show();
-
   void SetPosition(int x, int y);
 
   void Resize(int width, int height);
@@ -109,7 +107,21 @@ class AbstractView : public Object {
 
  protected:
 
-  virtual void OnShow() = 0;
+  /**
+    * @brief Update the display of this widget
+    */
+  void Update();
+
+  /**
+   * @brief Update this view and all sub views
+   */
+  void UpdateAll();
+
+  /**
+   * @brief A sub view request an update
+   * @param view
+   */
+  virtual void OnUpdate(AbstractView *view);
 
   virtual void OnResize(int width, int height) = 0;
 
@@ -126,8 +138,6 @@ class AbstractView : public Object {
   virtual void OnDraw(Canvas *canvas) = 0;
 
   void Damage(const Rect &rect);
-
-  void RedrawAll();
 
   void set_visible(bool visible) {
     visible_ = visible;
@@ -165,7 +175,7 @@ class AbstractView : public Object {
     return static_cast<AbstractView *>(last_child());
   }
 
-  const std::unique_ptr<ViewTask> &redraw_task() const {
+  const std::unique_ptr<RedrawTask> &redraw_task() const {
     return redraw_task_;
   }
 
@@ -173,13 +183,7 @@ class AbstractView : public Object {
     return mouse_task_;
   }
 
-  static void AddRedrawTask(ViewTask *task);
-
  private:
-
-  static void RedrawOnSurface(AbstractView *view, AbstractSurface *surface);
-
-  static void RedrawSubViewsOnSurface(const AbstractView *parent, AbstractSurface *surface);
 
   bool visible_;
 
@@ -195,7 +199,7 @@ class AbstractView : public Object {
   /**
    * This property should only be assigned with RedrawTask
    */
-  std::unique_ptr<ViewTask> redraw_task_;
+  std::unique_ptr<RedrawTask> redraw_task_;
 
   /**
    * This property should only be assigned with MouseTask

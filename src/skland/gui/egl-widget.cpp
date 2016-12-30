@@ -74,13 +74,6 @@ EGLWidget::~EGLWidget() {
 
 }
 
-void EGLWidget::OnShow() {
-  if (!redraw_task()->IsLinked()) {
-    AddRedrawTask(redraw_task().get());
-    surface()->Commit();
-  }
-}
-
 void EGLWidget::OnResize(int width, int height) {
   resize(width, height);
 }

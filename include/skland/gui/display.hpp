@@ -173,12 +173,12 @@ class Display : public Object {
 
   void ReleaseCursors();
 
-  static const Task *surface_task_head() {
-    return &kDisplay->surface_task_head_;
+  static const Task *redraw_task_head() {
+    return &kDisplay->redraw_task_head_;
   }
 
-  static const Task *surface_task_tail() {
-    return &kDisplay->surface_task_tail_;
+  static const Task *redraw_task_tail() {
+    return &kDisplay->redraw_task_tail_;
   }
 
   wayland::Display wl_display_;
@@ -214,8 +214,8 @@ class Display : public Object {
 
   /* idle task list */
 
-  Task surface_task_head_;
-  Task surface_task_tail_;
+  Task redraw_task_head_;
+  Task redraw_task_tail_;
 
   std::list<Global *> globals_;
   std::set<uint32_t> pixel_formats_;

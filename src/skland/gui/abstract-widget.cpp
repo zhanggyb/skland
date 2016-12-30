@@ -25,7 +25,7 @@
 #include <skland/gui/abstract-surface.hpp>
 
 #include "internal/redraw-task.hpp"
-#include "internal/widget-draw-task.hpp"
+#include "internal/view-task.hpp"
 
 namespace skland {
 
@@ -36,7 +36,6 @@ AbstractWidget::AbstractWidget()
 
 AbstractWidget::AbstractWidget(int width, int height)
     : AbstractView(width, height) {
-  widget_draw_task_.reset(new WidgetDrawTask(this));
 }
 
 AbstractWidget::~AbstractWidget() {
@@ -52,38 +51,6 @@ Size AbstractWidget::GetPreferredSize() const {
 
 Size AbstractWidget::GetMaximalSize() const {
   return Size(65536, 65536);
-}
-
-void AbstractWidget::Update() {
-  if (nullptr == parent()) return;
-
-  if (parent_view()->window()) {
-    //  TODO: call window to add this draw task
-    return;
-  }
-
-  AbstractWidget *parent = static_cast<AbstractWidget *>(this->parent());
-  parent->OnUpdate(widget_draw_task_.get());
-}
-
-void AbstractWidget::OnUpdate(WidgetDrawTask *task) {
-  if (nullptr == parent()) return;
-
-  if (parent_view()->window()) {
-    // TODO:: call window to add this draw task
-  }
-
-  AbstractWidget *parent = static_cast<AbstractWidget *>(this->parent());
-  parent->OnUpdate(task);
-}
-
-void AbstractWidget::OnShow() {
-  AbstractSurface *surface = GetSurface();
-  if (surface && surface->canvas()) {
-    static_cast<RedrawTask *>(redraw_task().get())->canvas = surface->canvas().get();
-    AddRedrawTask(redraw_task().get());
-    surface->Commit();
-  }
 }
 
 Widget::~Widget() {

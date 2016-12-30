@@ -52,7 +52,7 @@ class SimpleWidget : public AbstractWidget {
 
   virtual void OnResize(int width, int height) override {
     resize(width, height);
-    Show();
+    Update();
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {

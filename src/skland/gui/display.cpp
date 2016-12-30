@@ -313,13 +313,13 @@ void Display::OnXdgShellPing(uint32_t serial) {
 }
 
 void Display::InitializeSurfaceTaskList() {
-  surface_task_head_.PushBack(&surface_task_tail_);
+  redraw_task_head_.PushBack(&redraw_task_tail_);
 }
 
 void Display::ClearSurfaceTaskList() {
-  Task *task = surface_task_head_.next();
+  Task *task = redraw_task_head_.next();
   Task *next_task = nullptr;
-  while (task != &surface_task_tail_) {
+  while (task != &redraw_task_tail_) {
     next_task = task->next();
     task->Unlink();
     task = next_task;

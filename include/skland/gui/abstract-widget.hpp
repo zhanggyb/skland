@@ -22,7 +22,6 @@
 namespace skland {
 
 class AbstractWindow;
-struct WidgetDrawTask;
 
 /**
  * @brief The base class for widgets
@@ -36,7 +35,6 @@ struct WidgetDrawTask;
 class AbstractWidget : public AbstractView {
 
   friend class AbstractWindow;
-  friend struct WidgetDrawTask;
 
  public:
 
@@ -52,22 +50,6 @@ class AbstractWidget : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
- protected:
-
-  /**
-   * @brief Update the display of this widget
-   */
-  void Update();
-
-  virtual void OnUpdate(WidgetDrawTask *task);
-
-  virtual void OnDraw(Canvas *canvas) = 0;
-
-  virtual void OnShow() override;
-
- private:
-
-  std::unique_ptr<WidgetDrawTask> widget_draw_task_;
 };
 
 class Widget : public AbstractWidget {

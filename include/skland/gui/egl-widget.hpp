@@ -24,8 +24,6 @@ class EGLWidget : public AbstractWidget {
 
  protected:
 
-  virtual void OnShow() override;
-
   virtual void OnResize(int width, int height) override;
 
   virtual void OnMouseEnter(MouseEvent *event) override;

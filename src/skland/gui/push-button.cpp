@@ -37,7 +37,7 @@ Size PushButton::GetPreferredSize() const {
 
 void PushButton::OnResize(int width, int height) {
   resize(width, height);
-  Show();
+  Update();
 }
 
 void PushButton::OnDraw(Canvas *canvas) {
