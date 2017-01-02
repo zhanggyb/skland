@@ -106,10 +106,6 @@ class AbstractView : public Object {
 
   virtual Size GetMaximalSize() const = 0;
 
-  const AbstractWindow *window() const {
-    return window_;
-  }
-
  protected:
 
   /**
@@ -154,7 +150,7 @@ class AbstractView : public Object {
   }
 
   AbstractSurface *surface() const {
-    return surface_;
+    return surface_.get();
   }
 
   AbstractView *parent_view() const {
@@ -194,9 +190,7 @@ class AbstractView : public Object {
   /**
    * The main surface for this window
    */
-  AbstractSurface *surface_;
-
-  AbstractWindow *window_;
+  std::unique_ptr<AbstractSurface> surface_;
 
   /**
    * This property should only be assigned with RedrawTask

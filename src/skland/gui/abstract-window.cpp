@@ -20,7 +20,6 @@
 #include <skland/gui/raster-surface.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
-#include <skland/gui/display.hpp>
 
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
@@ -40,37 +39,34 @@ AbstractWindow::AbstractWindow(int width,
       display_(nullptr),
       window_frame_(nullptr),
       flags_(0),
-      is_xdg_surface_configured_(false) {
-  window_ = this;
-  widget_draw_task_head_.PushBack(&widget_draw_task_tail_);
-
+      is_xdg_surface_configured_(false),
+      main_surface_(nullptr) {
   if (title) title_ = title;
 
   int x = 0, y = 0;  // The input region
 
-  RasterSurface *surface = nullptr;
-
   if (frame) {
-    surface = new RasterSurface(Margin(Theme::shadow_margin_left(),
-                                       Theme::shadow_margin_top(),
-                                       Theme::shadow_margin_right(),
-                                       Theme::shadow_margin_bottom()));
+    main_surface_ = new RasterSurface(Margin(Theme::shadow_margin_left(),
+                                             Theme::shadow_margin_top(),
+                                             Theme::shadow_margin_right(),
+                                             Theme::shadow_margin_bottom()));
+
     SetWindowFrame(frame);
-    x += surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
-    y += surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
+    x += main_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
+    y += main_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
   } else {
-    surface = new RasterSurface();
+    main_surface_ = new RasterSurface();
   }
 
-  SetSurface(surface);
+  SetSurface(main_surface_);
   input_region_.Setup(Display::wl_compositor());
   input_region_.Add(x, y, width, height);
-  surface->SetInputRegion(input_region_);
+  main_surface_->SetInputRegion(input_region_);
 
   xdg_surface_.configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
-  xdg_surface_.Setup(Display::xdg_shell(), surface->wl_surface());
+  xdg_surface_.Setup(Display::xdg_shell(), main_surface_->wl_surface());
 
   xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
   xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
@@ -124,8 +120,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 
 void AbstractWindow::Show() {
   if (!is_xdg_surface_configured_) {
-    AbstractSurface *surf = surface();
-    surf->Commit();
+    main_surface_->Commit();
   }
 }
 
@@ -330,8 +325,8 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
   if (!is_xdg_surface_configured_) {
     is_xdg_surface_configured_ = true;
 
-    int x = surface()->margin().left;
-    int y = surface()->margin().top;
+    int x = main_surface_->margin().left;
+    int y = main_surface_->margin().top;
     int w = (int) width();
     int h = (int) height();
     xdg_surface_.SetWindowGeometry(x, y, w, h);
@@ -362,12 +357,12 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
       int x = 0, y = 0;
 
       if (!IsFrameless()) {
-        input_rect.left = surface()->margin().left - AbstractWindowFrame::kResizingMargin.left;
-        input_rect.top = surface()->margin().top - AbstractWindowFrame::kResizingMargin.top;
+        input_rect.left = main_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
+        input_rect.top = main_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
         input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
                           height + AbstractWindowFrame::kResizingMargin.tb());
-        x = surface()->margin().left;
-        y = surface()->margin().top;
+        x = main_surface_->margin().left;
+        y = main_surface_->margin().top;
       }
 
       input_region_.Setup(Display::wl_compositor());
@@ -375,7 +370,7 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
                         (int) input_rect.y(),
                         (int) input_rect.width(),
                         (int) input_rect.height());
-      surface()->SetInputRegion(input_region_);
+      main_surface_->SetInputRegion(input_region_);
 
       xdg_surface_.SetWindowGeometry(x, y, width, height);
 

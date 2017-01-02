@@ -18,6 +18,7 @@
 #define SKLAND_GUI_ABSTRACT_WINDOW_HPP_
 
 #include "abstract-view.hpp"
+#include "raster-surface.hpp"
 
 #include <wayland-client.h>
 #include <cstdint>
@@ -96,13 +97,13 @@ class AbstractWindow : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
-  bool IsFullscreened() const { return flags_ == kWindowFullscreen; }
+  bool IsFullscreened() const { return kWindowFullscreen == flags_; }
 
-  bool IsMaximized() const { return flags_ == kWindowMaximized; }
+  bool IsMaximized() const { return kWindowMaximized == flags_; }
 
-  bool IsMinimized() const { return flags_ == kWindowMinimized; }
+  bool IsMinimized() const { return kWindowMinimized == flags_; }
 
-  bool IsFrameless() const { return window_frame_ == nullptr; }
+  bool IsFrameless() const { return nullptr == window_frame_; }
 
   int GetMouseLocation(const MouseEvent *event) const;
 
@@ -160,8 +161,11 @@ class AbstractWindow : public AbstractView {
 
   bool is_xdg_surface_configured_;
 
-  Task widget_draw_task_head_;
-  Task widget_draw_task_tail_;
+  /**
+   * @brief The main raster surface for rendering widgets
+   */
+  RasterSurface *main_surface_;
+
 };
 
 }

@@ -34,15 +34,12 @@ AbstractView::AbstractView()
 AbstractView::AbstractView(int width, int height)
     : Object(),
       visible_(false),
-      geometry_(width, height),
-      surface_(nullptr),
-      window_(nullptr) {
+      geometry_(width, height) {
   redraw_task_.reset(new RedrawTask(this, nullptr));
   mouse_task_.reset(new ViewTask(this));
 }
 
 AbstractView::~AbstractView() {
-  delete surface_;
 }
 
 void AbstractView::SetPosition(int x, int y) {
@@ -70,13 +67,13 @@ bool AbstractView::Contain(int x, int y) const {
 }
 
 AbstractSurface *AbstractView::GetSurface() const {
-  if (surface_) return surface_;
+  if (surface_) return surface_.get();
 
   AbstractSurface *surface = nullptr;
   AbstractView *p = static_cast<AbstractView *>(parent());
   while (p) {
     if (p->surface_) {
-      surface = p->surface_;
+      surface = p->surface_.get();
       break;
     }
     p = static_cast<AbstractView *>(p->parent());
@@ -86,25 +83,18 @@ AbstractSurface *AbstractView::GetSurface() const {
 }
 
 AbstractWindow *AbstractView::GetWindow() const {
-  AbstractWindow *window = nullptr;
-  const AbstractView *p = this;
-  while (p) {
-    window = p->window_;
-    if (window) break;
-    p = p->parent_view();
-  }
-  return window;
+  return dynamic_cast<AbstractWindow *>(GetSurface()->view());
 }
 
 void AbstractView::SetSurface(AbstractSurface *surface) {
-  if (surface_ == surface) {
+  if (surface_.get() == surface) {
     DBG_ASSERT(surface->view_ == this);
     return;
   }
 
   // TODO: inform original view
 
-  surface_ = surface;
+  surface_.reset(surface);
 
   if (surface_) {
     surface_->view_ = this;
