@@ -31,7 +31,7 @@
 
 namespace skland {
 
-class AbstractWindow;
+class AbstractView;
 class Canvas;
 class Buffer;
 
@@ -43,7 +43,7 @@ class Buffer;
  */
 class AbstractSurface : public Object {
 
-  friend class AbstractWindow;
+  friend class AbstractView;
 
   AbstractSurface(const AbstractSurface &) = delete;
   AbstractSurface &operator=(const AbstractSurface &) = delete;
@@ -93,8 +93,8 @@ class AbstractSurface : public Object {
     return wl_sub_surface_;
   }
 
-  AbstractWindow *window() const {
-    return window_;
+  AbstractView *view() const {
+    return view_;
   }
 
   const Margin &margin() const {
@@ -145,7 +145,7 @@ class AbstractSurface : public Object {
 
   wayland::SubSurface wl_sub_surface_;
 
-  AbstractWindow *window_;
+  AbstractView *view_;
 
   Margin margin_;
 

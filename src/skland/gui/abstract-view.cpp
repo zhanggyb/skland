@@ -96,6 +96,22 @@ AbstractWindow *AbstractView::GetWindow() const {
   return window;
 }
 
+void AbstractView::SetSurface(AbstractSurface *surface) {
+  if (surface_ == surface) {
+    DBG_ASSERT(surface->view_ == this);
+    return;
+  }
+
+  // TODO: inform original view
+
+  surface_ = surface;
+
+  if (surface_) {
+    surface_->view_ = this;
+    surface_->OnSetup();
+  }
+}
+
 void AbstractView::Damage(const Rect &rect) {
   AbstractSurface *surface = GetSurface();
   if (surface) {
@@ -108,22 +124,9 @@ void AbstractView::Damage(const Rect &rect) {
 }
 
 void AbstractView::Update() {
-  if (this == window_) {
-    DBG_ASSERT(surface_);
+  if (redraw_task_->IsLinked()) return;
 
-    if (!redraw_task_->IsLinked()) {
-      redraw_task_->canvas = surface_->canvas().get();
-      Task *task = &Display::kDisplay->redraw_task_tail_;
-      task->PushFront(redraw_task_.get());
-      redraw_task_->canvas = surface_->canvas().get();
-      Damage(geometry());
-      surface_->Commit();
-    }
-  }
-
-  if (parent()) {
-    parent_view()->OnUpdate(this);
-  }
+  OnUpdate(this);
 }
 
 void AbstractView::UpdateAll() {
@@ -135,7 +138,9 @@ void AbstractView::UpdateAll() {
 
 void AbstractView::OnUpdate(AbstractView *view) {
   if (redraw_task_->IsLinked()) {
+    DBG_ASSERT(view != this);
     // This view is going to be redrawn, just push back the task of the sub view
+
     redraw_task_->PushBack(view->redraw_task_.get());
     view->redraw_task_->canvas = redraw_task_->canvas;
     return;

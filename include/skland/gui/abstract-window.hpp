@@ -124,8 +124,6 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnSetupSurface() = 0;
 
-  void SetSurface(AbstractSurface *surface);
-
   void AddSubView(AbstractView *view, int pos = 0);
 
   void MoveWithMouse(MouseEvent *event) const;

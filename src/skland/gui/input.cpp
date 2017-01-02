@@ -165,7 +165,7 @@ void Input::OnPointerEnter(uint32_t serial,
   mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
   mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
 
-  AbstractWindow *window = mouse_event_->surface_->window();
+  AbstractView *window = mouse_event_->surface_->view();
 
   mouse_event_->accepted_ = false;
   window->OnMouseEnter(mouse_event_);
@@ -179,7 +179,7 @@ void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
   mouse_event_->serial_ = serial;
 
   mouse_event_->surface_ = static_cast<AbstractSurface *>(wl_surface_get_user_data(wl_surface));
-  AbstractWindow *window = mouse_event_->surface_->window();
+  AbstractView *window = mouse_event_->surface_->view();
 
   mouse_event_->accepted_ = false;
   window->OnMouseLeave(mouse_event_);
@@ -216,7 +216,7 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
     mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
     mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
 
-    AbstractWindow *window = mouse_event_->surface_->window();
+    AbstractView *window = mouse_event_->surface_->view();
 
     mouse_event_->accepted_ = false;
     window->OnMouseMove(mouse_event_);
@@ -258,7 +258,7 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
   mouse_event_->state_ = state;
 
   if (mouse_event_->surface_) {
-    AbstractWindow *window = mouse_event_->surface_->window();
+    AbstractView *window = mouse_event_->surface_->view();
 
     window->OnMouseButton(mouse_event_);
     if (mouse_event_->accepted()) {

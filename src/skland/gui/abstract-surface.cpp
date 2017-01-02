@@ -23,7 +23,7 @@
 namespace skland {
 
 AbstractSurface::AbstractSurface(const Margin &margin)
-    : window_(nullptr), margin_(margin),
+    : view_(nullptr), margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1) {
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);

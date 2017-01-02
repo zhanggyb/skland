@@ -95,6 +95,11 @@ class AbstractView : public Object {
 
   AbstractWindow *GetWindow() const;
 
+  /**
+  * @brief Update the display of this widget
+  */
+  void Update();
+
   virtual Size GetMinimalSize() const = 0;
 
   virtual Size GetPreferredSize() const = 0;
@@ -106,11 +111,6 @@ class AbstractView : public Object {
   }
 
  protected:
-
-  /**
-    * @brief Update the display of this widget
-    */
-  void Update();
 
   /**
    * @brief Update this view and all sub views
@@ -136,6 +136,8 @@ class AbstractView : public Object {
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
   virtual void OnDraw(Canvas *canvas) = 0;
+
+  void SetSurface(AbstractSurface *surface);
 
   void Damage(const Rect &rect);
 
