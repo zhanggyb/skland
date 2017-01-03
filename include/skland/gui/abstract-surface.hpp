@@ -27,8 +27,6 @@
 #include "../wayland/region.hpp"
 #include "../wayland/subsurface.hpp"
 
-#include <memory>
-
 namespace skland {
 
 class AbstractView;
@@ -76,6 +74,10 @@ class AbstractSurface : public Object {
     wl_surface_.SetOpaqueRegion(region);
   }
 
+  void PlaceAbove(const AbstractSurface &surface);
+
+  void PlaceBelow(const AbstractSurface &surface);
+
   /**
    * @brief Set sub surface position
    * @param x
@@ -105,10 +107,6 @@ class AbstractSurface : public Object {
     return position_;
   }
 
-  const std::unique_ptr<Canvas> &canvas() const {
-    return canvas_;
-  }
-
   AbstractSurface *parent_surface() const {
     return static_cast<AbstractSurface *>(parent());
   }
@@ -127,8 +125,6 @@ class AbstractSurface : public Object {
    * @param buffer
    */
   virtual void OnAttach(const Buffer *buffer) = 0;
-
-  void SetCanvas(Canvas *canvas);
 
   void set_position(int x, int y) {
     position_.x = x;
@@ -155,8 +151,6 @@ class AbstractSurface : public Object {
    * For root surface, this should always be (0, 0)
    */
   Point position_;
-
-  std::unique_ptr<Canvas> canvas_;
 
   enum wl_output_transform buffer_transform_;
 

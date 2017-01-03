@@ -19,6 +19,7 @@
 #include <skland/gui/buffer.hpp>
 
 #include <skland/graphic/canvas.hpp>
+#include <skland/gui/abstract-view.hpp>
 
 namespace skland {
 
@@ -35,7 +36,11 @@ AbstractSurface::AbstractSurface(const Margin &margin)
 AbstractSurface::~AbstractSurface() {
   ClearChildren();
 
-  // TODO: check if need to do sth for window_
+  if (view_) {
+    // Assert this is the root surface used in a view
+    DBG_ASSERT(wl_sub_surface_.IsNull());
+    view_->surface_ = nullptr;
+  }
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
@@ -48,7 +53,8 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   DBG_ASSERT(nullptr == subsurface->parent());
 
   InsertChild(subsurface, pos);
-  subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(), subsurface->wl_surface_, this->wl_surface_);
+  subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(),
+                                    subsurface->wl_surface_, this->wl_surface_);
 }
 
 AbstractSurface *AbstractSurface::RemoveSubSurface(AbstractSurface *subsurface) {
@@ -83,14 +89,22 @@ void AbstractSurface::Commit() const {
   }
 }
 
-void AbstractSurface::SetPosition(int x, int y) {
-  if (wl_sub_surface_.IsNull()) return;
-
-  wl_sub_surface_.SetPosition(x, y);
+void AbstractSurface::PlaceAbove(const AbstractSurface &surface) {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.PlaceAbove(surface.wl_surface_);
+  }
 }
 
-void AbstractSurface::SetCanvas(Canvas *canvas) {
-  canvas_.reset(canvas);
+void AbstractSurface::PlaceBelow(const AbstractSurface &surface) {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.PlaceBelow(surface.wl_surface_);
+  }
+}
+
+void AbstractSurface::SetPosition(int x, int y) {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.SetPosition(x, y);
+  }
 }
 
 void AbstractSurface::OnEnter(struct wl_output *wl_output) {

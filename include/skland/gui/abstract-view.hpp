@@ -150,7 +150,7 @@ class AbstractView : public Object {
   }
 
   AbstractSurface *surface() const {
-    return surface_.get();
+    return surface_;
   }
 
   AbstractView *parent_view() const {
@@ -190,7 +190,7 @@ class AbstractView : public Object {
   /**
    * The main surface for this window
    */
-  std::unique_ptr<AbstractSurface> surface_;
+  AbstractSurface* surface_;
 
   /**
    * This property should only be assigned with RedrawTask

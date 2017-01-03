@@ -20,6 +20,9 @@
 #include <skland/gui/raster-surface.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
+#include <skland/gui/output.hpp>
+
+#include <skland/graphic/canvas.hpp>
 
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
@@ -40,22 +43,35 @@ AbstractWindow::AbstractWindow(int width,
       window_frame_(nullptr),
       flags_(0),
       is_xdg_surface_configured_(false),
-      main_surface_(nullptr) {
+      main_surface_(nullptr),
+      frame_surface_(nullptr) {
   if (title) title_ = title;
 
   int x = 0, y = 0;  // The input region
 
   if (frame) {
-    main_surface_ = new RasterSurface(Margin(Theme::shadow_margin_left(),
-                                             Theme::shadow_margin_top(),
-                                             Theme::shadow_margin_right(),
-                                             Theme::shadow_margin_bottom()));
+    main_surface_ =
+        new RasterSurface(Margin(Theme::shadow_margin_left(),
+                                 Theme::shadow_margin_top(),
+                                 Theme::shadow_margin_right(),
+                                 Theme::shadow_margin_bottom()));
+    frame_surface_ =
+        new RasterSurface(Margin(Theme::shadow_margin_left(),
+                                 Theme::shadow_margin_top(),
+                                 Theme::shadow_margin_right(),
+                                 Theme::shadow_margin_bottom()));
+    main_surface_->AddSubSurface(frame_surface_);
+    frame_surface_->PlaceBelow(*main_surface_);
 
     SetWindowFrame(frame);
     x += main_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
     y += main_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
+
+    frame_region_.Setup(Display::wl_compositor());
+    frame_region_.Add(0, 0, 0, 0);
+    frame_surface_->SetInputRegion(frame_region_);
   } else {
     main_surface_ = new RasterSurface();
   }
@@ -75,6 +91,27 @@ AbstractWindow::AbstractWindow(int width,
 
   Display::AddWindow(this);
   // TODO: layout in display
+
+  set_name(title);  // debug only
+
+  // Create buffer:
+  Size output_size(1024, 800);
+  if (const Output *output = Display::GetOutputAt(0)) {
+    output_size = output->current_mode_size();  // The current screen size
+  }
+
+  int total_width = std::max((int) this->width(), output_size.width);
+  int total_height = std::max((int) this->height(), output_size.height);
+  if (!IsFrameless()) {
+    total_width += surface()->margin().lr();
+    total_height += surface()->margin().tb();
+  }
+
+  main_pool_.Setup(total_width * 4 * total_height);
+  main_buffer_.Setup(main_pool_, total_width, total_height, total_width * 4, WL_SHM_FORMAT_ARGB8888);
+
+  frame_pool_.Setup(total_width * 4 * total_height);
+  frame_buffer_.Setup(frame_pool_, total_width, total_height, total_width * 4, WL_SHM_FORMAT_ARGB8888);
 }
 
 AbstractWindow::~AbstractWindow() {
@@ -88,6 +125,9 @@ AbstractWindow::~AbstractWindow() {
   DBG_ASSERT(display_ == nullptr);
 
   delete window_frame_;
+
+  delete frame_surface_;
+  delete main_surface_;
 }
 
 void AbstractWindow::SetTitle(const char *title) {
@@ -109,7 +149,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
   }
 
   if (window_frame) {
-    // TODO: check the original window use the window frame
+    // TODO: check if there's original window using the window frame
 
     window_frame_ = window_frame;
     window_frame_->window_ = this;
@@ -129,7 +169,6 @@ void AbstractWindow::Close(SLOT) {
     Application::Exit();
   }
 
-  // FIXME: the close button on title bar cause segment fault
   delete this;
 }
 
@@ -190,10 +229,19 @@ Rect AbstractWindow::GetClientGeometry() const {
 }
 
 void AbstractWindow::OnUpdate(AbstractView *view) {
-  Display::kDisplay->redraw_task_tail_.PushFront(view->redraw_task_.get());
-  view->redraw_task_->canvas = surface_->canvas().get();
-  Damage(view->geometry());
-  surface_->Commit();
+  if (view == this) {
+    if (frame_surface_) {
+      Display::kDisplay->redraw_task_tail_.PushFront(redraw_task_.get());
+      redraw_task_->canvas = frame_surface_->canvas().get();
+      Damage(geometry());
+      frame_surface_->Commit();
+    }
+  } else {
+    Display::kDisplay->redraw_task_tail_.PushFront(view->redraw_task_.get());
+    view->redraw_task_->canvas = main_surface_->canvas().get();
+    Damage(view->geometry());
+    main_surface_->Commit();
+  }
 }
 
 void AbstractWindow::OnMouseEnter(MouseEvent *event) {
@@ -304,7 +352,9 @@ void AbstractWindow::OnMouseButton(MouseEvent *event) {
 }
 
 void AbstractWindow::OnDraw(Canvas *canvas) {
-  if (window_frame_) window_frame_->OnDraw(canvas);
+  if (window_frame_) {
+    window_frame_->OnDraw(canvas);
+  }
 }
 
 void AbstractWindow::AddSubView(AbstractView *view, int pos) {
@@ -331,7 +381,11 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
     int h = (int) height();
     xdg_surface_.SetWindowGeometry(x, y, w, h);
 
-    OnSetupSurface();
+    main_surface_->Attach(&main_buffer_);
+    frame_surface_->Attach(&frame_buffer_);
+
+    main_surface_->canvas()->Clear();
+    UpdateAll();
   }
 }
 
@@ -363,6 +417,7 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
                           height + AbstractWindowFrame::kResizingMargin.tb());
         x = main_surface_->margin().left;
         y = main_surface_->margin().top;
+        window_frame_->OnResize(width, height);
       }
 
       input_region_.Setup(Display::wl_compositor());
@@ -374,7 +429,26 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
 
       xdg_surface_.SetWindowGeometry(x, y, width, height);
 
-      if (!IsFrameless()) window_frame_->OnResize(width, height);
+      resize(width, height);
+
+      // Reset buffer:
+      width += surface()->margin().lr();
+      height += surface()->margin().tb();
+
+      int total_size = width * 4 * height;
+      if (total_size > main_pool_.size()) {
+        DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n", total_size, main_pool_.size(), "Re-generate shm pool");
+        main_pool_.Setup(total_size);
+      }
+      main_buffer_.Setup(main_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+      main_surface_->Attach(&main_buffer_);
+
+      frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+      frame_surface_->Attach(&frame_buffer_);
+
+      main_surface_->canvas()->Clear();
+      UpdateAll();
+
       OnResize(width, height);
     }
   }

@@ -33,13 +33,13 @@ void RasterSurface::OnSetup() {
 
 void RasterSurface::OnAttach(const Buffer *buffer) {
   if (nullptr == buffer) {
-    SetCanvas(nullptr);
+    canvas_.reset(nullptr);
   } else {
     Canvas *canvas = new Canvas((unsigned char *) buffer->pixel(),
                                 buffer->size().width,
                                 buffer->size().height);
     canvas->SetOrigin((float) margin().left, (float) margin().top);
-    SetCanvas(canvas);
+    canvas_.reset(canvas);
   }
 }
 

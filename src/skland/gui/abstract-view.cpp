@@ -67,13 +67,13 @@ bool AbstractView::Contain(int x, int y) const {
 }
 
 AbstractSurface *AbstractView::GetSurface() const {
-  if (surface_) return surface_.get();
+  if (surface_) return surface_;
 
   AbstractSurface *surface = nullptr;
   AbstractView *p = static_cast<AbstractView *>(parent());
   while (p) {
     if (p->surface_) {
-      surface = p->surface_.get();
+      surface = p->surface_;
       break;
     }
     p = static_cast<AbstractView *>(p->parent());
@@ -87,14 +87,14 @@ AbstractWindow *AbstractView::GetWindow() const {
 }
 
 void AbstractView::SetSurface(AbstractSurface *surface) {
-  if (surface_.get() == surface) {
+  if (surface_ == surface) {
     DBG_ASSERT(surface->view_ == this);
     return;
   }
 
   // TODO: inform original view
 
-  surface_.reset(surface);
+  surface_ = surface;
 
   if (surface_) {
     surface_->view_ = this;

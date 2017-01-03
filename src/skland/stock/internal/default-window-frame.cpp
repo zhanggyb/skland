@@ -76,8 +76,12 @@ void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
   if (IsHovered()) {
     paint.SetStrokeWidth(2.f);
     paint.SetColor(0xFFEBEBEB);
-    canvas->DrawLine(center_x() - 2.75f, center_y() - 2.75f, center_x() + 2.75f, center_y() + 2.75f, paint);
-    canvas->DrawLine(center_x() + 2.75f, center_y() - 2.75f, center_x() - 2.75f, center_y() + 2.75f, paint);
+    canvas->DrawLine(center_x() - 2.75f, center_y() - 2.75f,
+                     center_x() + 2.75f, center_y() + 2.75f,
+                     paint);
+    canvas->DrawLine(center_x() + 2.75f, center_y() - 2.75f,
+                     center_x() - 2.75f, center_y() + 2.75f,
+                     paint);
   }
 }
 
@@ -250,7 +254,7 @@ void DefaultWindowFrame::OnDraw(Canvas *canvas) {
                          window()->right(),
                          window()->top() + title_bar_size()),
                     radii_up);
-  paint.SetColor(0xFF555555);
+  paint.SetColor(0x7F555555);
   canvas->DrawPath(path, paint);
 
   float radii_down[] = {
