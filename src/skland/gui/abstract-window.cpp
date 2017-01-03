@@ -87,7 +87,7 @@ AbstractWindow::AbstractWindow(int width,
   xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
   xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
   xdg_toplevel_.Setup(xdg_surface_);
-  xdg_toplevel_.SetTitle(title_.c_str());
+  xdg_toplevel_.SetTitle(title_.c_str()); // TODO: support multi-language
 
   Display::AddWindow(this);
   // TODO: layout in display
@@ -108,10 +108,12 @@ AbstractWindow::AbstractWindow(int width,
   }
 
   main_pool_.Setup(total_width * 4 * total_height);
-  main_buffer_.Setup(main_pool_, total_width, total_height, total_width * 4, WL_SHM_FORMAT_ARGB8888);
+  main_buffer_.Setup(main_pool_, total_width, total_height,
+                     total_width * 4, WL_SHM_FORMAT_ARGB8888);
 
   frame_pool_.Setup(total_width * 4 * total_height);
-  frame_buffer_.Setup(frame_pool_, total_width, total_height, total_width * 4, WL_SHM_FORMAT_ARGB8888);
+  frame_buffer_.Setup(frame_pool_, total_width, total_height,
+                      total_width * 4, WL_SHM_FORMAT_ARGB8888);
 }
 
 AbstractWindow::~AbstractWindow() {
@@ -125,7 +127,6 @@ AbstractWindow::~AbstractWindow() {
   DBG_ASSERT(display_ == nullptr);
 
   delete window_frame_;
-
   delete frame_surface_;
   delete main_surface_;
 }
@@ -148,10 +149,10 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
     window_frame_ = nullptr;
   }
 
-  if (window_frame) {
-    // TODO: check if there's original window using the window frame
+  window_frame_ = window_frame;
+  // TODO: check if there's original window using the window frame
 
-    window_frame_ = window_frame;
+  if (window_frame_) {
     window_frame_->window_ = this;
     window_frame_->window_action().Connect(this, &AbstractWindow::OnWindowAction);
     window_frame_->OnSetup();
@@ -233,13 +234,19 @@ void AbstractWindow::OnUpdate(AbstractView *view) {
     if (frame_surface_) {
       Display::kDisplay->redraw_task_tail_.PushFront(redraw_task_.get());
       redraw_task_->canvas = frame_surface_->canvas().get();
-      Damage(geometry());
+      frame_surface_->Damage((int) geometry().x() + frame_surface_->margin().left,
+                             (int) geometry().y() + frame_surface_->margin().top,
+                             (int) geometry().width(),
+                             (int) geometry().height());
       frame_surface_->Commit();
     }
   } else {
     Display::kDisplay->redraw_task_tail_.PushFront(view->redraw_task_.get());
     view->redraw_task_->canvas = main_surface_->canvas().get();
-    Damage(view->geometry());
+    main_surface_->Damage((int) view->geometry().x() + main_surface_->margin().left,
+                          (int) view->geometry().y() + main_surface_->margin().top,
+                          (int) view->geometry().width(),
+                          (int) view->geometry().height());
     main_surface_->Commit();
   }
 }
@@ -384,6 +391,7 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
     main_surface_->Attach(&main_buffer_);
     frame_surface_->Attach(&frame_buffer_);
 
+    frame_surface_->canvas()->Clear();
     main_surface_->canvas()->Clear();
     UpdateAll();
   }
