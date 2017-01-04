@@ -30,7 +30,7 @@ namespace skland {
 
 DefaultWindowFrame::CloseButton::CloseButton()
     : AbstractButton() {
-  resize(22, 17);
+  resize(14, 14);
   set_name("CloseButton");
 }
 
@@ -38,7 +38,7 @@ DefaultWindowFrame::CloseButton::~CloseButton() {
 }
 
 Size DefaultWindowFrame::CloseButton::GetPreferredSize() const {
-  return Size(22, 17);
+  return Size(14, 14);
 }
 
 void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */) {
@@ -46,7 +46,7 @@ void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */
 }
 
 void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
-  Color regular(0.9f, 0.33f, 0.33f, 1.f);
+  Color regular(0.83f, 0.83f, 0.83f, 1.f);
   Color down = regular - 50;
   Color hover = regular + 15;
 
@@ -62,25 +62,25 @@ void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
     }
   }
 
-  float radii[] = {
-      0.f, 0.f, // top-left
-      0.f, 0.f, // top-right
-      4.f, 4.f, // bottom-right
-      4.f, 4.f  // bottom-left
-  };
-  Path path;
-  path.AddRoundRect(geometry(), radii);
+//  float radii[] = {
+//      0.f, 0.f, // top-left
+//      0.f, 0.f, // top-right
+//      4.f, 4.f, // bottom-right
+//      4.f, 4.f  // bottom-left
+//  };
+//  Path path;
+//  path.AddRoundRect(geometry(), radii);
 
-  canvas->DrawPath(path, paint);
+  canvas->DrawCircle(center_x(), center_y(), 6.5f, paint);
 
   if (IsHovered()) {
-    paint.SetStrokeWidth(2.f);
-    paint.SetColor(0xFFEBEBEB);
-    canvas->DrawLine(center_x() - 2.75f, center_y() - 2.75f,
-                     center_x() + 2.75f, center_y() + 2.75f,
+    paint.SetStrokeWidth(1.5f);
+    paint.SetColor(0xFF3B3B3B);
+    canvas->DrawLine(center_x() - 2.5f, center_y() - 2.5f,
+                     center_x() + 2.5f, center_y() + 2.5f,
                      paint);
-    canvas->DrawLine(center_x() + 2.75f, center_y() - 2.75f,
-                     center_x() - 2.75f, center_y() + 2.75f,
+    canvas->DrawLine(center_x() + 2.5f, center_y() - 2.5f,
+                     center_x() - 2.5f, center_y() + 2.5f,
                      paint);
   }
 }
@@ -230,7 +230,8 @@ void DefaultWindowFrame::LayoutWidgets(int width, int height) {
   title_->SetPosition(0, 0);
   title_->Resize((int) window()->width(), title_bar_size());
 
-  close_button_->SetPosition(11, 0);
+  int pos = (title_bar_size() - (int) close_button_->height()) / 2;
+  close_button_->SetPosition(pos, pos);
 }
 
 void DefaultWindowFrame::OnDraw(Canvas *canvas) {
