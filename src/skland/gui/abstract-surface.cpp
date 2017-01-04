@@ -15,16 +15,16 @@
  */
 
 #include <skland/gui/abstract-surface.hpp>
+
 #include <skland/gui/display.hpp>
 #include <skland/gui/buffer.hpp>
-
-#include <skland/graphic/canvas.hpp>
 #include <skland/gui/abstract-view.hpp>
 
 namespace skland {
 
 AbstractSurface::AbstractSurface(const Margin &margin)
-    : view_(nullptr), margin_(margin),
+    : view_(nullptr),
+      margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1) {
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);
@@ -44,7 +44,8 @@ AbstractSurface::~AbstractSurface() {
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
-  if (nullptr == subsurface || subsurface == this) return;
+  if (subsurface->parent_surface() == this)
+    return;
 
   if (subsurface->parent()) {
     subsurface->parent_surface()->RemoveSubSurface(subsurface);

@@ -50,16 +50,9 @@ AbstractWindow::AbstractWindow(int width,
   int x = 0, y = 0;  // The input region
 
   if (frame) {
-    main_surface_ =
-        new RasterSurface(Margin(Theme::shadow_margin_left(),
-                                 Theme::shadow_margin_top(),
-                                 Theme::shadow_margin_right(),
-                                 Theme::shadow_margin_bottom()));
-    frame_surface_ =
-        new RasterSurface(Margin(Theme::shadow_margin_left(),
-                                 Theme::shadow_margin_top(),
-                                 Theme::shadow_margin_right(),
-                                 Theme::shadow_margin_bottom()));
+    main_surface_ = new RasterSurface(Theme::shadow_margin());
+    frame_surface_ = new RasterSurface(Theme::shadow_margin());
+
     main_surface_->AddSubSurface(frame_surface_);
     frame_surface_->PlaceBelow(*main_surface_);
 
