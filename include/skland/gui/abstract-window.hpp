@@ -18,21 +18,22 @@
 #define SKLAND_GUI_ABSTRACT_WINDOW_HPP_
 
 #include "abstract-view.hpp"
-#include "raster-surface.hpp"
 
-#include <wayland-client.h>
+#include "../core/defines.hpp"
+#include "../core/rect.hpp"
+
+#include "memory-pool.hpp"
+#include "buffer.hpp"
+#include "task.hpp"
+
 #include <cstdint>
 #include <string>
-
-#include <skland/core/defines.hpp>
-#include <skland/core/rect.hpp>
 
 #include <skland/wayland/xdg-surface.hpp>
 #include <skland/wayland/xdg-toplevel.hpp>
 #include <skland/wayland/region.hpp>
 
 #include <skland/stock/theme.hpp>
-#include <skland/gui/task.hpp>
 
 namespace skland {
 
@@ -40,6 +41,7 @@ class Display;
 class Application;
 class AbstractWindowFrame;
 class Input;
+class RasterSurface;
 
 enum WindowFlags {
   kWindowFullscreen = 0x1,
@@ -123,8 +125,6 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnDraw(Canvas *canvas) override;
 
-  virtual void OnSetupSurface() = 0;
-
   void AddSubView(AbstractView *view, int pos = 0);
 
   void MoveWithMouse(MouseEvent *event) const;
@@ -152,6 +152,7 @@ class AbstractWindow : public AbstractView {
   wayland::XdgToplevel xdg_toplevel_;
 
   wayland::Region input_region_;
+  wayland::Region frame_region_;
 
   std::string title_;
 
@@ -165,6 +166,26 @@ class AbstractWindow : public AbstractView {
    * @brief The main raster surface for rendering widgets
    */
   RasterSurface *main_surface_;
+
+  /**
+   * @brief The surface for frame
+   *
+   * FIXME:
+   *
+   * My initial indention is to use this surface for frame and background for this window.
+   * It is a sub surface of the main surface but I failed to place this below the main surface.
+   *
+   * The current code use this surface for widgets and the main surface for frame and background.
+   */
+  RasterSurface *frame_surface_;
+
+  /* Properties for main surface, JUST experimental */
+  MemoryPool main_pool_;
+  Buffer main_buffer_;
+
+  /* Properties for frame surface, JUST experimental */
+  MemoryPool frame_pool_;
+  Buffer frame_buffer_;
 
 };
 

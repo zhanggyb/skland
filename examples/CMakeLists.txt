@@ -14,8 +14,8 @@
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-add_executable(simple simple.cpp)
-target_link_libraries(simple skland)
+add_executable(hello hello.cpp)
+target_link_libraries(hello skland)
 
 add_executable(simple-shm simple-shm.cpp)
 target_link_libraries(simple-shm skland)

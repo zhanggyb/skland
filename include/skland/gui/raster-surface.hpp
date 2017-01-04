@@ -18,6 +18,7 @@
 #define SKLAND_GUI_RASTER_SURFACE_HPP_
 
 #include "abstract-surface.hpp"
+#include <memory>
 
 namespace skland {
 
@@ -35,11 +36,19 @@ class RasterSurface : public AbstractSurface {
 
   virtual ~RasterSurface();
 
+  const std::unique_ptr<Canvas> &canvas() const {
+    return canvas_;
+  }
+
  protected:
 
   virtual void OnSetup() final;
 
   virtual void OnAttach(const Buffer *buffer) final;
+
+ private:
+
+  std::unique_ptr<Canvas> canvas_;
 
 };
 

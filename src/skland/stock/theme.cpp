@@ -58,6 +58,11 @@ void Theme::Reset() {
   shadow_offset_x_ = 0;
   shadow_offset_y_ = 11;
 
+  shadow_margin_.left = shadow_radius_ - shadow_offset_x_;
+  shadow_margin_.right = shadow_radius_ + shadow_offset_x_;
+  shadow_margin_.top = shadow_radius_ - shadow_offset_y_;
+  shadow_margin_.bottom = shadow_radius_ + shadow_offset_y_;
+
   shadow_pixels_.resize(kShadowImageWidth * kShadowImageHeight, 0);
   GenerateShadowImage();
 

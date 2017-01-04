@@ -17,7 +17,8 @@
 #ifndef SKLAND_STOCK_THEME_HPP_
 #define SKLAND_STOCK_THEME_HPP_
 
-#include <skland/core/color.hpp>
+#include "../core/color.hpp"
+#include "../core/margin.hpp"
 
 #include <vector>
 
@@ -69,20 +70,8 @@ class Theme {
     return kTheme->shadow_offset_y_;
   }
 
-  static inline int shadow_margin_left() {
-    return kTheme->shadow_radius_ - kTheme->shadow_offset_x_;
-  }
-
-  static inline int shadow_margin_right() {
-    return kTheme->shadow_radius_ + kTheme->shadow_offset_x_;
-  }
-
-  static inline int shadow_margin_top() {
-    return kTheme->shadow_radius_ - kTheme->shadow_offset_y_;
-  }
-
-  static inline int shadow_margin_bottom() {
-    return kTheme->shadow_radius_ + kTheme->shadow_offset_y_;
+  static inline const Margin &shadow_margin() {
+    return kTheme->shadow_margin_;
   }
 
   static inline const SkPixmap *shadow_pixmap() {
@@ -109,6 +98,8 @@ class Theme {
 
   int shadow_offset_x_;
   int shadow_offset_y_;
+
+  Margin shadow_margin_;
 
   std::vector<uint32_t> shadow_pixels_;
 

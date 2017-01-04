@@ -51,14 +51,9 @@ class Window : public AbstractWindow {
 
   virtual void OnResize(int width, int height) final;
 
-  virtual void OnSetupSurface() final;
-
  private:
 
   void SetMainWidgetGeometry();
-
-  MemoryPool pool_;
-  Buffer buffer_;
 
   AbstractWidget *main_widget_;
 };

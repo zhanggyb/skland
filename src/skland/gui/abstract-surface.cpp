@@ -15,15 +15,16 @@
  */
 
 #include <skland/gui/abstract-surface.hpp>
+
 #include <skland/gui/display.hpp>
 #include <skland/gui/buffer.hpp>
-
-#include <skland/graphic/canvas.hpp>
+#include <skland/gui/abstract-view.hpp>
 
 namespace skland {
 
 AbstractSurface::AbstractSurface(const Margin &margin)
-    : view_(nullptr), margin_(margin),
+    : view_(nullptr),
+      margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1) {
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);
@@ -35,20 +36,24 @@ AbstractSurface::AbstractSurface(const Margin &margin)
 AbstractSurface::~AbstractSurface() {
   ClearChildren();
 
-  // TODO: check if need to do sth for window_
+  if (view_) {
+    // Assert this is the root surface used in a view
+    DBG_ASSERT(wl_sub_surface_.IsNull());
+    view_->surface_ = nullptr;
+  }
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
-  if (nullptr == subsurface || subsurface == this) return;
+  if (subsurface->parent_surface() == this) return;
 
-  if (subsurface->parent()) {
+  if (subsurface->parent())
     subsurface->parent_surface()->RemoveSubSurface(subsurface);
-  }
 
   DBG_ASSERT(nullptr == subsurface->parent());
 
   InsertChild(subsurface, pos);
-  subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(), subsurface->wl_surface_, this->wl_surface_);
+  subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(),
+                                    subsurface->wl_surface_, this->wl_surface_);
 }
 
 AbstractSurface *AbstractSurface::RemoveSubSurface(AbstractSurface *subsurface) {
@@ -76,6 +81,18 @@ void AbstractSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
   OnAttach(buffer);
 }
 
+void AbstractSurface::SetSync() const {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.SetSync();
+  }
+}
+
+void AbstractSurface::SetDesync() const {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.SetDesync();
+  }
+}
+
 void AbstractSurface::Commit() const {
   wl_surface_.Commit();
   if (parent()) {
@@ -83,22 +100,30 @@ void AbstractSurface::Commit() const {
   }
 }
 
-void AbstractSurface::SetPosition(int x, int y) {
-  if (wl_sub_surface_.IsNull()) return;
-
-  wl_sub_surface_.SetPosition(x, y);
+void AbstractSurface::PlaceAbove(const AbstractSurface &surface) {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.PlaceAbove(surface.wl_surface_);
+  }
 }
 
-void AbstractSurface::SetCanvas(Canvas *canvas) {
-  canvas_.reset(canvas);
+void AbstractSurface::PlaceBelow(const AbstractSurface &surface) {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.PlaceBelow(surface.wl_surface_);
+  }
+}
+
+void AbstractSurface::SetPosition(int x, int y) {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.SetPosition(x, y);
+  }
 }
 
 void AbstractSurface::OnEnter(struct wl_output *wl_output) {
-
+  // TODO: call function in view_
 }
 
 void AbstractSurface::OnLeave(struct wl_output *wl_output) {
-
+  // TODO: call function in view_
 }
 
 }

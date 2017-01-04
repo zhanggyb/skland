@@ -76,8 +76,12 @@ void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
   if (IsHovered()) {
     paint.SetStrokeWidth(2.f);
     paint.SetColor(0xFFEBEBEB);
-    canvas->DrawLine(center_x() - 2.75f, center_y() - 2.75f, center_x() + 2.75f, center_y() + 2.75f, paint);
-    canvas->DrawLine(center_x() + 2.75f, center_y() - 2.75f, center_x() - 2.75f, center_y() + 2.75f, paint);
+    canvas->DrawLine(center_x() - 2.75f, center_y() - 2.75f,
+                     center_x() + 2.75f, center_y() + 2.75f,
+                     paint);
+    canvas->DrawLine(center_x() + 2.75f, center_y() - 2.75f,
+                     center_x() - 2.75f, center_y() + 2.75f,
+                     paint);
   }
 }
 
@@ -208,7 +212,7 @@ void DefaultWindowFrame::CreateWidgets() {
 //  maximize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMaximizeButtonClicked);
 
   title_ = new Label(window()->title(), Font("Arial", Font::kWeightBold));
-  title_->SetForebround(0xFFEBEBEB);
+  title_->SetForeground(0xFFEBEBEB);
 
   AddWidget(title_);  // put the title below other widgets
   AddWidget(close_button_);
@@ -250,7 +254,7 @@ void DefaultWindowFrame::OnDraw(Canvas *canvas) {
                          window()->right(),
                          window()->top() + title_bar_size()),
                     radii_up);
-  paint.SetColor(0xFF555555);
+  paint.SetColor(0xE0555555);
   canvas->DrawPath(path, paint);
 
   float radii_down[] = {
@@ -289,24 +293,24 @@ int DefaultWindowFrame::GetMouseLocation(const MouseEvent *event) const {
 
   // TODO: maximized or frameless
 
-  if (x < (Theme::shadow_margin_left() - kResizingMargin.left))
+  if (x < (Theme::shadow_margin().left - kResizingMargin.left))
     hlocation = kExterior;
-  else if (x < Theme::shadow_margin_left() + kResizingMargin.left)
+  else if (x < Theme::shadow_margin().left + kResizingMargin.left)
     hlocation = kResizeLeft;
-  else if (x < Theme::shadow_margin_left() + window()->width() - kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + window()->width() - kResizingMargin.right)
     hlocation = kInterior;
-  else if (x < Theme::shadow_margin_left() + window()->width() + kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + window()->width() + kResizingMargin.right)
     hlocation = kResizeRight;
   else
     hlocation = kExterior;
 
-  if (y < (Theme::shadow_margin_top() - kResizingMargin.top))
+  if (y < (Theme::shadow_margin().top - kResizingMargin.top))
     vlocation = kExterior;
-  else if (y < Theme::shadow_margin_top() + kResizingMargin.top)
+  else if (y < Theme::shadow_margin().top + kResizingMargin.top)
     vlocation = kResizeTop;
-  else if (y < Theme::shadow_margin_top() + window()->height() - kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + window()->height() - kResizingMargin.bottom)
     vlocation = kInterior;
-  else if (y < Theme::shadow_margin_top() + window()->height() + kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + window()->height() + kResizingMargin.bottom)
     vlocation = kResizeBottom;
   else
     vlocation = kExterior;
@@ -316,7 +320,7 @@ int DefaultWindowFrame::GetMouseLocation(const MouseEvent *event) const {
     location = kExterior;
 
   if (location == kInterior &&
-      y < Theme::shadow_margin_top() + title_bar_size())
+      y < Theme::shadow_margin().top + title_bar_size())
     location = kTitleBar;
   else if (location == kInterior)
     location = kClientArea;
