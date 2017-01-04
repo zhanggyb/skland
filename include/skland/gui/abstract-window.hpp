@@ -166,6 +166,17 @@ class AbstractWindow : public AbstractView {
    * @brief The main raster surface for rendering widgets
    */
   RasterSurface *main_surface_;
+
+  /**
+   * @brief The surface for frame
+   *
+   * FIXME:
+   *
+   * My initial indention is to use this surface for frame and background for this window.
+   * It is a sub surface of the main surface but I failed to place this below the main surface.
+   *
+   * The current code use this surface for widgets and the main surface for frame and background.
+   */
   RasterSurface *frame_surface_;
 
   /* Properties for main surface, JUST experimental */

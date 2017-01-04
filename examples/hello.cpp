@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/shader.hpp>
-#include <skland/core/defines.hpp>
+#include <skland/gui/application.hpp>
+#include <skland/gui/window.hpp>
+#include <skland/gui/label.hpp>
 
-#include "internal/shader-meta.hpp"
+using namespace skland;
 
-namespace skland {
+int main(int argc, char *argv[]) {
+  using skland::Window;
 
-Shader::Shader(ShaderMeta *metadata)
-    : metadata_(metadata) {
-  DBG_ASSERT(metadata_);
-}
+  Application app(argc, argv);
 
-Shader::Shader(const Shader &other) {
-  metadata_.reset(new ShaderMeta(other.metadata_->sk_shader));
-}
+  Window *win = new Window(320, 240, "Hello");
+  win->SetAppId("Hello");
 
-Shader::~Shader() {
-}
+  Label *label = new Label("Hello Wayland!");
+  label->SetForeground(Color(0xFF0000FF));
+  win->SetMainWidget(label);
 
-Shader &Shader::operator=(const Shader &other) {
-  *metadata_ = *other.metadata_;
-  return *this;
-}
+  win->Show();
 
+  return app.Run();
 }

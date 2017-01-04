@@ -44,12 +44,10 @@ AbstractSurface::~AbstractSurface() {
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
-  if (subsurface->parent_surface() == this)
-    return;
+  if (subsurface->parent_surface() == this) return;
 
-  if (subsurface->parent()) {
+  if (subsurface->parent())
     subsurface->parent_surface()->RemoveSubSurface(subsurface);
-  }
 
   DBG_ASSERT(nullptr == subsurface->parent());
 
@@ -83,6 +81,18 @@ void AbstractSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
   OnAttach(buffer);
 }
 
+void AbstractSurface::SetSync() const {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.SetSync();
+  }
+}
+
+void AbstractSurface::SetDesync() const {
+  if (wl_sub_surface_.IsValid()) {
+    wl_sub_surface_.SetDesync();
+  }
+}
+
 void AbstractSurface::Commit() const {
   wl_surface_.Commit();
   if (parent()) {
@@ -109,11 +119,11 @@ void AbstractSurface::SetPosition(int x, int y) {
 }
 
 void AbstractSurface::OnEnter(struct wl_output *wl_output) {
-
+  // TODO: call function in view_
 }
 
 void AbstractSurface::OnLeave(struct wl_output *wl_output) {
-
+  // TODO: call function in view_
 }
 
 }

@@ -45,7 +45,7 @@ Label::~Label() {
 
 }
 
-void Label::SetForebround(const Color &color) {
+void Label::SetForeground(const Color &color) {
   if (foreground_ != color) {
     foreground_ = color;
     Update();

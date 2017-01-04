@@ -23,10 +23,12 @@ namespace skland {
 
 class Paint;
 struct ShaderMeta;
+class GradientShader;
 
 class Shader {
 
   friend class Paint;
+  friend class GradientShader;
 
  public:
 
@@ -35,10 +37,6 @@ class Shader {
     kTileModeRepeat,
     kTileModeMirror
   };
-
-  Shader();
-
-  Shader(ShaderMeta *metadata);
 
   Shader(const Shader &other);
 
@@ -50,9 +48,9 @@ class Shader {
     return metadata_.get();
   }
 
-  explicit operator bool() const noexcept {
-    return metadata_.operator bool();
-  }
+ protected:
+
+  Shader(ShaderMeta *metadata);
 
  private:
 

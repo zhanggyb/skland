@@ -212,7 +212,7 @@ void DefaultWindowFrame::CreateWidgets() {
 //  maximize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMaximizeButtonClicked);
 
   title_ = new Label(window()->title(), Font("Arial", Font::kWeightBold));
-  title_->SetForebround(0xFFEBEBEB);
+  title_->SetForeground(0xFFEBEBEB);
 
   AddWidget(title_);  // put the title below other widgets
   AddWidget(close_button_);
@@ -254,7 +254,7 @@ void DefaultWindowFrame::OnDraw(Canvas *canvas) {
                          window()->right(),
                          window()->top() + title_bar_size()),
                     radii_up);
-  paint.SetColor(0x7F555555);
+  paint.SetColor(0xE0555555);
   canvas->DrawPath(path, paint);
 
   float radii_down[] = {

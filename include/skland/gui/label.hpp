@@ -34,7 +34,7 @@ class Label : public AbstractWidget {
 
   virtual ~Label();
 
-  void SetForebround(const Color &color);
+  void SetForeground(const Color &color);
 
   void SetBackground(const Color &color);
 

@@ -60,6 +60,10 @@ class AbstractSurface : public Object {
 
   void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
+  void SetSync() const;
+
+  void SetDesync() const;
+
   void Commit() const;
 
   void Damage(int surface_x, int surface_y, int width, int height) const {
