@@ -22,10 +22,16 @@
 
 namespace skland {
 
-// Foreward declaration
-class Paint;
 struct FontMeta;
+class Paint;
 class Typeface;
+
+enum TextEncoding {
+  kTextEncodingUTF8,
+  kTextEncodingUTF16,
+  kTextEncodingUTF32,
+  kTextEncodingGlyphID
+};
 
 class Font {
 
@@ -51,9 +57,22 @@ class Font {
     kMaskLCD
   };
 
-  Font(const char *name = "Arial", FontStyle font_style = FontStyle());
+  Font(float size = 12.f, MaskType mask_type = kMaskBW, uint32_t flags = kFlagEnableAutoHints);
 
-  Font(const Typeface &typeface, float size, MaskType mask_type, uint32_t flags);
+  Font(const char *family_name,
+       FontStyle font_style,
+       float size,
+       MaskType mask_type = kMaskBW,
+       uint32_t flags = kFlagEnableAutoHints);
+
+  Font(const Typeface &typeface, float size, MaskType mask_type = kMaskBW, uint32_t flags = kFlagEnableAutoHints);
+
+  Font(const Typeface &typeface,
+       float size,
+       float scale_x,
+       float skew_x,
+       MaskType mask_type = kMaskBW,
+       uint32_t flags = kFlagEnableAutoHints);
 
   Font(const Font &other);
 

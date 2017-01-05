@@ -17,8 +17,6 @@
 #ifndef SKLAND_GRAPHIC_INTERNAL_FONT_META_HPP_
 #define SKLAND_GRAPHIC_INTERNAL_FONT_META_HPP_
 
-#include <skland/graphic/font.hpp>
-
 #include "SkFont.h"
 
 namespace skland {

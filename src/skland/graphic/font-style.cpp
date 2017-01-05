@@ -17,6 +17,7 @@
 #include <skland/graphic/font-style.hpp>
 
 #include <skland/core/numeric.hpp>
+#include "SkFontStyle.h"
 
 namespace skland {
 
@@ -32,6 +33,22 @@ FontStyle::FontStyle(int weight, int width, Slant slant) {
   data_.styles.weight = (uint16_t) clamp<int>(weight, kWeightInvisible, kWeightExtraBlack);
   data_.styles.width = (uint8_t) clamp<int>(width, kWidthUltraCondensed, kWidthUltraExpanded);
   data_.styles.slant = (uint8_t) clamp<int>(slant, kSlantUpright, kSlantOblique);
+}
+
+FontStyle::FontStyle(const FontStyle &other) {
+  data_.value = other.data_.value;
+}
+
+FontStyle::FontStyle(const SkFontStyle &sk_font_style) {
+  data_.value = 0;
+  data_.styles.weight = (uint16_t) sk_font_style.weight();
+  data_.styles.width = (uint8_t) sk_font_style.width();
+  data_.styles.slant = (uint8_t) sk_font_style.slant();
+}
+
+FontStyle& FontStyle::operator=(const FontStyle &other) {
+  data_.value = other.data_.value;
+  return *this;
 }
 
 }

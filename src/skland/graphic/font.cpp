@@ -22,15 +22,27 @@
 
 namespace skland {
 
-Font::Font(const char *name, FontStyle font_style) {
+Font::Font(float size, MaskType mask_type, uint32_t flags) {
   metadata_.reset(new FontMeta);
   sk_sp<SkTypeface> typeface = SkTypeface::MakeDefault();
-  metadata_->sk_font = SkFont::Make(typeface, 12.f, SkFont::kLCD_MaskType, SkFont::kEnableAutoHints_Flag);
+  metadata_->sk_font = SkFont::Make(typeface, size, (SkFont::MaskType) mask_type, flags);
+}
+
+Font::Font(const char *family_name, FontStyle font_style, float size, MaskType mask_type, uint32_t flags) {
+  metadata_.reset(new FontMeta);
+  sk_sp<SkTypeface> typeface = SkTypeface::MakeFromName(family_name, *reinterpret_cast<SkFontStyle *>(&font_style));
+  metadata_->sk_font = SkFont::Make(typeface, size, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const Typeface &typeface, float size, MaskType mask_type, uint32_t flags) {
   metadata_.reset(new FontMeta);
   metadata_->sk_font = SkFont::Make(typeface.metadata_->sk_typeface, size, (SkFont::MaskType) mask_type, flags);
+}
+
+Font::Font(const Typeface &typeface, float size, float scale_x, float skew_x, MaskType mask_type, uint32_t flags) {
+  metadata_.reset(new FontMeta);
+  metadata_->sk_font =
+      SkFont::Make(typeface.metadata_->sk_typeface, size, scale_x, skew_x, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const Font &other) {

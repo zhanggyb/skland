@@ -19,6 +19,8 @@
 
 #include <memory>
 
+class SkFontStyle;
+
 namespace skland {
 
 /**
@@ -65,6 +67,12 @@ class FontStyle {
   FontStyle();
 
   FontStyle(int weight, int width, Slant slant);
+
+  FontStyle(const FontStyle &other);
+
+  FontStyle(const SkFontStyle &sk_font_style);
+
+  FontStyle &operator=(const FontStyle &other);
 
   bool operator==(const FontStyle &other) const {
     return data_.value == other.data_.value;

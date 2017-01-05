@@ -211,7 +211,7 @@ void DefaultWindowFrame::CreateWidgets() {
 //  maximize_button_ = new MaximizeButton;
 //  maximize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMaximizeButtonClicked);
 
-  title_ = new Label(window()->title(), Font("Arial"));
+  title_ = new Label(window()->title());
   title_->SetForeground(0xFFEBEBEB);
 
   AddWidget(title_);  // put the title below other widgets
