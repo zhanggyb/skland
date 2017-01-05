@@ -19,33 +19,13 @@
 
 #include <skland/graphic/font.hpp>
 
-#include "SkTypeface.h"
+#include "SkFont.h"
 
 namespace skland {
 
 struct FontMeta {
 
-  FontMeta()
-      : sk_font_style() {
-  }
-
-  FontMeta(const char *name, int weight, int width, SkFontStyle::Slant slant)
-      : sk_font_style(weight, width, slant) {
-    sk_typeface = SkTypeface::MakeFromName(name, sk_font_style);
-  }
-
-  FontMeta(const FontMeta &other)
-      : sk_font_style(other.sk_font_style), sk_typeface(other.sk_typeface) {
-  }
-
-  FontMeta &operator=(const FontMeta &other) {
-    sk_typeface = other.sk_typeface;
-    sk_font_style = other.sk_font_style;
-    return *this;
-  }
-
-  SkFontStyle sk_font_style;
-  sk_sp<SkTypeface> sk_typeface;
+  sk_sp<SkFont> sk_font;
 
 };
 

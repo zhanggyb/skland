@@ -17,13 +17,15 @@
 #ifndef SKLAND_GRAPHIC_FONT_HPP_
 #define SKLAND_GRAPHIC_FONT_HPP_
 
+#include "font-style.hpp"
 #include <memory>
 
 namespace skland {
 
 // Foreward declaration
 class Paint;
-class FontMeta;
+struct FontMeta;
+class Typeface;
 
 class Font {
 
@@ -31,61 +33,33 @@ class Font {
 
  public:
 
-  enum Weight {
-    kWeightInvisible = 0,
-    kWeightThin = 100,
-    kWeightExtraLight = 200,
-    kWeightLight = 300,
-    kWeightNormal = 400,
-    kWeightMedium = 500,
-    kWeightSemiBold = 600,
-    kWeightBold = 700,
-    kWeightExtraBold = 800,
-    kWeightBlack = 900,
-    kWeightExtraBlack = 1000,
+  enum Flags {
+    kFlagEnableAutoHints = 1 << 0,
+    kFlagEnableByteCodeHints = 1 << 1,
+    kFlagEmbeddedBitmaps = 1 << 2,
+    kFlagUseNonlinearMetrics = 1 << 3,
+
+    kFlagVertical = 1 << 4,
+    kFlagGenA8FromLCD = 1 << 5,
+    kFlagEmbolden = 1 << 6,
+    kFlagDevKern = 1 << 7
   };
 
-  enum Width {
-    kWidthUltraCondensed = 1,
-    kWidthExtraCondensed = 2,
-    kWidthCondensed = 3,
-    kWidthSemiCondensed = 4,
-    kWidthNormal = 5,
-    kWidthSemiExpanded = 6,
-    kWidthExpanded = 7,
-    kWidthExtraExpanded = 8,
-    kWidthUltraExpanded = 9,
+  enum MaskType {
+    kMaskBW,
+    kMaskA8,
+    kMaskLCD
   };
 
-  enum Slant {
-    kSlantUpright,
-    kSlantItalic,
-    kSlantOblique
-  };
+  Font(const char *name = "Arial", FontStyle font_style = FontStyle());
 
-  Font(const char *name = "Arial",
-       Weight weight = kWeightNormal,
-       Width width = kWidthNormal,
-       Slant slant = kSlantUpright);
+  Font(const Typeface &typeface, float size, MaskType mask_type, uint32_t flags);
 
   Font(const Font &other);
 
   ~Font();
 
   Font &operator=(const Font &other);
-
-  void LoadName(const char *name,
-                Weight weight = kWeightNormal,
-                Width width = kWidthNormal,
-                Slant slant = kSlantUpright);
-
-  void SetBold(bool bold);
-
-  bool IsBold() const;
-
-  void SetItalic(bool italic);
-
-  bool IsItalic() const;
 
  private:
 

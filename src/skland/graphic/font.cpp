@@ -15,50 +15,35 @@
  */
 
 #include <skland/graphic/font.hpp>
+#include <skland/graphic/typeface.hpp>
 
 #include "internal/font-meta.hpp"
+#include "internal/typeface-meta.hpp"
 
 namespace skland {
 
-Font::Font(const char *name, Weight weight, Width width, Slant slant) {
-  metadata_.reset(new FontMeta(name, (int) weight, (int) width, (SkFontStyle::Slant) slant));
+Font::Font(const char *name, FontStyle font_style) {
+  metadata_.reset(new FontMeta);
+  sk_sp<SkTypeface> typeface = SkTypeface::MakeDefault();
+  metadata_->sk_font = SkFont::Make(typeface, 12.f, SkFont::kLCD_MaskType, SkFont::kEnableAutoHints_Flag);
+}
+
+Font::Font(const Typeface &typeface, float size, MaskType mask_type, uint32_t flags) {
+  metadata_.reset(new FontMeta);
+  metadata_->sk_font = SkFont::Make(typeface.metadata_->sk_typeface, size, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const Font &other) {
-  metadata_.reset(new FontMeta(*other.metadata_));
+  metadata_.reset(new FontMeta);
+  metadata_->sk_font = other.metadata_->sk_font;
 }
 
 Font::~Font() {
 }
 
 Font &Font::operator=(const Font &other) {
-  *metadata_ = *other.metadata_;
+  metadata_->sk_font = other.metadata_->sk_font;
   return *this;
-}
-
-void Font::LoadName(const char *name, Weight weight, Width width, Slant slant) {
-  metadata_->sk_font_style = SkFontStyle((int) weight, (int) width, (SkFontStyle::Slant) slant);
-  metadata_->sk_typeface = SkTypeface::MakeFromName(name, metadata_->sk_font_style);
-}
-
-void Font::SetBold(bool bold) {
-  if (bold != metadata_->sk_typeface->isBold()) {
-    metadata_->sk_typeface = SkTypeface::MakeFromTypeface(metadata_->sk_typeface.get(), SkTypeface::kBold);
-  }
-}
-
-bool Font::IsBold() const {
-  return metadata_->sk_typeface->isBold();
-}
-
-void Font::SetItalic(bool italic) {
-  if (italic != metadata_->sk_typeface->isItalic()) {
-    metadata_->sk_typeface = SkTypeface::MakeFromTypeface(metadata_->sk_typeface.get(), SkTypeface::kItalic);
-  }
-}
-
-bool Font::IsItalic() const {
-  return metadata_->sk_typeface->isItalic();
 }
 
 }

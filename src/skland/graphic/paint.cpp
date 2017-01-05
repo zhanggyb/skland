@@ -19,6 +19,7 @@
 #include <skland/graphic/shader.hpp>
 
 #include "SkPaint.h"
+#include "SkTypeface.h"
 
 #include "internal/font-meta.hpp"
 #include "internal/shader-meta.hpp"
@@ -97,7 +98,9 @@ void Paint::SetStrokeWidth(float width) {
 }
 
 void Paint::SetFont(const Font &font) {
-  metadata_->setTypeface(font.metadata_->sk_typeface);
+  SkTypeface *ptr = font.metadata_->sk_font->getTypeface();
+  sk_sp<SkTypeface> typeface = SkTypeface::MakeFromTypeface(ptr, ptr->style());
+  metadata_->setTypeface(typeface);
 }
 
 void Paint::SetTextSize(float size) {
