@@ -230,8 +230,9 @@ void DefaultWindowFrame::LayoutWidgets(int width, int height) {
   title_->SetPosition(0, 0);
   title_->Resize((int) window()->width(), title_bar_size());
 
-  int pos = (title_bar_size() - (int) close_button_->height()) / 2;
-  close_button_->SetPosition(pos, pos);
+  int y = (title_bar_size() - (int) close_button_->height()) / 2;
+  int x = y + 1;
+  close_button_->SetPosition(x, y);
 }
 
 void DefaultWindowFrame::OnDraw(Canvas *canvas) {

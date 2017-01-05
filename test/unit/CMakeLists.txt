@@ -29,6 +29,7 @@ if (LINUX)
 
     # graphic
     add_subdirectory(graphic-font)
+    add_subdirectory(graphic-font-style)
     add_subdirectory(graphic-path)
     add_subdirectory(graphic-pattern)
     add_subdirectory(graphic-paint)
