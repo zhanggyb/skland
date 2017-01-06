@@ -17,13 +17,13 @@
 #ifndef SKLAND_GRAPHIC_TYPEFACE_HPP_
 #define SKLAND_GRAPHIC_TYPEFACE_HPP_
 
+#include "../core/rect.hpp"
 #include "font-style.hpp"
 
 #include <memory>
 
 namespace skland {
 
-class Rect;
 class Font;
 struct TypefaceMeta;
 

@@ -98,17 +98,81 @@ void Paint::SetStrokeWidth(float width) {
 }
 
 void Paint::SetFont(const Font &font) {
-  SkTypeface *ptr = font.metadata_->sk_font->getTypeface();
+  SkTypeface *ptr = font.GetSkTypeface();
   sk_sp<SkTypeface> typeface = SkTypeface::MakeFromTypeface(ptr, ptr->style());
   metadata_->setTypeface(typeface);
+}
+
+void Paint::SetShader(const Shader &shader) {
+  metadata_->setShader(shader.metadata_->sk_shader);
+}
+
+Paint::Align Paint::GetTextAlign() const {
+  return static_cast<Align>(metadata_->getTextAlign());
+}
+
+void Paint::SetTextAlign(Align align) {
+  metadata_->setTextAlign(static_cast<SkPaint::Align>(align));
+}
+
+float Paint::GetTextSize() const {
+  return metadata_->getTextSize();
 }
 
 void Paint::SetTextSize(float size) {
   metadata_->setTextSize(size);
 }
 
-void Paint::SetShader(const Shader &shader) {
-  metadata_->setShader(shader.metadata_->sk_shader);
+float Paint::GetTextScaleX() const {
+  return metadata_->getTextScaleX();
+}
+
+void Paint::SetTextScaleX(float scale_x) {
+  metadata_->setTextScaleX(scale_x);
+}
+
+float Paint::GetTextSkewX() const {
+  return metadata_->getTextSkewX();
+}
+
+void Paint::SetTextSkewX(float skew_x) {
+  metadata_->setTextSkewX(skew_x);
+}
+
+TextEncoding Paint::GetTextEncoding() const {
+  return static_cast<TextEncoding>(metadata_->getTextEncoding());
+}
+
+void Paint::SetTextEncoding(TextEncoding encoding) {
+  metadata_->setTextEncoding(static_cast<SkPaint::TextEncoding>(encoding));
+}
+
+int Paint::TextToGlyphs(const void *text, size_t byte_length, uint16_t *glyphs) const {
+  return metadata_->textToGlyphs(text, byte_length, glyphs);
+}
+
+bool Paint::ContainsText(const void *text, size_t byte_length) const {
+  return metadata_->containsText(text, byte_length);
+}
+
+void Paint::GlyphsToUnichars(const uint16_t glyphs[], int count, int32_t text[]) const {
+  metadata_->glyphsToUnichars(glyphs, count, text);
+}
+
+int Paint::CountText(const void *text, size_t byte_length) const {
+  return metadata_->countText(text, byte_length);
+}
+
+float Paint::MeasureText(const void *text, size_t length, Rect *boulds) const {
+  return metadata_->measureText(text, length, reinterpret_cast<SkRect *>(boulds));
+}
+
+bool operator==(const Paint &paint1, const Paint &paint2) {
+  return paint1.metadata_ == paint2.metadata_;
+}
+
+bool operator!=(const Paint &paint1, const Paint &paint2) {
+  return paint1.metadata_ != paint2.metadata_;
 }
 
 }

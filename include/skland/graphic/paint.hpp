@@ -18,6 +18,7 @@
 #define SKLAND_GRAPHIC_PAINT_HPP_
 
 #include "../core/color.hpp"
+#include "font.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -26,24 +27,36 @@ class SkPaint;
 
 namespace skland {
 
-class Font;
 class Shader;
 
 class Paint {
 
+  friend bool operator==(const Paint &paint1, const Paint &paint2);
+  friend bool operator!=(const Paint &paint1, const Paint &paint2);
+
  public:
 
   enum Style {
-    kStyleFill, // kFill_Style,            //!< fill the geometry
-    kStyleStroke, // kStroke_Style,          //!< stroke the geometry
-    kStyleStrokeAndFill // kStrokeAndFill_Style,   //!< fill and stroke the geometry
+    kStyleFill,   //!< fill the geometry
+    kStyleStroke,      //!< stroke the geometry
+    kStyleStrokeAndFill    //!< fill and stroke the geometry
   };
 
   enum Hinting {
-    kHintingNone, // kNo_Hinting            = 0,
-    kHintingSlight, // kSlight_Hinting        = 1,
-    kHintingNormal, // kNormal_Hinting        = 2,     //!< this is the default
-    kHintingFull  // kFull_Hinting          = 3
+    kHintingNone,
+    kHintingSlight,
+    kHintingNormal,
+    kHintingFull
+  };
+
+  enum Align {
+    kAlignLeft,
+    kAlignCenter,
+    kAlignRight
+  };
+
+  enum {
+    kAlignCount = 3
   };
 
   Paint();
@@ -80,9 +93,41 @@ class Paint {
 
   void SetFont(const Font &font);
 
+  void SetShader(const Shader &shader);
+
+  Align GetTextAlign() const;
+
+  void SetTextAlign(Align align);
+
+  float GetTextSize() const;
+
   void SetTextSize(float size);
 
-  void SetShader(const Shader &shader);
+  float GetTextScaleX() const;
+
+  void SetTextScaleX(float scale_x);
+
+  float GetTextSkewX() const;
+
+  void SetTextSkewX(float skew_x);
+
+  TextEncoding GetTextEncoding() const;
+
+  void SetTextEncoding(TextEncoding encoding);
+
+  int TextToGlyphs(const void *text, size_t byte_length, uint16_t glyphs[]) const;
+
+  bool ContainsText(const void *text, size_t byte_length) const;
+
+  void GlyphsToUnichars(const uint16_t glyphs[], int count, int32_t text[]) const;
+
+  int CountText(const void *text, size_t byte_length) const;
+
+  float MeasureText(const void *text, size_t length, Rect *boulds) const;
+
+  float MeasureText(const void *text, size_t length) const {
+    return MeasureText(text, length, nullptr);
+  }
 
   SkPaint *sk_paint() const {
     return metadata_.get();
@@ -92,6 +137,10 @@ class Paint {
 
   std::unique_ptr<SkPaint> metadata_;
 };
+
+bool operator==(const Paint &paint1, const Paint &paint2);
+
+bool operator!=(const Paint &paint1, const Paint &paint2);
 
 }
 

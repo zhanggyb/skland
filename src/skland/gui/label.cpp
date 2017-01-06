@@ -59,6 +59,11 @@ void Label::SetBackground(const Color &color) {
   }
 }
 
+void Label::SetFont(const Font &font) {
+  font_ = font;
+  Update();
+}
+
 void Label::OnResize(int width, int height) {
   resize(width, height);
 }
@@ -90,11 +95,11 @@ void Label::OnDraw(Canvas *canvas) {
 
   paint.SetColor(foreground_);
   paint.SetAntiAlias(true);
-  paint.SetTextSize(12.f);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font_);
+  paint.SetTextSize(font_.GetSize());
 
-  float text_width = paint.sk_paint()->measureText(text_.c_str(), text_.length());
+  float text_width = paint.MeasureText(text_.c_str(), text_.length());
 
   SkTextBox text_box;
   // Put the text at the center

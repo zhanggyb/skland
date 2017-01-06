@@ -18,12 +18,14 @@
 #define SKLAND_GRAPHIC_FONT_HPP_
 
 #include "font-style.hpp"
+#include "typeface.hpp"
 #include <memory>
+
+class SkTypeface;
 
 namespace skland {
 
 struct FontMeta;
-class Paint;
 class Typeface;
 
 enum TextEncoding {
@@ -34,8 +36,6 @@ enum TextEncoding {
 };
 
 class Font {
-
-  friend class Paint;
 
  public:
 
@@ -57,7 +57,17 @@ class Font {
     kMaskLCD
   };
 
-  Font(float size = 12.f, MaskType mask_type = kMaskBW, uint32_t flags = kFlagEnableAutoHints);
+  /**
+   * @brief Create default font
+   * @param style An enum value of Typeface::Style
+   * @param size
+   * @param mask_type
+   * @param flags
+   */
+  Font(Typeface::Style style = Typeface::kNormal,
+       float size = 12.f,
+       MaskType mask_type = kMaskBW,
+       uint32_t flags = kFlagEnableAutoHints);
 
   Font(const char *family_name,
        FontStyle font_style,
@@ -65,7 +75,10 @@ class Font {
        MaskType mask_type = kMaskBW,
        uint32_t flags = kFlagEnableAutoHints);
 
-  Font(const Typeface &typeface, float size, MaskType mask_type = kMaskBW, uint32_t flags = kFlagEnableAutoHints);
+  Font(const Typeface &typeface,
+       float size,
+       MaskType mask_type = kMaskBW,
+       uint32_t flags = kFlagEnableAutoHints);
 
   Font(const Typeface &typeface,
        float size,
@@ -79,6 +92,50 @@ class Font {
   ~Font();
 
   Font &operator=(const Font &other);
+
+  /**
+    * @brief Get pointer to the native skia typeface
+    * @return
+    */
+  SkTypeface *GetSkTypeface() const;
+
+  float GetSize() const;
+
+  float GetScaleX() const;
+
+  float GetSkewX() const;
+
+  uint32_t GetFlags() const;
+
+  MaskType GetMaskType() const;
+
+  bool IsBold() const;
+
+  bool IsItalic() const;
+
+  bool IsVertical() const;
+
+  bool IsEmbolden() const;
+
+  bool IsEnableAutoHints() const;
+
+  bool IsEnableByteCodeHints() const;
+
+  bool IsUseNonLinearMetrics() const;
+
+  bool IsDevKern();
+
+  int TextToGlyphs(const void *text,
+                   size_t byte_length,
+                   TextEncoding encoding,
+                   uint16_t glyphs[],
+                   int max_glyph_count) const;
+
+  int CountText(const void *text, size_t byte_length, TextEncoding encoding) {
+    return TextToGlyphs(text, byte_length, encoding, nullptr, 0);
+  }
+
+  float MeasureText(const void *text, size_t byte_length, TextEncoding encoding) const;
 
  private:
 

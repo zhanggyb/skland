@@ -213,6 +213,7 @@ void DefaultWindowFrame::CreateWidgets() {
 
   title_ = new Label(window()->title());
   title_->SetForeground(0xFFEBEBEB);
+  title_->SetFont(Font(Typeface::kBold));
 
   AddWidget(title_);  // put the title below other widgets
   AddWidget(close_button_);
@@ -256,7 +257,7 @@ void DefaultWindowFrame::OnDraw(Canvas *canvas) {
                          window()->right(),
                          window()->top() + title_bar_size()),
                     radii_up);
-  paint.SetColor(0xE0555555);
+  paint.SetColor(0xEF555555);
   canvas->DrawPath(path, paint);
 
   float radii_down[] = {

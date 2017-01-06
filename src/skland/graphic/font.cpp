@@ -15,16 +15,15 @@
  */
 
 #include <skland/graphic/font.hpp>
-#include <skland/graphic/typeface.hpp>
 
 #include "internal/font-meta.hpp"
 #include "internal/typeface-meta.hpp"
 
 namespace skland {
 
-Font::Font(float size, MaskType mask_type, uint32_t flags) {
+Font::Font(Typeface::Style style, float size, MaskType mask_type, uint32_t flags) {
   metadata_.reset(new FontMeta);
-  sk_sp<SkTypeface> typeface = SkTypeface::MakeDefault();
+  sk_sp<SkTypeface> typeface = SkTypeface::MakeDefault((SkTypeface::Style) style);
   metadata_->sk_font = SkFont::Make(typeface, size, (SkFont::MaskType) mask_type, flags);
 }
 
@@ -56,6 +55,74 @@ Font::~Font() {
 Font &Font::operator=(const Font &other) {
   metadata_->sk_font = other.metadata_->sk_font;
   return *this;
+}
+
+SkTypeface *Font::GetSkTypeface() const {
+  return metadata_->sk_font->getTypeface();
+}
+
+float Font::GetSize() const {
+  return metadata_->sk_font->getSize();
+}
+
+float Font::GetScaleX() const {
+  return metadata_->sk_font->getScaleX();
+}
+
+float Font::GetSkewX() const {
+  return metadata_->sk_font->getSkewX();
+}
+
+uint32_t Font::GetFlags() const {
+  return metadata_->sk_font->getFlags();
+}
+
+Font::MaskType Font::GetMaskType() const {
+  return (MaskType) metadata_->sk_font->getMaskType();
+}
+
+bool Font::IsBold() const {
+  return metadata_->sk_font->getTypeface()->isBold();
+}
+
+bool Font::IsItalic() const {
+  return metadata_->sk_font->getTypeface()->isItalic();
+}
+
+bool Font::IsVertical() const {
+  return metadata_->sk_font->isVertical();
+}
+
+bool Font::IsEmbolden() const {
+  return metadata_->sk_font->isEmbolden();
+}
+
+bool Font::IsEnableAutoHints() const {
+  return metadata_->sk_font->isEnableAutoHints();
+}
+
+bool Font::IsEnableByteCodeHints() const {
+  return metadata_->sk_font->isEnableByteCodeHints();
+}
+
+bool Font::IsUseNonLinearMetrics() const {
+  return metadata_->sk_font->isUseNonLinearMetrics();
+}
+
+bool Font::IsDevKern() {
+  return metadata_->sk_font->isDevKern();
+}
+
+int Font::TextToGlyphs(const void *text,
+                       size_t byte_length,
+                       TextEncoding encoding,
+                       uint16_t *glyphs,
+                       int max_glyph_count) const {
+  return metadata_->sk_font->textToGlyphs(text, byte_length, (SkTextEncoding) encoding, glyphs, max_glyph_count);
+}
+
+float Font::MeasureText(const void *text, size_t byte_length, TextEncoding encoding) const {
+  return metadata_->sk_font->measureText(text, byte_length, (SkTextEncoding) encoding);
 }
 
 }

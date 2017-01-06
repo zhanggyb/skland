@@ -38,6 +38,8 @@ class Label : public AbstractWidget {
 
   void SetBackground(const Color &color);
 
+  void SetFont(const Font &font);
+
  protected:
 
   virtual void OnResize(int width, int height) override;
