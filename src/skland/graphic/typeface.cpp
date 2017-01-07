@@ -22,7 +22,7 @@ namespace skland {
 
 Typeface::Typeface(Style style) {
   metadata_.reset(new TypefaceMeta);
-  metadata_->sk_typeface = SkTypeface::MakeDefault((SkTypeface::Style) style);
+  metadata_->sk_typeface = SkTypeface::MakeDefault(static_cast<SkTypeface::Style>(style));
 }
 
 Typeface::Typeface(const char *family_name, FontStyle font_style) {
@@ -71,6 +71,10 @@ bool Typeface::IsFixedPitch() const {
 
 uint32_t Typeface::GetUniqueID() const {
   return metadata_->sk_typeface->uniqueID();
+}
+
+bool operator==(const Typeface &typeface1, const Typeface &typeface2) {
+  return SkTypeface::Equal(typeface1.metadata_->sk_typeface.get(), typeface2.metadata_->sk_typeface.get());
 }
 
 }

@@ -55,6 +55,8 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontConfigInterface.cpp
 remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontMgr_custom*.cpp)
 # skslc main()
 remove_srcs(${SKIA_SOURCE_DIR}/src/sksl/SkSLMain.cpp)
+# remove xbyak support
+remove_srcs(${SKIA_SOURCE_DIR}/src/opts/SkXbyak.cpp)
 
 
 # Skia sure ships a lot of code no one uses.

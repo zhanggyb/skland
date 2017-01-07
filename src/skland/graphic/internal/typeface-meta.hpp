@@ -24,6 +24,24 @@ namespace skland {
 
 struct TypefaceMeta {
 
+  TypefaceMeta() {}
+
+  TypefaceMeta(const sk_sp<SkTypeface> &typeface)
+      : sk_typeface(typeface) {}
+
+  TypefaceMeta(const TypefaceMeta &other)
+      : sk_typeface(other.sk_typeface) {}
+
+  TypefaceMeta &operator=(const TypefaceMeta &other) {
+    sk_typeface = other.sk_typeface;
+    return *this;
+  }
+
+  TypefaceMeta &operator=(const sk_sp<SkTypeface> &typeface) {
+    sk_typeface = typeface;
+    return *this;
+  }
+
   sk_sp<SkTypeface> sk_typeface;
 
 };

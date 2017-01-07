@@ -30,6 +30,7 @@ struct TypefaceMeta;
 class Typeface {
 
   friend class Font;
+  friend bool operator==(const Typeface &typeface1, const Typeface &typeface2);
 
  public:
 

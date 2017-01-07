@@ -235,9 +235,9 @@ void AbstractWindow::OnUpdate(AbstractView *view) {
       redraw_task_->canvas = main_surface_->canvas().get();
       DBG_ASSERT(redraw_task_->canvas);
       main_surface_->Damage((int) geometry().x() + main_surface_->margin().left,
-                             (int) geometry().y() + main_surface_->margin().top,
-                             (int) geometry().width(),
-                             (int) geometry().height());
+                            (int) geometry().y() + main_surface_->margin().top,
+                            (int) geometry().width(),
+                            (int) geometry().height());
       main_surface_->Commit();
     }
   } else {
@@ -247,9 +247,9 @@ void AbstractWindow::OnUpdate(AbstractView *view) {
     view->redraw_task_->canvas = frame_surface_->canvas().get();
     DBG_ASSERT(view->redraw_task_->canvas);
     frame_surface_->Damage((int) view->geometry().x() + frame_surface_->margin().left,
-                          (int) view->geometry().y() + frame_surface_->margin().top,
-                          (int) view->geometry().width(),
-                          (int) view->geometry().height());
+                           (int) view->geometry().y() + frame_surface_->margin().top,
+                           (int) view->geometry().width(),
+                           (int) view->geometry().height());
     frame_surface_->Commit();
   }
 }

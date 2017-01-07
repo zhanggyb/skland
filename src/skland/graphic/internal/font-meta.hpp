@@ -23,6 +23,24 @@ namespace skland {
 
 struct FontMeta {
 
+  FontMeta() {}
+
+  FontMeta(const sk_sp<SkFont> &font)
+      : sk_font(font) {}
+
+  FontMeta(const FontMeta &other)
+      : sk_font(other.sk_font) {}
+
+  FontMeta &operator=(const FontMeta &other) {
+    sk_font = other.sk_font;
+    return *this;
+  }
+
+  FontMeta &operator=(const sk_sp<SkFont> &font) {
+    sk_font = font;
+    return *this;
+  }
+
   sk_sp<SkFont> sk_font;
 
 };

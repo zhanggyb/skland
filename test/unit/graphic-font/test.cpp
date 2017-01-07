@@ -18,21 +18,21 @@ Test::~Test() {
 }
 
 TEST_F(Test, enums_check_1) {
-  ASSERT_TRUE(TextEncoding::kTextEncodingUTF8 == SkTextEncoding::kUTF8_SkTextEncoding);
-  ASSERT_TRUE(TextEncoding::kTextEncodingUTF16 == SkTextEncoding::kUTF16_SkTextEncoding);
-  ASSERT_TRUE(TextEncoding::kTextEncodingUTF32 == SkTextEncoding::kUTF32_SkTextEncoding);
-  ASSERT_TRUE(TextEncoding::kTextEncodingGlyphID == SkTextEncoding::kGlyphID_SkTextEncoding);
+  ASSERT_TRUE((int) TextEncoding::kTextEncodingUTF8 == (int) SkTextEncoding::kUTF8_SkTextEncoding);
+  ASSERT_TRUE((int) TextEncoding::kTextEncodingUTF16 == (int) SkTextEncoding::kUTF16_SkTextEncoding);
+  ASSERT_TRUE((int) TextEncoding::kTextEncodingUTF32 == (int) SkTextEncoding::kUTF32_SkTextEncoding);
+  ASSERT_TRUE((int) TextEncoding::kTextEncodingGlyphID == (int) SkTextEncoding::kGlyphID_SkTextEncoding);
 
-  ASSERT_TRUE(Font::Flags::kFlagEnableAutoHints == SkFont::Flags::kEnableAutoHints_Flag);
-  ASSERT_TRUE(Font::Flags::kFlagEnableByteCodeHints == SkFont::Flags::kEnableByteCodeHints_Flag);
-  ASSERT_TRUE(Font::Flags::kFlagEmbeddedBitmaps == SkFont::Flags::kEmbeddedBitmaps_Flag;
-  ASSERT_TRUE(Font::Flags::kFlagUseNonlinearMetrics == SkFont::Flags::kUseNonlinearMetrics_Flag);
-  ASSERT_TRUE(Font::Flags::kFlagVertical == SkFont::Flags::kVertical_Flag);
-  ASSERT_TRUE(Font::Flags::kFlagGenA8FromLCD == SkFont::Flags::kGenA8FromLCD_Flag);
-  ASSERT_TRUE(Font::Flags::kFlagEmbolden == SkFont::Flags::kEmbolden_Flag);
-  ASSERT_TRUE(Font::Flags::kFlagDevKern == SkFont::Flags::kDevKern_Flag);
+  ASSERT_TRUE((int) Font::Flags::kFlagEnableAutoHints == (int) SkFont::Flags::kEnableAutoHints_Flag);
+  ASSERT_TRUE((int) Font::Flags::kFlagEnableByteCodeHints == (int) SkFont::Flags::kEnableByteCodeHints_Flag);
+  ASSERT_TRUE((int) Font::Flags::kFlagEmbeddedBitmaps == (int) SkFont::Flags::kEmbeddedBitmaps_Flag);
+  ASSERT_TRUE((int) Font::Flags::kFlagUseNonlinearMetrics == (int) SkFont::Flags::kUseNonlinearMetrics_Flag);
+  ASSERT_TRUE((int) Font::Flags::kFlagVertical == (int) SkFont::Flags::kVertical_Flag);
+  ASSERT_TRUE((int) Font::Flags::kFlagGenA8FromLCD == (int) SkFont::Flags::kGenA8FromLCD_Flag);
+  ASSERT_TRUE((int) Font::Flags::kFlagEmbolden == (int) SkFont::Flags::kEmbolden_Flag);
+  ASSERT_TRUE((int) Font::Flags::kFlagDevKern == (int) SkFont::Flags::kDevKern_Flag);
 
-  ASSERT_TRUE(Font::MaskType::kMaskBW == SkFont::MaskType::kBW_MaskType);
-  ASSERT_TRUE(Font::MaskType::kMaskA8 == SkFont::MaskType::kA8_MaskType);
-  ASSERT_TRUE(Font::MaskType::kMaskLCD == SkFont::MaskType::kLCD_MaskType);
+  ASSERT_TRUE((int) Font::MaskType::kMaskBW == (int) SkFont::MaskType::kBW_MaskType);
+  ASSERT_TRUE((int) Font::MaskType::kMaskA8 == (int) SkFont::MaskType::kA8_MaskType);
+  ASSERT_TRUE((int) Font::MaskType::kMaskLCD == (int) SkFont::MaskType::kLCD_MaskType);
 }

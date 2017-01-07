@@ -23,17 +23,21 @@ namespace skland {
 
 struct ShaderMeta {
 
-  ShaderMeta() = delete;
+  ShaderMeta() {}
 
   ShaderMeta(const sk_sp<SkShader> &shader)
-      : sk_shader(shader) {
-  }
+      : sk_shader(shader) {}
 
   ShaderMeta(const ShaderMeta &other)
       : sk_shader(other.sk_shader) {}
 
   ShaderMeta &operator=(const ShaderMeta &other) {
     sk_shader = other.sk_shader;
+    return *this;
+  }
+
+  ShaderMeta &operator=(const sk_sp<SkShader> &shader) {
+    sk_shader = shader;
     return *this;
   }
 
