@@ -23,50 +23,77 @@
 namespace skland {
 
 AbstractSurface::AbstractSurface(const Margin &margin)
-    : view_(nullptr),
+    : parent_(nullptr),
+      previous_(nullptr),
+      next_(nullptr),
+      view_(nullptr),
       margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1) {
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);
   wl_surface_.leave().Set(this, &AbstractSurface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
-  wl_surface_.SetUserData(this);
 }
 
 AbstractSurface::~AbstractSurface() {
-  ClearChildren();
+  AbstractSurface *subsurface = nullptr;
+
+  subsurface = previous_;
+  while (subsurface && subsurface->parent_ == this) {
+    delete subsurface;
+  }
+  subsurface = next_;
+  while (subsurface && subsurface->next_ == this) {
+    delete subsurface;
+  }
+
+  if (previous_) previous_->next_ = next_;
+  if (next_) next_->previous_ = previous_;
 
   if (view_) {
-    // Assert this is the root surface used in a view
-    DBG_ASSERT(wl_sub_surface_.IsNull());
+    DBG_ASSERT(view_->surface_ == this);
     view_->surface_ = nullptr;
   }
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
-  if (subsurface->parent_surface() == this) return;
+  DBG_ASSERT(nullptr == subsurface->parent_);
+  DBG_ASSERT(nullptr == subsurface->previous_);
+  DBG_ASSERT(nullptr == subsurface->next_);
+  DBG_ASSERT(subsurface->wl_sub_surface_.IsNull());
 
-  if (subsurface->parent())
-    subsurface->parent_surface()->RemoveSubSurface(subsurface);
+  AbstractSurface *tmp = this;
+  AbstractSurface *p = this;
+  if (pos >= 0) {
+    do {
+      p = tmp;
+      tmp = tmp->next_;
+      if (nullptr == tmp || tmp->parent_ != this) break;
+      pos--;
+    } while (pos >= 0);
+    p->PushBack(subsurface);
+  } else {
+    do {
+      p = tmp;
+      tmp = tmp->previous_;
+      if (nullptr == tmp || tmp->parent_ != this) break;
+      pos++;
+    } while (pos < 0);
+    p->PushFront(subsurface);
+  }
 
-  DBG_ASSERT(nullptr == subsurface->parent());
-
-  InsertChild(subsurface, pos);
   subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(),
-                                    subsurface->wl_surface_, this->wl_surface_);
+                                    subsurface->wl_surface_,
+                                    this->wl_surface_);
+  subsurface->parent_ = this;
 }
 
 AbstractSurface *AbstractSurface::RemoveSubSurface(AbstractSurface *subsurface) {
-  if (RemoveChild(subsurface)) {
-    subsurface->wl_sub_surface_.Destroy();
-    return subsurface;
-  }
+  if (subsurface->parent_ != this)
+    return nullptr;
 
-  return nullptr;
-}
-
-AbstractSurface *AbstractSurface::GetSubSurfaceAt(int index) const {
-  return static_cast<AbstractSurface *>(GetChildAt(index));
+  subsurface->Unlink();
+  return subsurface;
 }
 
 void AbstractSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
@@ -95,8 +122,8 @@ void AbstractSurface::SetDesync() const {
 
 void AbstractSurface::Commit() const {
   wl_surface_.Commit();
-  if (parent()) {
-    static_cast<AbstractSurface *>(parent())->Commit();
+  if (parent_) {
+    parent_->Commit();
   }
 }
 
@@ -118,7 +145,34 @@ void AbstractSurface::SetPosition(int x, int y) {
   }
 }
 
+void AbstractSurface::PushFront(AbstractSurface *surface) {
+  surface->Unlink();
+
+  if (previous_) previous_->next_ = surface;
+  surface->previous_ = previous_;
+  previous_ = surface;
+  surface->next_ = this;
+}
+
+void AbstractSurface::PushBack(AbstractSurface *surface) {
+  surface->Unlink();
+
+  if (next_) next_->previous_ = surface;
+  surface->next_ = next_;
+  next_ = surface;
+  surface->previous_ = this;
+}
+
+void AbstractSurface::Unlink() {
+  if (previous_) previous_->next_ = next_;
+  if (next_) next_->previous_ = previous_;
+
+  previous_ = nullptr;
+  next_ = nullptr;
+}
+
 void AbstractSurface::OnEnter(struct wl_output *wl_output) {
+  wl_surface_.SetUserData(this);
   // TODO: call function in view_
 }
 

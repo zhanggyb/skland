@@ -39,7 +39,7 @@ class Buffer;
  * A surface in 'gui' module contains a native wayland surface and
  * can provide 2D, 3D, Texture property.
  */
-class AbstractSurface : public Object {
+class AbstractSurface {
 
   friend class AbstractView;
 
@@ -55,8 +55,6 @@ class AbstractSurface : public Object {
   void AddSubSurface(AbstractSurface *subsurface, int pos = 0);
 
   AbstractSurface *RemoveSubSurface(AbstractSurface *subsurface);
-
-  AbstractSurface *GetSubSurfaceAt(int index) const;
 
   void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
@@ -111,8 +109,16 @@ class AbstractSurface : public Object {
     return position_;
   }
 
-  AbstractSurface *parent_surface() const {
-    return static_cast<AbstractSurface *>(parent());
+  AbstractSurface *parent() const {
+    return parent_;
+  }
+
+  AbstractSurface *previous() const {
+    return previous_;
+  }
+
+  AbstractSurface *next() const {
+    return next_;
   }
 
  protected:
@@ -137,9 +143,21 @@ class AbstractSurface : public Object {
 
  private:
 
+  void PushFront(AbstractSurface *surface);
+
+  void PushBack(AbstractSurface *surface);
+
+  void Unlink();
+
   void OnEnter(struct wl_output *wl_output);
 
   void OnLeave(struct wl_output *wl_output);
+
+  AbstractSurface *parent_;
+
+  AbstractSurface *previous_;
+
+  AbstractSurface *next_;
 
   wayland::Surface wl_surface_;
 

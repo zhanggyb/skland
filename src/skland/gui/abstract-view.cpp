@@ -34,12 +34,14 @@ AbstractView::AbstractView()
 AbstractView::AbstractView(int width, int height)
     : Object(),
       visible_(false),
+      surface_(nullptr),
       geometry_(width, height) {
   redraw_task_.reset(new RedrawTask(this, nullptr));
   mouse_task_.reset(new ViewTask(this));
 }
 
 AbstractView::~AbstractView() {
+  delete surface_;
 }
 
 void AbstractView::SetPosition(int x, int y) {
