@@ -29,38 +29,53 @@ AbstractSurface::AbstractSurface(const Margin &margin)
       view_(nullptr),
       margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
-      buffer_scale_(1) {
+      buffer_scale_(1),
+      is_user_data_set_(false) {
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);
   wl_surface_.leave().Set(this, &AbstractSurface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
 }
 
 AbstractSurface::~AbstractSurface() {
-  AbstractSurface *subsurface = nullptr;
+  // Delete all sub surfaces of this one:
+  AbstractSurface *p = nullptr;
+  AbstractSurface *tmp = nullptr;
 
-  subsurface = previous_;
-  while (subsurface && subsurface->parent_ == this) {
-    delete subsurface;
-  }
-  subsurface = next_;
-  while (subsurface && subsurface->next_ == this) {
-    delete subsurface;
+  p = previous_;
+  while (p && p->parent_ == this) {
+    tmp = p->previous_;
+    delete p;
+    p = tmp;
   }
 
+  p = next_;
+  while (p && p->parent_ == this) {
+    tmp = p->next_;
+    delete p;
+    p = tmp;
+  }
+
+  // Break the link node
   if (previous_) previous_->next_ = next_;
   if (next_) next_->previous_ = previous_;
 
-  if (view_) {
-    DBG_ASSERT(view_->surface_ == this);
+  if (view_ && view_->surface_ == this) {
     view_->surface_ = nullptr;
   }
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
+  if (subsurface == this || subsurface->parent_) return;
+
   DBG_ASSERT(nullptr == subsurface->parent_);
   DBG_ASSERT(nullptr == subsurface->previous_);
   DBG_ASSERT(nullptr == subsurface->next_);
   DBG_ASSERT(subsurface->wl_sub_surface_.IsNull());
+
+  subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(),
+                                    subsurface->wl_surface_,
+                                    this->wl_surface_);
+  subsurface->parent_ = this;
 
   AbstractSurface *tmp = this;
   AbstractSurface *p = this;
@@ -71,7 +86,8 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
       if (nullptr == tmp || tmp->parent_ != this) break;
       pos--;
     } while (pos >= 0);
-    p->PushBack(subsurface);
+    p->InsertFront(subsurface);
+    subsurface->wl_sub_surface_.PlaceAbove(p->wl_surface_);
   } else {
     do {
       p = tmp;
@@ -79,21 +95,9 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
       if (nullptr == tmp || tmp->parent_ != this) break;
       pos++;
     } while (pos < 0);
-    p->PushFront(subsurface);
+    p->InsertBack(subsurface);
+    subsurface->wl_sub_surface_.PlaceBelow(p->wl_surface_);
   }
-
-  subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(),
-                                    subsurface->wl_surface_,
-                                    this->wl_surface_);
-  subsurface->parent_ = this;
-}
-
-AbstractSurface *AbstractSurface::RemoveSubSurface(AbstractSurface *subsurface) {
-  if (subsurface->parent_ != this)
-    return nullptr;
-
-  subsurface->Unlink();
-  return subsurface;
 }
 
 void AbstractSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
@@ -127,15 +131,39 @@ void AbstractSurface::Commit() const {
   }
 }
 
-void AbstractSurface::PlaceAbove(const AbstractSurface &surface) {
-  if (wl_sub_surface_.IsValid()) {
-    wl_sub_surface_.PlaceAbove(surface.wl_surface_);
+void AbstractSurface::PlaceAbove(AbstractSurface *sibling) {
+  if (sibling == this) return;
+
+  if (parent_ == sibling->parent_) {
+    DBG_ASSERT(wl_sub_surface_.IsValid());
+    wl_sub_surface_.PlaceAbove(sibling->wl_surface_);
+    MoveAbove(sibling, this);
+  } else if (this == sibling->parent_) {
+    DBG_ASSERT(sibling->wl_sub_surface_.IsValid());
+    sibling->wl_sub_surface_.PlaceBelow(wl_surface_);
+    MoveAbove(sibling, this);
+  } else if (parent_ == sibling) {
+    DBG_ASSERT(wl_sub_surface_.IsValid());
+    wl_sub_surface_.PlaceAbove(sibling->wl_surface_);
+    MoveAbove(sibling, this);
   }
 }
 
-void AbstractSurface::PlaceBelow(const AbstractSurface &surface) {
-  if (wl_sub_surface_.IsValid()) {
-    wl_sub_surface_.PlaceBelow(surface.wl_surface_);
+void AbstractSurface::PlaceBelow(AbstractSurface *sibling) {
+  if (sibling == this) return;
+
+  if (parent_ == sibling->parent_) {
+    DBG_ASSERT(wl_sub_surface_.IsValid());
+    wl_sub_surface_.PlaceBelow(sibling->wl_surface_);
+    MoveBelow(sibling, this);
+  } else if (this == sibling->parent_) {
+    DBG_ASSERT(sibling->wl_sub_surface_.IsValid());
+    sibling->wl_sub_surface_.PlaceAbove(wl_surface_);
+    MoveBelow(sibling, this);
+  } else if (parent_ == sibling) {
+    DBG_ASSERT(wl_sub_surface_.IsValid());
+    wl_sub_surface_.PlaceBelow(sibling->wl_surface_);
+    MoveBelow(sibling, this);
   }
 }
 
@@ -145,34 +173,97 @@ void AbstractSurface::SetPosition(int x, int y) {
   }
 }
 
-void AbstractSurface::PushFront(AbstractSurface *surface) {
-  surface->Unlink();
-
+void AbstractSurface::InsertFront(AbstractSurface *surface) {
   if (previous_) previous_->next_ = surface;
   surface->previous_ = previous_;
   previous_ = surface;
   surface->next_ = this;
 }
 
-void AbstractSurface::PushBack(AbstractSurface *surface) {
-  surface->Unlink();
-
+void AbstractSurface::InsertBack(AbstractSurface *surface) {
   if (next_) next_->previous_ = surface;
   surface->next_ = next_;
   next_ = surface;
   surface->previous_ = this;
 }
 
-void AbstractSurface::Unlink() {
-  if (previous_) previous_->next_ = next_;
-  if (next_) next_->previous_ = previous_;
+void AbstractSurface::MoveBelow(AbstractSurface *surface_a, AbstractSurface *surface_b) {
+  AbstractSurface *head = surface_b;
+  AbstractSurface *tail = surface_b;
+  AbstractSurface *tmp = nullptr;
 
-  previous_ = nullptr;
-  next_ = nullptr;
+  tmp = surface_b;
+  while (tmp->previous_ && (tmp->previous_->parent_ != surface_b->parent_)) {
+    head = tmp;
+    tmp = tmp->previous_;
+  }
+
+  tmp = surface_b;
+  while (tmp->next_ && (tmp->next_->parent_ != surface_b->parent_)) {
+    tail = tmp;
+    tmp = tmp->next_;
+  }
+
+  if (head == tail) {
+    if (surface_b->previous_) surface_b->previous_->next_ = surface_b->next_;
+    if (surface_b->next_) surface_b->next_->previous_ = surface_b->previous_;
+
+    surface_b->previous_ = surface_a;
+    surface_b->next_ = surface_a->next_;
+    if (surface_a->next_) surface_a->next_->previous_ = surface_b;
+    surface_a->next_ = surface_b;
+  } else {
+    if (head->previous_) head->previous_->next_ = tail->next_;
+    if (tail->next_) tail->next_->previous_ = head->previous_;
+
+    head->previous_ = surface_a;
+    tail->next_ = surface_a->next_;
+    if (surface_a->next_) surface_a->next_->previous_ = tail;
+    surface_a->next_ = head;
+  }
+}
+
+void AbstractSurface::MoveAbove(AbstractSurface *surface_a, AbstractSurface *surface_b) {
+  AbstractSurface *head = surface_b;
+  AbstractSurface *tail = surface_b;
+  AbstractSurface *tmp = nullptr;
+
+  tmp = surface_b;
+  while (tmp->previous_ && (tmp->previous_->parent_ != surface_b->parent_)) {
+    head = tmp;
+    tmp = tmp->previous_;
+  }
+
+  tmp = surface_b;
+  while (tmp->next_ && (tmp->next_->parent_ != surface_b->parent_)) {
+    tail = tmp;
+    tmp = tmp->next_;
+  }
+
+  if (head == tail) {
+    if (surface_b->previous_) surface_b->previous_->next_ = surface_b->next_;
+    if (surface_b->next_) surface_b->next_->previous_ = surface_b->previous_;
+
+    surface_b->previous_ = surface_a->previous_;
+    surface_b->next_ = surface_a;
+    if (surface_a->previous_) surface_a->previous_->next_ = surface_b;
+    surface_a->previous_ = surface_b;
+  } else {
+    if (head->previous_) head->previous_->next_ = tail->next_;
+    if (tail->next_) tail->next_->previous_ = head->previous_;
+
+    head->previous_ = surface_a->previous_;
+    tail->next_ = surface_a;
+    if (surface_a->previous_) surface_a->previous_->next_ = head;
+    surface_a->previous_ = tail;
+  }
 }
 
 void AbstractSurface::OnEnter(struct wl_output *wl_output) {
-  wl_surface_.SetUserData(this);
+  if (!is_user_data_set_) {
+    wl_surface_.SetUserData(this);
+    is_user_data_set_ = true;
+  }
   // TODO: call function in view_
 }
 

@@ -52,9 +52,12 @@ class AbstractSurface {
 
   virtual ~AbstractSurface();
 
+  /**
+   * @brief Add a new created surface into the sub surface list
+   * @param subsurface A new created surface object
+   * @param pos The position in the sub surface list, can be negative (below), positive (above)
+   */
   void AddSubSurface(AbstractSurface *subsurface, int pos = 0);
-
-  AbstractSurface *RemoveSubSurface(AbstractSurface *subsurface);
 
   void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
@@ -76,9 +79,9 @@ class AbstractSurface {
     wl_surface_.SetOpaqueRegion(region);
   }
 
-  void PlaceAbove(const AbstractSurface &surface);
+  void PlaceAbove(AbstractSurface *sibling);
 
-  void PlaceBelow(const AbstractSurface &surface);
+  void PlaceBelow(AbstractSurface *sibling);
 
   /**
    * @brief Set sub surface position
@@ -143,15 +146,27 @@ class AbstractSurface {
 
  private:
 
-  void PushFront(AbstractSurface *surface);
+  void InsertFront(AbstractSurface *surface);
 
-  void PushBack(AbstractSurface *surface);
-
-  void Unlink();
+  void InsertBack(AbstractSurface *surface);
 
   void OnEnter(struct wl_output *wl_output);
 
   void OnLeave(struct wl_output *wl_output);
+
+  /**
+   * @brief Move the local surface list of surface_b and insert before surface_a
+   * @param surface_a
+   * @param surface_b
+   */
+  static void MoveAbove(AbstractSurface *surface_a, AbstractSurface *surface_b);
+
+  /**
+   * @brief Move the local surface list of surface_b and insert after surface_a
+   * @param surface_a
+   * @param surface_b
+   */
+  static void MoveBelow(AbstractSurface *surface_a, AbstractSurface *surface_b);
 
   AbstractSurface *parent_;
 
@@ -177,6 +192,8 @@ class AbstractSurface {
   enum wl_output_transform buffer_transform_;
 
   int32_t buffer_scale_;
+
+  bool is_user_data_set_;
 
 };
 
