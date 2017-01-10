@@ -24,8 +24,8 @@ namespace skland {
 
 AbstractSurface::AbstractSurface(const Margin &margin)
     : parent_(nullptr),
-      previous_(nullptr),
-      next_(nullptr),
+      up_(nullptr),
+      down_(nullptr),
       view_(nullptr),
       margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
@@ -41,23 +41,23 @@ AbstractSurface::~AbstractSurface() {
   AbstractSurface *p = nullptr;
   AbstractSurface *tmp = nullptr;
 
-  p = previous_;
+  p = up_;
   while (p && p->parent_ == this) {
-    tmp = p->previous_;
+    tmp = p->up_;
     delete p;
     p = tmp;
   }
 
-  p = next_;
+  p = down_;
   while (p && p->parent_ == this) {
-    tmp = p->next_;
+    tmp = p->down_;
     delete p;
     p = tmp;
   }
 
   // Break the link node
-  if (previous_) previous_->next_ = next_;
-  if (next_) next_->previous_ = previous_;
+  if (up_) up_->down_ = down_;
+  if (down_) down_->up_ = up_;
 
   if (view_ && view_->surface_ == this) {
     view_->surface_ = nullptr;
@@ -68,8 +68,8 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   if (subsurface == this || subsurface->parent_) return;
 
   DBG_ASSERT(nullptr == subsurface->parent_);
-  DBG_ASSERT(nullptr == subsurface->previous_);
-  DBG_ASSERT(nullptr == subsurface->next_);
+  DBG_ASSERT(nullptr == subsurface->up_);
+  DBG_ASSERT(nullptr == subsurface->down_);
   DBG_ASSERT(subsurface->wl_sub_surface_.IsNull());
 
   subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(),
@@ -82,7 +82,7 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   if (pos >= 0) {
     do {
       p = tmp;
-      tmp = tmp->next_;
+      tmp = tmp->down_;
       if (nullptr == tmp || tmp->parent_ != this) break;
       pos--;
     } while (pos >= 0);
@@ -91,7 +91,7 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   } else {
     do {
       p = tmp;
-      tmp = tmp->previous_;
+      tmp = tmp->up_;
       if (nullptr == tmp || tmp->parent_ != this) break;
       pos++;
     } while (pos < 0);
@@ -174,88 +174,88 @@ void AbstractSurface::SetPosition(int x, int y) {
 }
 
 void AbstractSurface::InsertFront(AbstractSurface *surface) {
-  if (previous_) previous_->next_ = surface;
-  surface->previous_ = previous_;
-  previous_ = surface;
-  surface->next_ = this;
+  if (up_) up_->down_ = surface;
+  surface->up_ = up_;
+  up_ = surface;
+  surface->down_ = this;
 }
 
 void AbstractSurface::InsertBack(AbstractSurface *surface) {
-  if (next_) next_->previous_ = surface;
-  surface->next_ = next_;
-  next_ = surface;
-  surface->previous_ = this;
+  if (down_) down_->up_ = surface;
+  surface->down_ = down_;
+  down_ = surface;
+  surface->up_ = this;
 }
 
 void AbstractSurface::MoveBelow(AbstractSurface *surface_a, AbstractSurface *surface_b) {
-  AbstractSurface *head = surface_b;
-  AbstractSurface *tail = surface_b;
+  AbstractSurface *top = surface_b;
+  AbstractSurface *bottom = surface_b;
   AbstractSurface *tmp = nullptr;
 
   tmp = surface_b;
-  while (tmp->previous_ && (tmp->previous_->parent_ != surface_b->parent_)) {
-    head = tmp;
-    tmp = tmp->previous_;
+  while (tmp->up_ && (tmp->up_->parent_ != surface_b->parent_)) {
+    top = tmp;
+    tmp = tmp->up_;
   }
 
   tmp = surface_b;
-  while (tmp->next_ && (tmp->next_->parent_ != surface_b->parent_)) {
-    tail = tmp;
-    tmp = tmp->next_;
+  while (tmp->down_ && (tmp->down_->parent_ != surface_b->parent_)) {
+    bottom = tmp;
+    tmp = tmp->down_;
   }
 
-  if (head == tail) {
-    if (surface_b->previous_) surface_b->previous_->next_ = surface_b->next_;
-    if (surface_b->next_) surface_b->next_->previous_ = surface_b->previous_;
+  if (top == bottom) {
+    if (surface_b->up_) surface_b->up_->down_ = surface_b->down_;
+    if (surface_b->down_) surface_b->down_->up_ = surface_b->up_;
 
-    surface_b->previous_ = surface_a;
-    surface_b->next_ = surface_a->next_;
-    if (surface_a->next_) surface_a->next_->previous_ = surface_b;
-    surface_a->next_ = surface_b;
+    surface_b->up_ = surface_a;
+    surface_b->down_ = surface_a->down_;
+    if (surface_a->down_) surface_a->down_->up_ = surface_b;
+    surface_a->down_ = surface_b;
   } else {
-    if (head->previous_) head->previous_->next_ = tail->next_;
-    if (tail->next_) tail->next_->previous_ = head->previous_;
+    if (top->up_) top->up_->down_ = bottom->down_;
+    if (bottom->down_) bottom->down_->up_ = top->up_;
 
-    head->previous_ = surface_a;
-    tail->next_ = surface_a->next_;
-    if (surface_a->next_) surface_a->next_->previous_ = tail;
-    surface_a->next_ = head;
+    top->up_ = surface_a;
+    bottom->down_ = surface_a->down_;
+    if (surface_a->down_) surface_a->down_->up_ = bottom;
+    surface_a->down_ = top;
   }
 }
 
 void AbstractSurface::MoveAbove(AbstractSurface *surface_a, AbstractSurface *surface_b) {
-  AbstractSurface *head = surface_b;
-  AbstractSurface *tail = surface_b;
+  AbstractSurface *top = surface_b;
+  AbstractSurface *bottom = surface_b;
   AbstractSurface *tmp = nullptr;
 
   tmp = surface_b;
-  while (tmp->previous_ && (tmp->previous_->parent_ != surface_b->parent_)) {
-    head = tmp;
-    tmp = tmp->previous_;
+  while (tmp->up_ && (tmp->up_->parent_ != surface_b->parent_)) {
+    top = tmp;
+    tmp = tmp->up_;
   }
 
   tmp = surface_b;
-  while (tmp->next_ && (tmp->next_->parent_ != surface_b->parent_)) {
-    tail = tmp;
-    tmp = tmp->next_;
+  while (tmp->down_ && (tmp->down_->parent_ != surface_b->parent_)) {
+    bottom = tmp;
+    tmp = tmp->down_;
   }
 
-  if (head == tail) {
-    if (surface_b->previous_) surface_b->previous_->next_ = surface_b->next_;
-    if (surface_b->next_) surface_b->next_->previous_ = surface_b->previous_;
+  if (top == bottom) {
+    if (surface_b->up_) surface_b->up_->down_ = surface_b->down_;
+    if (surface_b->down_) surface_b->down_->up_ = surface_b->up_;
 
-    surface_b->previous_ = surface_a->previous_;
-    surface_b->next_ = surface_a;
-    if (surface_a->previous_) surface_a->previous_->next_ = surface_b;
-    surface_a->previous_ = surface_b;
+    surface_b->up_ = surface_a->up_;
+    surface_b->down_ = surface_a;
+    if (surface_a->up_) surface_a->up_->down_ = surface_b;
+    surface_a->up_ = surface_b;
   } else {
-    if (head->previous_) head->previous_->next_ = tail->next_;
-    if (tail->next_) tail->next_->previous_ = head->previous_;
+    if (top->up_) top->up_->down_ = bottom->down_;
+    if (bottom->down_) bottom->down_->up_ = top->up_;
 
-    head->previous_ = surface_a->previous_;
-    tail->next_ = surface_a;
-    if (surface_a->previous_) surface_a->previous_->next_ = head;
-    surface_a->previous_ = tail;
+    top->up_ = surface_a->up_;
+    bottom->down_ = surface_a;
+    if (surface_a->up_) surface_a->up_->down_ = top;
+    surface_a->up_ = bottom;
   }
 }
 

@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_ABSTRACT_SURFACE_HPP
-#define SKLAND_ABSTRACT_SURFACE_HPP
-
-#include "task.hpp"
+#ifndef SKLAND_ABSTRACT_SURFACE_HPP_
+#define SKLAND_ABSTRACT_SURFACE_HPP_
 
 #include "../core/object.hpp"
 #include "../core/margin.hpp"
@@ -27,6 +25,8 @@
 #include "../wayland/region.hpp"
 #include "../wayland/subsurface.hpp"
 
+#include "task.hpp"
+
 namespace skland {
 
 class AbstractView;
@@ -34,7 +34,7 @@ class Canvas;
 class Buffer;
 
 /**
- * @brief A surface represents a drawing rectangle
+ * @brief A drawing rectangle on screen
  *
  * A surface in 'gui' module contains a native wayland surface and
  * can provide 2D, 3D, Texture property.
@@ -116,12 +116,12 @@ class AbstractSurface {
     return parent_;
   }
 
-  AbstractSurface *previous() const {
-    return previous_;
+  AbstractSurface *up() const {
+    return up_;
   }
 
-  AbstractSurface *next() const {
-    return next_;
+  AbstractSurface *down() const {
+    return down_;
   }
 
  protected:
@@ -155,14 +155,14 @@ class AbstractSurface {
   void OnLeave(struct wl_output *wl_output);
 
   /**
-   * @brief Move the local surface list of surface_b and insert before surface_a
+   * @brief Move the local surface list of surface_b and insert above surface_a
    * @param surface_a
    * @param surface_b
    */
   static void MoveAbove(AbstractSurface *surface_a, AbstractSurface *surface_b);
 
   /**
-   * @brief Move the local surface list of surface_b and insert after surface_a
+   * @brief Move the local surface list of surface_b and insert below surface_a
    * @param surface_a
    * @param surface_b
    */
@@ -170,9 +170,9 @@ class AbstractSurface {
 
   AbstractSurface *parent_;
 
-  AbstractSurface *previous_;
+  AbstractSurface *up_;
 
-  AbstractSurface *next_;
+  AbstractSurface *down_;
 
   wayland::Surface wl_surface_;
 
@@ -199,4 +199,4 @@ class AbstractSurface {
 
 }
 
-#endif // SKLAND_ABSTRACT_SURFACE_HPP
+#endif // SKLAND_ABSTRACT_SURFACE_HPP_
