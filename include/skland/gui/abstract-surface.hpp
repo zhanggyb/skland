@@ -39,7 +39,7 @@ class Buffer;
  * A surface in 'gui' module contains a native wayland surface and
  * can provide 2D, 3D, Texture property.
  */
-class AbstractSurface : public Object {
+class AbstractSurface {
 
   friend class AbstractView;
 
@@ -52,11 +52,12 @@ class AbstractSurface : public Object {
 
   virtual ~AbstractSurface();
 
+  /**
+   * @brief Add a new created surface into the sub surface list
+   * @param subsurface A new created surface object
+   * @param pos The position in the sub surface list, can be negative (below), positive (above)
+   */
   void AddSubSurface(AbstractSurface *subsurface, int pos = 0);
-
-  AbstractSurface *RemoveSubSurface(AbstractSurface *subsurface);
-
-  AbstractSurface *GetSubSurfaceAt(int index) const;
 
   void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
@@ -78,9 +79,9 @@ class AbstractSurface : public Object {
     wl_surface_.SetOpaqueRegion(region);
   }
 
-  void PlaceAbove(const AbstractSurface &surface);
+  void PlaceAbove(AbstractSurface *sibling);
 
-  void PlaceBelow(const AbstractSurface &surface);
+  void PlaceBelow(AbstractSurface *sibling);
 
   /**
    * @brief Set sub surface position
@@ -111,8 +112,16 @@ class AbstractSurface : public Object {
     return position_;
   }
 
-  AbstractSurface *parent_surface() const {
-    return static_cast<AbstractSurface *>(parent());
+  AbstractSurface *parent() const {
+    return parent_;
+  }
+
+  AbstractSurface *previous() const {
+    return previous_;
+  }
+
+  AbstractSurface *next() const {
+    return next_;
   }
 
  protected:
@@ -137,9 +146,33 @@ class AbstractSurface : public Object {
 
  private:
 
+  void InsertFront(AbstractSurface *surface);
+
+  void InsertBack(AbstractSurface *surface);
+
   void OnEnter(struct wl_output *wl_output);
 
   void OnLeave(struct wl_output *wl_output);
+
+  /**
+   * @brief Move the local surface list of surface_b and insert before surface_a
+   * @param surface_a
+   * @param surface_b
+   */
+  static void MoveAbove(AbstractSurface *surface_a, AbstractSurface *surface_b);
+
+  /**
+   * @brief Move the local surface list of surface_b and insert after surface_a
+   * @param surface_a
+   * @param surface_b
+   */
+  static void MoveBelow(AbstractSurface *surface_a, AbstractSurface *surface_b);
+
+  AbstractSurface *parent_;
+
+  AbstractSurface *previous_;
+
+  AbstractSurface *next_;
 
   wayland::Surface wl_surface_;
 
@@ -159,6 +192,8 @@ class AbstractSurface : public Object {
   enum wl_output_transform buffer_transform_;
 
   int32_t buffer_scale_;
+
+  bool is_user_data_set_;
 
 };
 
