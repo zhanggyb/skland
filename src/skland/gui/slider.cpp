@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-#include <skland/gui/abstract-slider-bar.hpp>
+#include <skland/gui/slider.hpp>
 
 namespace skland {
 
-AbstractSliderBar::AbstractSliderBar()
-    : AbstractWidget(200, 20) {
+Slider::Slider() {
 
 }
 
-AbstractSliderBar::~AbstractSliderBar() {
+Slider::~Slider() {
 
 }
 
-Size AbstractSliderBar::GetPreferredSize() const {
-  return Size(200, 20);
+void Slider::OnDraw(Canvas *canvas) {
+
 }
 
 }

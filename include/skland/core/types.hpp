@@ -359,6 +359,11 @@ enum PixelFormat {
       kPixelFormatYVU444 = 0x34325659  // WL_SHM_FORMAT_YVU444
 };
 
+enum Orientation {
+  kHorizontal,
+  kVertical
+};
+
 }
 
 #endif // SKLAND_CORE_TYPES_HPP_

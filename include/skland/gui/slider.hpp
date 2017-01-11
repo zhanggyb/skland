@@ -17,20 +17,20 @@
 #ifndef SKLAND_GUI_SLIDER_BAR_HPP_
 #define SKLAND_GUI_SLIDER_BAR_HPP_
 
-#include "abstract-slider-bar.hpp"
+#include "abstract-slider.hpp"
 
 namespace skland {
 
-class SliderBar : public AbstractSliderBar {
+class Slider : public AbstractSlider<int> {
 
-  SliderBar(const SliderBar &) = delete;
-  SliderBar &operator=(const SliderBar &) = delete;
+  Slider(const Slider &) = delete;
+  Slider &operator=(const Slider &) = delete;
 
  public:
 
-  SliderBar();
+  Slider();
 
-  virtual ~SliderBar();
+  virtual ~Slider();
 
  protected:
 
