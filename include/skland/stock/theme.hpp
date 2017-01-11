@@ -52,7 +52,7 @@ class Theme {
 
  public:
 
-  static AbstractWindowFrame *CreateWindowFrame();
+  static AbstractWindowFrame *CreateWindowFrame(bool dark = false);
 
   static inline const ColorScheme &window_frame() {
     return kTheme->window_frame_;

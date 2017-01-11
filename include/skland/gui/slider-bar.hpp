@@ -14,26 +14,32 @@
  * limitations under the License.
  */
 
-#include <skland/gui/application.hpp>
-#include <skland/gui/window.hpp>
-#include <skland/gui/label.hpp>
+#ifndef SKLAND_GUI_SLIDER_BAR_HPP_
+#define SKLAND_GUI_SLIDER_BAR_HPP_
 
-using namespace skland;
+#include "abstract-slider-bar.hpp"
 
-int main(int argc, char *argv[]) {
-  using skland::Window;
+namespace skland {
 
-  Application app(argc, argv);
+class SliderBar : public AbstractSliderBar {
 
-  Window *win = new Window(320, 240, "Hello");
-  win->SetAppId("Hello");
+  SliderBar(const SliderBar &) = delete;
+  SliderBar &operator=(const SliderBar &) = delete;
 
-  Label *label = new Label("Hello Wayland!");
-  label->SetForeground(0xFF444444);
-  label->SetFont(skland::Font(Typeface::kBold, 24.f));
-  win->SetMainWidget(label);
+ public:
 
-  win->Show();
+  SliderBar();
 
-  return app.Run();
+  virtual ~SliderBar();
+
+ protected:
+
+  virtual void OnDraw(Canvas *canvas) override;
+
+ private:
+
+};
+
 }
+
+#endif // SKLAND_GUI_SLIDER_BAR_HPP_

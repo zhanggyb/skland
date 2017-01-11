@@ -46,7 +46,7 @@ void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */
 }
 
 void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
-  Color regular(0.83f, 0.83f, 0.83f, 1.f);
+  Color regular(0.83f, 0.33f, 0.33f);
   Color down = regular - 50;
   Color hover = regular + 15;
 
@@ -76,7 +76,7 @@ void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
   if (IsHovered()) {
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetStrokeWidth(1.5f);
-    paint.SetColor(0xFF3B3B3B);
+    paint.SetColor(0xFF444444);
     canvas->DrawLine(center_x() - 2.5f, center_y() - 2.5f,
                      center_x() + 2.5f, center_y() + 2.5f,
                      paint);
@@ -174,12 +174,13 @@ void DefaultWindowFrame::MinimizeButton::OnDraw(Canvas *canvas) {
 
 //-------------------------
 
-DefaultWindowFrame::DefaultWindowFrame()
+DefaultWindowFrame::DefaultWindowFrame(Mode mode)
     : AbstractWindowFrame(),
       close_button_(nullptr),
       maximize_button_(nullptr),
       minimize_button_(nullptr),
-      title_(nullptr) {
+      title_(nullptr),
+      mode_(mode) {
   set_border(0);
   set_title_bar_size(22);
   set_title_bar_position(kTitleBarTop);
@@ -213,7 +214,7 @@ void DefaultWindowFrame::CreateWidgets() {
 //  maximize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMaximizeButtonClicked);
 
   title_ = new Label(window()->title());
-  title_->SetForeground(0xFFEBEBEB);
+  title_->SetForeground(mode_ == kModeLight ? 0xFF444444 : 0xFFBBBBBB);
   title_->SetFont(Font(Typeface::kBold));
 
   AddWidget(title_);  // put the title below other widgets
@@ -257,44 +258,10 @@ void DefaultWindowFrame::OnDraw(Canvas *canvas) {
   Paint paint;
   paint.SetAntiAlias(true);
 
-  float radii_up[] = {
-      7.f, 7.f, // top-left
-      7.f, 7.f, // top-right
-      0.f, 0.f, // bottom-right
-      0.f, 0.f  // bottom-left
-  };
-
   path.Reset();
-  path.AddRoundRect(Rect(window()->left(),
-                         window()->top(),
-                         window()->right(),
-                         window()->top() + title_bar_size()),
-                    radii_up);
-  paint.SetColor(0xFF555555);
+  path.AddRoundRect(window()->geometry(), radii);
+  paint.SetColor(mode_ == kModeLight ? 0xEFF0F0F0 : 0xEF202020);
   canvas->DrawPath(path, paint);
-
-  float radii_down[] = {
-      0.f, 0.f, // top-left
-      0.f, 0.f, // top-right
-      4.f, 4.f, // bottom-right
-      4.f, 4.f  // bottom-left
-  };
-
-  path.Reset();
-  path.AddRoundRect(Rect(window()->left(),
-                         window()->top() + title_bar_size(),
-                         window()->right(),
-                         window()->bottom()),
-                    radii_down);
-
-  if (border() > 0) {
-    canvas->DrawPath(path, paint);
-    paint.SetColor(0xFFEBEBEB);
-    canvas->DrawRect(GetClientGeometry(), paint);
-  } else {
-    paint.SetColor(0xFFEBEBEB);
-    canvas->DrawPath(path, paint);
-  }
 
   canvas->Flush();
 }

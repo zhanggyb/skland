@@ -58,26 +58,6 @@ void PushButton::OnDraw(Canvas *canvas) {
   }
 
   canvas->DrawRect(geometry(), paint);
-
-  /*
-  canvas.SetOperator(CAIRO_OPERATOR_SOURCE);
-  canvas.SetColor(0.75, 0.75, 0.75, 1.);
-  canvas.RoundedRectangle(x() + 0.5,
-                          y() + 0.5,
-                          x() + width() - 0.5,
-                          y() + height() - 0.5,
-                          4.);
-  canvas.Fill();
-  canvas.SetColor(0.1, 0.1, 0.1, 1.);
-  canvas.RoundedRectangle(x() + 0.5,
-                          y() + 0.5,
-                          x() + width() - 0.5,
-                          y() + height() - 0.5,
-                          4.);
-  canvas.SetLineWidth(1.);
-  canvas.Stroke();
-   */
-  canvas->Flush();
 }
 
 }

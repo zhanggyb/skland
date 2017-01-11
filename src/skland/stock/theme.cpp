@@ -38,8 +38,8 @@ Theme::~Theme() {
   delete shadow_pixmap_;
 }
 
-AbstractWindowFrame *Theme::CreateWindowFrame() {
-  return new DefaultWindowFrame;
+AbstractWindowFrame *Theme::CreateWindowFrame(bool dark) {
+  return new DefaultWindowFrame(dark ? DefaultWindowFrame::kModeDark : DefaultWindowFrame::kModeLight);
 }
 
 void Theme::Reset() {
@@ -81,7 +81,7 @@ void Theme::GenerateShadowImage() {
                                     kShadowImageWidth * 4);
   SkPaint paint;
   paint.setAntiAlias(true);
-  paint.setARGB(99, 0, 0, 0);
+  paint.setARGB(105, 0, 0, 0);
   paint.setMaskFilter(SkBlurMaskFilter::Make(
       kNormal_SkBlurStyle, shadow_radius_ / 2.f - 0.5f, 0x2));  // Use high-quality blur
 

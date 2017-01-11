@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-#include <skland/gui/application.hpp>
-#include <skland/gui/window.hpp>
-#include <skland/gui/label.hpp>
+#include <skland/gui/abstract-slider-bar.hpp>
 
-using namespace skland;
+namespace skland {
 
-int main(int argc, char *argv[]) {
-  using skland::Window;
+AbstractSliderBar::AbstractSliderBar()
+    : AbstractWidget(200, 20) {
 
-  Application app(argc, argv);
+}
 
-  Window *win = new Window(320, 240, "Hello");
-  win->SetAppId("Hello");
+AbstractSliderBar::~AbstractSliderBar() {
 
-  Label *label = new Label("Hello Wayland!");
-  label->SetForeground(0xFF444444);
-  label->SetFont(skland::Font(Typeface::kBold, 24.f));
-  win->SetMainWidget(label);
+}
 
-  win->Show();
+Size AbstractSliderBar::GetPreferredSize() const {
+  return Size(200, 20);
+}
 
-  return app.Run();
 }

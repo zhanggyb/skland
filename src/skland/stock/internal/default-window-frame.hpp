@@ -36,7 +36,12 @@ class DefaultWindowFrame final : public AbstractWindowFrame {
 
  public:
 
-  DefaultWindowFrame();
+  enum Mode {
+    kModeLight,
+    kModeDark
+  };
+
+  DefaultWindowFrame(Mode mode = kModeLight);
 
   virtual ~DefaultWindowFrame();
 
@@ -141,6 +146,8 @@ class DefaultWindowFrame final : public AbstractWindowFrame {
   MinimizeButton *minimize_button_;
 
   Label *title_;
+
+  Mode mode_;
 
 };
 
