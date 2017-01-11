@@ -23,6 +23,8 @@
 #include "../core/rect.hpp"
 #include "../core/color.hpp"
 
+#include "clip-operation.hpp"
+
 #include <memory>
 
 class SkCanvas;
@@ -70,7 +72,11 @@ class Canvas {
 
   void Clear(const Color &color);
 
+  void ClipRect(const Rect &rect, ClipOperation op, bool antialias = false);
+
   void ClipRect(const Rect &rect, bool antialias = false);
+
+  void ClipPath(const Path &path, ClipOperation op, bool antialias = false);
 
   void ClipPath(const Path &path, bool antialias = false);
 

@@ -90,8 +90,16 @@ void Canvas::Clear(const Color &color) {
   metadata_->clear(color.argb());
 }
 
+void Canvas::ClipRect(const Rect &rect, ClipOperation op, bool antialias) {
+  metadata_->clipRect(reinterpret_cast<const SkRect &>(rect), static_cast<SkClipOp >(op), antialias);
+}
+
 void Canvas::ClipRect(const Rect &rect, bool antialias) {
   metadata_->clipRect(reinterpret_cast<const SkRect &>(rect), antialias);
+}
+
+void Canvas::ClipPath(const Path &path, ClipOperation op, bool antialias) {
+  metadata_->clipPath(*path.sk_path(), static_cast<SkClipOp >(op), antialias);
 }
 
 void Canvas::ClipPath(const Path &path, bool antilias) {

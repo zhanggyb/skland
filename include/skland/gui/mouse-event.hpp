@@ -55,6 +55,10 @@ class MouseEvent : public InputEvent {
         axis_(0) {
   }
 
+  AbstractSurface *surface() const {
+    return surface_;
+  }
+
   uint32_t serial() const {
     return serial_;
   }

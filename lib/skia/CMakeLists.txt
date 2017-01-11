@@ -55,8 +55,6 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontConfigInterface.cpp
 remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontMgr_custom*.cpp)
 # skslc main()
 remove_srcs(${SKIA_SOURCE_DIR}/src/sksl/SkSLMain.cpp)
-# remove xbyak support
-remove_srcs(${SKIA_SOURCE_DIR}/src/opts/SkXbyak.cpp)
 # remove the special splicer source, TODO: config cmake to detect clang and SSE
 remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
 

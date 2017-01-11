@@ -74,6 +74,7 @@ void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
   canvas->DrawCircle(center_x(), center_y(), 6.5f, paint);
 
   if (IsHovered()) {
+    paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetStrokeWidth(1.5f);
     paint.SetColor(0xFF3B3B3B);
     canvas->DrawLine(center_x() - 2.5f, center_y() - 2.5f,
@@ -239,7 +240,19 @@ void DefaultWindowFrame::LayoutWidgets(int width, int height) {
 void DefaultWindowFrame::OnDraw(Canvas *canvas) {
   canvas->Clear();
 
+  float radii[] = {
+      7.f, 7.f, // top-left
+      7.f, 7.f, // top-right
+      4.f, 4.f, // bottom-right
+      4.f, 4.f  // bottom-left
+  };
+  Path path;
+  path.AddRoundRect(window()->geometry(), radii);
+
+  canvas->Save();
+  canvas->ClipPath(path, kClipDifference, true);
   DrawShadow(canvas);
+  canvas->Restore();
 
   Paint paint;
   paint.SetAntiAlias(true);
@@ -251,13 +264,13 @@ void DefaultWindowFrame::OnDraw(Canvas *canvas) {
       0.f, 0.f  // bottom-left
   };
 
-  Path path;
+  path.Reset();
   path.AddRoundRect(Rect(window()->left(),
                          window()->top(),
                          window()->right(),
                          window()->top() + title_bar_size()),
                     radii_up);
-  paint.SetColor(0xEF555555);
+  paint.SetColor(0xFF555555);
   canvas->DrawPath(path, paint);
 
   float radii_down[] = {

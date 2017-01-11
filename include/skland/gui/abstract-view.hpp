@@ -135,7 +135,9 @@ class AbstractView : public Object {
 
   void SetSurface(AbstractSurface *surface);
 
-  void Damage(const Rect &rect);
+  void TrackMouseMotion(MouseEvent *event);
+
+  void UntrackMouseMotion();
 
   void set_visible(bool visible) {
     visible_ = visible;
@@ -190,17 +192,20 @@ class AbstractView : public Object {
   /**
    * The main surface for this window
    */
-  AbstractSurface* surface_;
+  AbstractSurface *surface_;
 
   /**
-   * This property should only be assigned with RedrawTask
+   * Used in event loop to render this view
    */
   std::unique_ptr<RedrawTask> redraw_task_;
 
   /**
-   * This property should only be assigned with MouseTask
+   * This property used in Input to dispatch mouse events for this view
    */
   std::unique_ptr<ViewTask> mouse_task_;
+
+  std::unique_ptr<ViewTask> mouse_motion_task_;
+
 };
 
 }

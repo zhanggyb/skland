@@ -20,6 +20,7 @@
 #include <skland/gui/abstract-surface.hpp>
 #include <skland/gui/display.hpp>
 #include <skland/gui/abstract-window.hpp>
+#include <skland/gui/mouse-event.hpp>
 
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
@@ -38,6 +39,7 @@ AbstractView::AbstractView(int width, int height)
       geometry_(width, height) {
   redraw_task_.reset(new RedrawTask(this, nullptr));
   mouse_task_.reset(new ViewTask(this));
+  mouse_motion_task_.reset(new ViewTask(this));
 }
 
 AbstractView::~AbstractView() {
@@ -88,33 +90,6 @@ AbstractWindow *AbstractView::GetWindow() const {
   return dynamic_cast<AbstractWindow *>(GetSurface()->view());
 }
 
-void AbstractView::SetSurface(AbstractSurface *surface) {
-  if (surface_ == surface) {
-    DBG_ASSERT(surface->view_ == this);
-    return;
-  }
-
-  // TODO: inform original view
-
-  surface_ = surface;
-
-  if (surface_) {
-    surface_->view_ = this;
-    surface_->OnSetup();
-  }
-}
-
-void AbstractView::Damage(const Rect &rect) {
-  AbstractSurface *surface = GetSurface();
-  if (surface) {
-    surface->Damage((int) rect.x() + surface->margin().left,
-                    (int) rect.y() + surface->margin().top,
-                    (int) rect.width(),
-                    (int) rect.height());
-    surface->Commit();
-  }
-}
-
 void AbstractView::Update() {
   if (redraw_task_->IsLinked()) return;
 
@@ -140,6 +115,38 @@ void AbstractView::OnUpdate(AbstractView *view) {
 
   if (parent())
     parent_view()->OnUpdate(view);
+}
+
+void AbstractView::SetSurface(AbstractSurface *surface) {
+  if (surface_ == surface) {
+    DBG_ASSERT(surface->view_ == this);
+    return;
+  }
+
+  // TODO: inform original view
+
+  surface_ = surface;
+
+  if (surface_) {
+    surface_->view_ = this;
+    surface_->OnSetup();
+  }
+}
+
+void AbstractView::TrackMouseMotion(MouseEvent *event) {
+  if (mouse_motion_task_->IsLinked()) return;
+
+  AbstractView *window = event->surface()->view();
+
+  ViewTask *task = window->mouse_motion_task_.get();
+  while (task->next()) {
+    task = static_cast<ViewTask *>(task->next());
+  }
+  task->PushBack(mouse_motion_task_.get());
+}
+
+void AbstractView::UntrackMouseMotion() {
+  mouse_motion_task_->Unlink();
 }
 
 }

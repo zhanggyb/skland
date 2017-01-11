@@ -247,6 +247,15 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
     // and recheck subviews:
     ProcessMouseEnterOnSubviews(tail->view, tail);
 
+    // Now dispatch mouse move event:
+    task = static_cast<ViewTask *>(window->mouse_motion_task_.get()->next());
+    mouse_event_->accepted_ = false;
+    while (task) {
+      task->view->OnMouseMove(mouse_event_);
+      if (!mouse_event_->accepted_) break;
+
+      task = static_cast<ViewTask *>(task->next());
+    }
   }
 }
 
