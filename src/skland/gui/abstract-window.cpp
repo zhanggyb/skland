@@ -95,8 +95,8 @@ AbstractWindow::AbstractWindow(int width,
     output_size = output->current_mode_size();  // The current screen size
   }
 
-  int total_width = std::max((int) this->width(), output_size.width);
-  int total_height = std::max((int) this->height(), output_size.height);
+  int total_width = std::max((int) geometry().width(), output_size.width);
+  int total_height = std::max((int) geometry().height(), output_size.height);
   total_width += shell_surface->margin().lr();
   total_height += shell_surface->margin().tb();
 
@@ -386,8 +386,8 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
 
     int x = main_surface_->margin().left;
     int y = main_surface_->margin().top;
-    int w = (int) width();
-    int h = (int) height();
+    int w = (int) geometry().width();
+    int h = (int) geometry().height();
     xdg_surface_.SetWindowGeometry(x, y, w, h);
 
     if (frame_surface_) {
@@ -417,7 +417,7 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
   height = clamp(height, min.height, max.height);
 
   if (maximized || fullscreen || resizing) {
-    if (width != this->width() || height != this->height()) {
+    if (width != geometry().width() || height != geometry().height()) {
 
       Rect input_rect(width, height);
       int x = 0, y = 0;

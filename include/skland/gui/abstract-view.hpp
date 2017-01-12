@@ -92,26 +92,6 @@ class AbstractView : public Object {
 
   virtual bool Contain(int x, int y) const;
 
-  float x() const { return geometry_.x(); }
-
-  float y() const { return geometry_.y(); }
-
-  float left() const { return geometry_.left; }
-
-  float top() const { return geometry_.top; }
-
-  float right() const { return geometry_.right; }
-
-  float bottom() const { return geometry_.bottom; }
-
-  float width() const { return geometry_.width(); }
-
-  float height() const { return geometry_.height(); }
-
-  float center_x() const { return geometry_.center_x(); }
-
-  float center_y() const { return geometry_.center_y(); }
-
   const Rect &geometry() const {
     return geometry_;
   }

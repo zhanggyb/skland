@@ -41,8 +41,8 @@ MainWindow::MainWindow(int width, int height, const char *title)
     output_size = output->current_mode_size();  // The current screen size
   }
 
-  int total_width = std::max((int) (this->width()), output_size.width);
-  int total_height = std::max((int) (this->height()), output_size.height);
+  int total_width = std::max((int) (geometry().width()), output_size.width);
+  int total_height = std::max((int) (geometry().height()), output_size.height);
   if (!IsFrameless()) {
 //    total_width += surface()->margin().lr();
 //    total_height += surface()->margin().tb();

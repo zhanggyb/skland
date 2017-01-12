@@ -96,13 +96,13 @@ void Slider::OnDraw(Canvas *canvas) {
   paint.SetStyle(Paint::Style::kStyleStroke);
   paint.SetColor(0xEF444444);
   paint.SetStrokeWidth(1.f);
-  canvas->DrawLine(left(), center_y(), right(), center_y(), paint);
+  canvas->DrawLine(geometry().l, geometry().center_y(), geometry().r, geometry().center_y(), paint);
   paint.SetAntiAlias(true);
   paint.SetColor(0xFFDF5E00);
-  canvas->DrawCircle(center_x(), center_y(), 5.f, paint);
+  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.f, paint);
   paint.SetColor(0xFFFF7E00);
   paint.SetStyle(Paint::Style::kStyleFill);
-  canvas->DrawCircle(center_x(), center_y(), 5.f, paint);
+  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.f, paint);
 }
 
 }

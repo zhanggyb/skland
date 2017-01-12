@@ -59,7 +59,7 @@ void AbstractView::Resize(int width, int height) {
   width = clamp(width, min.width, max.width);
   height = clamp(height, min.height, max.height);
 
-  if (this->width() != width || this->height() != height) {
+  if (geometry_.width() != width || geometry_.height() != height) {
     OnResize(width, height);
   }
 }

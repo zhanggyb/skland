@@ -36,8 +36,8 @@ AbstractWindowFrame::~AbstractWindowFrame() {
 Rect AbstractWindowFrame::GetClientGeometry() const {
   int x = border_,
       y = border_,
-      w = (int) window()->width() - 2 * border_,
-      h = (int) window()->height() - 2 * border_;
+      w = (int) window()->geometry().width() - 2 * border_,
+      h = (int) window()->geometry().height() - 2 * border_;
 
   switch (title_bar_position_) {
     case kTitleBarLeft: {
