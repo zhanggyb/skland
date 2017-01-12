@@ -13,18 +13,17 @@ namespace skland {
 
 class EGLSurface : public AbstractSurface {
 
+  EGLSurface() = delete;
   EGLSurface(const EGLSurface &) = delete;
   EGLSurface &operator=(const EGLSurface &) = delete;
 
  public:
 
-  EGLSurface();
+  EGLSurface(AbstractView *view);
 
   virtual ~EGLSurface();
 
  protected:
-
-  virtual void OnSetup() final;
 
   virtual void OnAttach(const Buffer *buffer) final;
 

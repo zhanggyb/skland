@@ -22,15 +22,16 @@
 
 namespace skland {
 
-AbstractSurface::AbstractSurface(const Margin &margin)
+AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
     : parent_(nullptr),
       up_(nullptr),
       down_(nullptr),
-      view_(nullptr),
+      view_(view),
       margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1),
       is_user_data_set_(false) {
+  DBG_ASSERT(nullptr != view_);
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);
   wl_surface_.leave().Set(this, &AbstractSurface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
@@ -58,10 +59,6 @@ AbstractSurface::~AbstractSurface() {
   // Break the link node
   if (up_) up_->down_ = down_;
   if (down_) down_->up_ = up_;
-
-  if (view_ && view_->surface_ == this) {
-    view_->surface_ = nullptr;
-  }
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {

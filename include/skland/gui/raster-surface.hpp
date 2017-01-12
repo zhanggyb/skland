@@ -27,12 +27,13 @@ namespace skland {
  */
 class RasterSurface : public AbstractSurface {
 
+  RasterSurface() = delete;
   RasterSurface(const RasterSurface &) = delete;
   RasterSurface &operator=(const RasterSurface &) = delete;
 
  public:
 
-  RasterSurface(const Margin &margin = Margin());
+  RasterSurface(AbstractView *view, const Margin &margin = Margin());
 
   virtual ~RasterSurface();
 
@@ -41,8 +42,6 @@ class RasterSurface : public AbstractSurface {
   }
 
  protected:
-
-  virtual void OnSetup() final;
 
   virtual void OnAttach(const Buffer *buffer) final;
 

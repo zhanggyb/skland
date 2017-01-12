@@ -16,9 +16,17 @@
 
 #include <skland/gui/slider.hpp>
 
+#include <skland/gui/mouse-event.hpp>
+#include <skland/gui/key-event.hpp>
+
+#include <skland/graphic/canvas.hpp>
+#include <skland/graphic/paint.hpp>
+
 namespace skland {
 
-Slider::Slider() {
+Slider::Slider(Orientation orientation)
+    : AbstractSlider<int>(orientation),
+      hover_(false) {
 
 }
 
@@ -26,8 +34,75 @@ Slider::~Slider() {
 
 }
 
-void Slider::OnDraw(Canvas *canvas) {
+void Slider::OnResize(int width, int height) {
+  resize(width, height);
+  Update();
+}
 
+void Slider::OnMouseEnter(MouseEvent *event) {
+  hover_ = true;
+  Update();
+  event->Accept();
+}
+
+void Slider::OnMouseLeave(MouseEvent *event) {
+  hover_ = false;
+  Update();
+  event->Accept();
+}
+
+void Slider::OnMouseMove(MouseEvent *event) {
+  event->Accept();
+}
+
+void Slider::OnMouseButton(MouseEvent *event) {
+  event->Accept();
+}
+
+void Slider::OnKeyboardKey(KeyEvent *event) {
+  event->Accept();
+}
+
+void Slider::OnSetValue(const int &value) {
+  int new_value = value - value % step();
+
+  if (new_value != this->value()) {
+    set_value(value - value % step());
+    Update();
+    EmitSignal();
+  }
+}
+
+void Slider::OnSetMinimum(const int &minimum) {
+  int new_minimum = minimum - minimum % step();
+
+  set_minimum(minimum);
+}
+
+void Slider::OnSetMaximum(const int &maximum) {
+  set_maximum(maximum);
+}
+
+void Slider::OnDraw(Canvas *canvas) {
+  Paint paint;
+
+  if (hover_) {
+    paint.SetColor(0xEFC0C0C0);
+  } else {
+    paint.SetColor(0xEEB0B0B0);
+  }
+  canvas->DrawRect(geometry(), paint);
+
+  paint.SetStyle(Paint::Style::kStyleStroke);
+  paint.SetColor(0xEF444444);
+  paint.SetStrokeWidth(1.f);
+  canvas->DrawLine(left(), center_y(), right(), center_y(), paint);
+  paint.SetAntiAlias(true);
+  paint.SetColor(0xFFDF5E00);
+  canvas->DrawCircle(center_x(), center_y(), 5.f, paint);
+  paint.SetColor(0xFFFF7E00);
+  paint.SetStyle(Paint::Style::kStyleFill);
+  canvas->DrawCircle(center_x(), center_y(), 5.f, paint);
 }
 
 }

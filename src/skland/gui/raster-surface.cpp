@@ -21,14 +21,10 @@
 
 namespace skland {
 
-RasterSurface::RasterSurface(const Margin &margin)
-    : AbstractSurface(margin) {}
+RasterSurface::RasterSurface(AbstractView *view, const Margin &margin)
+    : AbstractSurface(view, margin) {}
 
 RasterSurface::~RasterSurface() {
-}
-
-void RasterSurface::OnSetup() {
-  // TODO: setup when this surface is set in a view
 }
 
 void RasterSurface::OnAttach(const Buffer *buffer) {

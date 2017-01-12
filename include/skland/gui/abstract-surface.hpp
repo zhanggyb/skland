@@ -41,14 +41,13 @@ class Buffer;
  */
 class AbstractSurface {
 
-  friend class AbstractView;
-
+  AbstractSurface() = delete;
   AbstractSurface(const AbstractSurface &) = delete;
   AbstractSurface &operator=(const AbstractSurface &) = delete;
 
  public:
 
-  AbstractSurface(const Margin &margin = Margin());
+  AbstractSurface(AbstractView *view, const Margin &margin = Margin());
 
   virtual ~AbstractSurface();
 
@@ -125,13 +124,6 @@ class AbstractSurface {
   }
 
  protected:
-
-  /**
-   * @brief Setup this surface
-   *
-   * This virtual method is called when a surface is set in a window.
-   */
-  virtual void OnSetup() = 0;
 
   /**
    * @brief Attach a buffer on this surface

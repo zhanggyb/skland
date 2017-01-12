@@ -74,8 +74,26 @@ class AbstractSlider : public AbstractWidget {
 
  protected:
 
+  virtual void OnSetValue(const T &value) = 0;
+
+  virtual void OnSetMinimum(const T &minimum) = 0;
+
+  virtual void OnSetMaximum(const T &maximum) = 0;
+
   void EmitSignal() {
     changed_.Emit(value_);
+  }
+
+  void set_value(const T &value) {
+    value_ = value;
+  }
+
+  void set_minimum(const T &minimum) {
+    minimum_ = minimum;
+  }
+
+  void set_maximum(const T &maximum) {
+    maximum_ = maximum;
   }
 
  private:
@@ -118,11 +136,9 @@ Size AbstractSlider<T>::GetPreferredSize() const {
 template<typename T>
 void AbstractSlider<T>::SetValue(const T &value) {
   if (value_ == value) return;
-  if (value < minimum_ || value > maximum_) return;
+  if (((value - step_) < minimum_) || ((value + step_) > maximum_)) return;
 
-  value_ = value;
-  Update();
-  changed_.Emit(value_);
+  OnSetValue(value);
 }
 
 template<typename T>
@@ -130,16 +146,8 @@ void AbstractSlider<T>::SetRange(const T &value1, const T &value2) {
   T minimum = std::min(value1, value2);
   T maximum = std::max(value1, value2);
 
-  if (minimum == maximum) return;
-  if (minimum_ == minimum && maximum_ == maximum) return;
-
-  minimum_ = minimum;
-  maximum_ = maximum;
-
-  if (value_ < minimum_) value_ = minimum_;
-  if (value_ > maximum_) value_ = maximum_;
-
-  Update();
+  SetMinimum(minimum);
+  SetMaximum(maximum);
 }
 
 template<typename T>
@@ -147,21 +155,15 @@ void AbstractSlider<T>::SetMinimum(const T &minimum) {
   if (minimum_ == minimum) return;
   if ((minimum + step_) > maximum_) return;
 
-  minimum_ = minimum;
-  if (value_ < minimum_) value_ = minimum_;
-
-  Update();
+  OnSetMinimum(minimum);
 }
 
 template<typename T>
 void AbstractSlider<T>::SetMaximum(const T &maximum) {
   if (maximum_ == maximum) return;
-  if ((maximum - step_) < maximum_) return;
+  if ((maximum - step_) < minimum_) return;
 
-  maximum_ = maximum;
-  if (value_ > maximum_) value_ = maximum_;
-
-  Update();
+  OnSetMaximum(maximum);
 }
 
 template<typename T>

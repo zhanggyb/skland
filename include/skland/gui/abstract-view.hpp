@@ -91,9 +91,12 @@ class AbstractView : public Object {
     return geometry_;
   }
 
+  /**
+   * @brief Get the surface on which the given view renders
+   * @param view if null, get the surface for this view
+   * @return
+   */
   AbstractSurface *GetSurface() const;
-
-  AbstractWindow *GetWindow() const;
 
   /**
   * @brief Update the display of this widget
@@ -119,6 +122,8 @@ class AbstractView : public Object {
    */
   virtual void OnUpdate(AbstractView *view);
 
+  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const;
+
   virtual void OnResize(int width, int height) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) = 0;
@@ -132,8 +137,6 @@ class AbstractView : public Object {
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
   virtual void OnDraw(Canvas *canvas) = 0;
-
-  void SetSurface(AbstractSurface *surface);
 
   void TrackMouseMotion(MouseEvent *event);
 
@@ -149,10 +152,6 @@ class AbstractView : public Object {
 
   void resize(int width, int height) {
     geometry_.Resize(width, height);
-  }
-
-  AbstractSurface *surface() const {
-    return surface_;
   }
 
   AbstractView *parent_view() const {
@@ -188,11 +187,6 @@ class AbstractView : public Object {
   bool visible_;
 
   Rect geometry_;
-
-  /**
-   * The main surface for this window
-   */
-  AbstractSurface *surface_;
 
   /**
    * Used in event loop to render this view

@@ -50,8 +50,8 @@ AbstractWindow::AbstractWindow(int width,
   int x = 0, y = 0;  // The input region
 
   if (frame) {
-    main_surface_ = new RasterSurface(Theme::shadow_margin());
-    frame_surface_ = new RasterSurface(Theme::shadow_margin());
+    main_surface_ = new RasterSurface(this, Theme::shadow_margin());
+    frame_surface_ = new RasterSurface(this, Theme::shadow_margin());
 
     main_surface_->AddSubSurface(frame_surface_);
 
@@ -68,10 +68,9 @@ AbstractWindow::AbstractWindow(int width,
     frame_region_.Add(0, 0, 0, 0);
     frame_surface_->SetInputRegion(frame_region_);
   } else {
-    main_surface_ = new RasterSurface();
+    main_surface_ = new RasterSurface(this);
   }
 
-  SetSurface(main_surface_);
   input_region_.Setup(Display::wl_compositor());
   input_region_.Add(x, y, width, height);
   main_surface_->SetInputRegion(input_region_);
@@ -98,8 +97,8 @@ AbstractWindow::AbstractWindow(int width,
   int total_width = std::max((int) this->width(), output_size.width);
   int total_height = std::max((int) this->height(), output_size.height);
   if (!IsFrameless()) {
-    total_width += surface()->margin().lr();
-    total_height += surface()->margin().tb();
+    total_width += main_surface_->margin().lr();
+    total_height += main_surface_->margin().tb();
   }
 
   main_pool_.Setup(total_width * 4 * total_height);
@@ -156,10 +155,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 
 void AbstractWindow::Show() {
   if (!is_xdg_surface_configured_) {
-    if (frame_surface_)
-      frame_surface_->Commit();
-    else
-      main_surface_->Commit();
+    frame_surface_->Commit();
   }
 }
 
@@ -252,6 +248,10 @@ void AbstractWindow::OnUpdate(AbstractView *view) {
                            (int) view->geometry().height());
     frame_surface_->Commit();
   }
+}
+
+AbstractSurface *AbstractWindow::OnGetSurface(const AbstractView *view) const {
+  return nullptr == frame_surface_ ? main_surface_ : frame_surface_;
 }
 
 void AbstractWindow::OnMouseEnter(MouseEvent *event) {
@@ -443,8 +443,8 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
       resize(width, height);
 
       // Reset buffer:
-      width += surface()->margin().lr();
-      height += surface()->margin().tb();
+      width += main_surface_->margin().lr();
+      height += main_surface_->margin().tb();
 
       int total_size = width * 4 * height;
       if (total_size > main_pool_.size()) {

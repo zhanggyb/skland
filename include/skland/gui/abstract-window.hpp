@@ -26,14 +26,14 @@
 #include "buffer.hpp"
 #include "task.hpp"
 
+#include "../wayland/xdg-surface.hpp"
+#include "../wayland/xdg-toplevel.hpp"
+#include "../wayland/region.hpp"
+
+#include "../stock/theme.hpp"
+
 #include <cstdint>
 #include <string>
-
-#include <skland/wayland/xdg-surface.hpp>
-#include <skland/wayland/xdg-toplevel.hpp>
-#include <skland/wayland/region.hpp>
-
-#include <skland/stock/theme.hpp>
 
 namespace skland {
 
@@ -115,6 +115,8 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnUpdate(AbstractView *view) override;
 
+  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const;
+
   virtual void OnMouseEnter(MouseEvent *event) override;
 
   virtual void OnMouseLeave(MouseEvent *event) override;
@@ -148,14 +150,11 @@ class AbstractWindow : public AbstractView {
   int flags_;
 
   wayland::XdgSurface xdg_surface_;
-
   wayland::XdgToplevel xdg_toplevel_;
-
   wayland::Region input_region_;
   wayland::Region frame_region_;
 
   std::string title_;
-
   std::string app_id_;
 
   Size saved_size_;
@@ -163,19 +162,12 @@ class AbstractWindow : public AbstractView {
   bool is_xdg_surface_configured_;
 
   /**
-   * @brief The main raster surface for rendering widgets
+   * @brief The surface for widget
    */
   RasterSurface *main_surface_;
 
   /**
    * @brief The surface for frame
-   *
-   * FIXME:
-   *
-   * My initial indention is to use this surface for frame and background for this window.
-   * It is a sub surface of the main surface but I failed to place this below the main surface.
-   *
-   * The current code use this surface for widgets and the main surface for frame and background.
    */
   RasterSurface *frame_surface_;
 

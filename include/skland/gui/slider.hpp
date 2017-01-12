@@ -28,15 +28,35 @@ class Slider : public AbstractSlider<int> {
 
  public:
 
-  Slider();
+  Slider(Orientation orientation = kHorizontal);
 
   virtual ~Slider();
 
  protected:
 
+  virtual void OnResize(int width, int height) final;
+
+  virtual void OnMouseEnter(MouseEvent *event) final;
+
+  virtual void OnMouseLeave(MouseEvent *event) final;
+
+  virtual void OnMouseMove(MouseEvent *event) final;
+
+  virtual void OnMouseButton(MouseEvent *event) final;
+
+  virtual void OnKeyboardKey(KeyEvent *event) final;
+
+  virtual void OnSetValue(const int &value) final;
+
+  virtual void OnSetMinimum(const int &minimum) final;
+
+  virtual void OnSetMaximum(const int &maximum) final;
+
   virtual void OnDraw(Canvas *canvas) override;
 
  private:
+
+  bool hover_;
 
 };
 

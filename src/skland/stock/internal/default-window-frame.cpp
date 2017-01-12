@@ -47,13 +47,14 @@ void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */
 
 void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
   Color regular(0.83f, 0.33f, 0.33f);
+  Color outline(0.78f, 0.28f, 0.28f);
   Color down = regular - 50;
   Color hover = regular + 15;
 
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(regular);
 
+  paint.SetColor(regular);
   if (IsHovered()) {
     if (IsPressed()) {
       paint.SetColor(down);
@@ -61,20 +62,14 @@ void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
       paint.SetColor(hover);
     }
   }
+  canvas->DrawCircle(center_x(), center_y(), 6.f, paint);
 
-//  float radii[] = {
-//      0.f, 0.f, // top-left
-//      0.f, 0.f, // top-right
-//      4.f, 4.f, // bottom-right
-//      4.f, 4.f  // bottom-left
-//  };
-//  Path path;
-//  path.AddRoundRect(geometry(), radii);
-
-  canvas->DrawCircle(center_x(), center_y(), 6.5f, paint);
+  paint.SetStrokeWidth(1.f);
+  paint.SetColor(outline);
+  paint.SetStyle(Paint::Style::kStyleStroke);
+  canvas->DrawCircle(center_x(), center_y(), 6.f, paint);
 
   if (IsHovered()) {
-    paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetStrokeWidth(1.5f);
     paint.SetColor(0xFF444444);
     canvas->DrawLine(center_x() - 2.5f, center_y() - 2.5f,

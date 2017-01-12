@@ -44,8 +44,8 @@ MainWindow::MainWindow(int width, int height, const char *title)
   int total_width = std::max((int) (this->width()), output_size.width);
   int total_height = std::max((int) (this->height()), output_size.height);
   if (!IsFrameless()) {
-    total_width += surface()->margin().lr();
-    total_height += surface()->margin().tb();
+//    total_width += surface()->margin().lr();
+//    total_height += surface()->margin().tb();
   }
 
   pool_.Setup(total_width * 4 * total_height);
@@ -76,8 +76,8 @@ void MainWindow::OnKeyboardKey(KeyEvent *event) {
 void MainWindow::OnResize(int width, int height) {
   resize(width, height);
 
-  width += surface()->margin().lr();
-  height += surface()->margin().tb();
+//  width += surface()->margin().lr();
+//  height += surface()->margin().tb();
 
   int total_size = width * 4 * height;
   if (total_size > pool_.size()) {
@@ -85,7 +85,7 @@ void MainWindow::OnResize(int width, int height) {
     pool_.Setup(total_size);
   }
   buffer_.Setup(pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-  surface()->Attach(&buffer_);
+//  surface()->Attach(&buffer_);
 
   UpdateAll();
 
@@ -93,7 +93,7 @@ void MainWindow::OnResize(int width, int height) {
 }
 
 void MainWindow::OnSetupSurface() {
-  surface()->Attach(&buffer_);
+//  surface()->Attach(&buffer_);
   UpdateAll();
 }
 

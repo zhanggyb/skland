@@ -8,19 +8,12 @@
 
 namespace skland {
 
-EGLSurface::EGLSurface()
-    : AbstractSurface() {
+EGLSurface::EGLSurface(AbstractView *view)
+    : AbstractSurface(view) {
 }
 
 EGLSurface::~EGLSurface() {
 
-}
-
-void EGLSurface::OnSetup() {
-//  egl_surface_.Setup(Display::egl_display(),
-//                     wl_surface(),
-//                     (int) view()->width(),
-//                     (int) view()->height());
 }
 
 void EGLSurface::OnAttach(const Buffer *buffer) {
