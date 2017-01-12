@@ -43,40 +43,41 @@ AbstractWindow::AbstractWindow(int width,
       window_frame_(nullptr),
       flags_(0),
       is_xdg_surface_configured_(false),
-      main_surface_(nullptr),
-      frame_surface_(nullptr) {
+      frame_surface_(nullptr),
+      main_surface_(nullptr) {
   if (title) title_ = title;
 
   int x = 0, y = 0;  // The input region
+  AbstractSurface *shell_surface = nullptr;
 
   if (frame) {
-    main_surface_ = new RasterSurface(this, Theme::shadow_margin());
     frame_surface_ = new RasterSurface(this, Theme::shadow_margin());
+    main_surface_ = new RasterSurface(this, Theme::shadow_margin());
 
-    main_surface_->AddSubSurface(frame_surface_);
-
-    // FIXME: I cannot place the sub surface below the main surface:
-    // frame_surface_->PlaceBelow(*main_surface_);
+    // There's a known issue in current gnome that a sub surface cannot be placed below its parent
+    frame_surface_->AddSubSurface(main_surface_);
 
     SetWindowFrame(frame);
-    x += main_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
-    y += main_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
+    x += frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
+    y += frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
 
-    frame_region_.Setup(Display::wl_compositor());
-    frame_region_.Add(0, 0, 0, 0);
-    frame_surface_->SetInputRegion(frame_region_);
+    inactive_region_.Setup(Display::wl_compositor());
+    inactive_region_.Add(0, 0, 0, 0);
+    main_surface_->SetInputRegion(inactive_region_);
+    shell_surface = frame_surface_;
   } else {
     main_surface_ = new RasterSurface(this);
+    shell_surface = main_surface_;
   }
 
   input_region_.Setup(Display::wl_compositor());
   input_region_.Add(x, y, width, height);
-  main_surface_->SetInputRegion(input_region_);
+  shell_surface->SetInputRegion(input_region_);
 
   xdg_surface_.configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
-  xdg_surface_.Setup(Display::xdg_shell(), main_surface_->wl_surface());
+  xdg_surface_.Setup(Display::xdg_shell(), shell_surface->wl_surface());
 
   xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
   xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
@@ -96,10 +97,8 @@ AbstractWindow::AbstractWindow(int width,
 
   int total_width = std::max((int) this->width(), output_size.width);
   int total_height = std::max((int) this->height(), output_size.height);
-  if (!IsFrameless()) {
-    total_width += main_surface_->margin().lr();
-    total_height += main_surface_->margin().tb();
-  }
+  total_width += shell_surface->margin().lr();
+  total_height += shell_surface->margin().tb();
 
   main_pool_.Setup(total_width * 4 * total_height);
   main_buffer_.Setup(main_pool_, total_width, total_height,
@@ -121,8 +120,8 @@ AbstractWindow::~AbstractWindow() {
   DBG_ASSERT(display_ == nullptr);
 
   delete window_frame_;
-  delete frame_surface_;
   delete main_surface_;
+  delete frame_surface_;
 }
 
 void AbstractWindow::SetTitle(const char *title) {
@@ -155,7 +154,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 
 void AbstractWindow::Show() {
   if (!is_xdg_surface_configured_) {
-    frame_surface_->Commit();
+    main_surface_->Commit();
   }
 }
 
@@ -228,30 +227,30 @@ void AbstractWindow::OnUpdate(AbstractView *view) {
       Display::kDisplay->redraw_task_tail_.PushFront(redraw_task_.get());
       // TODO: this is just a workaround, should use frame_surface for frame and background,
       // but now use main_surface instead.
-      redraw_task_->canvas = main_surface_->canvas().get();
+      redraw_task_->canvas = frame_surface_->canvas().get();
       DBG_ASSERT(redraw_task_->canvas);
-      main_surface_->Damage((int) geometry().x() + main_surface_->margin().left,
-                            (int) geometry().y() + main_surface_->margin().top,
-                            (int) geometry().width(),
-                            (int) geometry().height());
-      main_surface_->Commit();
+      frame_surface_->Damage((int) geometry().x() + frame_surface_->margin().left,
+                             (int) geometry().y() + frame_surface_->margin().top,
+                             (int) geometry().width(),
+                             (int) geometry().height());
+      frame_surface_->Commit();
     }
   } else {
     Display::kDisplay->redraw_task_tail_.PushFront(view->redraw_task_.get());
 
     // TODO: this is juat a workaround, should render widgets on main_surface
-    view->redraw_task_->canvas = frame_surface_->canvas().get();
+    view->redraw_task_->canvas = main_surface_->canvas().get();
     DBG_ASSERT(view->redraw_task_->canvas);
-    frame_surface_->Damage((int) view->geometry().x() + frame_surface_->margin().left,
-                           (int) view->geometry().y() + frame_surface_->margin().top,
-                           (int) view->geometry().width(),
-                           (int) view->geometry().height());
-    frame_surface_->Commit();
+    main_surface_->Damage((int) view->geometry().x() + main_surface_->margin().left,
+                          (int) view->geometry().y() + main_surface_->margin().top,
+                          (int) view->geometry().width(),
+                          (int) view->geometry().height());
+    main_surface_->Commit();
   }
 }
 
 AbstractSurface *AbstractWindow::OnGetSurface(const AbstractView *view) const {
-  return nullptr == frame_surface_ ? main_surface_ : frame_surface_;
+  return main_surface_;
 }
 
 void AbstractWindow::OnMouseEnter(MouseEvent *event) {
@@ -391,10 +390,12 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
     int h = (int) height();
     xdg_surface_.SetWindowGeometry(x, y, w, h);
 
-    main_surface_->Attach(&main_buffer_);
-    frame_surface_->Attach(&frame_buffer_);
+    if (frame_surface_) {
+      frame_surface_->Attach(&frame_buffer_);
+      frame_surface_->canvas()->Clear();
+    }
 
-    frame_surface_->canvas()->Clear();
+    main_surface_->Attach(&main_buffer_);
     main_surface_->canvas()->Clear();
     UpdateAll();
   }
@@ -420,14 +421,15 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
 
       Rect input_rect(width, height);
       int x = 0, y = 0;
+      AbstractSurface *shell_surface = frame_surface_ ? frame_surface_ : main_surface_;
 
       if (!IsFrameless()) {
-        input_rect.left = main_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
-        input_rect.top = main_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
+        input_rect.left = frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
+        input_rect.top = frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
         input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
                           height + AbstractWindowFrame::kResizingMargin.tb());
-        x = main_surface_->margin().left;
-        y = main_surface_->margin().top;
+        x = frame_surface_->margin().left;
+        y = frame_surface_->margin().top;
         window_frame_->OnResize(width, height);
       }
 
@@ -436,15 +438,15 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
                         (int) input_rect.y(),
                         (int) input_rect.width(),
                         (int) input_rect.height());
-      main_surface_->SetInputRegion(input_region_);
+      shell_surface->SetInputRegion(input_region_);
 
       xdg_surface_.SetWindowGeometry(x, y, width, height);
 
       resize(width, height);
 
       // Reset buffer:
-      width += main_surface_->margin().lr();
-      height += main_surface_->margin().tb();
+      width += shell_surface->margin().lr();
+      height += shell_surface->margin().tb();
 
       int total_size = width * 4 * height;
       if (total_size > main_pool_.size()) {
@@ -454,11 +456,12 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
       main_buffer_.Setup(main_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
       main_surface_->Attach(&main_buffer_);
 
-      frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-      frame_surface_->Attach(&frame_buffer_);
+      if (frame_surface_) {
+        frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+        frame_surface_->Attach(&frame_buffer_);
+      }
 
-      // TODO: workaround, should use main_surface
-      frame_surface_->canvas()->Clear();
+      main_surface_->canvas()->Clear();
       UpdateAll();
 
       OnResize(width, height);

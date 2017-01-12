@@ -152,7 +152,7 @@ class AbstractWindow : public AbstractView {
   wayland::XdgSurface xdg_surface_;
   wayland::XdgToplevel xdg_toplevel_;
   wayland::Region input_region_;
-  wayland::Region frame_region_;
+  wayland::Region inactive_region_;
 
   std::string title_;
   std::string app_id_;
@@ -162,14 +162,14 @@ class AbstractWindow : public AbstractView {
   bool is_xdg_surface_configured_;
 
   /**
-   * @brief The surface for widget
-   */
-  RasterSurface *main_surface_;
-
-  /**
    * @brief The surface for frame
    */
   RasterSurface *frame_surface_;
+
+  /**
+   * @brief The surface for widgets
+   */
+  RasterSurface *main_surface_;
 
   /* Properties for main surface, JUST experimental */
   MemoryPool main_pool_;

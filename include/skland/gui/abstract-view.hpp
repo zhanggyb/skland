@@ -41,24 +41,49 @@ struct ViewTask;
 struct RedrawTask;
 
 /**
- * @brief A View represents an area on screen
+ * @brief An abstract base class for view object
  *
+ * AbstractView is an abstract base class for view object. A view object in
+ * SkLand is a rectangle area on screen and handle events. It can be a window,
+ * popup menu, or widgets in a window. You typically don't use this class
+ * directly. Instead, you use or create a subclass.
+ *
+ * A view can have parent and subviews, when you create a GUI application, it
+ * generates a view hierachy.
+ *
+ * A view can have its own wayland surface (and sub surfaces) for drawing, or
+ * just share the surface in a parent view.
+ *
+ * As this is a abstract class, you typically don't use this class
+ * directly.
+ *
+ * SkLand use Google Skia to draw content in a view.
  */
 class AbstractView : public Object {
 
   friend class Input;
   friend class Application;
   friend class Display;
-  friend class AbstractSurface;
   friend struct RedrawTask;
   friend class AbstractWindow;
 
  public:
 
+  /**
+   * @brief Default constructor
+   *
+   * This create a 400 x 300 view.
+   */
   AbstractView();
 
+  /**
+   * @brief Create a view by given size
+   */
   AbstractView(int width, int height);
 
+  /**
+   * @brief Destructor
+   */
   virtual ~AbstractView();
 
   void SetPosition(int x, int y);
@@ -92,9 +117,8 @@ class AbstractView : public Object {
   }
 
   /**
-   * @brief Get the surface on which the given view renders
-   * @param view if null, get the surface for this view
-   * @return
+   * @brief Get the surface on which this view renders
+   * @return A surface object or nullptr
    */
   AbstractSurface *GetSurface() const;
 
@@ -122,6 +146,11 @@ class AbstractView : public Object {
    */
   virtual void OnUpdate(AbstractView *view);
 
+  /**
+   * @brief Get surface for the given view
+   * @param view A view object, it is always this view or one of sub view in hierachy
+   * @return A pointer to a surface or nullptr
+   */
   virtual AbstractSurface *OnGetSurface(const AbstractView *view) const;
 
   virtual void OnResize(int width, int height) = 0;
