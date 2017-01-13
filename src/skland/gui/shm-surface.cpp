@@ -36,18 +36,17 @@ void ShmSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
   }
 
   if (nullptr == buffer) {
-    canvas_.reset(nullptr);
+    canvas_.reset();
   } else {
-    Canvas *canvas = new Canvas((unsigned char *) buffer->pixel(),
-                                buffer->size().width,
-                                buffer->size().height);
-    canvas->SetOrigin((float) margin().left, (float) margin().top);
-    canvas_.reset(canvas);
+    canvas_.reset(new Canvas((unsigned char *) buffer->pixel(),
+                             buffer->size().width,
+                             buffer->size().height));
+    canvas_->SetOrigin((float) margin().left, (float) margin().top);
   }
 }
 
-Canvas* ShmSurface::GetCanvas() const {
-  return canvas_.get();
+std::shared_ptr<Canvas> ShmSurface::GetCanvas() const {
+  return canvas_;
 }
 
 }

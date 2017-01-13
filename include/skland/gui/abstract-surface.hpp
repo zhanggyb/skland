@@ -27,6 +27,8 @@
 
 #include "task.hpp"
 
+#include <memory>
+
 namespace skland {
 
 class AbstractView;
@@ -103,37 +105,21 @@ class AbstractSurface {
    */
   void SetPosition(int x, int y);
 
-  const wayland::Surface &wl_surface() const {
-    return wl_surface_;
-  }
+  const wayland::Surface &wl_surface() const { return wl_surface_; }
 
-  const wayland::SubSurface &wl_sub_surface() const {
-    return wl_sub_surface_;
-  }
+  const wayland::SubSurface &wl_sub_surface() const { return wl_sub_surface_; }
 
-  AbstractView *view() const {
-    return view_;
-  }
+  AbstractView *view() const { return view_; }
 
-  const Margin &margin() const {
-    return margin_;
-  }
+  const Margin &margin() const { return margin_; }
 
-  const Point &position() const {
-    return position_;
-  }
+  const Point &position() const { return position_; }
 
-  AbstractSurface *parent() const {
-    return parent_;
-  }
+  AbstractSurface *parent() const { return parent_; }
 
-  AbstractSurface *up() const {
-    return up_;
-  }
+  AbstractSurface *up() const { return up_; }
 
-  AbstractSurface *down() const {
-    return down_;
-  }
+  AbstractSurface *down() const { return down_; }
 
   /**
    * @brief Virtual method to get the canvas for this surface
@@ -142,14 +128,7 @@ class AbstractSurface {
    * In ShmSurface this will return a pointer to a canvas object directly.
    * In EGLSurface this will render the 3D content to a canvas first.
    */
-  virtual Canvas *GetCanvas() const = 0;
-
- protected:
-
-  void set_position(int x, int y) {
-    position_.x = x;
-    position_.y = y;
-  }
+  virtual std::shared_ptr<Canvas> GetCanvas() const = 0;
 
  private:
 

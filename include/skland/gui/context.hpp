@@ -18,6 +18,7 @@
 #define SKLAND_GUI_CONTEXT_HPP_
 
 #include "abstract-surface.hpp"
+#include "../wayland/callback.hpp"
 
 namespace skland {
 
@@ -51,12 +52,12 @@ class Context {
     return *this;
   }
 
-  Canvas *GetCanvas() const {
+  std::shared_ptr<Canvas> GetCanvas() const {
     return surface_->GetCanvas();
   }
 
-  const wayland::Surface &GetWaylandSurface() const {
-    return surface_->wl_surface();
+  void SetupCallback(wayland::Callback &callback) const {
+    callback.Setup(surface_->wl_surface());
   }
 
  private:

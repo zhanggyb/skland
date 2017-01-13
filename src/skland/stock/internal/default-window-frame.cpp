@@ -47,7 +47,7 @@ void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */
 }
 
 void DefaultWindowFrame::CloseButton::OnDraw(const Context *context) {
-  Canvas *canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->GetCanvas();
 
   Color regular(0.83f, 0.33f, 0.33f);
   Color outline(0.78f, 0.28f, 0.28f);
@@ -103,7 +103,7 @@ void DefaultWindowFrame::MaximizeButton::OnResize(int /* width */, int /* height
 }
 
 void DefaultWindowFrame::MaximizeButton::OnDraw(const Context *context) {
-  Canvas *canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->GetCanvas();
 
   Color regular(0.25f, 0.8f, 0.25f, 1.f);
   Color down = regular - 50;
@@ -239,7 +239,7 @@ void DefaultWindowFrame::LayoutWidgets(int width, int height) {
 }
 
 void DefaultWindowFrame::OnDraw(const Context *context) {
-  Canvas *canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->GetCanvas();
   canvas->Clear();
 
   float radii[] = {
@@ -253,7 +253,7 @@ void DefaultWindowFrame::OnDraw(const Context *context) {
 
   canvas->Save();
   canvas->ClipPath(path, kClipDifference, true);
-  DrawShadow(canvas);
+  DrawShadow(canvas.get());
   canvas->Restore();
 
   Paint paint;

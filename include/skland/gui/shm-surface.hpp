@@ -19,8 +19,6 @@
 
 #include "abstract-surface.hpp"
 
-#include <memory>
-
 namespace skland {
 
 class Buffer;
@@ -42,11 +40,20 @@ class ShmSurface : public AbstractSurface {
 
   void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
-  Canvas *GetCanvas() const final;
+  /**
+   * @brief Get shared pointer to a canvas object for this surface
+   * @return A shared_pointer to a canvas
+   *
+   * When this surface is not attached a buffer, this will return an invalid pointer.
+   *
+   * The returned pointer should be used when rendering a view, it's not safe to use it
+   * in other situation as the buffer which the canvas object uses may be reset.
+   */
+  virtual std::shared_ptr<Canvas> GetCanvas() const final;
 
  private:
 
-  std::unique_ptr<Canvas> canvas_;
+  std::shared_ptr<Canvas> canvas_;
 
 };
 

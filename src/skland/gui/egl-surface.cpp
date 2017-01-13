@@ -28,7 +28,7 @@ EGLSurface::~EGLSurface() {
 
 }
 
-Canvas *EGLSurface::GetCanvas() const {
+std::shared_ptr<Canvas> EGLSurface::GetCanvas() const {
   // TODO: render to canvas
   return nullptr;
 }

@@ -35,7 +35,13 @@ class EGLSurface : public AbstractSurface {
 
   virtual ~EGLSurface();
 
-  virtual Canvas *GetCanvas() const override;
+  /**
+   * @brief Get the canvas which contains current frame
+   * @return A shared ptr to a canvas object
+   *
+   * The returned canvas object is not for rendering views.
+   */
+  virtual std::shared_ptr<Canvas> GetCanvas() const override;
 
  private:
 
