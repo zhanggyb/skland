@@ -35,7 +35,7 @@ class PushButton : public AbstractButton {
 
   virtual void OnResize(int width, int height) override;
 
-  virtual void OnDraw(Canvas *canvas) override;
+  virtual void OnDraw(const Context *context) override;
 
 };
 

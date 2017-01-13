@@ -41,7 +41,7 @@ class Display;
 class Application;
 class AbstractWindowFrame;
 class Input;
-class RasterSurface;
+class ShmSurface;
 
 enum WindowFlags {
   kWindowFullscreen = 0x1,
@@ -125,7 +125,7 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnMouseButton(MouseEvent *event) override;
 
-  virtual void OnDraw(Canvas *canvas) override;
+  virtual void OnDraw(const Context *context) override;
 
   void AddSubView(AbstractView *view, int pos = 0);
 
@@ -164,12 +164,12 @@ class AbstractWindow : public AbstractView {
   /**
    * @brief The surface for frame
    */
-  RasterSurface *frame_surface_;
+  ShmSurface *frame_surface_;
 
   /**
    * @brief The surface for widgets
    */
-  RasterSurface *main_surface_;
+  ShmSurface *main_surface_;
 
   /* Properties for main surface, JUST experimental */
   MemoryPool main_pool_;

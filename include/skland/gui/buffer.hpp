@@ -27,7 +27,6 @@
 namespace skland {
 
 class MemoryPool;
-class AbstractSurface;
 
 /**
  * @brief Buffer in wayland compositor
@@ -38,7 +37,6 @@ class AbstractSurface;
 class Buffer {
 
   friend class MemoryPool;
-  friend class AbstractSurface;
 
   Buffer(const Buffer &) = delete;
   Buffer &operator=(const Buffer &) = delete;
@@ -61,6 +59,11 @@ class Buffer {
              int offset = 0);
 
   void Destroy();
+
+  void SetPosition(int x, int y) {
+    position_.x = x;
+    position_.y = y;
+  }
 
   const wayland::Buffer &wl_buffer() const {
     return wl_buffer_;

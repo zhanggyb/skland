@@ -29,13 +29,14 @@ namespace skland {
 class Canvas;
 class Display;
 class Input;
+class Output;
 class KeyEvent;
 class MouseEvent;
 class TouchEvent;
-class Output;
 class Application;
 class AbstractSurface;
 class AbstractWindow;
+class Context;
 
 struct ViewTask;
 struct RedrawTask;
@@ -52,12 +53,15 @@ struct RedrawTask;
  * generates a view hierachy.
  *
  * A view can have its own wayland surface (and sub surfaces) for drawing, or
- * just share the surface in a parent view.
- *
- * As this is a abstract class, you typically don't use this class
- * directly.
+ * just share the surface with others which is managed in one of parent view.
+ * There's must at least one surface in the view hierachy, it is typically a
+ * window (@ref Abstractwindow) on screen and all widgets in it share the main
+ * surface.
  *
  * SkLand use Google Skia to draw content in a view.
+ *
+ * @see AbstractWindow
+ * @see AbstractSurface
  */
 class AbstractView : public Object {
 
@@ -145,7 +149,7 @@ class AbstractView : public Object {
 
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
-  virtual void OnDraw(Canvas *canvas) = 0;
+  virtual void OnDraw(const Context *context) = 0;
 
   void TrackMouseMotion(MouseEvent *event);
 

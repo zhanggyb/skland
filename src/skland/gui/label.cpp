@@ -19,6 +19,7 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
+#include <skland/gui/context.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 
@@ -88,10 +89,10 @@ void Label::OnKeyboardKey(KeyEvent *event) {
   event->Ignore();
 }
 
-void Label::OnDraw(Canvas *canvas) {
+void Label::OnDraw(const Context *context) {
   Paint paint;
   paint.SetColor(background_);
-  canvas->DrawRect(geometry(), paint);
+  context->GetCanvas()->DrawRect(geometry(), paint);
 
   paint.SetColor(foreground_);
   paint.SetAntiAlias(true);
@@ -109,7 +110,7 @@ void Label::OnDraw(Canvas *canvas) {
                   geometry().b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
   text_box.setText(text_.c_str(), text_.length(), *paint.sk_paint());
-  text_box.draw(canvas->sk_canvas());
+  text_box.draw(context->GetCanvas()->sk_canvas());
 }
 
 }

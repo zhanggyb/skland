@@ -35,9 +35,7 @@ class EGLSurface : public AbstractSurface {
 
   virtual ~EGLSurface();
 
- protected:
-
-  virtual void OnAttach(const Buffer *buffer) final;
+  virtual Canvas *GetCanvas() const override;
 
  private:
 

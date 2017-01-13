@@ -18,24 +18,24 @@
 #define SKLAND_GUI_REDRAW_TASK_HPP_
 
 #include "view-task.hpp"
+#include <skland/gui/context.hpp>
 
 namespace skland {
 
 class AbstractView;
-class Canvas;
 
 struct RedrawTask : public ViewTask {
   RedrawTask(const RedrawTask &) = delete;
   RedrawTask &operator=(const RedrawTask &) = delete;
 
-  RedrawTask(AbstractView *view = nullptr, Canvas *canvas = nullptr)
-      : ViewTask(view), canvas(canvas) {}
+  RedrawTask(AbstractView *view = nullptr, AbstractSurface *surface = nullptr)
+      : ViewTask(view), context(surface) {}
 
   virtual ~RedrawTask() {}
 
   virtual void Run() const final;
 
-  Canvas *canvas;
+  Context context;
 };
 
 }

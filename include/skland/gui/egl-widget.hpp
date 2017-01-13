@@ -48,7 +48,7 @@ class EGLWidget : public AbstractWidget {
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
-  virtual void OnDraw(Canvas *canvas) final;
+  virtual void OnDraw(const Context *context) final;
 
  private:
 

@@ -24,6 +24,7 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window.hpp>
 
+#include <skland/gui/context.hpp>
 #include "SkCanvas.h"
 
 namespace skland {
@@ -45,7 +46,9 @@ void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */
 
 }
 
-void DefaultWindowFrame::CloseButton::OnDraw(Canvas *canvas) {
+void DefaultWindowFrame::CloseButton::OnDraw(const Context *context) {
+  Canvas *canvas = context->GetCanvas();
+
   Color regular(0.83f, 0.33f, 0.33f);
   Color outline(0.78f, 0.28f, 0.28f);
   Color down = regular - 50;
@@ -99,7 +102,9 @@ void DefaultWindowFrame::MaximizeButton::OnResize(int /* width */, int /* height
 
 }
 
-void DefaultWindowFrame::MaximizeButton::OnDraw(Canvas *canvas) {
+void DefaultWindowFrame::MaximizeButton::OnDraw(const Context *context) {
+  Canvas *canvas = context->GetCanvas();
+
   Color regular(0.25f, 0.8f, 0.25f, 1.f);
   Color down = regular - 50;
   Color hover = regular + 15;
@@ -142,7 +147,7 @@ void DefaultWindowFrame::MinimizeButton::OnResize(int /* width */, int /* height
 
 }
 
-void DefaultWindowFrame::MinimizeButton::OnDraw(Canvas *canvas) {
+void DefaultWindowFrame::MinimizeButton::OnDraw(const Context *context) {
   Color regular(1.f, 0.75f, 0.2f, 1.f);
   Color down = regular - 50;
   Color hover = regular + 15;
@@ -159,12 +164,12 @@ void DefaultWindowFrame::MinimizeButton::OnDraw(Canvas *canvas) {
       paint.SetColor(hover);
     }
   }
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
+  context->GetCanvas()->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
 
   paint.SetColor(stroke_color);
   paint.SetStyle(Paint::kStyleStroke);
   paint.SetStrokeWidth(0.5f);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
+  context->GetCanvas()->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
 }
 
 //-------------------------
@@ -233,7 +238,8 @@ void DefaultWindowFrame::LayoutWidgets(int width, int height) {
   close_button_->SetPosition(x, y);
 }
 
-void DefaultWindowFrame::OnDraw(Canvas *canvas) {
+void DefaultWindowFrame::OnDraw(const Context *context) {
+  Canvas *canvas = context->GetCanvas();
   canvas->Clear();
 
   float radii[] = {

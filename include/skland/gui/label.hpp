@@ -54,7 +54,7 @@ class Label : public AbstractWidget {
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
-  virtual void OnDraw(Canvas *canvas) override;
+  virtual void OnDraw(const Context *context) override;
 
  private:
 

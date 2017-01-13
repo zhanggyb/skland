@@ -52,7 +52,7 @@ class Slider : public AbstractSlider<int> {
 
   virtual void OnSetMaximum(const int &maximum) final;
 
-  virtual void OnDraw(Canvas *canvas) override;
+  virtual void OnDraw(const Context *context) override;
 
  private:
 

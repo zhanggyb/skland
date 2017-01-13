@@ -25,7 +25,6 @@
 #include <skland/gui/abstract-surface.hpp>
 
 #include "internal/redraw-task.hpp"
-#include "internal/view-task.hpp"
 
 namespace skland {
 
@@ -81,11 +80,11 @@ void Widget::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void Widget::OnDraw(Canvas *canvas) {
+void Widget::OnDraw(const Context *context) {
   Paint paint;
   paint.SetColor(Color(0.95f, 0.95f, 0.95f, 1.f));
 
-  canvas->DrawRect(geometry(), paint);
+  context->GetCanvas()->DrawRect(geometry(), paint);
 }
 
 }

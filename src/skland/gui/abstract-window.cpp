@@ -17,7 +17,7 @@
 #include <skland/gui/abstract-window.hpp>
 
 #include <skland/gui/application.hpp>
-#include <skland/gui/raster-surface.hpp>
+#include <skland/gui/shm-surface.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
 #include <skland/gui/output.hpp>
@@ -51,8 +51,8 @@ AbstractWindow::AbstractWindow(int width,
   AbstractSurface *shell_surface = nullptr;
 
   if (frame) {
-    frame_surface_ = new RasterSurface(this, Theme::shadow_margin());
-    main_surface_ = new RasterSurface(this, Theme::shadow_margin());
+    frame_surface_ = new ShmSurface(this, Theme::shadow_margin());
+    main_surface_ = new ShmSurface(this, Theme::shadow_margin());
 
     // There's a known issue in current gnome that a sub surface cannot be placed below its parent
     frame_surface_->AddSubSurface(main_surface_);
@@ -68,7 +68,7 @@ AbstractWindow::AbstractWindow(int width,
     main_surface_->SetInputRegion(inactive_region_);
     shell_surface = frame_surface_;
   } else {
-    main_surface_ = new RasterSurface(this);
+    main_surface_ = new ShmSurface(this);
     shell_surface = main_surface_;
   }
 
@@ -224,11 +224,11 @@ void AbstractWindow::OnUpdate(AbstractView *view) {
 
   if (view == this) {
     if (frame_surface_) {
-      Display::kDisplay->redraw_task_tail_.PushFront(redraw_task_.get());
+      Display::kDisplay->redraw_task_tail_.PushFront(redraw_task().get());
       // TODO: this is just a workaround, should use frame_surface for frame and background,
       // but now use main_surface instead.
-      redraw_task_->canvas = frame_surface_->canvas().get();
-      DBG_ASSERT(redraw_task_->canvas);
+      redraw_task()->context = frame_surface_;
+      DBG_ASSERT(redraw_task()->context.GetCanvas());
       frame_surface_->Damage((int) geometry().x() + frame_surface_->margin().left,
                              (int) geometry().y() + frame_surface_->margin().top,
                              (int) geometry().width(),
@@ -236,11 +236,11 @@ void AbstractWindow::OnUpdate(AbstractView *view) {
       frame_surface_->Commit();
     }
   } else {
-    Display::kDisplay->redraw_task_tail_.PushFront(view->redraw_task_.get());
+    Display::kDisplay->redraw_task_tail_.PushFront(view->redraw_task().get());
 
     // TODO: this is juat a workaround, should render widgets on main_surface
-    view->redraw_task_->canvas = main_surface_->canvas().get();
-    DBG_ASSERT(view->redraw_task_->canvas);
+    view->redraw_task()->context = main_surface_;
+    DBG_ASSERT(view->redraw_task()->context.GetCanvas());
     main_surface_->Damage((int) view->geometry().x() + main_surface_->margin().left,
                           (int) view->geometry().y() + main_surface_->margin().top,
                           (int) view->geometry().width(),
@@ -360,9 +360,9 @@ void AbstractWindow::OnMouseButton(MouseEvent *event) {
   event->Accept();
 }
 
-void AbstractWindow::OnDraw(Canvas *canvas) {
+void AbstractWindow::OnDraw(const Context *context) {
   if (window_frame_) {
-    window_frame_->OnDraw(canvas);
+    window_frame_->OnDraw(context);
   }
 }
 
@@ -392,11 +392,11 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
 
     if (frame_surface_) {
       frame_surface_->Attach(&frame_buffer_);
-      frame_surface_->canvas()->Clear();
+      frame_surface_->GetCanvas()->Clear();
     }
 
     main_surface_->Attach(&main_buffer_);
-    main_surface_->canvas()->Clear();
+    main_surface_->GetCanvas()->Clear();
     UpdateAll();
   }
 }
@@ -461,7 +461,7 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
         frame_surface_->Attach(&frame_buffer_);
       }
 
-      main_surface_->canvas()->Clear();
+      main_surface_->GetCanvas()->Clear();
       UpdateAll();
 
       OnResize(width, height);

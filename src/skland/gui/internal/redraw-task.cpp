@@ -20,7 +20,7 @@
 namespace skland {
 
 void RedrawTask::Run() const {
-  view->OnDraw(canvas);
+  view->OnDraw(&context);
   view->visible_ = true;
 }
 

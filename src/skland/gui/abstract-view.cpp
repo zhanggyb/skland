@@ -91,7 +91,7 @@ void AbstractView::OnUpdate(AbstractView *view) {
     // This view is going to be redrawn, just push back the task of the sub view
 
     redraw_task_->PushBack(view->redraw_task_.get());
-    view->redraw_task_->canvas = redraw_task_->canvas;
+    view->redraw_task_->context = redraw_task_->context;
     return;
   }
 

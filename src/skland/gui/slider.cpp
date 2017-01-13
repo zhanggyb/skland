@@ -19,6 +19,7 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
+#include <skland/gui/context.hpp>
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
@@ -83,7 +84,8 @@ void Slider::OnSetMaximum(const int &maximum) {
   set_maximum(maximum);
 }
 
-void Slider::OnDraw(Canvas *canvas) {
+void Slider::OnDraw(const Context *context) {
+  Canvas* canvas = context->GetCanvas();
   Paint paint;
 
   if (hover_) {

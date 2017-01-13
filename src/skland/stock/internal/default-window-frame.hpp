@@ -51,7 +51,7 @@ class DefaultWindowFrame final : public AbstractWindowFrame {
 
   virtual void OnResize(int width, int height);
 
-  virtual void OnDraw(Canvas *canvas);
+  virtual void OnDraw(const Context *context);
 
   /**
     * Calculate and return the cursor position at the border of this frame
@@ -85,7 +85,7 @@ class DefaultWindowFrame final : public AbstractWindowFrame {
 
     virtual void OnResize(int width, int height) final;
 
-    virtual void OnDraw(Canvas *canvas) final;
+    virtual void OnDraw(const Context *context) final;
 
   };
 
@@ -103,7 +103,7 @@ class DefaultWindowFrame final : public AbstractWindowFrame {
 
     virtual void OnResize(int width, int height) final;
 
-    virtual void OnDraw(Canvas *canvas) final;
+    virtual void OnDraw(const Context *context) final;
 
   };
 
@@ -121,7 +121,7 @@ class DefaultWindowFrame final : public AbstractWindowFrame {
 
     virtual void OnResize(int width, int height) final;
 
-    virtual void OnDraw(Canvas *canvas) final;
+    virtual void OnDraw(const Context *context) final;
 
   };
 

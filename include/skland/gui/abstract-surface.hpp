@@ -31,13 +31,27 @@ namespace skland {
 
 class AbstractView;
 class Canvas;
-class Buffer;
 
 /**
- * @brief A drawing rectangle on screen
+ * @brief An abstract base class for surfaces
  *
- * A surface in 'gui' module contains a native wayland surface and
- * can provide 2D, 3D, Texture property.
+ * A surface in SkLand is the drawing area on screen, it uses the native wayland
+ * surface to show 2D, 3D contents.
+ *
+ * A surface can have a parent surface and sub surfaces. The root surface which
+ * has no parent is usually used in window object and assgiend a shell surface
+ * role.
+ *
+ * A surface can have arbitrary number of sub surfaces, use the AddSubSurface()
+ * to make the given new created surface object become a sub surface placed
+ * above or below the parent surface.
+ *
+ * According to wayland protocol, surfaces are stacked as a list, not a
+ * tree. Use the up() and down() property to get the sibling surface above or
+ * below current one.
+ *
+ * @see AbstractView
+ * @see AbstractWindow
  */
 class AbstractSurface {
 
@@ -57,8 +71,6 @@ class AbstractSurface {
    * @param pos The position in the sub surface list, can be negative (below), positive (above)
    */
   void AddSubSurface(AbstractSurface *subsurface, int pos = 0);
-
-  void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
   void SetSync() const;
 
@@ -83,11 +95,11 @@ class AbstractSurface {
   void PlaceBelow(AbstractSurface *sibling);
 
   /**
-   * @brief Set sub surface position
-   * @param x
-   * @param y
+   * @brief Set sub surface position in parent surface
+   * @param x X coordinate in parent surface
+   * @param y Y coordinate in parent surface
    *
-   * If this surface is a sub surface (whose wl_sub_surface_ is valid)
+   * If this surface is a sub surface, set the position in parent surface.
    */
   void SetPosition(int x, int y);
 
@@ -123,13 +135,16 @@ class AbstractSurface {
     return down_;
   }
 
- protected:
-
   /**
-   * @brief Attach a buffer on this surface
-   * @param buffer
+   * @brief Virtual method to get the canvas for this surface
+   * @return A canvas object
+   *
+   * In ShmSurface this will return a pointer to a canvas object directly.
+   * In EGLSurface this will render the 3D content to a canvas first.
    */
-  virtual void OnAttach(const Buffer *buffer) = 0;
+  virtual Canvas *GetCanvas() const = 0;
+
+ protected:
 
   void set_position(int x, int y) {
     position_.x = x;

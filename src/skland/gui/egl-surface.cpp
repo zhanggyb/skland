@@ -28,8 +28,9 @@ EGLSurface::~EGLSurface() {
 
 }
 
-void EGLSurface::OnAttach(const Buffer *buffer) {
-
+Canvas *EGLSurface::GetCanvas() const {
+  // TODO: render to canvas
+  return nullptr;
 }
 
 }

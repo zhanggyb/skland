@@ -29,7 +29,7 @@ namespace skland {
 class MouseEvent;
 class AbstractWindow;
 class AbstractWidget;
-class Canvas;
+class Context;
 
 /**
  * @brief The abstract class for window frame
@@ -89,7 +89,7 @@ class AbstractWindowFrame : public Trackable {
 
   virtual void OnResize(int width, int height) = 0;
 
-  virtual void OnDraw(Canvas *context) = 0;
+  virtual void OnDraw(const Context *context) = 0;
 
   virtual int GetMouseLocation(const MouseEvent *event) const = 0;
 

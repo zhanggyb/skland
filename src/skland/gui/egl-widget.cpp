@@ -112,7 +112,7 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 
 }
 
-void EGLWidget::OnDraw(Canvas *canvas) {
+void EGLWidget::OnDraw(const Context *context) {
   fprintf(stderr, "on draw\n");
 }
 

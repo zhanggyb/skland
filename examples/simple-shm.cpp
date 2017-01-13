@@ -68,7 +68,7 @@ class ShmWidget : public AbstractWidget {
     event->Ignore();
   }
 
-  virtual void OnDraw(Canvas *canvas) override {
+  virtual void OnDraw(const Context *context) override {
 //    Paint paint;
 //    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
 //

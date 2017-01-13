@@ -17,7 +17,6 @@
 #include <skland/gui/abstract-surface.hpp>
 
 #include <skland/gui/display.hpp>
-#include <skland/gui/buffer.hpp>
 #include <skland/gui/abstract-view.hpp>
 
 namespace skland {
@@ -95,18 +94,6 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
     p->InsertBack(subsurface);
     subsurface->wl_sub_surface_.PlaceBelow(p->wl_surface_);
   }
-}
-
-void AbstractSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
-  if (nullptr == buffer || buffer->wl_buffer().IsNull()) {
-    wl_surface_.Attach(NULL, x, y);
-  } else {
-    buffer->position_.x = x;
-    buffer->position_.y = y;
-    wl_surface_.Attach(buffer->wl_buffer(), x, y);
-  }
-
-  OnAttach(buffer);
 }
 
 void AbstractSurface::SetSync() const {

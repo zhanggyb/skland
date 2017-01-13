@@ -18,6 +18,7 @@
 #include <skland/gui/window.hpp>
 #include <skland/gui/abstract-widget.hpp>
 
+#include <skland/gui/context.hpp>
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
@@ -63,11 +64,11 @@ class MainWidget : public AbstractWidget {
     event->Ignore();
   }
 
-  virtual void OnDraw(Canvas *canvas) override {
+  virtual void OnDraw(const Context *context) override {
     Paint paint;
     paint.SetColor(Color(0.855f, 0.855f, 0.165f, 1.f));
 
-    canvas->DrawRect(geometry(), paint);
+    context->GetCanvas()->DrawRect(geometry(), paint);
   }
 
 };

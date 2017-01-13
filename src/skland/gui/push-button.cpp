@@ -19,6 +19,8 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/gui/mouse-event.hpp>
 
+#include <skland/gui/context.hpp>
+
 namespace skland {
 
 PushButton::PushButton()
@@ -40,7 +42,7 @@ void PushButton::OnResize(int width, int height) {
   Update();
 }
 
-void PushButton::OnDraw(Canvas *canvas) {
+void PushButton::OnDraw(const Context *context) {
 
   Paint paint;
 
@@ -57,7 +59,7 @@ void PushButton::OnDraw(Canvas *canvas) {
     }
   }
 
-  canvas->DrawRect(geometry(), paint);
+  context->GetCanvas()->DrawRect(geometry(), paint);
 }
 
 }

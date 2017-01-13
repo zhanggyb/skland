@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
-#include <skland/gui/raster-surface.hpp>
+#include <skland/gui/shm-surface.hpp>
 #include <skland/gui/buffer.hpp>
 
 #include <skland/graphic/canvas.hpp>
 
 namespace skland {
 
-RasterSurface::RasterSurface(AbstractView *view, const Margin &margin)
+ShmSurface::ShmSurface(AbstractView *view, const Margin &margin)
     : AbstractSurface(view, margin) {}
 
-RasterSurface::~RasterSurface() {
+ShmSurface::~ShmSurface() {
 }
 
-void RasterSurface::OnAttach(const Buffer *buffer) {
+void ShmSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
+  if (nullptr == buffer || buffer->wl_buffer().IsNull()) {
+    wl_surface().Attach(NULL, x, y);
+  } else {
+    buffer->SetPosition(x, y);
+    wl_surface().Attach(buffer->wl_buffer(), x, y);
+  }
+
   if (nullptr == buffer) {
     canvas_.reset(nullptr);
   } else {
@@ -37,6 +44,10 @@ void RasterSurface::OnAttach(const Buffer *buffer) {
     canvas->SetOrigin((float) margin().left, (float) margin().top);
     canvas_.reset(canvas);
   }
+}
+
+Canvas* ShmSurface::GetCanvas() const {
+  return canvas_.get();
 }
 
 }

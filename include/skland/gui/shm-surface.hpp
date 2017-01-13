@@ -18,32 +18,31 @@
 #define SKLAND_GUI_RASTER_SURFACE_HPP_
 
 #include "abstract-surface.hpp"
+
 #include <memory>
 
 namespace skland {
 
+class Buffer;
+
 /**
  * @brief A surface using raster canvas
  */
-class RasterSurface : public AbstractSurface {
+class ShmSurface : public AbstractSurface {
 
-  RasterSurface() = delete;
-  RasterSurface(const RasterSurface &) = delete;
-  RasterSurface &operator=(const RasterSurface &) = delete;
+  ShmSurface() = delete;
+  ShmSurface(const ShmSurface &) = delete;
+  ShmSurface &operator=(const ShmSurface &) = delete;
 
  public:
 
-  RasterSurface(AbstractView *view, const Margin &margin = Margin());
+  ShmSurface(AbstractView *view, const Margin &margin = Margin());
 
-  virtual ~RasterSurface();
+  virtual ~ShmSurface();
 
-  const std::unique_ptr<Canvas> &canvas() const {
-    return canvas_;
-  }
+  void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
- protected:
-
-  virtual void OnAttach(const Buffer *buffer) final;
+  Canvas *GetCanvas() const final;
 
  private:
 
