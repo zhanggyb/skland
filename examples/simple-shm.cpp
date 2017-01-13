@@ -17,8 +17,8 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
 #include <skland/gui/abstract-widget.hpp>
+#include <skland/gui/context.hpp>
 
-#include <skland/core/color.hpp>
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
@@ -33,8 +33,7 @@ class ShmWidget : public AbstractWidget {
  public:
 
   ShmWidget()
-      : AbstractWidget() {
-    set_name("Simple Widget");
+      : AbstractWidget(), context_(nullptr), direction_(false) {
   }
 
   virtual ~ShmWidget() {}
@@ -47,12 +46,10 @@ class ShmWidget : public AbstractWidget {
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {
-    std::cout << "Enter" << std::endl;
     event->Accept();
   }
 
   virtual void OnMouseLeave(MouseEvent *event) override {
-    std::cout << "Leave" << std::endl;
     event->Accept();
   }
 
@@ -69,12 +66,51 @@ class ShmWidget : public AbstractWidget {
   }
 
   virtual void OnDraw(const Context *context) override {
-//    Paint paint;
-//    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
-//
-//    canvas->DrawRectangle(x(), y(), width(), height(), paint);
+    static int padding = 5;
+    context_ = context;
+    std::shared_ptr<Canvas> canvas = context->GetCanvas();
+
+    Paint paint;
+    paint.SetColor(color_);
+
+    canvas->DrawRect(Rect(geometry().l + padding,
+                          geometry().t + padding,
+                          geometry().r - padding,
+                          geometry().b - padding),
+                     paint);
+    context_->SetupCallback(callback_);
+    callback_.done().Set(this, &ShmWidget::OnCallback);
+    context_->Damage(context_->GetMargin().l + (int) geometry().l,
+                     context_->GetMargin().t + (int) geometry().t,
+                     (int) geometry().width(),
+                     (int) geometry().height());
+    context_->Commit();
   }
 
+ private:
+
+  void OnCallback(uint32_t serial) {
+    if (direction_) {
+      color_.r += 0.005f;
+      if (color_.r > 1.f) {
+        color_.r = 1.f;
+        direction_ = !direction_;
+      }
+    } else {
+      color_.r -= 0.01f;
+      if (color_.r < 0.f) {
+        color_.r = 0.f;
+        direction_ = !direction_;
+      }
+    }
+
+    OnDraw(context_);
+  }
+
+  wayland::Callback callback_;
+  const Context *context_;
+  Color color_;
+  bool direction_;
 };
 
 int main(int argc, char *argv[]) {
@@ -82,7 +118,7 @@ int main(int argc, char *argv[]) {
 
   Application app(argc, argv);
 
-  Window *win = new Window(480, 480, "Simple Shm");
+  Window *win = new Window(320, 320, "Simple Shm");
   win->SetAppId("Simple-Shm");
 
   ShmWidget *widget = new ShmWidget;

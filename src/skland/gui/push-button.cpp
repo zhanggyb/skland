@@ -15,18 +15,17 @@
  */
 
 #include <skland/gui/push-button.hpp>
+#include <skland/gui/mouse-event.hpp>
+#include <skland/gui/context.hpp>
+
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
-#include <skland/gui/mouse-event.hpp>
-
-#include <skland/gui/context.hpp>
 
 namespace skland {
 
 PushButton::PushButton()
     : AbstractButton() {
   resize(90, 20);
-  set_name("CloseButton");
 }
 
 PushButton::~PushButton() {
@@ -46,7 +45,7 @@ void PushButton::OnDraw(const Context *context) {
 
   Paint paint;
 
-  Color regular(0.85f, 0.85f, 0.15f);
+  Color regular(0xFFB67E3E);
   Color down = regular - 50;
   Color hover = regular + 25;
 

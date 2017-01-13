@@ -60,6 +60,18 @@ class Context {
     callback.Setup(surface_->wl_surface());
   }
 
+  const Margin &GetMargin() const {
+    return surface_->margin();
+  }
+
+  void Damage(int surface_x, int surface_y, int surface_width, int surface_height) const {
+    surface_->Damage(surface_x, surface_y, surface_width, surface_height);
+  }
+
+  void Commit() const {
+    surface_->Commit();
+  }
+
  private:
 
   const AbstractSurface *surface_;
