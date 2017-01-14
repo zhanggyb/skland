@@ -24,7 +24,6 @@ mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules/")
 
-# You may need to set environment variable CMAKE_PREFIX_PATH, see http://doc.qt.io/qt-5/cmake-manual.html
 option(BUILD_UNIT_TEST "Build unit test code" OFF)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -96,7 +95,7 @@ if (BUILD_DOCUMENTATION)
 
     set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in)
     set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-    set(doxy_main_page ${CMAKE_CURRENT_SOURCE_DIR}/doc/mainpage.dox)
+    set(doxy_main_page ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
 
     configure_file(${doxyfile_in} ${doxyfile} @ONLY)
 

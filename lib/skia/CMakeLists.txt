@@ -60,12 +60,10 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
 
 
 # Skia sure ships a lot of code no one uses.
-remove_srcs(${SKIA_SOURCE_DIR}/src/animator/*
-        ${SKIA_SOURCE_DIR}/src/*nacl*
-        ${SKIA_SOURCE_DIR}/src/svg/*
+remove_srcs(${SKIA_SOURCE_DIR}/src/svg/*
         ${SKIA_SOURCE_DIR}/src/views/*
         ${SKIA_SOURCE_DIR}/src/xml/*)
-foreach (include animator svg views xml gpu/vk)
+foreach (include svg views xml gpu/vk)
     file(GLOB globed_include ${SKIA_SOURCE_DIR}/include/${include})
     list(REMOVE_ITEM public_includes ${globed_include})
 endforeach ()

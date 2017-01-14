@@ -34,6 +34,7 @@ class ShmWidget : public AbstractWidget {
 
   ShmWidget()
       : AbstractWidget(), context_(nullptr), direction_(false) {
+    callback_.done().Set(this, &ShmWidget::OnCallback);
   }
 
   virtual ~ShmWidget() {}
@@ -79,7 +80,6 @@ class ShmWidget : public AbstractWidget {
                           geometry().b - padding),
                      paint);
     context_->SetupCallback(callback_);
-    callback_.done().Set(this, &ShmWidget::OnCallback);
     context_->Damage(context_->GetMargin().l + (int) geometry().l,
                      context_->GetMargin().t + (int) geometry().t,
                      (int) geometry().width(),

@@ -52,6 +52,7 @@ class DelegateRef;
 
 /**
  * @brief Delegate with variadic template
+ * @ingroup core
  *
  * Inspired by http://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates
  *
@@ -256,6 +257,7 @@ inline bool operator>(const Delegate<ReturnType(ParamTypes...)> &src,
 
 /**
  * @brief A reference to expose delegate in an object
+ * @ingroup core
  */
 template<typename ReturnType, typename ... ParamTypes>
 class DelegateRef<ReturnType(ParamTypes...)> {
