@@ -17,7 +17,8 @@
 #ifndef SKLAND_WAYLAND_DISPLAY_HPP_
 #define SKLAND_WAYLAND_DISPLAY_HPP_
 
-#include <skland/core/delegate.hpp>
+#include "../core/delegate.hpp"
+
 #include <wayland-client.h>
 
 namespace skland {
@@ -31,6 +32,19 @@ namespace wayland {
 class Registry;
 class Callback;
 
+/**
+ * @ingroup wayland
+ * @brief A connection to the compositor.
+ *
+ * This class encapsulate a pointer to a native wl_display structure which
+ * represents a connection to the compositor and acts as a proxy to the
+ * wl_display singleton object.
+ *
+ * A display connection is created with Connect() (or connect_to_fd()). A
+ * connection is terminated using Disconnect().
+ *
+ * @note A Display object is not copyable.
+ */
 class Display {
 
   friend class Registry;

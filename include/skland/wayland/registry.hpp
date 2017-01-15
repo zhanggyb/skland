@@ -22,6 +22,9 @@
 namespace skland {
 namespace wayland {
 
+/**
+ * @ingroup wayland
+ */
 class Registry {
 
   Registry(const Registry &) = delete;

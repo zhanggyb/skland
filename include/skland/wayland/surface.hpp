@@ -35,6 +35,9 @@ class XdgSurface;
 class Callback;
 class Pointer;
 
+/**
+ * @ingroup wayland
+ */
 class Surface {
 
   friend class ShellSurface;

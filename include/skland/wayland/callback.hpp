@@ -23,6 +23,11 @@
 namespace skland {
 namespace wayland {
 
+/**
+ * @ingroup wayland
+ * @brief A callback to handle the 'done' event to get notified when the related
+ * request is done.
+ */
 class Callback {
 
   Callback(const Callback &) = delete;
@@ -33,18 +38,29 @@ class Callback {
   Callback()
       : wl_callback_(nullptr) {}
 
+  /**
+   * @brief Create a callback to a display sync event
+   */
   Callback(const Display &display)
       : wl_callback_(nullptr) {
     wl_callback_ = wl_display_sync(display.wl_display_);
     wl_callback_add_listener(wl_callback_, &kListener, this);
   }
 
+  /**
+   * @brief Create a callback to a surface frame event
+   */
   Callback(const Surface &surface)
       : wl_callback_(nullptr) {
     wl_callback_ = wl_surface_frame(surface.wl_surface_);
     wl_callback_add_listener(wl_callback_, &kListener, this);
   }
 
+  /**
+   * @brief Destructor
+   *
+   * Destroy the native wayland callback object
+   */
   ~Callback() {
     if (wl_callback_) wl_callback_destroy(wl_callback_);
   }
@@ -70,6 +86,9 @@ class Callback {
     }
   }
 
+  /**
+   * @brief A delegate to the 'done' event
+   */
   DelegateRef<void(uint32_t)> done() {
     return done_;
   }
