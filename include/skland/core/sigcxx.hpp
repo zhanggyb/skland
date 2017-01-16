@@ -238,8 +238,8 @@ class Slot {
 };
 
 /**
- * @brief The basic class for an object which provides slot methods
  * @ingroup core
+ * @brief The basic class for an object which can provide slot methods
  */
 class Trackable {
 
@@ -373,8 +373,8 @@ size_t Trackable::CountBindings(void (T::*method)(ParamTypes...)) const {
 }
 
 /**
- * @brief A template class which can emit signal(s)
  * @ingroup core
+ * @brief A template class which can emit signal(s)
  */
 template<typename ... ParamTypes>
 class Signal : public Trackable {
@@ -974,8 +974,8 @@ void Signal<ParamTypes...>::DisconnectAll() {
 }
 
 /**
- * @brief A reference to a corresponding signal
  * @ingroup core
+ * @brief A reference to a corresponding signal
  */
 template<typename ... ParamTypes>
 class SignalRef {

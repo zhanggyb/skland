@@ -1,35 +1,41 @@
 /**
  * @defgroup core Core
+ * @brief The core functionality
  *
  * ...
  */
 
 /**
- * @defgroup wayland
+ * @defgroup wayland Wayland
+ * @brief C++ wrappers to wayland client APIs.
  *
  * C++ wrapper to wayland client APIs.
  */
 
 /**
- * @defgroup egl
+ * @defgroup egl EGL
+ * @brief C++ wrappers to EGL APIs
  *
  * C++ wrapper to egl APIs
  */
 
 /**
  * @defgroup graphic Graphic
+ * @brief 2D graphic module based on Google Skia
  *
  * Code using Google Skia for drawing 2D in GUI views.
  */
 
 /**
  * @defgroup gui GUI
+ * @brief The main module provides GUI elements
  *
  * The main module provides GUI classes.
  */
 
 /**
  * @defgroup stock Stock
+ * @brief Stock resources
  *
  * Stock resources
  */

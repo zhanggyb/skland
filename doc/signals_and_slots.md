@@ -1,5 +1,5 @@
-New Signal/Slot Implementation in SkLand
-========================================
+Signals/Slots Implementation in SkLand
+======================================
 
 ## Overview
 

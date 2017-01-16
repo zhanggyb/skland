@@ -27,8 +27,8 @@ namespace skland {
 namespace core {
 
 /**
- * Color
- *
+ * @ingroup core
+ * @brief Template class for color
  * @tparam T Only support float or double
  */
 template<typename T>
@@ -196,8 +196,22 @@ inline bool operator!=(const Color<T> &src, const Color<T> &dst) {
 
 } // namespace core
 
+/**
+ * @ingroup core
+ * @brief A typedef to color with float values
+ */
 typedef core::Color<float> Color;
+
+/**
+ * @ingroup core
+ * @brief A typedef to color with float values
+ */
 typedef core::Color<float> ColorF;
+
+/**
+ * @ingroup core
+ * @brief A typedef to color with double values
+ */
 typedef core::Color<double> ColorD;
 
 }

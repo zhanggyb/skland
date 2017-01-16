@@ -142,6 +142,12 @@ class Delegate<ReturnType(ParamTypes...)> {
    */
   Delegate() {}
 
+  /**
+   * @brief Constructor to create a delegate by given object and method
+   * @tparam T The type of object
+   * @param object_ptr A pointer to the object
+   * @param method A pointer to a member function in class T
+   */
   template<typename T>
   Delegate(T *object_ptr, ReturnType (T::*method)(ParamTypes...)) {
     typedef ReturnType (T::*TMethod)(ParamTypes...);
@@ -151,6 +157,12 @@ class Delegate<ReturnType(ParamTypes...)> {
     data_.method_pointer = reinterpret_cast<GenericMethodPointer>(method);
   }
 
+  /**
+   * @brief Constructor to create a delegate by given object and const method
+   * @tparam T The type of object
+   * @param object_ptr A pointer to the object
+   * @param method A pointer to a const member function in class T
+   */
   template<typename T>
   Delegate(T *object_ptr, ReturnType (T::*method)(ParamTypes...) const) {
     typedef ReturnType (T::*TMethod)(ParamTypes...) const;
@@ -160,15 +172,35 @@ class Delegate<ReturnType(ParamTypes...)> {
     data_.method_pointer = reinterpret_cast<GenericMethodPointer>(method);
   }
 
+  /**
+   * @brief Copy constructor
+   * @param orig Another delegate
+   */
   Delegate(const Delegate &orig)
       : data_(orig.data_) {}
 
+  /**
+   * @brief Destructor
+   */
   ~Delegate() {}
 
+  /**
+   * @brief Reset this delegate
+   *
+   * Reset pointers in this delegate to nullptr (0)
+   *
+   * @note After reset, invoke this delegate by operator() or Invoke() will cause segment fault.
+   * The bool operator will return false.
+   */
   void Reset() {
     memset(&data_, 0, sizeof(PointerData));
   }
 
+  /**
+   * @brief Assignment operator overloading
+   * @param orig Another delegate
+   * @return
+   */
   Delegate &operator=(const Delegate &orig) {
     data_ = orig.data_;
     return *this;
@@ -182,11 +214,22 @@ class Delegate<ReturnType(ParamTypes...)> {
     return (*data_.method_stub)(data_.object_pointer, data_.method_pointer, Args...);
   }
 
+  /**
+   * @brief Bool operator
+   * @return True if pointer to a method is set, false otherwise
+   */
   operator bool() const {
     // Support method delegate only, no need to check other members:
     return data_.method_pointer != nullptr;
   }
 
+  /**
+   * @brief Compare this delegate to a member function of an object
+   * @tparam T
+   * @param object_ptr
+   * @param method
+   * @return
+   */
   template<typename T>
   bool Equal(T *object_ptr, ReturnType(T::*method)(ParamTypes...)) const {
     typedef ReturnType (T::*TMethod)(ParamTypes...);
@@ -196,6 +239,13 @@ class Delegate<ReturnType(ParamTypes...)> {
         (data_.method_pointer == reinterpret_cast<GenericMethodPointer>(method));
   }
 
+  /**
+   * @brief Compare this delegate to a const member function of an object
+   * @tparam T
+   * @param object_ptr
+   * @param method
+   * @return
+   */
   template<typename T>
   bool Equal(T *object_ptr, ReturnType(T::*method)(ParamTypes...) const) const {
     typedef ReturnType (T::*TMethod)(ParamTypes...) const;
@@ -226,6 +276,14 @@ class Delegate<ReturnType(ParamTypes...)> {
   PointerData data_;
 };
 
+/**
+ * @brief Compare 2 delegates
+ * @tparam ReturnType
+ * @tparam ParamTypes
+ * @param src
+ * @param dst
+ * @return True if 2 delegates point to the same method in one object
+ */
 template<typename ReturnType, typename ... ParamTypes>
 inline bool operator==(const Delegate<ReturnType(ParamTypes...)> &src,
                        const Delegate<ReturnType(ParamTypes...)> &dst) {
@@ -259,8 +317,8 @@ inline bool operator>(const Delegate<ReturnType(ParamTypes...)> &src,
 }
 
 /**
- * @brief A reference to expose delegate in an object
  * @ingroup core
+ * @brief A reference to a corresponding delegate
  */
 template<typename ReturnType, typename ... ParamTypes>
 class DelegateRef<ReturnType(ParamTypes...)> {
