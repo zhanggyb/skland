@@ -24,9 +24,7 @@ called [sigcxx](https://github.com/zhanggyb/sigcxx).
 
 ## Features
 
-- Based on fast C++ delegates<sup id="a1">[1](#f1)</sup><sup>,</sup><sup
-  id="a2">[2](#f2)</sup><sup>,</sup><sup id="a3">[3](#f3)</sup><sup>,</sup><sup
-  id="a4">[4](#f4)</sup>
+- Based on [fast C++ delegates](md_doc_delegates.html)
 - Powered by variadic template in C++11
 - Multicast
 - Slot can be virtual or pure virtual
@@ -35,17 +33,3 @@ called [sigcxx](https://github.com/zhanggyb/sigcxx).
 - etc.
 
 ## Usage
-
-----
-
-<small>
-<b id="f1">1</b>
-[Member Function Pointers and the Fastest Possible C++ Delegates](http://www.codeproject.com/Articles/7150/Member-Function-Pointers-and-the-Fastest-Possible),
-author: Don Clugston. [↩](#a1)<br>
-<b id="f2">2</b>
-[The Impossibly Fast C++ Delegates](http://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates), author: Sergey Ryazanov. [↩](#a2)<br>
-<b id="f3">3</b>
-[Fast C++ Delegate: Boost.Function 'drop-in' replacement and multicast](http://www.codeproject.com/Articles/18389/Fast-C-Delegate-Boost-Function-drop-in-replacement), author: JaeWook Choi. [↩](#a3)<br>
-<b id="f4">4</b>
-[CppEvents](http://code.google.com/p/cpp-events/), author: Nickolas V. Pohilets. [↩](#a4)
-</small>

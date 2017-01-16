@@ -51,13 +51,10 @@ class DelegateRef;
 /// @endcond
 
 /**
- * @brief Delegate with variadic template
  * @ingroup core
+ * @brief Template class for delegates
  *
- * Inspired by http://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates
- *
- * @note only support method in this project, which means you cannot
- * create a delegate to a static member function
+ * @see <a href="md_doc_delegates.html">Fast C++ Delegats</a>
  */
 template<typename ReturnType, typename ... ParamTypes>
 class Delegate<ReturnType(ParamTypes...)> {
@@ -137,6 +134,12 @@ class Delegate<ReturnType(ParamTypes...)> {
     return d;
   }
 
+  /**
+   * @brief Default constructor
+   *
+   * Create an empty delegate object, which cannot be called by operator() or
+   * Invoke(), and the bool operator returns false.
+   */
   Delegate() {}
 
   template<typename T>
