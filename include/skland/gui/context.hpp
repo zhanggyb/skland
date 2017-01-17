@@ -34,7 +34,7 @@ class Context {
 
  public:
 
-  Context(const AbstractSurface *surface)
+  Context(AbstractSurface *surface)
       : surface_(surface) {}
 
   Context(const Context &other)
@@ -47,7 +47,7 @@ class Context {
     return *this;
   }
 
-  Context &operator=(const AbstractSurface *surface) {
+  Context &operator=(AbstractSurface *surface) {
     surface_ = surface;
     return *this;
   }
@@ -72,9 +72,13 @@ class Context {
     surface_->Commit();
   }
 
+  AbstractSurface *surface() const {
+    return surface_;
+  }
+
  private:
 
-  const AbstractSurface *surface_;
+  AbstractSurface *surface_;
 
 };
 

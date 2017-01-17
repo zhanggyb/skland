@@ -125,14 +125,14 @@ class AbstractView : public Object {
   void UpdateAll();
 
   /**
-   * @brief A sub view request an update
-   * @param view
+   * @brief A view request an update
+   * @param view This view or a sub view in hierachy
    */
   virtual void OnUpdate(AbstractView *view);
 
   /**
    * @brief Get surface for the given view
-   * @param view A view object, it is always this view or one of sub view in hierachy
+   * @param view A view object, it is always this view or a sub view in hierachy
    * @return A pointer to a surface or nullptr
    */
   virtual AbstractSurface *OnGetSurface(const AbstractView *view) const;

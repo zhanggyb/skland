@@ -33,8 +33,11 @@ class ShmWidget : public AbstractWidget {
  public:
 
   ShmWidget()
-      : AbstractWidget(), context_(nullptr), direction_(false) {
-    callback_.done().Set(this, &ShmWidget::OnCallback);
+      : AbstractWidget(), context_(nullptr), radius_(0.f), angle_(0.f) {
+    color_ = 0xFF4FBF4F;
+    callback_.done().Set(this, &ShmWidget::OnFrame);
+
+    radius_ = clamp(std::min(geometry().width(), geometry().height()) / 2.f - 50.f, 50.f, 200.f);
   }
 
   virtual ~ShmWidget() {}
@@ -43,6 +46,7 @@ class ShmWidget : public AbstractWidget {
 
   virtual void OnResize(int width, int height) override {
     resize(width, height);
+    radius_ = clamp(std::min(geometry().width(), geometry().height()) / 2.f - 50.f, 50.f, 200.f);
     Update();
   }
 
@@ -70,15 +74,28 @@ class ShmWidget : public AbstractWidget {
     static int padding = 5;
     context_ = context;
     std::shared_ptr<Canvas> canvas = context->GetCanvas();
-
-    Paint paint;
-    paint.SetColor(color_);
-
-    canvas->DrawRect(Rect(geometry().l + padding,
+    canvas->Save();
+    canvas->ClipRect(Rect(geometry().l + padding,
                           geometry().t + padding,
                           geometry().r - padding,
-                          geometry().b - padding),
-                     paint);
+                          geometry().b - padding));
+
+    canvas->Clear(color_);
+
+    Paint paint;
+    paint.SetAntiAlias(true);
+    paint.SetColor(Color(0xEFFFFFFF));
+    paint.SetStyle(Paint::Style::kStyleStroke);
+    paint.SetStrokeWidth(5.f);
+
+    canvas->DrawArc(Rect(geometry().center_x() - radius_,
+                         geometry().center_y() - radius_,
+                         geometry().center_x() + radius_,
+                         geometry().center_y() + radius_),
+                    angle_, 300.f, false, paint);
+
+    canvas->Restore();
+
     context_->SetupCallback(callback_);
     context_->Damage(context_->GetMargin().l + (int) geometry().l,
                      context_->GetMargin().t + (int) geometry().t,
@@ -89,20 +106,10 @@ class ShmWidget : public AbstractWidget {
 
  private:
 
-  void OnCallback(uint32_t serial) {
-    if (direction_) {
-      color_.r += 0.005f;
-      if (color_.r > 1.f) {
-        color_.r = 1.f;
-        direction_ = !direction_;
-      }
-    } else {
-      color_.r -= 0.01f;
-      if (color_.r < 0.f) {
-        color_.r = 0.f;
-        direction_ = !direction_;
-      }
-    }
+  void OnFrame(uint32_t serial) {
+
+    angle_ += 5.f;
+    if (angle_ > 360.f) angle_ = 0.f;
 
     OnDraw(context_);
   }
@@ -110,7 +117,8 @@ class ShmWidget : public AbstractWidget {
   wayland::Callback callback_;
   const Context *context_;
   Color color_;
-  bool direction_;
+  float radius_;
+  float angle_;
 };
 
 int main(int argc, char *argv[]) {

@@ -57,6 +57,9 @@ class Canvas {
 
   void DrawCircle(float x, float y, float radius, const Paint &paint);
 
+  void DrawArc(const Rect &oval, float start_angle, float sweep_angle,
+               bool use_center, const Paint &paint);
+
   void DrawPath(const Path &path, const Paint &paint);
 
   void DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint);

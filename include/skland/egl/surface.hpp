@@ -61,7 +61,7 @@ class Surface {
 
  private:
 
-  EGLSurface egl_surface_;
+  ::EGLSurface egl_surface_;
   struct wl_egl_window *wl_egl_window_;
 };
 

@@ -65,6 +65,10 @@ void Canvas::DrawCircle(float x, float y, float radius, const Paint &paint) {
   metadata_->drawCircle(x, y, radius, *paint.sk_paint());
 }
 
+void Canvas::DrawArc(const Rect &oval, float start_angle, float sweep_angle, bool use_center, const Paint &paint) {
+  metadata_->drawArc(*reinterpret_cast<const SkRect *>(&oval), start_angle, sweep_angle, use_center, *paint.sk_paint());
+}
+
 void Canvas::DrawPath(const Path &path, const Paint &paint) {
   metadata_->drawPath(*path.sk_path(), *paint.sk_paint());
 }
