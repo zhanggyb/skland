@@ -71,23 +71,34 @@ create_shader(const char *source, GLenum shader_type) {
 
 EGLWidget::EGLWidget()
     : EGLWidget(400, 300) {
-
+  callback_.done().Set(this, &EGLWidget::OnFrame);
 }
 
 EGLWidget::EGLWidget(int width, int height)
-    : AbstractWidget(width, height) {
-//  EGLSurface *surf = new EGLSurface;
-//  SetSurface(surf);
+    : AbstractWidget(width, height),
+      surface_(nullptr) {
+  surface_ = new EGLSurface(this);
+  opaque_region_.Setup(Display::wl_compositor());
+  opaque_region_.Add(0, 0, (int) geometry().width(), (int) geometry().height());
+  surface_->SetOpaqueRegion(opaque_region_);
 
-  InitializeGL();
+//  InitializeGL();
 }
 
 EGLWidget::~EGLWidget() {
+  delete surface_;
+}
 
+AbstractSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
+  return surface_;
 }
 
 void EGLWidget::OnResize(int width, int height) {
   resize(width, height);
+  surface_->Resize(width, height);
+  opaque_region_.Setup(Display::wl_compositor());
+  opaque_region_.Add(0, 0, width, height);
+  surface_->SetOpaqueRegion(opaque_region_);
 }
 
 void EGLWidget::OnMouseEnter(MouseEvent *event) {
@@ -113,7 +124,20 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 }
 
 void EGLWidget::OnDraw(const Context *context) {
-  fprintf(stderr, "on draw\n");
+  if (surface_->wl_sub_surface().IsNull()) {
+    AbstractSurface *parent_surf = context->surface();
+    parent_surf->AddSubSurface(surface_);
+//    callback_.Setup(surface_->wl_surface());
+  }
+}
+
+void EGLWidget::OnRender() {
+
+}
+
+void EGLWidget::OnFrame(uint32_t /* serial */) {
+  OnRender();
+  callback_.Setup(surface_->wl_surface());
 }
 
 void EGLWidget::InitializeGL() {

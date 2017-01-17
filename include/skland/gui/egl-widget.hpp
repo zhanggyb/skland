@@ -19,10 +19,13 @@
 
 #include "abstract-widget.hpp"
 
-#include "../wayland/subsurface.hpp"
+#include "../wayland/callback.hpp"
+
 #include <GLES2/gl2.h>
 
 namespace skland {
+
+class EGLSurface;
 
 class EGLWidget : public AbstractWidget {
 
@@ -35,6 +38,8 @@ class EGLWidget : public AbstractWidget {
   virtual ~EGLWidget();
 
  protected:
+
+  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const override;
 
   virtual void OnResize(int width, int height) override;
 
@@ -50,13 +55,22 @@ class EGLWidget : public AbstractWidget {
 
   virtual void OnDraw(const Context *context) final;
 
+  virtual void OnRender();
+
  private:
 
+  void OnFrame(uint32_t serial);
+
   void InitializeGL();
+
+  EGLSurface *surface_;
 
   GLint rotation_uniform;
   GLuint pos;
   GLuint col;
+
+  wayland::Region opaque_region_;
+  wayland::Callback callback_;
 
 };
 

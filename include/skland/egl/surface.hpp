@@ -47,7 +47,7 @@ class Surface {
 
   void Destroy();
 
-  void Resize(int width, int height, int dx, int dy) {
+  void Resize(int width, int height, int dx = 0, int dy = 0) {
     wl_egl_window_resize(wl_egl_window_, width, height, dx, dy);
   }
 

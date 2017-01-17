@@ -43,6 +43,10 @@ class EGLSurface : public AbstractSurface {
    */
   virtual std::shared_ptr<Canvas> GetCanvas() const override;
 
+  void Resize(int width, int height, int dx = 0, int dy = 0) {
+    egl_surface_.Resize(width, height, dx, dy);
+  }
+
  private:
 
   egl::Surface egl_surface_;

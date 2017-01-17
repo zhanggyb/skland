@@ -76,7 +76,7 @@ class ShmWidget : public AbstractWidget {
     std::shared_ptr<Canvas> canvas = context->GetCanvas();
     canvas->Save();
     canvas->ClipRect(Rect(geometry().l + padding,
-                          geometry().t + padding,
+                          geometry().t,
                           geometry().r - padding,
                           geometry().b - padding));
 
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 
   Application app(argc, argv);
 
-  Window *win = new Window(320, 320, "Simple Shm");
+  Window *win = new Window(320, 280, "Simple Shm");
   win->SetAppId("Simple-Shm");
 
   ShmWidget *widget = new ShmWidget;
