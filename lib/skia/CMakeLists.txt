@@ -263,6 +263,8 @@ endif ()
 find_package(OpenGL REQUIRED)
 list(APPEND libs ${OPENGL_LIBRARIES})
 
+add_definitions(-DSK_SUPPORT_LEGACY_CANVAS_GETCLIPSTACK)    # getClipStack() is hiden in latest commit
+
 # This is our main output, libskia.{a,so,dll,dylib,etc...}
 # You can control whether this is static or shared with BUILD_SHARED_LIBS.
 add_library(skia ${srcs})

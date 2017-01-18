@@ -42,13 +42,11 @@ void PushButton::OnResize(int width, int height) {
 }
 
 void PushButton::OnDraw(const Context *context) {
-
-  Paint paint;
-
-  Color regular(0xFFB67E3E);
+  Color regular(0.95f, 0.55f, 0.1f);
   Color down = regular - 50;
   Color hover = regular + 25;
 
+  Paint paint;
   paint.SetColor(regular);
   if (IsHovered()) {
     if (IsPressed()) {

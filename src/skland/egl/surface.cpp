@@ -52,22 +52,6 @@ void Surface::Setup(const egl::Display &egl_display,
                                      egl_display.egl_config_,
                                      wl_egl_window_,
                                      NULL);
-
-  if (eglMakeCurrent(egl_display.egl_display_, egl_surface_, egl_surface_, egl_display.egl_context_)) {
-    fprintf(stderr, "Made current\n");
-  } else {
-    fprintf(stderr, "Made current failed\n");
-  }
-
-  glClearColor(0.0, 0.0, 0.0, 1.0);
-  glClear(GL_COLOR_BUFFER_BIT);
-  glFlush();
-
-  if (eglSwapBuffers(egl_display.egl_display_, egl_surface_)) {
-    fprintf(stderr, "swap buffer\n");
-  } else {
-    fprintf(stderr, "swap buffer failed\n");
-  }
 }
 
 void Surface::Destroy() {

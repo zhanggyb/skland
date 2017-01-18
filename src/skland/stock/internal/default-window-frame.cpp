@@ -48,40 +48,41 @@ void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */
 
 void DefaultWindowFrame::CloseButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  canvas->Save();
+  canvas->ClipRect(geometry());
+  canvas->Clear();
 
-  Color regular(0.83f, 0.33f, 0.33f);
-  Color outline(0.78f, 0.28f, 0.28f);
-  Color down = regular - 50;
+  Color regular(0.95f, 0.55f, 0.f);
+  // Color outline(0.78f, 0.28f, 0.28f);
+  Color outline(0xFF444444);
+  Color down = regular - 75;
   Color hover = regular + 15;
 
   Paint paint;
-  paint.SetAntiAlias(true);
 
-  paint.SetColor(regular);
   if (IsHovered()) {
     if (IsPressed()) {
       paint.SetColor(down);
     } else {
       paint.SetColor(hover);
     }
+  } else {
+    paint.SetColor(outline);
   }
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
 
-  paint.SetStrokeWidth(1.f);
-  paint.SetColor(outline);
   paint.SetStyle(Paint::Style::kStyleStroke);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
+  paint.SetAntiAlias(true);
+  paint.SetStrokeWidth(1.f);
+  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.5f, paint);
 
-  if (IsHovered()) {
-    paint.SetStrokeWidth(1.5f);
-    paint.SetColor(0xFF444444);
-    canvas->DrawLine(geometry().center_x() - 2.5f, geometry().center_y() - 2.5f,
-                     geometry().center_x() + 2.5f, geometry().center_y() + 2.5f,
-                     paint);
-    canvas->DrawLine(geometry().center_x() + 2.5f, geometry().center_y() - 2.5f,
-                     geometry().center_x() - 2.5f, geometry().center_y() + 2.5f,
-                     paint);
-  }
+  paint.SetStrokeWidth(1.5f);
+  canvas->DrawLine(geometry().center_x() - 2.5f, geometry().center_y() - 2.5f,
+                   geometry().center_x() + 2.5f, geometry().center_y() + 2.5f,
+                   paint);
+  canvas->DrawLine(geometry().center_x() + 2.5f, geometry().center_y() - 2.5f,
+                   geometry().center_x() - 2.5f, geometry().center_y() + 2.5f,
+                   paint);
+  canvas->Restore();
 }
 
 DefaultWindowFrame::MaximizeButton::MaximizeButton()

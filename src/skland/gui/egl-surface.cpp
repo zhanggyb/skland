@@ -37,4 +37,12 @@ std::shared_ptr<Canvas> EGLSurface::GetCanvas() const {
   return nullptr;
 }
 
+bool EGLSurface::MakeCurrent() {
+  return Display::egl_display().MakeCurrent(egl_surface_, egl_surface_);
+}
+
+bool EGLSurface::SwapBuffers() {
+  return Display::egl_display().SwapBuffers(egl_surface_);
+}
+
 }

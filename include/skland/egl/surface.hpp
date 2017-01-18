@@ -22,6 +22,7 @@
 
 namespace skland {
 
+// Forward declaration:
 namespace wayland {
 class Surface;
 }
@@ -30,7 +31,13 @@ namespace egl {
 
 class Display;
 
+/**
+ * @ingroup egl
+ * @brief EGL Surface
+ */
 class Surface {
+
+  friend class Display;
 
   Surface(const Surface &) = delete;
   Surface &operator=(const Surface &) = delete;

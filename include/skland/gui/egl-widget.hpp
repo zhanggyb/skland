@@ -27,6 +27,9 @@ namespace skland {
 
 class EGLSurface;
 
+/**
+ * @brief A widget use egl surface for 3D scene
+ */
 class EGLWidget : public AbstractWidget {
 
  public:
@@ -39,9 +42,9 @@ class EGLWidget : public AbstractWidget {
 
  protected:
 
-  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const override;
+  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const final;
 
-  virtual void OnResize(int width, int height) override;
+  virtual void OnResize(int width, int height) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -54,6 +57,10 @@ class EGLWidget : public AbstractWidget {
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
   virtual void OnDraw(const Context *context) final;
+
+  virtual void OnInitializeEGL();
+
+  virtual void OnResizeEGL();
 
   virtual void OnRender();
 
@@ -70,6 +77,7 @@ class EGLWidget : public AbstractWidget {
   GLuint col;
 
   wayland::Region opaque_region_;
+  wayland::Region input_region_;
   wayland::Callback callback_;
 
 };
