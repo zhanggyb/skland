@@ -62,9 +62,5 @@ bool XdgPositioner::IsValid() const {
   return nullptr != metadata_->zxdg_positioner;
 }
 
-bool XdgPositioner::IsNull() const {
-  return nullptr == metadata_->zxdg_positioner;
-}
-
 }
 }

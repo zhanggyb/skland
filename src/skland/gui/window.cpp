@@ -37,12 +37,12 @@ Window::~Window() {
 }
 
 void Window::SetMainWidget(AbstractWidget *widget) {
-  if (main_widget_) {
-    delete main_widget_;
-  }
+  if (widget == main_widget_) return;
+
+  if (main_widget_) delete main_widget_;
   main_widget_ = widget;
 
-  AddSubView(widget, -1);
+  AddSubView(widget);
   SetMainWidgetGeometry();
 }
 

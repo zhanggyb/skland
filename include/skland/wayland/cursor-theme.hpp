@@ -57,10 +57,6 @@ class CursorTheme {
     return nullptr != wl_cursor_theme_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_cursor_theme_;
-  }
-
  private:
 
   struct wl_cursor_theme *wl_cursor_theme_;

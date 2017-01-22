@@ -127,7 +127,7 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnDraw(const Context *context) override;
 
-  void AddSubView(AbstractView *view, int pos = 0);
+  void AddSubView(AbstractView *view, int pos = -1);
 
   void MoveWithMouse(MouseEvent *event) const;
 

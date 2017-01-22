@@ -68,9 +68,5 @@ bool XdgSurface::IsValid() const {
   return nullptr != metadata_->zxdg_surface;
 }
 
-bool XdgSurface::IsNull() const {
-  return nullptr == metadata_->zxdg_surface;
-}
-
 }
 }

@@ -97,10 +97,6 @@ class Callback {
     return nullptr != wl_callback_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_callback_;
-  }
-
  private:
 
   static void OnDone(void *data,

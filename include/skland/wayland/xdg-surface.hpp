@@ -59,8 +59,6 @@ class XdgSurface {
 
   bool IsValid() const;
 
-  bool IsNull() const;
-
   DelegateRef<void(uint32_t)> configure() { return configure_; }
 
  private:

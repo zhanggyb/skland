@@ -57,6 +57,7 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontMgr_custom*.cpp)
 remove_srcs(${SKIA_SOURCE_DIR}/src/sksl/SkSLMain.cpp)
 # remove the special splicer source, TODO: config cmake to detect clang and SSE
 remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
+remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages_lowp.cpp)
 
 
 # Skia sure ships a lot of code no one uses.
@@ -262,8 +263,6 @@ endif ()
 
 find_package(OpenGL REQUIRED)
 list(APPEND libs ${OPENGL_LIBRARIES})
-
-add_definitions(-DSK_SUPPORT_LEGACY_CANVAS_GETCLIPSTACK)    # getClipStack() is hiden in latest commit
 
 # This is our main output, libskia.{a,so,dll,dylib,etc...}
 # You can control whether this is static or shared with BUILD_SHARED_LIBS.

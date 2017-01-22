@@ -47,6 +47,8 @@ class EGLSurface : public AbstractSurface {
 
   bool SwapBuffers();
 
+  bool SwapInterval(EGLint interval = 0);
+
   void Resize(int width, int height, int dx = 0, int dy = 0) {
     egl_surface_.Resize(width, height, dx, dy);
   }

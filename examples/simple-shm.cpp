@@ -35,7 +35,7 @@ class ShmWidget : public AbstractWidget {
   ShmWidget()
       : AbstractWidget(), context_(nullptr), radius_(0.f), angle_(0.f) {
     color_ = 0xFF4FBF4F;
-    callback_.done().Set(this, &ShmWidget::OnFrame);
+    frame_callback_.done().Set(this, &ShmWidget::OnFrame);
 
     radius_ = clamp(std::min(geometry().width(), geometry().height()) / 2.f - 50.f, 50.f, 200.f);
   }
@@ -96,7 +96,7 @@ class ShmWidget : public AbstractWidget {
 
     canvas->Restore();
 
-    context_->SetupCallback(callback_);
+    context_->SetupCallback(frame_callback_);
     context_->Damage(context_->GetMargin().l + (int) geometry().l,
                      context_->GetMargin().t + (int) geometry().t,
                      (int) geometry().width(),
@@ -107,14 +107,13 @@ class ShmWidget : public AbstractWidget {
  private:
 
   void OnFrame(uint32_t serial) {
-
     angle_ += 5.f;
     if (angle_ > 360.f) angle_ = 0.f;
 
     OnDraw(context_);
   }
 
-  wayland::Callback callback_;
+  wayland::Callback frame_callback_;
   const Context *context_;
   Color color_;
   float radius_;

@@ -77,14 +77,14 @@ EGLWidget::EGLWidget(int width, int height)
     : AbstractWidget(width, height),
       surface_(nullptr) {
   surface_ = new EGLSurface(this);
-  opaque_region_.Setup(Display::wl_compositor());
-  opaque_region_.Add(0, 0, (int) geometry().width(), (int) geometry().height());
-  surface_->SetOpaqueRegion(opaque_region_);
-  input_region_.Setup(Display::wl_compositor());
-  input_region_.Add(0, 0, 0, 0);
-  surface_->SetInputRegion(input_region_);
 
-  callback_.done().Set(this, &EGLWidget::OnFrame);
+  // Set empty regions
+  empty_opaque_region_.Setup(Display::wl_compositor());
+  surface_->SetOpaqueRegion(empty_opaque_region_);
+  empty_input_region_.Setup(Display::wl_compositor());
+  surface_->SetInputRegion(empty_input_region_);
+
+  frame_callback_.done().Set(this, &EGLWidget::OnFrame);
 //  InitializeGL();
 }
 
@@ -99,12 +99,9 @@ AbstractSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const 
 void EGLWidget::OnResize(int width, int height) {
   resize(width, height);
   surface_->Resize(width, height);
-  opaque_region_.Setup(Display::wl_compositor());
-  opaque_region_.Add(0, 0, width, height);
-  surface_->SetOpaqueRegion(opaque_region_);
-
-  if (surface_->wl_sub_surface().IsNull())
+  if (!surface_->wl_sub_surface().IsValid()) {
     Update();
+  }
 }
 
 void EGLWidget::OnMouseEnter(MouseEvent *event) {
@@ -128,14 +125,16 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 }
 
 void EGLWidget::OnDraw(const Context *context) {
-  if (surface_->wl_sub_surface().IsNull()) {
+  fprintf(stderr, "on draw\n");
+  if (!surface_->wl_sub_surface().IsValid()) {
     AbstractSurface *parent_surf = context->surface();
     parent_surf->AddSubSurface(surface_);
-    surface_->SetPosition(parent_surf->margin().l + (int)geometry().x(),
-                          parent_surf->margin().t + (int)geometry().y());
+    surface_->SetPosition(parent_surf->margin().l + (int) geometry().x(),
+                          parent_surf->margin().t + (int) geometry().y());
+    surface_->SetSync();
     OnInitializeEGL();
 
-    callback_.Setup(surface_->wl_surface());
+//    OnRender();
 //    surface_->Damage(0, 0, (int) geometry().width(), (int) geometry().height());
 //    surface_->Commit();
   }
@@ -143,7 +142,8 @@ void EGLWidget::OnDraw(const Context *context) {
 
 void EGLWidget::OnInitializeEGL() {
   if (surface_->MakeCurrent()) {
-    glClearColor(0.1, 0.1, .85, 1.0);
+    frame_callback_.Setup(surface_->wl_surface());
+     glClearColor(0.1, 0.1, .85, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
     glFlush();
     surface_->SwapBuffers();
@@ -160,21 +160,21 @@ void EGLWidget::OnResizeEGL() {
 }
 
 void EGLWidget::OnRender() {
-  fprintf(stderr, "on render\n");
-  if (surface_->MakeCurrent()) {
     glClearColor(0.36, 0.85, 0.27, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
     glFlush();
-    surface_->SwapBuffers();
-
-    surface_->Damage(0, 0, (int) geometry().width(), (int) geometry().height());
-    surface_->Commit();
-  }
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-  callback_.Setup(surface_->wl_surface());
-  OnRender();
+  static uint64_t count = 0;
+  fprintf(stderr, "on render: %ld\n", count);
+  count++;
+
+  if (surface_->MakeCurrent()) {
+    frame_callback_.Setup(surface_->wl_surface());
+    OnRender();
+    surface_->SwapBuffers();
+  }
 }
 
 void EGLWidget::InitializeGL() {

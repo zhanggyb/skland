@@ -69,10 +69,6 @@ class Shell {
     return nullptr != wl_shell_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_shell_;
-  }
-
   bool Equal(const void *object) const {
     return wl_shell_ == object;
   }

@@ -76,9 +76,9 @@ class EGLWidget : public AbstractWidget {
   GLuint pos;
   GLuint col;
 
-  wayland::Region opaque_region_;
-  wayland::Region input_region_;
-  wayland::Callback callback_;
+  wayland::Region empty_opaque_region_;
+  wayland::Region empty_input_region_;
+  wayland::Callback frame_callback_;
 
 };
 

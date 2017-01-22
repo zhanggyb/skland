@@ -78,10 +78,6 @@ class ShmPool {
     return nullptr != wl_shm_pool_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_shm_pool_;
-  }
-
  private:
 
   struct wl_shm_pool *wl_shm_pool_;

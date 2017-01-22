@@ -45,4 +45,8 @@ bool EGLSurface::SwapBuffers() {
   return Display::egl_display().SwapBuffers(egl_surface_);
 }
 
+bool EGLSurface::SwapInterval(EGLint interval) {
+  return Display::egl_display().SwapInterval(interval);
+}
+
 }

@@ -77,6 +77,7 @@ void Display::Setup(const wayland::Display &wl_display) {
 
 void Display::Destroy() {
   if (egl_display_) {
+    eglMakeCurrent(egl_display_, (::EGLSurface) 0, (::EGLSurface) 0, (::EGLContext) 0);
     eglTerminate(egl_display_);
     eglReleaseThread();
 

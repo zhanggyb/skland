@@ -96,8 +96,6 @@ class XdgToplevel {
 
   bool IsValid() const;
 
-  bool IsNull() const;
-
   DelegateRef<void(int, int, int)> configure() { return configure_; }
 
   DelegateRef<void()> close() { return close_; }

@@ -51,6 +51,7 @@ class Display {
 
   ~Display() {
     if (egl_display_) {
+      eglMakeCurrent(egl_display_, (::EGLSurface) 0, (::EGLSurface) 0, (::EGLContext) 0);
       eglTerminate(egl_display_);
       eglReleaseThread();
     }
@@ -68,6 +69,10 @@ class Display {
   bool SwapBuffers(const Surface &surface) const {
     return EGL_TRUE ==
         eglSwapBuffers(egl_display_, surface.egl_surface_);
+  }
+
+  bool SwapInterval(EGLint interval = 0) const {
+    return EGL_TRUE == eglSwapInterval(egl_display_, interval);
   }
 
   EGLint major() const { return major_; }

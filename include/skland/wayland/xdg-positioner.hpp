@@ -53,8 +53,6 @@ class XdgPositioner {
 
   bool IsValid() const;
 
-  bool IsNull() const;
-
  private:
 
   std::unique_ptr<XdgPositionerMeta> metadata_;

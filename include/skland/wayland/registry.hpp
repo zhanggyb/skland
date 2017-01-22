@@ -74,10 +74,6 @@ class Registry {
     return nullptr != wl_registry_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_registry_;
-  }
-
   bool Equal(const void *object) const {
     return wl_registry_ == object;
   }

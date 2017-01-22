@@ -117,10 +117,6 @@ class Display {
     return nullptr != wl_display_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_display_;
-  }
-
   bool Equal(const void *object) const {
     return wl_display_ == object;
   }

@@ -113,9 +113,5 @@ bool XdgToplevel::IsValid() const {
   return nullptr != metadata_->zxdg_toplevel;
 }
 
-bool XdgToplevel::IsNull() const {
-  return nullptr == metadata_->zxdg_toplevel;
-}
-
 }
 }

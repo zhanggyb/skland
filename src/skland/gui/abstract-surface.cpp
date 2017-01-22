@@ -66,7 +66,7 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   DBG_ASSERT(nullptr == subsurface->parent_);
   DBG_ASSERT(nullptr == subsurface->up_);
   DBG_ASSERT(nullptr == subsurface->down_);
-  DBG_ASSERT(subsurface->wl_sub_surface_.IsNull());
+  DBG_ASSERT(!subsurface->wl_sub_surface_.IsValid());
 
   subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(),
                                     subsurface->wl_surface_,
