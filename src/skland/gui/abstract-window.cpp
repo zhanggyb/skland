@@ -39,7 +39,6 @@ AbstractWindow::AbstractWindow(int width,
                                const char *title,
                                AbstractWindowFrame *frame)
     : AbstractView(width, height),
-      display_(nullptr),
       window_frame_(nullptr),
       flags_(0),
       is_xdg_surface_configured_(false),
@@ -84,9 +83,6 @@ AbstractWindow::AbstractWindow(int width,
   xdg_toplevel_.Setup(xdg_surface_);
   xdg_toplevel_.SetTitle(title_.c_str()); // TODO: support multi-language
 
-  Display::AddWindow(this);
-  // TODO: layout in display
-
   set_name(title);  // debug only
 
   // Create buffer:
@@ -110,15 +106,6 @@ AbstractWindow::AbstractWindow(int width,
 }
 
 AbstractWindow::~AbstractWindow() {
-  if (display_)
-    RemoveManagedObject(display_,
-                        this,
-                        &display_,
-                        &display_->first_window_,
-                        &display_->last_window_,
-                        display_->windows_count_);
-  DBG_ASSERT(display_ == nullptr);
-
   delete window_frame_;
   delete main_surface_;
   delete frame_surface_;
@@ -159,7 +146,7 @@ void AbstractWindow::Show() {
 }
 
 void AbstractWindow::Close(SLOT) {
-  if (Display::windows_count() == 1) {
+  if (AbstractSurface::GetShellSurfaceCount() == 1) {
     Application::Exit();
   }
 

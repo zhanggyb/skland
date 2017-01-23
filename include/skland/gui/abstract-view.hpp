@@ -44,6 +44,7 @@ struct ViewTask;
 struct RedrawTask;
 
 /**
+ * @ingroup gui
  * @brief An abstract base class for view object
  *
  * AbstractView is an abstract base class for view object. A view object in

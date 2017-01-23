@@ -20,6 +20,7 @@
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
 #include <skland/gui/abstract-window.hpp>
+#include <skland/gui/abstract-surface.hpp>
 
 #include <iostream>
 
@@ -40,10 +41,7 @@ Display::Display()
       outputs_count_(0),
       first_input_(nullptr),
       last_input_(nullptr),
-      inputs_count_(0),
-      first_window_(nullptr),
-      last_window_(nullptr),
-      windows_count_(0) {
+      inputs_count_(0) {
   cursors_.resize(kCursorBlank, nullptr);
   AbstractView::InitializeRedrawTaskList();
 }
@@ -135,7 +133,8 @@ void Display::Disconnect() noexcept {
 
   ClearManagedObject(this, &first_output_, &last_output_, outputs_count_);
   ClearManagedObject(this, &first_input_, &last_input_, inputs_count_);
-  ClearManagedObject(this, &first_window_, &last_window_, windows_count_);
+//  ClearManagedObject(this, &first_window_, &last_window_, windows_count_);
+  AbstractSurface::Clear();
 
   if (wl_cursor_theme_.IsValid()) {
     ReleaseCursors();
@@ -152,28 +151,11 @@ void Display::Disconnect() noexcept {
   wl_display_.Disconnect();
 }
 
-void Display::AddWindow(AbstractWindow *window, int pos) {
-  InsertManagedObject(kDisplay,
-                      window,
-                      &window->display_,
-                      &kDisplay->first_window_,
-                      &kDisplay->last_window_,
-                      kDisplay->windows_count_,
-                      pos);
-}
-
 const Output *Display::GetOutputAt(int index) {
   return kDisplay->GetManagedObjectAt(index,
                                       kDisplay->first_output_,
                                       kDisplay->last_output_,
                                       kDisplay->outputs_count_);
-}
-
-AbstractWindow *Display::GetWindowAt(int index) {
-  return kDisplay->GetManagedObjectAt(index,
-                                      kDisplay->first_window_,
-                                      kDisplay->last_window_,
-                                      kDisplay->windows_count_);
 }
 
 void Display::AddOutput(Output *output, int index) {

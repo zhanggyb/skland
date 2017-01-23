@@ -46,8 +46,6 @@ namespace skland {
 
 // Forward declarations
 
-class AbstractView;
-class AbstractWindow;
 class Output;
 class Input;
 
@@ -59,23 +57,13 @@ struct Global {
 
 class Display : public Object {
 
-  friend class AbstractView;
-  friend class AbstractWindow;
   friend class Application;
   friend class Output;
   friend class Input;
 
  public:
 
-  static void AddWindow(AbstractWindow *window, int pos = 0);
-
   static const Output *GetOutputAt(int index = 0);
-
-  static AbstractWindow *GetWindowAt(int index = 0);
-
-  static int windows_count() {
-    return kDisplay->windows_count_;
-  }
 
   static int outputs_count() {
     return kDisplay->outputs_count_;
@@ -186,11 +174,6 @@ class Display : public Object {
   Input *first_input_;
   Input *last_input_;
   int inputs_count_;
-
-  /* window list */
-  AbstractWindow *first_window_;
-  AbstractWindow *last_window_;
-  int windows_count_;
 
   std::list<Global *> globals_;
   std::set<uint32_t> pixel_formats_;

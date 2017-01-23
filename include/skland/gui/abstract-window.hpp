@@ -37,10 +37,7 @@
 
 namespace skland {
 
-class Display;
-class Application;
 class AbstractWindowFrame;
-class Input;
 class ShmSurface;
 
 enum WindowFlags {
@@ -49,12 +46,12 @@ enum WindowFlags {
   kWindowMinimized = 0x3,
 };
 
+/**
+ * @ingroup gui
+ */
 class AbstractWindow : public AbstractView {
 
-  friend class Display;
-  friend class Application;
   friend class AbstractWindowFrame;
-  friend class Input;
 
  public:
 
@@ -142,8 +139,6 @@ class AbstractWindow : public AbstractView {
   void OnXdgToplevelClose();
 
   void OnWindowAction(int action, __SLOT__);
-
-  Display *display_;  /**< The manager object */
 
   AbstractWindowFrame *window_frame_;
 
