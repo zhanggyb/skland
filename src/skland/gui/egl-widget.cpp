@@ -143,7 +143,7 @@ void EGLWidget::OnDraw(const Context *context) {
 void EGLWidget::OnInitializeEGL() {
   if (surface_->MakeCurrent()) {
     frame_callback_.Setup(surface_->wl_surface());
-     glClearColor(0.1, 0.1, .85, 1.0);
+    glClearColor(0.1, 0.1, .85, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
     glFlush();
     surface_->SwapBuffers();
@@ -160,9 +160,9 @@ void EGLWidget::OnResizeEGL() {
 }
 
 void EGLWidget::OnRender() {
-    glClearColor(0.36, 0.85, 0.27, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glFlush();
+  glClearColor(0.36, 0.85, 0.27, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glFlush();
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {

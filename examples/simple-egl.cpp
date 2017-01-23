@@ -20,6 +20,8 @@
 #include <skland/gui/egl-widget.hpp>
 #include <skland/gui/abstract-surface.hpp>
 
+#include <skland/gui/egl-window.hpp>
+
 using namespace skland;
 
 int main(int argc, char *argv[]) {
@@ -27,12 +29,13 @@ int main(int argc, char *argv[]) {
 
   Application app(argc, argv);
 
-  Window *win = new Window(480, 360, "Simple EGL");
-  win->SetAppId("Simple-EGL");
+//  Window *win = new Window(480, 360, "Simple EGL");
+//  win->SetAppId("Simple-EGL");
+//
+//  EGLWidget *widget = new EGLWidget;
+//  win->SetMainWidget(widget);
 
-  EGLWidget *widget = new EGLWidget;
-  win->SetMainWidget(widget);
-
+  EGLWindow* win = new EGLWindow;
   win->Show();
 
   return app.Run();
