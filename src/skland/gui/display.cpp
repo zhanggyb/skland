@@ -45,11 +45,11 @@ Display::Display()
       last_window_(nullptr),
       windows_count_(0) {
   cursors_.resize(kCursorBlank, nullptr);
-  InitializeSurfaceTaskList();
+  AbstractView::InitializeRedrawTaskList();
 }
 
 Display::~Display() {
-  ClearSurfaceTaskList();
+  AbstractView::ClearRedrawTaskList();
 }
 
 void Display::Connect(const char *name) {
@@ -256,6 +256,7 @@ void Display::OnGlobal(uint32_t id,
     Output *output = new Output(wl_registry_, id, version);
     AddOutput(output);
   } else if (strcmp(interface, XdgShell::GetInterface()->name) == 0) {
+    xdg_shell_.ping().Set(this, &Display::OnXdgShellPing);
     xdg_shell_.Setup(wl_registry_, id, version);
   } else if (strcmp(interface, wl_shell_interface.name) == 0) {
     wl_shell_.Setup(wl_registry_, id, version);
@@ -310,20 +311,6 @@ void Display::OnFormat(uint32_t format) {
 
 void Display::OnXdgShellPing(uint32_t serial) {
   xdg_shell_.Pong(serial);
-}
-
-void Display::InitializeSurfaceTaskList() {
-  redraw_task_head_.PushBack(&redraw_task_tail_);
-}
-
-void Display::ClearSurfaceTaskList() {
-  Task *task = redraw_task_head_.next();
-  Task *next_task = nullptr;
-  while (task != &redraw_task_tail_) {
-    next_task = task->next();
-    task->Unlink();
-    task = next_task;
-  }
 }
 
 void Display::InitializeCursors() {

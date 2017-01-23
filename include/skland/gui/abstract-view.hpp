@@ -21,6 +21,8 @@
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
+#include "task.hpp"
+
 #include <memory>
 
 namespace skland {
@@ -194,6 +196,19 @@ class AbstractView : public Object {
   const std::unique_ptr<ViewTask> &mouse_task() const {
     return mouse_task_;
   }
+
+  /**
+  * @brief Initialize the idle task list
+  */
+  static void InitializeRedrawTaskList();
+
+  /**
+   * @brief Destroy the redraw task list
+   */
+  static void ClearRedrawTaskList();
+
+  static Task kRedrawTaskHead;
+  static Task kRedrawTaskTail;
 
  private:
 

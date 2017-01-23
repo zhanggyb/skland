@@ -28,7 +28,7 @@ ShmSurface::~ShmSurface() {
 }
 
 void ShmSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
-  if ((nullptr == buffer) || (!buffer->wl_buffer().IsValid())) {
+  if (nullptr == buffer) {
     wl_surface().Attach(NULL, x, y);
   } else {
     buffer->SetPosition(x, y);

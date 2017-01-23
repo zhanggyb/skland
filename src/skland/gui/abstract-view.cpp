@@ -27,6 +27,9 @@
 
 namespace skland {
 
+Task AbstractView::kRedrawTaskHead;
+Task AbstractView::kRedrawTaskTail;
+
 AbstractView::AbstractView()
     : AbstractView(400, 300) {
 
@@ -120,6 +123,20 @@ void AbstractView::TrackMouseMotion(MouseEvent *event) {
 
 void AbstractView::UntrackMouseMotion() {
   mouse_motion_task_->Unlink();
+}
+
+void AbstractView::InitializeRedrawTaskList() {
+  kRedrawTaskHead.PushBack(&kRedrawTaskTail);
+}
+
+void AbstractView::ClearRedrawTaskList() {
+  Task *task = kRedrawTaskHead.next();
+  Task *next_task = nullptr;
+  while (task != &kRedrawTaskTail) {
+    next_task = task->next();
+    task->Unlink();
+    task = next_task;
+  }
 }
 
 }

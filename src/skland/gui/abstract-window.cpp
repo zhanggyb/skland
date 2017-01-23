@@ -224,7 +224,7 @@ void AbstractWindow::OnUpdate(AbstractView *view) {
 
   if (view == this) {
     if (frame_surface_) {
-      Display::kDisplay->redraw_task_tail_.PushFront(redraw_task().get());
+      kRedrawTaskTail.PushFront(redraw_task().get());
       // TODO: this is just a workaround, should use frame_surface for frame and background,
       // but now use main_surface instead.
       redraw_task()->context = frame_surface_;
@@ -236,7 +236,7 @@ void AbstractWindow::OnUpdate(AbstractView *view) {
       frame_surface_->Commit();
     }
   } else {
-    Display::kDisplay->redraw_task_tail_.PushFront(view->redraw_task().get());
+    kRedrawTaskTail.PushFront(view->redraw_task().get());
 
     // TODO: this is juat a workaround, should render widgets on main_surface
     view->redraw_task()->context = main_surface_;

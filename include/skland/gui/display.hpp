@@ -24,8 +24,6 @@
 
 #include "../egl/display.hpp"
 
-#include "task.hpp"
-
 //#include <xkbcommon/xkbcommon.h>
 
 #include <list>
@@ -159,27 +157,9 @@ class Display : public Object {
 
   void AddInput(Input *input, int index = 0);
 
-  /**
-    * @brief Initialize the idle task list
-    */
-  void InitializeSurfaceTaskList();
-
-  /**
-   * @brief Destroy the redraw task list
-   */
-  void ClearSurfaceTaskList();
-
   void InitializeCursors();
 
   void ReleaseCursors();
-
-  static const Task *redraw_task_head() {
-    return &kDisplay->redraw_task_head_;
-  }
-
-  static const Task *redraw_task_tail() {
-    return &kDisplay->redraw_task_tail_;
-  }
 
   wayland::Display wl_display_;
   wayland::Registry wl_registry_;
@@ -211,11 +191,6 @@ class Display : public Object {
   AbstractWindow *first_window_;
   AbstractWindow *last_window_;
   int windows_count_;
-
-  /* idle task list */
-
-  Task redraw_task_head_;
-  Task redraw_task_tail_;
 
   std::list<Global *> globals_;
   std::set<uint32_t> pixel_formats_;
