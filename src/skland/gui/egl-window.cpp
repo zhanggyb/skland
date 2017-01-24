@@ -1,14 +1,29 @@
-//
-// Created by zhanggyb on 17-1-23.
-//
+/*
+ * Copyright 2016 Freeman Zhang <zhanggyb@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include <skland/gui/egl-window.hpp>
 
 #include <skland/gui/egl-surface.hpp>
 #include <skland/gui/display.hpp>
+#include <skland/gui/application.hpp>
 
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
+
+#include "internal/redraw-task.hpp"
 
 #include <skland/core/numeric.hpp>
 
@@ -17,7 +32,12 @@
 namespace skland {
 
 EGLWindow::EGLWindow()
-    : AbstractView(400, 300),
+    : EGLWindow(400, 300) {
+
+}
+
+EGLWindow::EGLWindow(int width, int height)
+    : AbstractView(width, height),
       is_xdg_surface_configured_(false),
       surface_(nullptr) {
   surface_ = new EGLSurface(this);
@@ -35,6 +55,8 @@ EGLWindow::EGLWindow()
 
   xdg_toplevel_.SetTitle("Test EGL surface"); // TODO: support multi-language
   xdg_toplevel_.SetAppId("Test EGL surface");
+
+  frame_callback_.done().Set(this, &EGLWindow::OnFrame);
 }
 
 EGLWindow::~EGLWindow() {
@@ -45,6 +67,14 @@ void EGLWindow::Show() {
   if (!is_xdg_surface_configured_) {
     surface_->Commit();
   }
+}
+
+void EGLWindow::Close(SLOT) {
+  if (AbstractSurface::GetShellSurfaceCount() == 1) {
+    Application::Exit();
+  }
+
+  delete this;
 }
 
 Size EGLWindow::GetMinimalSize() const {
@@ -59,8 +89,27 @@ Size EGLWindow::GetMaximalSize() const {
   return Size(65536, 65536);
 }
 
-void EGLWindow::OnUpdate(AbstractView *view) {
+void EGLWindow::InitializeEGL() {
 
+}
+
+void EGLWindow::ResizeEGL(int width, int height) {
+
+}
+
+void EGLWindow::RenderEGL() {
+  glClearColor(0.f, 0.f, 0.f, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glFlush();
+}
+
+void EGLWindow::OnUpdate(AbstractView *view) {
+  DBG_ASSERT(view == this);
+  if (!is_xdg_surface_configured_) return;
+
+  kRedrawTaskTail.PushFront(redraw_task().get());
+  redraw_task()->context = surface_;
+  surface_->Commit();
 }
 
 AbstractSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
@@ -69,6 +118,7 @@ AbstractSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
 
 void EGLWindow::OnResize(int width, int height) {
   resize(width, height);
+  Update();
 }
 
 void EGLWindow::OnMouseEnter(MouseEvent *event) {
@@ -84,7 +134,13 @@ void EGLWindow::OnMouseMove(MouseEvent *event) {
 }
 
 void EGLWindow::OnMouseButton(MouseEvent *event) {
+  if (event->button() == kMouseButtonLeft && event->state() == kMouseButtonPressed) {
+    xdg_toplevel_.Move(event->wl_seat(), event->serial());
+    event->Ignore();
+    return;
+  }
 
+  event->Accept();
 }
 
 void EGLWindow::OnKeyboardKey(KeyEvent *event) {
@@ -92,7 +148,11 @@ void EGLWindow::OnKeyboardKey(KeyEvent *event) {
 }
 
 void EGLWindow::OnDraw(const Context *context) {
-
+  if (surface_->MakeCurrent()) {
+    frame_callback_.Setup(surface_->wl_surface());
+    RenderEGL();
+    surface_->SwapBuffers();
+  }
 }
 
 void EGLWindow::OnXdgSurfaceConfigure(uint32_t serial) {
@@ -102,8 +162,14 @@ void EGLWindow::OnXdgSurfaceConfigure(uint32_t serial) {
     is_xdg_surface_configured_ = true;
 
     xdg_surface_.SetWindowGeometry(0, 0, (int) geometry().width(), (int) geometry().height());
-    surface_->Resize((int) geometry().width(), (int) geometry().height());
-    surface_->Commit();
+//    surface_->Resize((int) geometry().width(), (int) geometry().height());
+
+    if (surface_->MakeCurrent()) {
+      InitializeEGL();
+      surface_->SwapBuffers();
+    }
+
+    Update();
   }
 }
 
@@ -134,14 +200,8 @@ void EGLWindow::OnXdgToplevelConfigure(int width, int height, int states) {
       resize(width, height);
 
       surface_->Resize((int) geometry().width(), (int) geometry().height());
-      surface_->Commit();
-
-      if (surface_->MakeCurrent()) {
-        glClearColor(0.1, 0.1, .85, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glFlush();
-        surface_->SwapBuffers();
-      }
+//      surface_->Commit();
+      ResizeEGL(width, height);
 
       OnResize(width, height);
     }
@@ -150,7 +210,11 @@ void EGLWindow::OnXdgToplevelConfigure(int width, int height, int states) {
 }
 
 void EGLWindow::OnXdgToplevelClose() {
+  Close();
+}
 
+void EGLWindow::OnFrame(uint32_t serial) {
+  OnDraw(nullptr);
 }
 
 }

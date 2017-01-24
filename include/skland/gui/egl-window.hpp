@@ -1,6 +1,18 @@
-//
-// Created by zhanggyb on 17-1-23.
-//
+/*
+ * Copyright 2016 Freeman Zhang <zhanggyb@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef SKLAND_EGL_WINDOW_HPP
 #define SKLAND_EGL_WINDOW_HPP
@@ -10,6 +22,7 @@
 #include "../wayland/xdg-surface.hpp"
 #include "../wayland/xdg-toplevel.hpp"
 #include "../wayland/region.hpp"
+#include "../wayland/callback.hpp"
 
 namespace skland {
 
@@ -21,9 +34,13 @@ class EGLWindow : public AbstractView {
 
   EGLWindow();
 
+  EGLWindow(int width, int height);
+
   virtual ~EGLWindow();
 
   void Show();
+
+  void Close(__SLOT__);
 
   virtual Size GetMinimalSize() const override;
 
@@ -33,11 +50,17 @@ class EGLWindow : public AbstractView {
 
  protected:
 
-  virtual void OnUpdate(AbstractView *view) override;
+  virtual void InitializeEGL();
 
-  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const;
+  virtual void ResizeEGL(int width, int height);
 
-  virtual void OnResize(int width, int height) override;
+  virtual void RenderEGL();
+
+  virtual void OnUpdate(AbstractView *view) final;
+
+  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const final;
+
+  virtual void OnResize(int width, int height) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -49,7 +72,7 @@ class EGLWindow : public AbstractView {
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
-  virtual void OnDraw(const Context *context) override;
+  virtual void OnDraw(const Context *context) final;
 
  private:
 
@@ -58,6 +81,8 @@ class EGLWindow : public AbstractView {
   void OnXdgToplevelConfigure(int width, int height, int states);
 
   void OnXdgToplevelClose();
+
+  void OnFrame(uint32_t serial);
 
   bool is_xdg_surface_configured_;
 
@@ -69,6 +94,7 @@ class EGLWindow : public AbstractView {
 
   EGLSurface *surface_;
 
+  wayland::Callback frame_callback_;
 };
 
 }

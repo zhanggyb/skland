@@ -34,6 +34,10 @@ namespace skland {
 class Paint;
 class Path;
 
+/**
+ * @ingroup graphic
+ * @brief Canvas for drawing
+ */
 class Canvas {
 
   Canvas() = delete;

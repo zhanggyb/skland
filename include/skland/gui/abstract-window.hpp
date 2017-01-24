@@ -48,6 +48,7 @@ enum WindowFlags {
 
 /**
  * @ingroup gui
+ * @brief Abstract class for top level windows
  */
 class AbstractWindow : public AbstractView {
 

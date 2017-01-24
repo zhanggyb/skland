@@ -32,6 +32,7 @@ class AbstractWidget;
 class Context;
 
 /**
+ * @ingroup gui
  * @brief The abstract class for window frame
  *
  * A window frame provides decoration on a window, and draw background and border.

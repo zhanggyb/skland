@@ -25,6 +25,10 @@ namespace skland {
 
 class Display;
 
+/**
+ * @ingroup gui
+ * @brief Singleton application object
+ */
 class Application {
 
  public:
