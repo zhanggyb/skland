@@ -24,153 +24,113 @@
 
 using namespace skland;
 
-static const char *vert_shader_text =
-    "uniform mat4 rotation;\n"
-        "attribute vec4 pos;\n"
-        "attribute vec4 color;\n"
-        "varying vec4 v_color;\n"
-        "void main() {\n"
-        "  gl_Position = rotation * pos;\n"
-        "  v_color = color;\n"
-        "}\n";
-
-static const char *frag_shader_text =
-    "precision mediump float;\n"
-        "varying vec4 v_color;\n"
-        "void main() {\n"
-        "  gl_FragColor = v_color;\n"
-        "}\n";
-
-static GLuint
-create_shader(const char *source, GLenum shader_type) {
-  GLuint shader;
-  GLint status;
-
-  shader = glCreateShader(shader_type);
-  assert(shader != 0);
-
-  glShaderSource(shader, 1, (const char **) &source, NULL);
-  glCompileShader(shader);
-
-  glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-  if (!status) {
-    char log[1000];
-    GLsizei len;
-    glGetShaderInfoLog(shader, 1000, &len, log);
-    fprintf(stderr, "Error: compiling %s: %*s\n",
-            shader_type == GL_VERTEX_SHADER ? "vertex" : "fragment",
-            len, log);
-    exit(1);
-  }
-
-  return shader;
-}
-
 class SimpleWindow : public EGLWindow {
  public:
 
   SimpleWindow()
       : EGLWindow(250, 250) {}
 
-  virtual  ~SimpleWindow() {}
+  virtual  ~SimpleWindow() {
+    glDeleteProgram(program);
+  }
 
  protected:
 
-  virtual void InitializeEGL() override;
+  virtual void OnInitializeEGL() override;
 
-  virtual void ResizeEGL(int width, int height) override;
+  virtual void OnResizeEGL(int width, int height) override;
 
-  virtual void RenderEGL() override;
+  virtual void OnRenderEGL() override;
 
  private:
-  GLint rotation_uniform;
-  GLuint pos;
-  GLuint col;
-  time_t time;
+  GLuint program;
+  GLint attribute_coord2d;
 };
 
-void SimpleWindow::InitializeEGL() {
-  GLuint frag, vert;
-  GLuint program;
-  GLint status;
+void SimpleWindow::OnInitializeEGL() {
+  GLint compile_ok = GL_FALSE, link_ok = GL_FALSE;
+  GLuint vs = glCreateShader(GL_VERTEX_SHADER);
 
-  frag = create_shader(frag_shader_text, GL_FRAGMENT_SHADER);
-  vert = create_shader(vert_shader_text, GL_VERTEX_SHADER);
-
-  program = glCreateProgram();
-  glAttachShader(program, frag);
-  glAttachShader(program, vert);
-  glLinkProgram(program);
-
-  glGetProgramiv(program, GL_LINK_STATUS, &status);
-  if (!status) {
-    char log[1000];
-    GLsizei len;
-    glGetProgramInfoLog(program, 1000, &len, log);
-    fprintf(stderr, "Error: linking:\n%*s\n", len, log);
+  const char *vs_source =
+#ifdef GL_ES_VERSION_2_0
+      "#version 100\n"  // OpenGL ES 2.0
+#else
+          "#version 120\n"  // OpenGL 2.1
+#endif
+          "attribute vec2 coord2d;                  "
+          "void main(void) {                        "
+          "  gl_Position = vec4(coord2d, 0.0, 1.0); "
+          "}";
+  glShaderSource(vs, 1, &vs_source, NULL);
+  glCompileShader(vs);
+  glGetShaderiv(vs, GL_COMPILE_STATUS, &compile_ok);
+  if (!compile_ok) {
+    fprintf(stderr, "Error in vertex shader\n");
     exit(1);
   }
 
-  glUseProgram(program);
-
-  glBindAttribLocation(program, pos, "pos");
-  glBindAttribLocation(program, col, "color");
+  GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+  const char *fs_source =
+#ifdef GL_ES_VERSION_2_0
+      "#version 100\n"  // OpenGL ES 2.0
+#else
+          "#version 120\n"  // OpenGL 2.1
+#endif
+          "void main(void) {        "
+          "  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); "
+          "}";
+  glShaderSource(fs, 1, &fs_source, NULL);
+  glCompileShader(fs);
+  glGetShaderiv(fs, GL_COMPILE_STATUS, &compile_ok);
+  if (!compile_ok) {
+    fprintf(stderr, "Error in fragment shader\n");
+    exit(1);
+  }
+  program = glCreateProgram();
+  glAttachShader(program, vs);
+  glAttachShader(program, fs);
   glLinkProgram(program);
-
-  rotation_uniform = glGetUniformLocation(program, "rotation");
+  glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
+  if (!link_ok) {
+    fprintf(stderr, "glLinkProgram:");
+    exit(1);
+  }
+  const char *attribute_name = "coord2d";
+  attribute_coord2d = glGetAttribLocation(program, attribute_name);
+  if (attribute_coord2d == -1) {
+    fprintf(stderr, "Could not bind attribute %s\n", attribute_name);
+    exit(1);
+  }
 }
 
-void SimpleWindow::ResizeEGL(int width, int height) {
+void SimpleWindow::OnResizeEGL(int width, int height) {
 
 }
 
-void SimpleWindow::RenderEGL() {
-  static const GLfloat verts[3][2] = {
-      {-0.5f, -0.5f},
-      {0.5f, -0.5f},
-      {0.f, 0.5f}
-  };
-  static const GLfloat colors[3][3] = {
-      {1, 0, 0},
-      {0, 1, 0},
-      {0, 0, 1}
-  };
-  GLfloat angle;
-  GLfloat rotation[4][4] = {
-      {1, 0, 0, 0},
-      {0, 1, 0, 0},
-      {0, 0, 1, 0},
-      {0, 0, 0, 1}
-  };
-  static const uint32_t speed_div = 5;
-  struct timeval tv;
-
-  gettimeofday(&tv, NULL);
-  time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-
-  angle = (GLfloat) ((time / speed_div) % 360 * M_PI / 180.0);
-  rotation[0][0] = cos(angle);
-  rotation[0][2] = sin(angle);
-  rotation[2][0] = -sin(angle);
-  rotation[2][2] = cos(angle);
-
-  glViewport(0, 0, (int) geometry().width(), (int) geometry().height());
-
-  glUniformMatrix4fv(rotation_uniform, 1, GL_FALSE,
-                     (GLfloat *) rotation);
-
+void SimpleWindow::OnRenderEGL() {
   glClearColor(0.0, 0.0, 0.0, 0.5);
   glClear(GL_COLOR_BUFFER_BIT);
+  glUseProgram(program);
+  glEnableVertexAttribArray(attribute_coord2d);
+  GLfloat triangle_vertices[] = {
+      0.0f, 0.5f,
+      -0.6f, -0.5f,
+      0.6f, -0.5f
+  };
 
-  glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 0, verts);
-  glVertexAttribPointer(col, 3, GL_FLOAT, GL_FALSE, 0, colors);
-  glEnableVertexAttribArray(pos);
-  glEnableVertexAttribArray(col);
+  /* Describe our vertices array to OpenGL (it can't guess its format automatically) */
+  glVertexAttribPointer(
+      attribute_coord2d, // attribute
+      2,                 // number of elements per vertex, here (x,y)
+      GL_FLOAT,          // the type of each element
+      GL_FALSE,          // take our values as-is
+      0,                 // no extra data between each position
+      triangle_vertices  // pointer to the C array
+  );
 
+  /* Push each element in buffer_vertices to the vertex shader */
   glDrawArrays(GL_TRIANGLES, 0, 3);
-
-  glDisableVertexAttribArray(pos);
-  glDisableVertexAttribArray(col);
+  glDisableVertexAttribArray(attribute_coord2d);
 }
 
 int main(int argc, char *argv[]) {

@@ -76,8 +76,6 @@ AbstractSurface *AbstractView::GetSurface() const {
 }
 
 void AbstractView::Update() {
-  if (redraw_task_->IsLinked()) return;
-
   OnUpdate(this);
 }
 
@@ -89,8 +87,7 @@ void AbstractView::UpdateAll() {
 }
 
 void AbstractView::OnUpdate(AbstractView *view) {
-  if (redraw_task_->IsLinked()) {
-    DBG_ASSERT(view != this);
+  if (redraw_task_->IsLinked() && (view != this)) {
     // This view is going to be redrawn, just push back the task of the sub view
 
     redraw_task_->PushBack(view->redraw_task_.get());

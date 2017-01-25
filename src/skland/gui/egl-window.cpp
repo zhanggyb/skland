@@ -89,15 +89,15 @@ Size EGLWindow::GetMaximalSize() const {
   return Size(65536, 65536);
 }
 
-void EGLWindow::InitializeEGL() {
+void EGLWindow::OnInitializeEGL() {
 
 }
 
-void EGLWindow::ResizeEGL(int width, int height) {
+void EGLWindow::OnResizeEGL(int width, int height) {
 
 }
 
-void EGLWindow::RenderEGL() {
+void EGLWindow::OnRenderEGL() {
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
@@ -107,9 +107,7 @@ void EGLWindow::OnUpdate(AbstractView *view) {
   DBG_ASSERT(view == this);
   if (!is_xdg_surface_configured_) return;
 
-  kRedrawTaskTail.PushFront(redraw_task().get());
-  redraw_task()->context = surface_;
-  surface_->Commit();
+  OnFrame(0);
 }
 
 AbstractSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
@@ -147,12 +145,8 @@ void EGLWindow::OnKeyboardKey(KeyEvent *event) {
 
 }
 
-void EGLWindow::OnDraw(const Context *context) {
-  if (surface_->MakeCurrent()) {
-    frame_callback_.Setup(surface_->wl_surface());
-    RenderEGL();
-    surface_->SwapBuffers();
-  }
+void EGLWindow::OnDraw(const Context * /*context*/) {
+
 }
 
 void EGLWindow::OnXdgSurfaceConfigure(uint32_t serial) {
@@ -165,7 +159,7 @@ void EGLWindow::OnXdgSurfaceConfigure(uint32_t serial) {
 //    surface_->Resize((int) geometry().width(), (int) geometry().height());
 
     if (surface_->MakeCurrent()) {
-      InitializeEGL();
+      OnInitializeEGL();
       surface_->SwapBuffers();
     }
 
@@ -201,7 +195,7 @@ void EGLWindow::OnXdgToplevelConfigure(int width, int height, int states) {
 
       surface_->Resize((int) geometry().width(), (int) geometry().height());
 //      surface_->Commit();
-      ResizeEGL(width, height);
+      OnResizeEGL(width, height);
 
       OnResize(width, height);
     }
@@ -214,7 +208,14 @@ void EGLWindow::OnXdgToplevelClose() {
 }
 
 void EGLWindow::OnFrame(uint32_t serial) {
-  OnDraw(nullptr);
+  static int count = 0;
+  count++;
+  fprintf(stderr, "on frame: %d\n", count);
+  if (surface_->MakeCurrent()) {
+    frame_callback_.Setup(surface_->wl_surface());
+    OnRenderEGL();
+    surface_->SwapBuffers();
+  }
 }
 
 }

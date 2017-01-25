@@ -42,6 +42,8 @@ class EGLWidget : public AbstractWidget {
 
  protected:
 
+  virtual void OnUpdate(AbstractView *view) final;
+
   virtual AbstractSurface *OnGetSurface(const AbstractView *view) const final;
 
   virtual void OnResize(int width, int height) final;
@@ -62,13 +64,11 @@ class EGLWidget : public AbstractWidget {
 
   virtual void OnResizeEGL();
 
-  virtual void OnRender();
+  virtual void OnRenderEGL();
 
  private:
 
   void OnFrame(uint32_t serial);
-
-  void InitializeGL();
 
   EGLSurface *surface_;
 

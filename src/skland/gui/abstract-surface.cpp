@@ -87,7 +87,7 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   subsurface->parent_ = this;
 
   AbstractSurface *tmp = this;
-  AbstractSurface *p = this;
+  AbstractSurface *p = nullptr;
   if (pos >= 0) {
     do {
       p = tmp;

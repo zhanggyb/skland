@@ -33,7 +33,7 @@ class ShmWidget : public AbstractWidget {
  public:
 
   ShmWidget()
-      : AbstractWidget(), context_(nullptr), radius_(0.f), angle_(0.f) {
+      : AbstractWidget(), context_(nullptr), radius_(0.f), angle_(0.f), running_animation_(false) {
     color_ = 0xFF4FBF4F;
     frame_callback_.done().Set(this, &ShmWidget::OnFrame);
 
@@ -71,9 +71,19 @@ class ShmWidget : public AbstractWidget {
   }
 
   virtual void OnDraw(const Context *context) override {
-    static int padding = 5;
     context_ = context;
-    std::shared_ptr<Canvas> canvas = context->GetCanvas();
+
+    if (!running_animation_) {
+      running_animation_ = true;
+      OnFrame(0);
+    }
+  }
+
+ private:
+
+  void Animate() {
+    static int padding = 5;
+    std::shared_ptr<Canvas> canvas = context_->GetCanvas();
     canvas->Save();
     canvas->ClipRect(Rect(geometry().l + padding,
                           geometry().t,
@@ -95,8 +105,14 @@ class ShmWidget : public AbstractWidget {
                     angle_, 300.f, false, paint);
 
     canvas->Restore();
+  }
+
+  void OnFrame(uint32_t serial) {
+    angle_ += 5.f;
+    if (angle_ > 360.f) angle_ = 0.f;
 
     context_->SetupCallback(frame_callback_);
+    Animate();
     context_->Damage(context_->GetMargin().l + (int) geometry().l,
                      context_->GetMargin().t + (int) geometry().t,
                      (int) geometry().width(),
@@ -104,20 +120,12 @@ class ShmWidget : public AbstractWidget {
     context_->Commit();
   }
 
- private:
-
-  void OnFrame(uint32_t serial) {
-    angle_ += 5.f;
-    if (angle_ > 360.f) angle_ = 0.f;
-
-    OnDraw(context_);
-  }
-
   wayland::Callback frame_callback_;
   const Context *context_;
   Color color_;
   float radius_;
   float angle_;
+  bool running_animation_;
 };
 
 int main(int argc, char *argv[]) {

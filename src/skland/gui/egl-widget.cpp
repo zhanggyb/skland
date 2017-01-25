@@ -27,48 +27,6 @@
 
 namespace skland {
 
-static const char *vert_shader_text =
-    "uniform mat4 rotation;\n"
-        "attribute vec4 pos;\n"
-        "attribute vec4 color;\n"
-        "varying vec4 v_color;\n"
-        "void main() {\n"
-        "  gl_Position = rotation * pos;\n"
-        "  v_color = color;\n"
-        "}\n";
-
-static const char *frag_shader_text =
-    "precision mediump float;\n"
-        "varying vec4 v_color;\n"
-        "void main() {\n"
-        "  gl_FragColor = v_color;\n"
-        "}\n";
-
-static GLuint
-create_shader(const char *source, GLenum shader_type) {
-  GLuint shader;
-  GLint status;
-
-  shader = glCreateShader(shader_type);
-  assert(shader != 0);
-
-  glShaderSource(shader, 1, (const char **) &source, NULL);
-  glCompileShader(shader);
-
-  glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-  if (!status) {
-    char log[1000];
-    GLsizei len;
-    glGetShaderInfoLog(shader, 1000, &len, log);
-    fprintf(stderr, "Error: compiling %s: %*s\n",
-            shader_type == GL_VERTEX_SHADER ? "vertex" : "fragment",
-            len, log);
-    exit(1);
-  }
-
-  return shader;
-}
-
 EGLWidget::EGLWidget()
     : EGLWidget(400, 300) {
 }
@@ -85,11 +43,35 @@ EGLWidget::EGLWidget(int width, int height)
   surface_->SetInputRegion(empty_input_region_);
 
   frame_callback_.done().Set(this, &EGLWidget::OnFrame);
-//  InitializeGL();
 }
 
 EGLWidget::~EGLWidget() {
   delete surface_;
+}
+
+void EGLWidget::OnUpdate(AbstractView *view) {
+  DBG_ASSERT(view == this);
+
+  if (!surface_->wl_sub_surface().IsValid()) {
+    if (nullptr == parent_view()) return;
+
+    AbstractSurface *parent_surf = parent_view()->GetSurface();
+    if (nullptr == parent_surf) return;
+
+    parent_surf->AddSubSurface(surface_);
+    surface_->SetDesync();
+    surface_->SetPosition(parent_surf->margin().l + (int) geometry().x(),
+                          parent_surf->margin().t + (int) geometry().y());
+    surface_->Resize((int) geometry().width(), (int) geometry().height());
+
+    if (surface_->MakeCurrent()) {
+      OnInitializeEGL();
+    }
+
+    OnFrame(0);
+  }
+
+  AbstractWidget::OnUpdate(view);
 }
 
 AbstractSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
@@ -98,10 +80,7 @@ AbstractSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const 
 
 void EGLWidget::OnResize(int width, int height) {
   resize(width, height);
-  surface_->Resize(width, height);
-  if (!surface_->wl_sub_surface().IsValid()) {
-    Update();
-  }
+  Update();
 }
 
 void EGLWidget::OnMouseEnter(MouseEvent *event) {
@@ -125,90 +104,34 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 }
 
 void EGLWidget::OnDraw(const Context *context) {
-  fprintf(stderr, "on draw\n");
-  if (!surface_->wl_sub_surface().IsValid()) {
-    AbstractSurface *parent_surf = context->surface();
-    parent_surf->AddSubSurface(surface_);
-    surface_->SetPosition(parent_surf->margin().l + (int) geometry().x(),
-                          parent_surf->margin().t + (int) geometry().y());
-    surface_->SetSync();
-    OnInitializeEGL();
 
-//    OnRender();
-//    surface_->Damage(0, 0, (int) geometry().width(), (int) geometry().height());
-//    surface_->Commit();
-  }
 }
 
 void EGLWidget::OnInitializeEGL() {
-  if (surface_->MakeCurrent()) {
-    frame_callback_.Setup(surface_->wl_surface());
-    glClearColor(0.1, 0.1, .85, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glFlush();
-    surface_->SwapBuffers();
-  }
+  glClearColor(0.1, 0.1, .85, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glFlush();
 }
 
 void EGLWidget::OnResizeEGL() {
-  if (surface_->MakeCurrent()) {
-    glClearColor(0.1, 0.1, .85, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glFlush();
-    surface_->SwapBuffers();
-  }
+
 }
 
-void EGLWidget::OnRender() {
+void EGLWidget::OnRenderEGL() {
   glClearColor(0.36, 0.85, 0.27, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-  static uint64_t count = 0;
-  fprintf(stderr, "on render: %ld\n", count);
+  static int count = 0;
   count++;
-
+  fprintf(stderr, "on frame: %d\n", count);
   if (surface_->MakeCurrent()) {
     frame_callback_.Setup(surface_->wl_surface());
-    OnRender();
+    OnRenderEGL();
     surface_->SwapBuffers();
   }
-}
-
-void EGLWidget::InitializeGL() {
-  GLuint frag, vert;
-  GLuint program;
-  GLint status;
-
-  frag = create_shader(frag_shader_text, GL_FRAGMENT_SHADER);
-  vert = create_shader(vert_shader_text, GL_VERTEX_SHADER);
-
-  program = glCreateProgram();
-  glAttachShader(program, frag);
-  glAttachShader(program, vert);
-  glLinkProgram(program);
-
-  glGetProgramiv(program, GL_LINK_STATUS, &status);
-  if (!status) {
-    char log[1000];
-    GLsizei len;
-    glGetProgramInfoLog(program, 1000, &len, log);
-    fprintf(stderr, "Error: linking:\n%*s\n", len, log);
-    exit(1);
-  }
-
-  glUseProgram(program);
-
-  pos = 0;
-  col = 1;
-
-  glBindAttribLocation(program, pos, "pos");
-  glBindAttribLocation(program, col, "color");
-  glLinkProgram(program);
-
-  rotation_uniform = glGetUniformLocation(program, "rotation");
 }
 
 }

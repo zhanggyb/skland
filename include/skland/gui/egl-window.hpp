@@ -50,11 +50,11 @@ class EGLWindow : public AbstractView {
 
  protected:
 
-  virtual void InitializeEGL();
+  virtual void OnInitializeEGL();
 
-  virtual void ResizeEGL(int width, int height);
+  virtual void OnResizeEGL(int width, int height);
 
-  virtual void RenderEGL();
+  virtual void OnRenderEGL();
 
   virtual void OnUpdate(AbstractView *view) final;
 
