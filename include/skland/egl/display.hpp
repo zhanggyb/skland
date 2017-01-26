@@ -18,6 +18,7 @@
 #define SKLAND_EGL_DISPLAY_HPP_
 
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
 #include "surface.hpp"
 
 namespace skland {
@@ -66,6 +67,11 @@ class Display {
         eglMakeCurrent(egl_display_, draw.egl_surface_, read.egl_surface_, egl_context_);
   }
 
+  bool SwapBuffersWithDamage(const Surface &surface, int x, int y, int width, int height) {
+    EGLint rect[4] = {x, y, width, height};
+    return EGL_TRUE == kSwapBuffersWithDamageAPI(egl_display_, surface.egl_surface_, rect, 1);
+  }
+
   bool SwapBuffers(const Surface &surface) const {
     return EGL_TRUE ==
         eglSwapBuffers(egl_display_, surface.egl_surface_);
@@ -93,6 +99,8 @@ class Display {
 
   EGLint major_;  /**< The major version */
   EGLint minor_;  /**< The minor version */
+
+  static PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC kSwapBuffersWithDamageAPI;
 
 };
 

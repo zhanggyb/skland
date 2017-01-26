@@ -80,6 +80,11 @@ class EGLWidget : public AbstractWidget {
   wayland::Region empty_input_region_;
   wayland::Callback frame_callback_;
 
+  bool resize_;
+  bool animating_;
+
+  AbstractSurface* root_;
+
 };
 
 }

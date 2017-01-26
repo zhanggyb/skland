@@ -33,7 +33,10 @@ EGLWidget::EGLWidget()
 
 EGLWidget::EGLWidget(int width, int height)
     : AbstractWidget(width, height),
-      surface_(nullptr) {
+      surface_(nullptr),
+      resize_(false),
+      animating_(false),
+      root_(nullptr) {
   surface_ = new EGLSurface(this);
 
   // Set empty regions
@@ -55,20 +58,23 @@ void EGLWidget::OnUpdate(AbstractView *view) {
   if (!surface_->wl_sub_surface().IsValid()) {
     if (nullptr == parent_view()) return;
 
-    AbstractSurface *parent_surf = parent_view()->GetSurface();
-    if (nullptr == parent_surf) return;
+    AbstractSurface *main_surface = parent_view()->GetSurface();
+    if (nullptr == main_surface) return;
 
-    parent_surf->AddSubSurface(surface_);
+    root_ = main_surface;
+
+    main_surface->AddSubSurface(surface_);
     surface_->SetDesync();
-    surface_->SetPosition(parent_surf->margin().l + (int) geometry().x(),
-                          parent_surf->margin().t + (int) geometry().y());
+    surface_->SetPosition(main_surface->margin().l + (int) geometry().x(),
+                          main_surface->margin().t + (int) geometry().y());
     surface_->Resize((int) geometry().width(), (int) geometry().height());
 
     if (surface_->MakeCurrent()) {
       OnInitializeEGL();
+      surface_->SwapBuffers();
     }
 
-    OnFrame(0);
+//    OnFrame(0);
   }
 
   AbstractWidget::OnUpdate(view);
@@ -80,6 +86,7 @@ AbstractSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const 
 
 void EGLWidget::OnResize(int width, int height) {
   resize(width, height);
+  resize_ = true;
   Update();
 }
 
@@ -104,7 +111,10 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 }
 
 void EGLWidget::OnDraw(const Context *context) {
-
+  if (!animating_) {
+    animating_ = true;
+    OnFrame(0);
+  }
 }
 
 void EGLWidget::OnInitializeEGL() {
@@ -128,9 +138,14 @@ void EGLWidget::OnFrame(uint32_t /* serial */) {
   count++;
   fprintf(stderr, "on frame: %d\n", count);
   if (surface_->MakeCurrent()) {
-    frame_callback_.Setup(surface_->wl_surface());
+    if (resize_) {
+      resize_ = false;
+      surface_->Resize((int) geometry().width(), (int) geometry().height());
+    }
+    frame_callback_.Setup(root_->wl_surface());
     OnRenderEGL();
     surface_->SwapBuffers();
+    root_->Commit();
   }
 }
 
