@@ -18,17 +18,13 @@
 #define SKLAND_GUI_ABSTRACT_WINDOW_HPP_
 
 #include "abstract-view.hpp"
+#include "abstract-window-frame.hpp"
 
 #include "../core/defines.hpp"
 #include "../core/rect.hpp"
 
-#include "memory-pool.hpp"
-#include "buffer.hpp"
-#include "task.hpp"
-
 #include "../wayland/xdg-surface.hpp"
 #include "../wayland/xdg-toplevel.hpp"
-#include "../wayland/region.hpp"
 
 #include "../stock/theme.hpp"
 
@@ -111,9 +107,7 @@ class AbstractWindow : public AbstractView {
 
  protected:
 
-  virtual void OnUpdate(AbstractView *view) override;
-
-  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const;
+  virtual void OnShown() = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -123,6 +117,8 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnMouseButton(MouseEvent *event) override;
 
+  virtual void OnKeyboardKey(KeyEvent *event) override;
+
   virtual void OnDraw(const Context *context) override;
 
   void AddSubView(AbstractView *view, int pos = -1);
@@ -131,12 +127,18 @@ class AbstractWindow : public AbstractView {
 
   void ResizeWithMouse(MouseEvent *event, uint32_t edges) const;
 
-  const wayland::XdgSurface &xdg_surface() const {
-    return xdg_surface_;
+  void SetShellSurface(AbstractSurface *surface);
+
+  AbstractWindowFrame *window_frame() const {
+    return window_frame_;
   }
 
-  const wayland::XdgToplevel &xdg_toplevel() const {
-    return xdg_toplevel_;
+  AbstractSurface *shell_surface() const {
+    return shell_surface_;
+  }
+
+  static void ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height) {
+    window_frame->OnResize(width, height);
   }
 
  private:
@@ -149,14 +151,13 @@ class AbstractWindow : public AbstractView {
 
   void OnWindowAction(int action, __SLOT__);
 
-  AbstractWindowFrame *window_frame_;
-
   int flags_;
 
+  AbstractWindowFrame *window_frame_;
+
+  AbstractSurface *shell_surface_;
   wayland::XdgSurface xdg_surface_;
   wayland::XdgToplevel xdg_toplevel_;
-  wayland::Region input_region_;
-  wayland::Region empty_region_;
 
   std::string title_;
   std::string app_id_;
@@ -164,24 +165,6 @@ class AbstractWindow : public AbstractView {
   Size saved_size_;
 
   bool is_xdg_surface_configured_;
-
-  /**
-   * @brief The surface for frame
-   */
-  ShmSurface *frame_surface_;
-
-  /**
-   * @brief The surface for widgets
-   */
-  ShmSurface *main_surface_;
-
-  /* Properties for main surface, JUST experimental */
-  MemoryPool main_pool_;
-  Buffer main_buffer_;
-
-  /* Properties for frame surface, JUST experimental */
-  MemoryPool frame_pool_;
-  Buffer frame_buffer_;
 
 };
 

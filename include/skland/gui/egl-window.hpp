@@ -17,7 +17,7 @@
 #ifndef SKLAND_EGL_WINDOW_HPP
 #define SKLAND_EGL_WINDOW_HPP
 
-#include "abstract-view.hpp"
+#include "abstract-window.hpp"
 
 #include "../wayland/xdg-surface.hpp"
 #include "../wayland/xdg-toplevel.hpp"
@@ -28,27 +28,23 @@ namespace skland {
 
 class EGLSurface;
 
-class EGLWindow : public AbstractView {
+class EGLWindow : public AbstractWindow {
+
+  EGLWindow(const EGLWindow &) = delete;
+  EGLWindow &operator=(const EGLWindow &) = delete;
 
  public:
 
-  EGLWindow();
+  EGLWindow(const char *title, AbstractWindowFrame *frame = Theme::CreateWindowFrame());
 
-  EGLWindow(int width, int height);
+  EGLWindow(int width, int height, const char *title,
+            AbstractWindowFrame *frame = Theme::CreateWindowFrame());
 
   virtual ~EGLWindow();
 
-  void Show();
-
-  void Close(__SLOT__);
-
-  virtual Size GetMinimalSize() const override;
-
-  virtual Size GetPreferredSize() const override;
-
-  virtual Size GetMaximalSize() const override;
-
  protected:
+
+  virtual void OnShown() final;
 
   virtual void OnInitializeEGL();
 
@@ -62,32 +58,11 @@ class EGLWindow : public AbstractView {
 
   virtual void OnResize(int width, int height) final;
 
-  virtual void OnMouseEnter(MouseEvent *event) override;
-
-  virtual void OnMouseLeave(MouseEvent *event) override;
-
-  virtual void OnMouseMove(MouseEvent *event) override;
-
-  virtual void OnMouseButton(MouseEvent *event) override;
-
-  virtual void OnKeyboardKey(KeyEvent *event) override;
-
   virtual void OnDraw(const Context *context) final;
 
  private:
 
-  void OnXdgSurfaceConfigure(uint32_t serial);
-
-  void OnXdgToplevelConfigure(int width, int height, int states);
-
-  void OnXdgToplevelClose();
-
   void OnFrame(uint32_t serial);
-
-  bool is_xdg_surface_configured_;
-
-  wayland::XdgSurface xdg_surface_;
-  wayland::XdgToplevel xdg_toplevel_;
 
   wayland::Region input_region_;
   wayland::Region inactive_region_;
@@ -95,6 +70,8 @@ class EGLWindow : public AbstractView {
   EGLSurface *surface_;
 
   wayland::Callback frame_callback_;
+
+  bool shown_;
 };
 
 }

@@ -198,12 +198,16 @@ class AbstractView : public Object {
     return static_cast<AbstractView *>(last_child());
   }
 
-  const std::unique_ptr<RedrawTask> &redraw_task() const {
+  std::unique_ptr<RedrawTask> &redraw_task() {
     return redraw_task_;
   }
 
-  const std::unique_ptr<ViewTask> &mouse_task() const {
+  std::unique_ptr<ViewTask> &mouse_task() {
     return mouse_task_;
+  }
+
+  static RedrawTask *GetRedrawTask(AbstractView *view) {
+    return view->redraw_task_.get();
   }
 
   /**

@@ -28,7 +28,7 @@ class SimpleWindow : public EGLWindow {
  public:
 
   SimpleWindow()
-      : EGLWindow(250, 250) {}
+      : EGLWindow(250, 250, "SimpleEGL", nullptr) {}
 
   virtual  ~SimpleWindow() {
     glDeleteProgram(program);
@@ -143,6 +143,7 @@ int main(int argc, char *argv[]) {
 //  win->SetMainWidget(widget);
 
   SimpleWindow *win = new SimpleWindow();
+  win->SetAppId("SimpleEGL");
   win->Show();
 
   return app.Run();

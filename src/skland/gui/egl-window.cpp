@@ -31,62 +31,40 @@
 
 namespace skland {
 
-EGLWindow::EGLWindow()
-    : EGLWindow(400, 300) {
+EGLWindow::EGLWindow(const char *title, AbstractWindowFrame *frame)
+    : EGLWindow(400, 300, title, frame) {
 
 }
 
-EGLWindow::EGLWindow(int width, int height)
-    : AbstractView(width, height),
-      is_xdg_surface_configured_(false),
-      surface_(nullptr) {
+EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFrame *frame)
+    : AbstractWindow(width, height, title, frame),
+      surface_(nullptr),
+      shown_(false) {
   surface_ = new EGLSurface(this);
 
   input_region_.Setup(Display::wl_compositor());
   input_region_.Add(0, 0, (int) geometry().width(), (int) geometry().height());
   surface_->SetInputRegion(input_region_);
 
-  xdg_surface_.configure().Set(this, &EGLWindow::OnXdgSurfaceConfigure);
-  xdg_surface_.Setup(Display::xdg_shell(), surface_->wl_surface());
+  SetShellSurface(surface_);
 
-  xdg_toplevel_.configure().Set(this, &EGLWindow::OnXdgToplevelConfigure);
-  xdg_toplevel_.close().Set(this, &EGLWindow::OnXdgToplevelClose);
-  xdg_toplevel_.Setup(xdg_surface_);
-
-  xdg_toplevel_.SetTitle("Test EGL surface"); // TODO: support multi-language
-  xdg_toplevel_.SetAppId("Test EGL surface");
+  SetTitle(title);
 
   frame_callback_.done().Set(this, &EGLWindow::OnFrame);
 }
 
 EGLWindow::~EGLWindow() {
-  delete surface_;
 }
 
-void EGLWindow::Show() {
-  if (!is_xdg_surface_configured_) {
-    surface_->Commit();
-  }
-}
+void EGLWindow::OnShown() {
+  shown_ = true;
 
-void EGLWindow::Close(SLOT) {
-  if (AbstractSurface::GetShellSurfaceCount() == 1) {
-    Application::Exit();
+  if (surface_->MakeCurrent()) {
+    OnInitializeEGL();
+    surface_->SwapBuffers();
   }
 
-  delete this;
-}
-
-Size EGLWindow::GetMinimalSize() const {
-  return Size(100, 100);
-}
-
-Size EGLWindow::GetPreferredSize() const {
-  return Size(400, 300);
-}
-
-Size EGLWindow::GetMaximalSize() const {
-  return Size(65536, 65536);
+  Update();
 }
 
 void EGLWindow::OnInitializeEGL() {
@@ -105,7 +83,7 @@ void EGLWindow::OnRenderEGL() {
 
 void EGLWindow::OnUpdate(AbstractView *view) {
   DBG_ASSERT(view == this);
-  if (!is_xdg_surface_configured_) return;
+  if (!shown_) return;
 
   OnFrame(0);
 }
@@ -115,96 +93,19 @@ AbstractSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
 }
 
 void EGLWindow::OnResize(int width, int height) {
-  resize(width, height);
+  input_region_.Setup(Display::wl_compositor());
+  input_region_.Add(0, 0, width, height);
+  surface_->SetInputRegion(input_region_);
+
+  surface_->Resize(GetWidth(), GetHeight());
+//      surface_->Commit();
+  OnResizeEGL(width, height);
+
   Update();
-}
-
-void EGLWindow::OnMouseEnter(MouseEvent *event) {
-  event->Accept();
-}
-
-void EGLWindow::OnMouseLeave(MouseEvent *event) {
-  event->Accept();
-}
-
-void EGLWindow::OnMouseMove(MouseEvent *event) {
-  event->Accept();
-}
-
-void EGLWindow::OnMouseButton(MouseEvent *event) {
-  if (event->button() == kMouseButtonLeft && event->state() == kMouseButtonPressed) {
-    xdg_toplevel_.Move(event->wl_seat(), event->serial());
-    event->Ignore();
-    return;
-  }
-
-  event->Accept();
-}
-
-void EGLWindow::OnKeyboardKey(KeyEvent *event) {
-
 }
 
 void EGLWindow::OnDraw(const Context * /*context*/) {
 
-}
-
-void EGLWindow::OnXdgSurfaceConfigure(uint32_t serial) {
-  xdg_surface_.AckConfigure(serial);
-
-  if (!is_xdg_surface_configured_) {
-    is_xdg_surface_configured_ = true;
-
-    xdg_surface_.SetWindowGeometry(0, 0, (int) geometry().width(), (int) geometry().height());
-//    surface_->Resize((int) geometry().width(), (int) geometry().height());
-
-    if (surface_->MakeCurrent()) {
-      OnInitializeEGL();
-      surface_->SwapBuffers();
-    }
-
-    Update();
-  }
-}
-
-void EGLWindow::OnXdgToplevelConfigure(int width, int height, int states) {
-  using wayland::XdgToplevel;
-
-  bool maximized = ((states & XdgToplevel::kStateMaskMaximized) != 0);
-  bool fullscreen = ((states & XdgToplevel::kStateMaskFullscreen) != 0);
-  bool resizing = ((states & XdgToplevel::kStateMaskResizing) != 0);
-//  bool focus = ((states & XdgToplevel::kStateMaskActivated) != 0);
-
-  Size min = this->GetMinimalSize();
-  Size max = this->GetMaximalSize();
-  DBG_ASSERT(min.width < max.width && min.height < max.height);
-
-  width = clamp(width, min.width, max.width);
-  height = clamp(height, min.height, max.height);
-
-  if (maximized || fullscreen || resizing) {
-    if (width != geometry().width() || height != geometry().height()) {
-
-      input_region_.Setup(Display::wl_compositor());
-      input_region_.Add(0, 0, width, height);
-      surface_->SetInputRegion(input_region_);
-
-      xdg_surface_.SetWindowGeometry(0, 0, width, height);
-
-      resize(width, height);
-
-      surface_->Resize((int) geometry().width(), (int) geometry().height());
-//      surface_->Commit();
-      OnResizeEGL(width, height);
-
-      OnResize(width, height);
-    }
-  }
-
-}
-
-void EGLWindow::OnXdgToplevelClose() {
-  Close();
 }
 
 void EGLWindow::OnFrame(uint32_t serial) {
