@@ -86,6 +86,7 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
                                     this->wl_surface_);
   subsurface->parent_ = this;
 
+  // FIXME: error message in weston:
   AbstractSurface *tmp = this;
   AbstractSurface *p = nullptr;
   if (pos >= 0) {
@@ -110,15 +111,11 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
 }
 
 void AbstractSurface::SetSync() const {
-  if (wl_sub_surface_.IsValid()) {
-    wl_sub_surface_.SetSync();
-  }
+  wl_sub_surface_.SetSync();
 }
 
 void AbstractSurface::SetDesync() const {
-  if (wl_sub_surface_.IsValid()) {
-    wl_sub_surface_.SetDesync();
-  }
+  wl_sub_surface_.SetDesync();
 }
 
 void AbstractSurface::Commit() const {

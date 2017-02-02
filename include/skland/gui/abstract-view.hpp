@@ -93,11 +93,19 @@ class AbstractView : public Object {
    */
   virtual ~AbstractView();
 
-  void SetPosition(int x, int y);
+  void MoveTo(int x, int y);
 
   void Resize(int width, int height);
 
   virtual bool Contain(int x, int y) const;
+
+  int GetX() const { return static_cast<int>(geometry_.x()); }
+
+  int GetY() const { return static_cast<int>(geometry_.y()); }
+
+  int GetWidth() const { return static_cast<int>(geometry_.width()); }
+
+  int GetHeight() const { return static_cast<int>(geometry_.height()); }
 
   const Rect &geometry() const {
     return geometry_;
@@ -214,6 +222,8 @@ class AbstractView : public Object {
  private:
 
   bool visible_;
+
+  bool geometry_dirty_;
 
   Rect geometry_;
 

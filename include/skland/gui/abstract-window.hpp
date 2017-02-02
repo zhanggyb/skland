@@ -131,6 +131,14 @@ class AbstractWindow : public AbstractView {
 
   void ResizeWithMouse(MouseEvent *event, uint32_t edges) const;
 
+  const wayland::XdgSurface &xdg_surface() const {
+    return xdg_surface_;
+  }
+
+  const wayland::XdgToplevel &xdg_toplevel() const {
+    return xdg_toplevel_;
+  }
+
  private:
 
   void OnXdgSurfaceConfigure(uint32_t serial);
@@ -148,7 +156,7 @@ class AbstractWindow : public AbstractView {
   wayland::XdgSurface xdg_surface_;
   wayland::XdgToplevel xdg_toplevel_;
   wayland::Region input_region_;
-  wayland::Region inactive_region_;
+  wayland::Region empty_region_;
 
   std::string title_;
   std::string app_id_;

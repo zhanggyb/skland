@@ -62,9 +62,8 @@ AbstractWindow::AbstractWindow(int width,
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
 
-    inactive_region_.Setup(Display::wl_compositor());
-    inactive_region_.Add(0, 0, 0, 0);
-    main_surface_->SetInputRegion(inactive_region_);
+    empty_region_.Setup(Display::wl_compositor());
+    main_surface_->SetInputRegion(empty_region_);
     shell_surface = frame_surface_;
   } else {
     main_surface_ = new ShmSurface(this);
@@ -83,8 +82,6 @@ AbstractWindow::AbstractWindow(int width,
   xdg_toplevel_.Setup(xdg_surface_);
   xdg_toplevel_.SetTitle(title_.c_str()); // TODO: support multi-language
 
-  set_name(title);  // debug only
-
   // Create buffer:
   Size output_size(1024, 800);
   if (const Output *output = Display::GetOutputAt(0)) {
@@ -100,9 +97,11 @@ AbstractWindow::AbstractWindow(int width,
   main_buffer_.Setup(main_pool_, total_width, total_height,
                      total_width * 4, WL_SHM_FORMAT_ARGB8888);
 
-  frame_pool_.Setup(total_width * 4 * total_height);
-  frame_buffer_.Setup(frame_pool_, total_width, total_height,
-                      total_width * 4, WL_SHM_FORMAT_ARGB8888);
+  if (frame) {
+    frame_pool_.Setup(total_width * 4 * total_height);
+    frame_buffer_.Setup(frame_pool_, total_width, total_height,
+                        total_width * 4, WL_SHM_FORMAT_ARGB8888);
+  }
 }
 
 AbstractWindow::~AbstractWindow() {

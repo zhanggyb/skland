@@ -31,11 +31,6 @@ class TestableSubject : public skland::Object {
 
   }
 
-  inline TestableSubject(const char *name)
-      : Object(name), manager_(nullptr) {
-
-  }
-
   virtual ~TestableSubject();
 
   inline TestableSubject *previous_subject() const {
@@ -58,13 +53,6 @@ class TestableManager : public skland::Object {
 
   inline TestableManager()
       : Object(),
-        first_subject_(nullptr),
-        last_subject_(nullptr),
-        subjects_count_(0) {
-  }
-
-  inline TestableManager(const char *name)
-      : Object(name),
         first_subject_(nullptr),
         last_subject_(nullptr),
         subjects_count_(0) {

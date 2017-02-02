@@ -32,7 +32,6 @@ namespace skland {
 DefaultWindowFrame::CloseButton::CloseButton()
     : AbstractButton() {
   resize(14, 14);
-  set_name("CloseButton");
 }
 
 DefaultWindowFrame::CloseButton::~CloseButton() {
@@ -88,7 +87,6 @@ void DefaultWindowFrame::CloseButton::OnDraw(const Context *context) {
 DefaultWindowFrame::MaximizeButton::MaximizeButton()
     : AbstractButton() {
   resize(14, 14);
-  set_name("MaximizeButton");
 }
 
 DefaultWindowFrame::MaximizeButton::~MaximizeButton() {
@@ -133,7 +131,6 @@ void DefaultWindowFrame::MaximizeButton::OnDraw(const Context *context) {
 DefaultWindowFrame::MinimizeButton::MinimizeButton()
     : AbstractButton() {
   resize(14, 14);
-  set_name("MinimizeButton");
 }
 
 DefaultWindowFrame::MinimizeButton::~MinimizeButton() {
@@ -231,12 +228,12 @@ void DefaultWindowFrame::OnResize(int width, int height) {
 }
 
 void DefaultWindowFrame::LayoutWidgets(int width, int height) {
-  title_->SetPosition(0, 0);
+  title_->MoveTo(0, 0);
   title_->Resize((int) window()->geometry().width(), title_bar_size());
 
   int y = (title_bar_size() - (int) close_button_->geometry().height()) / 2;
   int x = y + 1;
-  close_button_->SetPosition(x, y);
+  close_button_->MoveTo(x, y);
 }
 
 void DefaultWindowFrame::OnDraw(const Context *context) {

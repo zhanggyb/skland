@@ -35,10 +35,8 @@ class SimpleWidget : public AbstractWidget {
 
   SimpleWidget()
       : AbstractWidget(), btn_(nullptr) {
-    set_name("Simple Widget");
-
     btn_ = new PushButton;
-    btn_->SetPosition(200, 200);
+    btn_->MoveTo(200, 200);
     btn_->Resize(200, 200);
 
     PushBackChild(btn_);

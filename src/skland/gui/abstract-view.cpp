@@ -47,7 +47,7 @@ AbstractView::AbstractView(int width, int height)
 AbstractView::~AbstractView() {
 }
 
-void AbstractView::SetPosition(int x, int y) {
+void AbstractView::MoveTo(int x, int y) {
   // TODO: check and re-layout
 
   set_position(x, y);

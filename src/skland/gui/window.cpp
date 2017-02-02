@@ -62,7 +62,7 @@ void Window::SetMainWidgetGeometry() {
 
   Rect rect = GetClientGeometry();
 
-  main_widget_->SetPosition((int) rect.x(), (int) rect.y());
+  main_widget_->MoveTo((int) rect.x(), (int) rect.y());
   main_widget_->Resize((int) rect.width(), (int) rect.height());
 }
 

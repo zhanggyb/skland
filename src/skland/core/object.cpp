@@ -28,11 +28,6 @@ Object::Object()
       children_count_(0) {
 }
 
-Object::Object(const char *name)
-    : Object() {
-  name_ = name;
-}
-
 Object::~Object() {
   if (parent_) parent_->RemoveChild(this);
   DBG_ASSERT(previous_ == nullptr);

@@ -62,10 +62,6 @@ class Surface {
     return nullptr != egl_surface_;
   }
 
-  bool IsNull() const {
-    return nullptr == egl_surface_;
-  }
-
  private:
 
   ::EGLSurface egl_surface_;
