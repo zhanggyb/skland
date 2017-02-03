@@ -90,7 +90,6 @@ class Window : public AbstractWindow {
 
   AbstractWidget *main_widget_;
 
-  bool shown_;
 };
 
 }

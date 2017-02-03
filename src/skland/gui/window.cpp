@@ -40,8 +40,7 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
     : AbstractWindow(width, height, title, frame),
       frame_surface_(nullptr),
       main_surface_(nullptr),
-      main_widget_(nullptr),
-      shown_(false) {
+      main_widget_(nullptr) {
   int x = 0, y = 0;  // The input region
   AbstractSurface *shell_surface = nullptr;
 
@@ -80,8 +79,8 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
     output_size = output->current_mode_size();  // The current screen size
   }
 
-  int total_width = std::max((int) geometry().width(), output_size.width);
-  int total_height = std::max((int) geometry().height(), output_size.height);
+  int total_width = std::max(this->width(), output_size.width);
+  int total_height = std::max(this->height(), output_size.height);
   total_width += shell_surface->margin().lr();
   total_height += shell_surface->margin().tb();
 
@@ -120,12 +119,11 @@ void Window::OnShown() {
 
   main_surface_->Attach(&main_buffer_);
   main_surface_->GetCanvas()->Clear();
-  shown_ = true;
   UpdateAll();
 }
 
 void Window::OnUpdate(AbstractView *view) {
-  if (!shown_) return;
+  if (!visible()) return;
 
   if (view == this) {
     if (frame_surface_) {
@@ -134,10 +132,10 @@ void Window::OnUpdate(AbstractView *view) {
       // but now use main_surface instead.
       redraw_task()->context = frame_surface_;
       DBG_ASSERT(redraw_task()->context.GetCanvas());
-      frame_surface_->Damage((int) geometry().x() + frame_surface_->margin().left,
-                             (int) geometry().y() + frame_surface_->margin().top,
-                             (int) geometry().width(),
-                             (int) geometry().height());
+      frame_surface_->Damage(x() + frame_surface_->margin().left,
+                             y() + frame_surface_->margin().top,
+                             width(),
+                             height());
       frame_surface_->Commit();
     }
   } else {
@@ -146,10 +144,10 @@ void Window::OnUpdate(AbstractView *view) {
     // TODO: this is juat a workaround, should render widgets on main_surface
     GetRedrawTask(view)->context = main_surface_;
     DBG_ASSERT(GetRedrawTask(view)->context.GetCanvas());
-    main_surface_->Damage((int) view->geometry().x() + main_surface_->margin().left,
-                          (int) view->geometry().y() + main_surface_->margin().top,
-                          (int) view->geometry().width(),
-                          (int) view->geometry().height());
+    main_surface_->Damage(view->x() + main_surface_->margin().left,
+                          view->y() + main_surface_->margin().top,
+                          view->width(),
+                          view->height());
     main_surface_->Commit();
   }
 }

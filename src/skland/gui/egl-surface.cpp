@@ -22,10 +22,7 @@ namespace skland {
 
 EGLSurface::EGLSurface(AbstractView *view)
     : AbstractSurface(view) {
-  egl_surface_.Setup(Display::egl_display(),
-                     wl_surface(),
-                     static_cast<int>(view->geometry().width()),
-                     static_cast<int>(view->geometry().height()));
+  egl_surface_.Setup(Display::egl_display(), wl_surface(), view->width(), view->height());
 }
 
 EGLSurface::~EGLSurface() {

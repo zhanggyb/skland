@@ -65,9 +65,9 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 
     main_surface->AddSubSurface(surface_);
     surface_->SetDesync();
-    surface_->SetPosition(main_surface->margin().l + (int) geometry().x(),
-                          main_surface->margin().t + (int) geometry().y());
-    surface_->Resize((int) geometry().width(), (int) geometry().height());
+    surface_->SetPosition(main_surface->margin().l + x(),
+                          main_surface->margin().t + y());
+    surface_->Resize(width(), height());
 
     if (surface_->MakeCurrent()) {
       OnInitializeEGL();
@@ -140,7 +140,7 @@ void EGLWidget::OnFrame(uint32_t /* serial */) {
   if (surface_->MakeCurrent()) {
     if (resize_) {
       resize_ = false;
-      surface_->Resize((int) geometry().width(), (int) geometry().height());
+      surface_->Resize(width(), height());
     }
     frame_callback_.Setup(root_->wl_surface());
     OnRenderEGL();

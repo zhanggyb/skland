@@ -43,7 +43,7 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFra
   surface_ = new EGLSurface(this);
 
   input_region_.Setup(Display::wl_compositor());
-  input_region_.Add(0, 0, (int) geometry().width(), (int) geometry().height());
+  input_region_.Add(0, 0, this->width(), this->height());
   surface_->SetInputRegion(input_region_);
 
   SetShellSurface(surface_);
@@ -97,7 +97,7 @@ void EGLWindow::OnResize(int width, int height) {
   input_region_.Add(0, 0, width, height);
   surface_->SetInputRegion(input_region_);
 
-  surface_->Resize(GetWidth(), GetHeight());
+  surface_->Resize(this->width(), this->height());
 //      surface_->Commit();
   OnResizeEGL(width, height);
 

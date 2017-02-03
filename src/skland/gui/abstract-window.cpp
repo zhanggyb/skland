@@ -37,8 +37,7 @@ AbstractWindow::AbstractWindow(int width,
     : AbstractView(width, height),
       flags_(0),
       window_frame_(nullptr),
-      shell_surface_(nullptr),
-      is_xdg_surface_configured_(false) {
+      shell_surface_(nullptr) {
   if (title) title_ = title;
 }
 
@@ -76,7 +75,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 }
 
 void AbstractWindow::Show() {
-  if (!is_xdg_surface_configured_) {
+  if (!visible()) {
     shell_surface_->Commit();
   }
 }
@@ -290,13 +289,13 @@ void AbstractWindow::SetShellSurface(AbstractSurface *surface) {
 void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
   xdg_surface_.AckConfigure(serial);
 
-  if (!is_xdg_surface_configured_) {
-    is_xdg_surface_configured_ = true;
+  if (!visible()) {
+    set_visible(true);
 
     int x = shell_surface_->margin().left;
     int y = shell_surface_->margin().top;
-    int w = GetWidth();
-    int h = GetHeight();
+    int w = width();
+    int h = height();
     xdg_surface_.SetWindowGeometry(x, y, w, h);
 
     OnShown();
@@ -319,7 +318,7 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
   height = clamp(height, min.height, max.height);
 
   if (maximized || fullscreen || resizing) {
-    if (width != geometry().width() || height != geometry().height()) {
+    if (width != this->width() || height != this->height()) {
 
       int x = 0, y = 0;
       x = shell_surface_->margin().left;

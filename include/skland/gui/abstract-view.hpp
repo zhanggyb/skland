@@ -99,17 +99,21 @@ class AbstractView : public Object {
 
   virtual bool Contain(int x, int y) const;
 
-  int GetX() const { return static_cast<int>(geometry_.x()); }
+  int x() const { return static_cast<int>(geometry_.x()); }
 
-  int GetY() const { return static_cast<int>(geometry_.y()); }
+  int y() const { return static_cast<int>(geometry_.y()); }
 
-  int GetWidth() const { return static_cast<int>(geometry_.width()); }
+  int width() const { return static_cast<int>(geometry_.width()); }
 
-  int GetHeight() const { return static_cast<int>(geometry_.height()); }
+  int height() const { return static_cast<int>(geometry_.height()); }
 
-  const Rect &geometry() const {
-    return geometry_;
-  }
+  float center_x() const { return geometry_.center_x(); }
+
+  float center_y() const { return geometry_.center_y(); }
+
+  const Rect &geometry() const { return geometry_; }
+
+  bool visible() const { return visible_; }
 
   /**
    * @brief Get the surface on which this view renders
@@ -226,8 +230,6 @@ class AbstractView : public Object {
  private:
 
   bool visible_;
-
-  bool geometry_dirty_;
 
   Rect geometry_;
 

@@ -113,10 +113,10 @@ class ShmWidget : public AbstractWidget {
 
     context_->SetupCallback(frame_callback_);
     Animate();
-    context_->Damage(context_->GetMargin().l + (int) geometry().l,
-                     context_->GetMargin().t + (int) geometry().t,
-                     (int) geometry().width(),
-                     (int) geometry().height());
+    context_->Damage(context_->GetMargin().l + x(),
+                     context_->GetMargin().t + y(),
+                     width(),
+                     height());
     context_->Commit();
   }
 

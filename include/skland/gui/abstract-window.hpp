@@ -164,8 +164,6 @@ class AbstractWindow : public AbstractView {
 
   Size saved_size_;
 
-  bool is_xdg_surface_configured_;
-
 };
 
 }
