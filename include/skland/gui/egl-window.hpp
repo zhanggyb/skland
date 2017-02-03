@@ -24,8 +24,12 @@
 #include "../wayland/region.hpp"
 #include "../wayland/callback.hpp"
 
+#include "memory-pool.hpp"
+#include "buffer.hpp"
+
 namespace skland {
 
+class ShmSurface;
 class EGLSurface;
 
 class EGLWindow : public AbstractWindow {
@@ -58,20 +62,28 @@ class EGLWindow : public AbstractWindow {
 
   virtual void OnResize(int width, int height) final;
 
-  virtual void OnDraw(const Context *context) final;
-
  private:
 
   void OnFrame(uint32_t serial);
 
+  void OnRelease();
+
   wayland::Region input_region_;
-  wayland::Region inactive_region_;
+  wayland::Region empty_region_;
+
+  ShmSurface *frame_surface_;
+  /* Properties for frame surface, JUST experimental */
+  MemoryPool frame_pool_;
+  Buffer frame_buffer_;
 
   EGLSurface *surface_;
 
   wayland::Callback frame_callback_;
 
-  bool shown_;
+  bool busy_;
+
+  bool resize_;
+
 };
 
 }

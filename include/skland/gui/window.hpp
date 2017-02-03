@@ -26,6 +26,7 @@
 namespace skland {
 
 class AbstractWidget;
+class ShmSurface;
 
 /**
  * @ingroup gui

@@ -231,7 +231,7 @@ void DefaultWindowFrame::LayoutWidgets(int width, int height) {
   title_->MoveTo(0, 0);
   title_->Resize(window()->width(), title_bar_size());
 
-  int y = (title_bar_size() - close_button_->height()) / 2;
+  int y = (title_bar_size() - (int) close_button_->geometry().height()) / 2;
   int x = y + 1;
   close_button_->MoveTo(x, y);
 }
@@ -279,9 +279,9 @@ int DefaultWindowFrame::GetMouseLocation(const MouseEvent *event) const {
     hlocation = kExterior;
   else if (x < Theme::shadow_margin().left + kResizingMargin.left)
     hlocation = kResizeLeft;
-  else if (x < Theme::shadow_margin().left + window()->width() - kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + window()->geometry().width() - kResizingMargin.right)
     hlocation = kInterior;
-  else if (x < Theme::shadow_margin().left + window()->width() + kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + window()->geometry().width() + kResizingMargin.right)
     hlocation = kResizeRight;
   else
     hlocation = kExterior;
@@ -290,9 +290,9 @@ int DefaultWindowFrame::GetMouseLocation(const MouseEvent *event) const {
     vlocation = kExterior;
   else if (y < Theme::shadow_margin().top + kResizingMargin.top)
     vlocation = kResizeTop;
-  else if (y < Theme::shadow_margin().top + window()->height() - kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + window()->geometry().height() - kResizingMargin.bottom)
     vlocation = kInterior;
-  else if (y < Theme::shadow_margin().top + window()->height() + kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + window()->geometry().height() + kResizingMargin.bottom)
     vlocation = kResizeBottom;
   else
     vlocation = kExterior;

@@ -89,6 +89,28 @@ void Display::Destroy() {
   }
 }
 
+void Display::MakeSwapBufferNonBlock() const {
+  EGLint a = EGL_MIN_SWAP_INTERVAL;
+  EGLint b = EGL_MAX_SWAP_INTERVAL;
+
+  if (!eglGetConfigAttrib(egl_display_, egl_config_, a, &a) ||
+      !eglGetConfigAttrib(egl_display_, egl_config_, b, &b)) {
+    fprintf(stderr, "warning: swap interval range unknown\n");
+  } else if (a > 0) {
+    fprintf(stderr, "warning: minimum swap interval is %d, "
+        "while 0 is required to not deadlock on resize.\n", a);
+  }
+
+  /*
+   * We rely on the Wayland compositor to sync to vblank anyway.
+   * We just need to be able to call eglSwapBuffers() without the
+   * risk of waiting for a frame callback in it.
+   */
+  if (!eglSwapInterval(egl_display_, 0)) {
+    fprintf(stderr, "error: eglSwapInterval() failed.\n");
+  }
+}
+
 EGLDisplay Display::GetEGLDisplay(EGLenum platform, void *native_display, const EGLint *attrib_list) {
   static PFNEGLGETPLATFORMDISPLAYEXTPROC get_platform_display = NULL;
 

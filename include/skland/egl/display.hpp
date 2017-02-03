@@ -81,6 +81,8 @@ class Display {
     return EGL_TRUE == eglSwapInterval(egl_display_, interval);
   }
 
+  void MakeSwapBufferNonBlock() const;
+
   EGLint major() const { return major_; }
 
   EGLint minor() const { return minor_; }

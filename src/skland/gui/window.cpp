@@ -59,6 +59,7 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
 
     empty_region_.Setup(Display::wl_compositor());
     main_surface_->SetInputRegion(empty_region_);
+
     shell_surface = frame_surface_;
   } else {
     main_surface_ = new ShmSurface(this);
@@ -70,7 +71,6 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
   shell_surface->SetInputRegion(input_region_);
 
   SetShellSurface(shell_surface);
-
   SetTitle(title); // TODO: support multi-language
 
   // Create buffer:

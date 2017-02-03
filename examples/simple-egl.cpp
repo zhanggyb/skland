@@ -28,7 +28,7 @@ class SimpleWindow : public EGLWindow {
  public:
 
   SimpleWindow()
-      : EGLWindow(250, 250, "SimpleEGL", nullptr) {}
+      : EGLWindow(250, 250, "SimpleEGL") {}
 
   virtual  ~SimpleWindow() {
     glDeleteProgram(program);

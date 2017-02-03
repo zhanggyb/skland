@@ -33,9 +33,6 @@
 
 namespace skland {
 
-class AbstractWindowFrame;
-class ShmSurface;
-
 enum WindowFlags {
   kWindowFullscreen = 0x1,
   kWindowMaximized = 0x2,
