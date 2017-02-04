@@ -76,14 +76,10 @@ class EGLWidget : public AbstractWidget {
   GLuint pos;
   GLuint col;
 
-  wayland::Region empty_opaque_region_;
-  wayland::Region empty_input_region_;
   wayland::Callback frame_callback_;
 
   bool resize_;
   bool animating_;
-
-  AbstractSurface* root_;
 
 };
 

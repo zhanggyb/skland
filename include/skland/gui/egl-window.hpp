@@ -21,7 +21,6 @@
 
 #include "../wayland/xdg-surface.hpp"
 #include "../wayland/xdg-toplevel.hpp"
-#include "../wayland/region.hpp"
 #include "../wayland/callback.hpp"
 
 #include "memory-pool.hpp"
@@ -62,14 +61,13 @@ class EGLWindow : public AbstractWindow {
 
   virtual void OnResize(int width, int height) final;
 
+  virtual void OnDraw(const Context *context) final;
+
  private:
 
   void OnFrame(uint32_t serial);
 
   void OnRelease();
-
-  wayland::Region input_region_;
-  wayland::Region empty_region_;
 
   ShmSurface *frame_surface_;
   /* Properties for frame surface, JUST experimental */
@@ -83,6 +81,7 @@ class EGLWindow : public AbstractWindow {
   bool busy_;
 
   bool resize_;
+  bool animating_;
 
 };
 

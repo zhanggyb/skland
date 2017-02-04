@@ -20,6 +20,7 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/egl-surface.hpp>
 #include <skland/gui/display.hpp>
+
 #include "internal/redraw-task.hpp"
 
 #include <stdlib.h>
@@ -35,15 +36,16 @@ EGLWidget::EGLWidget(int width, int height)
     : AbstractWidget(width, height),
       surface_(nullptr),
       resize_(false),
-      animating_(false),
-      root_(nullptr) {
+      animating_(false) {
   surface_ = new EGLSurface(this);
 
   // Set empty regions
-  empty_opaque_region_.Setup(Display::wl_compositor());
-  surface_->SetOpaqueRegion(empty_opaque_region_);
-  empty_input_region_.Setup(Display::wl_compositor());
-  surface_->SetInputRegion(empty_input_region_);
+  wayland::Region empty_opaque_region, empty_input_region;
+
+  empty_opaque_region.Setup(Display::wl_compositor());
+  surface_->SetOpaqueRegion(empty_opaque_region);
+  empty_input_region.Setup(Display::wl_compositor());
+  surface_->SetInputRegion(empty_input_region);
 
   frame_callback_.done().Set(this, &EGLWidget::OnFrame);
 }
@@ -61,8 +63,6 @@ void EGLWidget::OnUpdate(AbstractView *view) {
     AbstractSurface *main_surface = parent_view()->GetSurface();
     if (nullptr == main_surface) return;
 
-    root_ = main_surface;
-
     main_surface->AddSubSurface(surface_);
     surface_->SetDesync();
     surface_->SetPosition(main_surface->margin().l + x(),
@@ -71,7 +71,7 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 
     if (surface_->MakeCurrent()) {
       OnInitializeEGL();
-      surface_->SwapBuffers();
+      surface_->Commit();
     }
 
 //    OnFrame(0);
@@ -87,6 +87,8 @@ AbstractSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const 
 void EGLWidget::OnResize(int width, int height) {
   resize(width, height);
   resize_ = true;
+  surface_->Resize(this->width(), this->height());
+  OnResizeEGL();
   Update();
 }
 
@@ -128,7 +130,7 @@ void EGLWidget::OnResizeEGL() {
 }
 
 void EGLWidget::OnRenderEGL() {
-  glClearColor(0.36, 0.85, 0.27, 1.0);
+  glClearColor(0.36, 0.85, 0.27, 0.9);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
 }
@@ -138,14 +140,9 @@ void EGLWidget::OnFrame(uint32_t /* serial */) {
   count++;
   fprintf(stderr, "on frame: %d\n", count);
   if (surface_->MakeCurrent()) {
-    if (resize_) {
-      resize_ = false;
-      surface_->Resize(width(), height());
-    }
-    frame_callback_.Setup(root_->wl_surface());
     OnRenderEGL();
-    surface_->SwapBuffers();
-    root_->Commit();
+    frame_callback_.Setup(surface_->wl_surface());
+    surface_->Commit();
   }
 }
 

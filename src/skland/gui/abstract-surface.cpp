@@ -118,13 +118,6 @@ void AbstractSurface::SetDesync() const {
   wl_sub_surface_.SetDesync();
 }
 
-void AbstractSurface::Commit() const {
-  wl_surface_.Commit();
-  if (parent_) {
-    parent_->Commit();
-  }
-}
-
 void AbstractSurface::PlaceAbove(AbstractSurface *sibling) {
   if (sibling == this) return;
 

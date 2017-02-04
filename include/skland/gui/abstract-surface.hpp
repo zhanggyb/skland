@@ -86,7 +86,7 @@ class AbstractSurface {
 
   void SetDesync() const;
 
-  void Commit() const;
+  virtual void Commit() const = 0;
 
   void Damage(int surface_x, int surface_y, int width, int height) const {
     wl_surface_.Damage(surface_x, surface_y, width, height);

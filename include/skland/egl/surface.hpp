@@ -58,6 +58,10 @@ class Surface {
     wl_egl_window_resize(wl_egl_window_, width, height, dx, dy);
   }
 
+  void GetAttachedSize(int *width, int *height) {
+    wl_egl_window_get_attached_size(wl_egl_window_, width, height);
+  }
+
   bool IsValid() const {
     return nullptr != egl_surface_;
   }

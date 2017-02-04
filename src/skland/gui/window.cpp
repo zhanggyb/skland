@@ -27,6 +27,8 @@
 #include <skland/gui/context.hpp>
 #include <skland/graphic/canvas.hpp>
 
+#include <skland/wayland/region.hpp>
+
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
 
@@ -57,8 +59,9 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
 
-    empty_region_.Setup(Display::wl_compositor());
-    main_surface_->SetInputRegion(empty_region_);
+    wayland::Region empty_region;
+    empty_region.Setup(Display::wl_compositor());
+    main_surface_->SetInputRegion(empty_region);
 
     shell_surface = frame_surface_;
   } else {
@@ -66,9 +69,10 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
     shell_surface = main_surface_;
   }
 
-  input_region_.Setup(Display::wl_compositor());
-  input_region_.Add(x, y, width, height);
-  shell_surface->SetInputRegion(input_region_);
+  wayland::Region input_region;
+  input_region.Setup(Display::wl_compositor());
+  input_region.Add(x, y, width, height);
+  shell_surface->SetInputRegion(input_region);
 
   SetShellSurface(shell_surface);
   SetTitle(title); // TODO: support multi-language
@@ -132,10 +136,9 @@ void Window::OnUpdate(AbstractView *view) {
       // but now use main_surface instead.
       redraw_task()->context = frame_surface_;
       DBG_ASSERT(redraw_task()->context.GetCanvas());
-      frame_surface_->Damage(x() + frame_surface_->margin().left,
-                             y() + frame_surface_->margin().top,
-                             width(),
-                             height());
+      frame_surface_->Damage(0, 0,
+                             width() + frame_surface_->margin().lr(),
+                             height() + frame_surface_->margin().tb());
       frame_surface_->Commit();
     }
   } else {
@@ -175,12 +178,13 @@ void Window::OnResize(int width, int height) {
     ResizeWindowFrame(window_frame(), width, height);
   }
 
-  input_region_.Setup(Display::wl_compositor());
-  input_region_.Add((int) input_rect.x(),
-                    (int) input_rect.y(),
-                    (int) input_rect.width(),
-                    (int) input_rect.height());
-  shell_surface->SetInputRegion(input_region_);
+  wayland::Region input_region;
+  input_region.Setup(Display::wl_compositor());
+  input_region.Add((int) input_rect.x(),
+                   (int) input_rect.y(),
+                   (int) input_rect.width(),
+                   (int) input_rect.height());
+  shell_surface->SetInputRegion(input_region);
 
   // Reset buffer:
   width += shell_surface->margin().lr();

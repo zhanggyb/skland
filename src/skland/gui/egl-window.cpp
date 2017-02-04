@@ -24,11 +24,13 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 
-#include "internal/redraw-task.hpp"
-
 #include <skland/gui/shm-surface.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/graphic/canvas.hpp>
+
+//#include <skland/wayland/region.hpp>
+
+#include "internal/redraw-task.hpp"
 
 #include <GLES2/gl2.h>
 
@@ -44,26 +46,33 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFra
       frame_surface_(nullptr),
       surface_(nullptr),
       busy_(false),
-      resize_(false) {
+      resize_(false),
+      animating_(false) {
   int x = 0, y = 0; // The input region
   AbstractSurface *shell_surface = nullptr;
+  wayland::Region input_region, empty_region;
 
   if (frame) {
+    SetWindowFrame(frame);
+
     frame_surface_ = new ShmSurface(this, Theme::shadow_margin());
     surface_ = new EGLSurface(this);
 
     frame_surface_->AddSubSurface(surface_);
-    surface_->SetPosition(frame_surface_->margin().left, frame_surface_->margin().top + frame->title_bar_size());
-    SetWindowFrame(frame);
+
+    Rect client_rect = frame->GetClientGeometry();
+    surface_->SetPosition(frame_surface_->margin().left + (int) client_rect.l,
+                          frame_surface_->margin().top + (int) client_rect.t);
+    surface_->Resize((int) client_rect.width(), (int) client_rect.height());
 
     x += frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
     y += frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
     width += AbstractWindowFrame::kResizingMargin.lr();
     height += AbstractWindowFrame::kResizingMargin.tb();
 
-    input_region_.Setup(Display::wl_compositor());
-    input_region_.Add(x, y, width, height);
-    frame_surface_->SetInputRegion(input_region_);
+    input_region.Setup(Display::wl_compositor());
+    input_region.Add(x, y, width, height);
+    frame_surface_->SetInputRegion(input_region);
 
     // Create buffer:
     Size output_size(1024, 800);
@@ -81,15 +90,15 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFra
                         total_width * 4, WL_SHM_FORMAT_ARGB8888);
     frame_buffer_.release().Set(this, &EGLWindow::OnRelease);
 
-    empty_region_.Setup(Display::wl_compositor());
-    surface_->SetInputRegion(empty_region_);
+    empty_region.Setup(Display::wl_compositor());
+    surface_->SetInputRegion(empty_region);
 
     shell_surface = frame_surface_;
   } else {
     surface_ = new EGLSurface(this);
-    input_region_.Setup(Display::wl_compositor());
-    input_region_.Add(0, 0, this->width(), this->height());
-    surface_->SetInputRegion(input_region_);
+    input_region.Setup(Display::wl_compositor());
+    input_region.Add(0, 0, this->width(), this->height());
+    surface_->SetInputRegion(input_region);
     shell_surface = surface_;
   }
 
@@ -115,7 +124,7 @@ void EGLWindow::OnShown() {
   }
 
   UpdateAll();
-  OnFrame(0);
+//  OnFrame(0);
 }
 
 void EGLWindow::OnInitializeEGL() {
@@ -140,17 +149,17 @@ void EGLWindow::OnUpdate(AbstractView *view) {
       kRedrawTaskTail.PushFront(redraw_task().get());
       redraw_task()->context = frame_surface_;
       DBG_ASSERT(redraw_task()->context.GetCanvas());
-      frame_surface_->Damage(x() + frame_surface_->margin().left,
-                             y() + frame_surface_->margin().top,
-                             width(),
-                             height());
+      frame_surface_->Damage(0, 0,
+                             width() + frame_surface_->margin().lr(),
+                             height() + frame_surface_->margin().tb());
       busy_ = true;
       frame_surface_->Commit();
     } else {
-      kRedrawTaskTail.PushFront(GetRedrawTask(view));
+      RedrawTask *task = GetRedrawTask(view);
+      kRedrawTaskTail.PushFront(task);
 
-      GetRedrawTask(view)->context = frame_surface_;
-      DBG_ASSERT(GetRedrawTask(view)->context.GetCanvas());
+      task->context = frame_surface_;
+      DBG_ASSERT(task->context.GetCanvas());
       frame_surface_->Damage(view->x() + frame_surface_->margin().left,
                              view->y() + frame_surface_->margin().top,
                              view->width(),
@@ -166,6 +175,8 @@ AbstractSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
 }
 
 void EGLWindow::OnResize(int width, int height) {
+  wayland::Region input_region;
+
   if (frame_surface_) {
     Rect input_rect(width, height);
     input_rect.left = frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
@@ -174,12 +185,12 @@ void EGLWindow::OnResize(int width, int height) {
                       height + AbstractWindowFrame::kResizingMargin.tb());
     ResizeWindowFrame(window_frame(), width, height);
 
-    input_region_.Setup(Display::wl_compositor());
-    input_region_.Add((int) input_rect.x(),
-                      (int) input_rect.y(),
-                      (int) input_rect.width(),
-                      (int) input_rect.height());
-    frame_surface_->SetInputRegion(input_region_);
+    input_region.Setup(Display::wl_compositor());
+    input_region.Add((int) input_rect.x(),
+                     (int) input_rect.y(),
+                     (int) input_rect.width(),
+                     (int) input_rect.height());
+    frame_surface_->SetInputRegion(input_region);
 
     // Reset buffer:
     width += frame_surface_->margin().lr();
@@ -195,22 +206,24 @@ void EGLWindow::OnResize(int width, int height) {
 
     frame_surface_->GetCanvas()->Clear();
   } else {
-    input_region_.Setup(Display::wl_compositor());
-    input_region_.Add(0, 0, width, height);
-    surface_->SetInputRegion(input_region_);
+    input_region.Setup(Display::wl_compositor());
+    input_region.Add(0, 0, width, height);
+    surface_->SetInputRegion(input_region);
   }
 
-  // resize_ = true;
-
+  resize_ = true;
   UpdateAll();
+}
 
-//  if (resize_) {
-  surface_->Resize(this->width(), this->height());
-//      surface_->Commit();
+void EGLWindow::OnDraw(const Context *context) {
+  if (window_frame()) {
+    DrawWindowFrame(window_frame(), context);
+  }
 
-  OnResizeEGL(this->width(), this->height());
-//  }
-
+  if (!animating_) {
+    animating_ = true;
+    OnFrame(0);
+  }
 }
 
 void EGLWindow::OnFrame(uint32_t serial) {
@@ -219,12 +232,15 @@ void EGLWindow::OnFrame(uint32_t serial) {
   fprintf(stderr, "on frame: %d\n", count);
 
   if (surface_->MakeCurrent()) {
+    if (resize_) {
+      resize_ = false;
+      Rect client_rect = GetClientGeometry();
+      surface_->Resize((int) client_rect.width(), (int) client_rect.height());
+//      OnResizeEGL(this->width(), this->height());
+    }
     OnRenderEGL();
     frame_callback_.Setup(surface_->wl_surface());
-    surface_->SwapBuffers();
-    if (frame_surface_) {
-      frame_surface_->Commit();
-    }
+    surface_->Commit();
   }
 }
 

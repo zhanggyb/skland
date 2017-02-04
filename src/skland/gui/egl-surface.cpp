@@ -29,6 +29,13 @@ EGLSurface::~EGLSurface() {
 
 }
 
+void EGLSurface::Commit() const {
+  Display::egl_display().SwapBuffers(egl_surface_);
+  if (parent()) {
+    parent()->Commit();
+  }
+}
+
 std::shared_ptr<Canvas> EGLSurface::GetCanvas() const {
   // TODO: render to canvas
   return nullptr;
@@ -40,6 +47,10 @@ bool EGLSurface::MakeCurrent() {
 
 bool EGLSurface::SwapBuffers() {
   return Display::egl_display().SwapBuffers(egl_surface_);
+}
+
+bool EGLSurface::SwapBuffersWithDamage(int x, int y, int width, int height) {
+  return Display::egl_display().SwapBuffersWithDamage(egl_surface_, x, y, width, height);
 }
 
 bool EGLSurface::SwapInterval(EGLint interval) {

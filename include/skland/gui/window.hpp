@@ -21,8 +21,6 @@
 #include "memory-pool.hpp"
 #include "buffer.hpp"
 
-#include "../wayland/region.hpp"
-
 namespace skland {
 
 class AbstractWidget;
@@ -67,9 +65,6 @@ class Window : public AbstractWindow {
  private:
 
   void SetMainWidgetGeometry();
-
-  wayland::Region input_region_;
-  wayland::Region empty_region_;
 
   /**
    * @brief The surface for frame

@@ -35,6 +35,8 @@ class EGLSurface : public AbstractSurface {
 
   virtual ~EGLSurface();
 
+  virtual void Commit() const final;
+
   /**
    * @brief Get the canvas which contains current frame
    * @return A shared ptr to a canvas object
@@ -46,6 +48,8 @@ class EGLSurface : public AbstractSurface {
   bool MakeCurrent();
 
   bool SwapBuffers();
+
+  bool SwapBuffersWithDamage(int x, int y, int width, int height);
 
   bool SwapInterval(EGLint interval = 0);
 

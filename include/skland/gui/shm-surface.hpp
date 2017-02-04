@@ -40,6 +40,8 @@ class ShmSurface : public AbstractSurface {
 
   void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
+  virtual void Commit() const final;
+
   /**
    * @brief Get shared pointer to a canvas object for this surface
    * @return A shared_pointer to a canvas

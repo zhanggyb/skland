@@ -108,7 +108,7 @@ void SimpleWindow::OnResizeEGL(int width, int height) {
 }
 
 void SimpleWindow::OnRenderEGL() {
-  glClearColor(0.0, 0.0, 0.0, 0.5);
+  glClearColor(0.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
   glUseProgram(program);
   glEnableVertexAttribArray(attribute_coord2d);

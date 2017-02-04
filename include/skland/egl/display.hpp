@@ -67,9 +67,9 @@ class Display {
         eglMakeCurrent(egl_display_, draw.egl_surface_, read.egl_surface_, egl_context_);
   }
 
-  bool SwapBuffersWithDamage(const Surface &surface, int x, int y, int width, int height) {
+  bool SwapBuffersWithDamage(const Surface &surface, int x, int y, int width, int height) const {
     EGLint rect[4] = {x, y, width, height};
-    return EGL_TRUE == kSwapBuffersWithDamageAPI(egl_display_, surface.egl_surface_, rect, 1);
+    return EGL_TRUE == kSwapBuffersWithDamageAPI(egl_display_, surface.egl_surface_, rect, 4 * sizeof(EGLint));
   }
 
   bool SwapBuffers(const Surface &surface) const {

@@ -138,6 +138,10 @@ class AbstractWindow : public AbstractView {
     window_frame->OnResize(width, height);
   }
 
+  static void DrawWindowFrame(AbstractWindowFrame *window_frame, const Context *context) {
+    window_frame->OnDraw(context);
+  }
+
  private:
 
   void OnXdgSurfaceConfigure(uint32_t serial);
