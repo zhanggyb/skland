@@ -78,9 +78,6 @@ class EGLWindow : public AbstractWindow {
 
   wayland::Callback frame_callback_;
 
-  bool busy_;
-
-  bool resize_;
   bool animating_;
 
 };

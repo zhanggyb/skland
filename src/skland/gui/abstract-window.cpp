@@ -291,13 +291,9 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
 
   if (!visible()) {
     set_visible(true);
-
-    int x = shell_surface_->margin().left;
-    int y = shell_surface_->margin().top;
-    int w = width();
-    int h = height();
-    xdg_surface_.SetWindowGeometry(x, y, w, h);
-
+    xdg_surface_.SetWindowGeometry(shell_surface_->margin().left,
+                                   shell_surface_->margin().top,
+                                   width(), height());
     OnShown();
   }
 }

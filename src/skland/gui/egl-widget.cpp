@@ -68,13 +68,6 @@ void EGLWidget::OnUpdate(AbstractView *view) {
     surface_->SetPosition(main_surface->margin().l + x(),
                           main_surface->margin().t + y());
     surface_->Resize(width(), height());
-
-    if (surface_->MakeCurrent()) {
-      OnInitializeEGL();
-      surface_->Commit();
-    }
-
-//    OnFrame(0);
   }
 
   AbstractWidget::OnUpdate(view);
@@ -114,8 +107,12 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 
 void EGLWidget::OnDraw(const Context *context) {
   if (!animating_) {
-    animating_ = true;
-    OnFrame(0);
+    if (surface_->MakeCurrent()) {
+      animating_ = true;
+      OnInitializeEGL();
+      frame_callback_.Setup(surface_->wl_surface());
+      surface_->Commit();
+    }
   }
 }
 
@@ -136,9 +133,9 @@ void EGLWidget::OnRenderEGL() {
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-  static int count = 0;
-  count++;
-  fprintf(stderr, "on frame: %d\n", count);
+//  static int count = 0;
+//  count++;
+//  fprintf(stderr, "on frame: %d\n", count);
   if (surface_->MakeCurrent()) {
     OnRenderEGL();
     frame_callback_.Setup(surface_->wl_surface());
