@@ -49,12 +49,6 @@ class EGLWindow : public AbstractWindow {
 
   virtual void OnShown() final;
 
-  virtual void OnInitializeEGL();
-
-  virtual void OnResizeEGL(int width, int height);
-
-  virtual void OnRenderEGL();
-
   virtual void OnUpdate(AbstractView *view) final;
 
   virtual AbstractSurface *OnGetSurface(const AbstractView *view) const final;
@@ -62,6 +56,12 @@ class EGLWindow : public AbstractWindow {
   virtual void OnResize(int width, int height) final;
 
   virtual void OnDraw(const Context *context) final;
+
+  virtual void OnInitializeEGL();
+
+  virtual void OnResizeEGL(int width, int height);
+
+  virtual void OnRenderEGL();
 
  private:
 
@@ -73,6 +73,15 @@ class EGLWindow : public AbstractWindow {
   /* Properties for frame surface, JUST experimental */
   MemoryPool frame_pool_;
   Buffer frame_buffer_;
+
+  /**
+    * @brief The surface for widgets
+    */
+  ShmSurface *main_surface_;
+
+  /* Properties for main surface, JUST experimental */
+  MemoryPool main_pool_;
+  Buffer main_buffer_;
 
   EGLSurface *surface_;
 

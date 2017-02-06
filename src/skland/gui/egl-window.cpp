@@ -44,6 +44,7 @@ EGLWindow::EGLWindow(const char *title, AbstractWindowFrame *frame)
 EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFrame *frame)
     : AbstractWindow(width, height, title, frame),
       frame_surface_(nullptr),
+      main_surface_(nullptr),
       surface_(nullptr),
       animating_(false) {
   int x = 0, y = 0; // The input region
@@ -54,14 +55,17 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFra
     SetWindowFrame(frame);
 
     frame_surface_ = new ShmSurface(this, Theme::shadow_margin());
+    main_surface_ = new ShmSurface(this, Theme::shadow_margin());
     surface_ = new EGLSurface(this);
 
-    frame_surface_->AddSubSurface(surface_);
+    frame_surface_->AddSubSurface(main_surface_);
+    main_surface_->AddSubSurface(surface_);
 
     Rect client_rect = frame->GetClientGeometry();
-    surface_->SetPosition(frame_surface_->margin().left + (int) client_rect.l,
-                          frame_surface_->margin().top + (int) client_rect.t);
+    surface_->SetGlobalPosition((int) client_rect.l,
+                                (int) client_rect.t);
     surface_->Resize((int) client_rect.width(), (int) client_rect.height());
+    surface_->SetDesync();
 
     x += frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
     y += frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
@@ -86,7 +90,14 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFra
     frame_pool_.Setup(total_width * 4 * total_height);
     frame_buffer_.Setup(frame_pool_, total_width, total_height,
                         total_width * 4, WL_SHM_FORMAT_ARGB8888);
-    frame_buffer_.release().Set(this, &EGLWindow::OnRelease);
+//    frame_buffer_.release().Set(this, &EGLWindow::OnRelease);
+
+    main_pool_.Setup(total_width * 4 * total_height);
+    main_buffer_.Setup(main_pool_, total_width, total_height,
+                       total_width * 4, WL_SHM_FORMAT_ARGB8888);
+
+    empty_region.Setup(Display::wl_compositor());
+    main_surface_->SetInputRegion(empty_region);
 
     empty_region.Setup(Display::wl_compositor());
     surface_->SetInputRegion(empty_region);
@@ -107,16 +118,85 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFra
 }
 
 EGLWindow::~EGLWindow() {
-
+  // shell surface is deleted in AbstractWindow
 }
 
 void EGLWindow::OnShown() {
   if (frame_surface_) {
     frame_surface_->Attach(&frame_buffer_);
     frame_surface_->GetCanvas()->Clear();
+    main_surface_->Attach(&main_buffer_);
+    main_surface_->GetCanvas()->Clear();
   }
 
   UpdateAll();
+}
+
+AbstractSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
+  return main_surface_;
+}
+
+void EGLWindow::OnResize(int width, int height) {
+  wayland::Region input_region;
+
+  if (frame_surface_) {
+    Rect input_rect(width, height);
+    input_rect.left = frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
+    input_rect.top = frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
+    input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
+                      height + AbstractWindowFrame::kResizingMargin.tb());
+    ResizeWindowFrame(window_frame(), width, height);
+
+    input_region.Setup(Display::wl_compositor());
+    input_region.Add((int) input_rect.x(),
+                     (int) input_rect.y(),
+                     (int) input_rect.width(),
+                     (int) input_rect.height());
+    frame_surface_->SetInputRegion(input_region);
+
+    // Reset buffer:
+    width += frame_surface_->margin().lr();
+    height += frame_surface_->margin().tb();
+
+    int total_size = width * 4 * height;
+    if (total_size > frame_pool_.size()) {
+      DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n", total_size, frame_pool_.size(), "Re-generate shm pool");
+      frame_pool_.Setup(total_size);
+      main_pool_.Setup(total_size);
+    }
+    frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+    frame_surface_->Attach(&frame_buffer_);
+    frame_surface_->GetCanvas()->Clear();
+    main_buffer_.Setup(main_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+    main_surface_->Attach(&main_buffer_);
+    main_surface_->GetCanvas()->Clear();
+  } else {
+    input_region.Setup(Display::wl_compositor());
+    input_region.Add(0, 0, width, height);
+    surface_->SetInputRegion(input_region);
+  }
+
+  Rect client_rect = GetClientGeometry();
+  surface_->Resize((int) client_rect.width(), (int) client_rect.height());
+  OnResizeEGL(this->width(), this->height());
+
+  UpdateAll();
+}
+
+void EGLWindow::OnDraw(const Context *context) {
+  if (window_frame()) {
+    DrawWindowFrame(window_frame(), context);
+  }
+
+  if (!animating_) {
+    if (surface_->MakeCurrent()) {
+      animating_ = true;
+      OnInitializeEGL();
+      frame_callback_.Setup(surface_->wl_surface());
+      surface_->Commit();
+//      surface_->SwapBuffers();
+    }
+  }
 }
 
 void EGLWindow::OnInitializeEGL() {
@@ -148,75 +228,13 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     } else {
       RedrawTask *task = GetRedrawTask(view);
       kRedrawTaskTail.PushFront(task);
-      task->context = frame_surface_;
+      task->context = main_surface_;
       DBG_ASSERT(task->context.GetCanvas());
-      frame_surface_->Damage(view->x() + frame_surface_->margin().left,
-                             view->y() + frame_surface_->margin().top,
-                             view->width(),
-                             view->height());
-      frame_surface_->Commit();
-    }
-  }
-}
-
-AbstractSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
-  return frame_surface_;
-}
-
-void EGLWindow::OnResize(int width, int height) {
-  wayland::Region input_region;
-
-  if (frame_surface_) {
-    Rect input_rect(width, height);
-    input_rect.left = frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
-    input_rect.top = frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
-    input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
-                      height + AbstractWindowFrame::kResizingMargin.tb());
-    ResizeWindowFrame(window_frame(), width, height);
-
-    input_region.Setup(Display::wl_compositor());
-    input_region.Add((int) input_rect.x(),
-                     (int) input_rect.y(),
-                     (int) input_rect.width(),
-                     (int) input_rect.height());
-    frame_surface_->SetInputRegion(input_region);
-
-    // Reset buffer:
-    width += frame_surface_->margin().lr();
-    height += frame_surface_->margin().tb();
-
-    int total_size = width * 4 * height;
-    if (total_size > frame_pool_.size()) {
-      DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n", total_size, frame_pool_.size(), "Re-generate shm pool");
-      frame_pool_.Setup(total_size);
-    }
-    frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-    frame_surface_->Attach(&frame_buffer_);
-    frame_surface_->GetCanvas()->Clear();
-  } else {
-    input_region.Setup(Display::wl_compositor());
-    input_region.Add(0, 0, width, height);
-    surface_->SetInputRegion(input_region);
-  }
-
-  Rect client_rect = GetClientGeometry();
-  surface_->Resize((int) client_rect.width(), (int) client_rect.height());
-  OnResizeEGL(this->width(), this->height());
-
-  UpdateAll();
-}
-
-void EGLWindow::OnDraw(const Context *context) {
-  if (window_frame()) {
-    DrawWindowFrame(window_frame(), context);
-  }
-
-  if (!animating_) {
-    if (surface_->MakeCurrent()) {
-      animating_ = true;
-      OnInitializeEGL();
-      frame_callback_.Setup(surface_->wl_surface());
-      surface_->Commit();
+      main_surface_->Damage(view->x() + main_surface_->margin().left,
+                            view->y() + main_surface_->margin().top,
+                            view->width(),
+                            view->height());
+      main_surface_->Commit();
     }
   }
 }
@@ -230,6 +248,7 @@ void EGLWindow::OnFrame(uint32_t serial) {
     OnRenderEGL();
     frame_callback_.Setup(surface_->wl_surface());
     surface_->Commit();
+//    surface_->SwapBuffers();
   }
 }
 

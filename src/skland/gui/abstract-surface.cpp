@@ -26,7 +26,8 @@ AbstractSurface *AbstractSurface::kBottom = nullptr;
 int AbstractSurface::kCount = 0;
 
 AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
-    : parent_(nullptr),
+    : mode_(kSyncMode),
+      parent_(nullptr),
       above_(nullptr),
       below_(nullptr),
       up_(nullptr),
@@ -110,12 +111,14 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   }
 }
 
-void AbstractSurface::SetSync() const {
+void AbstractSurface::SetSync() {
   wl_sub_surface_.SetSync();
+  mode_ = kSyncMode;
 }
 
-void AbstractSurface::SetDesync() const {
+void AbstractSurface::SetDesync() {
   wl_sub_surface_.SetDesync();
+  mode_ = kDesyncMode;
 }
 
 void AbstractSurface::PlaceAbove(AbstractSurface *sibling) {
@@ -158,6 +161,28 @@ void AbstractSurface::SetPosition(int x, int y) {
   if (wl_sub_surface_.IsValid()) {
     wl_sub_surface_.SetPosition(x, y);
   }
+}
+
+void AbstractSurface::SetGlobalPosition(int x, int y) {
+  const AbstractSurface *parent = parent_;
+  if (parent) {
+    DBG_ASSERT(wl_sub_surface_.IsValid());
+    Point parent_global_position = parent->GetGlobalPosition();
+    wl_sub_surface_.SetPosition(x - parent_global_position.x - margin_.l,
+                                y - parent_global_position.y - margin_.t);
+  }
+}
+
+Point AbstractSurface::GetGlobalPosition() const {
+  Point position = position_;
+
+  const AbstractSurface *parent = parent_;
+  while (parent) {
+    position += (parent->position() - Point(parent->margin().l, parent->margin().t));
+    parent = parent->parent();
+  }
+
+  return position;
 }
 
 void AbstractSurface::InsertFront(AbstractSurface *surface) {

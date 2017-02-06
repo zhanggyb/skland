@@ -210,7 +210,7 @@ class AbstractView : public Object {
     return mouse_task_;
   }
 
-  static RedrawTask *GetRedrawTask(AbstractView *view) {
+  static RedrawTask *GetRedrawTask(const AbstractView *view) {
     return view->redraw_task_.get();
   }
 

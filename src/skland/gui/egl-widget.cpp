@@ -40,12 +40,12 @@ EGLWidget::EGLWidget(int width, int height)
   surface_ = new EGLSurface(this);
 
   // Set empty regions
-  wayland::Region empty_opaque_region, empty_input_region;
+  wayland::Region opaque_region, input_region;
 
-  empty_opaque_region.Setup(Display::wl_compositor());
-  surface_->SetOpaqueRegion(empty_opaque_region);
-  empty_input_region.Setup(Display::wl_compositor());
-  surface_->SetInputRegion(empty_input_region);
+  opaque_region.Setup(Display::wl_compositor());
+  surface_->SetOpaqueRegion(opaque_region);
+  input_region.Setup(Display::wl_compositor());
+  surface_->SetInputRegion(input_region);
 
   frame_callback_.done().Set(this, &EGLWidget::OnFrame);
 }
@@ -60,14 +60,13 @@ void EGLWidget::OnUpdate(AbstractView *view) {
   if (!surface_->wl_sub_surface().IsValid()) {
     if (nullptr == parent_view()) return;
 
-    AbstractSurface *main_surface = parent_view()->GetSurface();
-    if (nullptr == main_surface) return;
+    AbstractSurface *parent_surface = parent_view()->GetSurface();
+    if (nullptr == parent_surface) return;
 
-    main_surface->AddSubSurface(surface_);
-    surface_->SetDesync();
-    surface_->SetPosition(main_surface->margin().l + x(),
-                          main_surface->margin().t + y());
+    parent_surface->AddSubSurface(surface_);
+    surface_->SetGlobalPosition(x(), y());
     surface_->Resize(width(), height());
+    surface_->SetDesync();
   }
 
   AbstractWidget::OnUpdate(view);
@@ -112,6 +111,7 @@ void EGLWidget::OnDraw(const Context *context) {
       OnInitializeEGL();
       frame_callback_.Setup(surface_->wl_surface());
       surface_->Commit();
+//      surface_->SwapBuffers();
     }
   }
 }
@@ -133,13 +133,14 @@ void EGLWidget::OnRenderEGL() {
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-//  static int count = 0;
-//  count++;
-//  fprintf(stderr, "on frame: %d\n", count);
+  static int count = 0;
+  count++;
+  fprintf(stderr, "on frame: %d\n", count);
   if (surface_->MakeCurrent()) {
     OnRenderEGL();
     frame_callback_.Setup(surface_->wl_surface());
     surface_->Commit();
+//    surface_->SwapBuffers();
   }
 }
 

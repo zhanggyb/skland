@@ -32,6 +32,9 @@ class EGLSurface;
  */
 class EGLWidget : public AbstractWidget {
 
+  EGLWidget(const EGLWidget &) = delete;
+  EGLWidget &operator=(const EGLWidget &) = delete;
+
  public:
 
   EGLWidget();

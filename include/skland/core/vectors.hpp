@@ -41,6 +41,18 @@ struct Vector2 {
     return *this;
   }
 
+  inline Vector2 &operator+=(const Vector2 &other) {
+    x += other.x;
+    y += other.y;
+    return *this;
+  }
+
+  inline Vector2 &operator-=(const Vector2 &other) {
+    x -= other.x;
+    y -= other.y;
+    return *this;
+  }
+
   inline bool Equal(T x, T y) const {
     return this->x == x && this->y == y;
   }

@@ -67,9 +67,15 @@ class AbstractSurface {
 
  public:
 
-  static int GetShellSurfaceCount() {
-    return kCount;
-  }
+  /**
+   * @brief Commit behaviour of the sub-surface
+   */
+  enum Mode {
+    kSyncMode,
+    kDesyncMode
+  };
+
+  static int GetShellSurfaceCount() { return kCount; }
 
   AbstractSurface(AbstractView *view, const Margin &margin = Margin());
 
@@ -82,9 +88,9 @@ class AbstractSurface {
    */
   void AddSubSurface(AbstractSurface *subsurface, int pos = 0);
 
-  void SetSync() const;
+  void SetSync();
 
-  void SetDesync() const;
+  void SetDesync();
 
   virtual void Commit() const = 0;
 
@@ -112,6 +118,19 @@ class AbstractSurface {
    * If this surface is a sub surface, set the position in parent surface.
    */
   void SetPosition(int x, int y);
+
+  /**
+   * @brief Set position in window coordinates
+   * @param x The global x position
+   * @param y The global y position
+   */
+  void SetGlobalPosition(int x, int y);
+
+  /**
+   * @brief Get the global position in window coordinates
+   * @return Global position
+   */
+  Point GetGlobalPosition() const;
 
   const wayland::Surface &wl_surface() const { return wl_surface_; }
 
@@ -181,6 +200,8 @@ class AbstractSurface {
    * @param surface_b
    */
   static void MoveBelow(AbstractSurface *surface_a, AbstractSurface *surface_b);
+
+  Mode mode_;
 
   AbstractSurface *parent_;
 

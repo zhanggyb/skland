@@ -71,6 +71,10 @@ class Window : public AbstractWindow {
    */
   ShmSurface *frame_surface_;
 
+  /* Properties for frame surface, JUST experimental */
+  MemoryPool frame_pool_;
+  Buffer frame_buffer_;
+
   /**
    * @brief The surface for widgets
    */
@@ -79,10 +83,6 @@ class Window : public AbstractWindow {
   /* Properties for main surface, JUST experimental */
   MemoryPool main_pool_;
   Buffer main_buffer_;
-
-  /* Properties for frame surface, JUST experimental */
-  MemoryPool frame_pool_;
-  Buffer frame_buffer_;
 
   AbstractWidget *main_widget_;
 

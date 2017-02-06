@@ -47,13 +47,14 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
   AbstractSurface *shell_surface = nullptr;
 
   if (frame) {
+    SetWindowFrame(frame);
+
     frame_surface_ = new ShmSurface(this, Theme::shadow_margin());
     main_surface_ = new ShmSurface(this, Theme::shadow_margin());
 
     // There's a known issue in current gnome that a sub surface cannot be placed below its parent
     frame_surface_->AddSubSurface(main_surface_);
 
-    SetWindowFrame(frame);
     x += frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
     y += frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
     width += AbstractWindowFrame::kResizingMargin.lr();
@@ -132,8 +133,6 @@ void Window::OnUpdate(AbstractView *view) {
   if (view == this) {
     if (frame_surface_) {
       kRedrawTaskTail.PushFront(redraw_task().get());
-      // TODO: this is just a workaround, should use frame_surface for frame and background,
-      // but now use main_surface instead.
       redraw_task()->context = frame_surface_;
       DBG_ASSERT(redraw_task()->context.GetCanvas());
       frame_surface_->Damage(0, 0,
@@ -142,11 +141,10 @@ void Window::OnUpdate(AbstractView *view) {
       frame_surface_->Commit();
     }
   } else {
-    kRedrawTaskTail.PushFront(GetRedrawTask(view));
-
-    // TODO: this is juat a workaround, should render widgets on main_surface
-    GetRedrawTask(view)->context = main_surface_;
-    DBG_ASSERT(GetRedrawTask(view)->context.GetCanvas());
+    RedrawTask *task = GetRedrawTask(view);
+    kRedrawTaskTail.PushFront(task);
+    task->context = main_surface_;
+    DBG_ASSERT(task->context.GetCanvas());
     main_surface_->Damage(view->x() + main_surface_->margin().left,
                           view->y() + main_surface_->margin().top,
                           view->width(),
@@ -194,16 +192,19 @@ void Window::OnResize(int width, int height) {
   if (total_size > main_pool_.size()) {
     DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n", total_size, main_pool_.size(), "Re-generate shm pool");
     main_pool_.Setup(total_size);
+    if (frame_surface_) {
+      frame_pool_.Setup(total_size);
+    }
   }
   main_buffer_.Setup(main_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   main_surface_->Attach(&main_buffer_);
+  main_surface_->GetCanvas()->Clear();
 
   if (frame_surface_) {
     frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
     frame_surface_->Attach(&frame_buffer_);
+    frame_surface_->GetCanvas()->Clear();
   }
-
-  main_surface_->GetCanvas()->Clear();
 
   SetMainWidgetGeometry();
   UpdateAll();
