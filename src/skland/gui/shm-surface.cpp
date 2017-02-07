@@ -45,13 +45,6 @@ void ShmSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
   }
 }
 
-void ShmSurface::Commit() const {
-  wl_surface().Commit();
-  if (parent()) {
-    parent()->Commit();
-  }
-}
-
 std::shared_ptr<Canvas> ShmSurface::GetCanvas() const {
   return canvas_;
 }

@@ -31,9 +31,11 @@
 
 namespace skland {
 
+class Application;
 class Display;
 class AbstractView;
 class Canvas;
+struct CommitTask;
 
 /**
  * @ingroup gui
@@ -59,6 +61,7 @@ class Canvas;
  */
 class AbstractSurface {
 
+  friend class Application;
   friend class Display;
 
   AbstractSurface() = delete;
@@ -92,7 +95,7 @@ class AbstractSurface {
 
   void SetDesync();
 
-  virtual void Commit() const = 0;
+  void Commit();
 
   void Damage(int surface_x, int surface_y, int width, int height) const {
     wl_surface_.Damage(surface_x, surface_y, width, height);
@@ -246,6 +249,8 @@ class AbstractSurface {
 
   bool is_user_data_set_;
 
+  std::unique_ptr<CommitTask> commit_task_;
+
   // global surface stack:
 
   /**
@@ -270,6 +275,16 @@ class AbstractSurface {
   static void Clear();
 
   /**
+    * @brief Initialize the idle task list
+    */
+  static void InitializeCommitTaskList();
+
+  /**
+   * @brief Destroy the redraw task list
+   */
+  static void ClearCommitTaskList();
+
+  /**
    * @brief The top shell surface in the stack
    */
   static AbstractSurface *kTop;
@@ -283,6 +298,9 @@ class AbstractSurface {
    * @brief The count of shell surface
    */
   static int kCount;
+
+  static Task kCommitTaskHead;
+  static Task kCommitTaskTail;
 
 };
 

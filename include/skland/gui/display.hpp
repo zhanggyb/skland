@@ -55,6 +55,10 @@ struct Global {
   uint32_t version;
 };
 
+/**
+ * @ingroup gui
+ * @brief The global display
+ */
 class Display : public Object {
 
   friend class Application;

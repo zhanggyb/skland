@@ -16,8 +16,6 @@
 
 #include <skland/gui/egl-window.hpp>
 
-#include <skland/core/numeric.hpp>
-
 #include <skland/gui/egl-surface.hpp>
 #include <skland/gui/display.hpp>
 
@@ -27,8 +25,6 @@
 #include <skland/gui/shm-surface.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/graphic/canvas.hpp>
-
-//#include <skland/wayland/region.hpp>
 
 #include "internal/redraw-task.hpp"
 
@@ -65,7 +61,7 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFra
     surface_->SetGlobalPosition((int) client_rect.l,
                                 (int) client_rect.t);
     surface_->Resize((int) client_rect.width(), (int) client_rect.height());
-    surface_->SetDesync();
+    surface_->SetDesync();  // FIXME: looks no difference between sync and desync modes
 
     x += frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
     y += frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
@@ -132,6 +128,36 @@ void EGLWindow::OnShown() {
   UpdateAll();
 }
 
+void EGLWindow::OnUpdate(AbstractView *view) {
+  if (!visible()) return;
+
+  if (frame_surface_) {
+    if (view == this) {
+      kRedrawTaskTail.PushFront(redraw_task().get());
+      redraw_task()->context = frame_surface_;
+      DBG_ASSERT(redraw_task()->context.GetCanvas());
+      frame_surface_->Damage(0, 0,
+                             width() + frame_surface_->margin().lr(),
+                             height() + frame_surface_->margin().tb());
+      frame_surface_->Commit();
+    } else {
+      RedrawTask *task = GetRedrawTask(view);
+      kRedrawTaskTail.PushFront(task);
+      task->context = main_surface_;
+      DBG_ASSERT(task->context.GetCanvas());
+      main_surface_->Damage(view->x() + main_surface_->margin().left,
+                            view->y() + main_surface_->margin().top,
+                            view->width(),
+                            view->height());
+      main_surface_->Commit();
+    }
+  } else {
+    DBG_ASSERT(view == this);
+    kRedrawTaskTail.PushFront(redraw_task().get());
+    surface_->Commit();
+  }
+}
+
 AbstractSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
   return main_surface_;
 }
@@ -193,8 +219,9 @@ void EGLWindow::OnDraw(const Context *context) {
       animating_ = true;
       OnInitializeEGL();
       frame_callback_.Setup(surface_->wl_surface());
-      surface_->Commit();
-//      surface_->SwapBuffers();
+      surface_->SwapBuffers();
+      main_surface_->Commit();
+//      frame_surface_->Commit();
     }
   }
 }
@@ -213,32 +240,6 @@ void EGLWindow::OnRenderEGL() {
   glFlush();
 }
 
-void EGLWindow::OnUpdate(AbstractView *view) {
-  if (!visible()) return;
-
-  if (frame_surface_) {
-    if (view == this) {
-      kRedrawTaskTail.PushFront(redraw_task().get());
-      redraw_task()->context = frame_surface_;
-      DBG_ASSERT(redraw_task()->context.GetCanvas());
-      frame_surface_->Damage(0, 0,
-                             width() + frame_surface_->margin().lr(),
-                             height() + frame_surface_->margin().tb());
-      frame_surface_->Commit();
-    } else {
-      RedrawTask *task = GetRedrawTask(view);
-      kRedrawTaskTail.PushFront(task);
-      task->context = main_surface_;
-      DBG_ASSERT(task->context.GetCanvas());
-      main_surface_->Damage(view->x() + main_surface_->margin().left,
-                            view->y() + main_surface_->margin().top,
-                            view->width(),
-                            view->height());
-      main_surface_->Commit();
-    }
-  }
-}
-
 void EGLWindow::OnFrame(uint32_t serial) {
   static int count = 0;
   count++;
@@ -247,8 +248,9 @@ void EGLWindow::OnFrame(uint32_t serial) {
   if (surface_->MakeCurrent()) {
     OnRenderEGL();
     frame_callback_.Setup(surface_->wl_surface());
-    surface_->Commit();
-//    surface_->SwapBuffers();
+    surface_->SwapBuffers();
+    main_surface_->Commit();
+//    frame_surface_->Commit();
   }
 }
 

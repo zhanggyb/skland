@@ -29,13 +29,6 @@ EGLSurface::~EGLSurface() {
 
 }
 
-void EGLSurface::Commit() const {
-  Display::egl_display().SwapBuffers(egl_surface_);
-  if (parent()) {
-    parent()->Commit();
-  }
-}
-
 std::shared_ptr<Canvas> EGLSurface::GetCanvas() const {
   // TODO: render to canvas
   return nullptr;

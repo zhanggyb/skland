@@ -14,27 +14,13 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_VIEW_TASK_HPP_
-#define SKLAND_GUI_VIEW_TASK_HPP_
-
-#include <skland/gui/task.hpp>
+#include "commit-task.hpp"
+#include <skland/gui/abstract-surface.hpp>
 
 namespace skland {
 
-class AbstractView;
-
-struct ViewTask : public Task {
-  ViewTask(const ViewTask &) = delete;
-  ViewTask &operator=(const ViewTask &) = delete;
-
-  ViewTask(AbstractView *view = nullptr)
-      : Task(), view(view) {}
-
-  virtual ~ViewTask() {}
-
-  AbstractView *view;
-};
-
+void CommitTask::Run() const {
+  surface->wl_surface().Commit();
 }
 
-#endif  // SKLAND_GUI_VIEW_TASK_HPP_
+}

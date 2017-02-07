@@ -110,8 +110,14 @@ void EGLWidget::OnDraw(const Context *context) {
       animating_ = true;
       OnInitializeEGL();
       frame_callback_.Setup(surface_->wl_surface());
-      surface_->Commit();
-//      surface_->SwapBuffers();
+//      surface_->Commit();
+      surface_->SwapBuffers();
+      surface_->parent()->Commit();
+//      AbstractSurface *parent = surface_->parent();
+//      while (parent) {
+//        parent->Commit();
+//        parent = parent->parent();
+//      }
     }
   }
 }
@@ -139,8 +145,14 @@ void EGLWidget::OnFrame(uint32_t /* serial */) {
   if (surface_->MakeCurrent()) {
     OnRenderEGL();
     frame_callback_.Setup(surface_->wl_surface());
-    surface_->Commit();
-//    surface_->SwapBuffers();
+//    surface_->Commit();
+    surface_->SwapBuffers();
+    surface_->parent()->Commit();
+//    AbstractSurface *parent = surface_->parent();
+//    while (parent) {
+//      parent->Commit();
+//      parent = parent->parent();
+//    }
   }
 }
 

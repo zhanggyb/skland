@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_EGL_WINDOW_HPP
-#define SKLAND_EGL_WINDOW_HPP
+#ifndef SKLAND_GUI_EGL_WINDOW_HPP_
+#define SKLAND_GUI_EGL_WINDOW_HPP_
 
 #include "abstract-window.hpp"
 
@@ -93,4 +93,4 @@ class EGLWindow : public AbstractWindow {
 
 }
 
-#endif //SKLAND_EGL_WINDOW_HPP
+#endif // SKLAND_GUI_EGL_WINDOW_HPP_

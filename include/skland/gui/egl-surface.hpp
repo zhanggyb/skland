@@ -35,8 +35,6 @@ class EGLSurface : public AbstractSurface {
 
   virtual ~EGLSurface();
 
-  virtual void Commit() const final;
-
   /**
    * @brief Get the canvas which contains current frame
    * @return A shared ptr to a canvas object

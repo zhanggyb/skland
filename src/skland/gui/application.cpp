@@ -28,6 +28,7 @@
 #include <skland/stock/theme.hpp>
 
 #include <skland/gui/abstract-view.hpp>
+#include <skland/gui/abstract-surface.hpp>
 
 /**
  * Compile-time computation of number of items in a hardcoded array.
@@ -108,6 +109,11 @@ int Application::Run() {
   while (true) {
     while (AbstractView::kRedrawTaskHead.next() != &AbstractView::kRedrawTaskTail) {
       task = AbstractView::kRedrawTaskHead.next();
+      task->Unlink();
+      task->Run();
+    }
+    while (AbstractSurface::kCommitTaskHead.next() != &AbstractSurface::kCommitTaskTail) {
+      task = AbstractSurface::kCommitTaskHead.next();
       task->Unlink();
       task->Run();
     }

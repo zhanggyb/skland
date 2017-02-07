@@ -19,11 +19,15 @@
 #include <skland/gui/display.hpp>
 #include <skland/gui/abstract-view.hpp>
 
+#include "internal/commit-task.hpp"
+
 namespace skland {
 
 AbstractSurface *AbstractSurface::kTop = nullptr;
 AbstractSurface *AbstractSurface::kBottom = nullptr;
 int AbstractSurface::kCount = 0;
+Task AbstractSurface::kCommitTaskHead;
+Task AbstractSurface::kCommitTaskTail;
 
 AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
     : mode_(kSyncMode),
@@ -41,6 +45,8 @@ AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);
   wl_surface_.leave().Set(this, &AbstractSurface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
+
+  commit_task_.reset(new CommitTask(this));
 
   Push(this);
 }
@@ -119,6 +125,21 @@ void AbstractSurface::SetSync() {
 void AbstractSurface::SetDesync() {
   wl_sub_surface_.SetDesync();
   mode_ = kDesyncMode;
+}
+
+void AbstractSurface::Commit() {
+  if (commit_task_->IsLinked()) return;
+
+  if (nullptr == parent_) {
+    kCommitTaskTail.PushFront(commit_task_.get());
+  } else {
+    if (mode_ == kSyncMode) {
+      parent_->Commit();
+      parent_->commit_task_->PushFront(commit_task_.get());
+    } else {
+      kCommitTaskTail.PushFront(commit_task_.get());
+    }
+  }
 }
 
 void AbstractSurface::PlaceAbove(AbstractSurface *sibling) {
@@ -331,6 +352,20 @@ void AbstractSurface::Clear() {
   while (kCount > 0) {
     AbstractView *view = kTop->view();
     delete view;
+  }
+}
+
+void AbstractSurface::InitializeCommitTaskList() {
+  kCommitTaskHead.PushBack(&kCommitTaskTail);
+}
+
+void AbstractSurface::ClearCommitTaskList() {
+  Task *task = kCommitTaskHead.next();
+  Task *next_task = nullptr;
+  while (task != &kCommitTaskTail) {
+    next_task = task->next();
+    task->Unlink();
+    task = next_task;
   }
 }
 

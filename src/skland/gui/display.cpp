@@ -44,10 +44,12 @@ Display::Display()
       inputs_count_(0) {
   cursors_.resize(kCursorBlank, nullptr);
   AbstractView::InitializeRedrawTaskList();
+  AbstractSurface::InitializeCommitTaskList();
 }
 
 Display::~Display() {
   AbstractView::ClearRedrawTaskList();
+  AbstractSurface::ClearCommitTaskList();
 }
 
 void Display::Connect(const char *name) {

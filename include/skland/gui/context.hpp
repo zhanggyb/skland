@@ -23,9 +23,9 @@
 namespace skland {
 
 class Canvas;
-class AbstractSurface;
 
 /**
+ * @ingroup gui
  * @brief The context used to draw a view
  */
 class Context {
