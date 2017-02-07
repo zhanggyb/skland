@@ -58,7 +58,7 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFra
     main_surface_->AddSubSurface(surface_);
 
     Rect client_rect = frame->GetClientGeometry();
-    surface_->SetGlobalPosition((int) client_rect.l,
+    surface_->SetWindowPosition((int) client_rect.l,
                                 (int) client_rect.t);
     surface_->Resize((int) client_rect.width(), (int) client_rect.height());
     surface_->SetDesync();  // FIXME: looks no difference between sync and desync modes
@@ -215,14 +215,9 @@ void EGLWindow::OnDraw(const Context *context) {
   }
 
   if (!animating_) {
-    if (surface_->MakeCurrent()) {
-      animating_ = true;
-      OnInitializeEGL();
-      frame_callback_.Setup(surface_->wl_surface());
-      surface_->SwapBuffers();
-      main_surface_->Commit();
-//      frame_surface_->Commit();
-    }
+    animating_ = true;
+    frame_callback_.Setup(surface_->wl_surface());
+    OnInitializeEGL();
   }
 }
 
@@ -240,18 +235,18 @@ void EGLWindow::OnRenderEGL() {
   glFlush();
 }
 
-void EGLWindow::OnFrame(uint32_t serial) {
-  static int count = 0;
-  count++;
-  fprintf(stderr, "on frame: %d\n", count);
+bool EGLWindow::MakeCurrent() {
+  return surface_->MakeCurrent();
+}
 
-  if (surface_->MakeCurrent()) {
-    OnRenderEGL();
-    frame_callback_.Setup(surface_->wl_surface());
-    surface_->SwapBuffers();
-    main_surface_->Commit();
-//    frame_surface_->Commit();
-  }
+void EGLWindow::SwapBuffers() {
+  if (surface_->SwapBuffers())
+    surface_->parent()->Commit();
+}
+
+void EGLWindow::OnFrame(uint32_t serial) {
+  frame_callback_.Setup(surface_->wl_surface());
+  OnRenderEGL();
 }
 
 void EGLWindow::OnRelease() {

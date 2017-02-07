@@ -57,14 +57,14 @@ EGLWidget::~EGLWidget() {
 void EGLWidget::OnUpdate(AbstractView *view) {
   DBG_ASSERT(view == this);
 
-  if (!surface_->wl_sub_surface().IsValid()) {
+  if (nullptr == surface_->parent()) {
     if (nullptr == parent_view()) return;
 
     AbstractSurface *parent_surface = parent_view()->GetSurface();
     if (nullptr == parent_surface) return;
 
     parent_surface->AddSubSurface(surface_);
-    surface_->SetGlobalPosition(x(), y());
+    surface_->SetWindowPosition(x(), y());
     surface_->Resize(width(), height());
     surface_->SetDesync();
   }

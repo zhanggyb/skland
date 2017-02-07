@@ -63,6 +63,10 @@ class EGLWindow : public AbstractWindow {
 
   virtual void OnRenderEGL();
 
+  bool MakeCurrent();
+
+  void SwapBuffers();
+
  private:
 
   void OnFrame(uint32_t serial);

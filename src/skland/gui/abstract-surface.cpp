@@ -184,17 +184,17 @@ void AbstractSurface::SetPosition(int x, int y) {
   }
 }
 
-void AbstractSurface::SetGlobalPosition(int x, int y) {
+void AbstractSurface::SetWindowPosition(int x, int y) {
   const AbstractSurface *parent = parent_;
   if (parent) {
     DBG_ASSERT(wl_sub_surface_.IsValid());
-    Point parent_global_position = parent->GetGlobalPosition();
+    Point parent_global_position = parent->GetWindowPosition();
     wl_sub_surface_.SetPosition(x - parent_global_position.x - margin_.l,
                                 y - parent_global_position.y - margin_.t);
   }
 }
 
-Point AbstractSurface::GetGlobalPosition() const {
+Point AbstractSurface::GetWindowPosition() const {
   Point position = position_;
 
   const AbstractSurface *parent = parent_;

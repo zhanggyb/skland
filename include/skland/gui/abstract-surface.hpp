@@ -127,23 +127,15 @@ class AbstractSurface {
    * @param x The global x position
    * @param y The global y position
    */
-  void SetGlobalPosition(int x, int y);
+  void SetWindowPosition(int x, int y);
 
   /**
-   * @brief Get the global position in window coordinates
+   * @brief Get the position in window coordinates
    * @return Global position
    */
-  Point GetGlobalPosition() const;
+  Point GetWindowPosition() const;
 
-  const wayland::Surface &wl_surface() const { return wl_surface_; }
-
-  const wayland::SubSurface &wl_sub_surface() const { return wl_sub_surface_; }
-
-  AbstractView *view() const { return view_; }
-
-  const Margin &margin() const { return margin_; }
-
-  const Point &position() const { return position_; }
+  Mode mode() const { return mode_; }
 
   AbstractSurface *parent() const { return parent_; }
 
@@ -171,6 +163,14 @@ class AbstractSurface {
    */
   AbstractSurface *down() const { return down_; }
 
+  const wayland::Surface &wl_surface() const { return wl_surface_; }
+
+  AbstractView *view() const { return view_; }
+
+  const Margin &margin() const { return margin_; }
+
+  const Point &position() const { return position_; }
+
   /**
    * @brief Virtual method to get the canvas for this surface
    * @return A canvas object
@@ -179,6 +179,10 @@ class AbstractSurface {
    * In EGLSurface this will render the 3D content to a canvas first.
    */
   virtual std::shared_ptr<Canvas> GetCanvas() const = 0;
+
+ protected:
+
+  const wayland::SubSurface &wl_sub_surface() const { return wl_sub_surface_; }
 
  private:
 
