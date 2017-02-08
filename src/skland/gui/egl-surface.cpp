@@ -22,6 +22,7 @@ namespace skland {
 
 EGLSurface::EGLSurface(AbstractView *view)
     : AbstractSurface(view) {
+  egl_surface_.Setup(Display::egl_display(), wl_surface(), view->width(), view->height());
 }
 
 EGLSurface::~EGLSurface() {
@@ -31,6 +32,22 @@ EGLSurface::~EGLSurface() {
 std::shared_ptr<Canvas> EGLSurface::GetCanvas() const {
   // TODO: render to canvas
   return nullptr;
+}
+
+bool EGLSurface::MakeCurrent() {
+  return Display::egl_display().MakeCurrent(egl_surface_, egl_surface_);
+}
+
+bool EGLSurface::SwapBuffers() {
+  return Display::egl_display().SwapBuffers(egl_surface_);
+}
+
+bool EGLSurface::SwapBuffersWithDamage(int x, int y, int width, int height) {
+  return Display::egl_display().SwapBuffersWithDamage(egl_surface_, x, y, width, height);
+}
+
+bool EGLSurface::SwapInterval(EGLint interval) {
+  return Display::egl_display().SwapInterval(interval);
 }
 
 }

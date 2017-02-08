@@ -77,10 +77,6 @@ class Buffer {
     return nullptr != wl_buffer_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_buffer_;
-  };
-
   bool Equal(const void *object) const {
     return wl_buffer_ == object;
   }

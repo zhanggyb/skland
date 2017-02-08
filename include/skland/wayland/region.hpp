@@ -75,10 +75,6 @@ class Region {
     return nullptr != wl_region_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_region_;
-  }
-
  private:
 
   struct wl_region *wl_region_;

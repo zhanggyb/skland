@@ -67,10 +67,6 @@ bool XdgShell::IsValid() const {
   return nullptr != metadata_->zxdg_shell;
 }
 
-bool XdgShell::IsNull() const {
-  return nullptr == metadata_->zxdg_shell;
-}
-
 bool XdgShell::Equal(const void *object) const {
   return metadata_->zxdg_shell == object;
 }

@@ -23,8 +23,41 @@
 #include <skland/core/defines.hpp>
 #include <malloc.h>
 
+#ifndef ARRAY_LENGTH
+#define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
+#endif
+
 namespace skland {
 namespace egl {
+
+PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC Display::kSwapBuffersWithDamageAPI = NULL;
+
+static bool
+weston_check_egl_extension(const char *extensions, const char *extension) {
+  size_t extlen = strlen(extension);
+  const char *end = extensions + strlen(extensions);
+
+  while (extensions < end) {
+    size_t n = 0;
+
+    /* Skip whitespaces, if any */
+    if (*extensions == ' ') {
+      extensions++;
+      continue;
+    }
+
+    n = strcspn(extensions, " ");
+
+    /* Compare strings */
+    if (n == extlen && strncmp(extension, extensions, n) == 0)
+      return true; /* Found */
+
+    extensions += n;
+  }
+
+  /* Not found */
+  return false;
+}
 
 void Display::Setup(const wayland::Display &wl_display) {
   Destroy();
@@ -73,10 +106,44 @@ void Display::Setup(const wayland::Display &wl_display) {
 
   egl_context_ = eglCreateContext(egl_display_, egl_config_, EGL_NO_CONTEXT, context_attribs);
   DBG_ASSERT(egl_context_);
+
+  static const struct {
+    const char *extension, *entrypoint;
+  } swap_damage_ext_to_entrypoint[] = {
+      {
+          .extension = "EGL_EXT_swap_buffers_with_damage",
+          .entrypoint = "eglSwapBuffersWithDamageEXT",
+      },
+      {
+          .extension = "EGL_KHR_swap_buffers_with_damage",
+          .entrypoint = "eglSwapBuffersWithDamageKHR",
+      },
+  };
+  const char *extensions;
+
+  extensions = eglQueryString(egl_display_, EGL_EXTENSIONS);
+  if (extensions &&
+      weston_check_egl_extension(extensions, "EGL_EXT_buffer_age")) {
+//    int len = (int) ARRAY_LENGTH(swap_damage_ext_to_entrypoint);
+    int i = 0;
+    for (i = 0; i < 2; i++) {
+      if (weston_check_egl_extension(extensions,
+                                     swap_damage_ext_to_entrypoint[i].extension)) {
+        /* The EXTPROC is identical to the KHR one */
+        kSwapBuffersWithDamageAPI =
+            (PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC)
+                eglGetProcAddress(swap_damage_ext_to_entrypoint[i].entrypoint);
+        break;
+      }
+    }
+    if (kSwapBuffersWithDamageAPI)
+      printf("has EGL_EXT_buffer_age and %s\n", swap_damage_ext_to_entrypoint[i].extension);
+  }
 }
 
 void Display::Destroy() {
   if (egl_display_) {
+    eglMakeCurrent(egl_display_, (::EGLSurface) 0, (::EGLSurface) 0, (::EGLContext) 0);
     eglTerminate(egl_display_);
     eglReleaseThread();
 
@@ -85,6 +152,28 @@ void Display::Destroy() {
     egl_config_ = nullptr;
     major_ = 0;
     minor_ = 0;
+  }
+}
+
+void Display::MakeSwapBufferNonBlock() const {
+  EGLint a = EGL_MIN_SWAP_INTERVAL;
+  EGLint b = EGL_MAX_SWAP_INTERVAL;
+
+  if (!eglGetConfigAttrib(egl_display_, egl_config_, a, &a) ||
+      !eglGetConfigAttrib(egl_display_, egl_config_, b, &b)) {
+    fprintf(stderr, "warning: swap interval range unknown\n");
+  } else if (a > 0) {
+    fprintf(stderr, "warning: minimum swap interval is %d, "
+        "while 0 is required to not deadlock on resize.\n", a);
+  }
+
+  /*
+   * We rely on the Wayland compositor to sync to vblank anyway.
+   * We just need to be able to call eglSwapBuffers() without the
+   * risk of waiting for a frame callback in it.
+   */
+  if (!eglSwapInterval(egl_display_, 0)) {
+    fprintf(stderr, "error: eglSwapInterval() failed.\n");
   }
 }
 

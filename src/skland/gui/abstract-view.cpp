@@ -27,6 +27,9 @@
 
 namespace skland {
 
+Task AbstractView::kRedrawTaskHead;
+Task AbstractView::kRedrawTaskTail;
+
 AbstractView::AbstractView()
     : AbstractView(400, 300) {
 
@@ -44,7 +47,7 @@ AbstractView::AbstractView(int width, int height)
 AbstractView::~AbstractView() {
 }
 
-void AbstractView::SetPosition(int x, int y) {
+void AbstractView::MoveTo(int x, int y) {
   // TODO: check and re-layout
 
   set_position(x, y);
@@ -73,8 +76,6 @@ AbstractSurface *AbstractView::GetSurface() const {
 }
 
 void AbstractView::Update() {
-  if (redraw_task_->IsLinked()) return;
-
   OnUpdate(this);
 }
 
@@ -86,8 +87,7 @@ void AbstractView::UpdateAll() {
 }
 
 void AbstractView::OnUpdate(AbstractView *view) {
-  if (redraw_task_->IsLinked()) {
-    DBG_ASSERT(view != this);
+  if (redraw_task_->IsLinked() && (view != this)) {
     // This view is going to be redrawn, just push back the task of the sub view
 
     redraw_task_->PushBack(view->redraw_task_.get());
@@ -120,6 +120,20 @@ void AbstractView::TrackMouseMotion(MouseEvent *event) {
 
 void AbstractView::UntrackMouseMotion() {
   mouse_motion_task_->Unlink();
+}
+
+void AbstractView::InitializeRedrawTaskList() {
+  kRedrawTaskHead.PushBack(&kRedrawTaskTail);
+}
+
+void AbstractView::ClearRedrawTaskList() {
+  Task *task = kRedrawTaskHead.next();
+  Task *next_task = nullptr;
+  while (task != &kRedrawTaskTail) {
+    next_task = task->next();
+    task->Unlink();
+    task = next_task;
+  }
 }
 
 }

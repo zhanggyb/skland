@@ -19,10 +19,21 @@
 #include <skland/gui/display.hpp>
 #include <skland/gui/abstract-view.hpp>
 
+#include "internal/commit-task.hpp"
+
 namespace skland {
 
+AbstractSurface *AbstractSurface::kTop = nullptr;
+AbstractSurface *AbstractSurface::kBottom = nullptr;
+int AbstractSurface::kCount = 0;
+Task AbstractSurface::kCommitTaskHead;
+Task AbstractSurface::kCommitTaskTail;
+
 AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
-    : parent_(nullptr),
+    : mode_(kSyncMode),
+      parent_(nullptr),
+      above_(nullptr),
+      below_(nullptr),
       up_(nullptr),
       down_(nullptr),
       view_(view),
@@ -34,6 +45,10 @@ AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
   wl_surface_.enter().Set(this, &AbstractSurface::OnEnter);
   wl_surface_.leave().Set(this, &AbstractSurface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
+
+  commit_task_.reset(new CommitTask(this));
+
+  Push(this);
 }
 
 AbstractSurface::~AbstractSurface() {
@@ -41,44 +56,50 @@ AbstractSurface::~AbstractSurface() {
   AbstractSurface *p = nullptr;
   AbstractSurface *tmp = nullptr;
 
-  p = up_;
+  p = above_;
   while (p && p->parent_ == this) {
-    tmp = p->up_;
+    tmp = p->above_;
     delete p;
     p = tmp;
   }
 
-  p = down_;
+  p = below_;
   while (p && p->parent_ == this) {
-    tmp = p->down_;
+    tmp = p->below_;
     delete p;
     p = tmp;
   }
 
   // Break the link node
-  if (up_) up_->down_ = down_;
-  if (down_) down_->up_ = up_;
+  if (above_) above_->below_ = below_;
+  if (below_) below_->above_ = above_;
+
+  if (nullptr == parent_)
+    Remove(this);
 }
 
 void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   if (subsurface == this || subsurface->parent_) return;
 
+  Remove(subsurface);
+
   DBG_ASSERT(nullptr == subsurface->parent_);
-  DBG_ASSERT(nullptr == subsurface->up_);
-  DBG_ASSERT(nullptr == subsurface->down_);
-  DBG_ASSERT(subsurface->wl_sub_surface_.IsNull());
+  DBG_ASSERT(nullptr == subsurface->above_);
+  DBG_ASSERT(nullptr == subsurface->below_);
+  DBG_ASSERT(!subsurface->wl_sub_surface_.IsValid());
 
   subsurface->wl_sub_surface_.Setup(Display::wl_subcompositor(),
                                     subsurface->wl_surface_,
                                     this->wl_surface_);
   subsurface->parent_ = this;
 
+  // FIXME: error message in weston:
   AbstractSurface *tmp = this;
-  AbstractSurface *p = this;
+  AbstractSurface *p = nullptr;
   if (pos >= 0) {
     do {
       p = tmp;
-      tmp = tmp->down_;
+      tmp = tmp->below_;
       if (nullptr == tmp || tmp->parent_ != this) break;
       pos--;
     } while (pos >= 0);
@@ -87,7 +108,7 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   } else {
     do {
       p = tmp;
-      tmp = tmp->up_;
+      tmp = tmp->above_;
       if (nullptr == tmp || tmp->parent_ != this) break;
       pos++;
     } while (pos < 0);
@@ -96,22 +117,28 @@ void AbstractSurface::AddSubSurface(AbstractSurface *subsurface, int pos) {
   }
 }
 
-void AbstractSurface::SetSync() const {
-  if (wl_sub_surface_.IsValid()) {
-    wl_sub_surface_.SetSync();
-  }
+void AbstractSurface::SetSync() {
+  wl_sub_surface_.SetSync();
+  mode_ = kSyncMode;
 }
 
-void AbstractSurface::SetDesync() const {
-  if (wl_sub_surface_.IsValid()) {
-    wl_sub_surface_.SetDesync();
-  }
+void AbstractSurface::SetDesync() {
+  wl_sub_surface_.SetDesync();
+  mode_ = kDesyncMode;
 }
 
-void AbstractSurface::Commit() const {
-  wl_surface_.Commit();
-  if (parent_) {
-    parent_->Commit();
+void AbstractSurface::Commit() {
+  if (commit_task_->IsLinked()) return;
+
+  if (nullptr == parent_) {
+    kCommitTaskTail.PushFront(commit_task_.get());
+  } else {
+    if (mode_ == kSyncMode) {
+      parent_->Commit();
+      parent_->commit_task_->PushFront(commit_task_.get());
+    } else {
+      kCommitTaskTail.PushFront(commit_task_.get());
+    }
   }
 }
 
@@ -157,18 +184,40 @@ void AbstractSurface::SetPosition(int x, int y) {
   }
 }
 
+void AbstractSurface::SetWindowPosition(int x, int y) {
+  const AbstractSurface *parent = parent_;
+  if (parent) {
+    DBG_ASSERT(wl_sub_surface_.IsValid());
+    Point parent_global_position = parent->GetWindowPosition();
+    wl_sub_surface_.SetPosition(x - parent_global_position.x - margin_.l,
+                                y - parent_global_position.y - margin_.t);
+  }
+}
+
+Point AbstractSurface::GetWindowPosition() const {
+  Point position = position_;
+
+  const AbstractSurface *parent = parent_;
+  while (parent) {
+    position += (parent->position() - Point(parent->margin().l, parent->margin().t));
+    parent = parent->parent();
+  }
+
+  return position;
+}
+
 void AbstractSurface::InsertFront(AbstractSurface *surface) {
-  if (up_) up_->down_ = surface;
-  surface->up_ = up_;
-  up_ = surface;
-  surface->down_ = this;
+  if (above_) above_->below_ = surface;
+  surface->above_ = above_;
+  above_ = surface;
+  surface->below_ = this;
 }
 
 void AbstractSurface::InsertBack(AbstractSurface *surface) {
-  if (down_) down_->up_ = surface;
-  surface->down_ = down_;
-  down_ = surface;
-  surface->up_ = this;
+  if (below_) below_->above_ = surface;
+  surface->below_ = below_;
+  below_ = surface;
+  surface->above_ = this;
 }
 
 void AbstractSurface::MoveBelow(AbstractSurface *surface_a, AbstractSurface *surface_b) {
@@ -177,33 +226,33 @@ void AbstractSurface::MoveBelow(AbstractSurface *surface_a, AbstractSurface *sur
   AbstractSurface *tmp = nullptr;
 
   tmp = surface_b;
-  while (tmp->up_ && (tmp->up_->parent_ != surface_b->parent_)) {
+  while (tmp->above_ && (tmp->above_->parent_ != surface_b->parent_)) {
     top = tmp;
-    tmp = tmp->up_;
+    tmp = tmp->above_;
   }
 
   tmp = surface_b;
-  while (tmp->down_ && (tmp->down_->parent_ != surface_b->parent_)) {
+  while (tmp->below_ && (tmp->below_->parent_ != surface_b->parent_)) {
     bottom = tmp;
-    tmp = tmp->down_;
+    tmp = tmp->below_;
   }
 
   if (top == bottom) {
-    if (surface_b->up_) surface_b->up_->down_ = surface_b->down_;
-    if (surface_b->down_) surface_b->down_->up_ = surface_b->up_;
+    if (surface_b->above_) surface_b->above_->below_ = surface_b->below_;
+    if (surface_b->below_) surface_b->below_->above_ = surface_b->above_;
 
-    surface_b->up_ = surface_a;
-    surface_b->down_ = surface_a->down_;
-    if (surface_a->down_) surface_a->down_->up_ = surface_b;
-    surface_a->down_ = surface_b;
+    surface_b->above_ = surface_a;
+    surface_b->below_ = surface_a->below_;
+    if (surface_a->below_) surface_a->below_->above_ = surface_b;
+    surface_a->below_ = surface_b;
   } else {
-    if (top->up_) top->up_->down_ = bottom->down_;
-    if (bottom->down_) bottom->down_->up_ = top->up_;
+    if (top->above_) top->above_->below_ = bottom->below_;
+    if (bottom->below_) bottom->below_->above_ = top->above_;
 
-    top->up_ = surface_a;
-    bottom->down_ = surface_a->down_;
-    if (surface_a->down_) surface_a->down_->up_ = bottom;
-    surface_a->down_ = top;
+    top->above_ = surface_a;
+    bottom->below_ = surface_a->below_;
+    if (surface_a->below_) surface_a->below_->above_ = bottom;
+    surface_a->below_ = top;
   }
 }
 
@@ -213,33 +262,33 @@ void AbstractSurface::MoveAbove(AbstractSurface *surface_a, AbstractSurface *sur
   AbstractSurface *tmp = nullptr;
 
   tmp = surface_b;
-  while (tmp->up_ && (tmp->up_->parent_ != surface_b->parent_)) {
+  while (tmp->above_ && (tmp->above_->parent_ != surface_b->parent_)) {
     top = tmp;
-    tmp = tmp->up_;
+    tmp = tmp->above_;
   }
 
   tmp = surface_b;
-  while (tmp->down_ && (tmp->down_->parent_ != surface_b->parent_)) {
+  while (tmp->below_ && (tmp->below_->parent_ != surface_b->parent_)) {
     bottom = tmp;
-    tmp = tmp->down_;
+    tmp = tmp->below_;
   }
 
   if (top == bottom) {
-    if (surface_b->up_) surface_b->up_->down_ = surface_b->down_;
-    if (surface_b->down_) surface_b->down_->up_ = surface_b->up_;
+    if (surface_b->above_) surface_b->above_->below_ = surface_b->below_;
+    if (surface_b->below_) surface_b->below_->above_ = surface_b->above_;
 
-    surface_b->up_ = surface_a->up_;
-    surface_b->down_ = surface_a;
-    if (surface_a->up_) surface_a->up_->down_ = surface_b;
-    surface_a->up_ = surface_b;
+    surface_b->above_ = surface_a->above_;
+    surface_b->below_ = surface_a;
+    if (surface_a->above_) surface_a->above_->below_ = surface_b;
+    surface_a->above_ = surface_b;
   } else {
-    if (top->up_) top->up_->down_ = bottom->down_;
-    if (bottom->down_) bottom->down_->up_ = top->up_;
+    if (top->above_) top->above_->below_ = bottom->below_;
+    if (bottom->below_) bottom->below_->above_ = top->above_;
 
-    top->up_ = surface_a->up_;
-    bottom->down_ = surface_a;
-    if (surface_a->up_) surface_a->up_->down_ = top;
-    surface_a->up_ = bottom;
+    top->above_ = surface_a->above_;
+    bottom->below_ = surface_a;
+    if (surface_a->above_) surface_a->above_->below_ = top;
+    surface_a->above_ = bottom;
   }
 }
 
@@ -253,6 +302,71 @@ void AbstractSurface::OnEnter(struct wl_output *wl_output) {
 
 void AbstractSurface::OnLeave(struct wl_output *wl_output) {
   // TODO: call function in view_
+}
+
+void AbstractSurface::Push(AbstractSurface *surface) {
+  DBG_ASSERT(nullptr == surface->parent_);
+  DBG_ASSERT(nullptr == surface->up_);
+  DBG_ASSERT(nullptr == surface->down_);
+
+  DBG_ASSERT(kCount >= 0);
+
+  if (kTop) {
+    kTop->up_ = surface;
+    surface->down_ = kTop;
+    kTop = surface;
+  } else {
+    DBG_ASSERT(kCount == 0);
+    DBG_ASSERT(nullptr == kBottom);
+    kBottom = surface;
+    kTop = surface;
+  }
+
+  kCount++;
+}
+
+void AbstractSurface::Remove(AbstractSurface *surface) {
+  DBG_ASSERT(nullptr == surface->parent_);
+
+  if (surface->up_) {
+    surface->up_->down_ = surface->down_;
+  } else {
+    DBG_ASSERT(kTop == surface);
+    kTop = surface->down_;
+  }
+
+  if (surface->down_) {
+    surface->down_->up_ = surface->up_;
+  } else {
+    DBG_ASSERT(kBottom == surface);
+    kBottom = surface->up_;
+  }
+
+  surface->up_ = nullptr;
+  surface->down_ = nullptr;
+  kCount--;
+  DBG_ASSERT(kCount >= 0);
+}
+
+void AbstractSurface::Clear() {
+  while (kCount > 0) {
+    AbstractView *view = kTop->view();
+    delete view;
+  }
+}
+
+void AbstractSurface::InitializeCommitTaskList() {
+  kCommitTaskHead.PushBack(&kCommitTaskTail);
+}
+
+void AbstractSurface::ClearCommitTaskList() {
+  Task *task = kCommitTaskHead.next();
+  Task *next_task = nullptr;
+  while (task != &kCommitTaskTail) {
+    next_task = task->next();
+    task->Unlink();
+    task = next_task;
+  }
 }
 
 }

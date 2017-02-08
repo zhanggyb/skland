@@ -29,6 +29,10 @@ namespace skland {
 
 class Shader;
 
+/**
+ * @ingroup graphic
+ * @brief Class holds the style and color information about how to draw geometries, text and bitmaps.
+ */
 class Paint {
 
   friend bool operator==(const Paint &paint1, const Paint &paint2);

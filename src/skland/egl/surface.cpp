@@ -19,6 +19,11 @@
 #include <skland/wayland/surface.hpp>
 #include <skland/egl/display.hpp>
 
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <GLES2/gl2.h>
+
 namespace skland {
 namespace egl {
 

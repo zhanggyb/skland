@@ -57,6 +57,7 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontMgr_custom*.cpp)
 remove_srcs(${SKIA_SOURCE_DIR}/src/sksl/SkSLMain.cpp)
 # remove the special splicer source, TODO: config cmake to detect clang and SSE
 remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
+#remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages_lowp.cpp)
 
 
 # Skia sure ships a lot of code no one uses.
@@ -144,7 +145,7 @@ endif ()
 # Detect our optional dependencies.
 # If we can't find them, don't build the parts of Skia that use them.
 find_package(EXPAT)
-find_package(Lua)
+#find_package(Lua)  // Note: there's a code bug in current Skia master, to make it work, add '#include "SkVertices.h"' in SkLuaCanvas.h
 find_package(ZLIB)
 
 # For libraries that don't have find_package() scripts, we do it ourselves:

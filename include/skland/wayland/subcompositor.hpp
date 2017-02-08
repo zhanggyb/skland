@@ -71,10 +71,6 @@ class SubCompositor {
     return nullptr != wl_subcompositor_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_subcompositor_;
-  }
-
   bool Equal(const void *object) const {
     return wl_subcompositor_ == object;
   }

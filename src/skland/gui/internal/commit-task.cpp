@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_MAIN_WINDOW_HPP_
-#define SKLAND_GUI_MAIN_WINDOW_HPP_
-
-#include "abstract-window.hpp"
-#include "memory-pool.hpp"
-#include "buffer.hpp"
+#include "commit-task.hpp"
+#include <skland/gui/abstract-surface.hpp>
 
 namespace skland {
 
-class AbstractWidget;
-
+void CommitTask::Run() const {
+  surface->wl_surface().Commit();
 }
 
-#endif // SKLAND_GUI_MAIN_WINDOW_HPP_
+}

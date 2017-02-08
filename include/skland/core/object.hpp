@@ -51,14 +51,6 @@ class Object : public Trackable {
     return parent_;
   }
 
-  inline void set_name(const char *name) {
-    name_ = name;
-  }
-
-  inline const std::string &name() const {
-    return name_;
-  }
-
  protected:
 
   inline Object *previous() const {
@@ -188,8 +180,6 @@ class Object : public Trackable {
 
   Object *parent_;
   int children_count_;
-
-  std::string name_;
 
 };
 

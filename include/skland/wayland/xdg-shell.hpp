@@ -59,8 +59,6 @@ class XdgShell {
 
   bool IsValid() const;
 
-  bool IsNull() const;
-
   bool Equal(const void *object) const;
 
   DelegateRef<void(uint32_t)> ping() {

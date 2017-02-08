@@ -67,10 +67,6 @@ class Keyboard {
     return nullptr != wl_keyboard_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_keyboard_;
-  }
-
   DelegateRef<void(uint32_t, int32_t, uint32_t)> keymap() {
     return keymap_;
   }

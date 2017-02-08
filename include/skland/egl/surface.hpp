@@ -22,6 +22,7 @@
 
 namespace skland {
 
+// Forward declaration:
 namespace wayland {
 class Surface;
 }
@@ -30,7 +31,13 @@ namespace egl {
 
 class Display;
 
+/**
+ * @ingroup egl
+ * @brief EGL Surface
+ */
 class Surface {
+
+  friend class Display;
 
   Surface(const Surface &) = delete;
   Surface &operator=(const Surface &) = delete;
@@ -47,16 +54,16 @@ class Surface {
 
   void Destroy();
 
-  void Resize(int width, int height, int dx, int dy) {
+  void Resize(int width, int height, int dx = 0, int dy = 0) {
     wl_egl_window_resize(wl_egl_window_, width, height, dx, dy);
+  }
+
+  void GetAttachedSize(int *width, int *height) {
+    wl_egl_window_get_attached_size(wl_egl_window_, width, height);
   }
 
   bool IsValid() const {
     return nullptr != egl_surface_;
-  }
-
-  bool IsNull() const {
-    return nullptr == egl_surface_;
   }
 
  private:

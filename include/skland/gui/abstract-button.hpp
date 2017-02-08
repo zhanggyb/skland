@@ -73,7 +73,7 @@ class AbstractButton : public AbstractWidget {
         kFlagIndexPressed = 0x1 << 2,
 
     /**! if the mouse need to emit a click signal */
-        kFlagIndexClick = 0x1 << 3
+        kFlagIndexClicked = 0x1 << 3
 
   };
 

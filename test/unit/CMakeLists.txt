@@ -53,5 +53,6 @@ if (LINUX)
     add_subdirectory(gui-timer)
     # add_subdirectory(gui-main-window)
     add_subdirectory(gui-slider)
+    add_subdirectory(gui-egl-widget)
 
 endif ()

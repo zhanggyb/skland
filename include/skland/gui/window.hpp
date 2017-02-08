@@ -24,7 +24,12 @@
 namespace skland {
 
 class AbstractWidget;
+class ShmSurface;
 
+/**
+ * @ingroup gui
+ * @brief A simple window with client-side decorations
+ */
 class Window : public AbstractWindow {
 
   Window(const Window &) = delete;
@@ -47,6 +52,12 @@ class Window : public AbstractWindow {
 
  protected:
 
+  virtual void OnShown() final;
+
+  virtual void OnUpdate(AbstractView *view) override;
+
+  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const;
+
   virtual void OnKeyboardKey(KeyEvent *event) final;
 
   virtual void OnResize(int width, int height) final;
@@ -55,7 +66,26 @@ class Window : public AbstractWindow {
 
   void SetMainWidgetGeometry();
 
+  /**
+   * @brief The surface for frame
+   */
+  ShmSurface *frame_surface_;
+
+  /* Properties for frame surface, JUST experimental */
+  MemoryPool frame_pool_;
+  Buffer frame_buffer_;
+
+  /**
+   * @brief The surface for widgets
+   */
+  ShmSurface *main_surface_;
+
+  /* Properties for main surface, JUST experimental */
+  MemoryPool main_pool_;
+  Buffer main_buffer_;
+
   AbstractWidget *main_widget_;
+
 };
 
 }

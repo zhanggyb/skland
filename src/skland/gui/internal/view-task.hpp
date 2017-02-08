@@ -30,7 +30,7 @@ struct ViewTask : public Task {
   ViewTask(AbstractView *view = nullptr)
       : Task(), view(view) {}
 
-  ~ViewTask() {}
+  virtual ~ViewTask() {}
 
   AbstractView *view;
 };

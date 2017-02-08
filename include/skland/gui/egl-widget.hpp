@@ -19,12 +19,21 @@
 
 #include "abstract-widget.hpp"
 
-#include "../wayland/subsurface.hpp"
+#include "../wayland/callback.hpp"
+
 #include <GLES2/gl2.h>
 
 namespace skland {
 
+class EGLSurface;
+
+/**
+ * @brief A widget use egl surface for 3D scene
+ */
 class EGLWidget : public AbstractWidget {
+
+  EGLWidget(const EGLWidget &) = delete;
+  EGLWidget &operator=(const EGLWidget &) = delete;
 
  public:
 
@@ -36,7 +45,11 @@ class EGLWidget : public AbstractWidget {
 
  protected:
 
-  virtual void OnResize(int width, int height) override;
+  virtual void OnUpdate(AbstractView *view) final;
+
+  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const final;
+
+  virtual void OnResize(int width, int height) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -50,13 +63,26 @@ class EGLWidget : public AbstractWidget {
 
   virtual void OnDraw(const Context *context) final;
 
+  virtual void OnInitializeEGL();
+
+  virtual void OnResizeEGL();
+
+  virtual void OnRenderEGL();
+
  private:
 
-  void InitializeGL();
+  void OnFrame(uint32_t serial);
+
+  EGLSurface *surface_;
 
   GLint rotation_uniform;
   GLuint pos;
   GLuint col;
+
+  wayland::Callback frame_callback_;
+
+  bool resize_;
+  bool animating_;
 
 };
 

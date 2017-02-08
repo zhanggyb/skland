@@ -79,10 +79,6 @@ class Output {
     return nullptr != wl_output_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_output_;
-  }
-
   bool Equal(const void *object) const {
     return wl_output_ == object;
   }

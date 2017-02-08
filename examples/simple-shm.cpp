@@ -33,9 +33,9 @@ class ShmWidget : public AbstractWidget {
  public:
 
   ShmWidget()
-      : AbstractWidget(), context_(nullptr), radius_(0.f), angle_(0.f) {
+      : AbstractWidget(), context_(nullptr), radius_(0.f), angle_(0.f), running_animation_(false) {
     color_ = 0xFF4FBF4F;
-    callback_.done().Set(this, &ShmWidget::OnFrame);
+    frame_callback_.done().Set(this, &ShmWidget::OnFrame);
 
     radius_ = clamp(std::min(geometry().width(), geometry().height()) / 2.f - 50.f, 50.f, 200.f);
   }
@@ -71,12 +71,22 @@ class ShmWidget : public AbstractWidget {
   }
 
   virtual void OnDraw(const Context *context) override {
-    static int padding = 5;
     context_ = context;
-    std::shared_ptr<Canvas> canvas = context->GetCanvas();
+
+    if (!running_animation_) {
+      running_animation_ = true;
+      OnFrame(0);
+    }
+  }
+
+ private:
+
+  void Animate() {
+    static int padding = 5;
+    std::shared_ptr<Canvas> canvas = context_->GetCanvas();
     canvas->Save();
     canvas->ClipRect(Rect(geometry().l + padding,
-                          geometry().t + padding,
+                          geometry().t,
                           geometry().r - padding,
                           geometry().b - padding));
 
@@ -95,30 +105,27 @@ class ShmWidget : public AbstractWidget {
                     angle_, 300.f, false, paint);
 
     canvas->Restore();
-
-    context_->SetupCallback(callback_);
-    context_->Damage(context_->GetMargin().l + (int) geometry().l,
-                     context_->GetMargin().t + (int) geometry().t,
-                     (int) geometry().width(),
-                     (int) geometry().height());
-    context_->Commit();
   }
 
- private:
-
   void OnFrame(uint32_t serial) {
-
     angle_ += 5.f;
     if (angle_ > 360.f) angle_ = 0.f;
 
-    OnDraw(context_);
+    context_->SetupCallback(frame_callback_);
+    Animate();
+    context_->Damage(context_->GetMargin().l + x(),
+                     context_->GetMargin().t + y(),
+                     width(),
+                     height());
+    context_->Commit();
   }
 
-  wayland::Callback callback_;
+  wayland::Callback frame_callback_;
   const Context *context_;
   Color color_;
   float radius_;
   float angle_;
+  bool running_animation_;
 };
 
 int main(int argc, char *argv[]) {
@@ -126,7 +133,7 @@ int main(int argc, char *argv[]) {
 
   Application app(argc, argv);
 
-  Window *win = new Window(320, 320, "Simple Shm");
+  Window *win = new Window(320, 280, "Simple Shm");
   win->SetAppId("Simple-Shm");
 
   ShmWidget *widget = new ShmWidget;

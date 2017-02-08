@@ -17,15 +17,11 @@
 #include <skland/gui/abstract-window.hpp>
 
 #include <skland/gui/application.hpp>
-#include <skland/gui/shm-surface.hpp>
 #include <skland/gui/mouse-event.hpp>
-#include <skland/gui/abstract-window-frame.hpp>
-#include <skland/gui/output.hpp>
-
-#include <skland/graphic/canvas.hpp>
+#include <skland/gui/key-event.hpp>
+#include <skland/gui/abstract-surface.hpp>
 
 #include "internal/view-task.hpp"
-#include "internal/redraw-task.hpp"
 
 namespace skland {
 
@@ -39,89 +35,15 @@ AbstractWindow::AbstractWindow(int width,
                                const char *title,
                                AbstractWindowFrame *frame)
     : AbstractView(width, height),
-      display_(nullptr),
-      window_frame_(nullptr),
       flags_(0),
-      is_xdg_surface_configured_(false),
-      frame_surface_(nullptr),
-      main_surface_(nullptr) {
+      window_frame_(nullptr),
+      shell_surface_(nullptr) {
   if (title) title_ = title;
-
-  int x = 0, y = 0;  // The input region
-  AbstractSurface *shell_surface = nullptr;
-
-  if (frame) {
-    frame_surface_ = new ShmSurface(this, Theme::shadow_margin());
-    main_surface_ = new ShmSurface(this, Theme::shadow_margin());
-
-    // There's a known issue in current gnome that a sub surface cannot be placed below its parent
-    frame_surface_->AddSubSurface(main_surface_);
-
-    SetWindowFrame(frame);
-    x += frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
-    y += frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
-    width += AbstractWindowFrame::kResizingMargin.lr();
-    height += AbstractWindowFrame::kResizingMargin.tb();
-
-    inactive_region_.Setup(Display::wl_compositor());
-    inactive_region_.Add(0, 0, 0, 0);
-    main_surface_->SetInputRegion(inactive_region_);
-    shell_surface = frame_surface_;
-  } else {
-    main_surface_ = new ShmSurface(this);
-    shell_surface = main_surface_;
-  }
-
-  input_region_.Setup(Display::wl_compositor());
-  input_region_.Add(x, y, width, height);
-  shell_surface->SetInputRegion(input_region_);
-
-  xdg_surface_.configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
-  xdg_surface_.Setup(Display::xdg_shell(), shell_surface->wl_surface());
-
-  xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
-  xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
-  xdg_toplevel_.Setup(xdg_surface_);
-  xdg_toplevel_.SetTitle(title_.c_str()); // TODO: support multi-language
-
-  Display::AddWindow(this);
-  // TODO: layout in display
-
-  set_name(title);  // debug only
-
-  // Create buffer:
-  Size output_size(1024, 800);
-  if (const Output *output = Display::GetOutputAt(0)) {
-    output_size = output->current_mode_size();  // The current screen size
-  }
-
-  int total_width = std::max((int) geometry().width(), output_size.width);
-  int total_height = std::max((int) geometry().height(), output_size.height);
-  total_width += shell_surface->margin().lr();
-  total_height += shell_surface->margin().tb();
-
-  main_pool_.Setup(total_width * 4 * total_height);
-  main_buffer_.Setup(main_pool_, total_width, total_height,
-                     total_width * 4, WL_SHM_FORMAT_ARGB8888);
-
-  frame_pool_.Setup(total_width * 4 * total_height);
-  frame_buffer_.Setup(frame_pool_, total_width, total_height,
-                      total_width * 4, WL_SHM_FORMAT_ARGB8888);
 }
 
 AbstractWindow::~AbstractWindow() {
-  if (display_)
-    RemoveManagedObject(display_,
-                        this,
-                        &display_,
-                        &display_->first_window_,
-                        &display_->last_window_,
-                        display_->windows_count_);
-  DBG_ASSERT(display_ == nullptr);
-
   delete window_frame_;
-  delete main_surface_;
-  delete frame_surface_;
+  delete shell_surface_;
 }
 
 void AbstractWindow::SetTitle(const char *title) {
@@ -153,13 +75,13 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 }
 
 void AbstractWindow::Show() {
-  if (!is_xdg_surface_configured_) {
-    main_surface_->Commit();
+  if (!visible()) {
+    shell_surface_->Commit();
   }
 }
 
 void AbstractWindow::Close(SLOT) {
-  if (Display::windows_count() == 1) {
+  if (AbstractSurface::GetShellSurfaceCount() == 1) {
     Application::Exit();
   }
 
@@ -217,40 +139,6 @@ Rect AbstractWindow::GetClientGeometry() const {
   }
 
   return window_frame_->GetClientGeometry();
-}
-
-void AbstractWindow::OnUpdate(AbstractView *view) {
-  if (!is_xdg_surface_configured_) return;
-
-  if (view == this) {
-    if (frame_surface_) {
-      Display::kDisplay->redraw_task_tail_.PushFront(redraw_task().get());
-      // TODO: this is just a workaround, should use frame_surface for frame and background,
-      // but now use main_surface instead.
-      redraw_task()->context = frame_surface_;
-      DBG_ASSERT(redraw_task()->context.GetCanvas());
-      frame_surface_->Damage((int) geometry().x() + frame_surface_->margin().left,
-                             (int) geometry().y() + frame_surface_->margin().top,
-                             (int) geometry().width(),
-                             (int) geometry().height());
-      frame_surface_->Commit();
-    }
-  } else {
-    Display::kDisplay->redraw_task_tail_.PushFront(view->redraw_task().get());
-
-    // TODO: this is juat a workaround, should render widgets on main_surface
-    view->redraw_task()->context = main_surface_;
-    DBG_ASSERT(view->redraw_task()->context.GetCanvas());
-    main_surface_->Damage((int) view->geometry().x() + main_surface_->margin().left,
-                          (int) view->geometry().y() + main_surface_->margin().top,
-                          (int) view->geometry().width(),
-                          (int) view->geometry().height());
-    main_surface_->Commit();
-  }
-}
-
-AbstractSurface *AbstractWindow::OnGetSurface(const AbstractView *view) const {
-  return main_surface_;
 }
 
 void AbstractWindow::OnMouseEnter(MouseEvent *event) {
@@ -360,6 +248,10 @@ void AbstractWindow::OnMouseButton(MouseEvent *event) {
   event->Accept();
 }
 
+void AbstractWindow::OnKeyboardKey(KeyEvent *event) {
+  event->Accept();
+}
+
 void AbstractWindow::OnDraw(const Context *context) {
   if (window_frame_) {
     window_frame_->OnDraw(context);
@@ -378,26 +270,31 @@ void AbstractWindow::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
   xdg_toplevel_.Resize(event->wl_seat(), event->serial(), edges);
 }
 
+void AbstractWindow::SetShellSurface(AbstractSurface *surface) {
+  DBG_ASSERT(surface);
+  DBG_ASSERT(nullptr == surface->parent());
+
+  if (shell_surface_) delete shell_surface_;
+
+  shell_surface_ = surface;
+
+  xdg_surface_.configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
+  xdg_surface_.Setup(Display::xdg_shell(), shell_surface_->wl_surface());
+
+  xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
+  xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
+  xdg_toplevel_.Setup(xdg_surface_);
+}
+
 void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
   xdg_surface_.AckConfigure(serial);
 
-  if (!is_xdg_surface_configured_) {
-    is_xdg_surface_configured_ = true;
-
-    int x = main_surface_->margin().left;
-    int y = main_surface_->margin().top;
-    int w = (int) geometry().width();
-    int h = (int) geometry().height();
-    xdg_surface_.SetWindowGeometry(x, y, w, h);
-
-    if (frame_surface_) {
-      frame_surface_->Attach(&frame_buffer_);
-      frame_surface_->GetCanvas()->Clear();
-    }
-
-    main_surface_->Attach(&main_buffer_);
-    main_surface_->GetCanvas()->Clear();
-    UpdateAll();
+  if (!visible()) {
+    set_visible(true);
+    xdg_surface_.SetWindowGeometry(shell_surface_->margin().left,
+                                   shell_surface_->margin().top,
+                                   width(), height());
+    OnShown();
   }
 }
 
@@ -417,53 +314,13 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
   height = clamp(height, min.height, max.height);
 
   if (maximized || fullscreen || resizing) {
-    if (width != geometry().width() || height != geometry().height()) {
+    if (width != this->width() || height != this->height()) {
 
-      Rect input_rect(width, height);
       int x = 0, y = 0;
-      AbstractSurface *shell_surface = frame_surface_ ? frame_surface_ : main_surface_;
-
-      if (!IsFrameless()) {
-        input_rect.left = frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
-        input_rect.top = frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
-        input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
-                          height + AbstractWindowFrame::kResizingMargin.tb());
-        x = frame_surface_->margin().left;
-        y = frame_surface_->margin().top;
-        window_frame_->OnResize(width, height);
-      }
-
-      input_region_.Setup(Display::wl_compositor());
-      input_region_.Add((int) input_rect.x(),
-                        (int) input_rect.y(),
-                        (int) input_rect.width(),
-                        (int) input_rect.height());
-      shell_surface->SetInputRegion(input_region_);
-
+      x = shell_surface_->margin().left;
+      y = shell_surface_->margin().top;
       xdg_surface_.SetWindowGeometry(x, y, width, height);
-
       resize(width, height);
-
-      // Reset buffer:
-      width += shell_surface->margin().lr();
-      height += shell_surface->margin().tb();
-
-      int total_size = width * 4 * height;
-      if (total_size > main_pool_.size()) {
-        DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n", total_size, main_pool_.size(), "Re-generate shm pool");
-        main_pool_.Setup(total_size);
-      }
-      main_buffer_.Setup(main_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-      main_surface_->Attach(&main_buffer_);
-
-      if (frame_surface_) {
-        frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-        frame_surface_->Attach(&frame_buffer_);
-      }
-
-      main_surface_->GetCanvas()->Clear();
-      UpdateAll();
-
       OnResize(width, height);
     }
   }

@@ -115,10 +115,6 @@ class Surface {
     return nullptr != wl_surface_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_surface_;
-  }
-
   DelegateRef<void(struct wl_output *)> enter() {
     return enter_;
   }

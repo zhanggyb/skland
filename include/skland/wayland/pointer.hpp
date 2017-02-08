@@ -71,10 +71,6 @@ class Pointer {
     return nullptr != wl_pointer_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_pointer_;
-  }
-
   DelegateRef<void(uint32_t, struct wl_surface *,
                    wl_fixed_t, wl_fixed_t)> enter() {
     return enter_;

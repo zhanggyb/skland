@@ -23,9 +23,9 @@
 namespace skland {
 
 class Canvas;
-class AbstractSurface;
 
 /**
+ * @ingroup gui
  * @brief The context used to draw a view
  */
 class Context {
@@ -64,8 +64,8 @@ class Context {
     return surface_->margin();
   }
 
-  void Damage(int surface_x, int surface_y, int surface_width, int surface_height) const {
-    surface_->Damage(surface_x, surface_y, surface_width, surface_height);
+  void Damage(int surface_x, int surface_y, int width, int height) const {
+    surface_->Damage(surface_x, surface_y, width, height);
   }
 
   void Commit() const {

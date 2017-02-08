@@ -84,10 +84,6 @@ class SubSurface {
     return nullptr != wl_subsurface_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_subsurface_;
-  }
-
  private:
 
   struct wl_subsurface *wl_subsurface_;

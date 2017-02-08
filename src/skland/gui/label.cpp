@@ -39,7 +39,6 @@ Label::Label(const std::string &text, int width, int height, const Font &font)
       foreground_(0.2f, 0.2f, 0.2f),
       background_(0.f, 0.f, 0.f, 0.f),
       font_(font) {
-  set_name("Label");
 }
 
 Label::~Label() {

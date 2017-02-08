@@ -78,10 +78,6 @@ class Seat {
     return nullptr != wl_seat_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_seat_;
-  }
-
   bool Equal(const void *object) const {
     return wl_seat_ == object;
   }

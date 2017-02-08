@@ -32,7 +32,6 @@ namespace skland {
 DefaultWindowFrame::CloseButton::CloseButton()
     : AbstractButton() {
   resize(14, 14);
-  set_name("CloseButton");
 }
 
 DefaultWindowFrame::CloseButton::~CloseButton() {
@@ -48,46 +47,46 @@ void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */
 
 void DefaultWindowFrame::CloseButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  canvas->Save();
+  canvas->ClipRect(geometry());
+  canvas->Clear();
 
-  Color regular(0.83f, 0.33f, 0.33f);
-  Color outline(0.78f, 0.28f, 0.28f);
-  Color down = regular - 50;
+  Color regular(0.95f, 0.55f, 0.f);
+  // Color outline(0.78f, 0.28f, 0.28f);
+  Color outline(0xFF444444);
+  Color down = regular - 75;
   Color hover = regular + 15;
 
   Paint paint;
-  paint.SetAntiAlias(true);
 
-  paint.SetColor(regular);
   if (IsHovered()) {
     if (IsPressed()) {
       paint.SetColor(down);
     } else {
       paint.SetColor(hover);
     }
+  } else {
+    paint.SetColor(outline);
   }
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
 
-  paint.SetStrokeWidth(1.f);
-  paint.SetColor(outline);
   paint.SetStyle(Paint::Style::kStyleStroke);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
+  paint.SetAntiAlias(true);
+  paint.SetStrokeWidth(1.f);
+  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.5f, paint);
 
-  if (IsHovered()) {
-    paint.SetStrokeWidth(1.5f);
-    paint.SetColor(0xFF444444);
-    canvas->DrawLine(geometry().center_x() - 2.5f, geometry().center_y() - 2.5f,
-                     geometry().center_x() + 2.5f, geometry().center_y() + 2.5f,
-                     paint);
-    canvas->DrawLine(geometry().center_x() + 2.5f, geometry().center_y() - 2.5f,
-                     geometry().center_x() - 2.5f, geometry().center_y() + 2.5f,
-                     paint);
-  }
+  paint.SetStrokeWidth(1.5f);
+  canvas->DrawLine(geometry().center_x() - 2.5f, geometry().center_y() - 2.5f,
+                   geometry().center_x() + 2.5f, geometry().center_y() + 2.5f,
+                   paint);
+  canvas->DrawLine(geometry().center_x() + 2.5f, geometry().center_y() - 2.5f,
+                   geometry().center_x() - 2.5f, geometry().center_y() + 2.5f,
+                   paint);
+  canvas->Restore();
 }
 
 DefaultWindowFrame::MaximizeButton::MaximizeButton()
     : AbstractButton() {
   resize(14, 14);
-  set_name("MaximizeButton");
 }
 
 DefaultWindowFrame::MaximizeButton::~MaximizeButton() {
@@ -132,7 +131,6 @@ void DefaultWindowFrame::MaximizeButton::OnDraw(const Context *context) {
 DefaultWindowFrame::MinimizeButton::MinimizeButton()
     : AbstractButton() {
   resize(14, 14);
-  set_name("MinimizeButton");
 }
 
 DefaultWindowFrame::MinimizeButton::~MinimizeButton() {
@@ -222,7 +220,7 @@ void DefaultWindowFrame::CreateWidgets() {
 //  AddWidget(maximize_button_);
 //  AddWidget(minimize_button_);
 
-  LayoutWidgets((int) window()->geometry().width(), (int) window()->geometry().height());
+  LayoutWidgets(window()->width(), window()->height());
 }
 
 void DefaultWindowFrame::OnResize(int width, int height) {
@@ -230,12 +228,12 @@ void DefaultWindowFrame::OnResize(int width, int height) {
 }
 
 void DefaultWindowFrame::LayoutWidgets(int width, int height) {
-  title_->SetPosition(0, 0);
-  title_->Resize((int) window()->geometry().width(), title_bar_size());
+  title_->MoveTo(0, 0);
+  title_->Resize(window()->width(), title_bar_size());
 
   int y = (title_bar_size() - (int) close_button_->geometry().height()) / 2;
   int x = y + 1;
-  close_button_->SetPosition(x, y);
+  close_button_->MoveTo(x, y);
 }
 
 void DefaultWindowFrame::OnDraw(const Context *context) {
@@ -336,14 +334,14 @@ void DefaultWindowFrame::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
                                     250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
-                                    window()->geometry().width() - 2 * rad, 2 * rad),
+                                    window()->width() - 2 * rad, 2 * rad),
                    nullptr);
 
   // top-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
                                     250, 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(window()->geometry().width() - rad + offset_x, -rad + offset_y,
+                   SkRect::MakeXYWH(window()->width() - rad + offset_x, -rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -352,14 +350,14 @@ void DefaultWindowFrame::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
-                                    2 * rad, window()->geometry().height() - 2 * rad),
+                                    2 * rad, window()->height() - 2 * rad),
                    nullptr);
 
   // bottom-left
   c->drawImageRect(image,
                    SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(-rad + offset_x, window()->geometry().height() - rad + offset_y,
+                   SkRect::MakeXYWH(-rad + offset_x, window()->height() - rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -367,16 +365,16 @@ void DefaultWindowFrame::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250 - 2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(rad + offset_x, window()->geometry().height() - rad + offset_y,
-                                    window()->geometry().width() - 2 * rad, 2 * rad),
+                   SkRect::MakeXYWH(rad + offset_x, window()->height() - rad + offset_y,
+                                    window()->width() - 2 * rad, 2 * rad),
                    nullptr);
 
   // bottom-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250, 250),
-                   SkRect::MakeXYWH(window()->geometry().width() - rad + offset_x,
-                                    window()->geometry().height() - rad + offset_y,
+                   SkRect::MakeXYWH(window()->width() - rad + offset_x,
+                                    window()->height() - rad + offset_y,
                                     2 * rad,
                                     2 * rad),
                    nullptr);
@@ -385,8 +383,8 @@ void DefaultWindowFrame::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
                                     250, 250 - 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(window()->geometry().width() - rad + offset_x, rad + offset_y,
-                                    2 * rad, window()->geometry().height() - 2 * rad),
+                   SkRect::MakeXYWH(window()->width() - rad + offset_x, rad + offset_y,
+                                    2 * rad, window()->height() - 2 * rad),
                    nullptr);
 
 }

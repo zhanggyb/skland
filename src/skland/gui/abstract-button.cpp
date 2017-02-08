@@ -34,16 +34,15 @@ AbstractButton::~AbstractButton() {
 
 void AbstractButton::OnMouseEnter(MouseEvent *event) {
   set_bit<uint32_t>(flags_, kFlagIndexHovered);
-  if (flags_ && kFlagIndexSensitive) {
+  if (IsSensitive()) {
     Update();
   }
   event->Accept();
 }
 
 void AbstractButton::OnMouseLeave(MouseEvent *event) {
-  clear_bit<uint32_t>(flags_, kFlagIndexHovered);
-  clear_bit<uint32_t>(flags_, kFlagIndexClick);
-  if (flags_ && kFlagIndexSensitive) {
+  clear_bit<uint32_t>(flags_, kFlagIndexHovered | kFlagIndexClicked | kFlagIndexPressed);
+  if (IsSensitive()) {
     Update();
   }
   event->Accept();
@@ -54,15 +53,15 @@ void AbstractButton::OnMouseButton(MouseEvent *event) {
     set_bit<uint32_t>(flags_, kFlagIndexPressed);
     Update();
   } else {
-    if (flags_ & kFlagIndexPressed) {
-      set_bit<uint32_t>(flags_, kFlagIndexClick);
+    if (IsPressed()) {
+      set_bit<uint32_t>(flags_, kFlagIndexClicked);
     }
     clear_bit<uint32_t>(flags_, kFlagIndexPressed);
     Update();
   }
 
-  if (flags_ & kFlagIndexClick) {
-    clear_bit<uint32_t>(flags_, kFlagIndexClick);
+  if (flags_ & kFlagIndexClicked) {
+    clear_bit<uint32_t>(flags_, kFlagIndexClicked);
     event->Accept();
     clicked_();
     return;

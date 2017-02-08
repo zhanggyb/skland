@@ -73,10 +73,6 @@ class Compositor {
     return nullptr != wl_compositor_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_compositor_;
-  }
-
   bool Equal(const void *object) const {
     return wl_compositor_ == object;
   }

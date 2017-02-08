@@ -73,10 +73,6 @@ class Shm {
     return nullptr != wl_shm_;
   }
 
-  bool IsNull() const {
-    return nullptr == wl_shm_;
-  }
-
   bool Equal(const void *object) const {
     return wl_shm_ == object;
   }

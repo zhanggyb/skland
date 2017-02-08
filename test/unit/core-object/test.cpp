@@ -14,8 +14,6 @@ class TestableObject : public Object {
 
   inline TestableObject() : Object() {}
 
-  inline TestableObject(const char *name) : Object(name) {}
-
   inline uint32_t get_children_count() const { return children_count(); }
 
   inline void push_front_child(TestableObject *obj) { PushFrontChild(obj); }
@@ -105,10 +103,10 @@ TEST_F(Test, construct_1) {
  * Insert at 0, same as push front
  */
 TEST_F(Test, insert_1) {
-  TestableObject parent("parent");
-  TestableObject *child1 = new TestableObject("child1");
-  TestableObject *child2 = new TestableObject("child2");
-  TestableObject *child3 = new TestableObject("child3");
+  TestableObject parent;
+  TestableObject *child1 = new TestableObject;
+  TestableObject *child2 = new TestableObject;
+  TestableObject *child3 = new TestableObject;
 
   parent.insert_child(child1);
   parent.insert_child(child2);
@@ -126,10 +124,10 @@ TEST_F(Test, insert_1) {
  * Insert at end, same as push back
  */
 TEST_F(Test, insert_2) {
-  TestableObject parent("parent");
-  TestableObject *child1 = new TestableObject("child1");
-  TestableObject *child2 = new TestableObject("child2");
-  TestableObject *child3 = new TestableObject("child3");
+  TestableObject parent;
+  TestableObject *child1 = new TestableObject;
+  TestableObject *child2 = new TestableObject;
+  TestableObject *child3 = new TestableObject;
 
   parent.insert_child(child1, -1);
   parent.insert_child(child2, -1);
@@ -147,11 +145,11 @@ TEST_F(Test, insert_2) {
  * Insert as arbitrary index
  */
 TEST_F(Test, insert_3) {
-  TestableObject parent("parent");
-  TestableObject *child1 = new TestableObject("child1");
-  TestableObject *child2 = new TestableObject("child2");
-  TestableObject *child3 = new TestableObject("child3");
-  TestableObject *child4 = new TestableObject("child4");
+  TestableObject parent;
+  TestableObject *child1 = new TestableObject;
+  TestableObject *child2 = new TestableObject;
+  TestableObject *child3 = new TestableObject;
+  TestableObject *child4 = new TestableObject;
 
   parent.insert_child(child2);
   parent.insert_child(child3, -1);
@@ -169,10 +167,10 @@ TEST_F(Test, insert_3) {
 }
 
 TEST_F(Test, push_back1) {
-  TestableObject parent("parent");
-  TestableObject *child1 = new TestableObject("child1");
-  TestableObject *child2 = new TestableObject("child2");
-  TestableObject *child3 = new TestableObject("child3");
+  TestableObject parent;
+  TestableObject *child1 = new TestableObject;
+  TestableObject *child2 = new TestableObject;
+  TestableObject *child3 = new TestableObject;
 
   parent.push_back_child(child1);
   parent.push_back_child(child2);
@@ -185,10 +183,10 @@ TEST_F(Test, push_back1) {
 }
 
 TEST_F(Test, clear_1) {
-  TestableObject parent("parent");
-  TestableObject *child1 = new TestableObject("child1");
-  TestableObject *child2 = new TestableObject("child2");
-  TestableObject *child3 = new TestableObject("child3");
+  TestableObject parent;
+  TestableObject *child1 = new TestableObject;
+  TestableObject *child2 = new TestableObject;
+  TestableObject *child3 = new TestableObject;
 
   parent.push_back_child(child1);
   parent.push_back_child(child2);
@@ -200,10 +198,10 @@ TEST_F(Test, clear_1) {
 }
 
 TEST_F(Test, push_back_managed_object_1) {
-  TestableManager manager("manager");
-  TestableSubject *subject1 = new TestableSubject("subject1");
-  TestableSubject *subject2 = new TestableSubject("subject2");
-  TestableSubject *subject3 = new TestableSubject("subject3");
+  TestableManager manager;
+  TestableSubject *subject1 = new TestableSubject();
+  TestableSubject *subject2 = new TestableSubject();
+  TestableSubject *subject3 = new TestableSubject();
 
   manager.PushBackSubject(subject1);
   manager.PushBackSubject(subject2);
@@ -217,10 +215,10 @@ TEST_F(Test, push_back_managed_object_1) {
 }
 
 TEST_F(Test, push_front_managed_object_1) {
-  TestableManager manager("manager");
-  TestableSubject *subject1 = new TestableSubject("subject1");
-  TestableSubject *subject2 = new TestableSubject("subject2");
-  TestableSubject *subject3 = new TestableSubject("subject3");
+  TestableManager manager;
+  TestableSubject *subject1 = new TestableSubject();
+  TestableSubject *subject2 = new TestableSubject();
+  TestableSubject *subject3 = new TestableSubject();
 
   manager.PushFrontSubject(subject3);
   manager.PushFrontSubject(subject2);
@@ -234,10 +232,10 @@ TEST_F(Test, push_front_managed_object_1) {
 }
 
 TEST_F(Test, insert_managed_object_1) {
-  TestableManager manager("manager");
-  TestableSubject *subject1 = new TestableSubject("subject1");
-  TestableSubject *subject2 = new TestableSubject("subject2");
-  TestableSubject *subject3 = new TestableSubject("subject3");
+  TestableManager manager;
+  TestableSubject *subject1 = new TestableSubject();
+  TestableSubject *subject2 = new TestableSubject();
+  TestableSubject *subject3 = new TestableSubject();
 
   manager.InsertSubject(subject3);
   manager.InsertSubject(subject2);
@@ -251,10 +249,10 @@ TEST_F(Test, insert_managed_object_1) {
 }
 
 TEST_F(Test, clear_managed_objects_1) {
-  TestableManager manager("manager");
-  TestableSubject *subject1 = new TestableSubject("subject1");
-  TestableSubject *subject2 = new TestableSubject("subject2");
-  TestableSubject *subject3 = new TestableSubject("subject3");
+  TestableManager manager;
+  TestableSubject *subject1 = new TestableSubject();
+  TestableSubject *subject2 = new TestableSubject();
+  TestableSubject *subject3 = new TestableSubject();
 
   manager.PushBackSubject(subject1);
   manager.PushBackSubject(subject2);

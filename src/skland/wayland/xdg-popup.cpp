@@ -63,10 +63,6 @@ bool XdgPopup::IsValid() const {
   return nullptr != metadata_->zxdg_popup;
 }
 
-bool XdgPopup::IsNull() const {
-  return nullptr == metadata_->zxdg_popup;
-}
-
 }
 }
 

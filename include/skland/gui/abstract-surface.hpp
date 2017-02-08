@@ -31,10 +31,14 @@
 
 namespace skland {
 
+class Application;
+class Display;
 class AbstractView;
 class Canvas;
+struct CommitTask;
 
 /**
+ * @ingroup gui
  * @brief An abstract base class for surfaces
  *
  * A surface in SkLand is the drawing area on screen, it uses the native wayland
@@ -49,7 +53,7 @@ class Canvas;
  * above or below the parent surface.
  *
  * According to wayland protocol, surfaces are stacked as a list, not a
- * tree. Use the up() and down() property to get the sibling surface above or
+ * tree. Use the above() and below() property to get the sibling surface above or
  * below current one.
  *
  * @see AbstractView
@@ -57,11 +61,24 @@ class Canvas;
  */
 class AbstractSurface {
 
+  friend class Application;
+  friend class Display;
+
   AbstractSurface() = delete;
   AbstractSurface(const AbstractSurface &) = delete;
   AbstractSurface &operator=(const AbstractSurface &) = delete;
 
  public:
+
+  /**
+   * @brief Commit behaviour of the sub-surface
+   */
+  enum Mode {
+    kSyncMode,
+    kDesyncMode
+  };
+
+  static int GetShellSurfaceCount() { return kCount; }
 
   AbstractSurface(AbstractView *view, const Margin &margin = Margin());
 
@@ -74,11 +91,11 @@ class AbstractSurface {
    */
   void AddSubSurface(AbstractSurface *subsurface, int pos = 0);
 
-  void SetSync() const;
+  void SetSync();
 
-  void SetDesync() const;
+  void SetDesync();
 
-  void Commit() const;
+  void Commit();
 
   void Damage(int surface_x, int surface_y, int width, int height) const {
     wl_surface_.Damage(surface_x, surface_y, width, height);
@@ -105,21 +122,54 @@ class AbstractSurface {
    */
   void SetPosition(int x, int y);
 
-  const wayland::Surface &wl_surface() const { return wl_surface_; }
+  /**
+   * @brief Set position in window coordinates
+   * @param x The global x position
+   * @param y The global y position
+   */
+  void SetWindowPosition(int x, int y);
 
-  const wayland::SubSurface &wl_sub_surface() const { return wl_sub_surface_; }
+  /**
+   * @brief Get the position in window coordinates
+   * @return Global position
+   */
+  Point GetWindowPosition() const;
+
+  Mode mode() const { return mode_; }
+
+  AbstractSurface *parent() const { return parent_; }
+
+  /**
+   * @brief The sibling surface above this one
+   * @return
+   */
+  AbstractSurface *above() const { return above_; }
+
+  /**
+   * @brief The sibling surface below this one
+   * @return
+   */
+  AbstractSurface *below() const { return below_; }
+
+  /**
+   * @brief The shell surface shows over this one
+   * @return
+   */
+  AbstractSurface *up() const { return up_; }
+
+  /**
+   * @brief The shell surface shows under this one
+   * @return
+   */
+  AbstractSurface *down() const { return down_; }
+
+  const wayland::Surface &wl_surface() const { return wl_surface_; }
 
   AbstractView *view() const { return view_; }
 
   const Margin &margin() const { return margin_; }
 
   const Point &position() const { return position_; }
-
-  AbstractSurface *parent() const { return parent_; }
-
-  AbstractSurface *up() const { return up_; }
-
-  AbstractSurface *down() const { return down_; }
 
   /**
    * @brief Virtual method to get the canvas for this surface
@@ -129,6 +179,10 @@ class AbstractSurface {
    * In EGLSurface this will render the 3D content to a canvas first.
    */
   virtual std::shared_ptr<Canvas> GetCanvas() const = 0;
+
+ protected:
+
+  const wayland::SubSurface &wl_sub_surface() const { return wl_sub_surface_; }
 
  private:
 
@@ -154,10 +208,28 @@ class AbstractSurface {
    */
   static void MoveBelow(AbstractSurface *surface_a, AbstractSurface *surface_b);
 
+  Mode mode_;
+
   AbstractSurface *parent_;
 
+  /**
+   * @brief The sibling surface placed up
+   */
+  AbstractSurface *above_;
+
+  /**
+   * @brief The sibling surface placed down
+   */
+  AbstractSurface *below_;
+
+  /**
+   * @brief The shell surface shows front
+   */
   AbstractSurface *up_;
 
+  /**
+   * @brief The shell surface shows back
+   */
   AbstractSurface *down_;
 
   wayland::Surface wl_surface_;
@@ -180,6 +252,59 @@ class AbstractSurface {
   int32_t buffer_scale_;
 
   bool is_user_data_set_;
+
+  std::unique_ptr<CommitTask> commit_task_;
+
+  // global surface stack:
+
+  /**
+   * @brief Push the surface to the top of the global stack
+   * @param surface
+   *
+   * This function is only called in constructor
+   */
+  static void Push(AbstractSurface *surface);
+
+  /**
+   * @brief Remove the surface from the global stack
+   * @param surface
+   *
+   * This function is only called in destructor or when a new created surface is added into a parent
+   */
+  static void Remove(AbstractSurface *surface);
+
+  /**
+   * @brief Delete all shell surfaces and clear the global stack
+   */
+  static void Clear();
+
+  /**
+    * @brief Initialize the idle task list
+    */
+  static void InitializeCommitTaskList();
+
+  /**
+   * @brief Destroy the redraw task list
+   */
+  static void ClearCommitTaskList();
+
+  /**
+   * @brief The top shell surface in the stack
+   */
+  static AbstractSurface *kTop;
+
+  /**
+   * @brief The bottom shell surface in the stack
+   */
+  static AbstractSurface *kBottom;
+
+  /**
+   * @brief The count of shell surface
+   */
+  static int kCount;
+
+  static Task kCommitTaskHead;
+  static Task kCommitTaskTail;
 
 };
 

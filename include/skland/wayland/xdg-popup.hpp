@@ -47,8 +47,6 @@ class XdgPopup {
 
   bool IsValid() const;
 
-  bool IsNull() const;
-
   DelegateRef<void(int, int, int, int)> configure() { return configure_; }
 
   DelegateRef<void()> done() { return done_; }

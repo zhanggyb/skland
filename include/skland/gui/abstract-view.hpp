@@ -21,6 +21,8 @@
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
+#include "task.hpp"
+
 #include <memory>
 
 namespace skland {
@@ -42,6 +44,7 @@ struct ViewTask;
 struct RedrawTask;
 
 /**
+ * @ingroup gui
  * @brief An abstract base class for view object
  *
  * AbstractView is an abstract base class for view object. A view object in
@@ -90,15 +93,27 @@ class AbstractView : public Object {
    */
   virtual ~AbstractView();
 
-  void SetPosition(int x, int y);
+  void MoveTo(int x, int y);
 
   void Resize(int width, int height);
 
   virtual bool Contain(int x, int y) const;
 
-  const Rect &geometry() const {
-    return geometry_;
-  }
+  int x() const { return static_cast<int>(geometry_.x()); }
+
+  int y() const { return static_cast<int>(geometry_.y()); }
+
+  int width() const { return static_cast<int>(geometry_.width()); }
+
+  int height() const { return static_cast<int>(geometry_.height()); }
+
+  float center_x() const { return geometry_.center_x(); }
+
+  float center_y() const { return geometry_.center_y(); }
+
+  const Rect &geometry() const { return geometry_; }
+
+  bool visible() const { return visible_; }
 
   /**
    * @brief Get the surface on which this view renders
@@ -187,13 +202,30 @@ class AbstractView : public Object {
     return static_cast<AbstractView *>(last_child());
   }
 
-  const std::unique_ptr<RedrawTask> &redraw_task() const {
+  std::unique_ptr<RedrawTask> &redraw_task() {
     return redraw_task_;
   }
 
-  const std::unique_ptr<ViewTask> &mouse_task() const {
+  std::unique_ptr<ViewTask> &mouse_task() {
     return mouse_task_;
   }
+
+  static RedrawTask *GetRedrawTask(const AbstractView *view) {
+    return view->redraw_task_.get();
+  }
+
+  /**
+  * @brief Initialize the idle task list
+  */
+  static void InitializeRedrawTaskList();
+
+  /**
+   * @brief Destroy the redraw task list
+   */
+  static void ClearRedrawTaskList();
+
+  static Task kRedrawTaskHead;
+  static Task kRedrawTaskTail;
 
  private:
 

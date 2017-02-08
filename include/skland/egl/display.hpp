@@ -18,17 +18,22 @@
 #define SKLAND_EGL_DISPLAY_HPP_
 
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include "surface.hpp"
 
 namespace skland {
 
+// Forward declaration:
 namespace wayland {
 class Display;
 }
 
 namespace egl {
 
-class Surface;
-
+/**
+ * @ingroup egl
+ * @brief EGL Display
+ */
 class Display {
 
   friend class Surface;
@@ -47,6 +52,7 @@ class Display {
 
   ~Display() {
     if (egl_display_) {
+      eglMakeCurrent(egl_display_, (::EGLSurface) 0, (::EGLSurface) 0, (::EGLContext) 0);
       eglTerminate(egl_display_);
       eglReleaseThread();
     }
@@ -56,13 +62,30 @@ class Display {
 
   void Destroy();
 
-  EGLint major() const {
-    return major_;
+  bool MakeCurrent(const Surface &draw, const Surface &read) const {
+    return EGL_TRUE ==
+        eglMakeCurrent(egl_display_, draw.egl_surface_, read.egl_surface_, egl_context_);
   }
 
-  EGLint minor() const {
-    return minor_;
+  bool SwapBuffersWithDamage(const Surface &surface, int x, int y, int width, int height) const {
+    EGLint rect[4] = {x, y, width, height};
+    return EGL_TRUE == kSwapBuffersWithDamageAPI(egl_display_, surface.egl_surface_, rect, 4 * sizeof(EGLint));
   }
+
+  bool SwapBuffers(const Surface &surface) const {
+    return EGL_TRUE ==
+        eglSwapBuffers(egl_display_, surface.egl_surface_);
+  }
+
+  bool SwapInterval(EGLint interval = 0) const {
+    return EGL_TRUE == eglSwapInterval(egl_display_, interval);
+  }
+
+  void MakeSwapBufferNonBlock() const;
+
+  EGLint major() const { return major_; }
+
+  EGLint minor() const { return minor_; }
 
  private:
 
@@ -78,6 +101,8 @@ class Display {
 
   EGLint major_;  /**< The major version */
   EGLint minor_;  /**< The minor version */
+
+  static PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC kSwapBuffersWithDamageAPI;
 
 };
 

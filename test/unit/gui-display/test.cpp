@@ -39,7 +39,6 @@ TEST_F(Test, application) {
 
   Display *display = app.display();
 
-  cout << "windows count: " << display->windows_count() << endl;
   cout << "outputs count: " << display->outputs_count() << endl;
 //  cout << "pixel format: " << display->pixel_formats() << endl;
 

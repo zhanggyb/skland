@@ -14,17 +14,29 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_MAIN_WINDOW_HPP_
-#define SKLAND_GUI_MAIN_WINDOW_HPP_
+#ifndef SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
 
-#include "abstract-window.hpp"
-#include "memory-pool.hpp"
-#include "buffer.hpp"
+#include <skland/gui/task.hpp>
 
 namespace skland {
 
-class AbstractWidget;
+class AbstractSurface;
+
+struct CommitTask : public Task {
+  CommitTask(const CommitTask &) = delete;
+  CommitTask &operator=(const CommitTask &) = delete;
+
+  CommitTask(AbstractSurface *surface)
+      : Task(), surface(surface) {}
+
+  virtual ~CommitTask() {}
+
+  virtual void Run() const;
+
+  AbstractSurface *surface;
+};
 
 }
 
-#endif // SKLAND_GUI_MAIN_WINDOW_HPP_
+#endif // SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
