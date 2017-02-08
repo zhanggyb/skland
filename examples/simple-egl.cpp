@@ -156,9 +156,7 @@ void SimpleWindow::OnRenderEGL() {
       { 0, 0, 1, 0 },
       { 0, 0, 0, 1 }
   };
-  static const uint32_t speed_div = 5, benchmark_interval = 5;
-  EGLint rect[4];
-  EGLint buffer_age = 0;
+  static const uint32_t speed_div = 5;
   struct timeval tv;
 
   gettimeofday(&tv, NULL);
