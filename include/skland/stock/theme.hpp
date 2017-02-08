@@ -20,6 +20,8 @@
 #include "../core/color.hpp"
 #include "../core/margin.hpp"
 
+#include "../gui/abstract-window-frame.hpp"
+
 #include <vector>
 
 class SkPixmap;
@@ -43,6 +45,10 @@ struct ColorScheme {
   bool alpha_check;
 };
 
+/**
+ * @ingroup stock
+ * @brief The global theme manager
+ */
 class Theme {
 
   friend class Application;
@@ -52,7 +58,11 @@ class Theme {
 
  public:
 
-  static AbstractWindowFrame *CreateWindowFrame(bool dark = false);
+  static void Load(const char *name = nullptr);
+
+  static AbstractWindowFrame *CreateWindowFrame();
+
+  static void DestroyWindowFrame(AbstractWindowFrame *window_frame);
 
   static inline const ColorScheme &window_frame() {
     return kTheme->window_frame_;
@@ -104,6 +114,9 @@ class Theme {
   std::vector<uint32_t> shadow_pixels_;
 
   SkPixmap *shadow_pixmap_;
+
+  WindowFrameCreateHandle window_frame_create_handle_;
+  WindowFrameDestroyHandle window_frame_destroy_handle_;
 
   static Theme *kTheme;
 

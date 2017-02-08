@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_STOCK_INTERNAL_DEFAULT_WINDOW_FRAME_HPP_
-#define SKLAND_STOCK_INTERNAL_DEFAULT_WINDOW_FRAME_HPP_
+#ifndef SKLAND_STOCK_INTERNAL_WINDOW_FRAME_LIGHT_HPP_
+#define SKLAND_STOCK_INTERNAL_WINDOW_FRAME_LIGHT_HPP_
 
 #include <skland/gui/abstract-window-frame.hpp>
 
@@ -29,21 +29,16 @@ class Label;
 /**
  * @brief The default window frame
  */
-class DefaultWindowFrame final : public AbstractWindowFrame {
+class WindowFrameLight final : public AbstractWindowFrame {
 
-  DefaultWindowFrame(const DefaultWindowFrame &orig) = delete;
-  DefaultWindowFrame &operator=(const DefaultWindowFrame &other) = delete;
+  WindowFrameLight(const WindowFrameLight &orig) = delete;
+  WindowFrameLight &operator=(const WindowFrameLight &other) = delete;
 
  public:
 
-  enum Mode {
-    kModeLight,
-    kModeDark
-  };
+  WindowFrameLight();
 
-  DefaultWindowFrame(Mode mode = kModeLight);
-
-  virtual ~DefaultWindowFrame();
+  virtual ~WindowFrameLight();
 
  protected:
 
@@ -147,10 +142,12 @@ class DefaultWindowFrame final : public AbstractWindowFrame {
 
   Label *title_;
 
-  Mode mode_;
-
 };
 
 }
 
-#endif // SKLAND_GUI_WINDOW_FRAME_HPP_
+extern "C" void *WindowFrameLightCreate();
+
+extern "C" void WindowFrameLightDestroy(void *p);
+
+#endif // SKLAND_STOCK_INTERNAL_WINDOW_FRAME_LIGHT_HPP_

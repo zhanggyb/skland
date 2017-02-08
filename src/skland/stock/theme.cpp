@@ -15,21 +15,23 @@
  */
 
 #include <skland/stock/theme.hpp>
-#include <SkBlurMaskFilter.h>
-#include <SkPath.h>
+#include <iostream>
 
+#include "SkBlurMaskFilter.h"
+#include "SkPath.h"
 #include "SkCanvas.h"
-#include "SkPaint.h"
-#include "SkPixmap.h"
 
-#include "internal/default-window-frame.hpp"
+#include "internal/window-frame-light.hpp"
+#include "internal/window-frame-dark.hpp"
 
 namespace skland {
 
 Theme *Theme::kTheme = nullptr;
 
 Theme::Theme()
-    : shadow_pixmap_(nullptr) {
+    : shadow_pixmap_(nullptr),
+      window_frame_create_handle_(nullptr),
+      window_frame_destroy_handle_(nullptr) {
   shadow_pixmap_ = new SkPixmap;
   Reset();
 }
@@ -38,8 +40,34 @@ Theme::~Theme() {
   delete shadow_pixmap_;
 }
 
-AbstractWindowFrame *Theme::CreateWindowFrame(bool dark) {
-  return new DefaultWindowFrame(dark ? DefaultWindowFrame::kModeDark : DefaultWindowFrame::kModeLight);
+void Theme::Load(const char *name) {
+  if (nullptr == name) {
+    kTheme->Reset();
+    return;
+  }
+
+  // TODO: load from file
+
+  // Otherwise, use the builtin theme
+  std::string upper_name(name);
+  std::transform(upper_name.begin(), upper_name.end(), upper_name.begin(), ::toupper);
+
+  if (upper_name == "DARK") {
+    kTheme->Reset();
+    kTheme->window_frame_create_handle_ = WindowFrameDarkCreate;
+    kTheme->window_frame_destroy_handle_ = WindowFrameDarkDestroy;
+  } else {
+    kTheme->Reset();
+  }
+}
+
+AbstractWindowFrame *Theme::CreateWindowFrame() {
+//  return new DefaultWindowFrame(dark ? DefaultWindowFrame::kModeDark : DefaultWindowFrame::kModeLight);
+  return static_cast<AbstractWindowFrame *>(kTheme->window_frame_create_handle_());
+}
+
+void Theme::DestroyWindowFrame(AbstractWindowFrame *window_frame) {
+  kTheme->window_frame_destroy_handle_(window_frame);
 }
 
 void Theme::Reset() {
@@ -71,6 +99,9 @@ void Theme::Reset() {
   shadow_pixmap_ = new SkPixmap(image_info,
                                 shadow_pixels_.data(),
                                 kShadowImageWidth * 4);
+
+  window_frame_create_handle_ = WindowFrameLightCreate;
+  window_frame_destroy_handle_ = WindowFrameLightDestroy;
 }
 
 void Theme::GenerateShadowImage() {

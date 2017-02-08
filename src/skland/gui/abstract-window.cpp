@@ -42,7 +42,7 @@ AbstractWindow::AbstractWindow(int width,
 }
 
 AbstractWindow::~AbstractWindow() {
-  delete window_frame_;
+  Theme::DestroyWindowFrame(window_frame_);
   delete shell_surface_;
 }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "default-window-frame.hpp"
+#include "window-frame-dark.hpp"
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
@@ -29,23 +29,23 @@
 
 namespace skland {
 
-DefaultWindowFrame::CloseButton::CloseButton()
+WindowFrameDark::CloseButton::CloseButton()
     : AbstractButton() {
   resize(14, 14);
 }
 
-DefaultWindowFrame::CloseButton::~CloseButton() {
+WindowFrameDark::CloseButton::~CloseButton() {
 }
 
-Size DefaultWindowFrame::CloseButton::GetPreferredSize() const {
+Size WindowFrameDark::CloseButton::GetPreferredSize() const {
   return Size(14, 14);
 }
 
-void DefaultWindowFrame::CloseButton::OnResize(int /* width */, int /* height */) {
+void WindowFrameDark::CloseButton::OnResize(int /* width */, int /* height */) {
 
 }
 
-void DefaultWindowFrame::CloseButton::OnDraw(const Context *context) {
+void WindowFrameDark::CloseButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->GetCanvas();
   canvas->Save();
   canvas->ClipRect(geometry());
@@ -53,7 +53,7 @@ void DefaultWindowFrame::CloseButton::OnDraw(const Context *context) {
 
   Color regular(0.95f, 0.55f, 0.f);
   // Color outline(0.78f, 0.28f, 0.28f);
-  Color outline(0xFF444444);
+  Color outline(0xFFCCCCCC);
   Color down = regular - 75;
   Color hover = regular + 15;
 
@@ -84,24 +84,24 @@ void DefaultWindowFrame::CloseButton::OnDraw(const Context *context) {
   canvas->Restore();
 }
 
-DefaultWindowFrame::MaximizeButton::MaximizeButton()
+WindowFrameDark::MaximizeButton::MaximizeButton()
     : AbstractButton() {
   resize(14, 14);
 }
 
-DefaultWindowFrame::MaximizeButton::~MaximizeButton() {
+WindowFrameDark::MaximizeButton::~MaximizeButton() {
 
 }
 
-Size DefaultWindowFrame::MaximizeButton::GetPreferredSize() const {
+Size WindowFrameDark::MaximizeButton::GetPreferredSize() const {
   return Size(14, 14);
 }
 
-void DefaultWindowFrame::MaximizeButton::OnResize(int /* width */, int /* height */) {
+void WindowFrameDark::MaximizeButton::OnResize(int /* width */, int /* height */) {
 
 }
 
-void DefaultWindowFrame::MaximizeButton::OnDraw(const Context *context) {
+void WindowFrameDark::MaximizeButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->GetCanvas();
 
   Color regular(0.25f, 0.8f, 0.25f, 1.f);
@@ -128,24 +128,24 @@ void DefaultWindowFrame::MaximizeButton::OnDraw(const Context *context) {
   canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
 }
 
-DefaultWindowFrame::MinimizeButton::MinimizeButton()
+WindowFrameDark::MinimizeButton::MinimizeButton()
     : AbstractButton() {
   resize(14, 14);
 }
 
-DefaultWindowFrame::MinimizeButton::~MinimizeButton() {
+WindowFrameDark::MinimizeButton::~MinimizeButton() {
 
 }
 
-Size DefaultWindowFrame::MinimizeButton::GetPreferredSize() const {
+Size WindowFrameDark::MinimizeButton::GetPreferredSize() const {
   return Size(14, 14);
 }
 
-void DefaultWindowFrame::MinimizeButton::OnResize(int /* width */, int /* height */) {
+void WindowFrameDark::MinimizeButton::OnResize(int /* width */, int /* height */) {
 
 }
 
-void DefaultWindowFrame::MinimizeButton::OnDraw(const Context *context) {
+void WindowFrameDark::MinimizeButton::OnDraw(const Context *context) {
   Color regular(1.f, 0.75f, 0.2f, 1.f);
   Color down = regular - 50;
   Color hover = regular + 15;
@@ -172,38 +172,37 @@ void DefaultWindowFrame::MinimizeButton::OnDraw(const Context *context) {
 
 //-------------------------
 
-DefaultWindowFrame::DefaultWindowFrame(Mode mode)
+WindowFrameDark::WindowFrameDark()
     : AbstractWindowFrame(),
       close_button_(nullptr),
       maximize_button_(nullptr),
       minimize_button_(nullptr),
-      title_(nullptr),
-      mode_(mode) {
+      title_(nullptr) {
   set_border(0);
   set_title_bar_size(22);
   set_title_bar_position(kTitleBarTop);
 }
 
-DefaultWindowFrame::~DefaultWindowFrame() {
+WindowFrameDark::~WindowFrameDark() {
   delete title_;
   delete close_button_;
 }
 
-void DefaultWindowFrame::OnCloseButtonClicked(SLOT /* slot */) {
+void WindowFrameDark::OnCloseButtonClicked(SLOT /* slot */) {
   EmitAction(AbstractWindow::kActionClose);
 }
 
-void DefaultWindowFrame::OnMaximizeButtonClicked(SLOT /* slot */) {
+void WindowFrameDark::OnMaximizeButtonClicked(SLOT /* slot */) {
   EmitAction(AbstractWindow::kActionMaximize);
 }
 
-void DefaultWindowFrame::OnMinimizeButtonClicked(SLOT /* slot */) {
+void WindowFrameDark::OnMinimizeButtonClicked(SLOT /* slot */) {
   EmitAction(AbstractWindow::kActionMinimize);
 }
 
-void DefaultWindowFrame::CreateWidgets() {
+void WindowFrameDark::CreateWidgets() {
   close_button_ = new CloseButton;
-  close_button_->clicked().Connect(this, &DefaultWindowFrame::OnCloseButtonClicked);
+  close_button_->clicked().Connect(this, &WindowFrameDark::OnCloseButtonClicked);
 
 //  minimize_button_ = new MinimizeButton;
 //  minimize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMinimizeButtonClicked);
@@ -212,7 +211,7 @@ void DefaultWindowFrame::CreateWidgets() {
 //  maximize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMaximizeButtonClicked);
 
   title_ = new Label(window()->title());
-  title_->SetForeground(mode_ == kModeLight ? 0xFF444444 : 0xFFBBBBBB);
+  title_->SetForeground(0xFFBBBBBB);
   title_->SetFont(Font(Typeface::kBold));
 
   AddWidget(title_);  // put the title below other widgets
@@ -223,11 +222,11 @@ void DefaultWindowFrame::CreateWidgets() {
   LayoutWidgets(window()->width(), window()->height());
 }
 
-void DefaultWindowFrame::OnResize(int width, int height) {
+void WindowFrameDark::OnResize(int width, int height) {
   LayoutWidgets(width, height);
 }
 
-void DefaultWindowFrame::LayoutWidgets(int width, int height) {
+void WindowFrameDark::LayoutWidgets(int width, int height) {
   title_->MoveTo(0, 0);
   title_->Resize(window()->width(), title_bar_size());
 
@@ -236,7 +235,7 @@ void DefaultWindowFrame::LayoutWidgets(int width, int height) {
   close_button_->MoveTo(x, y);
 }
 
-void DefaultWindowFrame::OnDraw(const Context *context) {
+void WindowFrameDark::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->GetCanvas();
   canvas->Clear();
 
@@ -259,17 +258,17 @@ void DefaultWindowFrame::OnDraw(const Context *context) {
 
   path.Reset();
   path.AddRoundRect(window()->geometry(), radii);
-  paint.SetColor(mode_ == kModeLight ? 0xEFF0F0F0 : 0xEF202020);
+  paint.SetColor(0xEF202020);
   canvas->DrawPath(path, paint);
 
   canvas->Flush();
 }
 
-void DefaultWindowFrame::OnSetup() {
+void WindowFrameDark::OnSetup() {
   CreateWidgets();
 }
 
-int DefaultWindowFrame::GetMouseLocation(const MouseEvent *event) const {
+int WindowFrameDark::GetMouseLocation(const MouseEvent *event) const {
   int vlocation, hlocation, location;
   int x = static_cast<int>(event->surface_x()), y = static_cast<int>(event->surface_y());
 
@@ -310,7 +309,7 @@ int DefaultWindowFrame::GetMouseLocation(const MouseEvent *event) const {
   return location;
 }
 
-void DefaultWindowFrame::DrawShadow(Canvas *canvas) {
+void WindowFrameDark::DrawShadow(Canvas *canvas) {
 
   const float rad = Theme::shadow_radius() - 1.f; // The spread radius
 
@@ -390,3 +389,13 @@ void DefaultWindowFrame::DrawShadow(Canvas *canvas) {
 }
 
 }
+
+void *WindowFrameDarkCreate() {
+  return new skland::WindowFrameDark;
+}
+
+void WindowFrameDarkDestroy(void *p) {
+  skland::WindowFrameDark *frame = static_cast<skland::WindowFrameDark *>(p);
+  delete frame;
+}
+
