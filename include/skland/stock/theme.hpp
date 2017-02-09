@@ -20,8 +20,6 @@
 #include "../core/color.hpp"
 #include "../core/margin.hpp"
 
-#include "../gui/abstract-window-frame.hpp"
-
 #include <vector>
 
 class SkPixmap;

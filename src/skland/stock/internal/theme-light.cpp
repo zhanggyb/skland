@@ -24,8 +24,11 @@
 #include <skland/gui/label.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window.hpp>
-
+#include <skland/gui/abstract-window-frame.hpp>
 #include <skland/gui/context.hpp>
+
+#include <skland/graphic/gradient-shader.hpp>
+
 #include "SkCanvas.h"
 
 namespace skland {
@@ -146,18 +149,21 @@ class WindowFrameLight final : public AbstractWindowFrame {
 
   Label *title_;
 
+  static const int kButtonSize = 14;
+  static const int kButtonSpace = 5;
+
 };
 
 WindowFrameLight::CloseButton::CloseButton()
     : AbstractButton() {
-  resize(14, 14);
+  resize(kButtonSize, kButtonSize);
 }
 
 WindowFrameLight::CloseButton::~CloseButton() {
 }
 
 Size WindowFrameLight::CloseButton::GetPreferredSize() const {
-  return Size(14, 14);
+  return Size(kButtonSize, kButtonSize);
 }
 
 void WindowFrameLight::CloseButton::OnResize(int /* width */, int /* height */) {
@@ -170,42 +176,55 @@ void WindowFrameLight::CloseButton::OnDraw(const Context *context) {
   canvas->ClipRect(geometry());
   canvas->Clear();
 
-  Color regular(0.95f, 0.55f, 0.f);
-  // Color outline(0.78f, 0.28f, 0.28f);
-  Color outline(0xFF444444);
-  Color down = regular - 75;
-  Color hover = regular + 15;
-
-  Paint paint;
+  Color regulars[2] = {0xFF999999, 0xFF666666};
+  float pos[2] = {0.33f, 1.f};
+  Color outline = regulars[0];
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(down);
+      regulars[0] = regulars[0] - 25;
+      regulars[1] = regulars[1] - 25;
     } else {
-      paint.SetColor(hover);
+      regulars[0] = regulars[0] + 15;
+      regulars[1] = regulars[1] + 15;
     }
-  } else {
-    paint.SetColor(outline);
   }
 
-  paint.SetStyle(Paint::Style::kStyleStroke);
-  paint.SetAntiAlias(true);
-  paint.SetStrokeWidth(1.f);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.5f, paint);
+  Shader shader =
+      GradientShader::MakeRadial(Point2F(geometry().center_x(), geometry().center_y()),
+                                 6.f, regulars, pos, 2, Shader::TileMode::kTileModeClamp);
 
-  paint.SetStrokeWidth(1.5f);
-  canvas->DrawLine(geometry().center_x() - 2.5f, geometry().center_y() - 2.5f,
-                   geometry().center_x() + 2.5f, geometry().center_y() + 2.5f,
-                   paint);
-  canvas->DrawLine(geometry().center_x() + 2.5f, geometry().center_y() - 2.5f,
-                   geometry().center_x() - 2.5f, geometry().center_y() + 2.5f,
-                   paint);
+  Paint paint;
+  paint.SetShader(shader);
+  paint.SetAntiAlias(true);
+
+  paint.SetStyle(Paint::Style::kStyleFill);
+  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
+
+  paint.Reset();
+  paint.SetAntiAlias(true);
+  paint.SetStyle(Paint::Style::kStyleStroke);
+  paint.SetColor(outline);
+  paint.SetStrokeWidth(1.f);
+  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
+
+  if (IsHovered()) {
+    paint.SetColor(regulars[1]);
+    paint.SetStrokeWidth(1.5f);
+    canvas->DrawLine(geometry().center_x() - 2.5f, geometry().center_y() - 2.5f,
+                     geometry().center_x() + 2.5f, geometry().center_y() + 2.5f,
+                     paint);
+    canvas->DrawLine(geometry().center_x() + 2.5f, geometry().center_y() - 2.5f,
+                     geometry().center_x() - 2.5f, geometry().center_y() + 2.5f,
+                     paint);
+  }
+
   canvas->Restore();
 }
 
 WindowFrameLight::MaximizeButton::MaximizeButton()
     : AbstractButton() {
-  resize(14, 14);
+  resize(kButtonSize, kButtonSize);
 }
 
 WindowFrameLight::MaximizeButton::~MaximizeButton() {
@@ -213,7 +232,7 @@ WindowFrameLight::MaximizeButton::~MaximizeButton() {
 }
 
 Size WindowFrameLight::MaximizeButton::GetPreferredSize() const {
-  return Size(14, 14);
+  return Size(kButtonSize, kButtonSize);
 }
 
 void WindowFrameLight::MaximizeButton::OnResize(int /* width */, int /* height */) {
@@ -222,34 +241,59 @@ void WindowFrameLight::MaximizeButton::OnResize(int /* width */, int /* height *
 
 void WindowFrameLight::MaximizeButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  canvas->Save();
+  canvas->ClipRect(geometry());
+  canvas->Clear();
 
-  Color regular(0.25f, 0.8f, 0.25f, 1.f);
-  Color down = regular - 50;
-  Color hover = regular + 15;
-  Color stroke_color = regular - 55;
-
-  Paint paint;
-  paint.SetAntiAlias(true);
-  paint.SetColor(regular);
+  Color regulars[2] = {0xFF999999, 0xFF666666};
+  float pos[2] = {0.33f, 1.f};
+  Color outline = regulars[0];
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(down);
+      regulars[0] = regulars[0] - 25;
+      regulars[1] = regulars[1] - 25;
     } else {
-      paint.SetColor(hover);
+      regulars[0] = regulars[0] + 15;
+      regulars[1] = regulars[1] + 15;
     }
   }
+
+  Shader shader =
+      GradientShader::MakeRadial(Point2F(geometry().center_x(), geometry().center_y()),
+                                 6.f, regulars, pos, 2, Shader::TileMode::kTileModeClamp);
+
+  Paint paint;
+  paint.SetShader(shader);
+  paint.SetAntiAlias(true);
+
+  paint.SetStyle(Paint::Style::kStyleFill);
   canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
 
-  paint.SetColor(stroke_color);
-  paint.SetStyle(Paint::kStyleStroke);
-  paint.SetStrokeWidth(0.5f);
+  paint.Reset();
+  paint.SetAntiAlias(true);
+  paint.SetStyle(Paint::Style::kStyleStroke);
+  paint.SetColor(outline);
+  paint.SetStrokeWidth(1.f);
   canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
+
+  if (IsHovered()) {
+    paint.SetColor(regulars[1]);
+    paint.SetStrokeWidth(1.5f);
+    canvas->DrawLine(geometry().center_x() - 3.25f, geometry().center_y(),
+                     geometry().center_x() + 3.25f, geometry().center_y(),
+                     paint);
+    canvas->DrawLine(geometry().center_x(), geometry().center_y() - 3.25f,
+                     geometry().center_x(), geometry().center_y() + 3.25f,
+                     paint);
+  }
+
+  canvas->Restore();
 }
 
 WindowFrameLight::MinimizeButton::MinimizeButton()
     : AbstractButton() {
-  resize(14, 14);
+  resize(kButtonSize, kButtonSize);
 }
 
 WindowFrameLight::MinimizeButton::~MinimizeButton() {
@@ -257,7 +301,7 @@ WindowFrameLight::MinimizeButton::~MinimizeButton() {
 }
 
 Size WindowFrameLight::MinimizeButton::GetPreferredSize() const {
-  return Size(14, 14);
+  return Size(kButtonSize, kButtonSize);
 }
 
 void WindowFrameLight::MinimizeButton::OnResize(int /* width */, int /* height */) {
@@ -265,28 +309,52 @@ void WindowFrameLight::MinimizeButton::OnResize(int /* width */, int /* height *
 }
 
 void WindowFrameLight::MinimizeButton::OnDraw(const Context *context) {
-  Color regular(1.f, 0.75f, 0.2f, 1.f);
-  Color down = regular - 50;
-  Color hover = regular + 15;
-  Color stroke_color = regular - 55;
+  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  canvas->Save();
+  canvas->ClipRect(geometry());
+  canvas->Clear();
 
-  Paint paint;
-  paint.SetAntiAlias(true);
-  paint.SetColor(regular);
+  Color regulars[2] = {0xFF999999, 0xFF666666};
+  float pos[2] = {0.33f, 1.f};
+  Color outline = regulars[0];
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(down);
+      regulars[0] = regulars[0] - 25;
+      regulars[1] = regulars[1] - 25;
     } else {
-      paint.SetColor(hover);
+      regulars[0] = regulars[0] + 15;
+      regulars[1] = regulars[1] + 15;
     }
   }
-  context->GetCanvas()->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
 
-  paint.SetColor(stroke_color);
-  paint.SetStyle(Paint::kStyleStroke);
-  paint.SetStrokeWidth(0.5f);
-  context->GetCanvas()->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
+  Shader shader =
+      GradientShader::MakeRadial(Point2F(geometry().center_x(), geometry().center_y()),
+                                 6.f, regulars, pos, 2, Shader::TileMode::kTileModeClamp);
+
+  Paint paint;
+  paint.SetShader(shader);
+  paint.SetAntiAlias(true);
+
+  paint.SetStyle(Paint::Style::kStyleFill);
+  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
+
+  paint.Reset();
+  paint.SetAntiAlias(true);
+  paint.SetStyle(Paint::Style::kStyleStroke);
+  paint.SetColor(outline);
+  paint.SetStrokeWidth(1.f);
+  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
+
+  if (IsHovered()) {
+    paint.SetColor(regulars[1]);
+    paint.SetStrokeWidth(1.5f);
+    canvas->DrawLine(geometry().center_x() - 3.25f, geometry().center_y(),
+                     geometry().center_x() + 3.25f, geometry().center_y(),
+                     paint);
+  }
+
+  canvas->Restore();
 }
 
 //-------------------------
@@ -304,6 +372,8 @@ WindowFrameLight::WindowFrameLight()
 
 WindowFrameLight::~WindowFrameLight() {
   delete title_;
+  delete maximize_button_;
+  delete minimize_button_;
   delete close_button_;
 }
 
@@ -323,11 +393,11 @@ void WindowFrameLight::CreateWidgets() {
   close_button_ = new CloseButton;
   close_button_->clicked().Connect(this, &WindowFrameLight::OnCloseButtonClicked);
 
-//  minimize_button_ = new MinimizeButton;
-//  minimize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMinimizeButtonClicked);
+  minimize_button_ = new MinimizeButton;
+  minimize_button_->clicked().Connect(this, &WindowFrameLight::OnMinimizeButtonClicked);
 
-//  maximize_button_ = new MaximizeButton;
-//  maximize_button_->clicked().Connect(this, &DefaultWindowFrame::OnMaximizeButtonClicked);
+  maximize_button_ = new MaximizeButton;
+  maximize_button_->clicked().Connect(this, &WindowFrameLight::OnMaximizeButtonClicked);
 
   title_ = new Label(window()->title());
   title_->SetForeground(0xFF444444);
@@ -335,8 +405,8 @@ void WindowFrameLight::CreateWidgets() {
 
   AddWidget(title_);  // put the title below other widgets
   AddWidget(close_button_);
-//  AddWidget(maximize_button_);
-//  AddWidget(minimize_button_);
+  AddWidget(maximize_button_);
+  AddWidget(minimize_button_);
 
   LayoutWidgets(window()->width(), window()->height());
 }
@@ -349,9 +419,15 @@ void WindowFrameLight::LayoutWidgets(int width, int height) {
   title_->MoveTo(0, 0);
   title_->Resize(window()->width(), title_bar_size());
 
-  int y = (title_bar_size() - (int) close_button_->geometry().height()) / 2;
-  int x = y + 1;
+  int y = (title_bar_size() - kButtonSize) / 2;
+  int x = kButtonSpace;
   close_button_->MoveTo(x, y);
+
+  x += close_button_->width() + kButtonSpace;
+  maximize_button_->MoveTo(x, y);
+
+  x += maximize_button_->width() + kButtonSpace;
+  minimize_button_->MoveTo(x, y);
 }
 
 void WindowFrameLight::OnDraw(const Context *context) {

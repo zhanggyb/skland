@@ -18,12 +18,12 @@
 
 #include <skland/gui/egl-surface.hpp>
 #include <skland/gui/display.hpp>
-
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
-
 #include <skland/gui/shm-surface.hpp>
 #include <skland/gui/output.hpp>
+#include <skland/gui/abstract-window-frame.hpp>
+
 #include <skland/graphic/canvas.hpp>
 
 #include "internal/redraw-task.hpp"

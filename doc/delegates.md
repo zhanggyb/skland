@@ -106,11 +106,11 @@ auto bind2 = std::bind(&B::OnNotifyInB, &b, 1);
 
 delegate1.Equal(&a, &A::OnNotifyInA);  // Compare the given object and member function directly
 delegate1 == delegate2;  // return false
-delegate2 = delegate1;   // OK, now delegate2 delegate to member function OnNotifyInA of object a
+delegate2 = delegate1;   // OK, now delegate2 delegates to member function OnNotifyInA() of object a
 delegate1 == delegate2;  // return true after delegate2 = delegate1;
 
 bind1 == bind2;  // Compile error! bind objects cannot be compared
-bind2 = bind1;   // Compile error! bind object cannot be assigned to another one
+bind2 = bind1;   // Compile error! a bind object cannot be assigned to another one
 ```
 
 ## Implementation

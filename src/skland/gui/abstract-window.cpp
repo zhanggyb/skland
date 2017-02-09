@@ -20,6 +20,7 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/abstract-surface.hpp>
+#include <skland/gui/abstract-window-frame.hpp>
 
 #include "internal/view-task.hpp"
 
@@ -286,6 +287,14 @@ void AbstractWindow::SetShellSurface(AbstractSurface *surface) {
   xdg_toplevel_.Setup(xdg_surface_);
 }
 
+void AbstractWindow::ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height) {
+  window_frame->OnResize(width, height);
+}
+
+void AbstractWindow::DrawWindowFrame(AbstractWindowFrame *window_frame, const Context *context) {
+  window_frame->OnDraw(context);
+}
+
 void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
   xdg_surface_.AckConfigure(serial);
 
@@ -315,7 +324,6 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
 
   if (maximized || fullscreen || resizing) {
     if (width != this->width() || height != this->height()) {
-
       int x = 0, y = 0;
       x = shell_surface_->margin().left;
       y = shell_surface_->margin().top;
@@ -337,20 +345,21 @@ void AbstractWindow::OnWindowAction(int action, SLOT slot) {
       break;
     }
     case kActionMaximize: {
-      // TODO: maximize
       if (IsMaximized()) {
         clear_bit<int>(flags_, 0x3);
         xdg_toplevel_.UnsetMaximized();
       } else {
         clear_bit<int>(flags_, 0x3);
         set_bit<int>(flags_, kWindowMaximized);
+        DBG_ASSERT(IsMaximized());
         xdg_toplevel_.SetMaximized();
       }
       break;
     }
     case kActionMinimize: {
-      fprintf(stderr, "minimize\n");
-      // TODO: minimize
+      clear_bit<int>(flags_, 0x3);
+      set_bit<int>(flags_, kWindowMinimized);
+      DBG_ASSERT(IsMinimized());
       xdg_toplevel_.SetMinimized();
       break;
     }

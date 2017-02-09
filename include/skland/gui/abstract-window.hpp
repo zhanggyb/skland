@@ -18,7 +18,6 @@
 #define SKLAND_GUI_ABSTRACT_WINDOW_HPP_
 
 #include "abstract-view.hpp"
-#include "abstract-window-frame.hpp"
 
 #include "../core/defines.hpp"
 #include "../core/rect.hpp"
@@ -126,21 +125,13 @@ class AbstractWindow : public AbstractView {
 
   void SetShellSurface(AbstractSurface *surface);
 
-  AbstractWindowFrame *window_frame() const {
-    return window_frame_;
-  }
+  AbstractWindowFrame *window_frame() const { return window_frame_; }
 
-  AbstractSurface *shell_surface() const {
-    return shell_surface_;
-  }
+  AbstractSurface *shell_surface() const { return shell_surface_; }
 
-  static void ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height) {
-    window_frame->OnResize(width, height);
-  }
+  static void ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height);
 
-  static void DrawWindowFrame(AbstractWindowFrame *window_frame, const Context *context) {
-    window_frame->OnDraw(context);
-  }
+  static void DrawWindowFrame(AbstractWindowFrame *window_frame, const Context *context);
 
  private:
 

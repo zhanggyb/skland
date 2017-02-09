@@ -21,13 +21,11 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/shm-surface.hpp>
-
 #include <skland/gui/output.hpp>
-
 #include <skland/gui/context.hpp>
-#include <skland/graphic/canvas.hpp>
+#include <skland/gui/abstract-window-frame.hpp>
 
-#include <skland/wayland/region.hpp>
+#include <skland/graphic/canvas.hpp>
 
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
