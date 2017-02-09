@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GRAPHIC_CLIP_OPERATION_HPP_
-#define SKLAND_GRAPHIC_CLIP_OPERATION_HPP_
+#include <skland/gui/application.hpp>
+#include <skland/gui/window.hpp>
+#include <skland/gui/label.hpp>
 
-namespace skland {
+using namespace skland;
 
-/**
- * @ingroup graphic
- * @brief Clip operations
- */
-enum ClipOperation {
-  kClipDifference,  // 0
-  kClipIntersect, // 1
-  kClipUnion,
-  kClipXOR,
+int main(int argc, char *argv[]) {
+  using skland::Window;
 
-};
+  Application app(argc, argv);
+  Theme::Load("dark");
 
+  Window *win = new Window(320, 240, "Theme");
+  win->SetAppId("Theme");
+
+  Label *label = new Label("Dark Theme");
+  label->SetForeground(0xFF444444);
+  label->SetFont(skland::Font(Typeface::kBold, 24.f));
+  win->SetMainWidget(label);
+
+  win->Show();
+
+  return app.Run();
 }
-
-#endif // SKLAND_GRAPHIC_CLIP_OPERATION_HPP_

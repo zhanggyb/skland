@@ -26,6 +26,10 @@ namespace skland {
 
 class Matrix;
 
+/**
+ * @ingroup graphic
+ * @brief Gradient shader
+ */
 class GradientShader {
 
  public:

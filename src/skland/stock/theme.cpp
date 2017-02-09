@@ -21,12 +21,25 @@
 #include "SkPath.h"
 #include "SkCanvas.h"
 
-#include "internal/window-frame-light.hpp"
-#include "internal/window-frame-dark.hpp"
+#include "internal/theme-light.hpp"
+#include "internal/theme-dark.hpp"
 
 namespace skland {
 
 Theme *Theme::kTheme = nullptr;
+
+void Theme::Initialize() {
+  if (nullptr == kTheme) {
+    kTheme = new Theme;
+  }
+}
+
+void Theme::Release() {
+  if (kTheme) {
+    delete kTheme;
+    kTheme = nullptr;
+  }
+}
 
 Theme::Theme()
     : shadow_pixmap_(nullptr),
@@ -62,7 +75,6 @@ void Theme::Load(const char *name) {
 }
 
 AbstractWindowFrame *Theme::CreateWindowFrame() {
-//  return new DefaultWindowFrame(dark ? DefaultWindowFrame::kModeDark : DefaultWindowFrame::kModeLight);
   return static_cast<AbstractWindowFrame *>(kTheme->window_frame_create_handle_());
 }
 
@@ -71,16 +83,6 @@ void Theme::DestroyWindowFrame(AbstractWindowFrame *window_frame) {
 }
 
 void Theme::Reset() {
-  window_frame_.outline = 0x303030;
-  window_frame_.inner = 0x414141FF;
-  window_frame_.inner_selected = 0xB67E3EFF;
-  window_frame_.item = 0x191919FF;
-  window_frame_.text = 0xB8B8B8;
-  window_frame_.text_selected = 0xFFFFFF;
-  window_frame_.shaded = true;
-  window_frame_.shadetop = 15;
-  window_frame_.shadedown = 0;
-
   shadow_radius_ = 33;
 
   shadow_offset_x_ = 0;

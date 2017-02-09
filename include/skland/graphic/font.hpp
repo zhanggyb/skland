@@ -28,6 +28,10 @@ namespace skland {
 struct FontMeta;
 class Typeface;
 
+/**
+ * @ingroup graphic
+ * @brief Text encoding
+ */
 enum TextEncoding {
   kTextEncodingUTF8,
   kTextEncodingUTF16,
@@ -35,6 +39,10 @@ enum TextEncoding {
   kTextEncodingGlyphID
 };
 
+/**
+ * @ingroup graphic
+ * @brief Font
+ */
 class Font {
 
  public:

@@ -85,7 +85,7 @@ public:
   ~A();
   
   void OnNotifyInA(int num);
-}
+};
 
 class B {
 public:
@@ -98,16 +98,16 @@ public:
 A a;
 B b;
 
-auto delegate1 = Delegate<void(int)>::FromMethod(&a, &A::OnNotifyInA);
-auto delegate2 = Delegate<void(int)>::FromMethod(&b, &B::OnNotifyinB);
+auto delegate1 = Delegate<void(int)>(&a, &A::OnNotifyInA);
+auto delegate2 = Delegate<void(int)>(&b, &B::OnNotifyInB);
 
 auto bind1 = std::bind(&A::OnNotifyInA, &a, 1);
 auto bind2 = std::bind(&B::OnNotifyInB, &b, 1);
 
-d1.Equal(&a, &A::OnNotifyInA);  // Compare the given object and member function directly
-d1 == d2;  // return false
-d2 = d1;   // OK, not d2 delegate to member function OnNotifyInA of object a
-d1 == d2;  // return true after d2 = d1;
+delegate1.Equal(&a, &A::OnNotifyInA);  // Compare the given object and member function directly
+delegate1 == delegate2;  // return false
+delegate2 = delegate1;   // OK, now delegate2 delegate to member function OnNotifyInA of object a
+delegate1 == delegate2;  // return true after delegate2 = delegate1;
 
 bind1 == bind2;  // Compile error! bind objects cannot be compared
 bind2 = bind1;   // Compile error! bind object cannot be assigned to another one

@@ -27,6 +27,10 @@ namespace skland {
 class Font;
 struct TypefaceMeta;
 
+/**
+ * @ingroup graphic
+ * @brief Font typeface
+ */
 class Typeface {
 
   friend class Font;

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-#include "window-frame-dark.hpp"
+#include "theme-dark.hpp"
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
+#include <skland/gui/abstract-button.hpp>
 #include <skland/gui/label.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window.hpp>
@@ -28,6 +29,129 @@
 #include "SkCanvas.h"
 
 namespace skland {
+
+/**
+ * @brief The default window frame
+ */
+class WindowFrameDark final : public AbstractWindowFrame {
+
+  WindowFrameDark(const WindowFrameDark &orig) = delete;
+  WindowFrameDark &operator=(const WindowFrameDark &other) = delete;
+
+ public:
+
+  enum Mode {
+    kModeLight,
+    kModeDark
+  };
+
+  WindowFrameDark();
+
+  virtual ~WindowFrameDark();
+
+ protected:
+
+  virtual void OnSetup();
+
+  virtual void OnResize(int width, int height);
+
+  virtual void OnDraw(const Context *context);
+
+  /**
+    * Calculate and return the cursor position at the border of this frame
+    * @param x
+    * @param y
+    * @return
+    *
+    * |        |                 |
+    * |        |                 |
+    * | shadow | resizing border | resizing border
+    * |        |                 |
+    * |        |                 |
+    */
+  virtual int GetMouseLocation(const MouseEvent *event) const;
+
+ private:
+
+/// @cond IGNORE
+
+  class CloseButton final : public AbstractButton {
+
+   public:
+
+    CloseButton();
+
+    virtual ~CloseButton();
+
+    virtual Size GetPreferredSize() const final;
+
+   protected:
+
+    virtual void OnResize(int width, int height) final;
+
+    virtual void OnDraw(const Context *context) final;
+
+  };
+
+  class MaximizeButton final : public AbstractButton {
+
+   public:
+
+    MaximizeButton();
+
+    virtual ~MaximizeButton();
+
+    virtual Size GetPreferredSize() const final;
+
+   protected:
+
+    virtual void OnResize(int width, int height) final;
+
+    virtual void OnDraw(const Context *context) final;
+
+  };
+
+  class MinimizeButton final : public AbstractButton {
+
+   public:
+
+    MinimizeButton();
+
+    virtual ~MinimizeButton();
+
+    virtual Size GetPreferredSize() const final;
+
+   protected:
+
+    virtual void OnResize(int width, int height) final;
+
+    virtual void OnDraw(const Context *context) final;
+
+  };
+
+/// @endcond
+
+  void OnCloseButtonClicked(__SLOT__);
+
+  void OnMaximizeButtonClicked(__SLOT__);
+
+  void OnMinimizeButtonClicked(__SLOT__);
+
+  void CreateWidgets();
+
+  void LayoutWidgets(int width, int height);
+
+  void DrawShadow(Canvas *canvas);
+
+  CloseButton *close_button_;
+
+  MaximizeButton *maximize_button_;
+
+  MinimizeButton *minimize_button_;
+
+  Label *title_;
+
+};
 
 WindowFrameDark::CloseButton::CloseButton()
     : AbstractButton() {
@@ -248,18 +372,24 @@ void WindowFrameDark::OnDraw(const Context *context) {
   Path path;
   path.AddRoundRect(window()->geometry(), radii);
 
+  // Drop shadow:
   canvas->Save();
   canvas->ClipPath(path, kClipDifference, true);
   DrawShadow(canvas.get());
   canvas->Restore();
 
+  // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-
-  path.Reset();
-  path.AddRoundRect(window()->geometry(), radii);
   paint.SetColor(0xEF202020);
   canvas->DrawPath(path, paint);
+
+  // Draw the client area:
+  paint.SetColor(0xEF303030);
+  canvas->Save();
+  canvas->ClipPath(path, kClipIntersect, true);
+  canvas->DrawRect(GetClientGeometry(), paint);
+  canvas->Restore();
 
   canvas->Flush();
 }

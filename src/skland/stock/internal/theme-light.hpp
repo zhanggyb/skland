@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GRAPHIC_CLIP_OPERATION_HPP_
-#define SKLAND_GRAPHIC_CLIP_OPERATION_HPP_
+#ifndef SKLAND_STOCK_INTERNAL_THEME_LIGHT_HPP_
+#define SKLAND_STOCK_INTERNAL_THEME_LIGHT_HPP_
 
-namespace skland {
+extern "C" {
 
-/**
- * @ingroup graphic
- * @brief Clip operations
- */
-enum ClipOperation {
-  kClipDifference,  // 0
-  kClipIntersect, // 1
-  kClipUnion,
-  kClipXOR,
-
-};
+void *WindowFrameLightCreate();
+void WindowFrameLightDestroy(void *p);
 
 }
 
-#endif // SKLAND_GRAPHIC_CLIP_OPERATION_HPP_
+#endif // SKLAND_STOCK_INTERNAL_THEME_LIGHT_HPP_

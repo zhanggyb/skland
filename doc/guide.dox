@@ -1,0 +1,12 @@
+/**
+ * @page guide Programming Guide
+ * @tableofcontents
+ *
+ * @section basic Basic
+ *
+ * - Delegates
+ * - Signals and Slots
+ *
+ * @section skia Use Skia
+ *
+ */

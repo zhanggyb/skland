@@ -25,6 +25,10 @@ class Paint;
 struct ShaderMeta;
 class GradientShader;
 
+/**
+ * @ingroup graphic
+ * @brief The base shader class
+ */
 class Shader {
 
   friend class Paint;

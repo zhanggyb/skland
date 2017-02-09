@@ -63,8 +63,8 @@ Application::Application(int argc, char *argv[])
   }
 
   // Load theme
-  Theme::kTheme = new Theme;
-  Theme::kTheme->Reset();
+  Theme::Initialize();
+  Theme::Load();  // TODO: use an argument to specify the theme name
 
   epoll_fd_ = CreateEpollFd();
   WatchEpollFd(epoll_fd_, Display::kDisplay->display_fd_,
@@ -84,8 +84,7 @@ Application::~Application() {
   close(epoll_fd_);
   Display::kDisplay->Disconnect();
 
-  delete Theme::kTheme;
-  Theme::kTheme = nullptr;
+  Theme::Release();
   delete Display::kDisplay;
   Display::kDisplay = nullptr;
 

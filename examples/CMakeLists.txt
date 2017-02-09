@@ -29,6 +29,9 @@ target_link_libraries(eventdemo skland)
 add_executable(frameless frameless.cpp)
 target_link_libraries(frameless skland)
 
+add_executable(theme theme.cpp)
+target_link_libraries(theme skland)
+
 #add_executable(shadowing shadowing.cpp)
 #target_link_libraries(shadowing skland)
 #target_include_directories(shadowing PRIVATE "${SKIA_PUBLIC_INCLUDES}")

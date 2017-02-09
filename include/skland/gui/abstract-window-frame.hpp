@@ -123,9 +123,6 @@ class AbstractWindowFrame : public Trackable {
   Signal<int> window_action_;
 };
 
-typedef void *(*WindowFrameCreateHandle)();
-typedef void(*WindowFrameDestroyHandle)(void *p);
-
 }
 
 #endif // SKLAND_ABSTRACT_WINDOW_FRAME_HPP_

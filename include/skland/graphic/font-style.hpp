@@ -24,6 +24,7 @@ class SkFontStyle;
 namespace skland {
 
 /**
+ * @ingroup graphic
  * @brief Font style
  *
  * This class has the same structure of SkFontStyle so it can be reinterpreted cast to each other.

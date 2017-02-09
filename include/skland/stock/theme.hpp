@@ -45,6 +45,9 @@ struct ColorScheme {
   bool alpha_check;
 };
 
+typedef void *(*WindowFrameCreateHandle)();
+typedef void(*WindowFrameDestroyHandle)(void *p);
+
 /**
  * @ingroup stock
  * @brief The global theme manager
@@ -63,10 +66,6 @@ class Theme {
   static AbstractWindowFrame *CreateWindowFrame();
 
   static void DestroyWindowFrame(AbstractWindowFrame *window_frame);
-
-  static inline const ColorScheme &window_frame() {
-    return kTheme->window_frame_;
-  }
 
   static inline int shadow_radius() {
     return kTheme->shadow_radius_;
@@ -96,13 +95,15 @@ class Theme {
 
  private:
 
+  static void Initialize();
+
+  static void Release();
+
   Theme();
 
   ~Theme();
 
   void GenerateShadowImage();
-
-  ColorScheme window_frame_;  // The default window frame
 
   int shadow_radius_;
 

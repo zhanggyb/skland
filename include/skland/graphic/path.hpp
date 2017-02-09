@@ -27,6 +27,10 @@ namespace skland {
 
 class Canvas;
 
+/**
+ * @ingroup graphic
+ * @brief Path
+ */
 class Path {
 
   friend bool operator==(const Path &, const Path &);

@@ -23,6 +23,10 @@ class SkMatrix;
 
 namespace skland {
 
+/**
+ * @ingroup graphic
+ * @brief Skia matrix wrapper
+ */
 class Matrix {
 
  public:
