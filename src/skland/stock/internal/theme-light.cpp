@@ -444,10 +444,12 @@ void WindowFrameLight::OnDraw(const Context *context) {
   path.AddRoundRect(window()->geometry(), radii);
 
   // Drop shadow:
-  canvas->Save();
-  canvas->ClipPath(path, kClipDifference, true);
-  DrawShadow(canvas.get());
-  canvas->Restore();
+  if ((!window()->IsMaximized()) || (!window()->IsFullscreen())) {
+    canvas->Save();
+    canvas->ClipPath(path, kClipDifference, true);
+    DrawShadow(canvas.get());
+    canvas->Restore();
+  }
 
   // Fill color:
   Paint paint;
@@ -511,11 +513,15 @@ int WindowFrameLight::GetMouseLocation(const MouseEvent *event) const {
 }
 
 void WindowFrameLight::DrawShadow(Canvas *canvas) {
+  float rad = Theme::shadow_radius() - 1.f; // The spread radius
+  float offset_x = Theme::shadow_offset_x();
+  float offset_y = Theme::shadow_offset_y();
 
-  const float rad = Theme::shadow_radius() - 1.f; // The spread radius
-
-  const float offset_x = Theme::shadow_offset_x();
-  const float offset_y = Theme::shadow_offset_y();
+  if (!window()->IsFocused()) {
+    rad = (int) rad / 3;
+    offset_x = (int) offset_x / 3;
+    offset_y = (int) offset_y / 3;
+  }
 
   // shadow map
   SkCanvas *c = canvas->sk_canvas();

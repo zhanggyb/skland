@@ -31,6 +31,11 @@ inline void clear_bit(T &x, T y) {
   x &= ~y;
 }
 
+template<typename T>
+inline void inverse_bit(T &x, T y) {
+  x = (x & (~y)) | (x ^ y);
+}
+
 // clamp
 template<typename T>
 inline T clamp(T x, T min_value, T max_value) {

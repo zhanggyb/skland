@@ -32,12 +32,6 @@
 
 namespace skland {
 
-enum WindowFlags {
-  kWindowFullscreen = 0x1,
-  kWindowMaximized = 0x2,
-  kWindowMinimized = 0x3,
-};
-
 /**
  * @ingroup gui
  * @brief Abstract class for top level windows
@@ -89,11 +83,15 @@ class AbstractWindow : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
-  bool IsFullscreened() const { return kWindowFullscreen == flags_; }
+  bool IsFullscreen() const { return 0 != (flags_ & kFlagMaskFullscreen); }
 
-  bool IsMaximized() const { return kWindowMaximized == flags_; }
+  bool IsMaximized() const { return 0 != (flags_ & kFlagMaskMaximized); }
 
-  bool IsMinimized() const { return kWindowMinimized == flags_; }
+  bool IsMinimized() const { return 0 != (flags_ & kFlagMaskMinimized); }
+
+  bool IsFocused() const { return 0 != (flags_ & kFlagMaskFocused); }
+
+  bool IsResizing() const { return 0 != (flags_ & kFlagMaskResizing); }
 
   bool IsFrameless() const { return nullptr == window_frame_; }
 
@@ -117,6 +115,12 @@ class AbstractWindow : public AbstractView {
 
   virtual void OnDraw(const Context *context) override;
 
+  virtual void OnMaximized(bool);
+
+  virtual void OnFullscreen(bool);
+
+  virtual void OnFocus(bool);
+
   void AddSubView(AbstractView *view, int pos = -1);
 
   void MoveWithMouse(MouseEvent *event) const;
@@ -134,6 +138,14 @@ class AbstractWindow : public AbstractView {
   static void DrawWindowFrame(AbstractWindowFrame *window_frame, const Context *context);
 
  private:
+
+  enum FlagMask {
+    kFlagMaskMaximized = 0x1 << 0,
+    kFlagMaskFullscreen = 0x1 << 1,
+    kFlagMaskResizing = 0x1 << 2,
+    kFlagMaskFocused = 0x1 << 3,
+    kFlagMaskMinimized = 0x1 << 4
+  };
 
   void OnXdgSurfaceConfigure(uint32_t serial);
 
@@ -153,8 +165,6 @@ class AbstractWindow : public AbstractView {
 
   std::string title_;
   std::string app_id_;
-
-  Size saved_size_;
 
 };
 

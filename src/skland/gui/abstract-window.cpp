@@ -259,6 +259,18 @@ void AbstractWindow::OnDraw(const Context *context) {
   }
 }
 
+void AbstractWindow::OnMaximized(bool maximized) {
+
+}
+
+void AbstractWindow::OnFullscreen(bool) {
+
+}
+
+void AbstractWindow::OnFocus(bool focus) {
+  Update();
+}
+
 void AbstractWindow::AddSubView(AbstractView *view, int pos) {
   if (view) InsertChild(view, pos);
 }
@@ -313,24 +325,50 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
   bool maximized = ((states & XdgToplevel::kStateMaskMaximized) != 0);
   bool fullscreen = ((states & XdgToplevel::kStateMaskFullscreen) != 0);
   bool resizing = ((states & XdgToplevel::kStateMaskResizing) != 0);
-//  bool focus = ((states & XdgToplevel::kStateMaskActivated) != 0);
+  bool focus = ((states & XdgToplevel::kStateMaskActivated) != 0);
 
-  Size min = this->GetMinimalSize();
-  Size max = this->GetMaximalSize();
-  DBG_ASSERT(min.width < max.width && min.height < max.height);
+  bool do_resize = true;
 
-  width = clamp(width, min.width, max.width);
-  height = clamp(height, min.height, max.height);
+  if (width > 0 && height > 0) {
+    Size min = this->GetMinimalSize();
+    Size max = this->GetMaximalSize();
+    DBG_ASSERT(min.width < max.width && min.height < max.height);
 
-  if (maximized || fullscreen || resizing) {
-    if (width != this->width() || height != this->height()) {
-      int x = 0, y = 0;
-      x = shell_surface_->margin().left;
-      y = shell_surface_->margin().top;
-      xdg_surface_.SetWindowGeometry(x, y, width, height);
-      resize(width, height);
-      OnResize(width, height);
-    }
+    width = clamp(width, min.width, max.width);
+    height = clamp(height, min.height, max.height);
+    if (width == this->width() && height == this->height()) do_resize = false;
+  } else {
+    // Initialize
+    width = this->width();
+    height = this->height();
+  }
+
+  if (do_resize) {
+    int x = 0, y = 0;
+    x = shell_surface_->margin().left;
+    y = shell_surface_->margin().top;
+    xdg_surface_.SetWindowGeometry(x, y, width, height);
+    resize(width, height);
+    OnResize(width, height);
+  }
+
+  if (focus != IsFocused()) {
+    inverse_bit<int>(flags_, kFlagMaskFocused);
+    OnFocus(focus);
+  }
+
+  if (maximized != IsMaximized()) {
+    inverse_bit<int>(flags_, kFlagMaskMaximized);
+    OnMaximized(maximized);
+  }
+
+  if (fullscreen != IsFullscreen()) {
+    inverse_bit<int>(flags_, kFlagMaskFullscreen);
+    OnFullscreen(fullscreen);
+  }
+
+  if (resizing != IsResizing()) {
+    inverse_bit<int>(flags_, kFlagMaskResizing);
   }
 }
 
@@ -346,21 +384,16 @@ void AbstractWindow::OnWindowAction(int action, SLOT slot) {
     }
     case kActionMaximize: {
       if (IsMaximized()) {
-        clear_bit<int>(flags_, 0x3);
         xdg_toplevel_.UnsetMaximized();
       } else {
-        clear_bit<int>(flags_, 0x3);
-        set_bit<int>(flags_, kWindowMaximized);
-        DBG_ASSERT(IsMaximized());
         xdg_toplevel_.SetMaximized();
       }
       break;
     }
     case kActionMinimize: {
-      clear_bit<int>(flags_, 0x3);
-      set_bit<int>(flags_, kWindowMinimized);
-      DBG_ASSERT(IsMinimized());
+      set_bit<int>(flags_, kFlagMaskMinimized);
       xdg_toplevel_.SetMinimized();
+      DBG_ASSERT(IsMinimized());
       break;
     }
     case kActionMenu: {
