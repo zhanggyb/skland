@@ -21,20 +21,26 @@
 
 namespace skland {
 
-template<typename T>
-inline void set_bit(T &x, T y) {
-  x |= y;
-}
+class Bit {
 
-template<typename T>
-inline void clear_bit(T &x, T y) {
-  x &= ~y;
-}
+ public:
 
-template<typename T>
-inline void inverse_bit(T &x, T y) {
-  x = (x & (~y)) | (x ^ y);
-}
+  template<typename T>
+  static inline void Set(T &x, T y) {
+    x |= y;
+  }
+
+  template<typename T>
+  static inline void Clear(T &x, T y) {
+    x &= ~y;
+  }
+
+  template<typename T>
+  static inline void Inverse(T &x, T y) {
+    x = (x & (~y)) | (x ^ y);
+  }
+
+};
 
 // clamp
 template<typename T>

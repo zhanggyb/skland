@@ -43,19 +43,19 @@ void XdgToplevelMeta::OnConfigure(void *data,
     uint32_t state = *((uint32_t *) p);
     switch (state) {
       case ZXDG_TOPLEVEL_V6_STATE_MAXIMIZED: {
-        set_bit<int>(value, XdgToplevel::kStateMaskMaximized);
+        Bit::Set<int>(value, XdgToplevel::kStateMaskMaximized);
         break;
       }
       case ZXDG_TOPLEVEL_V6_STATE_FULLSCREEN: {
-        set_bit<int>(value, XdgToplevel::kStateMaskFullscreen);
+        Bit::Set<int>(value, XdgToplevel::kStateMaskFullscreen);
         break;
       }
       case ZXDG_TOPLEVEL_V6_STATE_RESIZING: {
-        set_bit<int>(value, XdgToplevel::kStateMaskResizing);
+        Bit::Set<int>(value, XdgToplevel::kStateMaskResizing);
         break;
       }
       case ZXDG_TOPLEVEL_V6_STATE_ACTIVATED: {
-        set_bit<int>(value, XdgToplevel::kStateMaskActivated);
+        Bit::Set<int>(value, XdgToplevel::kStateMaskActivated);
         break;
       }
       default:

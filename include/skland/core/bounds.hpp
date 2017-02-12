@@ -72,6 +72,7 @@ struct Bounds {
   union { T t, top; };
   union { T r, right; };
   union { T b, bottom; };
+
 };
 
 template<typename T>

@@ -353,22 +353,22 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
   }
 
   if (focus != IsFocused()) {
-    inverse_bit<int>(flags_, kFlagMaskFocused);
+    Bit::Inverse<int>(flags_, kFlagMaskFocused);
     OnFocus(focus);
   }
 
   if (maximized != IsMaximized()) {
-    inverse_bit<int>(flags_, kFlagMaskMaximized);
+    Bit::Inverse<int>(flags_, kFlagMaskMaximized);
     OnMaximized(maximized);
   }
 
   if (fullscreen != IsFullscreen()) {
-    inverse_bit<int>(flags_, kFlagMaskFullscreen);
+    Bit::Inverse<int>(flags_, kFlagMaskFullscreen);
     OnFullscreen(fullscreen);
   }
 
   if (resizing != IsResizing()) {
-    inverse_bit<int>(flags_, kFlagMaskResizing);
+    Bit::Inverse<int>(flags_, kFlagMaskResizing);
   }
 }
 
@@ -391,7 +391,7 @@ void AbstractWindow::OnWindowAction(int action, SLOT slot) {
       break;
     }
     case kActionMinimize: {
-      set_bit<int>(flags_, kFlagMaskMinimized);
+      Bit::Set<int>(flags_, kFlagMaskMinimized);
       xdg_toplevel_.SetMinimized();
       DBG_ASSERT(IsMinimized());
       break;

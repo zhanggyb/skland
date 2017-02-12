@@ -21,6 +21,11 @@ namespace skland {
 
 namespace core {
 
+/**
+ * @ingroup core
+ * @brief 2 dimension vector
+ * @tparam T
+ */
 template<typename T>
 struct Vector2 {
 
@@ -90,6 +95,11 @@ inline Vector2<T> operator-(const Vector2<T> &v1, const Vector2<T> &v2) {
   return Vector2<T>(v1.x - v2.x, v1.y - v2.y);
 }
 
+/**
+ * @ingroup core
+ * @brief 3 dimension vector
+ * @tparam T
+ */
 template<typename T>
 struct Vector3 {
 
@@ -126,6 +136,11 @@ inline bool operator!=(const Vector3<T> &vector1, const Vector3<T> &vector2) {
   return memcmp(&vector1, &vector2, sizeof(Vector3<T>)) != 0;
 }
 
+/**
+ * @ingroup core
+ * @brief 4 dimension vector
+ * @tparam T
+ */
 template<typename T>
 struct Vector4 {
 
@@ -168,4 +183,4 @@ inline bool operator!=(const Vector4<T> &vector1, const Vector4<T> &vector2) {
 
 } // namespace skland
 
-#endif //SKLAND_VECTORS_HPP
+#endif // SKLAND_CORE_VECTORS_HPP_

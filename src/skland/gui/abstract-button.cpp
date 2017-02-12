@@ -33,7 +33,7 @@ AbstractButton::~AbstractButton() {
 }
 
 void AbstractButton::OnMouseEnter(MouseEvent *event) {
-  set_bit<uint32_t>(flags_, kFlagIndexHovered);
+  Bit::Set<uint32_t>(flags_, kFlagIndexHovered);
   if (IsSensitive()) {
     Update();
   }
@@ -41,7 +41,7 @@ void AbstractButton::OnMouseEnter(MouseEvent *event) {
 }
 
 void AbstractButton::OnMouseLeave(MouseEvent *event) {
-  clear_bit<uint32_t>(flags_, kFlagIndexHovered | kFlagIndexClicked | kFlagIndexPressed);
+  Bit::Clear<uint32_t>(flags_, kFlagIndexHovered | kFlagIndexClicked | kFlagIndexPressed);
   if (IsSensitive()) {
     Update();
   }
@@ -50,18 +50,18 @@ void AbstractButton::OnMouseLeave(MouseEvent *event) {
 
 void AbstractButton::OnMouseButton(MouseEvent *event) {
   if (event->state() == kMouseButtonPressed) {
-    set_bit<uint32_t>(flags_, kFlagIndexPressed);
+    Bit::Set<uint32_t>(flags_, kFlagIndexPressed);
     Update();
   } else {
     if (IsPressed()) {
-      set_bit<uint32_t>(flags_, kFlagIndexClicked);
+      Bit::Set<uint32_t>(flags_, kFlagIndexClicked);
     }
-    clear_bit<uint32_t>(flags_, kFlagIndexPressed);
+    Bit::Clear<uint32_t>(flags_, kFlagIndexPressed);
     Update();
   }
 
   if (flags_ & kFlagIndexClicked) {
-    clear_bit<uint32_t>(flags_, kFlagIndexClicked);
+    Bit::Clear<uint32_t>(flags_, kFlagIndexClicked);
     event->Accept();
     clicked_();
     return;
@@ -78,9 +78,9 @@ void AbstractButton::OnKeyboardKey(KeyEvent *event) {
 
 void AbstractButton::SetSensitive(bool sensitive) {
   if (sensitive) {
-    set_bit<uint32_t>(flags_, kFlagIndexSensitive);
+    Bit::Set<uint32_t>(flags_, kFlagIndexSensitive);
   } else {
-    clear_bit<uint32_t>(flags_, kFlagIndexSensitive);
+    Bit::Clear<uint32_t>(flags_, kFlagIndexSensitive);
   }
 }
 
