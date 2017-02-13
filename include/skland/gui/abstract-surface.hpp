@@ -35,6 +35,8 @@ class Application;
 class Display;
 class AbstractView;
 class Canvas;
+class ShellSurface;
+class SubSurface;
 struct CommitTask;
 
 /**
@@ -63,6 +65,8 @@ class AbstractSurface {
 
   friend class Application;
   friend class Display;
+  friend class ShellSurface;
+  friend class SubSurface;
 
   AbstractSurface() = delete;
   AbstractSurface(const AbstractSurface &) = delete;
@@ -78,7 +82,7 @@ class AbstractSurface {
     kDesyncMode
   };
 
-  static int GetShellSurfaceCount() { return kCount; }
+  static int GetShellSurfaceCount() { return kShellSurfaceCount; }
 
   AbstractSurface(AbstractView *view, const Margin &margin = Margin());
 
@@ -255,6 +259,11 @@ class AbstractSurface {
 
   std::unique_ptr<CommitTask> commit_task_;
 
+  /**
+   * @brief A destroyed delegate called in destructor
+   */
+  Delegate<void()> destroyed_;
+
   // global surface stack:
 
   /**
@@ -301,7 +310,7 @@ class AbstractSurface {
   /**
    * @brief The count of shell surface
    */
-  static int kCount;
+  static int kShellSurfaceCount;
 
   static Task kCommitTaskHead;
   static Task kCommitTaskTail;

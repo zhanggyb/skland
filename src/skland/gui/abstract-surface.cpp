@@ -25,7 +25,7 @@ namespace skland {
 
 AbstractSurface *AbstractSurface::kTop = nullptr;
 AbstractSurface *AbstractSurface::kBottom = nullptr;
-int AbstractSurface::kCount = 0;
+int AbstractSurface::kShellSurfaceCount = 0;
 Task AbstractSurface::kCommitTaskHead;
 Task AbstractSurface::kCommitTaskTail;
 
@@ -52,6 +52,8 @@ AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
 }
 
 AbstractSurface::~AbstractSurface() {
+  if (destroyed_) destroyed_();
+
   // Delete all sub surfaces of this one:
   AbstractSurface *p = nullptr;
   AbstractSurface *tmp = nullptr;
@@ -309,20 +311,20 @@ void AbstractSurface::Push(AbstractSurface *surface) {
   DBG_ASSERT(nullptr == surface->up_);
   DBG_ASSERT(nullptr == surface->down_);
 
-  DBG_ASSERT(kCount >= 0);
+  DBG_ASSERT(kShellSurfaceCount >= 0);
 
   if (kTop) {
     kTop->up_ = surface;
     surface->down_ = kTop;
     kTop = surface;
   } else {
-    DBG_ASSERT(kCount == 0);
+    DBG_ASSERT(kShellSurfaceCount == 0);
     DBG_ASSERT(nullptr == kBottom);
     kBottom = surface;
     kTop = surface;
   }
 
-  kCount++;
+  kShellSurfaceCount++;
 }
 
 void AbstractSurface::Remove(AbstractSurface *surface) {
@@ -344,12 +346,12 @@ void AbstractSurface::Remove(AbstractSurface *surface) {
 
   surface->up_ = nullptr;
   surface->down_ = nullptr;
-  kCount--;
-  DBG_ASSERT(kCount >= 0);
+  kShellSurfaceCount--;
+  DBG_ASSERT(kShellSurfaceCount >= 0);
 }
 
 void AbstractSurface::Clear() {
-  while (kCount > 0) {
+  while (kShellSurfaceCount > 0) {
     AbstractView *view = kTop->view();
     delete view;
   }
