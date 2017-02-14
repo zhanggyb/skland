@@ -27,11 +27,19 @@ namespace skland {
  */
 class SurfaceHolder {
 
+  SurfaceHolder() = delete;
+
  public:
 
   SurfaceHolder(AbstractView *view, const Margin &margin = Margin());
 
+  SurfaceHolder(ViewSurface *surface);
+
+  SurfaceHolder(const SurfaceHolder &other);
+
   ~SurfaceHolder();
+
+  SurfaceHolder &operator=(const SurfaceHolder &other);
 
   ViewSurface *view_surface() const { return view_surface_; }
 

@@ -111,12 +111,6 @@ class ViewSurface {
 
   const Point &relative_position() const { return relative_position_; }
 
- protected:
-
-  const wayland::Surface &wl_surface() const { return wl_surface_; }
-
-  SignalRef<> destroyed() { return destroyed_; }
-
  private:
 
   ViewSurface(AbstractView *view, const Margin &margin = Margin());
@@ -177,6 +171,8 @@ class ViewSurface {
    * @brief A destroyed delegate called in destructor
    */
   Signal<> destroyed_;
+
+  size_t reference_count_;
 
   // global surface stack:
 

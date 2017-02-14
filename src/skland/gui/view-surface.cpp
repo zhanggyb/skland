@@ -40,7 +40,8 @@ ViewSurface::ViewSurface(AbstractView *view, const Margin &margin)
       margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1),
-      is_user_data_set_(false) {
+      is_user_data_set_(false),
+      reference_count_(0) {
   DBG_ASSERT(nullptr != view_);
   wl_surface_.enter().Set(this, &ViewSurface::OnEnter);
   wl_surface_.leave().Set(this, &ViewSurface::OnLeave);
@@ -77,10 +78,10 @@ ViewSurface::~ViewSurface() {
 
 void ViewSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
   if (nullptr == buffer) {
-    wl_surface().Attach(NULL, x, y);
+    wl_surface_.Attach(NULL, x, y);
   } else {
     buffer->SetPosition(x, y);
-    wl_surface().Attach(buffer->wl_buffer(), x, y);
+    wl_surface_.Attach(buffer->wl_buffer(), x, y);
   }
 }
 

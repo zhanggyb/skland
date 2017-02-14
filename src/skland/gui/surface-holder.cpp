@@ -22,10 +22,31 @@ namespace skland {
 SurfaceHolder::SurfaceHolder(AbstractView *view, const Margin &margin)
     : view_surface_(nullptr) {
   view_surface_ = new ViewSurface(view, margin);
+  ++view_surface_->reference_count_;
+}
+
+SurfaceHolder::SurfaceHolder(ViewSurface *surface)
+    : view_surface_(surface) {
+  DBG_ASSERT(view_surface_);
+  ++view_surface_->reference_count_;
+}
+
+SurfaceHolder::SurfaceHolder(const SurfaceHolder &other)
+    : view_surface_(other.view_surface_) {
+  DBG_ASSERT(view_surface_);
+  ++view_surface_->reference_count_;
 }
 
 SurfaceHolder::~SurfaceHolder() {
-  delete view_surface_;
+  if (--view_surface_->reference_count_ == 0) {
+    delete view_surface_;
+  }
+}
+
+SurfaceHolder &SurfaceHolder::operator=(const SurfaceHolder &other) {
+  view_surface_ = other.view_surface_;
+  ++view_surface_->reference_count_;
+  return *this;
 }
 
 void SurfaceHolder::SetParent(ViewSurface *parent) {

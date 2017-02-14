@@ -25,7 +25,7 @@ void CommitTask::Run() const {
 }
 
 void CommitTaskExt::Run() const {
-  surface->wl_surface().Commit();
+  surface->wl_surface_.Commit();
 }
 
 }
