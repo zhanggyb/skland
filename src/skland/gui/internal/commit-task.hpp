@@ -22,6 +22,7 @@
 namespace skland {
 
 class AbstractSurface;
+class ViewSurface;
 
 struct CommitTask : public Task {
   CommitTask(const CommitTask &) = delete;
@@ -35,6 +36,20 @@ struct CommitTask : public Task {
   virtual void Run() const;
 
   AbstractSurface *surface;
+};
+
+struct CommitTaskExt : public Task {
+  CommitTaskExt(const CommitTaskExt &) = delete;
+  CommitTaskExt &operator=(const CommitTaskExt &) = delete;
+
+  CommitTaskExt(ViewSurface *surface)
+      : Task(), surface(surface) {}
+
+  virtual ~CommitTaskExt() {}
+
+  virtual void Run() const;
+
+  ViewSurface *surface;
 };
 
 }

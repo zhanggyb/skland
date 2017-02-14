@@ -35,8 +35,8 @@ class Application;
 class Display;
 class AbstractView;
 class Canvas;
-class ShellSurface;
-class SubSurface;
+class ShellSurfaceRole;
+class SubSurfaceRole;
 struct CommitTask;
 
 /**
@@ -65,8 +65,8 @@ class AbstractSurface {
 
   friend class Application;
   friend class Display;
-  friend class ShellSurface;
-  friend class SubSurface;
+  friend class ShellSurfaceRole;
+  friend class SubSurfaceRole;
 
   AbstractSurface() = delete;
   AbstractSurface(const AbstractSurface &) = delete;

@@ -17,39 +17,39 @@
 #ifndef SKLAND_GUI_SHELL_SURFACE_HPP_
 #define SKLAND_GUI_SHELL_SURFACE_HPP_
 
+#include "surface-holder.hpp"
 #include "../wayland/xdg-surface.hpp"
 
 namespace skland {
-
-class AbstractSurface;
 
 /**
  * @ingroup gui
  * @brief Shell surface role
  */
-class ShellSurface {
+class ShellSurface : public Trackable {
 
  public:
 
-  ShellSurface();
+  ShellSurface(AbstractView *view, const Margin &margin = Margin());
 
-  ~ShellSurface();
+  virtual ~ShellSurface();
 
-  /**
-   * @brief Assign shell surface role to the given new created surface
-   * @param surface
-   */
-  void Setup(AbstractSurface *surface);
+  DelegateRef<void(uint32_t)> xdg_surface_configure() { return xdg_surface_.configure(); }
 
-  void Destroy();
+  ViewSurface *view_surface() const { return surface_holder_.view_surface(); }
 
-  DelegateRef<void(uint32_t)> configure() { return xdg_surface_.configure(); }
+ protected:
+
+  const SurfaceHolder &surface_holder() const { return surface_holder_; }
+
+  const wayland::XdgSurface &xdg_surface() const { return xdg_surface_; }
 
  private:
 
-  void OnSurfaceDestroyed();
+  void OnSurfaceDestroyed(__SLOT__);
 
-  AbstractSurface *surface_;
+  SurfaceHolder surface_holder_;
+
   wayland::XdgSurface xdg_surface_;
 
 };

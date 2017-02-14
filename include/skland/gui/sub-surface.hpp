@@ -17,38 +17,42 @@
 #ifndef SKLAND_GUI_SUB_SURFACE_HPP_
 #define SKLAND_GUI_SUB_SURFACE_HPP_
 
+#include "surface-holder.hpp"
 #include "../wayland/subsurface.hpp"
 
 namespace skland {
-
-class AbstractSurface;
 
 /**
  * @ingroup gui
  * @brief Sub surface role
  */
-class SubSurface {
+class SubSurface : public Trackable {
+
+  SubSurface() = delete;
+  SubSurface(const SubSurface &) = delete;
+  SubSurface &operator=(const SubSurface &)= delete;
 
  public:
 
-  SubSurface();
+  SubSurface(ViewSurface *parent, AbstractView *view, const Margin &margin = Margin());
 
-  ~SubSurface();
+  virtual ~SubSurface();
 
-  /**
-   * @brief Assign sub surface role to the given new created surface
-   * @param surface
-   * @param parent
-   */
-  void Setup(AbstractSurface *surface, AbstractSurface *parent);
+  void PlaceAbove(ViewSurface *sibling);
 
-  void Destroy();
+  void PlaceBelow(ViewSurface *sibling);
+
+  void SetRelativePosition(int x, int y);
+
+  void SetWindowPosition(int x, int y);
+
+  ViewSurface *view_surface() const { return surface_holder_.view_surface(); }
 
  private:
 
-  void OnSurfaceDestroyed();
+  void OnSurfaceDestroyed(__SLOT__);
 
-  AbstractSurface *surface_;
+  SurfaceHolder surface_holder_;
 
   wayland::SubSurface wl_sub_surface_;
 

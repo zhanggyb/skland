@@ -15,50 +15,24 @@
  */
 
 #include <skland/gui/shell-surface.hpp>
-#include <skland/core/defines.hpp>
-#include <skland/gui/abstract-surface.hpp>
 #include <skland/gui/display.hpp>
 
 namespace skland {
 
-ShellSurface::ShellSurface()
-    : surface_(nullptr) {
+ShellSurface::ShellSurface(AbstractView *view, const Margin &margin)
+    : Trackable(), surface_holder_(view, margin) {
+  surface_holder_.destroyed().Connect(this, &ShellSurface::OnSurfaceDestroyed);
+  xdg_surface_.Setup(Display::xdg_shell(), surface_holder_.wl_surface());
 
+  surface_holder_.PushShellSurface();
 }
 
 ShellSurface::~ShellSurface() {
-  Destroy();
+  surface_holder_.RemoveShellSurface();
 }
 
-void ShellSurface::Setup(AbstractSurface *surface) {
-  DBG_ASSERT(nullptr == surface->parent_
-                 && nullptr == surface->up_
-                 && nullptr == surface->down_
-                 && nullptr == surface->above_
-                 && nullptr == surface->below_);
-
-  if (surface_ == surface) {
-    DBG_ASSERT(xdg_surface_.IsValid());
-    return;
-  }
-
-  Destroy();
-
-  surface_ = surface;
-  surface_->destroyed_ = Delegate<void()>::FromMethod(this, &ShellSurface::OnSurfaceDestroyed);
-  xdg_surface_.Setup(Display::xdg_shell(), surface_->wl_surface_);
-}
-
-void ShellSurface::Destroy() {
-  if (surface_) {
-    DBG_ASSERT(xdg_surface_.IsValid());
-    delete surface_;
-  }
-}
-
-void ShellSurface::OnSurfaceDestroyed() {
+void ShellSurface::OnSurfaceDestroyed(SLOT) {
   xdg_surface_.Destroy();
-  surface_ = nullptr;
 }
 
 }
