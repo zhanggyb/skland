@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_SURFACE_ROLE_HPP_
-#define SKLAND_GUI_SURFACE_ROLE_HPP_
+#ifndef SKLAND_GUI_SURFACE_HOLDER_HPP_
+#define SKLAND_GUI_SURFACE_HOLDER_HPP_
 
 #include "view-surface.hpp"
 
@@ -47,25 +47,21 @@ class SurfaceHolder {
     return nullptr == view_surface ? view_surface_->wl_surface_ : view_surface->wl_surface_;
   }
 
-  SignalRef<> destroyed() const {
-    return view_surface_->destroyed_;
-  }
+  SignalRef<> destroyed() const { return view_surface_->destroyed_; }
 
   void SetParent(ViewSurface *parent);
 
   /**
- * @brief Move the local surface list of surface_b and insert above surface_a
- * @param surface_a
- * @param surface_b
- */
-  void MoveAbove(ViewSurface *surface_b);
+   * @brief Move the local surface list and insert above target dst surface
+   * @param dst
+   */
+  void MoveAbove(ViewSurface *dst);
 
   /**
-   * @brief Move the local surface list of surface_b and insert below surface_a
-   * @param surface_a
-   * @param surface_b
+   * @brief Move the local surface list and insert below target dst surface
+   * @param dst
    */
-  void MoveBelow(ViewSurface *surface_b);
+  void MoveBelow(ViewSurface *dst);
 
   void SetRelativePosition(int x, int y) {
     view_surface_->relative_position_.x = x;
@@ -88,4 +84,4 @@ class SurfaceHolder {
 
 }
 
-#endif // SKLAND_GUI_SURFACE_ROLE_HPP_
+#endif // SKLAND_GUI_SURFACE_HOLDER_HPP_

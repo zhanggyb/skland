@@ -66,7 +66,7 @@ void SurfaceHolder::SetParent(ViewSurface *parent) {
   InsertAbove(sibling);
 }
 
-void SurfaceHolder::MoveAbove(ViewSurface *surface_a) {
+void SurfaceHolder::MoveAbove(ViewSurface *dst) {
   ViewSurface *top = view_surface_;
   ViewSurface *bottom = view_surface_;
   ViewSurface *tmp = nullptr;
@@ -87,22 +87,22 @@ void SurfaceHolder::MoveAbove(ViewSurface *surface_a) {
     if (view_surface_->above_) view_surface_->above_->below_ = view_surface_->below_;
     if (view_surface_->below_) view_surface_->below_->above_ = view_surface_->above_;
 
-    view_surface_->above_ = surface_a->above_;
-    view_surface_->below_ = surface_a;
-    if (surface_a->above_) surface_a->above_->below_ = view_surface_;
-    surface_a->above_ = view_surface_;
+    view_surface_->above_ = dst->above_;
+    view_surface_->below_ = dst;
+    if (dst->above_) dst->above_->below_ = view_surface_;
+    dst->above_ = view_surface_;
   } else {
     if (top->above_) top->above_->below_ = bottom->below_;
     if (bottom->below_) bottom->below_->above_ = top->above_;
 
-    top->above_ = surface_a->above_;
-    bottom->below_ = surface_a;
-    if (surface_a->above_) surface_a->above_->below_ = top;
-    surface_a->above_ = bottom;
+    top->above_ = dst->above_;
+    bottom->below_ = dst;
+    if (dst->above_) dst->above_->below_ = top;
+    dst->above_ = bottom;
   }
 }
 
-void SurfaceHolder::MoveBelow(ViewSurface *surface_a) {
+void SurfaceHolder::MoveBelow(ViewSurface *dst) {
   ViewSurface *top = view_surface_;
   ViewSurface *bottom = view_surface_;
   ViewSurface *tmp = nullptr;
@@ -123,18 +123,18 @@ void SurfaceHolder::MoveBelow(ViewSurface *surface_a) {
     if (view_surface_->above_) view_surface_->above_->below_ = view_surface_->below_;
     if (view_surface_->below_) view_surface_->below_->above_ = view_surface_->above_;
 
-    view_surface_->above_ = surface_a;
-    view_surface_->below_ = surface_a->below_;
-    if (surface_a->below_) surface_a->below_->above_ = view_surface_;
-    surface_a->below_ = view_surface_;
+    view_surface_->above_ = dst;
+    view_surface_->below_ = dst->below_;
+    if (dst->below_) dst->below_->above_ = view_surface_;
+    dst->below_ = view_surface_;
   } else {
     if (top->above_) top->above_->below_ = bottom->below_;
     if (bottom->below_) bottom->below_->above_ = top->above_;
 
-    top->above_ = surface_a;
-    bottom->below_ = surface_a->below_;
-    if (surface_a->below_) surface_a->below_->above_ = bottom;
-    surface_a->below_ = top;
+    top->above_ = dst;
+    bottom->below_ = dst->below_;
+    if (dst->below_) dst->below_->above_ = bottom;
+    dst->below_ = top;
   }
 }
 

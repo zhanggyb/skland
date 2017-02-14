@@ -122,8 +122,8 @@ class AbstractView : public Object {
   AbstractSurface *GetSurface() const;
 
   /**
-  * @brief Update the display of this widget
-  */
+   * @brief Update the display of this widget
+   */
   void Update();
 
   virtual Size GetMinimalSize() const = 0;
@@ -215,8 +215,8 @@ class AbstractView : public Object {
   }
 
   /**
-  * @brief Initialize the idle task list
-  */
+   * @brief Initialize the idle task list
+   */
   static void InitializeRedrawTaskList();
 
   /**

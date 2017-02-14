@@ -41,6 +41,10 @@ class Buffer;
 /**
  * @ingroup gui
  * @brief Surface used in views
+ *
+ * You cannot create or delete a ViewSurface object directly. A ViewSurface is
+ * created and hold by SurfaceHolder, which is usually used as a property in
+ * ShellSurface/SubSurface/EGLSurface.
  */
 class ViewSurface {
 
