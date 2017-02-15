@@ -41,7 +41,8 @@ ViewSurface::ViewSurface(AbstractView *view, const Margin &margin)
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1),
       is_user_data_set_(false),
-      reference_count_(0) {
+      reference_count_(0),
+      is_destroying_(false) {
   DBG_ASSERT(nullptr != view_);
   wl_surface_.enter().Set(this, &ViewSurface::OnEnter);
   wl_surface_.leave().Set(this, &ViewSurface::OnLeave);
@@ -51,7 +52,8 @@ ViewSurface::ViewSurface(AbstractView *view, const Margin &margin)
 }
 
 ViewSurface::~ViewSurface() {
-  destroyed_.Emit();
+  is_destroying_ = true;
+  destroying_.Emit();
 
   // Delete all sub surfaces of this one:
   ViewSurface *p = nullptr;

@@ -20,15 +20,16 @@ namespace skland {
 
 ToplevelShellSurface::ToplevelShellSurface(AbstractView *view, const Margin &margin)
     : ShellSurface(view, margin) {
-  surface_holder().destroyed().Connect(this, &ToplevelShellSurface::OnSurfaceDestroyed, -1);
+  destroying().Connect(this, &ToplevelShellSurface::OnShellSurfaceDestroying);
   xdg_toplevel_.Setup(xdg_surface());
 }
 
 ToplevelShellSurface::~ToplevelShellSurface() {
-
+  UnbindAll();
+  xdg_toplevel_.Destroy();
 }
 
-void ToplevelShellSurface::OnSurfaceDestroyed(SLOT) {
+void ToplevelShellSurface::OnShellSurfaceDestroying(SLOT) {
   xdg_toplevel_.Destroy();
 }
 

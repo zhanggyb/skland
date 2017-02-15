@@ -34,13 +34,13 @@ class ToplevelShellSurface : public ShellSurface {
 
   virtual ~ToplevelShellSurface();
 
-  DelegateRef<void(int, int, int)> xdg_toplevel_configure() { return xdg_toplevel_.configure(); }
+  DelegateRef<void(int, int, int)> toplevel_configure() { return xdg_toplevel_.configure(); }
 
-  DelegateRef<void()> xdg_toplevel_close() { return xdg_toplevel_.close(); }
+  DelegateRef<void()> toplevel_close() { return xdg_toplevel_.close(); }
 
  private:
 
-  void OnSurfaceDestroyed(__SLOT__);
+  void OnShellSurfaceDestroying(__SLOT__);
 
   wayland::XdgToplevel xdg_toplevel_;
 

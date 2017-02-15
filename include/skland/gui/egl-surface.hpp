@@ -18,6 +18,7 @@
 #define SKLAND_EGL_SURFACE_HPP
 
 #include "abstract-surface.hpp"
+#include "view-surface-holder.hpp"
 
 #include "../egl/surface.hpp"
 
@@ -56,6 +57,40 @@ class EGLSurface : public AbstractSurface {
   }
 
  private:
+
+  egl::Surface egl_surface_;
+
+};
+
+class EGLSurfaceExt : public Trackable {
+
+  EGLSurfaceExt() = delete;
+  EGLSurfaceExt(const EGLSurfaceExt &) = delete;
+  EGLSurfaceExt &operator=(const EGLSurfaceExt &) = delete;
+
+ public:
+
+  EGLSurfaceExt(ViewSurface *view_surface);
+
+  virtual ~EGLSurfaceExt();
+
+  bool MakeCurrent();
+
+  bool SwapBuffers();
+
+  bool SwapBuffersWithDamage(int x, int y, int width, int height);
+
+  bool SwapInterval(EGLint interval = 0);
+
+  void Resize(int width, int height, int dx = 0, int dy = 0) {
+    egl_surface_.Resize(width, height, dx, dy);
+  }
+
+ private:
+
+  void OnViewSurfaceDestroying(__SLOT__);
+
+  ViewSurfaceHolder view_surface_holder_;
 
   egl::Surface egl_surface_;
 

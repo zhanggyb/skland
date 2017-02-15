@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_SURFACE_HOLDER_HPP_
-#define SKLAND_GUI_SURFACE_HOLDER_HPP_
+#ifndef SKLAND_GUI_VIEW_SURFACE_HOLDER_HPP_
+#define SKLAND_GUI_VIEW_SURFACE_HOLDER_HPP_
 
 #include "view-surface.hpp"
 
@@ -25,29 +25,27 @@ namespace skland {
  * @ingroup gui
  * @brief The basic class acts as a surface role
  */
-class SurfaceHolder {
+class ViewSurfaceHolder: public Trackable {
 
-  SurfaceHolder() = delete;
+  ViewSurfaceHolder() = delete;
 
  public:
 
-  SurfaceHolder(AbstractView *view, const Margin &margin = Margin());
+  ViewSurfaceHolder(AbstractView *view, const Margin &margin = Margin());
 
-  SurfaceHolder(ViewSurface *surface);
+  ViewSurfaceHolder(ViewSurface *surface);
 
-  SurfaceHolder(const SurfaceHolder &other);
+  ViewSurfaceHolder(const ViewSurfaceHolder &other);
 
-  ~SurfaceHolder();
+  ~ViewSurfaceHolder();
 
-  SurfaceHolder &operator=(const SurfaceHolder &other);
+  ViewSurfaceHolder &operator=(const ViewSurfaceHolder &other);
 
   ViewSurface *view_surface() const { return view_surface_; }
 
-  const wayland::Surface &wl_surface(ViewSurface *view_surface = nullptr) const {
-    return nullptr == view_surface ? view_surface_->wl_surface_ : view_surface->wl_surface_;
-  }
+  SignalRef<> view_surface_destroying() { return view_surface_destroying_; }
 
-  SignalRef<> destroyed() const { return view_surface_->destroyed_; }
+  const wayland::Surface &wl_surface() const { return view_surface_->wl_surface_; }
 
   void SetParent(ViewSurface *parent);
 
@@ -72,16 +70,26 @@ class SurfaceHolder {
 
   void RemoveShellSurface();
 
+  static const wayland::Surface &wl_surface(const ViewSurface *view_surface) {
+    return view_surface->wl_surface_;
+  }
+
+  static int GetShellSurfaceCount() { return ViewSurface::kShellSurfaceCount; }
+
  private:
 
   void InsertAbove(ViewSurface *sibling);
 
   void InsertBelow(ViewSurface *sibling);
 
+  void OnViewSurfaceDestroying(__SLOT__);
+
   ViewSurface *view_surface_;
+
+  Signal<> view_surface_destroying_;
 
 };
 
 }
 
-#endif // SKLAND_GUI_SURFACE_HOLDER_HPP_
+#endif // SKLAND_GUI_VIEW_SURFACE_HOLDER_HPP_

@@ -14,42 +14,45 @@
  * limitations under the License.
  */
 
-#include <skland/gui/surface-holder.hpp>
+#include <skland/gui/view-surface-holder.hpp>
 #include <skland/core/defines.hpp>
 
 namespace skland {
 
-SurfaceHolder::SurfaceHolder(AbstractView *view, const Margin &margin)
-    : view_surface_(nullptr) {
+ViewSurfaceHolder::ViewSurfaceHolder(AbstractView *view, const Margin &margin)
+    : Trackable(), view_surface_(nullptr) {
   view_surface_ = new ViewSurface(view, margin);
   ++view_surface_->reference_count_;
+  view_surface_->destroying_.Connect(this, &ViewSurfaceHolder::OnViewSurfaceDestroying);
 }
 
-SurfaceHolder::SurfaceHolder(ViewSurface *surface)
-    : view_surface_(surface) {
+ViewSurfaceHolder::ViewSurfaceHolder(ViewSurface *surface)
+    : Trackable(), view_surface_(surface) {
   DBG_ASSERT(view_surface_);
   ++view_surface_->reference_count_;
+  view_surface_->destroying_.Connect(this, &ViewSurfaceHolder::OnViewSurfaceDestroying);
 }
 
-SurfaceHolder::SurfaceHolder(const SurfaceHolder &other)
-    : view_surface_(other.view_surface_) {
+ViewSurfaceHolder::ViewSurfaceHolder(const ViewSurfaceHolder &other)
+    : Trackable(), view_surface_(other.view_surface_) {
   DBG_ASSERT(view_surface_);
   ++view_surface_->reference_count_;
+  view_surface_->destroying_.Connect(this, &ViewSurfaceHolder::OnViewSurfaceDestroying);
 }
 
-SurfaceHolder::~SurfaceHolder() {
-  if (--view_surface_->reference_count_ == 0) {
+ViewSurfaceHolder::~ViewSurfaceHolder() {
+  if (view_surface_ && (--view_surface_->reference_count_ == 0)) {
     delete view_surface_;
   }
 }
 
-SurfaceHolder &SurfaceHolder::operator=(const SurfaceHolder &other) {
+ViewSurfaceHolder &ViewSurfaceHolder::operator=(const ViewSurfaceHolder &other) {
   view_surface_ = other.view_surface_;
   ++view_surface_->reference_count_;
   return *this;
 }
 
-void SurfaceHolder::SetParent(ViewSurface *parent) {
+void ViewSurfaceHolder::SetParent(ViewSurface *parent) {
   DBG_ASSERT(view_surface_->parent_ == nullptr &&
       view_surface_->up_ == nullptr &&
       view_surface_->down_ == nullptr);
@@ -66,7 +69,7 @@ void SurfaceHolder::SetParent(ViewSurface *parent) {
   InsertAbove(sibling);
 }
 
-void SurfaceHolder::MoveAbove(ViewSurface *dst) {
+void ViewSurfaceHolder::MoveAbove(ViewSurface *dst) {
   ViewSurface *top = view_surface_;
   ViewSurface *bottom = view_surface_;
   ViewSurface *tmp = nullptr;
@@ -102,7 +105,7 @@ void SurfaceHolder::MoveAbove(ViewSurface *dst) {
   }
 }
 
-void SurfaceHolder::MoveBelow(ViewSurface *dst) {
+void ViewSurfaceHolder::MoveBelow(ViewSurface *dst) {
   ViewSurface *top = view_surface_;
   ViewSurface *bottom = view_surface_;
   ViewSurface *tmp = nullptr;
@@ -138,7 +141,7 @@ void SurfaceHolder::MoveBelow(ViewSurface *dst) {
   }
 }
 
-void SurfaceHolder::PushShellSurface() {
+void ViewSurfaceHolder::PushShellSurface() {
   DBG_ASSERT(nullptr == view_surface_->parent_);
   DBG_ASSERT(nullptr == view_surface_->up_);
   DBG_ASSERT(nullptr == view_surface_->down_);
@@ -159,7 +162,7 @@ void SurfaceHolder::PushShellSurface() {
   ViewSurface::kShellSurfaceCount++;
 }
 
-void SurfaceHolder::RemoveShellSurface() {
+void ViewSurfaceHolder::RemoveShellSurface() {
   DBG_ASSERT(nullptr == view_surface_->parent_);
 
   if (view_surface_->up_) {
@@ -182,7 +185,7 @@ void SurfaceHolder::RemoveShellSurface() {
   DBG_ASSERT(ViewSurface::kShellSurfaceCount >= 0);
 }
 
-void SurfaceHolder::InsertAbove(ViewSurface *sibling) {
+void ViewSurfaceHolder::InsertAbove(ViewSurface *sibling) {
   DBG_ASSERT(view_surface_->parent_ == sibling->parent_ || view_surface_ == sibling->parent_
                  || view_surface_->parent_ == sibling);
   if (sibling->above_) sibling->above_->below_ = view_surface_;
@@ -191,13 +194,21 @@ void SurfaceHolder::InsertAbove(ViewSurface *sibling) {
   view_surface_->below_ = sibling;
 }
 
-void SurfaceHolder::InsertBelow(ViewSurface *sibling) {
+void ViewSurfaceHolder::InsertBelow(ViewSurface *sibling) {
   DBG_ASSERT(view_surface_->parent_ == sibling->parent_ || view_surface_ == sibling->parent_
                  || view_surface_->parent_ == sibling);
   if (sibling->below_) sibling->below_->above_ = view_surface_;
   view_surface_->below_ = sibling->below_;
   sibling->below_ = view_surface_;
   view_surface_->above_ = sibling;
+}
+
+void ViewSurfaceHolder::OnViewSurfaceDestroying(SLOT slot) {
+  view_surface_destroying_.Emit();
+  --view_surface_->reference_count_;
+  DBG_ASSERT(view_surface_->reference_count_ >= 0);
+  DBG_ASSERT(view_surface_->is_destroying_);
+  view_surface_ = nullptr;
 }
 
 }

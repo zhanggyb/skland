@@ -20,18 +20,20 @@
 namespace skland {
 
 ShellSurface::ShellSurface(AbstractView *view, const Margin &margin)
-    : Trackable(), surface_holder_(view, margin) {
-  surface_holder_.destroyed().Connect(this, &ShellSurface::OnSurfaceDestroyed);
-  xdg_surface_.Setup(Display::xdg_shell(), surface_holder_.wl_surface());
-
-  surface_holder_.PushShellSurface();
+    : Trackable(), view_surface_holder_(view, margin) {
+  view_surface_holder_.view_surface_destroying().Connect(this, &ShellSurface::OnViewSurfaceDestroying);
+  xdg_surface_.Setup(Display::xdg_shell(), view_surface_holder_.wl_surface());
+  view_surface_holder_.PushShellSurface();
 }
 
 ShellSurface::~ShellSurface() {
-  surface_holder_.RemoveShellSurface();
+  UnbindAll();
+  view_surface_holder_.RemoveShellSurface();
+  xdg_surface_.Destroy();
 }
 
-void ShellSurface::OnSurfaceDestroyed(SLOT) {
+void ShellSurface::OnViewSurfaceDestroying(SLOT) {
+  destroying_.Emit();
   xdg_surface_.Destroy();
 }
 

@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_SHELL_SURFACE_HPP_
 #define SKLAND_GUI_SHELL_SURFACE_HPP_
 
-#include "surface-holder.hpp"
+#include "view-surface-holder.hpp"
 #include "../wayland/xdg-surface.hpp"
 
 namespace skland {
@@ -28,29 +28,37 @@ namespace skland {
  */
 class ShellSurface : public Trackable {
 
+  ShellSurface() = delete;
+  ShellSurface(const ShellSurface &) = delete;
+  ShellSurface &operator=(const ShellSurface &) = delete;
+
  public:
 
   ShellSurface(AbstractView *view, const Margin &margin = Margin());
 
   virtual ~ShellSurface();
 
-  DelegateRef<void(uint32_t)> xdg_surface_configure() { return xdg_surface_.configure(); }
+  DelegateRef<void(uint32_t)> surface_configure() { return xdg_surface_.configure(); }
 
-  ViewSurface *view_surface() const { return surface_holder_.view_surface(); }
+  ViewSurface *view_surface() const { return view_surface_holder_.view_surface(); }
 
  protected:
 
-  const SurfaceHolder &surface_holder() const { return surface_holder_; }
+  const ViewSurfaceHolder &view_surface_holder() const { return view_surface_holder_; }
 
   const wayland::XdgSurface &xdg_surface() const { return xdg_surface_; }
 
+  SignalRef<> destroying() { return destroying_; }
+
  private:
 
-  void OnSurfaceDestroyed(__SLOT__);
+  void OnViewSurfaceDestroying(__SLOT__);
 
-  SurfaceHolder surface_holder_;
+  ViewSurfaceHolder view_surface_holder_;
 
   wayland::XdgSurface xdg_surface_;
+
+  Signal<> destroying_;
 
 };
 

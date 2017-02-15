@@ -34,7 +34,7 @@ namespace skland {
 class Application;
 class Display;
 class AbstractView;
-class SurfaceHolder;
+class ViewSurfaceHolder;
 struct CommitTaskExt;
 class Buffer;
 
@@ -50,7 +50,7 @@ class ViewSurface {
 
   friend class Application;
   friend class Display;
-  friend class SurfaceHolder;
+  friend class ViewSurfaceHolder;
   friend struct CommitTaskExt;
 
   ViewSurface() = delete;
@@ -174,9 +174,11 @@ class ViewSurface {
   /**
    * @brief A destroyed delegate called in destructor
    */
-  Signal<> destroyed_;
+  Signal<> destroying_;
 
   size_t reference_count_;
+
+  bool is_destroying_;
 
   // global surface stack:
 
