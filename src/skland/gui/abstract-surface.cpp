@@ -46,7 +46,7 @@ AbstractSurface::AbstractSurface(AbstractView *view, const Margin &margin)
   wl_surface_.leave().Set(this, &AbstractSurface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
 
-  commit_task_.reset(new CommitTask(this));
+//  commit_task_.reset(new CommitTask(this));
 
   Push(this);
 }
@@ -130,18 +130,18 @@ void AbstractSurface::SetDesync() {
 }
 
 void AbstractSurface::Commit() {
-  if (commit_task_->IsLinked()) return;
+//  if (commit_task_->IsLinked()) return;
 
-  if (nullptr == parent_) {
-    kCommitTaskTail.PushFront(commit_task_.get());
-  } else {
-    if (mode_ == kSyncMode) {
-      parent_->Commit();
-      parent_->commit_task_->PushFront(commit_task_.get());
-    } else {
-      kCommitTaskTail.PushFront(commit_task_.get());
-    }
-  }
+//  if (nullptr == parent_) {
+//    kCommitTaskTail.PushFront(commit_task_.get());
+//  } else {
+//    if (mode_ == kSyncMode) {
+//      parent_->Commit();
+//      parent_->commit_task_->PushFront(commit_task_.get());
+//    } else {
+//      kCommitTaskTail.PushFront(commit_task_.get());
+//    }
+//  }
 }
 
 void AbstractSurface::PlaceAbove(AbstractSurface *sibling) {

@@ -107,7 +107,7 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFra
     shell_surface = surface_;
   }
 
-  SetShellSurface(shell_surface);
+//  SetToplevelShellSurface(shell_surface);
   SetTitle(title);
 
   frame_callback_.done().Set(this, &EGLWindow::OnFrame);
@@ -131,35 +131,36 @@ void EGLWindow::OnShown() {
 void EGLWindow::OnUpdate(AbstractView *view) {
   if (!visible()) return;
 
-  if (frame_surface_) {
-    if (view == this) {
-      kRedrawTaskTail.PushFront(redraw_task().get());
-      redraw_task()->context = frame_surface_;
-      DBG_ASSERT(redraw_task()->context.GetCanvas());
-      frame_surface_->Damage(0, 0,
-                             width() + frame_surface_->margin().lr(),
-                             height() + frame_surface_->margin().tb());
-      frame_surface_->Commit();
-    } else {
-      RedrawTask *task = GetRedrawTask(view);
-      kRedrawTaskTail.PushFront(task);
-      task->context = main_surface_;
-      DBG_ASSERT(task->context.GetCanvas());
-      main_surface_->Damage(view->x() + main_surface_->margin().left,
-                            view->y() + main_surface_->margin().top,
-                            view->width(),
-                            view->height());
-      main_surface_->Commit();
-    }
-  } else {
-    DBG_ASSERT(view == this);
-    kRedrawTaskTail.PushFront(redraw_task().get());
-    surface_->Commit();
-  }
+//  if (frame_surface_) {
+//    if (view == this) {
+//      kRedrawTaskTail.PushFront(redraw_task().get());
+//      redraw_task()->context = frame_surface_;
+//      DBG_ASSERT(redraw_task()->context.GetCanvas());
+//      frame_surface_->Damage(0, 0,
+//                             width() + frame_surface_->margin().lr(),
+//                             height() + frame_surface_->margin().tb());
+//      frame_surface_->Commit();
+//    } else {
+//      RedrawTask *task = GetRedrawTask(view);
+//      kRedrawTaskTail.PushFront(task);
+//      task->context = main_surface_;
+//      DBG_ASSERT(task->context.GetCanvas());
+//      main_surface_->Damage(view->x() + main_surface_->margin().left,
+//                            view->y() + main_surface_->margin().top,
+//                            view->width(),
+//                            view->height());
+//      main_surface_->Commit();
+//    }
+//  } else {
+//    DBG_ASSERT(view == this);
+//    kRedrawTaskTail.PushFront(redraw_task().get());
+//    surface_->Commit();
+//  }
 }
 
-AbstractSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
-  return main_surface_;
+ViewSurface *EGLWindow::OnGetSurface(const AbstractView *view) const {
+//  return main_surface_;
+  return nullptr;
 }
 
 void EGLWindow::OnResize(int width, int height) {

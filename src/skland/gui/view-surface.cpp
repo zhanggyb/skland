@@ -48,7 +48,7 @@ ViewSurface::ViewSurface(AbstractView *view, const Margin &margin)
   wl_surface_.leave().Set(this, &ViewSurface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
 
-  commit_task_.reset(new CommitTaskExt(this));
+  commit_task_.reset(new CommitTask(this));
 }
 
 ViewSurface::~ViewSurface() {

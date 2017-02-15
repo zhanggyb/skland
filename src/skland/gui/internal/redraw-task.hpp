@@ -28,8 +28,8 @@ struct RedrawTask : public ViewTask {
   RedrawTask(const RedrawTask &) = delete;
   RedrawTask &operator=(const RedrawTask &) = delete;
 
-  RedrawTask(AbstractView *view = nullptr, AbstractSurface *surface = nullptr)
-      : ViewTask(view), context(surface) {}
+  RedrawTask(AbstractView *view = nullptr)
+      : ViewTask(view) {}
 
   virtual ~RedrawTask() {}
 

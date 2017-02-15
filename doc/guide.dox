@@ -2,11 +2,18 @@
  * @page guide Programming Guide
  * @tableofcontents
  *
- * @section basic Basic
+ * @section basics Basics
  *
- * - Delegates
+ * - C++11
+ * - Fast C++ Delegates
  * - Signals and Slots
+ * - A "Hello World" example
  *
- * @section skia Use Skia
+ * @section wayland_intro Wayland Introduction
+ *
+ * - Surface
+ *  - Surface stack
+ *
+ * @section using_skia Using Skia in SkLand
  *
  */

@@ -83,7 +83,7 @@ class ShmWidget : public AbstractWidget {
 
   void Animate() {
     static int padding = 5;
-    std::shared_ptr<Canvas> canvas = context_->GetCanvas();
+    std::shared_ptr<Canvas> canvas = context_->canvas();
     canvas->Save();
     canvas->ClipRect(Rect(geometry().l + padding,
                           geometry().t,

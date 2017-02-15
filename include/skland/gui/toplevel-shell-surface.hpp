@@ -34,6 +34,34 @@ class ToplevelShellSurface : public ShellSurface {
 
   virtual ~ToplevelShellSurface();
 
+  void SetTitle(const char *title) {
+    xdg_toplevel_.SetTitle(title);
+  }
+
+  void SetAppId(const char *id) {
+    xdg_toplevel_.SetAppId(id);
+  }
+
+  void Move(const wayland::Seat &seat, uint32_t serial) const {
+    xdg_toplevel_.Move(seat, serial);
+  }
+
+  void Resize(const wayland::Seat &seat, uint32_t serial, uint32_t edges) const {
+    xdg_toplevel_.Resize(seat, serial, edges);
+  }
+
+  void SetMaximized() const {
+    xdg_toplevel_.SetMaximized();
+  }
+
+  void UnsetMaximized() const {
+    xdg_toplevel_.UnsetMaximized();
+  }
+
+  void SetMinimized() const {
+    xdg_toplevel_.SetMinimized();
+  }
+
   DelegateRef<void(int, int, int)> toplevel_configure() { return xdg_toplevel_.configure(); }
 
   DelegateRef<void()> toplevel_close() { return xdg_toplevel_.close(); }

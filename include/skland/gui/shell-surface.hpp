@@ -38,6 +38,14 @@ class ShellSurface : public Trackable {
 
   virtual ~ShellSurface();
 
+  void SetWindowGeometry(int x, int y, int width, int height) const {
+    xdg_surface_.SetWindowGeometry(x, y, width, height);
+  }
+
+  void AckConfigure(uint32_t serial) const {
+    xdg_surface_.AckConfigure(serial);
+  }
+
   DelegateRef<void(uint32_t)> surface_configure() { return xdg_surface_.configure(); }
 
   ViewSurface *view_surface() const { return view_surface_holder_.view_surface(); }

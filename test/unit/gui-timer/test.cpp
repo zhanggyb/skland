@@ -72,7 +72,7 @@ class ShmWidget : public AbstractWidget {
     Paint paint;
     paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
 
-    context->GetCanvas()->DrawRect(geometry(), paint);
+    context->canvas()->DrawRect(geometry(), paint);
   }
 
 };

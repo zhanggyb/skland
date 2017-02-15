@@ -84,7 +84,7 @@ void Widget::OnDraw(const Context *context) {
   Paint paint;
   paint.SetColor(Color(0.95f, 0.95f, 0.95f, 1.f));
 
-  context->GetCanvas()->DrawRect(geometry(), paint);
+  context->canvas()->DrawRect(geometry(), paint);
 }
 
 }

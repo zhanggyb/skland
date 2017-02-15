@@ -19,7 +19,8 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
-#include <skland/gui/abstract-surface.hpp>
+#include <skland/gui/toplevel-shell-surface.hpp>
+#include <skland/gui/sub-surface.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
 
 #include "internal/view-task.hpp"
@@ -37,24 +38,24 @@ AbstractWindow::AbstractWindow(int width,
                                AbstractWindowFrame *frame)
     : AbstractView(width, height),
       flags_(0),
-      window_frame_(nullptr),
-      shell_surface_(nullptr) {
+      toplevel_shell_surface_(nullptr),
+      window_frame_(nullptr) {
   if (title) title_ = title;
 }
 
 AbstractWindow::~AbstractWindow() {
   Theme::DestroyWindowFrame(window_frame_);
-  delete shell_surface_;
+  delete toplevel_shell_surface_;
 }
 
 void AbstractWindow::SetTitle(const char *title) {
   title_ = title;
-  xdg_toplevel_.SetTitle(title);
+  toplevel_shell_surface_->SetTitle(title);
 }
 
 void AbstractWindow::SetAppId(const char *app_id) {
   app_id_ = app_id;
-  xdg_toplevel_.SetAppId(app_id);
+  toplevel_shell_surface_->SetAppId(app_id);
 }
 
 void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
@@ -77,12 +78,12 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 
 void AbstractWindow::Show() {
   if (!visible()) {
-    shell_surface_->Commit();
+    toplevel_shell_surface_->view_surface()->Commit();
   }
 }
 
 void AbstractWindow::Close(SLOT) {
-  if (AbstractSurface::GetShellSurfaceCount() == 1) {
+  if (ViewSurface::GetShellSurfaceCount() == 1) {
     Application::Exit();
   }
 
@@ -276,27 +277,24 @@ void AbstractWindow::AddSubView(AbstractView *view, int pos) {
 }
 
 void AbstractWindow::MoveWithMouse(MouseEvent *event) const {
-  xdg_toplevel_.Move(event->wl_seat(), event->serial());
+  toplevel_shell_surface_->Move(event->wl_seat(), event->serial());
 }
 
 void AbstractWindow::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
-  xdg_toplevel_.Resize(event->wl_seat(), event->serial(), edges);
+  toplevel_shell_surface_->Resize(event->wl_seat(), event->serial(), edges);
 }
 
-void AbstractWindow::SetShellSurface(AbstractSurface *surface) {
+void AbstractWindow::SetToplevelShellSurface(ToplevelShellSurface *surface) {
   DBG_ASSERT(surface);
-  DBG_ASSERT(nullptr == surface->parent());
+  DBG_ASSERT(nullptr == surface->view_surface()->parent());
 
-  if (shell_surface_) delete shell_surface_;
+  if (toplevel_shell_surface_) delete toplevel_shell_surface_;
 
-  shell_surface_ = surface;
+  toplevel_shell_surface_ = surface;
 
-  xdg_surface_.configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
-  xdg_surface_.Setup(Display::xdg_shell(), shell_surface_->wl_surface());
-
-  xdg_toplevel_.configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
-  xdg_toplevel_.close().Set(this, &AbstractWindow::OnXdgToplevelClose);
-  xdg_toplevel_.Setup(xdg_surface_);
+  toplevel_shell_surface_->surface_configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
+  toplevel_shell_surface_->toplevel_configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
+  toplevel_shell_surface_->toplevel_close().Set(this, &AbstractWindow::OnXdgToplevelClose);
 }
 
 void AbstractWindow::ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height) {
@@ -308,13 +306,13 @@ void AbstractWindow::DrawWindowFrame(AbstractWindowFrame *window_frame, const Co
 }
 
 void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
-  xdg_surface_.AckConfigure(serial);
+  toplevel_shell_surface_->AckConfigure(serial);
 
   if (!visible()) {
     set_visible(true);
-    xdg_surface_.SetWindowGeometry(shell_surface_->margin().left,
-                                   shell_surface_->margin().top,
-                                   width(), height());
+    toplevel_shell_surface_->SetWindowGeometry(toplevel_shell_surface_->view_surface()->margin().left,
+                                               toplevel_shell_surface_->view_surface()->margin().top,
+                                               width(), height());
     OnShown();
   }
 }
@@ -345,9 +343,9 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
 
   if (do_resize) {
     int x = 0, y = 0;
-    x = shell_surface_->margin().left;
-    y = shell_surface_->margin().top;
-    xdg_surface_.SetWindowGeometry(x, y, width, height);
+    x = toplevel_shell_surface_->view_surface()->margin().left;
+    y = toplevel_shell_surface_->view_surface()->margin().top;
+    toplevel_shell_surface_->SetWindowGeometry(x, y, width, height);
     resize(width, height);
     OnResize(width, height);
   }
@@ -384,15 +382,15 @@ void AbstractWindow::OnWindowAction(int action, SLOT slot) {
     }
     case kActionMaximize: {
       if (IsMaximized()) {
-        xdg_toplevel_.UnsetMaximized();
+        toplevel_shell_surface_->UnsetMaximized();
       } else {
-        xdg_toplevel_.SetMaximized();
+        toplevel_shell_surface_->SetMaximized();
       }
       break;
     }
     case kActionMinimize: {
       Bit::Set<int>(flags_, kFlagMaskMinimized);
-      xdg_toplevel_.SetMinimized();
+      toplevel_shell_surface_->SetMinimized();
       DBG_ASSERT(IsMinimized());
       break;
     }

@@ -24,6 +24,7 @@
 #include "../wayland/surface.hpp"
 #include "../wayland/region.hpp"
 #include "../wayland/subsurface.hpp"
+#include "../wayland/callback.hpp"
 
 #include "task.hpp"
 
@@ -35,7 +36,7 @@ class Application;
 class Display;
 class AbstractView;
 class ViewSurfaceHolder;
-struct CommitTaskExt;
+struct CommitTask;
 class Buffer;
 
 /**
@@ -51,7 +52,7 @@ class ViewSurface {
   friend class Application;
   friend class Display;
   friend class ViewSurfaceHolder;
-  friend struct CommitTaskExt;
+  friend struct CommitTask;
 
   ViewSurface() = delete;
   ViewSurface(const ViewSurface &) = delete;
@@ -75,6 +76,10 @@ class ViewSurface {
 
   void SetOpaqueRegion(const wayland::Region &region) {
     wl_surface_.SetOpaqueRegion(region);
+  }
+
+  void SetupCallback(wayland::Callback &callback) {
+    callback.Setup(wl_surface_);
   }
 
   /**
@@ -169,7 +174,7 @@ class ViewSurface {
 
   bool is_user_data_set_;
 
-  std::unique_ptr<CommitTaskExt> commit_task_;
+  std::unique_ptr<CommitTask> commit_task_;
 
   /**
    * @brief A destroyed delegate called in destructor

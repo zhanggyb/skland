@@ -18,7 +18,7 @@
 #define SKLAND_GUI_CONTEXT_HPP_
 
 #include "abstract-surface.hpp"
-#include "../wayland/callback.hpp"
+#include "view-surface.hpp"
 
 namespace skland {
 
@@ -30,55 +30,49 @@ class Canvas;
  */
 class Context {
 
-  Context() = delete;
-
  public:
 
-  Context(AbstractSurface *surface)
-      : surface_(surface) {}
+  Context()
+      : view_surface_(nullptr) {}
+
+  Context(ViewSurface *surface, const std::shared_ptr<Canvas> canvas)
+      : view_surface_(surface), canvas_(canvas) {}
 
   Context(const Context &other)
-      : surface_(other.surface_) {}
+      : view_surface_(other.view_surface_), canvas_(other.canvas_) {}
 
   ~Context() {}
 
   Context &operator=(const Context &other) {
-    surface_ = other.surface_;
+    view_surface_ = other.view_surface_;
+    canvas_ = other.canvas_;
     return *this;
-  }
-
-  Context &operator=(AbstractSurface *surface) {
-    surface_ = surface;
-    return *this;
-  }
-
-  std::shared_ptr<Canvas> GetCanvas() const {
-    return surface_->GetCanvas();
   }
 
   void SetupCallback(wayland::Callback &callback) const {
-    callback.Setup(surface_->wl_surface());
+    view_surface_->SetupCallback(callback);
   }
 
   const Margin &GetMargin() const {
-    return surface_->margin();
+    return view_surface_->margin();
   }
 
   void Damage(int surface_x, int surface_y, int width, int height) const {
-    surface_->Damage(surface_x, surface_y, width, height);
+    view_surface_->Damage(surface_x, surface_y, width, height);
   }
 
   void Commit() const {
-    surface_->Commit();
+    view_surface_->Commit();
   }
 
-  AbstractSurface *surface() const {
-    return surface_;
-  }
+  ViewSurface *surface() const { return view_surface_; }
+
+  const std::shared_ptr<Canvas> &canvas() const { return canvas_; }
 
  private:
 
-  AbstractSurface *surface_;
+  ViewSurface *view_surface_;
+  std::shared_ptr<Canvas> canvas_;
 
 };
 

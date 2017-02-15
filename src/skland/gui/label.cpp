@@ -91,7 +91,7 @@ void Label::OnKeyboardKey(KeyEvent *event) {
 void Label::OnDraw(const Context *context) {
   Paint paint;
   paint.SetColor(background_);
-  context->GetCanvas()->DrawRect(geometry(), paint);
+  context->canvas()->DrawRect(geometry(), paint);
 
   paint.SetColor(foreground_);
   paint.SetAntiAlias(true);
@@ -109,7 +109,7 @@ void Label::OnDraw(const Context *context) {
                   geometry().b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
   text_box.setText(text_.c_str(), text_.length(), *paint.sk_paint());
-  text_box.draw(context->GetCanvas()->sk_canvas());
+  text_box.draw(context->canvas()->sk_canvas());
 }
 
 }

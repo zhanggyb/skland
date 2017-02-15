@@ -55,25 +55,26 @@ EGLWidget::~EGLWidget() {
 }
 
 void EGLWidget::OnUpdate(AbstractView *view) {
-  DBG_ASSERT(view == this);
-
-  if (nullptr == surface_->parent()) {
-    if (nullptr == parent_view()) return;
-
-    AbstractSurface *parent_surface = parent_view()->GetSurface();
-    if (nullptr == parent_surface) return;
-
-    parent_surface->AddSubSurface(surface_);
-    surface_->SetWindowPosition(x(), y());
-    surface_->Resize(width(), height());
-    surface_->SetDesync();
-  }
-
-  AbstractWidget::OnUpdate(view);
+//  DBG_ASSERT(view == this);
+//
+//  if (nullptr == surface_->parent()) {
+//    if (nullptr == parent_view()) return;
+//
+//    ViewSurface *parent_surface = parent_view()->GetSurface();
+//    if (nullptr == parent_surface) return;
+//
+//    parent_surface->AddSubSurface(surface_);
+//    surface_->SetWindowPosition(x(), y());
+//    surface_->Resize(width(), height());
+//    surface_->SetDesync();
+//  }
+//
+//  AbstractWidget::OnUpdate(view);
 }
 
-AbstractSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
-  return surface_;
+ViewSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
+  return nullptr;
+//  return surface_;
 }
 
 void EGLWidget::OnResize(int width, int height) {

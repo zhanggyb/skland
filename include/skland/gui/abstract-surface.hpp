@@ -257,7 +257,7 @@ class AbstractSurface {
 
   bool is_user_data_set_;
 
-  std::unique_ptr<CommitTask> commit_task_;
+//  std::unique_ptr<CommitTask> commit_task_;
 
   /**
    * @brief A destroyed delegate called in destructor

@@ -47,9 +47,9 @@ class XdgSurface {
 
   void Destroy();
 
-  void SetWindowGeometry(int x, int y, int width, int height);
+  void SetWindowGeometry(int x, int y, int width, int height) const;
 
-  void AckConfigure(uint32_t serial);
+  void AckConfigure(uint32_t serial) const;
 
   void SetUserData(void *user_data);
 

@@ -39,7 +39,7 @@ AbstractView::AbstractView(int width, int height)
     : Object(),
       visible_(false),
       geometry_(width, height) {
-  redraw_task_.reset(new RedrawTask(this, nullptr));
+  redraw_task_.reset(new RedrawTask(this));
   mouse_task_.reset(new ViewTask(this));
   mouse_motion_task_.reset(new ViewTask(this));
 }
@@ -71,7 +71,7 @@ bool AbstractView::Contain(int x, int y) const {
   return geometry_.Contain(x, y);
 }
 
-AbstractSurface *AbstractView::GetSurface() const {
+ViewSurface *AbstractView::GetSurface() const {
   return OnGetSurface(this);
 }
 
@@ -99,7 +99,7 @@ void AbstractView::OnUpdate(AbstractView *view) {
     parent_view()->OnUpdate(view);
 }
 
-AbstractSurface *AbstractView::OnGetSurface(const AbstractView *view) const {
+ViewSurface *AbstractView::OnGetSurface(const AbstractView *view) const {
   if (view->parent_view())
     return view->parent_view()->OnGetSurface(view);
 

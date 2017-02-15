@@ -171,7 +171,7 @@ void WindowFrameLight::CloseButton::OnResize(int /* width */, int /* height */) 
 }
 
 void WindowFrameLight::CloseButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
   canvas->ClipRect(geometry());
   canvas->Clear();
@@ -240,7 +240,7 @@ void WindowFrameLight::MaximizeButton::OnResize(int /* width */, int /* height *
 }
 
 void WindowFrameLight::MaximizeButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
   canvas->ClipRect(geometry());
   canvas->Clear();
@@ -309,7 +309,7 @@ void WindowFrameLight::MinimizeButton::OnResize(int /* width */, int /* height *
 }
 
 void WindowFrameLight::MinimizeButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
   canvas->ClipRect(geometry());
   canvas->Clear();
@@ -431,7 +431,7 @@ void WindowFrameLight::LayoutWidgets(int width, int height) {
 }
 
 void WindowFrameLight::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Clear();
 
   float radii[] = {
