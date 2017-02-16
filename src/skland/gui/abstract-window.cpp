@@ -55,7 +55,7 @@ AbstractWindow::AbstractWindow(int width,
   wayland::Region input_region;
   input_region.Setup(Display::wl_compositor());
   input_region.Add(x, y, width, height);
-  toplevel_shell_surface_->view_surface()->SetInputRegion(input_region);
+  toplevel_shell_surface_->surface()->SetInputRegion(input_region);
 
   toplevel_shell_surface_->SetTitle(title);
 
@@ -97,12 +97,12 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 
 void AbstractWindow::Show() {
   if (!visible()) {
-    toplevel_shell_surface_->view_surface()->Commit();
+    toplevel_shell_surface_->surface()->Commit();
   }
 }
 
 void AbstractWindow::Close(SLOT) {
-  if (ViewSurface::GetShellSurfaceCount() == 1) {
+  if (Surface::GetShellSurfaceCount() == 1) {
     Application::Exit();
   }
 

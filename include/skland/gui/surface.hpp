@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_VIEW_SURFACE_HPP_
-#define SKLAND_GUI_VIEW_SURFACE_HPP_
+#ifndef SKLAND_GUI_SURFACE_HPP_
+#define SKLAND_GUI_SURFACE_HPP_
 
 #include "../core/sigcxx.hpp"
 #include "../core/margin.hpp"
@@ -35,7 +35,7 @@ namespace skland {
 class Application;
 class Display;
 class AbstractView;
-class ViewSurfaceHolder;
+class SurfaceHolder;
 struct CommitTask;
 class Buffer;
 
@@ -47,25 +47,25 @@ class Buffer;
  * created and hold by SurfaceHolder, which is usually used as a property in
  * ShellSurface/SubSurface/EGLSurface.
  */
-class ViewSurface {
+class Surface {
 
   friend class Application;
   friend class Display;
-  friend class ViewSurfaceHolder;
+  friend class SurfaceHolder;
   friend struct CommitTask;
 
-  ViewSurface() = delete;
-  ViewSurface(const ViewSurface &) = delete;
-  ViewSurface &operator=(const ViewSurface &) = delete;
+  Surface() = delete;
+  Surface(const Surface &) = delete;
+  Surface &operator=(const Surface &) = delete;
 
  public:
 
   /**
     * @brief Commit behaviour of the sub-surface
     */
-  enum Mode {
-    kSyncMode,
-    kDesyncMode
+  enum CommitMode {
+    kSynchronized,
+    kDesynchronized
   };
 
   static int GetShellSurfaceCount() { return kShellSurfaceCount; }
@@ -90,37 +90,39 @@ class ViewSurface {
     callback.Setup(wl_surface_);
   }
 
+  Surface *GetShellSurface();
+
   /**
    * @brief Get the position in window coordinates
    * @return Global position
    */
   Point GetWindowPosition() const;
 
-  ViewSurface *parent() const { return parent_; }
+  Surface *parent() const { return parent_; }
 
   /**
    * @brief The sibling surface above this one
    * @return
    */
-  ViewSurface *above() const { return above_; }
+  Surface *above() const { return above_; }
 
   /**
    * @brief The sibling surface below this one
    * @return
    */
-  ViewSurface *below() const { return below_; }
+  Surface *below() const { return below_; }
 
   /**
    * @brief The shell surface shows over this one
    * @return
    */
-  ViewSurface *up() const { return up_; }
+  Surface *up() const { return up_; }
 
   /**
    * @brief The shell surface shows under this one
    * @return
    */
-  ViewSurface *down() const { return down_; }
+  Surface *down() const { return down_; }
 
   AbstractView *view() const { return view_; }
 
@@ -130,40 +132,40 @@ class ViewSurface {
 
  private:
 
-  ViewSurface(AbstractView *view, const Margin &margin = Margin());
+  Surface(AbstractView *view, const Margin &margin = Margin());
 
-  virtual ~ViewSurface();
+  virtual ~Surface();
 
   void OnEnter(struct wl_output *wl_output);
 
   void OnLeave(struct wl_output *wl_output);
 
-  Mode mode_;
+  CommitMode mode_;
 
   /**
    * @brief The parent surface
    */
-  ViewSurface *parent_;
+  Surface *parent_;
 
   /**
    * @brief The sibling surface placed up
    */
-  ViewSurface *above_;
+  Surface *above_;
 
   /**
    * @brief The sibling surface placed down
    */
-  ViewSurface *below_;
+  Surface *below_;
 
   /**
    * @brief The shell surface shows front
    */
-  ViewSurface *up_;
+  Surface *up_;
 
   /**
    * @brief The shell surface shows back
    */
-  ViewSurface *down_;
+  Surface *down_;
 
   wayland::Surface wl_surface_;
 
@@ -215,12 +217,12 @@ class ViewSurface {
   /**
    * @brief The top shell surface in the stack
    */
-  static ViewSurface *kTop;
+  static Surface *kTop;
 
   /**
    * @brief The bottom shell surface in the stack
    */
-  static ViewSurface *kBottom;
+  static Surface *kBottom;
 
   /**
    * @brief The count of shell surface

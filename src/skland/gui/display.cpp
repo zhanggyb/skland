@@ -20,7 +20,7 @@
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
 #include <skland/gui/abstract-window.hpp>
-#include <skland/gui/view-surface.hpp>
+#include <skland/gui/surface.hpp>
 
 #include <iostream>
 
@@ -44,12 +44,12 @@ Display::Display()
       inputs_count_(0) {
   cursors_.resize(kCursorBlank, nullptr);
   AbstractView::InitializeRedrawTaskList();
-  ViewSurface::InitializeCommitTaskList();
+  Surface::InitializeCommitTaskList();
 }
 
 Display::~Display() {
   AbstractView::ClearRedrawTaskList();
-  ViewSurface::ClearCommitTaskList();
+  Surface::ClearCommitTaskList();
 }
 
 void Display::Connect(const char *name) {
@@ -136,7 +136,7 @@ void Display::Disconnect() noexcept {
   ClearManagedObject(this, &first_output_, &last_output_, outputs_count_);
   ClearManagedObject(this, &first_input_, &last_input_, inputs_count_);
 //  ClearManagedObject(this, &first_window_, &last_window_, windows_count_);
-  ViewSurface::Clear();
+  Surface::Clear();
 
   if (wl_cursor_theme_.IsValid()) {
     ReleaseCursors();

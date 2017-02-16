@@ -20,14 +20,14 @@
 
 namespace skland {
 
-SubSurface::SubSurface(ViewSurface *parent, AbstractView *view, const Margin &margin)
-    : Trackable(), view_surface_holder_(view, margin) {
-  view_surface_holder_.view_surface_destroying().Connect(this, &SubSurface::OnViewSurfaceDestroying);
+SubSurface::SubSurface(Surface *parent, AbstractView *view, const Margin &margin)
+    : Trackable(), surface_holder_(view, margin) {
+  surface_holder_.surface_destroying().Connect(this, &SubSurface::OnSurfaceDestroying);
   wl_sub_surface_.Setup(Display::wl_subcompositor(),
-                        view_surface_holder_.wl_surface(),
-                        view_surface_holder_.wl_surface(parent));
+                        surface_holder_.wl_surface(),
+                        surface_holder_.wl_surface(parent));
 
-  view_surface_holder_.SetParent(parent);
+  surface_holder_.SetParent(parent);
 }
 
 SubSurface::~SubSurface() {
@@ -35,43 +35,43 @@ SubSurface::~SubSurface() {
   wl_sub_surface_.Destroy();
 }
 
-void SubSurface::PlaceAbove(ViewSurface *sibling) {
-  if (sibling == view_surface_holder_.view_surface()) return;
+void SubSurface::PlaceAbove(Surface *sibling) {
+  if (sibling == surface_holder_.surface()) return;
 
-  if (view_surface_holder_.view_surface()->parent() == sibling->parent() ||
-      view_surface_holder_.view_surface() == sibling->parent() ||
-      view_surface_holder_.view_surface()->parent() == sibling) {
-    wl_sub_surface_.PlaceAbove(view_surface_holder_.wl_surface(sibling));
-    view_surface_holder_.MoveAbove(sibling);
+  if (surface_holder_.surface()->parent() == sibling->parent() ||
+      surface_holder_.surface() == sibling->parent() ||
+      surface_holder_.surface()->parent() == sibling) {
+    wl_sub_surface_.PlaceAbove(surface_holder_.wl_surface(sibling));
+    surface_holder_.MoveAbove(sibling);
   }
 }
 
-void SubSurface::PlaceBelow(ViewSurface *sibling) {
-  if (sibling == view_surface_holder_.view_surface()) return;
+void SubSurface::PlaceBelow(Surface *sibling) {
+  if (sibling == surface_holder_.surface()) return;
 
-  if (view_surface_holder_.view_surface()->parent() == sibling->parent() ||
-      view_surface_holder_.view_surface() == sibling->parent() ||
-      view_surface_holder_.view_surface()->parent() == sibling) {
-    wl_sub_surface_.PlaceBelow(view_surface_holder_.wl_surface(sibling));
-    view_surface_holder_.MoveBelow(sibling);
+  if (surface_holder_.surface()->parent() == sibling->parent() ||
+      surface_holder_.surface() == sibling->parent() ||
+      surface_holder_.surface()->parent() == sibling) {
+    wl_sub_surface_.PlaceBelow(surface_holder_.wl_surface(sibling));
+    surface_holder_.MoveBelow(sibling);
   }
 }
 
 void SubSurface::SetRelativePosition(int x, int y) {
   wl_sub_surface_.SetPosition(x, y);
-  view_surface_holder_.SetRelativePosition(x, y);
+  surface_holder_.SetRelativePosition(x, y);
 }
 
 void SubSurface::SetWindowPosition(int x, int y) {
-  ViewSurface* _this_view_surface = view_surface_holder_.view_surface();
-  Point parent_global_position = _this_view_surface->parent()->GetWindowPosition();
+  Surface* _this_surface = surface_holder_.surface();
+  Point parent_global_position = _this_surface->parent()->GetWindowPosition();
   int local_x = x - parent_global_position.x;
   int local_y = y - parent_global_position.y;
   wl_sub_surface_.SetPosition(local_x, local_y);
-  view_surface_holder_.SetRelativePosition(local_x, local_y);
+  surface_holder_.SetRelativePosition(local_x, local_y);
 }
 
-void SubSurface::OnViewSurfaceDestroying(SLOT) {
+void SubSurface::OnSurfaceDestroying(SLOT) {
   wl_sub_surface_.Destroy();
 }
 

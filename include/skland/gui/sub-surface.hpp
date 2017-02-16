@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_SUB_SURFACE_HPP_
 #define SKLAND_GUI_SUB_SURFACE_HPP_
 
-#include "view-surface-holder.hpp"
+#include "surface-holder.hpp"
 #include "../wayland/subsurface.hpp"
 
 namespace skland {
@@ -34,25 +34,25 @@ class SubSurface : public Trackable {
 
  public:
 
-  SubSurface(ViewSurface *parent, AbstractView *view, const Margin &margin = Margin());
+  SubSurface(Surface *parent, AbstractView *view, const Margin &margin = Margin());
 
   virtual ~SubSurface();
 
-  void PlaceAbove(ViewSurface *sibling);
+  void PlaceAbove(Surface *sibling);
 
-  void PlaceBelow(ViewSurface *sibling);
+  void PlaceBelow(Surface *sibling);
 
   void SetRelativePosition(int x, int y);
 
   void SetWindowPosition(int x, int y);
 
-  ViewSurface *view_surface() const { return view_surface_holder_.view_surface(); }
+  Surface *surface() const { return surface_holder_.surface(); }
 
  private:
 
-  void OnViewSurfaceDestroying(__SLOT__);
+  void OnSurfaceDestroying(__SLOT__);
 
-  ViewSurfaceHolder view_surface_holder_;
+  SurfaceHolder surface_holder_;
 
   wayland::SubSurface wl_sub_surface_;
 

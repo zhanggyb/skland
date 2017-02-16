@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <skland/gui/view-surface.hpp>
+#include <skland/gui/surface.hpp>
 
 #include <skland/gui/display.hpp>
 #include <skland/gui/abstract-view.hpp>
@@ -24,14 +24,14 @@
 
 namespace skland {
 
-ViewSurface *ViewSurface::kTop = nullptr;
-ViewSurface *ViewSurface::kBottom = nullptr;
-int ViewSurface::kShellSurfaceCount = 0;
-Task ViewSurface::kCommitTaskHead;
-Task ViewSurface::kCommitTaskTail;
+Surface *Surface::kTop = nullptr;
+Surface *Surface::kBottom = nullptr;
+int Surface::kShellSurfaceCount = 0;
+Task Surface::kCommitTaskHead;
+Task Surface::kCommitTaskTail;
 
-ViewSurface::ViewSurface(AbstractView *view, const Margin &margin)
-    : mode_(kSyncMode),
+Surface::Surface(AbstractView *view, const Margin &margin)
+    : mode_(kSynchronized),
       parent_(nullptr),
       above_(nullptr),
       below_(nullptr),
@@ -45,20 +45,20 @@ ViewSurface::ViewSurface(AbstractView *view, const Margin &margin)
       reference_count_(0),
       is_destroying_(false) {
   DBG_ASSERT(nullptr != view_);
-  wl_surface_.enter().Set(this, &ViewSurface::OnEnter);
-  wl_surface_.leave().Set(this, &ViewSurface::OnLeave);
+  wl_surface_.enter().Set(this, &Surface::OnEnter);
+  wl_surface_.leave().Set(this, &Surface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
 
   commit_task_.reset(new CommitTask(this));
 }
 
-ViewSurface::~ViewSurface() {
+Surface::~Surface() {
   is_destroying_ = true;
   destroying_.Emit();
 
   // Delete all sub surfaces of this one:
-  ViewSurface *p = nullptr;
-  ViewSurface *tmp = nullptr;
+  Surface *p = nullptr;
+  Surface *tmp = nullptr;
 
   p = above_;
   while (p && p->parent_ == this) {
@@ -79,7 +79,7 @@ ViewSurface::~ViewSurface() {
   if (below_) below_->above_ = above_;
 }
 
-void ViewSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
+void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
   if (nullptr == buffer) {
     wl_surface_.Attach(NULL, x, y);
   } else {
@@ -88,26 +88,40 @@ void ViewSurface::Attach(Buffer *buffer, int32_t x, int32_t y) {
   }
 }
 
-void ViewSurface::Commit() {
+void Surface::Commit() {
   if (commit_task_->IsLinked()) return;
 
   if (nullptr == parent_) {
     kCommitTaskTail.PushFront(commit_task_.get());
   } else {
-    if (mode_ == kSyncMode) {
-      parent_->Commit();
-      parent_->commit_task_->PushFront(commit_task_.get());
+    if (mode_ == kSynchronized) {
+      // Synchronized mode need to commit the main surface too
+      Surface *main_surface = GetShellSurface();
+      main_surface->Commit();
+      main_surface->commit_task_->PushFront(commit_task_.get());
     } else {
       kCommitTaskTail.PushFront(commit_task_.get());
     }
   }
 }
 
-Point ViewSurface::GetWindowPosition() const {
+Surface *Surface::GetShellSurface() {
+  Surface *shell_surface = this;
+  Surface *parent = parent_;
+
+  while (parent) {
+    shell_surface = parent;
+    parent = parent->parent_;
+  }
+
+  return shell_surface;
+}
+
+Point Surface::GetWindowPosition() const {
   Point position = relative_position_;
 
-  const ViewSurface *parent = parent_;
-  const ViewSurface *shell_surface = this;
+  const Surface *parent = parent_;
+  const Surface *shell_surface = this;
 
   while (parent) {
     position += parent->relative_position();
@@ -118,7 +132,7 @@ Point ViewSurface::GetWindowPosition() const {
   return position - Point(shell_surface->margin().l, shell_surface->margin().t);
 }
 
-void ViewSurface::OnEnter(struct wl_output *wl_output) {
+void Surface::OnEnter(struct wl_output *wl_output) {
   if (!is_user_data_set_) {
     wl_surface_.SetUserData(this);
     is_user_data_set_ = true;
@@ -126,22 +140,22 @@ void ViewSurface::OnEnter(struct wl_output *wl_output) {
   // TODO: call function in view_
 }
 
-void ViewSurface::OnLeave(struct wl_output *wl_output) {
+void Surface::OnLeave(struct wl_output *wl_output) {
   // TODO: call function in view_
 }
 
-void ViewSurface::Clear() {
+void Surface::Clear() {
   while (kShellSurfaceCount > 0) {
     AbstractView *view = kTop->view();
     delete view;
   }
 }
 
-void ViewSurface::InitializeCommitTaskList() {
+void Surface::InitializeCommitTaskList() {
   kCommitTaskHead.PushBack(&kCommitTaskTail);
 }
 
-void ViewSurface::ClearCommitTaskList() {
+void Surface::ClearCommitTaskList() {
   Task *task = kCommitTaskHead.next();
   Task *next_task = nullptr;
   while (task != &kCommitTaskTail) {

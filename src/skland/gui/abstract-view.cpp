@@ -71,7 +71,7 @@ bool AbstractView::Contain(int x, int y) const {
   return geometry_.Contain(x, y);
 }
 
-ViewSurface *AbstractView::GetSurface() const {
+Surface *AbstractView::GetSurface() const {
   return OnGetSurface(this);
 }
 
@@ -99,7 +99,7 @@ void AbstractView::OnUpdate(AbstractView *view) {
     parent_view()->OnUpdate(view);
 }
 
-ViewSurface *AbstractView::OnGetSurface(const AbstractView *view) const {
+Surface *AbstractView::OnGetSurface(const AbstractView *view) const {
   if (view->parent_view())
     return view->parent_view()->OnGetSurface(view);
 

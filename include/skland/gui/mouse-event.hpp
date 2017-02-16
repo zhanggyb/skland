@@ -22,7 +22,7 @@
 
 namespace skland {
 
-class ViewSurface;
+class Surface;
 
 enum MouseButtonType {
   kMouseButtonLeft = BTN_LEFT,
@@ -55,7 +55,7 @@ class MouseEvent : public InputEvent {
         axis_(0) {
   }
 
-  ViewSurface *surface() const {
+  Surface *surface() const {
     return surface_;
   }
 
@@ -104,7 +104,7 @@ class MouseEvent : public InputEvent {
   ~MouseEvent() {}
 
   /** The surface this pointer hovers */
-  ViewSurface *surface_;
+  Surface *surface_;
 
   uint32_t serial_;
 

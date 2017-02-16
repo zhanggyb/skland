@@ -54,7 +54,7 @@ class Window : public AbstractWindow {
 
   virtual void OnUpdate(AbstractView *view) override;
 
-  virtual ViewSurface *OnGetSurface(const AbstractView *view) const;
+  virtual Surface *OnGetSurface(const AbstractView *view) const;
 
   virtual void OnKeyboardKey(KeyEvent *event) final;
 

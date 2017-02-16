@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_EGL_SURFACE_HPP
-#define SKLAND_EGL_SURFACE_HPP
+#ifndef SKLAND_GUI_EGL_SURFACE_HPP_
+#define SKLAND_GUI_EGL_SURFACE_HPP_
 
-#include "view-surface-holder.hpp"
+#include "surface-holder.hpp"
 #include "../egl/surface.hpp"
 
 namespace skland {
@@ -30,7 +30,7 @@ class EGLSurface : public Trackable {
 
  public:
 
-  EGLSurface(ViewSurface *view_surface);
+  EGLSurface(Surface *surface);
 
   virtual ~EGLSurface();
 
@@ -46,13 +46,13 @@ class EGLSurface : public Trackable {
     egl_surface_.Resize(width, height, dx, dy);
   }
 
-  ViewSurface *view_surface() const { return view_surface_holder_.view_surface(); }
+  Surface *surface() const { return surface_holder_.surface(); }
 
  private:
 
-  void OnViewSurfaceDestroying(__SLOT__);
+  void OnSurfaceDestroying(__SLOT__);
 
-  ViewSurfaceHolder view_surface_holder_;
+  SurfaceHolder surface_holder_;
 
   egl::Surface egl_surface_;
 
@@ -60,4 +60,4 @@ class EGLSurface : public Trackable {
 
 }
 
-#endif //SKLAND_EGL_SURFACE_HPP
+#endif // SKLAND_GUI_EGL_SURFACE_HPP_

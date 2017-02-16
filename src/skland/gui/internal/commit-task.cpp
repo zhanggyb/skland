@@ -15,12 +15,12 @@
  */
 
 #include "commit-task.hpp"
-#include <skland/gui/view-surface.hpp>
+#include <skland/gui/surface.hpp>
 
 namespace skland {
 
 void CommitTask::Run() const {
-  view_surface->wl_surface_.Commit();
+  surface->wl_surface_.Commit();
 }
 
 }

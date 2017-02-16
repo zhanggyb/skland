@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_SHELL_SURFACE_HPP_
 #define SKLAND_GUI_SHELL_SURFACE_HPP_
 
-#include "view-surface-holder.hpp"
+#include "surface-holder.hpp"
 #include "../wayland/xdg-surface.hpp"
 
 namespace skland {
@@ -39,8 +39,8 @@ class ShellSurface : public Trackable {
   virtual ~ShellSurface();
 
   void ResizeWindow(int width, int height) const {
-    xdg_surface_.SetWindowGeometry(view_surface()->margin().l,
-                                   view_surface()->margin().t,
+    xdg_surface_.SetWindowGeometry(surface()->margin().l,
+                                   surface()->margin().t,
                                    width, height);
   }
 
@@ -50,11 +50,11 @@ class ShellSurface : public Trackable {
 
   DelegateRef<void(uint32_t)> surface_configure() { return xdg_surface_.configure(); }
 
-  ViewSurface *view_surface() const { return view_surface_holder_.view_surface(); }
+  Surface *surface() const { return surface_holder_.surface(); }
 
  protected:
 
-  const ViewSurfaceHolder &view_surface_holder() const { return view_surface_holder_; }
+  const SurfaceHolder &surface_holder() const { return surface_holder_; }
 
   const wayland::XdgSurface &xdg_surface() const { return xdg_surface_; }
 
@@ -64,7 +64,7 @@ class ShellSurface : public Trackable {
 
   void OnViewSurfaceDestroying(__SLOT__);
 
-  ViewSurfaceHolder view_surface_holder_;
+  SurfaceHolder surface_holder_;
 
   wayland::XdgSurface xdg_surface_;
 

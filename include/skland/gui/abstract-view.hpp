@@ -36,7 +36,7 @@ class KeyEvent;
 class MouseEvent;
 class TouchEvent;
 class Application;
-class ViewSurface;
+class Surface;
 class AbstractWindow;
 class Context;
 
@@ -119,7 +119,7 @@ class AbstractView : public Object {
    * @brief Get the surface on which this view renders
    * @return A surface object or nullptr
    */
-  ViewSurface *GetSurface() const;
+  Surface *GetSurface() const;
 
   /**
    * @brief Update the display of this widget
@@ -150,7 +150,7 @@ class AbstractView : public Object {
    * @param view A view object, it is always this view or a sub view in hierachy
    * @return A pointer to a surface or nullptr
    */
-  virtual ViewSurface *OnGetSurface(const AbstractView *view) const;
+  virtual Surface *OnGetSurface(const AbstractView *view) const;
 
   virtual void OnResize(int width, int height) = 0;
 

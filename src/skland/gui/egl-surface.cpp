@@ -20,13 +20,13 @@
 
 namespace skland {
 
-EGLSurface::EGLSurface(ViewSurface *view_surface)
-    : Trackable(), view_surface_holder_(view_surface) {
-  view_surface_holder_.view_surface_destroying().Connect(this, &EGLSurface::OnViewSurfaceDestroying);
+EGLSurface::EGLSurface(Surface *surface)
+    : Trackable(), surface_holder_(surface) {
+  surface_holder_.surface_destroying().Connect(this, &EGLSurface::OnSurfaceDestroying);
   egl_surface_.Setup(Display::egl_display(),
-                     view_surface_holder_.wl_surface(),
-                     view_surface->view()->width(),
-                     view_surface->view()->height());
+                     surface_holder_.wl_surface(),
+                     surface->view()->width(),
+                     surface->view()->height());
 }
 
 EGLSurface::~EGLSurface() {
@@ -50,7 +50,7 @@ bool EGLSurface::SwapInterval(EGLint interval) {
   return Display::egl_display().SwapInterval(interval);
 }
 
-void EGLSurface::OnViewSurfaceDestroying(SLOT slot) {
+void EGLSurface::OnSurfaceDestroying(SLOT slot) {
   egl_surface_.Destroy();
 }
 

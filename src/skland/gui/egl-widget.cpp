@@ -56,11 +56,11 @@ void EGLWidget::OnUpdate(AbstractView *view) {
     DBG_ASSERT(nullptr == egl_surface_);
     if (nullptr == parent_view()) return;
 
-    ViewSurface *parent_surface = parent_view()->GetSurface();
+    Surface *parent_surface = parent_view()->GetSurface();
     if (nullptr == parent_surface) return;
 
     sub_surface_ = new SubSurface(parent_surface, this);
-    egl_surface_ = new EGLSurface(sub_surface_->view_surface());
+    egl_surface_ = new EGLSurface(sub_surface_->surface());
     sub_surface_->SetWindowPosition(x(), y());
     egl_surface_->Resize(width(), height());
 //    surface_->SetDesync();
@@ -69,8 +69,8 @@ void EGLWidget::OnUpdate(AbstractView *view) {
   AbstractWidget::OnUpdate(view);
 }
 
-ViewSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
-  return sub_surface_->view_surface();
+Surface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
+  return sub_surface_->surface();
 }
 
 void EGLWidget::OnResize(int width, int height) {
@@ -109,15 +109,10 @@ void EGLWidget::OnDraw(const Context *context) {
         OnResize(width(), height());
       }
       OnInitializeEGL();
-      egl_surface_->view_surface()->SetupCallback(frame_callback_);
-//      surface_->Commit();
+      egl_surface_->surface()->SetupCallback(frame_callback_);
       egl_surface_->SwapBuffers();
-      sub_surface_->view_surface()->parent()->Commit();
-//      AbstractSurface *parent = surface_->parent();
-//      while (parent) {
-//        parent->Commit();
-//        parent = parent->parent();
-//      }
+      sub_surface_->surface()->parent()->Commit();
+      sub_surface_->surface()->GetShellSurface()->Commit();
     }
   }
 }
@@ -144,15 +139,9 @@ void EGLWidget::OnFrame(uint32_t /* serial */) {
   fprintf(stderr, "on frame: %d\n", count);
   if (egl_surface_->MakeCurrent()) {
     OnRenderEGL();
-    egl_surface_->view_surface()->SetupCallback(frame_callback_);
-//    surface_->Commit();
+    egl_surface_->surface()->SetupCallback(frame_callback_);
     egl_surface_->SwapBuffers();
-    sub_surface_->view_surface()->parent()->Commit();
-//    AbstractSurface *parent = surface_->parent();
-//    while (parent) {
-//      parent->Commit();
-//      parent = parent->parent();
-//    }
+    sub_surface_->surface()->GetShellSurface()->Commit();
   }
 }
 
