@@ -44,11 +44,11 @@ void XdgSurface::Destroy() {
   }
 }
 
-void XdgSurface::SetWindowGeometry(int x, int y, int width, int height) {
+void XdgSurface::SetWindowGeometry(int x, int y, int width, int height) const {
   zxdg_surface_v6_set_window_geometry(metadata_->zxdg_surface, x, y, width, height);
 }
 
-void XdgSurface::AckConfigure(uint32_t serial) {
+void XdgSurface::AckConfigure(uint32_t serial) const {
   zxdg_surface_v6_ack_configure(metadata_->zxdg_surface, serial);
 }
 

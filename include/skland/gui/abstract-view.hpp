@@ -36,7 +36,7 @@ class KeyEvent;
 class MouseEvent;
 class TouchEvent;
 class Application;
-class AbstractSurface;
+class Surface;
 class AbstractWindow;
 class Context;
 
@@ -119,11 +119,11 @@ class AbstractView : public Object {
    * @brief Get the surface on which this view renders
    * @return A surface object or nullptr
    */
-  AbstractSurface *GetSurface() const;
+  Surface *GetSurface() const;
 
   /**
-  * @brief Update the display of this widget
-  */
+   * @brief Update the display of this widget
+   */
   void Update();
 
   virtual Size GetMinimalSize() const = 0;
@@ -150,7 +150,7 @@ class AbstractView : public Object {
    * @param view A view object, it is always this view or a sub view in hierachy
    * @return A pointer to a surface or nullptr
    */
-  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const;
+  virtual Surface *OnGetSurface(const AbstractView *view) const;
 
   virtual void OnResize(int width, int height) = 0;
 
@@ -210,13 +210,15 @@ class AbstractView : public Object {
     return mouse_task_;
   }
 
+  static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
+
   static RedrawTask *GetRedrawTask(const AbstractView *view) {
     return view->redraw_task_.get();
   }
 
   /**
-  * @brief Initialize the idle task list
-  */
+   * @brief Initialize the idle task list
+   */
   static void InitializeRedrawTaskList();
 
   /**
@@ -244,6 +246,10 @@ class AbstractView : public Object {
   std::unique_ptr<ViewTask> mouse_task_;
 
   std::unique_ptr<ViewTask> mouse_motion_task_;
+
+  // Damage area
+  bool is_damaged_;
+  RectI damaged_region_;
 
 };
 

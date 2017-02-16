@@ -20,10 +20,11 @@
 #include <skland/gui/abstract-widget.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
-#include <skland/gui/shm-surface.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/gui/context.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
+#include <skland/gui/toplevel-shell-surface.hpp>
+#include <skland/gui/sub-surface.hpp>
 
 #include <skland/graphic/canvas.hpp>
 
@@ -38,70 +39,22 @@ Window::Window(const char *title, AbstractWindowFrame *frame)
 
 Window::Window(int width, int height, const char *title, AbstractWindowFrame *frame)
     : AbstractWindow(width, height, title, frame),
-      frame_surface_(nullptr),
       main_surface_(nullptr),
       main_widget_(nullptr) {
-  int x = 0, y = 0;  // The input region
-  AbstractSurface *shell_surface = nullptr;
-
   if (frame) {
-    SetWindowFrame(frame);
-
-    frame_surface_ = new ShmSurface(this, Theme::shadow_margin());
-    main_surface_ = new ShmSurface(this, Theme::shadow_margin());
-
-    // There's a known issue in current gnome that a sub surface cannot be placed below its parent
-    frame_surface_->AddSubSurface(main_surface_);
-
-    x += frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
-    y += frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
-    width += AbstractWindowFrame::kResizingMargin.lr();
-    height += AbstractWindowFrame::kResizingMargin.tb();
-
+    Surface *parent = toplevel_shell_surface()->surface();
+    main_surface_ = new SubSurface(parent, this, Theme::shadow_margin());
+    DBG_ASSERT(main_surface_->surface()->parent() == parent);
+    DBG_ASSERT(main_surface_->surface()->below() == parent);
     wayland::Region empty_region;
     empty_region.Setup(Display::wl_compositor());
-    main_surface_->SetInputRegion(empty_region);
-
-    shell_surface = frame_surface_;
-  } else {
-    main_surface_ = new ShmSurface(this);
-    shell_surface = main_surface_;
-  }
-
-  wayland::Region input_region;
-  input_region.Setup(Display::wl_compositor());
-  input_region.Add(x, y, width, height);
-  shell_surface->SetInputRegion(input_region);
-
-  SetShellSurface(shell_surface);
-  SetTitle(title); // TODO: support multi-language
-
-  // Create buffer:
-  Size output_size(1024, 800);
-  if (const Output *output = Display::GetOutputAt(0)) {
-    output_size = output->current_mode_size();  // The current screen size
-  }
-
-  int total_width = std::max(this->width(), output_size.width);
-  int total_height = std::max(this->height(), output_size.height);
-  total_width += shell_surface->margin().lr();
-  total_height += shell_surface->margin().tb();
-
-  main_pool_.Setup(total_width * 4 * total_height);
-  main_buffer_.Setup(main_pool_, total_width, total_height,
-                     total_width * 4, WL_SHM_FORMAT_ARGB8888);
-
-  if (frame) {
-    frame_pool_.Setup(total_width * 4 * total_height);
-    frame_buffer_.Setup(frame_pool_, total_width, total_height,
-                        total_width * 4, WL_SHM_FORMAT_ARGB8888);
+    main_surface_->surface()->SetInputRegion(empty_region);
   }
 }
 
 Window::~Window() {
-//  delete main_surface_;
-//  delete frame_surface_;
   delete main_widget_;
+  delete main_surface_;
 }
 
 void Window::SetMainWidget(AbstractWidget *widget) {
@@ -115,44 +68,88 @@ void Window::SetMainWidget(AbstractWidget *widget) {
 }
 
 void Window::OnShown() {
-  if (frame_surface_) {
-    frame_surface_->Attach(&frame_buffer_);
-    frame_surface_->GetCanvas()->Clear();
+  Surface *shell_surface = toplevel_shell_surface()->surface();
+
+  // Create buffer:
+  Size output_size(1024, 800);
+  if (const Output *output = Display::GetOutputAt(0)) {
+    output_size = output->current_mode_size();  // The current screen size
   }
 
-  main_surface_->Attach(&main_buffer_);
-  main_surface_->GetCanvas()->Clear();
+  int total_width = std::max(this->width(), output_size.width);
+  int total_height = std::max(this->height(), output_size.height);
+  total_width += shell_surface->margin().lr();
+  total_height += shell_surface->margin().tb();
+
+  frame_pool_.Setup(total_width * 4 * total_height);
+  frame_buffer_.Setup(frame_pool_, total_width, total_height,
+                      total_width * 4, WL_SHM_FORMAT_ARGB8888);
+
+  shell_surface->Attach(&frame_buffer_);
+  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.pixel(),
+                                 frame_buffer_.size().width,
+                                 frame_buffer_.size().height));
+  frame_canvas_->SetOrigin((float) shell_surface->margin().left,
+                           (float) shell_surface->margin().top);
+  frame_canvas_->Clear();
+
+  if (main_surface_) {
+    main_pool_.Setup(total_width * 4 * total_height);
+    main_buffer_.Setup(main_pool_, total_width, total_height,
+                       total_width * 4, WL_SHM_FORMAT_ARGB8888);
+    main_surface_->surface()->Attach(&main_buffer_);
+    main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.pixel(),
+                                  main_buffer_.size().width,
+                                  main_buffer_.size().height));
+    main_canvas_->SetOrigin((float) main_surface_->surface()->margin().left,
+                            (float) main_surface_->surface()->margin().top);
+    main_canvas_->Clear();
+  }
+
   UpdateAll();
 }
 
 void Window::OnUpdate(AbstractView *view) {
   if (!visible()) return;
 
+  Surface *surface = nullptr;
+
   if (view == this) {
-    if (frame_surface_) {
-      kRedrawTaskTail.PushFront(redraw_task().get());
-      redraw_task()->context = frame_surface_;
-      DBG_ASSERT(redraw_task()->context.GetCanvas());
-      frame_surface_->Damage(0, 0,
-                             width() + frame_surface_->margin().lr(),
-                             height() + frame_surface_->margin().tb());
-      frame_surface_->Commit();
-    }
+    surface = toplevel_shell_surface()->surface();
+    kRedrawTaskTail.PushFront(redraw_task().get());
+    redraw_task()->context = Context(surface, frame_canvas_);
+    DBG_ASSERT(frame_canvas_);
+    Damage(this, 0, 0,
+           width() + surface->margin().lr(),
+           height() + surface->margin().tb());
+    surface->Commit();
   } else {
+    std::shared_ptr<Canvas> canvas;
+    if (main_surface_) {
+      surface = main_surface_->surface();
+      canvas = main_canvas_;
+    } else {
+      surface = toplevel_shell_surface()->surface();
+      canvas = frame_canvas_;
+    }
+
     RedrawTask *task = GetRedrawTask(view);
     kRedrawTaskTail.PushFront(task);
-    task->context = main_surface_;
-    DBG_ASSERT(task->context.GetCanvas());
-    main_surface_->Damage(view->x() + main_surface_->margin().left,
-                          view->y() + main_surface_->margin().top,
-                          view->width(),
-                          view->height());
-    main_surface_->Commit();
+    task->context = Context(surface, canvas);
+    DBG_ASSERT(canvas);
+    Damage(view, view->x() + surface->margin().left,
+           view->y() + surface->margin().top,
+           view->width(),
+           view->height());
+    surface->Commit();
   }
 }
 
-AbstractSurface *Window::OnGetSurface(const AbstractView *view) const {
-  return main_surface_;
+Surface *Window::OnGetSurface(const AbstractView *view) const {
+  if (view == this)
+    return toplevel_shell_surface()->surface();
+
+  return nullptr != main_surface_ ? main_surface_->surface() : toplevel_shell_surface()->surface();
 }
 
 void Window::OnKeyboardKey(KeyEvent *event) {
@@ -163,23 +160,18 @@ void Window::OnKeyboardKey(KeyEvent *event) {
 }
 
 void Window::OnResize(int width, int height) {
-  Rect input_rect(width, height);
-  AbstractSurface *shell_surface = frame_surface_ ? frame_surface_ : main_surface_;
+  RectI input_rect(width, height);
+  Surface *shell_surface = toplevel_shell_surface()->surface();
 
-  if (!IsFrameless()) {
-    input_rect.left = frame_surface_->margin().left - AbstractWindowFrame::kResizingMargin.left;
-    input_rect.top = frame_surface_->margin().top - AbstractWindowFrame::kResizingMargin.top;
-    input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
-                      height + AbstractWindowFrame::kResizingMargin.tb());
-    ResizeWindowFrame(window_frame(), width, height);
-  }
+  input_rect.left = shell_surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
+  input_rect.top = shell_surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
+  input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
+                    height + AbstractWindowFrame::kResizingMargin.tb());
 
   wayland::Region input_region;
   input_region.Setup(Display::wl_compositor());
-  input_region.Add((int) input_rect.x(),
-                   (int) input_rect.y(),
-                   (int) input_rect.width(),
-                   (int) input_rect.height());
+  input_region.Add(input_rect.x(), input_rect.y(),
+                   input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);
 
   // Reset buffer:
@@ -187,21 +179,33 @@ void Window::OnResize(int width, int height) {
   height += shell_surface->margin().tb();
 
   int total_size = width * 4 * height;
-  if (total_size > main_pool_.size()) {
-    DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n", total_size, main_pool_.size(), "Re-generate shm pool");
-    main_pool_.Setup(total_size);
-    if (frame_surface_) {
-      frame_pool_.Setup(total_size);
-    }
+  if (total_size > frame_pool_.size()) {
+    DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n",
+                  total_size, frame_pool_.size(), "Re-generate shm pool");
+    frame_pool_.Setup(total_size);
   }
-  main_buffer_.Setup(main_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-  main_surface_->Attach(&main_buffer_);
-  main_surface_->GetCanvas()->Clear();
 
-  if (frame_surface_) {
-    frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-    frame_surface_->Attach(&frame_buffer_);
-    frame_surface_->GetCanvas()->Clear();
+  frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&frame_buffer_);
+  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.pixel(),
+                                 frame_buffer_.size().width,
+                                 frame_buffer_.size().height));
+  frame_canvas_->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
+  frame_canvas_->Clear();
+
+  if (main_surface_) {
+    main_pool_.Setup(total_size);
+    main_buffer_.Setup(main_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+    main_surface_->surface()->Attach(&main_buffer_);
+    main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.pixel(),
+                                  main_buffer_.size().width,
+                                  main_buffer_.size().height));
+    main_canvas_->SetOrigin(main_surface_->surface()->margin().left,
+                            main_surface_->surface()->margin().top);
+    main_canvas_->Clear();
+
+    DBG_ASSERT(window_frame());
+    ResizeWindowFrame(window_frame(), width, height);
   }
 
   SetMainWidgetGeometry();

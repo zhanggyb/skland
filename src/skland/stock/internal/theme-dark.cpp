@@ -171,7 +171,7 @@ void WindowFrameDark::CloseButton::OnResize(int /* width */, int /* height */) {
 }
 
 void WindowFrameDark::CloseButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
   canvas->ClipRect(geometry());
   canvas->Clear();
@@ -240,7 +240,7 @@ void WindowFrameDark::MaximizeButton::OnResize(int /* width */, int /* height */
 }
 
 void WindowFrameDark::MaximizeButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
   canvas->ClipRect(geometry());
   canvas->Clear();
@@ -309,7 +309,7 @@ void WindowFrameDark::MinimizeButton::OnResize(int /* width */, int /* height */
 }
 
 void WindowFrameDark::MinimizeButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
   canvas->ClipRect(geometry());
   canvas->Clear();
@@ -431,7 +431,7 @@ void WindowFrameDark::LayoutWidgets(int width, int height) {
 }
 
 void WindowFrameDark::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Clear();
 
   float radii[] = {

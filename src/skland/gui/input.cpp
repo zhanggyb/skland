@@ -16,7 +16,7 @@
 
 #include <skland/gui/input.hpp>
 #include <skland/gui/display.hpp>
-#include <skland/gui/abstract-surface.hpp>
+#include <skland/gui/surface.hpp>
 
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
@@ -161,7 +161,7 @@ void Input::OnPointerEnter(uint32_t serial,
   mouse_event_->surface_xy_.x = wl_fixed_to_double(surface_x);
   mouse_event_->surface_xy_.y = wl_fixed_to_double(surface_y);
 
-  mouse_event_->surface_ = static_cast<AbstractSurface *>(wl_surface_get_user_data(wl_surface));
+  mouse_event_->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
   mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
   mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
 
@@ -178,7 +178,7 @@ void Input::OnPointerEnter(uint32_t serial,
 void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
   mouse_event_->serial_ = serial;
 
-  mouse_event_->surface_ = static_cast<AbstractSurface *>(wl_surface_get_user_data(wl_surface));
+  mouse_event_->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
   AbstractView *window = mouse_event_->surface_->view();
 
   mouse_event_->accepted_ = false;
@@ -274,7 +274,7 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
       ViewTask *task = window->mouse_task_.get();
       task = static_cast<ViewTask *>(task->next());
       while (task) {
-        task->view->OnMouseButton(mouse_event_);
+        task->view->OnMouseButton(mouse_event_);  // FIXME: sometimes this line cause segment fault
         if (!mouse_event_->accepted()) {
           break;
         }

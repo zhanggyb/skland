@@ -17,8 +17,6 @@
 #include <skland/gui/abstract-view.hpp>
 
 #include <skland/core/numeric.hpp>
-#include <skland/gui/abstract-surface.hpp>
-#include <skland/gui/display.hpp>
 #include <skland/gui/abstract-window.hpp>
 #include <skland/gui/mouse-event.hpp>
 
@@ -38,13 +36,15 @@ AbstractView::AbstractView()
 AbstractView::AbstractView(int width, int height)
     : Object(),
       visible_(false),
-      geometry_(width, height) {
-  redraw_task_.reset(new RedrawTask(this, nullptr));
+      geometry_(width, height),
+      is_damaged_(false) {
+  redraw_task_.reset(new RedrawTask(this));
   mouse_task_.reset(new ViewTask(this));
   mouse_motion_task_.reset(new ViewTask(this));
 }
 
 AbstractView::~AbstractView() {
+
 }
 
 void AbstractView::MoveTo(int x, int y) {
@@ -71,7 +71,7 @@ bool AbstractView::Contain(int x, int y) const {
   return geometry_.Contain(x, y);
 }
 
-AbstractSurface *AbstractView::GetSurface() const {
+Surface *AbstractView::GetSurface() const {
   return OnGetSurface(this);
 }
 
@@ -99,7 +99,7 @@ void AbstractView::OnUpdate(AbstractView *view) {
     parent_view()->OnUpdate(view);
 }
 
-AbstractSurface *AbstractView::OnGetSurface(const AbstractView *view) const {
+Surface *AbstractView::OnGetSurface(const AbstractView *view) const {
   if (view->parent_view())
     return view->parent_view()->OnGetSurface(view);
 
@@ -120,6 +120,13 @@ void AbstractView::TrackMouseMotion(MouseEvent *event) {
 
 void AbstractView::UntrackMouseMotion() {
   mouse_motion_task_->Unlink();
+}
+
+void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int width, int height) {
+  view->is_damaged_ = true;
+  view->damaged_region_.l = surface_x;
+  view->damaged_region_.t = surface_y;
+  view->damaged_region_.Resize(width, height);
 }
 
 void AbstractView::InitializeRedrawTaskList() {

@@ -85,7 +85,7 @@ void Slider::OnSetMaximum(const int &maximum) {
 }
 
 void Slider::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->GetCanvas();
+  std::shared_ptr<Canvas> canvas = context->canvas();
   Paint paint;
 
   if (hover_) {

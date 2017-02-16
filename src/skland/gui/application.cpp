@@ -28,7 +28,7 @@
 #include <skland/stock/theme.hpp>
 
 #include <skland/gui/abstract-view.hpp>
-#include <skland/gui/abstract-surface.hpp>
+#include <skland/gui/surface.hpp>
 
 /**
  * Compile-time computation of number of items in a hardcoded array.
@@ -111,8 +111,8 @@ int Application::Run() {
       task->Unlink();
       task->Run();
     }
-    while (AbstractSurface::kCommitTaskHead.next() != &AbstractSurface::kCommitTaskTail) {
-      task = AbstractSurface::kCommitTaskHead.next();
+    while (Surface::kCommitTaskHead.next() != &Surface::kCommitTaskTail) {
+      task = Surface::kCommitTaskHead.next();
       task->Unlink();
       task->Run();
     }

@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
-#define SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
-
-#include <skland/gui/task.hpp>
+#include <skland/gui/shell-surface.hpp>
+#include <skland/gui/display.hpp>
 
 namespace skland {
 
-class Surface;
-
-struct CommitTask : public Task {
-  CommitTask(const CommitTask &) = delete;
-  CommitTask &operator=(const CommitTask &) = delete;
-
-  CommitTask(Surface *surface)
-      : Task(), surface(surface) {}
-
-  virtual ~CommitTask() {}
-
-  virtual void Run() const;
-
-  Surface *surface;
-};
-
+ShellSurface::ShellSurface(AbstractView *view, const Margin &margin)
+    : Trackable(), surface_holder_(view, margin) {
+  surface_holder_.surface_destroying().Connect(this, &ShellSurface::OnViewSurfaceDestroying);
+  xdg_surface_.Setup(Display::xdg_shell(), surface_holder_.wl_surface());
+  surface_holder_.PushShellSurface();
 }
 
-#endif // SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
+ShellSurface::~ShellSurface() {
+  UnbindAll();
+  surface_holder_.RemoveShellSurface();
+  xdg_surface_.Destroy();
+}
+
+void ShellSurface::OnViewSurfaceDestroying(SLOT) {
+  destroying_.Emit();
+  xdg_surface_.Destroy();
+}
+
+}

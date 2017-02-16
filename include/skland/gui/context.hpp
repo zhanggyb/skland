@@ -17,8 +17,7 @@
 #ifndef SKLAND_GUI_CONTEXT_HPP_
 #define SKLAND_GUI_CONTEXT_HPP_
 
-#include "abstract-surface.hpp"
-#include "../wayland/callback.hpp"
+#include "surface.hpp"
 
 namespace skland {
 
@@ -30,37 +29,30 @@ class Canvas;
  */
 class Context {
 
-  Context() = delete;
-
  public:
 
-  Context(AbstractSurface *surface)
-      : surface_(surface) {}
+  Context()
+      : surface_(nullptr) {}
+
+  Context(Surface *surface, const std::shared_ptr<Canvas> canvas)
+      : surface_(surface), canvas_(canvas) {}
 
   Context(const Context &other)
-      : surface_(other.surface_) {}
+      : surface_(other.surface_), canvas_(other.canvas_) {}
 
   ~Context() {}
 
   Context &operator=(const Context &other) {
     surface_ = other.surface_;
+    canvas_ = other.canvas_;
     return *this;
-  }
-
-  Context &operator=(AbstractSurface *surface) {
-    surface_ = surface;
-    return *this;
-  }
-
-  std::shared_ptr<Canvas> GetCanvas() const {
-    return surface_->GetCanvas();
   }
 
   void SetupCallback(wayland::Callback &callback) const {
-    callback.Setup(surface_->wl_surface());
+    surface_->SetupCallback(callback);
   }
 
-  const Margin &GetMargin() const {
+  const Margin &margin() const {
     return surface_->margin();
   }
 
@@ -72,13 +64,14 @@ class Context {
     surface_->Commit();
   }
 
-  AbstractSurface *surface() const {
-    return surface_;
-  }
+  Surface *surface() const { return surface_; }
+
+  const std::shared_ptr<Canvas> &canvas() const { return canvas_; }
 
  private:
 
-  AbstractSurface *surface_;
+  Surface *surface_;
+  std::shared_ptr<Canvas> canvas_;
 
 };
 

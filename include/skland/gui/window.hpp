@@ -24,7 +24,7 @@
 namespace skland {
 
 class AbstractWidget;
-class ShmSurface;
+class SubSurface;
 
 /**
  * @ingroup gui
@@ -46,9 +46,7 @@ class Window : public AbstractWindow {
 
   void SetMainWidget(AbstractWidget *widget);
 
-  AbstractWidget *main_widget() const {
-    return main_widget_;
-  }
+  AbstractWidget *main_widget() const { return main_widget_; }
 
  protected:
 
@@ -56,7 +54,7 @@ class Window : public AbstractWindow {
 
   virtual void OnUpdate(AbstractView *view) override;
 
-  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const;
+  virtual Surface *OnGetSurface(const AbstractView *view) const;
 
   virtual void OnKeyboardKey(KeyEvent *event) final;
 
@@ -66,25 +64,19 @@ class Window : public AbstractWindow {
 
   void SetMainWidgetGeometry();
 
-  /**
-   * @brief The surface for frame
-   */
-  ShmSurface *frame_surface_;
+  SubSurface *main_surface_;
 
   /* Properties for frame surface, JUST experimental */
   MemoryPool frame_pool_;
   Buffer frame_buffer_;
-
-  /**
-   * @brief The surface for widgets
-   */
-  ShmSurface *main_surface_;
+  std::shared_ptr<Canvas> frame_canvas_;
 
   /* Properties for main surface, JUST experimental */
   MemoryPool main_pool_;
   Buffer main_buffer_;
+  std::shared_ptr<Canvas> main_canvas_;
 
-  AbstractWidget *main_widget_;
+  AbstractWidget *main_widget_; // This will be a layout
 
 };
 

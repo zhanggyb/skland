@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-#include <skland/gui/main-window.hpp>
-
-#include <skland/gui/application.hpp>
-#include <skland/gui/output.hpp>
-#include <skland/gui/abstract-widget.hpp>
-#include <skland/gui/mouse-event.hpp>
-#include <skland/gui/key-event.hpp>
-
-#include <skland/stock/theme.hpp>
+#include <skland/gui/toplevel-shell-surface.hpp>
 
 namespace skland {
+
+ToplevelShellSurface::ToplevelShellSurface(AbstractView *view, const Margin &margin)
+    : ShellSurface(view, margin) {
+  destroying().Connect(this, &ToplevelShellSurface::OnShellSurfaceDestroying);
+  xdg_toplevel_.Setup(xdg_surface());
+}
+
+ToplevelShellSurface::~ToplevelShellSurface() {
+  UnbindAll();
+  xdg_toplevel_.Destroy();
+}
+
+void ToplevelShellSurface::OnShellSurfaceDestroying(SLOT) {
+  xdg_toplevel_.Destroy();
+}
 
 }

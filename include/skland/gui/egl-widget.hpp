@@ -21,10 +21,9 @@
 
 #include "../wayland/callback.hpp"
 
-#include <GLES2/gl2.h>
-
 namespace skland {
 
+class SubSurface;
 class EGLSurface;
 
 /**
@@ -47,7 +46,7 @@ class EGLWidget : public AbstractWidget {
 
   virtual void OnUpdate(AbstractView *view) final;
 
-  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const final;
+  virtual Surface *OnGetSurface(const AbstractView *view) const final;
 
   virtual void OnResize(int width, int height) final;
 
@@ -73,11 +72,8 @@ class EGLWidget : public AbstractWidget {
 
   void OnFrame(uint32_t serial);
 
-  EGLSurface *surface_;
-
-  GLint rotation_uniform;
-  GLuint pos;
-  GLuint col;
+  SubSurface *sub_surface_;
+  EGLSurface *egl_surface_;
 
   wayland::Callback frame_callback_;
 

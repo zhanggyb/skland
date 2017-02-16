@@ -22,15 +22,14 @@
 #include "../core/defines.hpp"
 #include "../core/rect.hpp"
 
-#include "../wayland/xdg-surface.hpp"
-#include "../wayland/xdg-toplevel.hpp"
-
 #include "../stock/theme.hpp"
 
 #include <cstdint>
 #include <string>
 
 namespace skland {
+
+class ToplevelShellSurface;
 
 /**
  * @ingroup gui
@@ -74,8 +73,6 @@ class AbstractWindow : public AbstractView {
   void Minimize(__SLOT__);
 
   const std::string &title() const { return title_; }
-
-  int flags() const { return flags_; }
 
   virtual Size GetMinimalSize() const override;
 
@@ -127,11 +124,11 @@ class AbstractWindow : public AbstractView {
 
   void ResizeWithMouse(MouseEvent *event, uint32_t edges) const;
 
-  void SetShellSurface(AbstractSurface *surface);
+  int flags() const { return flags_; }
 
   AbstractWindowFrame *window_frame() const { return window_frame_; }
 
-  AbstractSurface *shell_surface() const { return shell_surface_; }
+  ToplevelShellSurface *toplevel_shell_surface() const { return toplevel_shell_surface_; }
 
   static void ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height);
 
@@ -157,11 +154,9 @@ class AbstractWindow : public AbstractView {
 
   int flags_;
 
-  AbstractWindowFrame *window_frame_;
+  ToplevelShellSurface *toplevel_shell_surface_;
 
-  AbstractSurface *shell_surface_;
-  wayland::XdgSurface xdg_surface_;
-  wayland::XdgToplevel xdg_toplevel_;
+  AbstractWindowFrame *window_frame_;
 
   std::string title_;
   std::string app_id_;

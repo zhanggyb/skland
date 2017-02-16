@@ -22,6 +22,14 @@ namespace skland {
 void RedrawTask::Run() const {
   view->OnDraw(&context);
   view->visible_ = true;
+
+  if (view->is_damaged_) {
+    context.surface()->Damage(view->damaged_region_.x(),
+                              view->damaged_region_.y(),
+                              view->damaged_region_.width(),
+                              view->damaged_region_.height());
+    view->is_damaged_ = false;
+  }
 }
 
 }

@@ -56,15 +56,16 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontMgr_custom*.cpp)
 # skslc main()
 remove_srcs(${SKIA_SOURCE_DIR}/src/sksl/SkSLMain.cpp)
 # remove the special splicer source, TODO: config cmake to detect clang and SSE
-remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
-#remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages_lowp.cpp)
+# remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
+# remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages_lowp.cpp)
 
 
 # Skia sure ships a lot of code no one uses.
 remove_srcs(${SKIA_SOURCE_DIR}/src/svg/*
         ${SKIA_SOURCE_DIR}/src/views/*
-        ${SKIA_SOURCE_DIR}/src/xml/*)
-foreach (include svg views xml gpu/vk)
+        ${SKIA_SOURCE_DIR}/src/xml/*
+        ${SKIA_SOURCE_DIR}/src/jumper/*)
+foreach (include svg views gpu/vk)
     file(GLOB globed_include ${SKIA_SOURCE_DIR}/include/${include})
     list(REMOVE_ITEM public_includes ${globed_include})
 endforeach ()

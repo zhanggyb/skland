@@ -56,7 +56,7 @@ void PushButton::OnDraw(const Context *context) {
     }
   }
 
-  context->GetCanvas()->DrawRect(geometry(), paint);
+  context->canvas()->DrawRect(geometry(), paint);
 }
 
 }

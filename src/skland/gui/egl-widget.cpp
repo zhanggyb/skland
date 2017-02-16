@@ -18,10 +18,13 @@
 
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
+#include <skland/gui/sub-surface.hpp>
 #include <skland/gui/egl-surface.hpp>
 #include <skland/gui/display.hpp>
 
 #include "internal/redraw-task.hpp"
+
+#include <GLES2/gl2.h>
 
 #include <stdlib.h>
 #include <assert.h>
@@ -34,53 +37,46 @@ EGLWidget::EGLWidget()
 
 EGLWidget::EGLWidget(int width, int height)
     : AbstractWidget(width, height),
-      surface_(nullptr),
+      sub_surface_(nullptr),
+      egl_surface_(nullptr),
       resize_(false),
       animating_(false) {
-  surface_ = new EGLSurface(this);
-
-  // Set empty regions
-  wayland::Region opaque_region, input_region;
-
-  opaque_region.Setup(Display::wl_compositor());
-  surface_->SetOpaqueRegion(opaque_region);
-  input_region.Setup(Display::wl_compositor());
-  surface_->SetInputRegion(input_region);
-
   frame_callback_.done().Set(this, &EGLWidget::OnFrame);
 }
 
 EGLWidget::~EGLWidget() {
-  delete surface_;
+  delete egl_surface_;
+  delete sub_surface_;
 }
 
 void EGLWidget::OnUpdate(AbstractView *view) {
   DBG_ASSERT(view == this);
 
-  if (nullptr == surface_->parent()) {
+  if (nullptr == sub_surface_) {
+    DBG_ASSERT(nullptr == egl_surface_);
     if (nullptr == parent_view()) return;
 
-    AbstractSurface *parent_surface = parent_view()->GetSurface();
+    Surface *parent_surface = parent_view()->GetSurface();
     if (nullptr == parent_surface) return;
 
-    parent_surface->AddSubSurface(surface_);
-    surface_->SetWindowPosition(x(), y());
-    surface_->Resize(width(), height());
-    surface_->SetDesync();
+    sub_surface_ = new SubSurface(parent_surface, this);
+    egl_surface_ = new EGLSurface(sub_surface_->surface());
+    sub_surface_->SetWindowPosition(x(), y());
+    egl_surface_->Resize(width(), height());
+//    surface_->SetDesync();
   }
 
   AbstractWidget::OnUpdate(view);
 }
 
-AbstractSurface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
-  return surface_;
+Surface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
+  return sub_surface_->surface();
 }
 
 void EGLWidget::OnResize(int width, int height) {
   resize(width, height);
   resize_ = true;
-  surface_->Resize(this->width(), this->height());
-  OnResizeEGL();
+//  egl_surface_->Resize(this->width(), this->height());
   Update();
 }
 
@@ -106,18 +102,17 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 
 void EGLWidget::OnDraw(const Context *context) {
   if (!animating_) {
-    if (surface_->MakeCurrent()) {
+    if (egl_surface_->MakeCurrent()) {
       animating_ = true;
+      if (resize_) {
+        resize_ = false;
+        OnResize(width(), height());
+      }
       OnInitializeEGL();
-      frame_callback_.Setup(surface_->wl_surface());
-//      surface_->Commit();
-      surface_->SwapBuffers();
-      surface_->parent()->Commit();
-//      AbstractSurface *parent = surface_->parent();
-//      while (parent) {
-//        parent->Commit();
-//        parent = parent->parent();
-//      }
+      egl_surface_->surface()->SetupCallback(frame_callback_);
+      egl_surface_->SwapBuffers();
+      sub_surface_->surface()->parent()->Commit();
+      sub_surface_->surface()->GetShellSurface()->Commit();
     }
   }
 }
@@ -142,17 +137,11 @@ void EGLWidget::OnFrame(uint32_t /* serial */) {
   static int count = 0;
   count++;
   fprintf(stderr, "on frame: %d\n", count);
-  if (surface_->MakeCurrent()) {
+  if (egl_surface_->MakeCurrent()) {
     OnRenderEGL();
-    frame_callback_.Setup(surface_->wl_surface());
-//    surface_->Commit();
-    surface_->SwapBuffers();
-    surface_->parent()->Commit();
-//    AbstractSurface *parent = surface_->parent();
-//    while (parent) {
-//      parent->Commit();
-//      parent = parent->parent();
-//    }
+    egl_surface_->surface()->SetupCallback(frame_callback_);
+    egl_surface_->SwapBuffers();
+    sub_surface_->surface()->GetShellSurface()->Commit();
   }
 }
 

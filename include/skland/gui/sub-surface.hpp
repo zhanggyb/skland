@@ -14,37 +14,37 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_EGL_SURFACE_HPP_
-#define SKLAND_GUI_EGL_SURFACE_HPP_
+#ifndef SKLAND_GUI_SUB_SURFACE_HPP_
+#define SKLAND_GUI_SUB_SURFACE_HPP_
 
 #include "surface-holder.hpp"
-#include "../egl/surface.hpp"
+#include "../wayland/subsurface.hpp"
 
 namespace skland {
 
-class EGLSurface : public Trackable {
+/**
+ * @ingroup gui
+ * @brief Sub surface role
+ */
+class SubSurface : public Trackable {
 
-  EGLSurface() = delete;
-  EGLSurface(const EGLSurface &) = delete;
-  EGLSurface &operator=(const EGLSurface &) = delete;
+  SubSurface() = delete;
+  SubSurface(const SubSurface &) = delete;
+  SubSurface &operator=(const SubSurface &)= delete;
 
  public:
 
-  EGLSurface(Surface *surface);
+  SubSurface(Surface *parent, AbstractView *view, const Margin &margin = Margin());
 
-  virtual ~EGLSurface();
+  virtual ~SubSurface();
 
-  bool MakeCurrent();
+  void PlaceAbove(Surface *sibling);
 
-  bool SwapBuffers();
+  void PlaceBelow(Surface *sibling);
 
-  bool SwapBuffersWithDamage(int x, int y, int width, int height);
+  void SetRelativePosition(int x, int y);
 
-  bool SwapInterval(EGLint interval = 0);
-
-  void Resize(int width, int height, int dx = 0, int dy = 0) {
-    egl_surface_.Resize(width, height, dx, dy);
-  }
+  void SetWindowPosition(int x, int y);
 
   Surface *surface() const { return surface_holder_.surface(); }
 
@@ -54,10 +54,10 @@ class EGLSurface : public Trackable {
 
   SurfaceHolder surface_holder_;
 
-  egl::Surface egl_surface_;
+  wayland::SubSurface wl_sub_surface_;
 
 };
 
 }
 
-#endif // SKLAND_GUI_EGL_SURFACE_HPP_
+#endif // SKLAND_GUI_SUB_SURFACE_HPP_

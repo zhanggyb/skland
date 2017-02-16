@@ -19,8 +19,6 @@
 
 #include "abstract-window.hpp"
 
-#include "../wayland/xdg-surface.hpp"
-#include "../wayland/xdg-toplevel.hpp"
 #include "../wayland/callback.hpp"
 
 #include "memory-pool.hpp"
@@ -28,7 +26,7 @@
 
 namespace skland {
 
-class ShmSurface;
+class SubSurface;
 class EGLSurface;
 
 class EGLWindow : public AbstractWindow {
@@ -51,7 +49,7 @@ class EGLWindow : public AbstractWindow {
 
   virtual void OnUpdate(AbstractView *view) final;
 
-  virtual AbstractSurface *OnGetSurface(const AbstractView *view) const final;
+  virtual Surface *OnGetSurface(const AbstractView *view) const final;
 
   virtual void OnResize(int width, int height) final;
 
@@ -73,21 +71,20 @@ class EGLWindow : public AbstractWindow {
 
   void OnRelease();
 
-  ShmSurface *frame_surface_;
   /* Properties for frame surface, JUST experimental */
   MemoryPool frame_pool_;
   Buffer frame_buffer_;
-
-  /**
-    * @brief The surface for widgets
-    */
-  ShmSurface *main_surface_;
+  std::shared_ptr<Canvas> frame_canvas_;
 
   /* Properties for main surface, JUST experimental */
   MemoryPool main_pool_;
   Buffer main_buffer_;
+  std::shared_ptr<Canvas> main_canvas_;
 
-  EGLSurface *surface_;
+  SubSurface *main_surface_;
+
+  SubSurface *sub_surface_;
+  EGLSurface *egl_surface_;
 
   wayland::Callback frame_callback_;
 

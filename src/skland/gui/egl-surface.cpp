@@ -20,18 +20,18 @@
 
 namespace skland {
 
-EGLSurface::EGLSurface(AbstractView *view)
-    : AbstractSurface(view) {
-  egl_surface_.Setup(Display::egl_display(), wl_surface(), view->width(), view->height());
+EGLSurface::EGLSurface(Surface *surface)
+    : Trackable(), surface_holder_(surface) {
+  surface_holder_.surface_destroying().Connect(this, &EGLSurface::OnSurfaceDestroying);
+  egl_surface_.Setup(Display::egl_display(),
+                     surface_holder_.wl_surface(),
+                     surface->view()->width(),
+                     surface->view()->height());
 }
 
 EGLSurface::~EGLSurface() {
-
-}
-
-std::shared_ptr<Canvas> EGLSurface::GetCanvas() const {
-  // TODO: render to canvas
-  return nullptr;
+  UnbindAll();
+  egl_surface_.Destroy();
 }
 
 bool EGLSurface::MakeCurrent() {
@@ -50,4 +50,8 @@ bool EGLSurface::SwapInterval(EGLint interval) {
   return Display::egl_display().SwapInterval(interval);
 }
 
+void EGLSurface::OnSurfaceDestroying(SLOT slot) {
+  egl_surface_.Destroy();
 }
+
+} // namespace skland
