@@ -42,39 +42,20 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
     : AbstractWindow(width, height, title, frame),
       main_surface_(nullptr),
       main_widget_(nullptr) {
-  int x = 0, y = 0;  // The input region
-  ToplevelShellSurface *shell_surface = nullptr;
-
   if (frame) {
-    SetWindowFrame(frame);
-
-    shell_surface = new ToplevelShellSurface(this, Theme::shadow_margin());
-    main_surface_ = new SubSurface(shell_surface->view_surface(), this, Theme::shadow_margin());
-
-    x += Theme::shadow_margin().left - AbstractWindowFrame::kResizingMargin.left;
-    y += Theme::shadow_margin().top - AbstractWindowFrame::kResizingMargin.top;
-    width += AbstractWindowFrame::kResizingMargin.lr();
-    height += AbstractWindowFrame::kResizingMargin.tb();
-
+    ViewSurface *parent = toplevel_shell_surface()->view_surface();
+    main_surface_ = new SubSurface(parent, this, Theme::shadow_margin());
+    DBG_ASSERT(main_surface_->view_surface()->parent() == parent);
+    DBG_ASSERT(main_surface_->view_surface()->below() == parent);
     wayland::Region empty_region;
     empty_region.Setup(Display::wl_compositor());
     main_surface_->view_surface()->SetInputRegion(empty_region);
-  } else {
-    shell_surface = new ToplevelShellSurface(this);
   }
-
-  wayland::Region input_region;
-  input_region.Setup(Display::wl_compositor());
-  input_region.Add(x, y, width, height);
-  shell_surface->view_surface()->SetInputRegion(input_region);
-
-  SetToplevelShellSurface(shell_surface);
-  SetTitle(title); // TODO: support multi-language
 }
 
 Window::~Window() {
-  delete main_surface_;
   delete main_widget_;
+  delete main_surface_;
 }
 
 void Window::SetMainWidget(AbstractWidget *widget) {
@@ -109,7 +90,8 @@ void Window::OnShown() {
   frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.pixel(),
                                  frame_buffer_.size().width,
                                  frame_buffer_.size().height));
-  frame_canvas_->SetOrigin((float) shell_surface->margin().left, (float) shell_surface->margin().top);
+  frame_canvas_->SetOrigin((float) shell_surface->margin().left,
+                           (float) shell_surface->margin().top);
   frame_canvas_->Clear();
 
   if (main_surface_) {
@@ -124,11 +106,13 @@ void Window::OnShown() {
                             (float) main_surface_->view_surface()->margin().top);
     main_canvas_->Clear();
   }
+
   UpdateAll();
 }
 
 void Window::OnUpdate(AbstractView *view) {
   if (!visible()) return;
+
   ViewSurface *surface = nullptr;
 
   if (view == this) {
@@ -136,9 +120,9 @@ void Window::OnUpdate(AbstractView *view) {
     kRedrawTaskTail.PushFront(redraw_task().get());
     redraw_task()->context = Context(surface, frame_canvas_);
     DBG_ASSERT(frame_canvas_);
-    surface->Damage(0, 0,
-                    width() + surface->margin().lr(),
-                    height() + surface->margin().tb());
+    Damage(this, 0, 0,
+           width() + surface->margin().lr(),
+           height() + surface->margin().tb());
     surface->Commit();
   } else {
     std::shared_ptr<Canvas> canvas;
@@ -154,16 +138,19 @@ void Window::OnUpdate(AbstractView *view) {
     kRedrawTaskTail.PushFront(task);
     task->context = Context(surface, canvas);
     DBG_ASSERT(canvas);
-    surface->Damage(view->x() + surface->margin().left,
-                    view->y() + surface->margin().top,
-                    view->width(),
-                    view->height());
+    Damage(view, view->x() + surface->margin().left,
+           view->y() + surface->margin().top,
+           view->width(),
+           view->height());
     surface->Commit();
   }
 }
 
 ViewSurface *Window::OnGetSurface(const AbstractView *view) const {
-  return main_surface_->view_surface();
+  if (view == this)
+    return toplevel_shell_surface()->view_surface();
+
+  return nullptr != main_surface_ ? main_surface_->view_surface() : toplevel_shell_surface()->view_surface();
 }
 
 void Window::OnKeyboardKey(KeyEvent *event) {
@@ -174,24 +161,21 @@ void Window::OnKeyboardKey(KeyEvent *event) {
 }
 
 void Window::OnResize(int width, int height) {
-  Rect input_rect(width, height);
+  RectI input_rect(width, height);
   ViewSurface *shell_surface = toplevel_shell_surface()->view_surface();
 
-  if (!IsFrameless()) {
-    input_rect.left = shell_surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
-    input_rect.top = shell_surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
-    input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
-                      height + AbstractWindowFrame::kResizingMargin.tb());
-    ResizeWindowFrame(window_frame(), width, height);
-  }
+  input_rect.left = shell_surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
+  input_rect.top = shell_surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
+  input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
+                    height + AbstractWindowFrame::kResizingMargin.tb());
 
   wayland::Region input_region;
   input_region.Setup(Display::wl_compositor());
-  input_region.Add((int) input_rect.x(),
-                   (int) input_rect.y(),
-                   (int) input_rect.width(),
-                   (int) input_rect.height());
+  input_region.Add(input_rect.x(), input_rect.y(),
+                   input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);
+
+  ResizeWindowFrame(window_frame(), width, height);
 
   // Reset buffer:
   width += shell_surface->margin().lr();
@@ -199,7 +183,8 @@ void Window::OnResize(int width, int height) {
 
   int total_size = width * 4 * height;
   if (total_size > frame_pool_.size()) {
-    DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n", total_size, main_pool_.size(), "Re-generate shm pool");
+    DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n",
+                  total_size, main_pool_.size(), "Re-generate shm pool");
     frame_pool_.Setup(total_size);
     if (main_surface_) {
       main_pool_.Setup(total_size);
@@ -211,7 +196,7 @@ void Window::OnResize(int width, int height) {
   frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.pixel(),
                                  frame_buffer_.size().width,
                                  frame_buffer_.size().height));
-  frame_canvas_->SetOrigin((float) shell_surface->margin().left, (float) shell_surface->margin().top);
+  frame_canvas_->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
   frame_canvas_->Clear();
 
   if (main_surface_) {
@@ -220,8 +205,8 @@ void Window::OnResize(int width, int height) {
     main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.pixel(),
                                   main_buffer_.size().width,
                                   main_buffer_.size().height));
-    main_canvas_->SetOrigin((float) main_surface_->view_surface()->margin().left,
-                            (float) main_surface_->view_surface()->margin().top);
+    main_canvas_->SetOrigin(main_surface_->view_surface()->margin().left,
+                            main_surface_->view_surface()->margin().top);
     main_canvas_->Clear();
   }
 

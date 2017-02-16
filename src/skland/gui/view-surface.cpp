@@ -31,7 +31,8 @@ Task ViewSurface::kCommitTaskHead;
 Task ViewSurface::kCommitTaskTail;
 
 ViewSurface::ViewSurface(AbstractView *view, const Margin &margin)
-    : parent_(nullptr),
+    : mode_(kSyncMode),
+      parent_(nullptr),
       above_(nullptr),
       below_(nullptr),
       up_(nullptr),
@@ -93,7 +94,12 @@ void ViewSurface::Commit() {
   if (nullptr == parent_) {
     kCommitTaskTail.PushFront(commit_task_.get());
   } else {
-
+    if (mode_ == kSyncMode) {
+      parent_->Commit();
+      parent_->commit_task_->PushFront(commit_task_.get());
+    } else {
+      kCommitTaskTail.PushFront(commit_task_.get());
+    }
   }
 }
 

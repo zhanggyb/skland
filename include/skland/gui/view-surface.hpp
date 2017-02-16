@@ -60,6 +60,14 @@ class ViewSurface {
 
  public:
 
+  /**
+    * @brief Commit behaviour of the sub-surface
+    */
+  enum Mode {
+    kSyncMode,
+    kDesyncMode
+  };
+
   static int GetShellSurfaceCount() { return kShellSurfaceCount; }
 
   void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
@@ -129,6 +137,8 @@ class ViewSurface {
   void OnEnter(struct wl_output *wl_output);
 
   void OnLeave(struct wl_output *wl_output);
+
+  Mode mode_;
 
   /**
    * @brief The parent surface

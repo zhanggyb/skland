@@ -38,13 +38,15 @@ AbstractView::AbstractView()
 AbstractView::AbstractView(int width, int height)
     : Object(),
       visible_(false),
-      geometry_(width, height) {
+      geometry_(width, height),
+      is_damaged_(false) {
   redraw_task_.reset(new RedrawTask(this));
   mouse_task_.reset(new ViewTask(this));
   mouse_motion_task_.reset(new ViewTask(this));
 }
 
 AbstractView::~AbstractView() {
+
 }
 
 void AbstractView::MoveTo(int x, int y) {
@@ -120,6 +122,13 @@ void AbstractView::TrackMouseMotion(MouseEvent *event) {
 
 void AbstractView::UntrackMouseMotion() {
   mouse_motion_task_->Unlink();
+}
+
+void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int width, int height) {
+  view->is_damaged_ = true;
+  view->damaged_region_.l = surface_x;
+  view->damaged_region_.t = surface_y;
+  view->damaged_region_.Resize(width, height);
 }
 
 void AbstractView::InitializeRedrawTaskList() {

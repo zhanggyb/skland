@@ -48,9 +48,7 @@ class Window : public AbstractWindow {
 
   void SetMainWidget(AbstractWidget *widget);
 
-  AbstractWidget *main_widget() const {
-    return main_widget_;
-  }
+  AbstractWidget *main_widget() const { return main_widget_; }
 
  protected:
 

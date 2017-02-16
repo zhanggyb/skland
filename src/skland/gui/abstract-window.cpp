@@ -20,7 +20,6 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/toplevel-shell-surface.hpp>
-#include <skland/gui/sub-surface.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
 
 #include "internal/view-task.hpp"
@@ -41,6 +40,26 @@ AbstractWindow::AbstractWindow(int width,
       toplevel_shell_surface_(nullptr),
       window_frame_(nullptr) {
   if (title) title_ = title;
+
+  toplevel_shell_surface_ = new ToplevelShellSurface(this, Theme::shadow_margin());
+  toplevel_shell_surface_->surface_configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
+  toplevel_shell_surface_->toplevel_configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
+  toplevel_shell_surface_->toplevel_close().Set(this, &AbstractWindow::OnXdgToplevelClose);
+
+  int x = 0, y = 0;  // The input region
+  x += Theme::shadow_margin().left - AbstractWindowFrame::kResizingMargin.left;
+  y += Theme::shadow_margin().top - AbstractWindowFrame::kResizingMargin.top;
+  width += AbstractWindowFrame::kResizingMargin.lr();
+  height += AbstractWindowFrame::kResizingMargin.tb();
+
+  wayland::Region input_region;
+  input_region.Setup(Display::wl_compositor());
+  input_region.Add(x, y, width, height);
+  toplevel_shell_surface_->view_surface()->SetInputRegion(input_region);
+
+  toplevel_shell_surface_->SetTitle(title);
+
+  SetWindowFrame(frame);
 }
 
 AbstractWindow::~AbstractWindow() {
@@ -282,19 +301,6 @@ void AbstractWindow::MoveWithMouse(MouseEvent *event) const {
 
 void AbstractWindow::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
   toplevel_shell_surface_->Resize(event->wl_seat(), event->serial(), edges);
-}
-
-void AbstractWindow::SetToplevelShellSurface(ToplevelShellSurface *surface) {
-  DBG_ASSERT(surface);
-  DBG_ASSERT(nullptr == surface->view_surface()->parent());
-
-  if (toplevel_shell_surface_) delete toplevel_shell_surface_;
-
-  toplevel_shell_surface_ = surface;
-
-  toplevel_shell_surface_->surface_configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
-  toplevel_shell_surface_->toplevel_configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
-  toplevel_shell_surface_->toplevel_close().Set(this, &AbstractWindow::OnXdgToplevelClose);
 }
 
 void AbstractWindow::ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height) {

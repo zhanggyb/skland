@@ -74,8 +74,6 @@ class AbstractWindow : public AbstractView {
 
   const std::string &title() const { return title_; }
 
-  int flags() const { return flags_; }
-
   virtual Size GetMinimalSize() const override;
 
   virtual Size GetPreferredSize() const override;
@@ -126,7 +124,7 @@ class AbstractWindow : public AbstractView {
 
   void ResizeWithMouse(MouseEvent *event, uint32_t edges) const;
 
-  void SetToplevelShellSurface(ToplevelShellSurface *surface);
+  int flags() const { return flags_; }
 
   AbstractWindowFrame *window_frame() const { return window_frame_; }
 

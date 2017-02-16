@@ -53,7 +53,7 @@ class Context {
     view_surface_->SetupCallback(callback);
   }
 
-  const Margin &GetMargin() const {
+  const Margin &margin() const {
     return view_surface_->margin();
   }
 
@@ -65,7 +65,7 @@ class Context {
     view_surface_->Commit();
   }
 
-  ViewSurface *surface() const { return view_surface_; }
+  ViewSurface *view_surface() const { return view_surface_; }
 
   const std::shared_ptr<Canvas> &canvas() const { return canvas_; }
 

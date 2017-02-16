@@ -210,6 +210,8 @@ class AbstractView : public Object {
     return mouse_task_;
   }
 
+  static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
+
   static RedrawTask *GetRedrawTask(const AbstractView *view) {
     return view->redraw_task_.get();
   }
@@ -244,6 +246,10 @@ class AbstractView : public Object {
   std::unique_ptr<ViewTask> mouse_task_;
 
   std::unique_ptr<ViewTask> mouse_motion_task_;
+
+  // Damage area
+  bool is_damaged_;
+  RectI damaged_region_;
 
 };
 
