@@ -63,9 +63,12 @@ void SubSurface::SetRelativePosition(int x, int y) {
 }
 
 void SubSurface::SetWindowPosition(int x, int y) {
-  Point parent_global_position = view_surface_holder_.view_surface()->parent()->GetWindowPosition();
-  wl_sub_surface_.SetPosition(x - parent_global_position.x - view_surface_holder_.view_surface()->margin().l,
-                              y - parent_global_position.y - view_surface_holder_.view_surface()->margin().t);
+  ViewSurface* _this_view_surface = view_surface_holder_.view_surface();
+  Point parent_global_position = _this_view_surface->parent()->GetWindowPosition();
+  int local_x = x - parent_global_position.x;
+  int local_y = y - parent_global_position.y;
+  wl_sub_surface_.SetPosition(local_x, local_y);
+  view_surface_holder_.SetRelativePosition(local_x, local_y);
 }
 
 void SubSurface::OnViewSurfaceDestroying(SLOT) {

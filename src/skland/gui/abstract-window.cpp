@@ -316,9 +316,7 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
 
   if (!visible()) {
     set_visible(true);
-    toplevel_shell_surface_->SetWindowGeometry(toplevel_shell_surface_->view_surface()->margin().left,
-                                               toplevel_shell_surface_->view_surface()->margin().top,
-                                               width(), height());
+    toplevel_shell_surface_->ResizeWindow(width(), height());
     OnShown();
   }
 }
@@ -348,10 +346,7 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
   }
 
   if (do_resize) {
-    int x = 0, y = 0;
-    x = toplevel_shell_surface_->view_surface()->margin().left;
-    y = toplevel_shell_surface_->view_surface()->margin().top;
-    toplevel_shell_surface_->SetWindowGeometry(x, y, width, height);
+    toplevel_shell_surface_->ResizeWindow(width, height);
     resize(width, height);
     OnResize(width, height);
   }

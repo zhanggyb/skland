@@ -107,12 +107,15 @@ Point ViewSurface::GetWindowPosition() const {
   Point position = relative_position_;
 
   const ViewSurface *parent = parent_;
+  const ViewSurface *shell_surface = this;
+
   while (parent) {
-    position += (parent->relative_position() - Point(parent->margin().l, parent->margin().t));
+    position += parent->relative_position();
+    if (nullptr == parent->parent_) shell_surface = parent;
     parent = parent->parent();
   }
 
-  return position;
+  return position - Point(shell_surface->margin().l, shell_surface->margin().t);
 }
 
 void ViewSurface::OnEnter(struct wl_output *wl_output) {

@@ -38,8 +38,10 @@ class ShellSurface : public Trackable {
 
   virtual ~ShellSurface();
 
-  void SetWindowGeometry(int x, int y, int width, int height) const {
-    xdg_surface_.SetWindowGeometry(x, y, width, height);
+  void ResizeWindow(int width, int height) const {
+    xdg_surface_.SetWindowGeometry(view_surface()->margin().l,
+                                   view_surface()->margin().t,
+                                   width, height);
   }
 
   void AckConfigure(uint32_t serial) const {

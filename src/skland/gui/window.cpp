@@ -174,8 +174,6 @@ void Window::OnResize(int width, int height) {
                    input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);
 
-  ResizeWindowFrame(window_frame(), width, height);
-
   // Reset buffer:
   width += shell_surface->margin().lr();
   height += shell_surface->margin().tb();
@@ -185,9 +183,6 @@ void Window::OnResize(int width, int height) {
     DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n",
                   total_size, frame_pool_.size(), "Re-generate shm pool");
     frame_pool_.Setup(total_size);
-    if (main_surface_) {
-      main_pool_.Setup(total_size);
-    }
   }
 
   frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
@@ -199,6 +194,7 @@ void Window::OnResize(int width, int height) {
   frame_canvas_->Clear();
 
   if (main_surface_) {
+    main_pool_.Setup(total_size);
     main_buffer_.Setup(main_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
     main_surface_->view_surface()->Attach(&main_buffer_);
     main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.pixel(),
@@ -207,6 +203,9 @@ void Window::OnResize(int width, int height) {
     main_canvas_->SetOrigin(main_surface_->view_surface()->margin().left,
                             main_surface_->view_surface()->margin().top);
     main_canvas_->Clear();
+
+    DBG_ASSERT(window_frame());
+    ResizeWindowFrame(window_frame(), width, height);
   }
 
   SetMainWidgetGeometry();
