@@ -28,7 +28,6 @@
 #include <skland/stock/theme.hpp>
 
 #include <skland/gui/abstract-view.hpp>
-#include <skland/gui/abstract-surface.hpp>
 #include <skland/gui/view-surface.hpp>
 
 /**

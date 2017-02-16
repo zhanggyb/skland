@@ -18,7 +18,6 @@
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/output.hpp>
-#include <skland/gui/shm-surface.hpp>
 #include <skland/gui/abstract-widget.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>

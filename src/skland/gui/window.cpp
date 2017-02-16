@@ -20,7 +20,6 @@
 #include <skland/gui/abstract-widget.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
-#include <skland/gui/shm-surface.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/gui/context.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
@@ -184,7 +183,7 @@ void Window::OnResize(int width, int height) {
   int total_size = width * 4 * height;
   if (total_size > frame_pool_.size()) {
     DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n",
-                  total_size, main_pool_.size(), "Re-generate shm pool");
+                  total_size, frame_pool_.size(), "Re-generate shm pool");
     frame_pool_.Setup(total_size);
     if (main_surface_) {
       main_pool_.Setup(total_size);

@@ -20,7 +20,6 @@
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
 #include <skland/gui/abstract-window.hpp>
-#include <skland/gui/abstract-surface.hpp>
 #include <skland/gui/view-surface.hpp>
 
 #include <iostream>

@@ -20,12 +20,10 @@
 #include "abstract-window.hpp"
 #include "memory-pool.hpp"
 #include "buffer.hpp"
-#include "view-surface.hpp"
 
 namespace skland {
 
 class AbstractWidget;
-class ShmSurface;
 class SubSurface;
 
 /**

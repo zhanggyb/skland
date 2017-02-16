@@ -16,7 +16,6 @@
 
 #include <skland/gui/sub-surface.hpp>
 #include <skland/core/defines.hpp>
-#include <skland/gui/abstract-surface.hpp>
 #include <skland/gui/display.hpp>
 
 namespace skland {

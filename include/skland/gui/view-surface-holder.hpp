@@ -25,7 +25,7 @@ namespace skland {
  * @ingroup gui
  * @brief The basic class acts as a surface role
  */
-class ViewSurfaceHolder: public Trackable {
+class ViewSurfaceHolder : public Trackable {
 
   ViewSurfaceHolder() = delete;
 

@@ -20,18 +20,18 @@
 
 namespace skland {
 
-EGLSurface::EGLSurface(AbstractView *view)
-    : AbstractSurface(view) {
-  egl_surface_.Setup(Display::egl_display(), wl_surface(), view->width(), view->height());
+EGLSurface::EGLSurface(ViewSurface *view_surface)
+    : Trackable(), view_surface_holder_(view_surface) {
+  view_surface_holder_.view_surface_destroying().Connect(this, &EGLSurface::OnViewSurfaceDestroying);
+  egl_surface_.Setup(Display::egl_display(),
+                     view_surface_holder_.wl_surface(),
+                     view_surface->view()->width(),
+                     view_surface->view()->height());
 }
 
 EGLSurface::~EGLSurface() {
-
-}
-
-std::shared_ptr<Canvas> EGLSurface::GetCanvas() const {
-  // TODO: render to canvas
-  return nullptr;
+  UnbindAll();
+  egl_surface_.Destroy();
 }
 
 bool EGLSurface::MakeCurrent() {
@@ -50,39 +50,7 @@ bool EGLSurface::SwapInterval(EGLint interval) {
   return Display::egl_display().SwapInterval(interval);
 }
 
-// --------------------------------
-
-EGLSurfaceExt::EGLSurfaceExt(ViewSurface *view_surface)
-    : Trackable(), view_surface_holder_(view_surface) {
-  view_surface_holder_.view_surface_destroying().Connect(this, &EGLSurfaceExt::OnViewSurfaceDestroying);
-  egl_surface_.Setup(Display::egl_display(),
-                     view_surface_holder_.wl_surface(),
-                     view_surface->view()->width(),
-                     view_surface->view()->height());
-}
-
-EGLSurfaceExt::~EGLSurfaceExt() {
-  UnbindAll();
-  egl_surface_.Destroy();
-}
-
-bool EGLSurfaceExt::MakeCurrent() {
-  return Display::egl_display().MakeCurrent(egl_surface_, egl_surface_);
-}
-
-bool EGLSurfaceExt::SwapBuffers() {
-  return Display::egl_display().SwapBuffers(egl_surface_);
-}
-
-bool EGLSurfaceExt::SwapBuffersWithDamage(int x, int y, int width, int height) {
-  return Display::egl_display().SwapBuffersWithDamage(egl_surface_, x, y, width, height);
-}
-
-bool EGLSurfaceExt::SwapInterval(EGLint interval) {
-  return Display::egl_display().SwapInterval(interval);
-}
-
-void EGLSurfaceExt::OnViewSurfaceDestroying(SLOT slot) {
+void EGLSurface::OnViewSurfaceDestroying(SLOT slot) {
   egl_surface_.Destroy();
 }
 

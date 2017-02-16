@@ -17,8 +17,6 @@
 #include <skland/gui/abstract-view.hpp>
 
 #include <skland/core/numeric.hpp>
-#include <skland/gui/abstract-surface.hpp>
-#include <skland/gui/display.hpp>
 #include <skland/gui/abstract-window.hpp>
 #include <skland/gui/mouse-event.hpp>
 

@@ -17,14 +17,12 @@
 #ifndef SKLAND_EGL_SURFACE_HPP
 #define SKLAND_EGL_SURFACE_HPP
 
-#include "abstract-surface.hpp"
 #include "view-surface-holder.hpp"
-
 #include "../egl/surface.hpp"
 
 namespace skland {
 
-class EGLSurface : public AbstractSurface {
+class EGLSurface : public Trackable {
 
   EGLSurface() = delete;
   EGLSurface(const EGLSurface &) = delete;
@@ -32,18 +30,10 @@ class EGLSurface : public AbstractSurface {
 
  public:
 
-  EGLSurface(AbstractView *view);
+  EGLSurface(ViewSurface *view_surface);
 
   virtual ~EGLSurface();
 
-  /**
-   * @brief Get the canvas which contains current frame
-   * @return A shared ptr to a canvas object
-   *
-   * The returned canvas object is not for rendering views.
-   */
-  virtual std::shared_ptr<Canvas> GetCanvas() const override;
-
   bool MakeCurrent();
 
   bool SwapBuffers();
@@ -56,35 +46,7 @@ class EGLSurface : public AbstractSurface {
     egl_surface_.Resize(width, height, dx, dy);
   }
 
- private:
-
-  egl::Surface egl_surface_;
-
-};
-
-class EGLSurfaceExt : public Trackable {
-
-  EGLSurfaceExt() = delete;
-  EGLSurfaceExt(const EGLSurfaceExt &) = delete;
-  EGLSurfaceExt &operator=(const EGLSurfaceExt &) = delete;
-
- public:
-
-  EGLSurfaceExt(ViewSurface *view_surface);
-
-  virtual ~EGLSurfaceExt();
-
-  bool MakeCurrent();
-
-  bool SwapBuffers();
-
-  bool SwapBuffersWithDamage(int x, int y, int width, int height);
-
-  bool SwapInterval(EGLint interval = 0);
-
-  void Resize(int width, int height, int dx = 0, int dy = 0) {
-    egl_surface_.Resize(width, height, dx, dy);
-  }
+  ViewSurface *view_surface() const { return view_surface_holder_.view_surface(); }
 
  private:
 

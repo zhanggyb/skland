@@ -37,15 +37,15 @@ EGLWidget::EGLWidget(int width, int height)
       surface_(nullptr),
       resize_(false),
       animating_(false) {
-  surface_ = new EGLSurface(this);
-
-  // Set empty regions
-  wayland::Region opaque_region, input_region;
-
-  opaque_region.Setup(Display::wl_compositor());
-  surface_->SetOpaqueRegion(opaque_region);
-  input_region.Setup(Display::wl_compositor());
-  surface_->SetInputRegion(input_region);
+//  surface_ = new EGLSurface(this);
+//
+//  // Set empty regions
+//  wayland::Region opaque_region, input_region;
+//
+//  opaque_region.Setup(Display::wl_compositor());
+//  surface_->SetOpaqueRegion(opaque_region);
+//  input_region.Setup(Display::wl_compositor());
+//  surface_->SetInputRegion(input_region);
 
   frame_callback_.done().Set(this, &EGLWidget::OnFrame);
 }
@@ -106,21 +106,21 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 }
 
 void EGLWidget::OnDraw(const Context *context) {
-  if (!animating_) {
-    if (surface_->MakeCurrent()) {
-      animating_ = true;
-      OnInitializeEGL();
-      frame_callback_.Setup(surface_->wl_surface());
-//      surface_->Commit();
-      surface_->SwapBuffers();
-      surface_->parent()->Commit();
-//      AbstractSurface *parent = surface_->parent();
-//      while (parent) {
-//        parent->Commit();
-//        parent = parent->parent();
-//      }
-    }
-  }
+//  if (!animating_) {
+//    if (surface_->MakeCurrent()) {
+//      animating_ = true;
+//      OnInitializeEGL();
+//      frame_callback_.Setup(surface_->wl_surface());
+////      surface_->Commit();
+//      surface_->SwapBuffers();
+//      surface_->parent()->Commit();
+////      AbstractSurface *parent = surface_->parent();
+////      while (parent) {
+////        parent->Commit();
+////        parent = parent->parent();
+////      }
+//    }
+//  }
 }
 
 void EGLWidget::OnInitializeEGL() {
@@ -140,21 +140,21 @@ void EGLWidget::OnRenderEGL() {
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-  static int count = 0;
-  count++;
-  fprintf(stderr, "on frame: %d\n", count);
-  if (surface_->MakeCurrent()) {
-    OnRenderEGL();
-    frame_callback_.Setup(surface_->wl_surface());
-//    surface_->Commit();
-    surface_->SwapBuffers();
-    surface_->parent()->Commit();
-//    AbstractSurface *parent = surface_->parent();
-//    while (parent) {
-//      parent->Commit();
-//      parent = parent->parent();
-//    }
-  }
+//  static int count = 0;
+//  count++;
+//  fprintf(stderr, "on frame: %d\n", count);
+//  if (surface_->MakeCurrent()) {
+//    OnRenderEGL();
+//    frame_callback_.Setup(surface_->wl_surface());
+////    surface_->Commit();
+//    surface_->SwapBuffers();
+//    surface_->parent()->Commit();
+////    AbstractSurface *parent = surface_->parent();
+////    while (parent) {
+////      parent->Commit();
+////      parent = parent->parent();
+////    }
+//  }
 }
 
 }
