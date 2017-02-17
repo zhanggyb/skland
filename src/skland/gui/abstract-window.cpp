@@ -23,6 +23,7 @@
 #include <skland/gui/abstract-window-frame.hpp>
 
 #include "internal/view-task.hpp"
+#include "internal/mouse-task-proxy.hpp"
 
 namespace skland {
 
@@ -247,7 +248,8 @@ void AbstractWindow::OnMouseButton(MouseEvent *event) {
       int location = window_frame_->GetMouseLocation(event);
 
       if (location == kTitleBar) {
-        if (mouse_task()->next()) {
+        MouseTaskProxy proxy(this);
+        if (proxy.HasNextTask()) {
           // If the mouse is hover on a sub widget (mostly close/min/max button on title bar).
           event->Accept();
           return;

@@ -27,7 +27,7 @@
 
 namespace skland {
 
-// Forward declaration
+// Forward declarations
 class Canvas;
 class Display;
 class Input;
@@ -40,9 +40,11 @@ class Surface;
 class AbstractWindow;
 class Context;
 
+// Internal classes
 struct ViewTask;
 struct RedrawTask;
 class RedrawTaskProxy;
+class MouseTaskProxy;
 
 /**
  * @ingroup gui
@@ -53,27 +55,29 @@ class RedrawTaskProxy;
  * popup menu, or widgets in a window. You typically don't use this class
  * directly. Instead, you use or create a subclass.
  *
- * A view can have parent and subviews, when you create a GUI application, it
- * generates a view hierachy.
+ * A view can have parent and subviews, when you create a GUI
+ * application, it generates a view hierachy.
  *
- * A view can have its own wayland surface (and sub surfaces) for drawing, or
- * just share the surface with others which is managed in one of parent view.
- * There's must at least one surface in the view hierachy, it is typically a
- * window (@ref Abstractwindow) on screen and all widgets in it share the main
- * surface.
+ * A view object can have arbitrary number of surfaces. A view which
+ * does not have a parent must contains a shell surface. A view
+ * without parent usually is a window or a popup menu.
  *
- * SkLand use Google Skia to draw content in a view.
+ * If a view does not have its own wayland surface (most widgets),
+ * then it shares the surface with others which is managed in one of
+ * parent views.
  *
  * @see AbstractWindow
- * @see AbstractSurface
+ * @see Surface
  */
 class AbstractView : public Object {
 
   friend class Input;
   friend class Application;
   friend class Display;
+
   friend struct RedrawTask;
   friend class RedrawTaskProxy;
+  friend class MouseTaskProxy;
 
  public:
 
@@ -97,8 +101,6 @@ class AbstractView : public Object {
   void MoveTo(int x, int y);
 
   void Resize(int width, int height);
-
-  virtual bool Contain(int x, int y) const;
 
   int x() const { return static_cast<int>(geometry_.x()); }
 
@@ -126,6 +128,8 @@ class AbstractView : public Object {
    * @brief Update the display of this widget
    */
   void Update();
+
+  virtual bool Contain(int x, int y) const;
 
   virtual Size GetMinimalSize() const = 0;
 
@@ -201,14 +205,6 @@ class AbstractView : public Object {
 
   AbstractView *last_subview() const {
     return static_cast<AbstractView *>(last_child());
-  }
-
-  std::unique_ptr<RedrawTask> &redraw_task() {
-    return redraw_task_;
-  }
-
-  std::unique_ptr<ViewTask> &mouse_task() {
-    return mouse_task_;
   }
 
   static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);

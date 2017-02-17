@@ -1,0 +1,20 @@
+/**
+ * @page documentation Documentation
+ * @tableofcontents
+ *
+ * @section start Start
+ *
+ * - Get the code: checkout, build and run
+ * - Directory structure
+ *
+ * @section guide Development Guides
+ *
+ * - C++11
+ * - [Fast C++ Delegates](md_doc_delegates.html)
+ * - [Signals and Slots](md_doc_signals_and_slots.html)
+ * - A "Hello World" example
+ * - Wayland introduction
+ *  - Surface stack
+ * - Google Skia introduction
+ * - Unit test
+ */

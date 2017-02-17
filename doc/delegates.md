@@ -11,11 +11,11 @@ Fast C++ Delegates
 Delegates are object-oriented function pointers and wildly used in this project,
 for example, they are used to build a signal object, or replace the callback
 function in native wayland wrapper classes. To be precise, a delegate in
-`SkLand` is an object which contains 2 pointers: one pointer to an object,
+[SkLand](https://github.com/zhanggyb/skland) is an object which contains 2 pointers: one pointer to an object,
 another to a member function in corresponding class, created by a template
 class. Invoke a delegate just works as call the member function directly.
 
-**Note:** Delegate in `SkLand` does not support static methods or global
+**Note:** Delegate in [SkLand](https://github.com/zhanggyb/skland) does not support static methods or global
 functions. A delegate to a static method is meanless (it's not object-oriented),
 use
 [`std::bind`](http://en.cppreference.com/w/cpp/utility/functional/bind),
@@ -25,7 +25,7 @@ or just function pointer as you want.
 You use a template class defined in `skland/core/delegate.hpp` to create a new
 delegate.
 
-For example, if you have such object a of class A:
+For example, if you have a class `A` and an instance `a`:
 
 ``` c++
 class A {
@@ -46,8 +46,8 @@ then you can use a delegate points to the `OnNotifyInA()` member function of
 ``` c++
 #include "core/delegate.hpp"
 
-Delegate<void(int)> d = Delegate<void(int)>::FromMethod(&a, &A::OnNotifyInA);
-// or use auto for short: auto d = Delegate<void(int)>::FromMethod(&a, &A::OnNotifyInA);
+Delegate<void(int)> d(&a, &A::OnNotifyInA);
+// or use a static method: auto d = Delegate<void(int)>::FromMethod(&a, &A::OnNotifyInA);
 ```
 
 now you can use the delegate to call the assigned member function:
@@ -70,9 +70,9 @@ b();
 But
 unlike [`std::bind`](http://en.cppreference.com/w/cpp/utility/functional/bind),
 a delegate can be assigned to another member function of another type which has
-the same arguments, or compared to each other. This is a very important feature
+the same arguments, or compared with each other. This is a very important feature
 which makes delegate more flexible to be used
-in [signals and slots](md_doc_signals_and_slots.html).
+in [signals and slots](signals_and_slots.md).
 
 For example:
 

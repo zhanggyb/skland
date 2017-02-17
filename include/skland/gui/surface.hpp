@@ -41,11 +41,20 @@ class Buffer;
 
 /**
  * @ingroup gui
- * @brief Surface used in views
+ * @brief Surface for views
  *
- * You cannot create or delete a ViewSurface object directly. A ViewSurface is
- * created and hold by SurfaceHolder, which is usually used as a property in
- * ShellSurface/SubSurface/EGLSurface.
+ * Surface represents a native wayland surface to display views. A
+ * surface object can have parent or sub surfaces. According to
+ * wayland protocol, a surface without a parent must be a shell
+ * surface. You can get the parent/siblings by parent(), above(),
+ * below().
+ *
+ * A Surface can be used to display 2D contents through wayland shared
+ * memory buffer, or 3D scene through EGL.
+ *
+ * @note You cannot create or delete a Surface object directly, it's
+ * created and hold by a SurfaceHolder, which is usually used as a
+ * property in ShellSurface/SubSurface/EGLSurface.
  */
 class Surface {
 
@@ -70,10 +79,26 @@ class Surface {
 
   static int GetShellSurfaceCount() { return kShellSurfaceCount; }
 
+  /**
+   * @brief Attach a shared memory buffer
+   */
   void Attach(Buffer *buffer, int32_t x = 0, int32_t y = 0);
 
+  /**
+   * @brief Add this surface in the commit task list
+   *
+   * This method add this surface in the commit task list and will
+   * commit the native wayland surface in the event loop.
+   *
+   * If this surface is a sub surface and commit behaviour is
+   * synchronized, this method will commit the shell surface (main
+   * surface) too.
+   */
   void Commit();
 
+  /**
+   * @brief Mark the damaged region of the surface
+   */
   void Damage(int surface_x, int surface_y, int width, int height) const {
     wl_surface_.Damage(surface_x, surface_y, width, height);
   }
@@ -98,6 +123,10 @@ class Surface {
    */
   Point GetWindowPosition() const;
 
+  /**
+   * @brief Get the parent surface
+   * @return
+   */
   Surface *parent() const { return parent_; }
 
   /**

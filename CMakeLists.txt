@@ -14,7 +14,7 @@
 
 cmake_minimum_required(VERSION 3.1)
 
-project(skland)
+project(SkLand)
 
 # The project version number.
 set(VERSION_MAJOR 0 CACHE STRING "Project major version number.")

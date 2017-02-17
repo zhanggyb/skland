@@ -67,16 +67,16 @@ void AbstractView::Resize(int width, int height) {
   }
 }
 
-bool AbstractView::Contain(int x, int y) const {
-  return geometry_.Contain(x, y);
-}
-
 Surface *AbstractView::GetSurface() const {
   return OnGetSurface(this);
 }
 
 void AbstractView::Update() {
   OnUpdate(this);
+}
+
+bool AbstractView::Contain(int x, int y) const {
+  return geometry_.Contain(x, y);
 }
 
 void AbstractView::UpdateAll() {

@@ -21,7 +21,7 @@
 
 /**
  * @defgroup graphic Graphic
- * @brief 2D graphic module based on Google Skia
+ * @brief Graphic classes based on Google Skia
  *
  * Code using Google Skia for drawing 2D in GUI views.
  */
@@ -30,7 +30,14 @@
  * @defgroup gui GUI
  * @brief The main module provides GUI elements
  *
- * The main module provides GUI classes.
+ * The gui module provides classes to build user interface displayed on the screen.
+ *
+ * The most important base classes in this module are:
+ *
+ * - skland::AbstractView: the base class for all views such as window, menu, widget etc.
+ * - skland::Surface: represents the surface on screen, it contains a native wayland surface.
+ * - skland::Application: class for the singleton application instance.
+ * - skland::Display: class for the singleton connection to the compositor, which contains the native wayland display.
  */
 
 /**
