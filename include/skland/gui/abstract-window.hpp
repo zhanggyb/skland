@@ -39,6 +39,10 @@ class AbstractWindow : public AbstractView {
 
   friend class AbstractWindowFrame;
 
+  AbstractWindow() = delete;
+  AbstractWindow(const AbstractWindow &) = delete;
+  AbstractWindow &operator=(const AbstractWindow &) = delete;
+
  public:
 
   enum Action {

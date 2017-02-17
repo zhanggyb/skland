@@ -28,16 +28,13 @@
 namespace skland {
 
 // Forward declarations
-class Canvas;
+class Application;
 class Display;
 class Input;
-class Output;
 class KeyEvent;
 class MouseEvent;
 class TouchEvent;
-class Application;
 class Surface;
-class AbstractWindow;
 class Context;
 
 // Internal classes
@@ -71,9 +68,9 @@ class MouseTaskProxy;
  */
 class AbstractView : public Object {
 
-  friend class Input;
   friend class Application;
   friend class Display;
+  friend class Input;
 
   friend struct RedrawTask;
   friend class RedrawTaskProxy;

@@ -26,11 +26,11 @@ int main(int argc, char *argv[]) {
   Application app(argc, argv);
   Theme::Load("dark");
 
-  Window *win = new Window(320, 240, "Theme");
+  Window *win = new Window(320, 240, "Dark Theme");
   win->SetAppId("Theme");
 
-  Label *label = new Label("Dark Theme");
-  label->SetForeground(0xFF444444);
+  Label *label = new Label("Hello Wayland!");
+  label->SetForeground(0xFF777777);
   label->SetFont(skland::Font(Typeface::kBold, 24.f));
   win->SetMainWidget(label);
 

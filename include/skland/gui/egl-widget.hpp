@@ -27,7 +27,8 @@ class SubSurface;
 class EGLSurface;
 
 /**
- * @brief A widget use egl surface for 3D scene
+ * @ingroup gui
+ * @brief A widget use an EGL surface for 3D scene
  */
 class EGLWidget : public AbstractWidget {
 

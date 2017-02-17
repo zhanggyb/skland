@@ -25,6 +25,7 @@ namespace skland {
 
 class AbstractWidget;
 class SubSurface;
+class Canvas;
 
 /**
  * @ingroup gui

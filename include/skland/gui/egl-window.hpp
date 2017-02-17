@@ -28,9 +28,15 @@ namespace skland {
 
 class SubSurface;
 class EGLSurface;
+class Canvas;
 
+/**
+ * @ingroup gui
+ * @brief A window contains an EGL surface for 3D scene
+ */
 class EGLWindow : public AbstractWindow {
 
+  EGLWindow() = delete;
   EGLWindow(const EGLWindow &) = delete;
   EGLWindow &operator=(const EGLWindow &) = delete;
 

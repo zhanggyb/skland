@@ -176,9 +176,12 @@ void WindowFrameDark::CloseButton::OnDraw(const Context *context) {
   canvas->ClipRect(geometry());
   canvas->Clear();
 
-  Color regulars[2] = {0xFF999999, 0xFF666666};
+  Color regulars[2] = {0xFFCCCCCC, 0xFFAAAAAA};
   float pos[2] = {0.33f, 1.f};
   Color outline = regulars[0];
+
+  Paint paint;
+  paint.SetAntiAlias(true);
 
   if (IsHovered()) {
     if (IsPressed()) {
@@ -188,36 +191,30 @@ void WindowFrameDark::CloseButton::OnDraw(const Context *context) {
       regulars[0] = regulars[0] + 15;
       regulars[1] = regulars[1] + 15;
     }
+
+    Shader shader =
+        GradientShader::MakeRadial(Point2F(geometry().center_x(), geometry().center_y()),
+                                   7.f, regulars, pos, 2, Shader::TileMode::kTileModeClamp);
+    paint.SetShader(shader);
+    paint.SetStyle(Paint::Style::kStyleFill);
+    canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 7.f, paint);
+
+    paint.Reset();
+    paint.SetAntiAlias(true);
+    paint.SetStyle(Paint::Style::kStyleStroke);
+    paint.SetColor(outline);
+    paint.SetStrokeWidth(1.f);
+    canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.5f, paint);
   }
 
-  Shader shader =
-      GradientShader::MakeRadial(Point2F(geometry().center_x(), geometry().center_y()),
-                                 6.f, regulars, pos, 2, Shader::TileMode::kTileModeClamp);
-
-  Paint paint;
-  paint.SetShader(shader);
-  paint.SetAntiAlias(true);
-
-  paint.SetStyle(Paint::Style::kStyleFill);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
-
-  paint.Reset();
-  paint.SetAntiAlias(true);
-  paint.SetStyle(Paint::Style::kStyleStroke);
-  paint.SetColor(outline);
-  paint.SetStrokeWidth(1.f);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
-
-  if (IsHovered()) {
-    paint.SetColor(regulars[1]);
-    paint.SetStrokeWidth(1.5f);
-    canvas->DrawLine(geometry().center_x() - 2.5f, geometry().center_y() - 2.5f,
-                     geometry().center_x() + 2.5f, geometry().center_y() + 2.5f,
-                     paint);
-    canvas->DrawLine(geometry().center_x() + 2.5f, geometry().center_y() - 2.5f,
-                     geometry().center_x() - 2.5f, geometry().center_y() + 2.5f,
-                     paint);
-  }
+  paint.SetColor(regulars[1]);
+  paint.SetStrokeWidth(1.5f);
+  canvas->DrawLine(geometry().center_x() - 3.f, geometry().center_y() - 3.f,
+                   geometry().center_x() + 3.f, geometry().center_y() + 3.f,
+                   paint);
+  canvas->DrawLine(geometry().center_x() + 3.f, geometry().center_y() - 3.f,
+                   geometry().center_x() - 3.f, geometry().center_y() + 3.f,
+                   paint);
 
   canvas->Restore();
 }
@@ -245,9 +242,12 @@ void WindowFrameDark::MaximizeButton::OnDraw(const Context *context) {
   canvas->ClipRect(geometry());
   canvas->Clear();
 
-  Color regulars[2] = {0xFF999999, 0xFF666666};
+  Color regulars[2] = {0xFFCCCCCC, 0xFFAAAAAA};
   float pos[2] = {0.33f, 1.f};
   Color outline = regulars[0];
+
+  Paint paint;
+  paint.SetAntiAlias(true);
 
   if (IsHovered()) {
     if (IsPressed()) {
@@ -257,36 +257,30 @@ void WindowFrameDark::MaximizeButton::OnDraw(const Context *context) {
       regulars[0] = regulars[0] + 15;
       regulars[1] = regulars[1] + 15;
     }
+
+    Shader shader =
+        GradientShader::MakeRadial(Point2F(geometry().center_x(), geometry().center_y()),
+                                   7.f, regulars, pos, 2, Shader::TileMode::kTileModeClamp);
+    paint.SetShader(shader);
+    paint.SetStyle(Paint::Style::kStyleFill);
+    canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 7.f, paint);
+
+    paint.Reset();
+    paint.SetAntiAlias(true);
+    paint.SetStyle(Paint::Style::kStyleStroke);
+    paint.SetColor(outline);
+    paint.SetStrokeWidth(1.f);
+    canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.5f, paint);
   }
 
-  Shader shader =
-      GradientShader::MakeRadial(Point2F(geometry().center_x(), geometry().center_y()),
-                                 6.f, regulars, pos, 2, Shader::TileMode::kTileModeClamp);
-
-  Paint paint;
-  paint.SetShader(shader);
-  paint.SetAntiAlias(true);
-
-  paint.SetStyle(Paint::Style::kStyleFill);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
-
-  paint.Reset();
-  paint.SetAntiAlias(true);
-  paint.SetStyle(Paint::Style::kStyleStroke);
-  paint.SetColor(outline);
-  paint.SetStrokeWidth(1.f);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
-
-  if (IsHovered()) {
-    paint.SetColor(regulars[1]);
-    paint.SetStrokeWidth(1.5f);
-    canvas->DrawLine(geometry().center_x() - 3.25f, geometry().center_y(),
-                     geometry().center_x() + 3.25f, geometry().center_y(),
-                     paint);
-    canvas->DrawLine(geometry().center_x(), geometry().center_y() - 3.25f,
-                     geometry().center_x(), geometry().center_y() + 3.25f,
-                     paint);
-  }
+  paint.SetColor(regulars[1]);
+  paint.SetStrokeWidth(1.5f);
+  canvas->DrawLine(geometry().center_x() - 4.f, geometry().center_y(),
+                   geometry().center_x() + 4.f, geometry().center_y(),
+                   paint);
+  canvas->DrawLine(geometry().center_x(), geometry().center_y() - 4.f,
+                   geometry().center_x(), geometry().center_y() + 4.f,
+                   paint);
 
   canvas->Restore();
 }
@@ -314,9 +308,12 @@ void WindowFrameDark::MinimizeButton::OnDraw(const Context *context) {
   canvas->ClipRect(geometry());
   canvas->Clear();
 
-  Color regulars[2] = {0xFF999999, 0xFF666666};
+  Color regulars[2] = {0xFFCCCCCC, 0xFFAAAAAA};
   float pos[2] = {0.33f, 1.f};
   Color outline = regulars[0];
+
+  Paint paint;
+  paint.SetAntiAlias(true);
 
   if (IsHovered()) {
     if (IsPressed()) {
@@ -326,33 +323,28 @@ void WindowFrameDark::MinimizeButton::OnDraw(const Context *context) {
       regulars[0] = regulars[0] + 15;
       regulars[1] = regulars[1] + 15;
     }
+
+    Shader shader =
+        GradientShader::MakeRadial(Point2F(geometry().center_x(), geometry().center_y()),
+                                   7.f, regulars, pos, 2, Shader::TileMode::kTileModeClamp);
+    paint.SetShader(shader);
+
+    paint.SetStyle(Paint::Style::kStyleFill);
+    canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 7.f, paint);
+
+    paint.Reset();
+    paint.SetAntiAlias(true);
+    paint.SetStyle(Paint::Style::kStyleStroke);
+    paint.SetColor(outline);
+    paint.SetStrokeWidth(1.f);
+    canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.5f, paint);
   }
 
-  Shader shader =
-      GradientShader::MakeRadial(Point2F(geometry().center_x(), geometry().center_y()),
-                                 6.f, regulars, pos, 2, Shader::TileMode::kTileModeClamp);
-
-  Paint paint;
-  paint.SetShader(shader);
-  paint.SetAntiAlias(true);
-
-  paint.SetStyle(Paint::Style::kStyleFill);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.f, paint);
-
-  paint.Reset();
-  paint.SetAntiAlias(true);
-  paint.SetStyle(Paint::Style::kStyleStroke);
-  paint.SetColor(outline);
-  paint.SetStrokeWidth(1.f);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.5f, paint);
-
-  if (IsHovered()) {
-    paint.SetColor(regulars[1]);
-    paint.SetStrokeWidth(1.5f);
-    canvas->DrawLine(geometry().center_x() - 3.25f, geometry().center_y(),
-                     geometry().center_x() + 3.25f, geometry().center_y(),
-                     paint);
-  }
+  paint.SetColor(regulars[1]);
+  paint.SetStrokeWidth(1.5f);
+  canvas->DrawLine(geometry().center_x() - 4.f, geometry().center_y(),
+                   geometry().center_x() + 4.f, geometry().center_y(),
+                   paint);
 
   canvas->Restore();
 }
@@ -400,7 +392,7 @@ void WindowFrameDark::CreateWidgets() {
   maximize_button_->clicked().Connect(this, &WindowFrameDark::OnMaximizeButtonClicked);
 
   title_ = new Label(window()->title());
-  title_->SetForeground(0xFFBBBBBB);
+  title_->SetForeground(0xFFAAAAAA);
   title_->SetFont(Font(Typeface::kBold));
 
   AddWidget(title_);  // put the title below other widgets
