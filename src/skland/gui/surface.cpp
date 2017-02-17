@@ -43,6 +43,7 @@ Surface::Surface(AbstractView *view, const Margin &margin)
       buffer_scale_(1),
       is_user_data_set_(false),
       reference_count_(0),
+      egl_(false),
       is_destroying_(false) {
   DBG_ASSERT(nullptr != view_);
   wl_surface_.enter().Set(this, &Surface::OnEnter);
@@ -80,6 +81,8 @@ Surface::~Surface() {
 }
 
 void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
+  if (egl_) return;
+
   if (nullptr == buffer) {
     wl_surface_.Attach(NULL, x, y);
   } else {
@@ -89,19 +92,32 @@ void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
 }
 
 void Surface::Commit() {
-  if (commit_task_->IsLinked()) return;
+  if (egl_) {
+    // EGL surface does not use commit
+    if (mode_ == kSynchronized) {
+      // Synchronized mode need to commit the main surface
+      Surface *main_surface = GetShellSurface();
+      main_surface->Commit();
+    }
+
+    return;
+  }
+
+  if (commit_task_->IsLinked())
+    return;
 
   if (nullptr == parent_) {
     kCommitTaskTail.PushFront(commit_task_.get());
+    return;
+  }
+
+  if (mode_ == kSynchronized) {
+    // Synchronized mode need to commit the main surface too
+    Surface *main_surface = GetShellSurface();
+    main_surface->Commit();
+    main_surface->commit_task_->PushFront(commit_task_.get());
   } else {
-    if (mode_ == kSynchronized) {
-      // Synchronized mode need to commit the main surface too
-      Surface *main_surface = GetShellSurface();
-      main_surface->Commit();
-      main_surface->commit_task_->PushFront(commit_task_.get());
-    } else {
-      kCommitTaskTail.PushFront(commit_task_.get());
-    }
+    kCommitTaskTail.PushFront(commit_task_.get());
   }
 }
 

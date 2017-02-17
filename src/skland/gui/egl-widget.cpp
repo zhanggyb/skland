@@ -111,8 +111,7 @@ void EGLWidget::OnDraw(const Context *context) {
       OnInitializeEGL();
       egl_surface_->surface()->SetupCallback(frame_callback_);
       egl_surface_->SwapBuffers();
-      sub_surface_->surface()->parent()->Commit();
-      sub_surface_->surface()->GetShellSurface()->Commit();
+      egl_surface_->surface()->Commit();
     }
   }
 }
@@ -141,7 +140,7 @@ void EGLWidget::OnFrame(uint32_t /* serial */) {
     OnRenderEGL();
     egl_surface_->surface()->SetupCallback(frame_callback_);
     egl_surface_->SwapBuffers();
-    sub_surface_->surface()->GetShellSurface()->Commit();
+    egl_surface_->surface()->Commit();
   }
 }
 

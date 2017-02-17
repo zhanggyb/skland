@@ -195,6 +195,8 @@ class Surface {
 
   size_t reference_count_;
 
+  bool egl_;
+
   bool is_destroying_;
 
   // global surface stack:

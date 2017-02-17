@@ -31,7 +31,7 @@ SubSurface::SubSurface(Surface *parent, AbstractView *view, const Margin &margin
 }
 
 SubSurface::~SubSurface() {
-  UnbindAll();
+  UnbindAll();  // Note: Unbind all signals before deleting surface_holder_
   wl_sub_surface_.Destroy();
 }
 

@@ -27,14 +27,15 @@ ShellSurface::ShellSurface(AbstractView *view, const Margin &margin)
 }
 
 ShellSurface::~ShellSurface() {
-  UnbindAll();
+  UnbindAll();  // Note: Unbind all signals before deleting surface_holder_
   surface_holder_.RemoveShellSurface();
   xdg_surface_.Destroy();
 }
 
-void ShellSurface::OnViewSurfaceDestroying(SLOT) {
+void ShellSurface::OnViewSurfaceDestroying(SLOT slot) {
   destroying_.Emit();
   xdg_surface_.Destroy();
+  Unbind(slot);
 }
 
 }

@@ -28,6 +28,10 @@ namespace skland {
  */
 class ToplevelShellSurface : public ShellSurface {
 
+  ToplevelShellSurface() = delete;
+  ToplevelShellSurface(const ToplevelShellSurface &) = delete;
+  ToplevelShellSurface &operator=(const ToplevelShellSurface &) = delete;
+
  public:
 
   ToplevelShellSurface(AbstractView *view, const Margin &margin = Margin());

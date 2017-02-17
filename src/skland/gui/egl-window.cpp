@@ -238,7 +238,7 @@ bool EGLWindow::MakeCurrent() {
 
 void EGLWindow::SwapBuffers() {
   if (egl_surface_->SwapBuffers())
-    toplevel_shell_surface()->surface()->Commit();
+    egl_surface_->surface()->Commit();
 }
 
 void EGLWindow::OnFrame(uint32_t serial) {

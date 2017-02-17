@@ -66,6 +66,10 @@ class SurfaceHolder : public Trackable {
     surface_->relative_position_.y = y;
   }
 
+  void SetEGL(bool egl) {
+    surface_->egl_ = egl;
+  }
+
   void PushShellSurface();
 
   void RemoveShellSurface();

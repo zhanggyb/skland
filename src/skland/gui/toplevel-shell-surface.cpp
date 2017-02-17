@@ -29,8 +29,9 @@ ToplevelShellSurface::~ToplevelShellSurface() {
   xdg_toplevel_.Destroy();
 }
 
-void ToplevelShellSurface::OnShellSurfaceDestroying(SLOT) {
+void ToplevelShellSurface::OnShellSurfaceDestroying(SLOT slot) {
   xdg_toplevel_.Destroy();
+  Unbind(slot);
 }
 
 }

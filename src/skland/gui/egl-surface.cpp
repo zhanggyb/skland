@@ -27,11 +27,13 @@ EGLSurface::EGLSurface(Surface *surface)
                      surface_holder_.wl_surface(),
                      surface->view()->width(),
                      surface->view()->height());
+  surface_holder_.SetEGL(true);
 }
 
 EGLSurface::~EGLSurface() {
   UnbindAll();
   egl_surface_.Destroy();
+  surface_holder_.SetEGL(false);
 }
 
 bool EGLSurface::MakeCurrent() {
@@ -52,6 +54,8 @@ bool EGLSurface::SwapInterval(EGLint interval) {
 
 void EGLSurface::OnSurfaceDestroying(SLOT slot) {
   egl_surface_.Destroy();
+  surface_holder_.SetEGL(false);
+  Unbind(slot);
 }
 
 } // namespace skland
