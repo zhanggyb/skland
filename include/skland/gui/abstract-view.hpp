@@ -42,6 +42,7 @@ class Context;
 
 struct ViewTask;
 struct RedrawTask;
+class RedrawTaskProxy;
 
 /**
  * @ingroup gui
@@ -72,7 +73,7 @@ class AbstractView : public Object {
   friend class Application;
   friend class Display;
   friend struct RedrawTask;
-  friend class AbstractWindow;
+  friend class RedrawTaskProxy;
 
  public:
 
@@ -212,23 +213,6 @@ class AbstractView : public Object {
 
   static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
 
-  static RedrawTask *GetRedrawTask(const AbstractView *view) {
-    return view->redraw_task_.get();
-  }
-
-  /**
-   * @brief Initialize the idle task list
-   */
-  static void InitializeRedrawTaskList();
-
-  /**
-   * @brief Destroy the redraw task list
-   */
-  static void ClearRedrawTaskList();
-
-  static Task kRedrawTaskHead;
-  static Task kRedrawTaskTail;
-
  private:
 
   bool visible_;
@@ -250,6 +234,19 @@ class AbstractView : public Object {
   // Damage area
   bool is_damaged_;
   RectI damaged_region_;
+
+  /**
+   * @brief Initialize the idle task list
+   */
+  static void InitializeRedrawTaskList();
+
+  /**
+   * @brief Destroy the redraw task list
+   */
+  static void ClearRedrawTaskList();
+
+  static Task kRedrawTaskHead;
+  static Task kRedrawTaskTail;
 
 };
 

@@ -20,7 +20,6 @@
 #include <skland/gui/abstract-widget.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
-#include <skland/gui/output.hpp>
 #include <skland/gui/context.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
 #include <skland/gui/toplevel-shell-surface.hpp>
@@ -30,6 +29,7 @@
 
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
+#include "internal/redraw-task-proxy.hpp"
 
 namespace skland {
 
@@ -71,20 +71,14 @@ void Window::OnShown() {
   Surface *shell_surface = toplevel_shell_surface()->surface();
 
   // Create buffer:
-  Size output_size(1024, 800);
-  if (const Output *output = Display::GetOutputAt(0)) {
-    output_size = output->current_mode_size();  // The current screen size
-  }
-
-  int total_width = std::max(this->width(), output_size.width);
-  int total_height = std::max(this->height(), output_size.height);
+  int total_width = width();
+  int total_height = height();
   total_width += shell_surface->margin().lr();
   total_height += shell_surface->margin().tb();
 
   frame_pool_.Setup(total_width * 4 * total_height);
   frame_buffer_.Setup(frame_pool_, total_width, total_height,
                       total_width * 4, WL_SHM_FORMAT_ARGB8888);
-
   shell_surface->Attach(&frame_buffer_);
   frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.pixel(),
                                  frame_buffer_.size().width,
@@ -116,8 +110,9 @@ void Window::OnUpdate(AbstractView *view) {
 
   if (view == this) {
     surface = toplevel_shell_surface()->surface();
-    kRedrawTaskTail.PushFront(redraw_task().get());
-    redraw_task()->context = Context(surface, frame_canvas_);
+    RedrawTaskProxy redraw_task_helper(this);
+    redraw_task_helper.MoveToTail();
+    redraw_task_helper.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
     Damage(this, 0, 0,
            width() + surface->margin().lr(),
@@ -133,9 +128,9 @@ void Window::OnUpdate(AbstractView *view) {
       canvas = frame_canvas_;
     }
 
-    RedrawTask *task = GetRedrawTask(view);
-    kRedrawTaskTail.PushFront(task);
-    task->context = Context(surface, canvas);
+    RedrawTaskProxy redraw_task_helper(view);
+    redraw_task_helper.MoveToTail();
+    redraw_task_helper.SetContext(Context(surface, canvas));
     DBG_ASSERT(canvas);
     Damage(view, view->x() + surface->margin().left,
            view->y() + surface->margin().top,
@@ -179,11 +174,7 @@ void Window::OnResize(int width, int height) {
   height += shell_surface->margin().tb();
 
   int total_size = width * 4 * height;
-  if (total_size > frame_pool_.size()) {
-    DBG_PRINT_MSG("size_required: %d, pool size: %d, %s\n",
-                  total_size, frame_pool_.size(), "Re-generate shm pool");
-    frame_pool_.Setup(total_size);
-  }
+  frame_pool_.Setup(total_size);
 
   frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&frame_buffer_);

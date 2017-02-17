@@ -22,8 +22,8 @@ set(userconfig_directory ${CMAKE_BINARY_DIR}/include)
 list(APPEND public_includes ${userconfig_directory})
 
 # These guys are third_party but provided by a Skia checkout.
-list(APPEND srcs ${SKIA_SOURCE_DIR}/third_party/etc1/etc1.cpp ${SKIA_SOURCE_DIR}/third_party/ktx/ktx.cpp)
-list(APPEND private_includes ${SKIA_SOURCE_DIR}/third_party/etc1 ${SKIA_SOURCE_DIR}/third_party/ktx)
+list(APPEND srcs ${SKIA_SOURCE_DIR}/third_party/etc1/etc1.cpp)  # ${SKIA_SOURCE_DIR}/third_party/ktx/ktx.cpp)
+list(APPEND private_includes ${SKIA_SOURCE_DIR}/third_party/etc1)   # ${SKIA_SOURCE_DIR}/third_party/ktx)
 
 list(APPEND srcs ${SKIA_SOURCE_DIR}/third_party/gif/SkGifImageReader.cpp)
 list(APPEND private_includes ${SKIA_SOURCE_DIR}/third_party/gif)
