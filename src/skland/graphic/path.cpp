@@ -44,9 +44,21 @@ bool Path::Interpolate(const Path &ending, float weight, Path *out) const {
   return metadata_->interpolate(*ending.metadata_, weight, out->metadata_.get());
 }
 
+void Path::AddRect(const Rect &rect, Direction dir) {
+  metadata_->addRect(reinterpret_cast<const SkRect &>(rect), static_cast<SkPath::Direction >(dir));
+}
+
+void Path::AddRect(const Rect &rect, Direction dir, unsigned start) {
+  metadata_->addRect(reinterpret_cast<const SkRect &>(rect), static_cast<SkPath::Direction >(dir), start);
+}
+
+void Path::AddRect(float left, float top, float right, float bottom, Direction dir) {
+  metadata_->addRect(left, top, right, bottom, static_cast<SkPath::Direction >(dir));
+}
+
 void Path::AddRoundRect(const Rect &rect, const float radii[], Direction dir) {
   metadata_->addRoundRect(reinterpret_cast<const SkRect &>(rect),
-                         radii, static_cast<SkPath::Direction>(dir));
+                          radii, static_cast<SkPath::Direction>(dir));
 }
 
 Path::FillType Path::GetFillType() const {

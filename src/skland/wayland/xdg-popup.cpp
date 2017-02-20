@@ -28,6 +28,7 @@ XdgPopup::XdgPopup() {
 }
 
 XdgPopup::~XdgPopup() {
+
 }
 
 void XdgPopup::Setup(const XdgSurface &xdg_surface, const XdgSurface &parent, const XdgPositioner &positioner) {

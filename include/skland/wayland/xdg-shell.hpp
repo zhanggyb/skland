@@ -61,9 +61,11 @@ class XdgShell {
 
   bool Equal(const void *object) const;
 
-  DelegateRef<void(uint32_t)> ping() {
-    return ping_;
-  }
+  /**
+   * @brief A ping callback sent from compositor
+   * @return Reference to the ping delegate
+   */
+  DelegateRef<void(uint32_t)> ping() { return ping_; }
 
  private:
 

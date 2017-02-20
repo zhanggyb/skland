@@ -426,21 +426,23 @@ void WindowFrameDark::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Clear();
 
-  float radii[] = {
-      7.f, 7.f, // top-left
-      7.f, 7.f, // top-right
-      4.f, 4.f, // bottom-right
-      4.f, 4.f  // bottom-left
-  };
   Path path;
-  path.AddRoundRect(window()->geometry(), radii);
 
   // Drop shadow:
   if ((!window()->IsMaximized()) || (!window()->IsFullscreen())) {
+    float radii[] = {
+        7.f, 7.f, // top-left
+        7.f, 7.f, // top-right
+        4.f, 4.f, // bottom-right
+        4.f, 4.f  // bottom-left
+    };
+    path.AddRoundRect(window()->geometry(), radii);
     canvas->Save();
     canvas->ClipPath(path, kClipDifference, true);
     DrawShadow(canvas.get());
     canvas->Restore();
+  } else {
+    path.AddRect(window()->geometry());
   }
 
   // Fill color:

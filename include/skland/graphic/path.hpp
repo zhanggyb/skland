@@ -68,6 +68,12 @@ class Path {
 
   bool Interpolate(const Path &ending, float weight, Path *out) const;
 
+  void AddRect(const Rect &rect, Direction dir = kClockwise);
+
+  void AddRect(const Rect &rect, Direction dir, unsigned start);
+
+  void AddRect(float left, float top, float right, float bottom, Direction dir = kClockwise);
+
   void AddRoundRect(const Rect &rect, const float radii[], Direction dir = kClockwise);
 
   FillType GetFillType() const;
