@@ -20,6 +20,10 @@
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/buffer.hpp>
 
+#include <skland/gui/shell-surface.hpp>
+#include <skland/gui/sub-surface.hpp>
+#include <skland/gui/egl-surface.hpp>
+
 #include "internal/commit-task.hpp"
 
 namespace skland {
@@ -42,10 +46,10 @@ Surface::Surface(AbstractView *view, const Margin &margin)
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1),
       is_user_data_set_(false),
-      reference_count_(0),
-      egl_(false),
-      is_destroying_(false) {
+      egl_surface_role_(nullptr) {
   DBG_ASSERT(nullptr != view_);
+  role_.placeholder = nullptr;
+
   wl_surface_.enter().Set(this, &Surface::OnEnter);
   wl_surface_.leave().Set(this, &Surface::OnLeave);
   wl_surface_.Setup(Display::wl_compositor());
@@ -54,34 +58,19 @@ Surface::Surface(AbstractView *view, const Margin &margin)
 }
 
 Surface::~Surface() {
-  is_destroying_ = true;
-  destroying_.Emit();
-
-  // Delete all sub surfaces of this one:
-  Surface *p = nullptr;
-  Surface *tmp = nullptr;
-
-  p = above_;
-  while (p && p->parent_ == this) {
-    tmp = p->above_;
-    delete p;
-    p = tmp;
+  if (egl_surface_role_) {
+    delete egl_surface_role_;
   }
 
-  p = below_;
-  while (p && p->parent_ == this) {
-    tmp = p->below_;
-    delete p;
-    p = tmp;
+  if (nullptr == parent_) {
+    delete role_.shell_surface; // deleting a shell surface will break the links to up_ and down_
+  } else {
+    delete role_.sub_surface; // deleting all sub surfaces and break the links to above_ and below_
   }
-
-  // Break the link node
-  if (above_) above_->below_ = below_;
-  if (below_) below_->above_ = above_;
 }
 
 void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
-  if (egl_) return;
+  if (nullptr != egl_surface_role_) return;
 
   if (nullptr == buffer) {
     wl_surface_.Attach(NULL, x, y);
@@ -92,7 +81,7 @@ void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
 }
 
 void Surface::Commit() {
-  if (egl_) {
+  if (nullptr != egl_surface_role_) {
     // EGL surface does not use commit
     if (mode_ == kSynchronized) {
       // Synchronized mode need to commit the main surface

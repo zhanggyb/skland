@@ -17,62 +17,203 @@
 #include <skland/gui/sub-surface.hpp>
 #include <skland/core/defines.hpp>
 #include <skland/gui/display.hpp>
+#include <skland/gui/surface.hpp>
 
 namespace skland {
 
-SubSurface::SubSurface(Surface *parent, AbstractView *view, const Margin &margin)
-    : Trackable(), surface_holder_(view, margin) {
-  surface_holder_.surface_destroying().Connect(this, &SubSurface::OnSurfaceDestroying);
-  wl_sub_surface_.Setup(Display::wl_subcompositor(),
-                        surface_holder_.wl_surface(),
-                        surface_holder_.wl_surface(parent));
+Surface *SubSurface::Create(Surface *parent, AbstractView *view, const Margin &margin) {
+  Surface *surface = new Surface(view, margin);
+  surface->role_.sub_surface = new SubSurface(surface, parent);
+  return surface;
+}
 
-  surface_holder_.SetParent(parent);
+SubSurface *SubSurface::Get(const Surface *surface) {
+  if (nullptr == surface->parent_) return nullptr;
+
+  return surface->role_.sub_surface;
+}
+
+SubSurface::SubSurface(Surface *surface, Surface *parent)
+    : surface_(surface) {
+  DBG_ASSERT(surface_);
+  DBG_ASSERT(parent);
+  wl_sub_surface_.Setup(Display::wl_subcompositor(),
+                        surface_->wl_surface_,
+                        parent->wl_surface_);
+  SetParent(parent);
 }
 
 SubSurface::~SubSurface() {
-  UnbindAll();  // Note: Unbind all signals before deleting surface_holder_
+  DBG_ASSERT(surface_->role_.sub_surface == this);
+
+  // Delete all sub surfaces of this one:
+  Surface *p = nullptr;
+  Surface *tmp = nullptr;
+
+  p = surface_->above_;
+  while (p && p->parent_ == surface_) {
+    tmp = p->above_;
+    delete p;
+    p = tmp;
+  }
+
+  p = surface_->below_;
+  while (p && p->parent_ == surface_) {
+    tmp = p->below_;
+    delete p;
+    p = tmp;
+  }
+
+  // Break the link node
+  if (surface_->above_) surface_->above_->below_ = surface_->below_;
+  if (surface_->below_) surface_->below_->above_ = surface_->above_;
+
   wl_sub_surface_.Destroy();
+  surface_->role_.sub_surface = nullptr;
 }
 
 void SubSurface::PlaceAbove(Surface *sibling) {
-  if (sibling == surface_holder_.surface()) return;
+  if (sibling == surface_) return;
 
-  if (surface_holder_.surface()->parent() == sibling->parent() ||
-      surface_holder_.surface() == sibling->parent() ||
-      surface_holder_.surface()->parent() == sibling) {
-    wl_sub_surface_.PlaceAbove(surface_holder_.wl_surface(sibling));
-    surface_holder_.MoveAbove(sibling);
+  if (surface_->parent() == sibling->parent() ||
+      surface_ == sibling->parent() ||
+      surface_->parent() == sibling) {
+    wl_sub_surface_.PlaceAbove(sibling->wl_surface_);
+    MoveAbove(sibling);
   }
 }
 
 void SubSurface::PlaceBelow(Surface *sibling) {
-  if (sibling == surface_holder_.surface()) return;
+  if (sibling == surface_) return;
 
-  if (surface_holder_.surface()->parent() == sibling->parent() ||
-      surface_holder_.surface() == sibling->parent() ||
-      surface_holder_.surface()->parent() == sibling) {
-    wl_sub_surface_.PlaceBelow(surface_holder_.wl_surface(sibling));
-    surface_holder_.MoveBelow(sibling);
+  if (surface_->parent() == sibling->parent() ||
+      surface_ == sibling->parent() ||
+      surface_->parent() == sibling) {
+    wl_sub_surface_.PlaceBelow(sibling->wl_surface_);
+    MoveBelow(sibling);
   }
 }
 
 void SubSurface::SetRelativePosition(int x, int y) {
   wl_sub_surface_.SetPosition(x, y);
-  surface_holder_.SetRelativePosition(x, y);
+  surface_->relative_position_.x = x;
+  surface_->relative_position_.y = y;
 }
 
 void SubSurface::SetWindowPosition(int x, int y) {
-  Surface* _this_surface = surface_holder_.surface();
-  Point parent_global_position = _this_surface->parent()->GetWindowPosition();
+  Point parent_global_position = surface_->parent()->GetWindowPosition();
   int local_x = x - parent_global_position.x;
   int local_y = y - parent_global_position.y;
   wl_sub_surface_.SetPosition(local_x, local_y);
-  surface_holder_.SetRelativePosition(local_x, local_y);
+  surface_->relative_position_.x = x;
+  surface_->relative_position_.y = y;
 }
 
-void SubSurface::OnSurfaceDestroying(SLOT) {
-  wl_sub_surface_.Destroy();
+void SubSurface::SetParent(Surface *parent) {
+  DBG_ASSERT(surface_->parent_ == nullptr &&
+      surface_->up_ == nullptr &&
+      surface_->down_ == nullptr);
+
+  surface_->parent_ = parent;
+
+  Surface *tmp = parent;
+  Surface *sibling = nullptr;
+  do {
+    sibling = tmp;
+    tmp = tmp->above_;
+    if (nullptr == tmp || tmp->parent_ != parent) break;
+  } while (true);
+  InsertAbove(sibling);
+}
+
+void SubSurface::MoveAbove(Surface *dst) {
+  Surface *top = surface_;
+  Surface *bottom = surface_;
+  Surface *tmp = nullptr;
+
+  tmp = surface_;
+  while (tmp->above_ && (tmp->above_->parent_ != surface_->parent_)) {
+    top = tmp;
+    tmp = tmp->above_;
+  }
+
+  tmp = surface_;
+  while (tmp->below_ && (tmp->below_->parent_ != surface_->parent_)) {
+    bottom = tmp;
+    tmp = tmp->below_;
+  }
+
+  if (top == bottom) {
+    if (surface_->above_) surface_->above_->below_ = surface_->below_;
+    if (surface_->below_) surface_->below_->above_ = surface_->above_;
+
+    surface_->above_ = dst->above_;
+    surface_->below_ = dst;
+    if (dst->above_) dst->above_->below_ = surface_;
+    dst->above_ = surface_;
+  } else {
+    if (top->above_) top->above_->below_ = bottom->below_;
+    if (bottom->below_) bottom->below_->above_ = top->above_;
+
+    top->above_ = dst->above_;
+    bottom->below_ = dst;
+    if (dst->above_) dst->above_->below_ = top;
+    dst->above_ = bottom;
+  }
+}
+
+void SubSurface::MoveBelow(Surface *dst) {
+  Surface *top = surface_;
+  Surface *bottom = surface_;
+  Surface *tmp = nullptr;
+
+  tmp = surface_;
+  while (tmp->above_ && (tmp->above_->parent_ != surface_->parent_)) {
+    top = tmp;
+    tmp = tmp->above_;
+  }
+
+  tmp = surface_;
+  while (tmp->below_ && (tmp->below_->parent_ != surface_->parent_)) {
+    bottom = tmp;
+    tmp = tmp->below_;
+  }
+
+  if (top == bottom) {
+    if (surface_->above_) surface_->above_->below_ = surface_->below_;
+    if (surface_->below_) surface_->below_->above_ = surface_->above_;
+
+    surface_->above_ = dst;
+    surface_->below_ = dst->below_;
+    if (dst->below_) dst->below_->above_ = surface_;
+    dst->below_ = surface_;
+  } else {
+    if (top->above_) top->above_->below_ = bottom->below_;
+    if (bottom->below_) bottom->below_->above_ = top->above_;
+
+    top->above_ = dst;
+    bottom->below_ = dst->below_;
+    if (dst->below_) dst->below_->above_ = bottom;
+    dst->below_ = top;
+  }
+}
+
+void SubSurface::InsertAbove(Surface *sibling) {
+  DBG_ASSERT(surface_->parent_ == sibling->parent_ || surface_ == sibling->parent_
+                 || surface_->parent_ == sibling);
+  if (sibling->above_) sibling->above_->below_ = surface_;
+  surface_->above_ = sibling->above_;
+  sibling->above_ = surface_;
+  surface_->below_ = sibling;
+}
+
+void SubSurface::InsertBelow(Surface *sibling) {
+  DBG_ASSERT(surface_->parent_ == sibling->parent_ || surface_ == sibling->parent_
+                 || surface_->parent_ == sibling);
+  if (sibling->below_) sibling->below_->above_ = surface_;
+  surface_->below_ = sibling->below_;
+  sibling->below_ = surface_;
+  surface_->above_ = sibling;
 }
 
 }

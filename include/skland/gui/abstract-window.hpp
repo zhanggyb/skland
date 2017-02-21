@@ -29,8 +29,6 @@
 
 namespace skland {
 
-class ToplevelShellSurface;
-
 /**
  * @ingroup gui
  * @brief Abstract class for top level windows
@@ -132,7 +130,7 @@ class AbstractWindow : public AbstractView {
 
   AbstractWindowFrame *window_frame() const { return window_frame_; }
 
-  ToplevelShellSurface *toplevel_shell_surface() const { return toplevel_shell_surface_; }
+  Surface *toplevel_shell_surface() const { return toplevel_shell_surface_; }
 
   static void ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height);
 
@@ -158,7 +156,7 @@ class AbstractWindow : public AbstractView {
 
   int flags_;
 
-  ToplevelShellSurface *toplevel_shell_surface_;
+  Surface *toplevel_shell_surface_;
 
   AbstractWindowFrame *window_frame_;
 

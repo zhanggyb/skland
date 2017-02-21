@@ -116,12 +116,6 @@ class AbstractView : public Object {
   bool visible() const { return visible_; }
 
   /**
-   * @brief Get the surface on which this view renders
-   * @return A surface object or nullptr
-   */
-  Surface *GetSurface() const;
-
-  /**
    * @brief Update the display of this widget
    */
   void Update();
@@ -203,6 +197,12 @@ class AbstractView : public Object {
   AbstractView *last_subview() const {
     return static_cast<AbstractView *>(last_child());
   }
+
+  /**
+   * @brief Get the surface on which this view renders
+   * @return A surface object or nullptr
+   */
+  static Surface *GetSurface(const AbstractView *view);
 
   static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
 

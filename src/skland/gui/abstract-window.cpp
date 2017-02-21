@@ -19,7 +19,11 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
+
+#include <skland/gui/surface.hpp>
+#include <skland/gui/shell-surface.hpp>
 #include <skland/gui/toplevel-shell-surface.hpp>
+
 #include <skland/gui/abstract-window-frame.hpp>
 
 #include "internal/view-task.hpp"
@@ -42,10 +46,11 @@ AbstractWindow::AbstractWindow(int width,
       window_frame_(nullptr) {
   if (title) title_ = title;
 
-  toplevel_shell_surface_ = new ToplevelShellSurface(this, Theme::shadow_margin());
-  toplevel_shell_surface_->surface_configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
-  toplevel_shell_surface_->toplevel_configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
-  toplevel_shell_surface_->toplevel_close().Set(this, &AbstractWindow::OnXdgToplevelClose);
+  toplevel_shell_surface_ = ToplevelShellSurface::Create(this, Theme::shadow_margin());
+  ShellSurface::Get(toplevel_shell_surface_)->configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
+  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(toplevel_shell_surface_);
+  toplevel->configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
+  toplevel->close().Set(this, &AbstractWindow::OnXdgToplevelClose);
 
   int x = 0, y = 0;  // The input region
   x += Theme::shadow_margin().left - AbstractWindowFrame::kResizingMargin.left;
@@ -56,10 +61,9 @@ AbstractWindow::AbstractWindow(int width,
   wayland::Region input_region;
   input_region.Setup(Display::wl_compositor());
   input_region.Add(x, y, width, height);
-  toplevel_shell_surface_->surface()->SetInputRegion(input_region);
+  toplevel_shell_surface_->SetInputRegion(input_region);
 
-  toplevel_shell_surface_->SetTitle(title);
-
+  toplevel->SetTitle(title);
   SetWindowFrame(frame);
 }
 
@@ -70,12 +74,12 @@ AbstractWindow::~AbstractWindow() {
 
 void AbstractWindow::SetTitle(const char *title) {
   title_ = title;
-  toplevel_shell_surface_->SetTitle(title);
+  ToplevelShellSurface::Get(toplevel_shell_surface_)->SetTitle(title);
 }
 
 void AbstractWindow::SetAppId(const char *app_id) {
   app_id_ = app_id;
-  toplevel_shell_surface_->SetAppId(app_id);
+  ToplevelShellSurface::Get(toplevel_shell_surface_)->SetAppId(app_id);
 }
 
 void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
@@ -98,7 +102,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 
 void AbstractWindow::Show() {
   if (!visible()) {
-    toplevel_shell_surface_->surface()->Commit();
+    toplevel_shell_surface_->Commit();
   }
 }
 
@@ -298,11 +302,11 @@ void AbstractWindow::AddSubView(AbstractView *view, int pos) {
 }
 
 void AbstractWindow::MoveWithMouse(MouseEvent *event) const {
-  toplevel_shell_surface_->Move(event->wl_seat(), event->serial());
+  ToplevelShellSurface::Get(toplevel_shell_surface_)->Move(event->wl_seat(), event->serial());
 }
 
 void AbstractWindow::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
-  toplevel_shell_surface_->Resize(event->wl_seat(), event->serial(), edges);
+  ToplevelShellSurface::Get(toplevel_shell_surface_)->Resize(event->wl_seat(), event->serial(), edges);
 }
 
 void AbstractWindow::ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height) {
@@ -314,11 +318,12 @@ void AbstractWindow::DrawWindowFrame(AbstractWindowFrame *window_frame, const Co
 }
 
 void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
-  toplevel_shell_surface_->AckConfigure(serial);
+  ShellSurface *shell_surface = ShellSurface::Get(toplevel_shell_surface_);
+  shell_surface->AckConfigure(serial);
 
   if (!visible()) {
     set_visible(true);
-    toplevel_shell_surface_->ResizeWindow(width(), height());
+    shell_surface->ResizeWindow(width(), height());
     OnShown();
   }
 }
@@ -348,7 +353,7 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
   }
 
   if (do_resize) {
-    toplevel_shell_surface_->ResizeWindow(width, height);
+    ShellSurface::Get(toplevel_shell_surface_)->ResizeWindow(width, height);
     resize(width, height);
     OnResize(width, height);
   }
@@ -378,6 +383,8 @@ void AbstractWindow::OnXdgToplevelClose() {
 }
 
 void AbstractWindow::OnWindowAction(int action, SLOT slot) {
+  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(toplevel_shell_surface_);
+
   switch (action) {
     case kActionClose: {
       Close(slot);
@@ -385,15 +392,15 @@ void AbstractWindow::OnWindowAction(int action, SLOT slot) {
     }
     case kActionMaximize: {
       if (IsMaximized()) {
-        toplevel_shell_surface_->UnsetMaximized();
+        toplevel->UnsetMaximized();
       } else {
-        toplevel_shell_surface_->SetMaximized();
+        toplevel->SetMaximized();
       }
       break;
     }
     case kActionMinimize: {
       Bit::Set<int>(flags_, kFlagMaskMinimized);
-      toplevel_shell_surface_->SetMinimized();
+      toplevel->SetMinimized();
       DBG_ASSERT(IsMinimized());
       break;
     }

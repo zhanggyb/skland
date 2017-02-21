@@ -274,7 +274,7 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
       ViewTask *task = window->mouse_task_.get();
       task = static_cast<ViewTask *>(task->next());
       while (task) {
-        task->view->OnMouseButton(mouse_event_);  // FIXME: sometimes this line cause segment fault
+        task->view->OnMouseButton(mouse_event_);  // FIXME: sometimes this line causes segment fault
         if (!mouse_event_->accepted()) {
           break;
         }

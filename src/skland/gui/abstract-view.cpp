@@ -67,10 +67,6 @@ void AbstractView::Resize(int width, int height) {
   }
 }
 
-Surface *AbstractView::GetSurface() const {
-  return OnGetSurface(this);
-}
-
 void AbstractView::Update() {
   OnUpdate(this);
 }
@@ -120,6 +116,10 @@ void AbstractView::TrackMouseMotion(MouseEvent *event) {
 
 void AbstractView::UntrackMouseMotion() {
   mouse_motion_task_->Unlink();
+}
+
+Surface *AbstractView::GetSurface(const AbstractView *view) {
+  return view->OnGetSurface(view);
 }
 
 void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int width, int height) {

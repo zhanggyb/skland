@@ -17,16 +17,22 @@
 #ifndef SKLAND_GUI_TOPLEVEL_SHELL_SURFACE_HPP_
 #define SKLAND_GUI_TOPLEVEL_SHELL_SURFACE_HPP_
 
-#include "shell-surface.hpp"
+#include "../core/margin.hpp"
 #include "../wayland/xdg-toplevel.hpp"
 
 namespace skland {
+
+class AbstractView;
+class Surface;
+class ShellSurface;
 
 /**
  * @ingroup gui
  * @brief Xdg toplevel shell surface
  */
-class ToplevelShellSurface : public ShellSurface {
+class ToplevelShellSurface {
+
+  friend class ShellSurface;
 
   ToplevelShellSurface() = delete;
   ToplevelShellSurface(const ToplevelShellSurface &) = delete;
@@ -34,9 +40,9 @@ class ToplevelShellSurface : public ShellSurface {
 
  public:
 
-  ToplevelShellSurface(AbstractView *view, const Margin &margin = Margin());
+  static Surface *Create(AbstractView *view, const Margin &margin = Margin());
 
-  virtual ~ToplevelShellSurface();
+  static ToplevelShellSurface *Get(const Surface *surface);
 
   void SetTitle(const char *title) {
     xdg_toplevel_.SetTitle(title);
@@ -66,13 +72,17 @@ class ToplevelShellSurface : public ShellSurface {
     xdg_toplevel_.SetMinimized();
   }
 
-  DelegateRef<void(int, int, int)> toplevel_configure() { return xdg_toplevel_.configure(); }
+  DelegateRef<void(int, int, int)> configure() { return xdg_toplevel_.configure(); }
 
-  DelegateRef<void()> toplevel_close() { return xdg_toplevel_.close(); }
+  DelegateRef<void()> close() { return xdg_toplevel_.close(); }
 
  private:
 
-  void OnShellSurfaceDestroying(__SLOT__);
+  ToplevelShellSurface(ShellSurface *shell_surface);
+
+  ~ToplevelShellSurface();
+
+  ShellSurface *shell_surface_;
 
   wayland::XdgToplevel xdg_toplevel_;
 

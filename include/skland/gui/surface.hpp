@@ -39,6 +39,10 @@ class SurfaceHolder;
 struct CommitTask;
 class Buffer;
 
+class ShellSurface;
+class SubSurface;
+class EGLSurface;
+
 /**
  * @ingroup gui
  * @brief Surface for views
@@ -49,8 +53,11 @@ class Buffer;
  * surface. You can get the parent/siblings by parent(), above(),
  * below().
  *
- * A Surface can be used to display 2D contents through wayland shared
- * memory buffer, or 3D scene through EGL.
+ * A surface can be used as different roles for view, it can be a shell
+ * surface for a window, or a sub surface for a widget (e.g. a video
+ * widget). It can also be used as a EGL surface to display 3D scene,
+ * otherwise, it displays 2D contents through wayland shared memory
+ * buffer.
  *
  * @note You cannot create or delete a Surface object directly, it's
  * created and hold by a SurfaceHolder, which is usually used as a
@@ -63,11 +70,17 @@ class Surface {
   friend class SurfaceHolder;
   friend struct CommitTask;
 
+  friend class ShellSurface;
+  friend class SubSurface;
+  friend class EGLSurface;
+
   Surface() = delete;
   Surface(const Surface &) = delete;
   Surface &operator=(const Surface &) = delete;
 
  public:
+
+  virtual ~Surface();
 
   /**
     * @brief Commit behaviour of the sub-surface
@@ -163,8 +176,6 @@ class Surface {
 
   Surface(AbstractView *view, const Margin &margin = Margin());
 
-  virtual ~Surface();
-
   void OnEnter(struct wl_output *wl_output);
 
   void OnLeave(struct wl_output *wl_output);
@@ -217,16 +228,13 @@ class Surface {
 
   std::unique_ptr<CommitTask> commit_task_;
 
-  /**
-   * @brief A destroyed delegate called in destructor
-   */
-  Signal<> destroying_;
+  EGLSurface *egl_surface_role_;
 
-  size_t reference_count_;
-
-  bool egl_;
-
-  bool is_destroying_;
+  union {
+    void *placeholder;
+    ShellSurface *shell_surface;
+    SubSurface *sub_surface;
+  } role_;
 
   // global surface stack:
 

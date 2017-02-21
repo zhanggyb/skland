@@ -17,12 +17,15 @@
 #ifndef SKLAND_GUI_EGL_SURFACE_HPP_
 #define SKLAND_GUI_EGL_SURFACE_HPP_
 
-#include "surface-holder.hpp"
 #include "../egl/surface.hpp"
 
 namespace skland {
 
-class EGLSurface : public Trackable {
+class Surface;
+
+class EGLSurface {
+
+  friend class Surface;
 
   EGLSurface() = delete;
   EGLSurface(const EGLSurface &) = delete;
@@ -30,7 +33,7 @@ class EGLSurface : public Trackable {
 
  public:
 
-  EGLSurface(Surface *surface);
+  static EGLSurface *Get(Surface *surface);
 
   virtual ~EGLSurface();
 
@@ -46,13 +49,13 @@ class EGLSurface : public Trackable {
     egl_surface_.Resize(width, height, dx, dy);
   }
 
-  Surface *surface() const { return surface_holder_.surface(); }
+  Surface *surface() const { return surface_; }
 
  private:
 
-  void OnSurfaceDestroying(__SLOT__);
+  EGLSurface(Surface *surface);
 
-  SurfaceHolder surface_holder_;
+  Surface *surface_;
 
   egl::Surface egl_surface_;
 

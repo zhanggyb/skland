@@ -17,16 +17,21 @@
 #ifndef SKLAND_GUI_SUB_SURFACE_HPP_
 #define SKLAND_GUI_SUB_SURFACE_HPP_
 
-#include "surface-holder.hpp"
+#include "../core/margin.hpp"
 #include "../wayland/subsurface.hpp"
 
 namespace skland {
+
+class Surface;
+class AbstractView;
 
 /**
  * @ingroup gui
  * @brief Sub surface role
  */
-class SubSurface : public Trackable {
+class SubSurface {
+
+  friend class Surface;
 
   SubSurface() = delete;
   SubSurface(const SubSurface &) = delete;
@@ -34,9 +39,9 @@ class SubSurface : public Trackable {
 
  public:
 
-  SubSurface(Surface *parent, AbstractView *view, const Margin &margin = Margin());
+  static Surface *Create(Surface *parent, AbstractView *view, const Margin &margin = Margin());
 
-  virtual ~SubSurface();
+  static SubSurface *Get(const Surface *surface);
 
   void PlaceAbove(Surface *sibling);
 
@@ -46,13 +51,33 @@ class SubSurface : public Trackable {
 
   void SetWindowPosition(int x, int y);
 
-  Surface *surface() const { return surface_holder_.surface(); }
+  Surface *surface() const { return surface_; }
 
  private:
 
-  void OnSurfaceDestroying(__SLOT__);
+  SubSurface(Surface *surface, Surface *parent);
 
-  SurfaceHolder surface_holder_;
+  ~SubSurface();
+
+  void SetParent(Surface *parent);
+
+  /**
+ * @brief Move the local surface list and insert above target dst surface
+ * @param dst
+ */
+  void MoveAbove(Surface *dst);
+
+  /**
+   * @brief Move the local surface list and insert below target dst surface
+   * @param dst
+   */
+  void MoveBelow(Surface *dst);
+
+  void InsertAbove(Surface *sibling);
+
+  void InsertBelow(Surface *sibling);
+
+  Surface *surface_;
 
   wayland::SubSurface wl_sub_surface_;
 

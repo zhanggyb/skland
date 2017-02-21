@@ -26,7 +26,7 @@
 
 namespace skland {
 
-class SubSurface;
+class Surface;
 class EGLSurface;
 class Canvas;
 
@@ -87,9 +87,10 @@ class EGLWindow : public AbstractWindow {
   Buffer main_buffer_;
   std::shared_ptr<Canvas> main_canvas_;
 
-  SubSurface *main_surface_;
+  Surface *main_surface_;
 
-  SubSurface *sub_surface_;
+  Surface *sub_surface_;
+
   EGLSurface *egl_surface_;
 
   wayland::Callback frame_callback_;

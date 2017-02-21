@@ -24,7 +24,7 @@
 namespace skland {
 
 class AbstractWidget;
-class SubSurface;
+class Surface;
 class Canvas;
 
 /**
@@ -65,7 +65,7 @@ class Window : public AbstractWindow {
 
   void SetMainWidgetGeometry();
 
-  SubSurface *main_surface_;
+  Surface *main_surface_;
 
   /* Properties for frame surface, JUST experimental */
   MemoryPool frame_pool_;

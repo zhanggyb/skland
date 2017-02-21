@@ -73,7 +73,8 @@ class EGLWidget : public AbstractWidget {
 
   void OnFrame(uint32_t serial);
 
-  SubSurface *sub_surface_;
+  Surface *sub_surface_;
+
   EGLSurface *egl_surface_;
 
   wayland::Callback frame_callback_;

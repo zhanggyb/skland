@@ -17,23 +17,28 @@
 #include <skland/gui/egl-surface.hpp>
 #include <skland/gui/display.hpp>
 #include <skland/gui/abstract-view.hpp>
+#include <skland/gui/surface.hpp>
 
 namespace skland {
 
+EGLSurface *EGLSurface::Get(Surface *surface) {
+  if (nullptr == surface->egl_surface_role_)
+    surface->egl_surface_role_ = new EGLSurface(surface);
+
+  return surface->egl_surface_role_;
+}
+
 EGLSurface::EGLSurface(Surface *surface)
-    : Trackable(), surface_holder_(surface) {
-  surface_holder_.surface_destroying().Connect(this, &EGLSurface::OnSurfaceDestroying);
+    : surface_(surface) {
   egl_surface_.Setup(Display::egl_display(),
-                     surface_holder_.wl_surface(),
+                     surface_->wl_surface_,
                      surface->view()->width(),
                      surface->view()->height());
-  surface_holder_.SetEGL(true);
 }
 
 EGLSurface::~EGLSurface() {
-  UnbindAll();
   egl_surface_.Destroy();
-  surface_holder_.SetEGL(false);
+  surface_->egl_surface_role_ = nullptr;
 }
 
 bool EGLSurface::MakeCurrent() {
@@ -50,12 +55,6 @@ bool EGLSurface::SwapBuffersWithDamage(int x, int y, int width, int height) {
 
 bool EGLSurface::SwapInterval(EGLint interval) {
   return Display::egl_display().SwapInterval(interval);
-}
-
-void EGLSurface::OnSurfaceDestroying(SLOT slot) {
-  egl_surface_.Destroy();
-  surface_holder_.SetEGL(false);
-  Unbind(slot);
 }
 
 } // namespace skland

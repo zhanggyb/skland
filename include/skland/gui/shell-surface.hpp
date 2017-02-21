@@ -17,16 +17,25 @@
 #ifndef SKLAND_GUI_SHELL_SURFACE_HPP_
 #define SKLAND_GUI_SHELL_SURFACE_HPP_
 
-#include "surface-holder.hpp"
+#include "../core/margin.hpp"
 #include "../wayland/xdg-surface.hpp"
 
 namespace skland {
+
+class AbstractView;
+class Surface;
+class ToplevelShellSurface;
+class PopupShellSurface;
 
 /**
  * @ingroup gui
  * @brief Shell surface role
  */
-class ShellSurface : public Trackable {
+class ShellSurface {
+
+  friend class Surface;
+  friend class ToplevelShellSurface;
+  friend class PopupShellSurface;
 
   ShellSurface() = delete;
   ShellSurface(const ShellSurface &) = delete;
@@ -34,41 +43,41 @@ class ShellSurface : public Trackable {
 
  public:
 
-  ShellSurface(AbstractView *view, const Margin &margin = Margin());
+  static ShellSurface *Get(const Surface *surface);
 
-  virtual ~ShellSurface();
-
-  void ResizeWindow(int width, int height) const {
-    xdg_surface_.SetWindowGeometry(surface()->margin().l,
-                                   surface()->margin().t,
-                                   width, height);
-  }
+  void ResizeWindow(int width, int height) const;
 
   void AckConfigure(uint32_t serial) const {
     xdg_surface_.AckConfigure(serial);
   }
 
-  DelegateRef<void(uint32_t)> surface_configure() { return xdg_surface_.configure(); }
+  Surface *surface() const { return surface_; }
 
-  Surface *surface() const { return surface_holder_.surface(); }
-
- protected:
-
-  const SurfaceHolder &surface_holder() const { return surface_holder_; }
-
-  const wayland::XdgSurface &xdg_surface() const { return xdg_surface_; }
-
-  SignalRef<> destroying() { return destroying_; }
+  DelegateRef<void(uint32_t)> configure() { return xdg_surface_.configure(); }
 
  private:
 
-  void OnViewSurfaceDestroying(__SLOT__);
+  static Surface *Create(AbstractView *view, const Margin &margin = Margin());
 
-  SurfaceHolder surface_holder_;
+  ShellSurface(Surface *surface);
+
+  ~ShellSurface();
+
+  void PushShellSurface();
+
+  void RemoveShellSurface();
+
+  Surface *surface_;
 
   wayland::XdgSurface xdg_surface_;
 
-  Signal<> destroying_;
+  ShellSurface *parent_;
+
+  union {
+    void *placeholder;
+    ToplevelShellSurface *toplevel_shell_surface;
+    PopupShellSurface *popup_shell_surface_;
+  } role_;
 
 };
 

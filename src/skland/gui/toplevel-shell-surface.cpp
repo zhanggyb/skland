@@ -15,23 +15,40 @@
  */
 
 #include <skland/gui/toplevel-shell-surface.hpp>
+#include <skland/gui/shell-surface.hpp>
+#include <skland/core/defines.hpp>
 
 namespace skland {
 
-ToplevelShellSurface::ToplevelShellSurface(AbstractView *view, const Margin &margin)
-    : ShellSurface(view, margin) {
-  destroying().Connect(this, &ToplevelShellSurface::OnShellSurfaceDestroying);
-  xdg_toplevel_.Setup(xdg_surface());
+Surface *ToplevelShellSurface::Create(AbstractView *view, const Margin &margin) {
+  Surface *surface = ShellSurface::Create(view, margin);
+  ShellSurface *shell_surface = ShellSurface::Get(surface);
+  shell_surface->role_.toplevel_shell_surface = new ToplevelShellSurface(shell_surface);
+  return surface;
+}
+
+ToplevelShellSurface *ToplevelShellSurface::Get(const Surface *surface) {
+  ShellSurface *shell_surface = ShellSurface::Get(surface);
+
+  if (nullptr == shell_surface) return nullptr;
+
+  if (shell_surface->parent_)
+    return nullptr;
+
+  return shell_surface->role_.toplevel_shell_surface;
+}
+
+ToplevelShellSurface::ToplevelShellSurface(ShellSurface *shell_surface)
+    : shell_surface_(shell_surface) {
+  xdg_toplevel_.Setup(shell_surface_->xdg_surface_);
 }
 
 ToplevelShellSurface::~ToplevelShellSurface() {
-  UnbindAll();
   xdg_toplevel_.Destroy();
-}
 
-void ToplevelShellSurface::OnShellSurfaceDestroying(SLOT slot) {
-  xdg_toplevel_.Destroy();
-  Unbind(slot);
+  DBG_ASSERT(shell_surface_->role_.toplevel_shell_surface == this);
+  DBG_ASSERT(nullptr == shell_surface_->parent_);
+  shell_surface_->role_.toplevel_shell_surface = nullptr;
 }
 
 }
