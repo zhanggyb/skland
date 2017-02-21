@@ -111,7 +111,11 @@ void AbstractWindow::Close(SLOT) {
     Application::Exit();
   }
 
-  delete this;
+  // TODO: use a close task if there's more than 1 windows in an application
+
+  // windows will be deleted when application exits, uncomment this line
+  // sometimes cause segfault when close button is clicked:
+  //  delete this;
 }
 
 void AbstractWindow::Maximize(SLOT) {
