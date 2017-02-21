@@ -58,15 +58,13 @@ Surface::Surface(AbstractView *view, const Margin &margin)
 }
 
 Surface::~Surface() {
-  if (egl_surface_role_) {
+  if (egl_surface_role_)
     delete egl_surface_role_;
-  }
 
-  if (nullptr == parent_) {
+  if (nullptr == parent_)
     delete role_.shell_surface; // deleting a shell surface will break the links to up_ and down_
-  } else {
+  else
     delete role_.sub_surface; // deleting all sub surfaces and break the links to above_ and below_
-  }
 }
 
 void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {

@@ -64,7 +64,7 @@ list(APPEND SKIA_PUBLIC_INCLUDES
         "${SKIA_SOURCE_DIR}/include/utils"
         "${SKIA_SOURCE_DIR}/include/private")
 
-add_subdirectory(lib)
+add_subdirectory(deps)
 
 if (LINUX)
 

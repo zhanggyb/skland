@@ -253,7 +253,7 @@ void AbstractWindow::OnMouseButton(MouseEvent *event) {
 
       if (location == kTitleBar) {
         MouseTaskProxy proxy(this);
-        if (proxy.HasNextTask()) {
+        if (proxy.GetNextTask()) {
           // If the mouse is hover on a sub widget (mostly close/min/max button on title bar).
           event->Accept();
           return;

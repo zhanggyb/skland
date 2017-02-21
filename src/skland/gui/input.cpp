@@ -24,6 +24,7 @@
 #include <skland/gui/abstract-window.hpp>
 
 #include "internal/view-task.hpp"
+#include "internal/mouse-task-proxy.hpp"
 
 namespace skland {
 
@@ -171,7 +172,7 @@ void Input::OnPointerEnter(uint32_t serial,
   window->OnMouseEnter(mouse_event_);
   if (mouse_event_->accepted()) {
     ViewTask *task = window->mouse_task_.get();
-    ProcessMouseEnterOnSubviews(window, task);
+    DispatchMouseEnterEvent(window, task);
   }
 }
 
@@ -212,50 +213,49 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
   mouse_event_->surface_xy_.x = wl_fixed_to_double(surface_x);
   mouse_event_->surface_xy_.y = wl_fixed_to_double(surface_y);
 
-  if (mouse_event_->surface_) {
-    mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
-    mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
+  if (nullptr == mouse_event_->surface_) return;
 
-    AbstractView *window = mouse_event_->surface_->view();
+  mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
+  mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
 
+  AbstractView *window = mouse_event_->surface_->view();
+
+  mouse_event_->accepted_ = false;
+  window->OnMouseMove(mouse_event_);
+
+  // The following code check if the mouse enters sub views in this surface:
+
+  ViewTask *task = window->mouse_task_.get();
+  ViewTask *tail = task;
+  while (tail->next()) {
+    tail = static_cast<ViewTask *>(tail->next());
+  }
+
+  ViewTask *previous = nullptr;
+  while (tail->previous()) {
+    if (tail->view->Contain((int) mouse_event_->window_xy_.x, (int) mouse_event_->window_xy_.y)) {
+      break;
+    }
+    previous = static_cast<ViewTask *>(tail->previous());
+
+    tail->Unlink();
     mouse_event_->accepted_ = false;
-    window->OnMouseMove(mouse_event_);
+    tail->view->OnMouseLeave(mouse_event_);
+    // TODO: if need to check the 'accepted_' variable
 
-    // The following code check if the mouse enters sub views in this surface:
+    tail = previous;
+  }
 
-    ViewTask *task = window->mouse_task_.get();
-    ViewTask *tail = task;
-    while (tail->next()) {
-      tail = static_cast<ViewTask *>(tail->next());
-    }
+  // and recheck subviews:
+  DispatchMouseEnterEvent(tail->view, tail);
 
-    ViewTask *previous = nullptr;
-    while (tail->previous()) {
-      if (tail->view->Contain((int) mouse_event_->window_xy_.x, (int) mouse_event_->window_xy_.y)) {
-        break;
-      }
-      previous = static_cast<ViewTask *>(tail->previous());
-
-      tail->Unlink();
-      mouse_event_->accepted_ = false;
-      tail->view->OnMouseLeave(mouse_event_);
-      // TODO: if need to check the 'accepted_' variable
-
-      tail = previous;
-    }
-
-    // and recheck subviews:
-    ProcessMouseEnterOnSubviews(tail->view, tail);
-
-    // Now dispatch mouse move event:
-    task = static_cast<ViewTask *>(window->mouse_motion_task_.get()->next());
-    mouse_event_->accepted_ = false;
-    while (task) {
-      task->view->OnMouseMove(mouse_event_);
-      if (!mouse_event_->accepted_) break;
-
-      task = static_cast<ViewTask *>(task->next());
-    }
+  // Now dispatch mouse move event:
+  task = static_cast<ViewTask *>(window->mouse_motion_task_.get()->next());
+  mouse_event_->accepted_ = false;
+  while (task) {
+    task->view->OnMouseMove(mouse_event_);
+    if (!mouse_event_->accepted_) break;
+    task = static_cast<ViewTask *>(task->next());
   }
 }
 
@@ -266,20 +266,19 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
   mouse_event_->button_ = button;
   mouse_event_->state_ = state;
 
-  if (mouse_event_->surface_) {
-    AbstractView *window = mouse_event_->surface_->view();
+  if (nullptr == mouse_event_->surface_) return;
 
-    window->OnMouseButton(mouse_event_);
-    if (mouse_event_->accepted()) {
-      ViewTask *task = window->mouse_task_.get();
-      task = static_cast<ViewTask *>(task->next());
-      while (task) {
-        task->view->OnMouseButton(mouse_event_);  // FIXME: sometimes this line causes segment fault
-        if (!mouse_event_->accepted()) {
-          break;
-        }
-        task = static_cast<ViewTask *>(task->next());
+  AbstractView *view = mouse_event_->surface_->view();
+  view->OnMouseButton(mouse_event_);
+  if (mouse_event_->accepted()) {
+    ViewTask *task = view->mouse_task_.get();
+    task = static_cast<ViewTask *>(task->next());
+    while (task) {
+      task->view->OnMouseButton(mouse_event_);  // FIXME: sometimes this line causes segment fault
+      if (!mouse_event_->accepted()) {
+        break;
       }
+      task = static_cast<ViewTask *>(task->next());
     }
   }
 }
@@ -329,15 +328,15 @@ void Input::OnTouchCancel() {
 
 }
 
-void Input::ProcessMouseEnterOnSubviews(AbstractView *parent, ViewTask *task) {
-  for (AbstractView *subview = parent->first_subview(); subview; subview = subview->next_view()) {
-    if (subview->Contain((int) mouse_event_->window_xy_.x, (int) mouse_event_->window_xy_.y)) {
+void Input::DispatchMouseEnterEvent(AbstractView *parent, ViewTask *task) {
+  for (AbstractView *view = parent->first_subview(); view; view = view->next_view()) {
+    if (view->Contain((int) mouse_event_->window_xy_.x, (int) mouse_event_->window_xy_.y)) {
       mouse_event_->accepted_ = false;
-      subview->OnMouseEnter(mouse_event_);
+      view->OnMouseEnter(mouse_event_);
       if (mouse_event_->accepted()) {
-        task->PushBack(subview->mouse_task_.get());
+        task->PushBack(view->mouse_task_.get());
         task = static_cast<ViewTask *>(task->next());
-        ProcessMouseEnterOnSubviews(subview, task);
+        DispatchMouseEnterEvent(view, task);
       }
       break;
     }

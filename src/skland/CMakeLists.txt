@@ -83,7 +83,7 @@ add_library(skland ${global_header} ${all_source_files})
 
 target_include_directories(skland
         PRIVATE "${SKIA_PUBLIC_INCLUDES}"
-        PRIVATE "${PROJECT_BINARY_DIR}/lib/wayland-protocols/unstable/xdg-shell")
+        PRIVATE "${PROJECT_BINARY_DIR}/deps/wayland-protocols/unstable/xdg-shell")
 
 if (LINUX)
     target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client)

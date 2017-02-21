@@ -34,6 +34,10 @@ class TouchEvent;
 class AbstractView;
 struct ViewTask;
 
+/**
+ * @ingroup gui
+ * @brief Input manager
+ */
 class Input : public Object {
 
   friend class Display;
@@ -146,7 +150,12 @@ class Input : public Object {
 
   void OnTouchCancel();
 
-  void ProcessMouseEnterOnSubviews(AbstractView *parent, ViewTask *task);
+  /**
+   * @brief Dispatch mouse enter event on sub views
+   * @param parent
+   * @param task
+   */
+  void DispatchMouseEnterEvent(AbstractView *parent, ViewTask *task);
 
   Display *display_;
 
