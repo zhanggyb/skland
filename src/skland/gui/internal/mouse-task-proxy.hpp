@@ -22,6 +22,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup gui_intern
+ * @brief A proxy class to manipulate mouse task of a view object
+ */
 class MouseTaskProxy {
 
  public:

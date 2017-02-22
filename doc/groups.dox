@@ -27,6 +27,12 @@
  */
 
 /**
+ * @ingroup graphic
+ * @defgroup graphic_intern Internal
+ * @brief Private code used in Graphic module only
+ */
+
+/**
  * @defgroup gui GUI
  * @brief The main module provides GUI elements
  *
@@ -41,8 +47,20 @@
  */
 
 /**
+ * @ingroup gui
+ * @defgroup gui_intern Internal
+ * @brief Private code used in GUI module only
+ */
+
+/**
  * @defgroup stock Stock
  * @brief Stock resources
  *
  * Stock resources
+ */
+
+/**
+ * @ingroup stock
+ * @defgroup stock_intern Internal
+ * @brief Private code used in Stock module only
  */

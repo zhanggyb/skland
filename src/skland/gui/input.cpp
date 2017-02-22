@@ -23,7 +23,6 @@
 #include <skland/gui/touch-event.hpp>
 #include <skland/gui/abstract-window.hpp>
 
-#include "internal/view-task.hpp"
 #include "internal/mouse-task-proxy.hpp"
 
 namespace skland {
@@ -270,16 +269,15 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
 
   AbstractView *view = mouse_event_->surface_->view();
   view->OnMouseButton(mouse_event_);
-  if (mouse_event_->accepted()) {
-    ViewTask *task = view->mouse_task_.get();
-    task = static_cast<ViewTask *>(task->next());
-    while (task) {
-      task->view->OnMouseButton(mouse_event_);
-      if (!mouse_event_->accepted()) {
-        break;
-      }
-      task = static_cast<ViewTask *>(task->next());
+  if (!mouse_event_->accepted()) return;
+
+  MouseTaskProxy proxy(view);
+  while (proxy.GetNextTask()) {
+    proxy.GetNextTask()->view->OnMouseButton(mouse_event_);
+    if (!mouse_event_->accepted()) {
+      break;
     }
+    ++proxy;
   }
 }
 

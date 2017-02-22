@@ -21,6 +21,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup graphic_intern
+ * @brief Structure to encapsulate a sk_sp<SkShader> object
+ */
 struct ShaderMeta {
 
   ShaderMeta() {}

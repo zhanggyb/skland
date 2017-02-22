@@ -21,6 +21,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup gui
+ * @brief The abstract class for buttons
+ */
 class AbstractButton : public AbstractWidget {
 
  public:

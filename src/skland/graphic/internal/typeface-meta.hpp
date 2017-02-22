@@ -22,6 +22,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup graphic_intern
+ * @brief Structure to encapsulate a sk_sp<SkTypeface> object
+ */
 struct TypefaceMeta {
 
   TypefaceMeta() {}
