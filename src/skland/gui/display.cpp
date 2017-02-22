@@ -138,6 +138,7 @@ void Display::Disconnect() noexcept {
 //  ClearManagedObject(this, &first_window_, &last_window_, windows_count_);
   Surface::Clear();
 
+  wl_data_device_manager_.Destroy();
   if (wl_cursor_theme_.IsValid()) {
     ReleaseCursors();
     wl_cursor_theme_.Destroy();
