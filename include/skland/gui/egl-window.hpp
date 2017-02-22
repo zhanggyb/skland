@@ -33,6 +33,8 @@ class Canvas;
 /**
  * @ingroup gui
  * @brief A window contains an EGL surface for 3D scene
+ *
+ * @example simple-egl.cpp
  */
 class EGLWindow : public AbstractWindow {
 

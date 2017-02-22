@@ -47,21 +47,33 @@ class EGLSurface;
  * @ingroup gui
  * @brief Surface for views
  *
- * Surface represents a native wayland surface to display views. A
- * surface object can have parent or sub surfaces. According to
- * wayland protocol, a surface without a parent must be a shell
- * surface. You can get the parent/siblings by parent(), above(),
- * below().
+ * Surface is an important concept in SkLand, it represents a native
+ * wayland surface to display views.
  *
- * A surface can be used as different roles for view, it can be a shell
- * surface for a window, or a sub surface for a widget (e.g. a video
- * widget). It can also be used as a EGL surface to display 3D scene,
- * otherwise, it displays 2D contents through wayland shared memory
- * buffer.
+ * A surface can have parent or arbitrary sub surfaces and acts as
+ * different roles. According to wayland protocol, a surface without a
+ * parent must be a shell surface, a shell surface is usually managed
+ * in a window object, but can also be used to display a popup view
+ * such as menu or tooltip.
+ *
+ * A surface which has a parent is called a sub surface, it's usually
+ * used in special widgets (e.g. video widget, or EGL widget) as such
+ * widgets need their own surface to display something.
+ *
+ * Each shell surface or sub surface can also be a EGL surface to
+ * display 3D scene, otherwise, it displays 2D contents through
+ * wayland shared memory buffer.
+ *
+ * All surfaces in an SkLand application are stacked by the order
+ * defined in wayland protocol. [TODO: use an image to show the
+ * surface stack.]
  *
  * @note You cannot create or delete a Surface object directly, it's
- * created and hold by a SurfaceHolder, which is usually used as a
- * property in ShellSurface/SubSurface/EGLSurface.
+ * created or gotten through ShellSurface/SubSurface/EGLSurface.
+ *
+ * @see ShellSurface
+ * @see SubSurface
+ * @see EGLSurface
  */
 class Surface {
 

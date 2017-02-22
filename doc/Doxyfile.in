@@ -869,7 +869,6 @@ EXCLUDE                = @PROJECT_SOURCE_DIR@/test \
                          @PROJECT_SOURCE_DIR@/build \
                          @PROJECT_SOURCE_DIR@/lib \
                          @PROJECT_SOURCE_DIR@/third_party \
-                         @PROJECT_SOURCE_DIR@/examples \
                          @PROJECT_SOURCE_DIR@/cmake \
                          @PROJECT_SOURCE_DIR@/cmake-build-debug
 
@@ -904,7 +903,7 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = 
+EXAMPLE_PATH           = @PROJECT_SOURCE_DIR@/examples
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and

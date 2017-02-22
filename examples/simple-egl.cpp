@@ -42,8 +42,7 @@ static const char *frag_shader_text =
         "}\n";
 
 static GLuint
-create_shader(const char *source, GLenum shader_type)
-{
+create_shader(const char *source, GLenum shader_type) {
   GLuint shader;
   GLint status;
 
@@ -67,13 +66,13 @@ create_shader(const char *source, GLenum shader_type)
   return shader;
 }
 
-class SimpleWindow : public EGLWindow {
+class SimpleEGLWindow : public EGLWindow {
  public:
 
-  SimpleWindow()
+  SimpleEGLWindow()
       : EGLWindow(250, 250, "Simple EGL") {}
 
-  virtual  ~SimpleWindow() {
+  virtual  ~SimpleEGLWindow() {
     glDeleteProgram(program);
   }
 
@@ -94,7 +93,7 @@ class SimpleWindow : public EGLWindow {
 
 };
 
-void SimpleWindow::OnInitializeEGL() {
+void SimpleEGLWindow::OnInitializeEGL() {
   MakeCurrent();
 
   GLuint frag, vert;
@@ -132,29 +131,29 @@ void SimpleWindow::OnInitializeEGL() {
   SwapBuffers();
 }
 
-void SimpleWindow::OnResizeEGL(int width, int height) {
+void SimpleEGLWindow::OnResizeEGL(int width, int height) {
 
 }
 
-void SimpleWindow::OnRenderEGL() {
+void SimpleEGLWindow::OnRenderEGL() {
   MakeCurrent();
 
   static const GLfloat verts[3][2] = {
-      { -0.5, -0.5 },
-      {  0.5, -0.5 },
-      {  0,    0.5 }
+      {-0.5, -0.5},
+      {0.5, -0.5},
+      {0, 0.5}
   };
   static const GLfloat colors[3][3] = {
-      { 1, 0, 0 },
-      { 0, 1, 0 },
-      { 0, 0, 1 }
+      {1, 0, 0},
+      {0, 1, 0},
+      {0, 0, 1}
   };
   GLfloat angle;
   GLfloat rotation[4][4] = {
-      { 1, 0, 0, 0 },
-      { 0, 1, 0, 0 },
-      { 0, 0, 1, 0 },
-      { 0, 0, 0, 1 }
+      {1, 0, 0, 0},
+      {0, 1, 0, 0},
+      {0, 0, 1, 0},
+      {0, 0, 0, 1}
   };
   static const uint32_t speed_div = 5;
   struct timeval tv;
@@ -163,13 +162,13 @@ void SimpleWindow::OnRenderEGL() {
   uint32_t time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 
   angle = (time / speed_div) % 360 * M_PI / 180.0;
-  rotation[0][0] =  cos(angle);
-  rotation[0][2] =  sin(angle);
+  rotation[0][0] = cos(angle);
+  rotation[0][2] = sin(angle);
   rotation[2][0] = -sin(angle);
-  rotation[2][2] =  cos(angle);
+  rotation[2][2] = cos(angle);
 
   Rect client_rect = GetClientGeometry();
-  glViewport(0, 0, (int)client_rect.width(), (int)client_rect.height());
+  glViewport(0, 0, (int) client_rect.width(), (int) client_rect.height());
 
   glUniformMatrix4fv(rotation_uniform, 1, GL_FALSE,
                      (GLfloat *) rotation);
@@ -193,15 +192,10 @@ void SimpleWindow::OnRenderEGL() {
 int main(int argc, char *argv[]) {
   Application app(argc, argv);
 
-//  Window *win = new Window(480, 360, "Simple EGL");
-//  win->SetAppId("Simple-EGL");
-//
-//  EGLWidget *widget = new EGLWidget;
-//  win->SetMainWidget(widget);
-
-  SimpleWindow *win = new SimpleWindow();
+  SimpleEGLWindow *win = new SimpleEGLWindow();
   win->SetAppId("Simple-EGL");
   win->Show();
+  // All window objects will be deleted when application exits
 
   return app.Run();
 }

@@ -4,7 +4,7 @@
  *
  * @section start Start
  *
- * - Get the code: checkout, build and run
+ * - [Get the code: checkout, build and run](md_doc_build.html)
  * - Directory structure
  *
  * @section guide Development Guides
@@ -15,6 +15,6 @@
  * - A "Hello World" example
  * - Wayland introduction
  *  - Surface stack
- * - Google Skia introduction
+ * - Drawing with Google Skia
  * - Unit test
  */

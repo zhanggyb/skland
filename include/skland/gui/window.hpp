@@ -30,6 +30,8 @@ class Canvas;
 /**
  * @ingroup gui
  * @brief A simple window with client-side decorations
+ *
+ * @example hello.cpp
  */
 class Window : public AbstractWindow {
 

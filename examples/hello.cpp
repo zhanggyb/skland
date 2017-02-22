@@ -18,9 +18,8 @@
 #include <skland/gui/window.hpp>
 #include <skland/gui/label.hpp>
 
-using namespace skland;
-
 int main(int argc, char *argv[]) {
+  using namespace skland;
   using skland::Window;
 
   Application app(argc, argv);
