@@ -227,7 +227,7 @@ void Application::HandleEpollEvents(uint32_t events) {
 
 void Application::HandleSignalInt(int) {
   DBG_PRINT_MSG("%s\n", "Get SIGINT");
-  Application::instance()->Exit();
+  Application::Get()->Exit();
 }
 
 }

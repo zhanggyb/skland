@@ -33,10 +33,13 @@
 
 namespace skland {
 
+/**
+ * @ingroup gui_intern
+ * @brief The private data structure in Display
+ */
 struct Display::Private {
 
   Private() {}
-
   ~Private() {}
 
   wayland::Display wl_display;

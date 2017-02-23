@@ -359,7 +359,6 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
 
   if (do_resize) {
     ShellSurface::Get(toplevel_shell_surface_)->ResizeWindow(width, height);
-    resize(width, height);
     OnResize(width, height);
   }
 

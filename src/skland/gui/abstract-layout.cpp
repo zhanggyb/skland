@@ -16,8 +16,78 @@
 
 #include <skland/gui/abstract-layout.hpp>
 
+#include <skland/gui/mouse-event.hpp>
+#include <skland/gui/key-event.hpp>
+
+#include <skland/gui/context.hpp>
+#include <skland/graphic/canvas.hpp>
+#include <skland/graphic/paint.hpp>
+
+//#ifdef DEBUG
+#include <cstdlib>
+#include <skland/gui/timer.hpp>
+//#endif
+
 namespace skland {
 
+AbstractLayout::AbstractLayout(const Margin &margin)
+    : AbstractView(), margin_(margin) {
 
+}
+
+AbstractLayout::~AbstractLayout() {
+
+}
+
+Size AbstractLayout::GetMinimalSize() const {
+  return Size(margin_.lr(), margin_.tb());
+}
+
+Size AbstractLayout::GetPreferredSize() const {
+  return Size(400, 300);
+}
+
+Size AbstractLayout::GetMaximalSize() const {
+  return Size(65536, 65536);
+}
+
+void AbstractLayout::AddView(AbstractView *view) {
+  // TODO: check if view already in this layout
+
+  OnViewAdded(view);
+}
+
+void AbstractLayout::OnMouseEnter(MouseEvent *event) {
+  event->Ignore();
+}
+
+void AbstractLayout::OnMouseLeave(MouseEvent *event) {
+  event->Ignore();
+}
+
+void AbstractLayout::OnMouseMove(MouseEvent *event) {
+  event->Ignore();
+}
+
+void AbstractLayout::OnMouseButton(MouseEvent *event) {
+  event->Ignore();
+}
+
+void AbstractLayout::OnKeyboardKey(KeyEvent *event) {
+  event->Ignore();
+}
+
+void AbstractLayout::OnDraw(const Context *context) {
+//#ifdef DEBUG
+  srand(Timer::GetMicroSeconds());
+  float r = rand() % 255 / 255.f;
+  float g = rand() % 255 / 255.f;
+  float b = rand() % 255 / 255.f;
+
+  Paint paint;
+  paint.SetColor(Color(r, g, b, 0.25));
+  context->canvas()->DrawRect(geometry(), paint);
+//#endif
+}
 
 }

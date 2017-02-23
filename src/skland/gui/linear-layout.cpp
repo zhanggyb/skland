@@ -14,38 +14,26 @@
  * limitations under the License.
  */
 
-#include "test.hpp"
+#include <skland/gui/linear-layout.hpp>
 
-#include <skland/gui/application.hpp>
-#include <skland/gui/window.hpp>
+namespace skland {
 
-using skland::Application;
-using skland::Window;
-
-Test::Test()
-    : testing::Test() {
-}
-
-Test::~Test() {
+LinearLayout::LinearLayout()
+    : AbstractLayout() {
 
 }
 
-/**
- * @brief Show a default empty window
- *
- * Expected result: display and resize a default window
- */
-TEST_F(Test, show) {
-  int argc = 1;
-  char argv1[] = "show";  // to avoid compile warning
-  char *argv[] = {argv1};
+LinearLayout::~LinearLayout() {
 
-  Application app(argc, argv);
+}
 
-  Window win(400, 300, "Test Window");
-  win.Show();
+void LinearLayout::OnResize(int width, int height) {
+  resize(width, height);
+  Update();
+}
 
-  int result = app.Run();
+void LinearLayout::OnViewAdded(AbstractView *view) {
+  // TODO:
+}
 
-  ASSERT_TRUE(result == 0);
 }

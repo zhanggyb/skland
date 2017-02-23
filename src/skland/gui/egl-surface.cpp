@@ -15,7 +15,6 @@
  */
 
 #include <skland/gui/egl-surface.hpp>
-#include <skland/gui/display.hpp>
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/surface.hpp>
 

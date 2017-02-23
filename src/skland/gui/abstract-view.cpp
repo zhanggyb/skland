@@ -20,8 +20,7 @@
 #include <skland/gui/abstract-window.hpp>
 #include <skland/gui/mouse-event.hpp>
 
-#include "internal/view-task.hpp"
-#include "internal/redraw-task.hpp"
+#include "internal/abstract-view-private.hpp"
 
 namespace skland {
 
@@ -38,9 +37,7 @@ AbstractView::AbstractView(int width, int height)
       visible_(false),
       geometry_(width, height),
       is_damaged_(false) {
-  redraw_task_.reset(new RedrawTask(this));
-  mouse_task_.reset(new ViewTask(this));
-  mouse_motion_task_.reset(new ViewTask(this));
+  data_.reset(new Private(this));
 }
 
 AbstractView::~AbstractView() {
@@ -83,11 +80,11 @@ void AbstractView::UpdateAll() {
 }
 
 void AbstractView::OnUpdate(AbstractView *view) {
-  if (redraw_task_->IsLinked() && (view != this)) {
+  if (data_->redraw_task.IsLinked() && (view != this)) {
     // This view is going to be redrawn, just push back the task of the sub view
 
-    redraw_task_->PushBack(view->redraw_task_.get());
-    view->redraw_task_->context = redraw_task_->context;
+    data_->redraw_task.PushBack(&view->data_->redraw_task);
+    view->data_->redraw_task.context = data_->redraw_task.context;
     return;
   }
 
@@ -103,19 +100,19 @@ Surface *AbstractView::OnGetSurface(const AbstractView *view) const {
 }
 
 void AbstractView::TrackMouseMotion(MouseEvent *event) {
-  if (mouse_motion_task_->IsLinked()) return;
+  if (data_->mouse_motion_task.IsLinked()) return;
 
   AbstractView *window = event->surface()->view();
 
-  ViewTask *task = window->mouse_motion_task_.get();
+  ViewTask *task = &window->data_->mouse_motion_task;
   while (task->next()) {
     task = static_cast<ViewTask *>(task->next());
   }
-  task->PushBack(mouse_motion_task_.get());
+  task->PushBack(&data_->mouse_motion_task);
 }
 
 void AbstractView::UntrackMouseMotion() {
-  mouse_motion_task_->Unlink();
+  data_->mouse_motion_task.Unlink();
 }
 
 Surface *AbstractView::GetSurface(const AbstractView *view) {

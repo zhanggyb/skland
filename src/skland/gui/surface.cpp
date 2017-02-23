@@ -16,7 +16,6 @@
 
 #include <skland/gui/surface.hpp>
 
-#include <skland/gui/display.hpp>
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/buffer.hpp>
 

@@ -162,17 +162,20 @@ void Input::OnPointerEnter(uint32_t serial,
   mouse_event_->surface_xy_.x = wl_fixed_to_double(surface_x);
   mouse_event_->surface_xy_.y = wl_fixed_to_double(surface_y);
 
-  mouse_event_->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
-  mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
-  mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
+  mouse_event_->surface_ =
+      static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
+  mouse_event_->window_xy_.x =
+      mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
+  mouse_event_->window_xy_.y =
+      mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
 
-  AbstractView *window = mouse_event_->surface_->view();
+  AbstractView *view = mouse_event_->surface_->view();
 
   mouse_event_->accepted_ = false;
-  window->OnMouseEnter(mouse_event_);
+  view->OnMouseEnter(mouse_event_);
   if (mouse_event_->accepted()) {
-    ViewTask *task = window->mouse_task_.get();
-    DispatchMouseEnterEvent(window, task);
+    ViewTask *task = &view->data_->mouse_task;
+    DispatchMouseEnterEvent(view, task);
   }
 }
 
@@ -180,12 +183,12 @@ void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
   mouse_event_->serial_ = serial;
 
   mouse_event_->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
-  AbstractView *window = mouse_event_->surface_->view();
+  AbstractView *view = mouse_event_->surface_->view();
 
   mouse_event_->accepted_ = false;
-  window->OnMouseLeave(mouse_event_);
+  view->OnMouseLeave(mouse_event_);
   if (mouse_event_->accepted()) {
-    ViewTask *task = window->mouse_task_.get();
+    ViewTask *task = &view->data_->mouse_task;
     ViewTask *next = nullptr;
     bool need_call = true;
 
@@ -215,17 +218,19 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
 
   if (nullptr == mouse_event_->surface_) return;
 
-  mouse_event_->window_xy_.x = mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
-  mouse_event_->window_xy_.y = mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
+  mouse_event_->window_xy_.x =
+      mouse_event_->surface_xy_.x - mouse_event_->surface_->margin().left;
+  mouse_event_->window_xy_.y =
+      mouse_event_->surface_xy_.y - mouse_event_->surface_->margin().top;
 
-  AbstractView *window = mouse_event_->surface_->view();
+  AbstractView *view = mouse_event_->surface_->view();
 
   mouse_event_->accepted_ = false;
-  window->OnMouseMove(mouse_event_);
+  view->OnMouseMove(mouse_event_);
 
   // The following code check if the mouse enters sub views in this surface:
 
-  ViewTask *task = window->mouse_task_.get();
+  ViewTask *task = &view->data_->mouse_task;
   ViewTask *tail = task;
   while (tail->next()) {
     tail = static_cast<ViewTask *>(tail->next());
@@ -250,7 +255,7 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
   DispatchMouseEnterEvent(tail->view, tail);
 
   // Now dispatch mouse move event:
-  task = static_cast<ViewTask *>(window->mouse_motion_task_.get()->next());
+  task = static_cast<ViewTask *>(view->data_->mouse_motion_task.next());
   mouse_event_->accepted_ = false;
   while (task) {
     task->view->OnMouseMove(mouse_event_);
@@ -333,7 +338,7 @@ void Input::DispatchMouseEnterEvent(AbstractView *parent, ViewTask *task) {
       mouse_event_->accepted_ = false;
       view->OnMouseEnter(mouse_event_);
       if (mouse_event_->accepted()) {
-        task->PushBack(view->mouse_task_.get());
+        task->PushBack(&view->data_->mouse_task);
         task = static_cast<ViewTask *>(task->next());
         DispatchMouseEnterEvent(view, task);
       }

@@ -47,9 +47,9 @@ class Window : public AbstractWindow {
 
   virtual ~Window();
 
-  void SetMainWidget(AbstractWidget *widget);
+  void SetMainWidget(AbstractView *widget);
 
-  AbstractWidget *main_widget() const { return main_widget_; }
+  AbstractView *main_widget() const { return main_widget_; }
 
  protected:
 
@@ -79,7 +79,7 @@ class Window : public AbstractWindow {
   Buffer main_buffer_;
   std::shared_ptr<Canvas> main_canvas_;
 
-  AbstractWidget *main_widget_; // This will be a layout
+  AbstractView *main_widget_; // This will be a layout
 
 };
 

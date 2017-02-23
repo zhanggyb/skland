@@ -27,7 +27,7 @@ struct ViewTask : public Task {
   ViewTask(const ViewTask &) = delete;
   ViewTask &operator=(const ViewTask &) = delete;
 
-  ViewTask(AbstractView *view = nullptr)
+  ViewTask(AbstractView *view)
       : Task(), view(view) {}
 
   virtual ~ViewTask() {}

@@ -17,22 +17,52 @@
 #ifndef SKLAND_GUI_ABSTRACT_LAYOUT_HPP_
 #define SKLAND_GUI_ABSTRACT_LAYOUT_HPP_
 
+#include "abstract-view.hpp"
+
+#include "../core/margin.hpp"
+
 namespace skland {
 
-class AbstractView;
+class AbstractLayout : public AbstractView {
 
-class AbstractLayout {
+  AbstractLayout(const AbstractLayout &) = delete;
+  AbstractLayout &operator=(const AbstractLayout &) = delete;
 
  public:
 
-  AbstractLayout()
-      : view_(nullptr) {}
+  AbstractLayout(const Margin &margin = Margin(5));
 
-  virtual ~AbstractLayout() {}
+  virtual ~AbstractLayout();
+
+  virtual Size GetMinimalSize() const override;
+
+  virtual Size GetPreferredSize() const override;
+
+  virtual Size GetMaximalSize() const override;
+
+  void AddView(AbstractView *view);
+
+  const Margin &margin() const { return margin_; }
+
+ protected:
+
+  virtual void OnViewAdded(AbstractView *view) = 0;
+
+  virtual void OnMouseEnter(MouseEvent *event) final;
+
+  virtual void OnMouseLeave(MouseEvent *event) final;
+
+  virtual void OnMouseMove(MouseEvent *event) final;
+
+  virtual void OnMouseButton(MouseEvent *event) final;
+
+  virtual void OnKeyboardKey(KeyEvent *event) final;
+
+  virtual void OnDraw(const Context *context) final;
 
  private:
 
-  AbstractView *view_;
+  Margin margin_;
 
 };
 

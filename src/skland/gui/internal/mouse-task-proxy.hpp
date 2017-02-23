@@ -18,7 +18,8 @@
 #define SKLAND_GUI_INTERNAL_MOUSE_TASK_PROXY_HPP_
 
 #include "view-task.hpp"
-#include <skland/gui/abstract-view.hpp>
+
+#include "abstract-view-private.hpp"
 
 namespace skland {
 
@@ -48,11 +49,11 @@ class MouseTaskProxy {
    * @param view
    */
   void PushFront(AbstractView *view) {
-    view_->mouse_task_->PushFront(view->mouse_task_.get());
+    view_->data_->mouse_task.PushFront(&view->data_->mouse_task);
   }
 
   void PushFront(const MouseTaskProxy &other) {
-    view_->mouse_task_->PushFront(other.view_->mouse_task_.get());
+    view_->data_->mouse_task.PushFront(&other.view_->data_->mouse_task);
   }
 
   /**
@@ -60,44 +61,44 @@ class MouseTaskProxy {
    * @param view
    */
   void PushBack(AbstractView *view) {
-    view_->mouse_task_->PushBack(view->mouse_task_.get());
+    view_->data_->mouse_task.PushBack(&view->data_->mouse_task);
   }
 
   void PushBack(const MouseTaskProxy &other) {
-    view_->mouse_task_->PushBack(other.view_->mouse_task_.get());
+    view_->data_->mouse_task.PushBack(&other.view_->data_->mouse_task);
   }
 
   ViewTask *GetTask() const {
-    return view_->mouse_task_.get();
+    return &view_->data_->mouse_task;
   }
 
   ViewTask *GetPreviousTask() const {
-    return static_cast<ViewTask *>(view_->mouse_task_->previous());
+    return static_cast<ViewTask *>(view_->data_->mouse_task.previous());
   }
 
   ViewTask *GetNextTask() const {
-    return static_cast<ViewTask *>(view_->mouse_task_->next());
+    return static_cast<ViewTask *>(view_->data_->mouse_task.next());
   }
 
   MouseTaskProxy &operator++() {
-    view_ = static_cast<ViewTask *>(view_->mouse_task_->next())->view;
+    view_ = static_cast<ViewTask *>(view_->data_->mouse_task.next())->view;
     return *this;
   }
 
   MouseTaskProxy operator++(int) {
     MouseTaskProxy proxy(*this);
-    proxy.view_ = static_cast<ViewTask *>(view_->mouse_task_->next())->view;
+    proxy.view_ = static_cast<ViewTask *>(view_->data_->mouse_task.next())->view;
     return proxy;
   }
 
   MouseTaskProxy &operator--() {
-    view_ = static_cast<ViewTask *>(view_->mouse_task_->previous())->view;
+    view_ = static_cast<ViewTask *>(view_->data_->mouse_task.previous())->view;
     return *this;
   }
 
   MouseTaskProxy operator--(int) {
     MouseTaskProxy proxy(*this);
-    proxy.view_ = static_cast<ViewTask *>(view_->mouse_task_->previous())->view;
+    proxy.view_ = static_cast<ViewTask *>(view_->data_->mouse_task.previous())->view;
     return proxy;
   }
 

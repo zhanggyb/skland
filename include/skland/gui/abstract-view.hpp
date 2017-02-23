@@ -208,21 +208,13 @@ class AbstractView : public Object {
 
  private:
 
+  struct Private;
+
   bool visible_;
 
   Rect geometry_;
 
-  /**
-   * Used in event loop to render this view
-   */
-  std::unique_ptr<RedrawTask> redraw_task_;
-
-  /**
-   * This property used in Input to dispatch mouse events for this view
-   */
-  std::unique_ptr<ViewTask> mouse_task_;
-
-  std::unique_ptr<ViewTask> mouse_motion_task_;
+  std::unique_ptr<Private> data_;
 
   // Damage area
   bool is_damaged_;

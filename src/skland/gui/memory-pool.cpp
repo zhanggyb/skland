@@ -16,11 +16,8 @@
 
 #include <skland/gui/memory-pool.hpp>
 
-#include <skland/gui/display.hpp>
-
 #include <stdlib.h>
 #include <malloc.h>
-#include <cstring>
 #include <unistd.h>
 
 #define HAVE_POSIX_FALLOCATE

@@ -14,38 +14,9 @@
  * limitations under the License.
  */
 
-#include "test.hpp"
+#include <gtest/gtest.h>
 
-#include <skland/gui/application.hpp>
-#include <skland/gui/window.hpp>
-
-using skland::Application;
-using skland::Window;
-
-Test::Test()
-    : testing::Test() {
-}
-
-Test::~Test() {
-
-}
-
-/**
- * @brief Show a default empty window
- *
- * Expected result: display and resize a default window
- */
-TEST_F(Test, show) {
-  int argc = 1;
-  char argv1[] = "show";  // to avoid compile warning
-  char *argv[] = {argv1};
-
-  Application app(argc, argv);
-
-  Window win(400, 300, "Test Window");
-  win.Show();
-
-  int result = app.Run();
-
-  ASSERT_TRUE(result == 0);
+int main(int argc, char *argv[]) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

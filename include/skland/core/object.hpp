@@ -43,35 +43,21 @@ class Object : public Trackable {
 
   Object();
 
-  Object(const char *name);
-
   virtual ~Object();
 
-  inline Object *parent() const {
-    return parent_;
-  }
+  Object *parent() const { return parent_; }
 
  protected:
 
-  inline Object *previous() const {
-    return previous_;
-  }
+  Object *previous() const { return previous_; }
 
-  inline Object *next() const {
-    return next_;
-  }
+  Object *next() const { return next_; }
 
-  inline Object *first_child() const {
-    return first_child_;
-  }
+  Object *first_child() const { return first_child_; }
 
-  inline Object *last_child() const {
-    return last_child_;
-  }
+  Object *last_child() const { return last_child_; }
 
-  inline int children_count() const {
-    return children_count_;
-  }
+  int children_count() const { return children_count_; }
 
   Object *GetChildAt(int index) const;
 

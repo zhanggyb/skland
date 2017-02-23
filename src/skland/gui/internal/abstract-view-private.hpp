@@ -14,28 +14,35 @@
  * limitations under the License.
  */
 
-#include <skland/gui/cursor.hpp>
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
 
-#include "internal/display-proxy.hpp"
+#include <skland/gui/abstract-view.hpp>
+
+#include "redraw-task.hpp"
+#include "view-task.hpp"
 
 namespace skland {
 
-Cursor *Cursor::Create(struct wl_cursor *wl_cursor) {
-  Cursor *cursor = new Cursor;
+struct AbstractView::Private {
 
-  cursor->wl_surface_.Setup(DisplayProxy().wl_compositor());
-  cursor->wl_cursor_ = wl_cursor;
+  Private() = delete;
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
 
-  struct wl_cursor_image *image = wl_cursor->images[0];
-  struct wl_buffer *buffer = wl_cursor_image_get_buffer(image);
+  Private(AbstractView *view)
+      : redraw_task(view),
+        mouse_task(view),
+        mouse_motion_task(view) {}
 
-  // TODO: attach buffer to surface
-  cursor->wl_surface_.Attach(buffer, 0, 0);
+  ~Private() {}
 
-  return cursor;
+  RedrawTask redraw_task;
+  ViewTask mouse_task;
+  ViewTask mouse_motion_task;
+
+};
+
 }
 
-Cursor::~Cursor() {
-}
-
-}
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_

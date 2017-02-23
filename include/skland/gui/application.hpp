@@ -23,8 +23,6 @@
 
 namespace skland {
 
-class Display;
-
 /**
  * @ingroup gui
  * @brief Singleton application object
@@ -45,7 +43,7 @@ class Application {
 
   static void Exit();
 
-  static inline Application *instance() {
+  static inline Application *Get() {
     return Application::kInstance;
   }
 

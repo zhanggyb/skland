@@ -16,7 +16,6 @@
 
 #include <skland/gui/egl-window.hpp>
 
-#include <skland/gui/display.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window-frame.hpp>
@@ -155,6 +154,8 @@ Surface *EGLWindow::OnGetSurface(const AbstractView *view) const {
 }
 
 void EGLWindow::OnResize(int width, int height) {
+  resize(width, height);
+
   RectI input_rect(width, height);
   Surface *shell_surface = toplevel_shell_surface();
 

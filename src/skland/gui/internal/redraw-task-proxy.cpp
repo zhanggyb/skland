@@ -17,20 +17,20 @@
 #include "redraw-task-proxy.hpp"
 
 #include "redraw-task.hpp"
-#include <skland/gui/abstract-view.hpp>
+#include "abstract-view-private.hpp"
 
 namespace skland {
 
 void RedrawTaskProxy::SetContext(const Context &context) {
-  view_->redraw_task_->context = context;
+  view_->data_->redraw_task.context = context;
 }
 
 void RedrawTaskProxy::MoveToHead() {
-  AbstractView::kRedrawTaskHead.PushBack(view_->redraw_task_.get());
+  AbstractView::kRedrawTaskHead.PushBack(&view_->data_->redraw_task);
 }
 
 void RedrawTaskProxy::MoveToTail() {
-  AbstractView::kRedrawTaskTail.PushFront(view_->redraw_task_.get());
+  AbstractView::kRedrawTaskTail.PushFront(&view_->data_->redraw_task);
 }
 
 }

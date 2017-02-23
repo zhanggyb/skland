@@ -18,9 +18,11 @@
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
+#include <skland/gui/linear-layout.hpp>
 
 using skland::Application;
 using skland::Window;
+using skland::LinearLayout;
 
 Test::Test()
     : testing::Test() {
@@ -31,11 +33,11 @@ Test::~Test() {
 }
 
 /**
- * @brief Show a default empty window
+ * @brief Show a linear layout in a simple window
  *
  * Expected result: display and resize a default window
  */
-TEST_F(Test, show) {
+TEST_F(Test, regular) {
   int argc = 1;
   char argv1[] = "show";  // to avoid compile warning
   char *argv[] = {argv1};
@@ -43,6 +45,7 @@ TEST_F(Test, show) {
   Application app(argc, argv);
 
   Window win(400, 300, "Test Window");
+  win.SetMainWidget(new LinearLayout);
   win.Show();
 
   int result = app.Run();

@@ -24,7 +24,6 @@
 
 #include <string>
 
-
 namespace skland {
 
 class Display;

@@ -16,7 +16,6 @@
 
 #include <skland/gui/sub-surface.hpp>
 #include <skland/core/defines.hpp>
-#include <skland/gui/display.hpp>
 #include <skland/gui/surface.hpp>
 
 #include "internal/display-proxy.hpp"

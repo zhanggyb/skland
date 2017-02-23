@@ -24,6 +24,9 @@ namespace skland {
 
 class DisplayProxy {
 
+  DisplayProxy(const DisplayProxy &) = delete;
+  DisplayProxy &operator=(const DisplayProxy &) = delete;
+
  public:
 
   DisplayProxy()

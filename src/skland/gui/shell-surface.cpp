@@ -15,7 +15,6 @@
  */
 
 #include <skland/gui/shell-surface.hpp>
-#include <skland/gui/display.hpp>
 #include <skland/gui/surface.hpp>
 
 #include <skland/gui/toplevel-shell-surface.hpp>

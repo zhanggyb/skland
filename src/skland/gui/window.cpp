@@ -58,7 +58,7 @@ Window::~Window() {
   delete main_surface_;
 }
 
-void Window::SetMainWidget(AbstractWidget *widget) {
+void Window::SetMainWidget(AbstractView *widget) {
   if (widget == main_widget_) return;
 
   if (main_widget_) delete main_widget_;
@@ -156,6 +156,8 @@ void Window::OnKeyboardKey(KeyEvent *event) {
 }
 
 void Window::OnResize(int width, int height) {
+  resize(width, height);
+
   RectI input_rect(width, height);
   Surface *shell_surface = toplevel_shell_surface();
 
