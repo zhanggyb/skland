@@ -17,30 +17,17 @@
 #ifndef SKLAND_GUI_DISPLAY_HPP_
 #define SKLAND_GUI_DISPLAY_HPP_
 
-#include "cursor.hpp"
-
 #include "../core/object.hpp"
 #include "../core/types.hpp"
 
-#include "../egl/display.hpp"
+#include "cursor.hpp"
 
 //#include <xkbcommon/xkbcommon.h>
 
 #include <list>
-#include <set>
 #include <vector>
-
-#include <skland/wayland/display.hpp>
-#include <skland/wayland/registry.hpp>
-#include <skland/wayland/compositor.hpp>
-#include <skland/wayland/subcompositor.hpp>
-#include <skland/wayland/shm.hpp>
-#include <skland/wayland/shell.hpp>
-#include <skland/wayland/xdg-shell.hpp>
-#include <skland/wayland/cursor-theme.hpp>
-#include <skland/wayland/data-device-manager.hpp>
-
-#include <EGL/egl.h>
+#include <set>
+#include <memory>
 
 namespace skland {
 
@@ -48,6 +35,8 @@ namespace skland {
 
 class Output;
 class Input;
+
+class DisplayProxy;
 
 struct Global {
   uint32_t id;
@@ -64,6 +53,7 @@ class Display : public Object {
   friend class Application;
   friend class Output;
   friend class Input;
+  friend class DisplayProxy;
 
  public:
 
@@ -85,39 +75,9 @@ class Display : public Object {
     return kDisplay->cursors_[cursor_type];
   }
 
-  static const wayland::Display &wl_display() {
-    return kDisplay->wl_display_;
-  }
-
-  static const wayland::Compositor &wl_compositor() {
-    return kDisplay->wl_compositor_;
-  }
-
-  static const wayland::SubCompositor &wl_subcompositor() {
-    return kDisplay->wl_subcompositor_;
-  }
-
-  static const wayland::Shm &wl_shm() {
-    return kDisplay->wl_shm_;
-  }
-
-  static const wayland::XdgShell &xdg_shell() {
-    return kDisplay->xdg_shell_;
-  }
-
-  static const wayland::Shell &wl_shell() {
-    return kDisplay->wl_shell_;
-  }
-
-  static const wayland::DataDeviceManager &wl_data_device_manager() {
-    return kDisplay->wl_data_device_manager_;
-  }
-
-  static const egl::Display &egl_display() {
-    return kDisplay->egl_display_;
-  }
-
  private:
+
+  struct Private;
 
   void OnError(void *object_id,
                uint32_t code,
@@ -153,21 +113,9 @@ class Display : public Object {
 
   void ReleaseCursors();
 
-  wayland::Display wl_display_;
-  wayland::Registry wl_registry_;
-  wayland::Compositor wl_compositor_;
-  wayland::SubCompositor wl_subcompositor_;
-  wayland::Shm wl_shm_;
-  wayland::Shell wl_shell_;
-  wayland::XdgShell xdg_shell_;  /* xdg shell v6 */
-  wayland::CursorTheme wl_cursor_theme_;
-  wayland::DataDeviceManager wl_data_device_manager_;
-
-//  struct xkb_context *xkb_context_;
+  std::unique_ptr<Private> data_;
 
   int display_fd_;
-
-  egl::Display egl_display_;
 
   /* output list */
   Output *first_output_;

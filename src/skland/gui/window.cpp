@@ -27,6 +27,7 @@
 
 #include <skland/graphic/canvas.hpp>
 
+#include "internal/display-proxy.hpp"
 #include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
 #include "internal/redraw-task-proxy.hpp"
@@ -47,7 +48,7 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
     DBG_ASSERT(main_surface_->parent() == parent);
     DBG_ASSERT(main_surface_->below() == parent);
     wayland::Region empty_region;
-    empty_region.Setup(Display::wl_compositor());
+    empty_region.Setup(DisplayProxy().wl_compositor());
     main_surface_->SetInputRegion(empty_region);
   }
 }
@@ -164,7 +165,7 @@ void Window::OnResize(int width, int height) {
                     height + AbstractWindowFrame::kResizingMargin.tb());
 
   wayland::Region input_region;
-  input_region.Setup(Display::wl_compositor());
+  input_region.Setup(DisplayProxy().wl_compositor());
   input_region.Add(input_rect.x(), input_rect.y(),
                    input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);

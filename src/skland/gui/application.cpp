@@ -30,6 +30,8 @@
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/surface.hpp>
 
+#include "internal/display-private.hpp"
+
 /**
  * Compile-time computation of number of items in a hardcoded array.
  *
@@ -117,11 +119,11 @@ int Application::Run() {
       task->Run();
     }
 
-    Display::kDisplay->wl_display_.DispatchPending();
+    Display::kDisplay->data_->wl_display.DispatchPending();
 
     if (!kInstance->running_) break;
 
-    ret = Display::kDisplay->wl_display_.Flush();
+    ret = Display::kDisplay->data_->wl_display.Flush();
     if (ret < 0 && errno == EAGAIN) {
       DBG_PRINT_MSG("%s\n", "Error when flush display");
       ep[0].events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
@@ -203,14 +205,14 @@ void Application::HandleEpollEvents(uint32_t events) {
     return;
   }
   if (events & EPOLLIN) {
-    if (Display::kDisplay->wl_display_.Dispatch() == -1) {
+    if (Display::kDisplay->data_->wl_display.Dispatch() == -1) {
       Exit();
       return;
     }
   }
   if (events & EPOLLOUT) {
     struct epoll_event ep;
-    int ret = Display::kDisplay->wl_display_.Flush();
+    int ret = Display::kDisplay->data_->wl_display.Flush();
     if (ret == 0) {
       ep.events = EPOLLIN | EPOLLERR | EPOLLHUP;
       ep.data.ptr = NULL;

@@ -26,6 +26,7 @@
 
 #include <skland/gui/abstract-window-frame.hpp>
 
+#include "internal/display-proxy.hpp"
 #include "internal/view-task.hpp"
 #include "internal/mouse-task-proxy.hpp"
 
@@ -59,7 +60,7 @@ AbstractWindow::AbstractWindow(int width,
   height += AbstractWindowFrame::kResizingMargin.tb();
 
   wayland::Region input_region;
-  input_region.Setup(Display::wl_compositor());
+  input_region.Setup(DisplayProxy().wl_compositor());
   input_region.Add(x, y, width, height);
   toplevel_shell_surface_->SetInputRegion(input_region);
 

@@ -48,7 +48,7 @@ class Input : public Object {
 
  public:
 
-  Input(const wayland::Registry &registry, uint32_t id, uint32_t version);
+  Input(uint32_t id, uint32_t version);
 
   virtual ~Input();
 

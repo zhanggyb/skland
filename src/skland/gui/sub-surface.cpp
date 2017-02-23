@@ -19,6 +19,8 @@
 #include <skland/gui/display.hpp>
 #include <skland/gui/surface.hpp>
 
+#include "internal/display-proxy.hpp"
+
 namespace skland {
 
 Surface *SubSurface::Create(Surface *parent, AbstractView *view, const Margin &margin) {
@@ -37,7 +39,7 @@ SubSurface::SubSurface(Surface *surface, Surface *parent)
     : surface_(surface) {
   DBG_ASSERT(surface_);
   DBG_ASSERT(parent);
-  wl_sub_surface_.Setup(Display::wl_subcompositor(),
+  wl_sub_surface_.Setup(DisplayProxy().wl_subcompositor(),
                         surface_->wl_surface_,
                         parent->wl_surface_);
   SetParent(parent);

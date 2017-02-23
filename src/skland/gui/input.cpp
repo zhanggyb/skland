@@ -24,10 +24,11 @@
 #include <skland/gui/abstract-window.hpp>
 
 #include "internal/mouse-task-proxy.hpp"
+#include "internal/display-proxy.hpp"
 
 namespace skland {
 
-Input::Input(const wayland::Registry &registry, uint32_t id, uint32_t version)
+Input::Input(uint32_t id, uint32_t version)
     : Object(),
       display_(nullptr),
       key_event_(nullptr),
@@ -35,7 +36,7 @@ Input::Input(const wayland::Registry &registry, uint32_t id, uint32_t version)
       touch_event_(nullptr) {
   wl_seat_.capabilities().Set(this, &Input::OnSeatCapabilities);
   wl_seat_.name().Set(this, &Input::OnSeatName);
-  wl_seat_.Setup(registry, id, version);
+  wl_seat_.Setup(DisplayProxy().wl_registry(), id, version);
 }
 
 Input::~Input() {

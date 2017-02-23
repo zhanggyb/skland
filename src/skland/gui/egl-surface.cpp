@@ -19,6 +19,8 @@
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/surface.hpp>
 
+#include "internal/display-proxy.hpp"
+
 namespace skland {
 
 EGLSurface *EGLSurface::Get(Surface *surface) {
@@ -30,7 +32,7 @@ EGLSurface *EGLSurface::Get(Surface *surface) {
 
 EGLSurface::EGLSurface(Surface *surface)
     : surface_(surface) {
-  egl_surface_.Setup(Display::egl_display(),
+  egl_surface_.Setup(DisplayProxy().egl_display(),
                      surface_->wl_surface_,
                      surface->view()->width(),
                      surface->view()->height());
@@ -42,19 +44,19 @@ EGLSurface::~EGLSurface() {
 }
 
 bool EGLSurface::MakeCurrent() {
-  return Display::egl_display().MakeCurrent(egl_surface_, egl_surface_);
+  return DisplayProxy().egl_display().MakeCurrent(egl_surface_, egl_surface_);
 }
 
 bool EGLSurface::SwapBuffers() {
-  return Display::egl_display().SwapBuffers(egl_surface_);
+  return DisplayProxy().egl_display().SwapBuffers(egl_surface_);
 }
 
 bool EGLSurface::SwapBuffersWithDamage(int x, int y, int width, int height) {
-  return Display::egl_display().SwapBuffersWithDamage(egl_surface_, x, y, width, height);
+  return DisplayProxy().egl_display().SwapBuffersWithDamage(egl_surface_, x, y, width, height);
 }
 
 bool EGLSurface::SwapInterval(EGLint interval) {
-  return Display::egl_display().SwapInterval(interval);
+  return DisplayProxy().egl_display().SwapInterval(interval);
 }
 
 } // namespace skland

@@ -17,12 +17,14 @@
 #include <skland/gui/cursor.hpp>
 #include <skland/gui/display.hpp>
 
+#include "internal/display-proxy.hpp"
+
 namespace skland {
 
 Cursor *Cursor::Create(struct wl_cursor *wl_cursor) {
   Cursor *cursor = new Cursor;
 
-  cursor->wl_surface_.Setup(Display::wl_compositor());
+  cursor->wl_surface_.Setup(DisplayProxy().wl_compositor());
   cursor->wl_cursor_ = wl_cursor;
 
   struct wl_cursor_image *image = wl_cursor->images[0];

@@ -16,9 +16,7 @@
 
 #include <skland/gui/memory-pool.hpp>
 
-#include <skland/gui/shared-memory.hpp>
 #include <skland/gui/display.hpp>
-#include <skland/gui/buffer.hpp>
 
 #include <stdlib.h>
 #include <malloc.h>
@@ -32,6 +30,8 @@
 #include <fcntl.h>
 #include <new>
 #endif
+
+#include "internal/display-proxy.hpp"
 
 namespace skland {
 
@@ -47,7 +47,7 @@ void MemoryPool::Setup(int32_t size) {
     throw std::runtime_error("Cannot map shared memory");
   }
 
-  wl_shm_pool_.Setup(Display::wl_shm(), fd, size);
+  wl_shm_pool_.Setup(DisplayProxy().wl_shm(), fd, size);
   size_ = size;
   close(fd);
 }
