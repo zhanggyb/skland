@@ -23,7 +23,7 @@ namespace skland {
 
 class AbstractView;
 
-struct ViewTask : public Task {
+SKLAND_NO_EXPORT struct ViewTask : public Task {
   ViewTask(const ViewTask &) = delete;
   ViewTask &operator=(const ViewTask &) = delete;
 

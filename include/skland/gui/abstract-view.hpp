@@ -17,6 +17,7 @@
 #ifndef SKLAND_GUI_ABSTRACT_VIEW_HPP_
 #define SKLAND_GUI_ABSTRACT_VIEW_HPP_
 
+#include "../core/defines.hpp"
 #include "../core/object.hpp"
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
@@ -66,7 +67,7 @@ class MouseTaskProxy;
  * @see AbstractWindow
  * @see Surface
  */
-class AbstractView : public Object {
+SKLAND_EXPORT class AbstractView : public Object {
 
   friend class Application;
   friend class Display;

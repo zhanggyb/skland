@@ -23,7 +23,7 @@
 
 namespace skland {
 
-class AbstractLayout : public AbstractView {
+SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   AbstractLayout(const AbstractLayout &) = delete;
   AbstractLayout &operator=(const AbstractLayout &) = delete;

@@ -25,6 +25,7 @@ mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules/")
 
 option(BUILD_UNIT_TEST "Build unit test code" OFF)
+option(BUILD_SHARED_LIBRARY "Build shared library" OFF)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(APPLE TRUE)
@@ -48,26 +49,7 @@ else ()
     set(CMAKE_CXX_FLAGS "-O3 -std=c++11")
 endif ()
 
-set(SKIA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/skia)
-list(APPEND SKIA_PUBLIC_INCLUDES
-        "${SKIA_SOURCE_DIR}/include/android"
-        "${SKIA_SOURCE_DIR}/include/c"
-        "${SKIA_SOURCE_DIR}/include/codec"
-        "${SKIA_SOURCE_DIR}/include/core"
-        "${SKIA_SOURCE_DIR}/include/effects"
-        "${SKIA_SOURCE_DIR}/include/gpu"
-        "${SKIA_SOURCE_DIR}/include/gpu/effects"
-        "${SKIA_SOURCE_DIR}/include/gpu/gl"
-        "${SKIA_SOURCE_DIR}/include/images"
-        "${SKIA_SOURCE_DIR}/include/pathops"
-        "${SKIA_SOURCE_DIR}/include/ports"
-        "${SKIA_SOURCE_DIR}/include/utils"
-        "${SKIA_SOURCE_DIR}/include/private")
-
-add_subdirectory(deps)
-
 if (LINUX)
-
     find_package(EGL)
     if (EGL_FOUND)
         # set(HAVE_EGL 1)
@@ -80,9 +62,7 @@ if (LINUX)
         include_directories(${WAYLAND_CLIENT_INCLUDE_DIR} ${WAYLAND_EGL_INCLUDE_DIR})
         set(LIBS ${LIBS} ${WAYLAND_CLIENT_LIBRARIES} ${WAYLAND_EGL_LIBRARIES})
     endif ()
-
     #add_definitions(-D__UNIX__)
-
 endif ()
 
 find_package(Doxygen)
@@ -112,6 +92,34 @@ if (BUILD_DOCUMENTATION)
             VERBATIM)
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share/doc)
 endif ()
+
+# ----------------------------------------------------------------------------
+# Global definitions
+# ----------------------------------------------------------------------------
+if (BUILD_SHARED_LIBRARY)
+    add_definitions(-DSKLAND_SHARED_EXPORT)
+endif ()
+
+# ----------------------------------------------------------------------------
+# Sub directories
+# ----------------------------------------------------------------------------
+set(SKIA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/skia)
+list(APPEND SKIA_PUBLIC_INCLUDES
+        "${SKIA_SOURCE_DIR}/include/android"
+        "${SKIA_SOURCE_DIR}/include/c"
+        "${SKIA_SOURCE_DIR}/include/codec"
+        "${SKIA_SOURCE_DIR}/include/core"
+        "${SKIA_SOURCE_DIR}/include/effects"
+        "${SKIA_SOURCE_DIR}/include/gpu"
+        "${SKIA_SOURCE_DIR}/include/gpu/effects"
+        "${SKIA_SOURCE_DIR}/include/gpu/gl"
+        "${SKIA_SOURCE_DIR}/include/images"
+        "${SKIA_SOURCE_DIR}/include/pathops"
+        "${SKIA_SOURCE_DIR}/include/ports"
+        "${SKIA_SOURCE_DIR}/include/utils"
+        "${SKIA_SOURCE_DIR}/include/private")
+
+add_subdirectory(deps)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 

@@ -58,4 +58,24 @@
 
 #endif // END DEBUG
 
+#ifdef SKLAND_SHARED_EXPORT
+#define SKLAND_EXPORT __attribute__((visibility("default")))
+#define SKLAND_NO_EXPORT __attribute__((visibility("hidden")))
+#else
+#define SKLAND_EXPORT
+#define SKLAND_NO_EXPORT
+#endif  // SKLAND_SHARED_EXPORT
+
+#ifndef SKLAND_DEPRECATED
+#define SKLAND_DEPRECATED __attribute__ ((__deprecated__))
+#endif
+
+#ifndef SKLAND_DEPRECATED_EXPORT
+#define SKLAND_DEPRECATED_EXPORT SKLAND_EXPORT SKLAND_DEPRECATED
+#endif
+
+#ifndef SKLAND_DEPRECATED_NO_EXPORT
+#define SKLAND_DEPRECATED_NO_EXPORT SKLAND_NO_EXPORT SKLAND_DEPRECATED
+#endif
+
 #endif // SKLAND_CORE_DEFINES_HPP_

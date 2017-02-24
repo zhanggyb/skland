@@ -33,7 +33,7 @@ namespace skland {
  * @ingroup gui
  * @brief Abstract class for top level windows
  */
-class AbstractWindow : public AbstractView {
+SKLAND_EXPORT class AbstractWindow : public AbstractView {
 
   friend class AbstractWindowFrame;
 

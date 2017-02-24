@@ -79,7 +79,12 @@ set(global_header "${PROJECT_SOURCE_DIR}/include/skland/skland.hpp")
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
-add_library(skland ${global_header} ${all_source_files})
+if (BUILD_SHARED_LIBRARY)
+    add_library(skland SHARED ${global_header} ${all_source_files})
+    set_target_properties(skland PROPERTIES VERSION 1 SOVERSION 1)
+else ()
+    add_library(skland ${global_header} ${all_source_files})
+endif ()
 
 target_include_directories(skland
         PRIVATE "${SKIA_PUBLIC_INCLUDES}"
@@ -89,10 +94,6 @@ if (LINUX)
     target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client)
 else ()
     target_link_libraries(skland ${LIBS} skia)
-endif ()
-
-if (NOT DEFINED BUILD_STATIC_LIBRARY)
-    set_target_properties(skland PROPERTIES VERSION 1 SOVERSION 1)
 endif ()
 
 install(TARGETS skland DESTINATION lib)

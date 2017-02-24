@@ -24,7 +24,7 @@ namespace skland {
 
 class AbstractView;
 
-struct RedrawTask : public ViewTask {
+SKLAND_NO_EXPORT struct RedrawTask : public ViewTask {
   RedrawTask(const RedrawTask &) = delete;
   RedrawTask &operator=(const RedrawTask &) = delete;
 

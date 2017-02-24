@@ -27,7 +27,7 @@ namespace skland {
  * @ingroup gui
  * @brief Singleton application object
  */
-class Application {
+SKLAND_EXPORT class Application {
 
  public:
 
