@@ -18,6 +18,8 @@
 #define SKLAND_GUI_MOUSE_EVENT_HPP_
 
 #include "input-event.hpp"
+
+#include <wayland-client.h>
 #include <linux/input-event-codes.h>
 
 namespace skland {

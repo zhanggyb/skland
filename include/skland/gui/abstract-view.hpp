@@ -123,6 +123,10 @@ SKLAND_EXPORT class AbstractView : public Object {
 
   virtual bool Contain(int x, int y) const;
 
+  virtual bool IsExpandX() const;
+
+  virtual bool IsExpandY() const;
+
   virtual Size GetMinimalSize() const = 0;
 
   virtual Size GetPreferredSize() const = 0;

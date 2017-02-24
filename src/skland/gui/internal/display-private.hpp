@@ -48,13 +48,13 @@ struct Display::Private {
   wayland::SubCompositor wl_subcompositor;
   wayland::Shm wl_shm;
   wayland::Shell wl_shell;
-  wayland::XdgShell xdg_shell;  /* xdg shell v6 */
+  wayland::XdgShell xdg_shell;
   wayland::CursorTheme wl_cursor_theme;
   wayland::DataDeviceManager wl_data_device_manager;
 
   egl::Display egl_display;
 
-//  struct xkb_context *xkb_context_;
+  struct xkb_context *xkb_context;
 
 };
 

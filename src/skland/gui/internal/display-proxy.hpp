@@ -36,40 +36,44 @@ class DisplayProxy {
 
   ~DisplayProxy() {}
 
-  const wayland::Display &wl_display() {
+  const wayland::Display &wl_display() const {
     return display_->data_->wl_display;
   }
 
-  const wayland::Registry &wl_registry() {
+  const wayland::Registry &wl_registry() const {
     return display_->data_->wl_registry;
   }
 
-  const wayland::Compositor &wl_compositor() {
+  const wayland::Compositor &wl_compositor() const {
     return display_->data_->wl_compositor;
   }
 
-  const wayland::SubCompositor &wl_subcompositor() {
+  const wayland::SubCompositor &wl_subcompositor() const {
     return display_->data_->wl_subcompositor;
   }
 
-  const wayland::Shm &wl_shm() {
+  const wayland::Shm &wl_shm() const {
     return display_->data_->wl_shm;
   }
 
-  const wayland::XdgShell &xdg_shell() {
+  const wayland::XdgShell &xdg_shell() const {
     return display_->data_->xdg_shell;
   }
 
-  const wayland::Shell &wl_shell() {
+  const wayland::Shell &wl_shell() const {
     return display_->data_->wl_shell;
   }
 
-  const wayland::DataDeviceManager &wl_data_device_manager() {
+  const wayland::DataDeviceManager &wl_data_device_manager() const {
     return display_->data_->wl_data_device_manager;
   }
 
-  const egl::Display &egl_display() {
+  const egl::Display &egl_display() const {
     return display_->data_->egl_display;
+  }
+
+  struct xkb_context *xkb_context() const {
+    return display_->data_->xkb_context;
   }
 
  private:

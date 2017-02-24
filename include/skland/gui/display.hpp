@@ -22,7 +22,7 @@
 
 #include "cursor.hpp"
 
-//#include <xkbcommon/xkbcommon.h>
+#include <xkbcommon/xkbcommon.h>
 
 #include <list>
 #include <vector>

@@ -72,6 +72,14 @@ bool AbstractView::Contain(int x, int y) const {
   return geometry_.Contain(x, y);
 }
 
+bool AbstractView::IsExpandX() const {
+  return false;
+}
+
+bool AbstractView::IsExpandY() const {
+  return false;
+}
+
 void AbstractView::UpdateAll() {
   Update();
   for (AbstractView *sub = last_subview(); sub; sub = sub->previous_view()) {

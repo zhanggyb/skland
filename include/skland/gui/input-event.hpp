@@ -17,41 +17,52 @@
 #ifndef SKLAND_GUI_INPUT_EVENT_HPP_
 #define SKLAND_GUI_INPUT_EVENT_HPP_
 
-#include "input.hpp"
+#include "../core/defines.hpp"
 
 namespace skland {
 
 class Input;
+class Cursor;
 
-class InputEvent {
+namespace wayland {
+class Seat;
+}
+
+SKLAND_EXPORT class InputEvent {
 
   friend class Input;
 
  public:
 
+  enum Response {
+    kUnknown,
+    kAccept,
+    kIgnore,
+    kReject
+  };
+
   InputEvent(Input *input)
-      : input_(input), accepted_(false) {}
+      : input_(input),
+        response_(kUnknown) {
+
+  }
 
   virtual ~InputEvent() {}
 
-  void SetCursor(const Cursor *cursor) const {
-    input_->SetCursor(cursor);
-  }
+  void SetCursor(const Cursor *cursor) const;
 
-  const wayland::Seat &wl_seat() const {
-    return input_->wl_seat();
-  }
+  const wayland::Seat &GetSeat() const;
 
   void Accept() {
-    accepted_ = true;
+    response_ = kAccept;
   }
 
   void Ignore() {
-    accepted_ = false;
+    response_ = kIgnore;
   }
 
-  bool accepted() const {
-    return accepted_;
+  bool IsAccepted() const {
+    return kAccept == response_;
   }
 
  protected:
@@ -62,7 +73,7 @@ class InputEvent {
 
   Input *input_;
 
-  bool accepted_;
+  Response response_;
 
 };
 

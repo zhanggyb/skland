@@ -19,10 +19,8 @@
 
 #include "../core/object.hpp"
 
-#include "../wayland/seat.hpp"
-#include "../wayland/pointer.hpp"
-#include "../wayland/keyboard.hpp"
-#include "../wayland/touch.hpp"
+#include <wayland-client.h>
+#include <memory>
 
 namespace skland {
 
@@ -34,11 +32,15 @@ class TouchEvent;
 class AbstractView;
 struct ViewTask;
 
+namespace wayland {
+class Seat;
+}
+
 /**
  * @ingroup gui
  * @brief Input manager
  */
-class Input : public Object {
+SKLAND_EXPORT class Input : public Object {
 
   friend class Display;
 
@@ -54,11 +56,11 @@ class Input : public Object {
 
   void SetCursor(const Cursor *cursor) const;
 
-  const wayland::Seat &wl_seat() const {
-    return wl_seat_;
-  }
+  const wayland::Seat &GetSeat() const;
 
  private:
+
+  struct Private;
 
   /**
    * @brief Callback function for delegate in wl_seat_
@@ -159,16 +161,7 @@ class Input : public Object {
 
   Display *display_;
 
-  wayland::Seat wl_seat_;
-  wayland::Keyboard wl_keyboard_;
-  wayland::Pointer wl_pointer_;
-  wayland::Touch wl_touch_;
-
-  KeyEvent *key_event_;
-  MouseEvent *mouse_event_;
-  TouchEvent *touch_event_;
-
-  std::string name_;
+  std::unique_ptr<Private> data_;
 
 };
 

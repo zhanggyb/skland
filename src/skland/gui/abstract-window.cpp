@@ -307,11 +307,11 @@ void AbstractWindow::AddSubView(AbstractView *view, int pos) {
 }
 
 void AbstractWindow::MoveWithMouse(MouseEvent *event) const {
-  ToplevelShellSurface::Get(toplevel_shell_surface_)->Move(event->wl_seat(), event->serial());
+  ToplevelShellSurface::Get(toplevel_shell_surface_)->Move(event->GetSeat(), event->serial());
 }
 
 void AbstractWindow::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
-  ToplevelShellSurface::Get(toplevel_shell_surface_)->Resize(event->wl_seat(), event->serial(), edges);
+  ToplevelShellSurface::Get(toplevel_shell_surface_)->Resize(event->GetSeat(), event->serial(), edges);
 }
 
 void AbstractWindow::ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height) {

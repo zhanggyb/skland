@@ -66,14 +66,14 @@ void Display::Connect(const char *name) {
     throw std::runtime_error("FATAL! Cannot connect to Wayland compositor!");
   }
 
+  data_->xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+  if (data_->xkb_context == NULL) {
+    throw std::runtime_error("FATAL! Cannot create xkb_context!");
+  }
+
   display_fd_ = data_->wl_display.GetFd();
   data_->egl_display.Setup(data_->wl_display);
   fprintf(stdout, "Use EGL version: %d.%d\n", data_->egl_display.major(), data_->egl_display.minor());
-
-//  xkb_context_ = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
-//  if (xkb_context_ == NULL) {
-//    throw std::runtime_error("Cannot create xkb_context!");
-//  }
 
   data_->wl_registry.global().Set(this, &Display::OnGlobal);
   data_->wl_registry.global_remove().Set(this, &Display::OnGlobalRemove);
@@ -132,7 +132,7 @@ void Display::Connect(const char *name) {
 void Display::Disconnect() noexcept {
   if (!data_->wl_display.IsValid()) return;
 
-//  xkb_context_unref(xkb_context_);
+  xkb_context_unref(data_->xkb_context);
 
   // TODO: other operations
 
