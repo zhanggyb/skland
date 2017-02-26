@@ -56,7 +56,7 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontMgr_custom*.cpp)
 # skslc main()
 remove_srcs(${SKIA_SOURCE_DIR}/src/sksl/SkSLMain.cpp)
 # remove the special splicer source, TODO: config cmake to detect clang and SSE
-# remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
+remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
 # remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages_lowp.cpp)
 
 
@@ -293,6 +293,9 @@ endif ()
 add_definitions(-DSK_CPU_SSE_LEVEL=42)
 set(cc_flags "${cc_flags} -msse4.2")
 #set(cc_flags "${cc_flags} -mfma -msse -msse2 -msse3 -msse4.1 -msse4.2 -mavx -mavx2")
+
+# Global definitions:
+add_definitions(-DSK_IGNORE_ETC1_SUPPORT)   # avoid 'ktx.h' error
 
 set_target_properties(skia PROPERTIES
         COMPILE_FLAGS ${cc_flags})
