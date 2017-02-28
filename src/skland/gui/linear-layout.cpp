@@ -16,15 +16,46 @@
 
 #include <skland/gui/linear-layout.hpp>
 
+#include "internal/abstract-view-iterators.hpp"
+
 namespace skland {
 
-LinearLayout::LinearLayout()
-    : AbstractLayout() {
+LinearLayout::LinearLayout(Orientation orientation, const Padding &padding, int space)
+    : AbstractLayout(padding) {
 
 }
 
 LinearLayout::~LinearLayout() {
 
+}
+
+Size LinearLayout::GetPreferredSize() const {
+  Size size(padding().lr(), padding().tb());
+  Size tmp;
+  int space = 0;
+  ConstIterator it(this);
+
+  if (orientation_ == kVertical) {
+    for (it = it.first_child(); it; ++it) {
+      if (it.view()->visible()) {
+        tmp = it.view()->GetPreferredSize();
+        size.width = std::max(size.width, tmp.width);
+        size.height += (tmp.height + space);
+        space += space_;
+      }
+    }
+  } else {
+    for (it = it.first_child(); it; ++it) {
+      if (it.view()->visible()) {
+        tmp = it.view()->GetPreferredSize();
+        size.width += (tmp.width + space);
+        size.height = std::max(size.height, tmp.height);
+        space += space_;
+      }
+    }
+  }
+
+  return size;
 }
 
 void LinearLayout::OnResize(int width, int height) {

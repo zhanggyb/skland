@@ -23,6 +23,8 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
+#include "internal/abstract-view-iterators.hpp"
+
 //#ifdef DEBUG
 #include <cstdlib>
 #include <skland/gui/timer.hpp>
@@ -52,23 +54,26 @@ Size AbstractLayout::GetMaximalSize() const {
 }
 
 void AbstractLayout::AddView(AbstractView *view) {
+  Iterator it(view);
+
   // TODO: check if view already in this layout
-  if (view->parent() == this)
+  if (it.parent() == this)
     return;
 
-  if (view->parent()) {
-    static_cast<AbstractLayout *>(view->parent())->RemoveView(view);
+  if (it.parent()) {
+    static_cast<AbstractLayout *>(it.parent())->RemoveView(view);
   }
 
-  DBG_ASSERT(nullptr == view->parent());
+  DBG_ASSERT(nullptr == it.parent());
   InsertChild(view);
   OnViewAdded(view);
 }
 
 void AbstractLayout::RemoveView(AbstractView *view) {
-  if (view->parent() != this) {
+  Iterator it(view);
+
+  if (it.parent() != this)
     return;
-  }
 
   RemoveChild(view);
   OnViewRemoved(view);

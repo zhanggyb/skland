@@ -17,17 +17,25 @@
 #ifndef SKLAND_GUI_LINEAR_LAYOUT_HPP_
 #define SKLAND_GUI_LINEAR_LAYOUT_HPP_
 
+#include <skland/core/types.hpp>
 #include "abstract-layout.hpp"
 
 namespace skland {
 
-class LinearLayout final : public AbstractLayout {
+SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
+
+  LinearLayout(const LinearLayout &) = delete;
+  LinearLayout &operator=(const LinearLayout &) = delete;
 
  public:
 
-  LinearLayout();
+  LinearLayout(Orientation orientation = kHorizontal,
+               const Padding &padding = Padding(5),
+               int space = 5);
 
   virtual ~LinearLayout();
+
+  virtual Size GetPreferredSize() const;
 
  protected:
 
@@ -36,6 +44,12 @@ class LinearLayout final : public AbstractLayout {
   virtual void OnViewAdded(AbstractView *view);
 
   virtual void OnViewRemoved(AbstractView *view);
+
+ private:
+
+  Orientation orientation_;
+
+  int space_;
 
 };
 

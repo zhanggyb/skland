@@ -82,6 +82,9 @@ SKLAND_EXPORT class AbstractView : public Trackable {
 
  public:
 
+  class Iterator;
+  class ConstIterator;
+
   /**
    * @brief Default constructor
    *
@@ -135,8 +138,6 @@ SKLAND_EXPORT class AbstractView : public Trackable {
   virtual Size GetPreferredSize() const = 0;
 
   virtual Size GetMaximalSize() const = 0;
-
-  AbstractView *parent() const { return parent_; }
 
  protected:
 
@@ -244,14 +245,6 @@ SKLAND_EXPORT class AbstractView : public Trackable {
     geometry_.Resize(width, height);
   }
 
-  AbstractView *previous() const { return previous_; }
-
-  AbstractView *next() const { return next_; }
-
-  AbstractView *first_child() const { return first_child_; }
-
-  AbstractView *last_child() const { return last_child_; }
-
   /**
    * @brief Get the surface on which this view renders
    * @return A surface object or nullptr
@@ -268,16 +261,7 @@ SKLAND_EXPORT class AbstractView : public Trackable {
 
   Rect geometry_;
 
-  AbstractView *previous_;
-  AbstractView *next_;
-
-  AbstractView *first_child_;
-  AbstractView *last_child_;
-
-  AbstractView *parent_;
-  int children_count_;
-
-  std::unique_ptr<Private> data_;
+  std::unique_ptr<Private> p_;
 
   /**
    * @brief Initialize the idle task list

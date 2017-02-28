@@ -23,6 +23,7 @@
 #include <skland/gui/egl-surface.hpp>
 
 #include "internal/redraw-task.hpp"
+#include "internal/abstract-view-iterators.hpp"
 
 #include <GLES2/gl2.h>
 
@@ -54,9 +55,10 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 
   if (nullptr == sub_surface_) {
     DBG_ASSERT(nullptr == egl_surface_);
-    if (nullptr == parent()) return;
+    Iterator it(this);
+    if (nullptr == it.parent()) return;
 
-    Surface *parent_surface = GetSurface(parent());
+    Surface *parent_surface = GetSurface(it.parent());
     if (nullptr == parent_surface) return;
 
     sub_surface_ = SubSurface::Create(parent_surface, this);

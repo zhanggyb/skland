@@ -161,7 +161,7 @@ SKLAND_EXPORT class Input : public Object {
 
   Display *display_;
 
-  std::unique_ptr<Private> data_;
+  std::unique_ptr<Private> p_;
 
 };
 

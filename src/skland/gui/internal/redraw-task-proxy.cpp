@@ -22,15 +22,15 @@
 namespace skland {
 
 void RedrawTaskProxy::SetContext(const Context &context) {
-  view_->data_->redraw_task.context = context;
+  view_->p_->redraw_task.context = context;
 }
 
 void RedrawTaskProxy::MoveToHead() {
-  AbstractView::kRedrawTaskHead.PushBack(&view_->data_->redraw_task);
+  AbstractView::kRedrawTaskHead.PushBack(&view_->p_->redraw_task);
 }
 
 void RedrawTaskProxy::MoveToTail() {
-  AbstractView::kRedrawTaskTail.PushFront(&view_->data_->redraw_task);
+  AbstractView::kRedrawTaskTail.PushFront(&view_->p_->redraw_task);
 }
 
 }

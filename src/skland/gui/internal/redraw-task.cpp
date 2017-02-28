@@ -25,12 +25,12 @@ void RedrawTask::Run() const {
   view->OnDraw(&context);
   view->visible_ = true;
 
-  if (view->data_->is_damaged_) {
-    context.surface()->Damage(view->data_->damaged_region_.x(),
-                              view->data_->damaged_region_.y(),
-                              view->data_->damaged_region_.width(),
-                              view->data_->damaged_region_.height());
-    view->data_->is_damaged_ = false;
+  if (view->p_->is_damaged_) {
+    context.surface()->Damage(view->p_->damaged_region_.x(),
+                              view->p_->damaged_region_.y(),
+                              view->p_->damaged_region_.width(),
+                              view->p_->damaged_region_.height());
+    view->p_->is_damaged_ = false;
   }
 }
 

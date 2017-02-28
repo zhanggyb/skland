@@ -31,12 +31,27 @@ struct AbstractView::Private {
   Private &operator=(const Private &) = delete;
 
   Private(AbstractView *view)
-      : redraw_task(view),
+      : previous(nullptr),
+        next(nullptr),
+        first_child(nullptr),
+        last_child(nullptr),
+        parent(nullptr),
+        children_count(0),
+        redraw_task(view),
         mouse_task(view),
         mouse_motion_task(view),
         is_damaged_(false) {}
 
   ~Private() {}
+
+  AbstractView *previous;
+  AbstractView *next;
+
+  AbstractView *first_child;
+  AbstractView *last_child;
+
+  AbstractView *parent;
+  int children_count;
 
   RedrawTask redraw_task;
   ViewTask mouse_task;
