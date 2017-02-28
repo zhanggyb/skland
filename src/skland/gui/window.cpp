@@ -155,7 +155,7 @@ void Window::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void Window::OnResize(int width, int height) {
+void Window::OnSizeChanged(int width, int height) {
   resize(width, height);
 
   RectI input_rect(width, height);

@@ -45,7 +45,7 @@ class VideoView final : public AbstractView {
 
   virtual Surface *OnGetSurface(const AbstractView *view) const;
 
-  virtual void OnResize(int width, int height);
+  virtual void OnSizeChanged(int width, int height);
 
   virtual void OnMouseEnter(MouseEvent *event);
 

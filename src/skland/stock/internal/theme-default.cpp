@@ -53,7 +53,7 @@ void CloseButton::SetBackground(const Color &color) {
   Update();
 }
 
-void CloseButton::OnResize(int /* width */, int /* height */) {
+void CloseButton::OnSizeChanged(int /* width */, int /* height */) {
 
 }
 
@@ -118,7 +118,7 @@ Size MaximizeButton::GetPreferredSize() const {
   return Size(WindowFrameDefault::kButtonSize, WindowFrameDefault::kButtonSize);
 }
 
-void MaximizeButton::OnResize(int /* width */, int /* height */) {
+void MaximizeButton::OnSizeChanged(int /* width */, int /* height */) {
 
 }
 
@@ -183,7 +183,7 @@ void MinimizeButton::SetBackground(const Color &color) {
   Update();
 }
 
-void MinimizeButton::OnResize(int /* width */, int /* height */) {
+void MinimizeButton::OnSizeChanged(int /* width */, int /* height */) {
 
 }
 

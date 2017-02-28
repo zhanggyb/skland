@@ -61,7 +61,7 @@ class Window : public AbstractWindow {
 
   virtual void OnKeyboardKey(KeyEvent *event) final;
 
-  virtual void OnResize(int width, int height) final;
+  virtual void OnSizeChanged(int width, int height) final;
 
  private:
 

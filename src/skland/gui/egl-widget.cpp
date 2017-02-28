@@ -75,7 +75,7 @@ Surface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
   return sub_surface_;
 }
 
-void EGLWidget::OnResize(int width, int height) {
+void EGLWidget::OnSizeChanged(int width, int height) {
   resize(width, height);
   resize_ = true;
 //  egl_surface_->Resize(this->width(), this->height());
@@ -108,7 +108,7 @@ void EGLWidget::OnDraw(const Context *context) {
       animating_ = true;
       if (resize_) {
         resize_ = false;
-        OnResize(width(), height());
+        OnSizeChanged(width(), height());
       }
       OnInitializeEGL();
       egl_surface_->surface()->SetupCallback(frame_callback_);

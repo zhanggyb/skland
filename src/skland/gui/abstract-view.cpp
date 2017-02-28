@@ -70,7 +70,7 @@ void AbstractView::Resize(int width, int height) {
   height = clamp(height, min.height, max.height);
 
   if (geometry_.width() != width || geometry_.height() != height) {
-    OnResize(width, height);
+    OnSizeChanged(width, height);
   }
 }
 

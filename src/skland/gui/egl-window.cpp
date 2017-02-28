@@ -153,7 +153,7 @@ Surface *EGLWindow::OnGetSurface(const AbstractView *view) const {
   return nullptr != sub_surface_ ? sub_surface_ : toplevel_shell_surface();
 }
 
-void EGLWindow::OnResize(int width, int height) {
+void EGLWindow::OnSizeChanged(int width, int height) {
   resize(width, height);
 
   RectI input_rect(width, height);

@@ -38,12 +38,6 @@ class TouchEvent;
 class Surface;
 class Context;
 
-// Internal classes
-struct ViewTask;
-struct RedrawTask;
-class RedrawTaskProxy;
-class MouseTaskProxy;
-
 /**
  * @ingroup gui
  * @brief An abstract base class for view object
@@ -215,7 +209,7 @@ SKLAND_EXPORT class AbstractView : public Trackable {
    */
   virtual Surface *OnGetSurface(const AbstractView *view) const;
 
-  virtual void OnResize(int width, int height) = 0;
+  virtual void OnSizeChanged(int width, int height) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) = 0;
 

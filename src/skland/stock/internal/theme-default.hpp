@@ -47,7 +47,7 @@ class CloseButton final : public AbstractButton {
 
  protected:
 
-  virtual void OnResize(int width, int height);
+  virtual void OnSizeChanged(int width, int height);
 
   virtual void OnDraw(const Context *context);
 
@@ -78,7 +78,7 @@ class MaximizeButton final : public AbstractButton {
 
  protected:
 
-  virtual void OnResize(int width, int height);
+  virtual void OnSizeChanged(int width, int height);
 
   virtual void OnDraw(const Context *context);
 
@@ -109,7 +109,7 @@ class MinimizeButton final : public AbstractButton {
 
  protected:
 
-  virtual void OnResize(int width, int height);
+  virtual void OnSizeChanged(int width, int height);
 
   virtual void OnDraw(const Context *context);
 

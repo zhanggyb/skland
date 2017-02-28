@@ -54,7 +54,7 @@ Widget::~Widget() {
 
 }
 
-void Widget::OnResize(int width, int height) {
+void Widget::OnSizeChanged(int width, int height) {
 
 }
 

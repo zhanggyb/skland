@@ -35,7 +35,7 @@ Slider::~Slider() {
 
 }
 
-void Slider::OnResize(int width, int height) {
+void Slider::OnSizeChanged(int width, int height) {
   resize(width, height);
   Update();
 }

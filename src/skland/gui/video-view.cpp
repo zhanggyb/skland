@@ -46,7 +46,7 @@ Surface *VideoView::OnGetSurface(const AbstractView *view) const {
   return surface_;
 }
 
-void VideoView::OnResize(int width, int height) {
+void VideoView::OnSizeChanged(int width, int height) {
   resize(width, height);
   Update();
 }

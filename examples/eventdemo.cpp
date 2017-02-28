@@ -48,7 +48,7 @@ class SimpleWidget : public AbstractWidget {
 
  protected:
 
-  virtual void OnResize(int width, int height) override {
+  virtual void OnSizeChanged(int width, int height) override {
     resize(width, height);
     Update();
   }

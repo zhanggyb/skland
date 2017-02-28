@@ -33,7 +33,7 @@ class PushButton : public AbstractButton {
 
  protected:
 
-  virtual void OnResize(int width, int height) override;
+  virtual void OnSizeChanged(int width, int height) override;
 
   virtual void OnDraw(const Context *context) override;
 

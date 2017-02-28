@@ -36,7 +36,7 @@ Size PushButton::GetPreferredSize() const {
   return Size(90, 20);
 }
 
-void PushButton::OnResize(int width, int height) {
+void PushButton::OnSizeChanged(int width, int height) {
   resize(width, height);
   Update();
 }

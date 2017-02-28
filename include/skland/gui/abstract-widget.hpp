@@ -62,7 +62,7 @@ class Widget : public AbstractWidget {
 
  protected:
 
-  virtual void OnResize(int width, int height) override;
+  virtual void OnSizeChanged(int width, int height) override;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

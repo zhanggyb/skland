@@ -34,7 +34,7 @@ class Slider : public AbstractSlider<int> {
 
  protected:
 
-  virtual void OnResize(int width, int height) final;
+  virtual void OnSizeChanged(int width, int height) final;
 
   virtual void OnMouseEnter(MouseEvent *event) final;
 

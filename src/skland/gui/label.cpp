@@ -64,7 +64,7 @@ void Label::SetFont(const Font &font) {
   Update();
 }
 
-void Label::OnResize(int width, int height) {
+void Label::OnSizeChanged(int width, int height) {
   resize(width, height);
 }
 
