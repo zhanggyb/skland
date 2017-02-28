@@ -97,6 +97,10 @@ class Object : public Trackable {
 
   void ClearChildren();
 
+  virtual void OnAddedToParent();
+
+  virtual void OnRemovedFromParent(Object *original_parent);
+
   static bool SwapIndex(Object *object1, Object *object2);
 
   static bool InsertSiblingBefore(Object *src, Object *dst);

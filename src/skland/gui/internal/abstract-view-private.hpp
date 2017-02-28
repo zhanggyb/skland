@@ -33,13 +33,18 @@ struct AbstractView::Private {
   Private(AbstractView *view)
       : redraw_task(view),
         mouse_task(view),
-        mouse_motion_task(view) {}
+        mouse_motion_task(view),
+        is_damaged_(false) {}
 
   ~Private() {}
 
   RedrawTask redraw_task;
   ViewTask mouse_task;
   ViewTask mouse_motion_task;
+
+  // Damage area
+  bool is_damaged_;
+  RectI damaged_region_;
 
 };
 

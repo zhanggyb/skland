@@ -18,7 +18,7 @@
 #define SKLAND_GUI_ABSTRACT_VIEW_HPP_
 
 #include "../core/defines.hpp"
-#include "../core/object.hpp"
+#include "../core/sigcxx.hpp"
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
@@ -67,7 +67,7 @@ class MouseTaskProxy;
  * @see AbstractWindow
  * @see Surface
  */
-SKLAND_EXPORT class AbstractView : public Object {
+SKLAND_EXPORT class AbstractView : public Trackable {
 
   friend class Application;
   friend class Display;
@@ -76,6 +76,9 @@ SKLAND_EXPORT class AbstractView : public Object {
   friend struct RedrawTask;
   friend class RedrawTaskProxy;
   friend class MouseTaskProxy;
+
+  AbstractView(const AbstractView &) = delete;
+  AbstractView &operator=(const AbstractView &) = delete;
 
  public:
 
@@ -133,7 +136,65 @@ SKLAND_EXPORT class AbstractView : public Object {
 
   virtual Size GetMaximalSize() const = 0;
 
+  AbstractView *parent() const { return parent_; }
+
  protected:
+
+  AbstractView *GetChildAt(int index) const;
+
+  /**
+   * @brief Push a child object to the front
+   * @param child
+   *
+   * @warning This method does not check if child is nullptr
+   */
+  void PushFrontChild(AbstractView *child);
+
+  /**
+   * @brief Insert a child object at the given index
+   * @param child
+   * @param index The position to be inserted before, default is 0, same as push front
+   *
+   * @warning This method does not check if child is nullptr
+   */
+  void InsertChild(AbstractView *child, int index = 0);
+
+  /**
+   * @brief Push a child object to the back
+   * @param child
+   *
+   * @warning This method does not check if child is nullptr
+   */
+  void PushBackChild(AbstractView *child);
+
+  /**
+   * @brief Remove a child object from the children list
+   * @param child
+   * @return nullptr if the object is not a child, or the removed object
+   *
+   * @warning This method does not check if the param is nullptr
+   */
+  AbstractView *RemoveChild(AbstractView *child);
+
+  void ClearChildren();
+
+  virtual void OnAddedToParent();
+
+  virtual void OnRemovedFromParent(AbstractView *original_parent);
+
+  static bool SwapIndex(AbstractView *object1, AbstractView *object2);
+
+  static bool InsertSiblingBefore(AbstractView *src, AbstractView *dst);
+
+  static bool InsertSiblingAfter(AbstractView *src, AbstractView *dst);
+
+  static void MoveToFirst(AbstractView *object);
+
+  static void MoveToLast(AbstractView *object);
+
+  static void MoveForward(AbstractView *object);
+
+  static void MoveBackward(AbstractView *object);
 
   /**
    * @brief Update this view and all sub views
@@ -183,25 +244,13 @@ SKLAND_EXPORT class AbstractView : public Object {
     geometry_.Resize(width, height);
   }
 
-  AbstractView *parent_view() const {
-    return static_cast<AbstractView *>(parent());
-  }
+  AbstractView *previous() const { return previous_; }
 
-  AbstractView *previous_view() const {
-    return static_cast<AbstractView *>(previous());
-  }
+  AbstractView *next() const { return next_; }
 
-  AbstractView *next_view() const {
-    return static_cast<AbstractView *>(next());
-  }
+  AbstractView *first_child() const { return first_child_; }
 
-  AbstractView *first_subview() const {
-    return static_cast<AbstractView *>(first_child());
-  }
-
-  AbstractView *last_subview() const {
-    return static_cast<AbstractView *>(last_child());
-  }
+  AbstractView *last_child() const { return last_child_; }
 
   /**
    * @brief Get the surface on which this view renders
@@ -219,11 +268,16 @@ SKLAND_EXPORT class AbstractView : public Object {
 
   Rect geometry_;
 
-  std::unique_ptr<Private> data_;
+  AbstractView *previous_;
+  AbstractView *next_;
 
-  // Damage area
-  bool is_damaged_;
-  RectI damaged_region_;
+  AbstractView *first_child_;
+  AbstractView *last_child_;
+
+  AbstractView *parent_;
+  int children_count_;
+
+  std::unique_ptr<Private> data_;
 
   /**
    * @brief Initialize the idle task list

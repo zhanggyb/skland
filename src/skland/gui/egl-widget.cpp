@@ -54,9 +54,9 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 
   if (nullptr == sub_surface_) {
     DBG_ASSERT(nullptr == egl_surface_);
-    if (nullptr == parent_view()) return;
+    if (nullptr == parent()) return;
 
-    Surface *parent_surface = GetSurface(parent_view());
+    Surface *parent_surface = GetSurface(parent());
     if (nullptr == parent_surface) return;
 
     sub_surface_ = SubSurface::Create(parent_surface, this);

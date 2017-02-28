@@ -19,7 +19,7 @@
 
 #include "abstract-view.hpp"
 
-#include "../core/margin.hpp"
+#include "../core/padding.hpp"
 
 namespace skland {
 
@@ -30,7 +30,7 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
  public:
 
-  AbstractLayout(const Margin &margin = Margin(5));
+  AbstractLayout(const Padding &padding = Padding(5));
 
   virtual ~AbstractLayout();
 
@@ -42,11 +42,15 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   void AddView(AbstractView *view);
 
-  const Margin &margin() const { return margin_; }
+  void RemoveView(AbstractView *view);
+
+  const Padding &padding() const { return padding_; }
 
  protected:
 
   virtual void OnViewAdded(AbstractView *view) = 0;
+
+  virtual void OnViewRemoved(AbstractView *view) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) final;
 
@@ -62,7 +66,7 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
  private:
 
-  Margin margin_;
+  Padding padding_;
 
 };
 

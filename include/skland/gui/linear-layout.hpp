@@ -35,6 +35,8 @@ class LinearLayout final : public AbstractLayout {
 
   virtual void OnViewAdded(AbstractView *view);
 
+  virtual void OnViewRemoved(AbstractView *view);
+
 };
 
 }

@@ -15,7 +15,9 @@
  */
 
 #include "redraw-task.hpp"
+
 #include <skland/gui/abstract-view.hpp>
+#include "abstract-view-private.hpp"
 
 namespace skland {
 
@@ -23,12 +25,12 @@ void RedrawTask::Run() const {
   view->OnDraw(&context);
   view->visible_ = true;
 
-  if (view->is_damaged_) {
-    context.surface()->Damage(view->damaged_region_.x(),
-                              view->damaged_region_.y(),
-                              view->damaged_region_.width(),
-                              view->damaged_region_.height());
-    view->is_damaged_ = false;
+  if (view->data_->is_damaged_) {
+    context.surface()->Damage(view->data_->damaged_region_.x(),
+                              view->data_->damaged_region_.y(),
+                              view->data_->damaged_region_.width(),
+                              view->data_->damaged_region_.height());
+    view->data_->is_damaged_ = false;
   }
 }
 

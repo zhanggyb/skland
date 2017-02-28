@@ -30,8 +30,8 @@
 
 namespace skland {
 
-AbstractLayout::AbstractLayout(const Margin &margin)
-    : AbstractView(), margin_(margin) {
+AbstractLayout::AbstractLayout(const Margin &padding)
+    : AbstractView(), padding_(padding) {
 
 }
 
@@ -40,7 +40,7 @@ AbstractLayout::~AbstractLayout() {
 }
 
 Size AbstractLayout::GetMinimalSize() const {
-  return Size(margin_.lr(), margin_.tb());
+  return Size(padding_.lr(), padding_.tb());
 }
 
 Size AbstractLayout::GetPreferredSize() const {
@@ -53,8 +53,25 @@ Size AbstractLayout::GetMaximalSize() const {
 
 void AbstractLayout::AddView(AbstractView *view) {
   // TODO: check if view already in this layout
+  if (view->parent() == this)
+    return;
 
+  if (view->parent()) {
+    static_cast<AbstractLayout *>(view->parent())->RemoveView(view);
+  }
+
+  DBG_ASSERT(nullptr == view->parent());
+  InsertChild(view);
   OnViewAdded(view);
+}
+
+void AbstractLayout::RemoveView(AbstractView *view) {
+  if (view->parent() != this) {
+    return;
+  }
+
+  RemoveChild(view);
+  OnViewRemoved(view);
 }
 
 void AbstractLayout::OnMouseEnter(MouseEvent *event) {

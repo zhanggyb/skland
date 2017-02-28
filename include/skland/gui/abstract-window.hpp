@@ -100,6 +100,8 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
 
  protected:
 
+  virtual void OnAddedToParent() final;
+
   virtual void OnShown() = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;

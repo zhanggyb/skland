@@ -172,6 +172,10 @@ Rect AbstractWindow::GetClientGeometry() const {
   return window_frame_->GetClientGeometry();
 }
 
+void AbstractWindow::OnAddedToParent() {
+  throw std::runtime_error("ERROR! Window object MUST be the root object in view hierachy!");
+}
+
 void AbstractWindow::OnMouseEnter(MouseEvent *event) {
   if (!IsFrameless()) {
     switch (window_frame_->GetMouseLocation(event)) {

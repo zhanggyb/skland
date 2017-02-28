@@ -36,4 +36,8 @@ void LinearLayout::OnViewAdded(AbstractView *view) {
   // TODO:
 }
 
+void LinearLayout::OnViewRemoved(AbstractView *view) {
+  // TODO:
+}
+
 }

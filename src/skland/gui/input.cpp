@@ -403,7 +403,7 @@ void Input::OnTouchCancel() {
 }
 
 void Input::DispatchMouseEnterEvent(AbstractView *parent, ViewTask *task) {
-  for (AbstractView *view = parent->first_subview(); view; view = view->next_view()) {
+  for (AbstractView *view = parent->first_child(); view; view = view->next()) {
     if (view->Contain((int) data_->mouse_event->window_xy_.x, (int) data_->mouse_event->window_xy_.y)) {
       data_->mouse_event->response_ = InputEvent::kUnknown;
       view->OnMouseEnter(data_->mouse_event);

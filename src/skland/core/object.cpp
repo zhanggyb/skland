@@ -94,6 +94,8 @@ void Object::PushFrontChild(Object *child) {
   // child->previous_ = nullptr;
   child->parent_ = this;
   children_count_++;
+
+  child->OnAddedToParent();
 }
 
 void Object::InsertChild(Object *child, int index) {
@@ -158,6 +160,8 @@ void Object::InsertChild(Object *child, int index) {
 
   child->parent_ = this;
   children_count_++;
+
+  child->OnAddedToParent();
 }
 
 void Object::PushBackChild(Object *child) {
@@ -187,6 +191,8 @@ void Object::PushBackChild(Object *child) {
   // child->next_ = nullptr;
   child->parent_ = this;
   children_count_++;
+
+  child->OnAddedToParent();
 }
 
 Object *Object::RemoveChild(Object *child) {
@@ -215,6 +221,8 @@ Object *Object::RemoveChild(Object *child) {
   child->next_ = nullptr;
   child->parent_ = nullptr;
 
+  child->OnRemovedFromParent(this);
+
   return child;
 }
 
@@ -234,6 +242,14 @@ void Object::ClearChildren() {
   children_count_ = 0;
   first_child_ = nullptr;
   last_child_ = nullptr;
+}
+
+void Object::OnAddedToParent() {
+  // override in subclass
+}
+
+void Object::OnRemovedFromParent(Object *original_parent) {
+  // override in subclass
 }
 
 bool Object::SwapIndex(Object *object1, Object *object2) {
