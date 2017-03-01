@@ -18,6 +18,7 @@
 #define SKLAND_GUI_INPUT_HPP_
 
 #include "../core/object.hpp"
+#include "abstract-event-handler.hpp"
 
 #include <wayland-client.h>
 #include <memory>
@@ -157,7 +158,7 @@ SKLAND_EXPORT class Input : public Object {
    * @param parent
    * @param task
    */
-  void DispatchMouseEnterEvent(AbstractView *parent, ViewTask *task);
+//  void DispatchMouseEnterEvent(AbstractEventHandler *parent, ViewTask *task);
 
   Display *display_;
 

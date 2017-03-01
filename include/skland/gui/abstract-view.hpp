@@ -17,8 +17,8 @@
 #ifndef SKLAND_GUI_ABSTRACT_VIEW_HPP_
 #define SKLAND_GUI_ABSTRACT_VIEW_HPP_
 
-#include "../core/defines.hpp"
-#include "../core/sigcxx.hpp"
+#include "abstract-event-handler.hpp"
+
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
@@ -31,10 +31,6 @@ namespace skland {
 // Forward declarations
 class Application;
 class Display;
-class Input;
-class KeyEvent;
-class MouseEvent;
-class TouchEvent;
 class Surface;
 class Context;
 
@@ -61,15 +57,13 @@ class Context;
  * @see AbstractWindow
  * @see Surface
  */
-SKLAND_EXPORT class AbstractView : public Trackable {
+SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   friend class Application;
   friend class Display;
-  friend class Input;
 
   friend struct RedrawTask;
   friend class RedrawTaskProxy;
-  friend class MouseTaskProxy;
 
   AbstractView(const AbstractView &) = delete;
   AbstractView &operator=(const AbstractView &) = delete;
@@ -210,16 +204,6 @@ SKLAND_EXPORT class AbstractView : public Trackable {
   virtual Surface *OnGetSurface(const AbstractView *view) const;
 
   virtual void OnSizeChanged(int width, int height) = 0;
-
-  virtual void OnMouseEnter(MouseEvent *event) = 0;
-
-  virtual void OnMouseLeave(MouseEvent *event) = 0;
-
-  virtual void OnMouseMove(MouseEvent *event) = 0;
-
-  virtual void OnMouseButton(MouseEvent *event) = 0;
-
-  virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
   virtual void OnDraw(const Context *context) = 0;
 

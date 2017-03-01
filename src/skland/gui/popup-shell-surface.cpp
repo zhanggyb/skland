@@ -20,7 +20,7 @@
 
 namespace skland {
 
-Surface *PopupShellSurface::Create(ShellSurface *parent, AbstractView *view, const Margin &margin) {
+Surface *PopupShellSurface::Create(ShellSurface *parent, AbstractEventHandler *view, const Margin &margin) {
   Surface *surface = ShellSurface::Create(view, margin);
   ShellSurface *shell_surface = ShellSurface::Get(surface);
   shell_surface->parent_ = parent;

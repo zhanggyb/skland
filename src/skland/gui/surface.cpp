@@ -16,7 +16,7 @@
 
 #include <skland/gui/surface.hpp>
 
-#include <skland/gui/abstract-view.hpp>
+#include <skland/gui/abstract-event-handler.hpp>
 #include <skland/gui/buffer.hpp>
 
 #include <skland/gui/shell-surface.hpp>
@@ -34,20 +34,20 @@ int Surface::kShellSurfaceCount = 0;
 Task Surface::kCommitTaskHead;
 Task Surface::kCommitTaskTail;
 
-Surface::Surface(AbstractView *view, const Margin &margin)
+Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)
     : mode_(kSynchronized),
       parent_(nullptr),
       above_(nullptr),
       below_(nullptr),
       up_(nullptr),
       down_(nullptr),
-      view_(view),
+      event_handler_(event_handler),
       margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
       buffer_scale_(1),
       is_user_data_set_(false),
       egl_surface_role_(nullptr) {
-  DBG_ASSERT(nullptr != view_);
+  DBG_ASSERT(nullptr != event_handler_);
   role_.placeholder = nullptr;
 
   wl_surface_.enter().Set(this, &Surface::OnEnter);
@@ -149,8 +149,8 @@ void Surface::OnLeave(struct wl_output *wl_output) {
 
 void Surface::Clear() {
   while (kShellSurfaceCount > 0) {
-    AbstractView *view = kTop->view();
-    delete view;
+    AbstractEventHandler *event_handler = kTop->event_handler();
+    delete event_handler;
   }
 }
 

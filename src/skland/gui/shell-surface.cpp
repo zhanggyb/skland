@@ -24,8 +24,8 @@
 
 namespace skland {
 
-Surface *ShellSurface::Create(AbstractView *view, const Margin &margin) {
-  Surface *surface = new Surface(view, margin);
+Surface *ShellSurface::Create(AbstractEventHandler *event_handler, const Margin &margin) {
+  Surface *surface = new Surface(event_handler, margin);
   surface->role_.shell_surface = new ShellSurface(surface);
   return surface;
 }

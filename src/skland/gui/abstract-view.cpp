@@ -33,7 +33,7 @@ AbstractView::AbstractView()
 }
 
 AbstractView::AbstractView(int width, int height)
-    : Trackable(),
+    : AbstractEventHandler(),
       visible_(false),
       geometry_(width, height) {
   p_.reset(new Private(this));
@@ -657,19 +657,19 @@ Surface *AbstractView::OnGetSurface(const AbstractView *view) const {
 }
 
 void AbstractView::TrackMouseMotion(MouseEvent *event) {
-  if (p_->mouse_motion_task.IsLinked()) return;
+//  if (p_->mouse_motion_task.IsLinked()) return;
 
-  AbstractView *window = event->surface()->view();
-
-  ViewTask *task = &window->p_->mouse_motion_task;
-  while (task->next()) {
-    task = static_cast<ViewTask *>(task->next());
-  }
-  task->PushBack(&p_->mouse_motion_task);
+//  AbstractView *window = event->surface()->event_handler();
+//
+//  ViewTask *task = &window->p_->mouse_motion_task;
+//  while (task->next()) {
+//    task = static_cast<ViewTask *>(task->next());
+//  }
+//  task->PushBack(&p_->mouse_motion_task);
 }
 
 void AbstractView::UntrackMouseMotion() {
-  p_->mouse_motion_task.Unlink();
+//  p_->mouse_motion_task.Unlink();
 }
 
 Surface *AbstractView::GetSurface(const AbstractView *view) {

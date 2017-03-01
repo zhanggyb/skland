@@ -34,7 +34,7 @@ namespace skland {
 
 class Application;
 class Display;
-class AbstractView;
+class AbstractEventHandler;
 class SurfaceHolder;
 struct CommitTask;
 class Buffer;
@@ -178,7 +178,7 @@ class Surface {
    */
   Surface *down() const { return down_; }
 
-  AbstractView *view() const { return view_; }
+  AbstractEventHandler *event_handler() const { return event_handler_; }
 
   const Margin &margin() const { return margin_; }
 
@@ -186,7 +186,7 @@ class Surface {
 
  private:
 
-  Surface(AbstractView *view, const Margin &margin = Margin());
+  Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
 
   void OnEnter(struct wl_output *wl_output);
 
@@ -221,7 +221,7 @@ class Surface {
 
   wayland::Surface wl_surface_;
 
-  AbstractView *view_;
+  AbstractEventHandler *event_handler_;
 
   Margin margin_;
 

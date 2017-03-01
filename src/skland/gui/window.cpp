@@ -28,7 +28,6 @@
 #include <skland/graphic/canvas.hpp>
 
 #include "internal/display-proxy.hpp"
-#include "internal/view-task.hpp"
 #include "internal/redraw-task.hpp"
 #include "internal/redraw-task-proxy.hpp"
 

@@ -17,9 +17,9 @@
 #ifndef SKLAND_GUI_INTERNAL_MOUSE_TASK_PROXY_HPP_
 #define SKLAND_GUI_INTERNAL_MOUSE_TASK_PROXY_HPP_
 
-#include "view-task.hpp"
+#include "event-task.hpp"
 
-#include "abstract-view-private.hpp"
+#include "abstract-event-handler-private.hpp"
 
 namespace skland {
 
@@ -31,16 +31,16 @@ class MouseTaskProxy {
 
  public:
 
-  MouseTaskProxy(AbstractView *view)
-      : view_(view) {}
+  MouseTaskProxy(AbstractEventHandler *view)
+      : event_handler_(view) {}
 
   MouseTaskProxy(const MouseTaskProxy &orig)
-      : view_(orig.view_) {}
+      : event_handler_(orig.event_handler_) {}
 
   ~MouseTaskProxy() {}
 
   MouseTaskProxy &operator=(const MouseTaskProxy &other) {
-    view_ = other.view_;
+    event_handler_ = other.event_handler_;
     return *this;
   }
 
@@ -48,65 +48,69 @@ class MouseTaskProxy {
    * @brief Push this mouse task of the given view at the front of this task
    * @param view
    */
-  void PushFront(AbstractView *view) {
-    view_->p_->mouse_task.PushFront(&view->p_->mouse_task);
+  void PushFront(AbstractEventHandler *view) {
+    event_handler_->p_->mouse_task.PushFront(&view->p_->mouse_task);
   }
 
   void PushFront(const MouseTaskProxy &other) {
-    view_->p_->mouse_task.PushFront(&other.view_->p_->mouse_task);
+    event_handler_->p_->mouse_task.PushFront(&other.event_handler_->p_->mouse_task);
   }
 
   /**
    * @brief Push this mouse task of the given view at the back of this task
    * @param view
    */
-  void PushBack(AbstractView *view) {
-    view_->p_->mouse_task.PushBack(&view->p_->mouse_task);
+  void PushBack(AbstractEventHandler *view) {
+    event_handler_->p_->mouse_task.PushBack(&view->p_->mouse_task);
   }
 
   void PushBack(const MouseTaskProxy &other) {
-    view_->p_->mouse_task.PushBack(&other.view_->p_->mouse_task);
+    event_handler_->p_->mouse_task.PushBack(&other.event_handler_->p_->mouse_task);
   }
 
-  ViewTask *GetTask() const {
-    return &view_->p_->mouse_task;
+  EventTask *GetTask() const {
+    return &event_handler_->p_->mouse_task;
   }
 
-  ViewTask *GetPreviousTask() const {
-    return static_cast<ViewTask *>(view_->p_->mouse_task.previous());
+  EventTask *GetPreviousTask() const {
+    return static_cast<EventTask *>(event_handler_->p_->mouse_task.previous());
   }
 
-  ViewTask *GetNextTask() const {
-    return static_cast<ViewTask *>(view_->p_->mouse_task.next());
+  EventTask *GetNextTask() const {
+    return static_cast<EventTask *>(event_handler_->p_->mouse_task.next());
   }
 
   MouseTaskProxy &operator++() {
-    view_ = static_cast<ViewTask *>(view_->p_->mouse_task.next())->view;
+    event_handler_ =
+        static_cast<EventTask *>(event_handler_->p_->mouse_task.next())->event_handler;
     return *this;
   }
 
   MouseTaskProxy operator++(int) {
     MouseTaskProxy proxy(*this);
-    proxy.view_ = static_cast<ViewTask *>(view_->p_->mouse_task.next())->view;
+    proxy.event_handler_ =
+        static_cast<EventTask *>(event_handler_->p_->mouse_task.next())->event_handler;
     return proxy;
   }
 
   MouseTaskProxy &operator--() {
-    view_ = static_cast<ViewTask *>(view_->p_->mouse_task.previous())->view;
+    event_handler_ =
+        static_cast<EventTask *>(event_handler_->p_->mouse_task.previous())->event_handler;
     return *this;
   }
 
   MouseTaskProxy operator--(int) {
     MouseTaskProxy proxy(*this);
-    proxy.view_ = static_cast<ViewTask *>(view_->p_->mouse_task.previous())->view;
+    proxy.event_handler_ =
+        static_cast<EventTask *>(event_handler_->p_->mouse_task.previous())->event_handler;
     return proxy;
   }
 
-  AbstractView *view() const { return view_; }
+  AbstractEventHandler *view() const { return event_handler_; }
 
  private:
 
-  AbstractView *view_;
+  AbstractEventHandler *event_handler_;
 
 };
 

@@ -32,9 +32,9 @@ EGLSurface *EGLSurface::Get(Surface *surface) {
 EGLSurface::EGLSurface(Surface *surface)
     : surface_(surface) {
   egl_surface_.Setup(DisplayProxy().egl_display(),
-                     surface_->wl_surface_,
-                     surface->view()->width(),
-                     surface->view()->height());
+                     surface_->wl_surface_, 400, 400);
+//                     surface->event_handler()->width(),
+//                     surface->event_handler()->height());
 }
 
 EGLSurface::~EGLSurface() {

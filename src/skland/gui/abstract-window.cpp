@@ -27,7 +27,6 @@
 #include <skland/gui/abstract-window-frame.hpp>
 
 #include "internal/display-proxy.hpp"
-#include "internal/view-task.hpp"
 #include "internal/mouse-task-proxy.hpp"
 
 namespace skland {

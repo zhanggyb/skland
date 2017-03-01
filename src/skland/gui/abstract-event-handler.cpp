@@ -14,31 +14,17 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_REDRAW_TASK_HPP_
-#define SKLAND_GUI_REDRAW_TASK_HPP_
-
-#include <skland/gui/task.hpp>
-#include <skland/gui/context.hpp>
+#include "internal/abstract-event-handler-private.hpp"
 
 namespace skland {
 
-class AbstractView;
+AbstractEventHandler::AbstractEventHandler()
+    : Trackable() {
+  p_.reset(new Private(this));
+}
 
-SKLAND_NO_EXPORT struct RedrawTask : public Task {
-  RedrawTask(const RedrawTask &) = delete;
-  RedrawTask &operator=(const RedrawTask &) = delete;
-
-  RedrawTask(AbstractView *view)
-      : Task(), view(view) {}
-
-  virtual ~RedrawTask() {}
-
-  virtual void Run() const final;
-
-  AbstractView *view;
-  Context context;
-};
+AbstractEventHandler::~AbstractEventHandler() {
 
 }
 
-#endif // SKLAND_GUI_REDRAW_TASK_HPP_
+}

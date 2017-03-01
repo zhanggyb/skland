@@ -22,7 +22,7 @@
 
 namespace skland {
 
-class AbstractView;
+class AbstractEventHandler;
 class Surface;
 class ShellSurface;
 
@@ -40,7 +40,7 @@ class ToplevelShellSurface {
 
  public:
 
-  static Surface *Create(AbstractView *view, const Margin &margin = Margin());
+  static Surface *Create(AbstractEventHandler *event_handler, const Margin &margin = Margin());
 
   static ToplevelShellSurface *Get(const Surface *surface);
 

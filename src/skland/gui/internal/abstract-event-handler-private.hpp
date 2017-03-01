@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_VIEW_TASK_HPP_
-#define SKLAND_GUI_VIEW_TASK_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_
 
-#include <skland/gui/task.hpp>
+#include <skland/gui/abstract-event-handler.hpp>
+
+#include "event-task.hpp"
 
 namespace skland {
 
-class AbstractView;
+struct AbstractEventHandler::Private {
 
-SKLAND_NO_EXPORT struct ViewTask : public Task {
-  ViewTask(const ViewTask &) = delete;
-  ViewTask &operator=(const ViewTask &) = delete;
+  Private(AbstractEventHandler *event_handler)
+      : mouse_task(event_handler),
+        mouse_motion_task(event_handler) {}
 
-  ViewTask(AbstractView *view)
-      : Task(), view(view) {}
+  ~Private() {}
 
-  virtual ~ViewTask() {}
+  EventTask mouse_task;
+  EventTask mouse_motion_task;
 
-  AbstractView *view;
 };
 
 }
 
-#endif  // SKLAND_GUI_VIEW_TASK_HPP_
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_

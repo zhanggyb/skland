@@ -14,31 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_REDRAW_TASK_HPP_
-#define SKLAND_GUI_REDRAW_TASK_HPP_
+#ifndef SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
 
 #include <skland/gui/task.hpp>
-#include <skland/gui/context.hpp>
 
 namespace skland {
 
-class AbstractView;
+class AbstractEventHandler;
 
-SKLAND_NO_EXPORT struct RedrawTask : public Task {
-  RedrawTask(const RedrawTask &) = delete;
-  RedrawTask &operator=(const RedrawTask &) = delete;
+SKLAND_NO_EXPORT struct EventTask : public Task {
+  EventTask(const EventTask &) = delete;
+  EventTask &operator=(const EventTask &) = delete;
 
-  RedrawTask(AbstractView *view)
-      : Task(), view(view) {}
+  EventTask(AbstractEventHandler *event_handler = nullptr)
+      : Task(), event_handler(event_handler) {}
 
-  virtual ~RedrawTask() {}
+  virtual ~EventTask() {}
 
-  virtual void Run() const final;
-
-  AbstractView *view;
-  Context context;
+  AbstractEventHandler *event_handler;
 };
 
 }
 
-#endif // SKLAND_GUI_REDRAW_TASK_HPP_
+#endif // SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
