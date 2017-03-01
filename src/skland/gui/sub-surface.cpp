@@ -22,8 +22,8 @@
 
 namespace skland {
 
-Surface *SubSurface::Create(Surface *parent, AbstractEventHandler *view, const Margin &margin) {
-  Surface *surface = new Surface(view, margin);
+Surface *SubSurface::Create(Surface *parent, AbstractEventHandler *event_handler, const Margin &margin) {
+  Surface *surface = new Surface(event_handler, margin);
   surface->role_.sub_surface = new SubSurface(surface, parent);
   return surface;
 }

@@ -58,27 +58,11 @@ class AbstractWindowFrame : public Trackable {
 
   virtual ~AbstractWindowFrame();
 
-  Rect GetClientGeometry() const;
+  virtual Rect GetClientGeometry() const = 0;
 
-  AbstractWindow *window() const {
-    return window_;
-  }
+  AbstractWindow *window() const { return window_; }
 
-  int border() const {
-    return border_;
-  }
-
-  TitleBarPosition title_bar_position() const {
-    return title_bar_position_;
-  }
-
-  int title_bar_size() const {
-    return title_bar_size_;
-  }
-
-  SignalRef<int> window_action() {
-    return window_action_;
-  }
+  SignalRef<int> window_action() { return window_action_; }
 
   /** The margin within which the cursor should switch to resizing,
    * the values SHOULD smaller than shadow margin */
@@ -96,29 +80,11 @@ class AbstractWindowFrame : public Trackable {
 
   void AddWidget(AbstractWidget *widget, int pos = 0);
 
-  void EmitAction(int action) {
-    window_action_.Emit(action);
-  }
-
-  void set_border(int border) {
-    border_ = border;
-  }
-
-  void set_title_bar_size(int title_bar_size) {
-    title_bar_size_ = title_bar_size;
-  }
-
-  void set_title_bar_position(TitleBarPosition position) {
-    title_bar_position_ = position;
-  }
+  void EmitAction(int action) { window_action_.Emit(action); }
 
  private:
 
   AbstractWindow *window_;
-
-  int border_;
-  int title_bar_size_;
-  TitleBarPosition title_bar_position_;
 
   Signal<int> window_action_;
 };

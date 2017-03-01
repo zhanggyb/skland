@@ -75,11 +75,11 @@ void WindowFrameLight::OnDraw(const Context *context) {
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(0xEFF0F0F0);
+  paint.SetColor(0xFFF0F0F0);
   canvas->DrawPath(path, paint);
 
   // Draw the client area:
-  paint.SetColor(0xEFE0E0E0);
+  paint.SetColor(0xFFE0E0E0);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
   canvas->DrawRect(GetClientGeometry(), paint);

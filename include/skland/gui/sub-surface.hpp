@@ -39,7 +39,7 @@ class SubSurface {
 
  public:
 
-  static Surface *Create(Surface *parent, AbstractEventHandler *view, const Margin &margin = Margin());
+  static Surface *Create(Surface *parent, AbstractEventHandler *event_handler, const Margin &margin = Margin());
 
   static SubSurface *Get(const Surface *surface);
 

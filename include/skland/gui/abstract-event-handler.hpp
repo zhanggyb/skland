@@ -20,6 +20,7 @@
 #include "../core/defines.hpp"
 #include "../core/sigcxx.hpp"
 
+#include "task.hpp"
 #include <memory>
 
 namespace skland {
@@ -27,17 +28,26 @@ namespace skland {
 class MouseEvent;
 class KeyEvent;
 
+class Surface;
+class AbstractView;
+class Context;
+
 SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
   friend class Input;
+  friend class Application;
+  friend class Display;
 
+  friend class AbstractView;
   friend class MouseTaskProxy;
+  friend struct RedrawTask;
+  friend class RedrawTaskProxy;
 
  public:
 
   AbstractEventHandler();
 
-  virtual  ~AbstractEventHandler();
+  virtual ~AbstractEventHandler();
 
  protected:
 
@@ -51,11 +61,41 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
+  /**
+   * @brief A view request an update
+   * @param view This view or a sub view in hierachy
+   */
+  virtual void OnUpdate(AbstractView *view) = 0;
+
+  /**
+   * @brief Get surface for the given view
+   * @param view A view object, it is always this view or a sub view in hierachy
+   * @return A pointer to a surface or nullptr
+   */
+  virtual Surface *OnGetSurface(const AbstractView *view) const = 0;
+
+  virtual void OnDraw(const Context *context) = 0;
+
+  static void Damage(AbstractEventHandler *object, int surface_x, int surface_y, int width, int height);
+
  private:
 
   struct Private;
 
   std::unique_ptr<Private> p_;
+
+  /**
+ * @brief Initialize the idle task list
+ */
+  static void InitializeRedrawTaskList();
+
+  /**
+   * @brief Destroy the redraw task list
+   */
+  static void ClearRedrawTaskList();
+
+  static Task kRedrawTaskHead;
+  static Task kRedrawTaskTail;
 
 };
 

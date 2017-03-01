@@ -24,43 +24,10 @@ const Margin AbstractWindowFrame::kResizingMargin(5, 5, 5, 5);
 
 AbstractWindowFrame::AbstractWindowFrame()
     : Trackable(),
-      window_(nullptr),
-      border_(0),
-      title_bar_size_(0),
-      title_bar_position_(kTitleBarNone) {
+      window_(nullptr) {
 }
 
 AbstractWindowFrame::~AbstractWindowFrame() {
-}
-
-Rect AbstractWindowFrame::GetClientGeometry() const {
-  int x = border_,
-      y = border_,
-      w = window()->width() - 2 * border_,
-      h = window()->height() - 2 * border_;
-
-  switch (title_bar_position_) {
-    case kTitleBarLeft: {
-      x += title_bar_size_ - border_;
-      break;
-    }
-    case kTitleBarRight: {
-      w -= title_bar_size_ + border_;
-      break;
-    }
-    case kTitleBarBottom: {
-      h -= title_bar_size_ + border_;
-      break;
-    }
-    case kTitleBarTop:
-    default: {
-      y += title_bar_size_ - border_;
-      h -= title_bar_size_ - border_;
-      break;
-    }
-  }
-
-  return Rect::FromXYWH(x, y, w, h);
 }
 
 void AbstractWindowFrame::AddWidget(AbstractWidget *widget, int pos) {

@@ -18,8 +18,10 @@
 #define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_
 
 #include <skland/gui/abstract-event-handler.hpp>
+#include <skland/core/rect.hpp>
 
 #include "event-task.hpp"
+#include "redraw-task.hpp"
 
 namespace skland {
 
@@ -27,12 +29,20 @@ struct AbstractEventHandler::Private {
 
   Private(AbstractEventHandler *event_handler)
       : mouse_task(event_handler),
-        mouse_motion_task(event_handler) {}
+        mouse_motion_task(event_handler),
+        redraw_task(event_handler),
+        is_damaged_(false) {}
 
   ~Private() {}
 
   EventTask mouse_task;
   EventTask mouse_motion_task;
+
+  RedrawTask redraw_task;
+
+  // Damage area
+  bool is_damaged_;
+  RectI damaged_region_;
 
 };
 

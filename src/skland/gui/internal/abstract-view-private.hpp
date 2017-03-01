@@ -36,8 +36,7 @@ struct AbstractView::Private {
         last_child(nullptr),
         parent(nullptr),
         children_count(0),
-        redraw_task(view),
-        is_damaged_(false) {}
+        shell(nullptr) {}
 
   ~Private() {}
 
@@ -50,11 +49,7 @@ struct AbstractView::Private {
   AbstractView *parent;
   int children_count;
 
-  RedrawTask redraw_task;
-
-  // Damage area
-  bool is_damaged_;
-  RectI damaged_region_;
+  AbstractEventHandler *shell;
 
 };
 

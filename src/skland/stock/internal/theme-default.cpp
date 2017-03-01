@@ -224,13 +224,13 @@ void MinimizeButton::OnDraw(const Context *context) {
 
 WindowFrameDefault::WindowFrameDefault()
     : AbstractWindowFrame(),
+      border_(0),
+      title_bar_size_(22),
+      title_bar_position_(kTitleBarTop),
       close_button_(nullptr),
       maximize_button_(nullptr),
       minimize_button_(nullptr),
       title_(nullptr) {
-  set_border(0);
-  set_title_bar_size(22);
-  set_title_bar_position(kTitleBarTop);
 }
 
 WindowFrameDefault::~WindowFrameDefault() {
@@ -238,6 +238,36 @@ WindowFrameDefault::~WindowFrameDefault() {
   delete maximize_button_;
   delete minimize_button_;
   delete close_button_;
+}
+
+Rect WindowFrameDefault::GetClientGeometry() const {
+  int x = border_,
+      y = border_,
+      w = window()->width() - 2 * border_,
+      h = window()->height() - 2 * border_;
+
+  switch (title_bar_position_) {
+    case kTitleBarLeft: {
+      x += title_bar_size_ - border_;
+      break;
+    }
+    case kTitleBarRight: {
+      w -= title_bar_size_ + border_;
+      break;
+    }
+    case kTitleBarBottom: {
+      h -= title_bar_size_ + border_;
+      break;
+    }
+    case kTitleBarTop:
+    default: {
+      y += title_bar_size_ - border_;
+      h -= title_bar_size_ - border_;
+      break;
+    }
+  }
+
+  return Rect::FromXYWH(x, y, w, h);
 }
 
 void WindowFrameDefault::OnCloseButtonClicked(SLOT /* slot */) {
@@ -280,9 +310,9 @@ void WindowFrameDefault::OnResize(int width, int height) {
 
 void WindowFrameDefault::LayoutWidgets(int width, int height) {
   title_->MoveTo(0, 0);
-  title_->Resize(window()->width(), title_bar_size());
+  title_->Resize(window()->width(), title_bar_size_);
 
-  int y = (title_bar_size() - kButtonSize) / 2;
+  int y = (title_bar_size_ - kButtonSize) / 2;
   int x = kButtonSpace;
   close_button_->MoveTo(x, y);
 
@@ -369,7 +399,7 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     location = kExterior;
 
   if (location == kInterior &&
-      y < Theme::shadow_margin().top + title_bar_size())
+      y < Theme::shadow_margin().top + title_bar_size_)
     location = kTitleBar;
   else if (location == kInterior)
     location = kClientArea;

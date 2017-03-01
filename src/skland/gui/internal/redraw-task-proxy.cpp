@@ -17,20 +17,40 @@
 #include "redraw-task-proxy.hpp"
 
 #include "redraw-task.hpp"
-#include "abstract-view-private.hpp"
+#include "abstract-event-handler-private.hpp"
 
 namespace skland {
 
 void RedrawTaskProxy::SetContext(const Context &context) {
-  view_->p_->redraw_task.context = context;
+  event_handler_->p_->redraw_task.context = context;
+}
+
+void RedrawTaskProxy::CopyContextTo(AbstractEventHandler *event_handler) {
+  event_handler->p_->redraw_task.context = event_handler_->p_->redraw_task.context;
+}
+
+const Context &RedrawTaskProxy::GetContext() const {
+  return event_handler_->p_->redraw_task.context;
+}
+
+bool RedrawTaskProxy::IsLinked() const {
+  return event_handler_->p_->redraw_task.IsLinked();
+}
+
+void RedrawTaskProxy::PushBack(AbstractEventHandler *event_handler) {
+  event_handler_->p_->redraw_task.PushBack(&event_handler->p_->redraw_task);
+}
+
+void RedrawTaskProxy::PushFront(AbstractEventHandler *event_handler) {
+  event_handler_->p_->redraw_task.PushFront(&event_handler->p_->redraw_task);
 }
 
 void RedrawTaskProxy::MoveToHead() {
-  AbstractView::kRedrawTaskHead.PushBack(&view_->p_->redraw_task);
+  AbstractEventHandler::kRedrawTaskHead.PushBack(&event_handler_->p_->redraw_task);
 }
 
 void RedrawTaskProxy::MoveToTail() {
-  AbstractView::kRedrawTaskTail.PushFront(&view_->p_->redraw_task);
+  AbstractEventHandler::kRedrawTaskTail.PushFront(&event_handler_->p_->redraw_task);
 }
 
 }

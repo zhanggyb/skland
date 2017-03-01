@@ -21,11 +21,9 @@
 #include <skland/gui/mouse-event.hpp>
 
 #include "internal/abstract-view-private.hpp"
+#include "internal/redraw-task-proxy.hpp"
 
 namespace skland {
-
-Task AbstractView::kRedrawTaskHead;
-Task AbstractView::kRedrawTaskTail;
 
 AbstractView::AbstractView()
     : AbstractView(400, 300) {
@@ -637,21 +635,39 @@ void AbstractView::UpdateAll() {
 }
 
 void AbstractView::OnUpdate(AbstractView *view) {
-  if (p_->redraw_task.IsLinked() && (view != this)) {
+  RedrawTaskProxy proxy(this);
+
+  if (proxy.IsLinked() && (view != this)) {
     // This view is going to be redrawn, just push back the task of the sub view
 
-    p_->redraw_task.PushBack(&view->p_->redraw_task);
-    view->p_->redraw_task.context = p_->redraw_task.context;
+    proxy.PushBack(view);
+    proxy.CopyContextTo(view);
+
     return;
   }
 
-  if (p_->parent)
+  if (p_->parent) {
+    DBG_ASSERT(nullptr == p_->shell);
     p_->parent->OnUpdate(view);
+    return;
+  }
+
+  if (p_->shell) {
+    DBG_ASSERT(nullptr == p_->parent);
+    p_->shell->OnUpdate(view);
+  }
 }
 
 Surface *AbstractView::OnGetSurface(const AbstractView *view) const {
-  if (view->p_->parent)
+  if (view->p_->parent) {
+    DBG_ASSERT(nullptr == p_->shell);
     return view->p_->parent->OnGetSurface(view);
+  }
+
+  if (view->p_->shell) {
+    DBG_ASSERT(nullptr == p_->parent);
+    return view->p_->shell->OnGetSurface(view);
+  }
 
   return nullptr;
 }
@@ -674,27 +690,6 @@ void AbstractView::UntrackMouseMotion() {
 
 Surface *AbstractView::GetSurface(const AbstractView *view) {
   return view->OnGetSurface(view);
-}
-
-void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int width, int height) {
-  view->p_->is_damaged_ = true;
-  view->p_->damaged_region_.l = surface_x;
-  view->p_->damaged_region_.t = surface_y;
-  view->p_->damaged_region_.Resize(width, height);
-}
-
-void AbstractView::InitializeRedrawTaskList() {
-  kRedrawTaskHead.PushBack(&kRedrawTaskTail);
-}
-
-void AbstractView::ClearRedrawTaskList() {
-  Task *task = kRedrawTaskHead.next();
-  Task *next_task = nullptr;
-  while (task != &kRedrawTaskTail) {
-    next_task = task->next();
-    task->Unlink();
-    task = next_task;
-  }
 }
 
 }

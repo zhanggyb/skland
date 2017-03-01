@@ -104,7 +104,7 @@ void Window::OnShown() {
 }
 
 void Window::OnUpdate(AbstractView *view) {
-  if (!visible()) return;
+  if (!commited()) return;
 
   Surface *surface = nullptr;
 

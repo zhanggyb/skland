@@ -15,28 +15,20 @@
  */
 
 #include <skland/gui/input.hpp>
-#include <skland/gui/display.hpp>
-#include <skland/gui/surface.hpp>
 
+#include <skland/gui/surface.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/touch-event.hpp>
-
-#include <skland/gui/abstract-event-handler.hpp>
 
 #include <skland/wayland/seat.hpp>
 #include <skland/wayland/pointer.hpp>
 #include <skland/wayland/keyboard.hpp>
 #include <skland/wayland/touch.hpp>
 
-#include "internal/abstract-event-handler-private.hpp"
-
-#include "internal/mouse-task-proxy.hpp"
 #include "internal/display-proxy.hpp"
 #include "internal/keymap.hpp"
 #include "internal/keyboard-state.hpp"
-
-#include "internal/abstract-view-iterators.hpp"
 
 #include <unistd.h>
 #include <sys/mman.h>

@@ -19,19 +19,29 @@
 
 namespace skland {
 
-class AbstractView;
+class AbstractEventHandler;
 class Context;
 
 class RedrawTaskProxy {
 
  public:
 
-  RedrawTaskProxy(AbstractView *view)
-      : view_(view) {}
+  RedrawTaskProxy(AbstractEventHandler *event_handler)
+      : event_handler_(event_handler) {}
 
   ~RedrawTaskProxy() {}
 
-  void SetContext(const Context& context);
+  void SetContext(const Context &context);
+
+  void CopyContextTo(AbstractEventHandler *event_handler);
+
+  const Context &GetContext() const;
+
+  bool IsLinked() const;
+
+  void PushBack(AbstractEventHandler *event_handler);
+
+  void PushFront(AbstractEventHandler *event_handler);
 
   void MoveToHead();
 
@@ -39,10 +49,10 @@ class RedrawTaskProxy {
 
  private:
 
-  AbstractView *view_;
+  AbstractEventHandler *event_handler_;
 
 };
 
 } // namespace skland
 
-#endif //SKLAND_REDRAWTASKHELPER_HPP
+#endif // SKLAND_GUI_INTERNAL_REDRAW_TASK_PROXY_HPP_

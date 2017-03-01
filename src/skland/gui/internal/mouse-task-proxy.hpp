@@ -31,8 +31,8 @@ class MouseTaskProxy {
 
  public:
 
-  MouseTaskProxy(AbstractEventHandler *view)
-      : event_handler_(view) {}
+  MouseTaskProxy(AbstractEventHandler *event_handler)
+      : event_handler_(event_handler) {}
 
   MouseTaskProxy(const MouseTaskProxy &orig)
       : event_handler_(orig.event_handler_) {}
@@ -58,10 +58,10 @@ class MouseTaskProxy {
 
   /**
    * @brief Push this mouse task of the given view at the back of this task
-   * @param view
+   * @param event_handler
    */
-  void PushBack(AbstractEventHandler *view) {
-    event_handler_->p_->mouse_task.PushBack(&view->p_->mouse_task);
+  void PushBack(AbstractEventHandler *event_handler) {
+    event_handler_->p_->mouse_task.PushBack(&event_handler->p_->mouse_task);
   }
 
   void PushBack(const MouseTaskProxy &other) {
@@ -106,7 +106,7 @@ class MouseTaskProxy {
     return proxy;
   }
 
-  AbstractEventHandler *view() const { return event_handler_; }
+  AbstractEventHandler *event_handler() const { return event_handler_; }
 
  private:
 

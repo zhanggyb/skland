@@ -41,6 +41,7 @@ AbstractWindow::AbstractWindow(int width,
                                const char *title,
                                AbstractWindowFrame *frame)
     : AbstractView(width, height),
+      commited_(false),
       flags_(0),
       toplevel_shell_surface_(nullptr),
       window_frame_(nullptr) {
@@ -101,7 +102,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 }
 
 void AbstractWindow::Show() {
-  if (!visible()) {
+  if (!commited_) {
     toplevel_shell_surface_->Commit();
   }
 }
@@ -130,21 +131,22 @@ Size AbstractWindow::GetMinimalSize() const {
   if (IsFrameless()) return Size(100, 100);
 
   int w = 160, h = 120;
-  switch (window_frame_->title_bar_position()) {
-    case AbstractWindowFrame::kTitleBarLeft:
-    case AbstractWindowFrame::kTitleBarRight: {
-      w = window_frame_->title_bar_size() + window_frame_->border();
-      w += 120;
-      break;
-    }
-    case AbstractWindowFrame::kTitleBarBottom:
-    case AbstractWindowFrame::kTitleBarTop:
-    default: {
-      h = window_frame_->title_bar_size() + window_frame_->border();
-      h += 90;
-      break;
-    }
-  }
+//  Rect client = GetClientGeometry();
+//  switch (window_frame_->title_bar_position()) {
+//    case AbstractWindowFrame::kTitleBarLeft:
+//    case AbstractWindowFrame::kTitleBarRight: {
+//      w = window_frame_->title_bar_size() + window_frame_->border();
+//      w += 120;
+//      break;
+//    }
+//    case AbstractWindowFrame::kTitleBarBottom:
+//    case AbstractWindowFrame::kTitleBarTop:
+//    default: {
+//      h = window_frame_->title_bar_size() + window_frame_->border();
+//      h += 90;
+//      break;
+//    }
+//  }
   return Size(w, h);
 }
 
@@ -329,8 +331,8 @@ void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
   ShellSurface *shell_surface = ShellSurface::Get(toplevel_shell_surface_);
   shell_surface->AckConfigure(serial);
 
-  if (!visible()) {
-    set_visible(true);
+  if (!commited_) {
+    commited_ = true;
     shell_surface->ResizeWindow(width(), height());
     OnShown();
   }

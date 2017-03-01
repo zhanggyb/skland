@@ -135,6 +135,8 @@ class WindowFrameDefault : public AbstractWindowFrame {
 
   virtual ~WindowFrameDefault();
 
+  virtual Rect GetClientGeometry() const final;
+
   static const int kButtonSize = 14;
   static const int kButtonSpace = 5;
 
@@ -181,6 +183,10 @@ class WindowFrameDefault : public AbstractWindowFrame {
   void CreateWidgets();
 
   void LayoutWidgets(int width, int height);
+
+  int border_;
+  int title_bar_size_;
+  TitleBarPosition title_bar_position_;
 
   CloseButton *close_button_;
 

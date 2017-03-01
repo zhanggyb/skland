@@ -22,17 +22,9 @@
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
-#include "task.hpp"
-
 #include <memory>
 
 namespace skland {
-
-// Forward declarations
-class Application;
-class Display;
-class Surface;
-class Context;
 
 /**
  * @ingroup gui
@@ -58,12 +50,6 @@ class Context;
  * @see Surface
  */
 SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
-
-  friend class Application;
-  friend class Display;
-
-  friend struct RedrawTask;
-  friend class RedrawTaskProxy;
 
   AbstractView(const AbstractView &) = delete;
   AbstractView &operator=(const AbstractView &) = delete;
@@ -205,8 +191,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual void OnSizeChanged(int width, int height) = 0;
 
-  virtual void OnDraw(const Context *context) = 0;
-
   void TrackMouseMotion(MouseEvent *event);
 
   void UntrackMouseMotion();
@@ -229,8 +213,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   static Surface *GetSurface(const AbstractView *view);
 
-  static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
-
  private:
 
   struct Private;
@@ -240,19 +222,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   Rect geometry_;
 
   std::unique_ptr<Private> p_;
-
-  /**
-   * @brief Initialize the idle task list
-   */
-  static void InitializeRedrawTaskList();
-
-  /**
-   * @brief Destroy the redraw task list
-   */
-  static void ClearRedrawTaskList();
-
-  static Task kRedrawTaskHead;
-  static Task kRedrawTaskTail;
 
 };
 

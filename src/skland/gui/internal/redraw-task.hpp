@@ -22,20 +22,20 @@
 
 namespace skland {
 
-class AbstractView;
+class AbstractEventHandler;
 
 SKLAND_NO_EXPORT struct RedrawTask : public Task {
   RedrawTask(const RedrawTask &) = delete;
   RedrawTask &operator=(const RedrawTask &) = delete;
 
-  RedrawTask(AbstractView *view)
-      : Task(), view(view) {}
+  RedrawTask(AbstractEventHandler *event_handler)
+      : Task(), event_handler(event_handler) {}
 
   virtual ~RedrawTask() {}
 
   virtual void Run() const final;
 
-  AbstractView *view;
+  AbstractEventHandler *event_handler;
   Context context;
 };
 

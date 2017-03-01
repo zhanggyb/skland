@@ -90,11 +90,11 @@ void WindowFrameDark::OnDraw(const Context *context) {
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(0xEF202020);
+  paint.SetColor(0xFF202020);
   canvas->DrawPath(path, paint);
 
   // Draw the client area:
-  paint.SetColor(0xEF303030);
+  paint.SetColor(0xFF303030);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
   canvas->DrawRect(GetClientGeometry(), paint);

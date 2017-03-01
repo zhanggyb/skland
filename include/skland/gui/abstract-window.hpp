@@ -138,6 +138,10 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
 
   static void DrawWindowFrame(AbstractWindowFrame *window_frame, const Context *context);
 
+  bool commited() const {
+    return commited_;
+  }
+
  private:
 
   enum FlagMask {
@@ -155,6 +159,8 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
   void OnXdgToplevelClose();
 
   void OnWindowAction(int action, __SLOT__);
+
+  bool commited_;
 
   int flags_;
 
