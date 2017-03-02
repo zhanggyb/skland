@@ -54,6 +54,7 @@ void WindowFrameLight::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, window()->size().width, window()->size().height);
 
   // Drop shadow:
   if ((!window()->IsMaximized()) || (!window()->IsFullscreen())) {
@@ -63,13 +64,13 @@ void WindowFrameLight::OnDraw(const Context *context) {
         4.f, 4.f, // bottom-right
         4.f, 4.f  // bottom-left
     };
-    path.AddRoundRect(window()->geometry(), radii);
+    path.AddRoundRect(geometry, radii);
     canvas->Save();
     canvas->ClipPath(path, kClipDifference, true);
     DrawShadow(canvas.get());
     canvas->Restore();
   } else {
-    path.AddRect(window()->geometry());
+    path.AddRect(geometry);
   }
 
   // Fill color:

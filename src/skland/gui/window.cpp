@@ -38,11 +38,10 @@ Window::Window(const char *title, AbstractWindowFrame *frame)
 }
 
 Window::Window(int width, int height, const char *title, AbstractWindowFrame *frame)
-    : AbstractWindow(width, height, title, frame),
-      main_surface_(nullptr),
-      main_widget_(nullptr) {
+    : AbstractWindow(width, height, title, nullptr, frame),
+      main_surface_(nullptr) {
   if (frame) {
-    Surface *parent = toplevel_shell_surface();
+    Surface *parent = shell_surface();
     main_surface_ = SubSurface::Create(parent, this, Theme::shadow_margin());
     DBG_ASSERT(main_surface_->parent() == parent);
     DBG_ASSERT(main_surface_->below() == parent);
@@ -53,26 +52,15 @@ Window::Window(int width, int height, const char *title, AbstractWindowFrame *fr
 }
 
 Window::~Window() {
-  delete main_widget_;
   delete main_surface_;
 }
 
-void Window::SetMainWidget(AbstractView *widget) {
-  if (widget == main_widget_) return;
-
-  if (main_widget_) delete main_widget_;
-  main_widget_ = widget;
-
-  AddSubView(widget);
-  SetMainWidgetGeometry();
-}
-
 void Window::OnShown() {
-  Surface *shell_surface = toplevel_shell_surface();
+  Surface *shell_surface = this->shell_surface();
 
   // Create buffer:
-  int total_width = width();
-  int total_height = height();
+  int total_width = size().width;
+  int total_height = size().height;
   total_width += shell_surface->margin().lr();
   total_height += shell_surface->margin().tb();
 
@@ -100,23 +88,24 @@ void Window::OnShown() {
     main_canvas_->Clear();
   }
 
-  UpdateAll();
+  OnUpdate(nullptr);
+  if (content_view()) UpdateAll(content_view());
 }
 
 void Window::OnUpdate(AbstractView *view) {
-  if (!commited()) return;
+  if (!shown()) return;
 
   Surface *surface = nullptr;
 
-  if (view == this) {
-    surface = this->toplevel_shell_surface();
+  if (nullptr == view) {
+    surface = this->shell_surface();
     RedrawTaskProxy redraw_task_helper(this);
     redraw_task_helper.MoveToTail();
     redraw_task_helper.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
     Damage(this, 0, 0,
-           width() + surface->margin().lr(),
-           height() + surface->margin().tb());
+           size().width + surface->margin().lr(),
+           size().height + surface->margin().tb());
     surface->Commit();
   } else {
     std::shared_ptr<Canvas> canvas;
@@ -124,7 +113,7 @@ void Window::OnUpdate(AbstractView *view) {
       surface = main_surface_;
       canvas = main_canvas_;
     } else {
-      surface = this->toplevel_shell_surface();
+      surface = this->shell_surface();
       canvas = frame_canvas_;
     }
 
@@ -140,11 +129,11 @@ void Window::OnUpdate(AbstractView *view) {
   }
 }
 
-Surface *Window::OnGetSurface(const AbstractView *view) const {
-  if (view == this)
-    return toplevel_shell_surface();
+Surface *Window::GetSurface(const AbstractView *view) const {
+  if (nullptr == view)
+    return shell_surface();
 
-  return nullptr != main_surface_ ? main_surface_ : toplevel_shell_surface();
+  return nullptr != main_surface_ ? main_surface_ : shell_surface();
 }
 
 void Window::OnKeyboardKey(KeyEvent *event) {
@@ -155,10 +144,8 @@ void Window::OnKeyboardKey(KeyEvent *event) {
 }
 
 void Window::OnSizeChanged(int width, int height) {
-  resize(width, height);
-
   RectI input_rect(width, height);
-  Surface *shell_surface = toplevel_shell_surface();
+  Surface *shell_surface = this->shell_surface();
 
   input_rect.left = shell_surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
   input_rect.top = shell_surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
@@ -196,22 +183,10 @@ void Window::OnSizeChanged(int width, int height) {
     main_canvas_->SetOrigin(main_surface_->margin().left,
                             main_surface_->margin().top);
     main_canvas_->Clear();
-
-    DBG_ASSERT(window_frame());
-    ResizeWindowFrame(window_frame(), width, height);
   }
 
-  SetMainWidgetGeometry();
-  UpdateAll();
-}
-
-void Window::SetMainWidgetGeometry() {
-  if (main_widget_ == nullptr) return;
-
-  Rect rect = GetClientGeometry();
-
-  main_widget_->MoveTo((int) rect.x(), (int) rect.y());
-  main_widget_->Resize((int) rect.width(), (int) rect.height());
+  OnUpdate(nullptr);
+  if (content_view()) UpdateAll(content_view());
 }
 
 }

@@ -64,6 +64,8 @@ class AbstractView::Iterator {
     return it;
   }
 
+  Surface *GetSurface() const { return view_->GetSurface(view_); }
+
   AbstractView *parent() const { return view_->p_->parent; }
 
   AbstractView *previous() const { return view_->p_->previous; }

@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-#include <skland/gui/abstract-view.hpp>
-
 #include <skland/core/numeric.hpp>
-#include <skland/gui/abstract-window.hpp>
 #include <skland/gui/mouse-event.hpp>
 
-#include "internal/abstract-view-private.hpp"
 #include "internal/redraw-task-proxy.hpp"
+#include "internal/abstract-view-private.hpp"
 
 namespace skland {
 
@@ -38,18 +35,30 @@ AbstractView::AbstractView(int width, int height)
 }
 
 AbstractView::~AbstractView() {
-  if (p_->parent) p_->parent->RemoveChild(this);
-  DBG_ASSERT(p_->previous == nullptr);
-  DBG_ASSERT(p_->next == nullptr);
+  if (p_->parent) {
+    DBG_ASSERT(nullptr == p_->root_event_handler);
+    AbstractView *parent = p_->parent;
+    parent->RemoveChild(this);
+    parent->OnViewDestroyed(this);
+  } else if (p_->root_event_handler) {
+    DBG_ASSERT(nullptr == p_->parent);
+    p_->root_event_handler->OnViewDestroyed(this);
+    p_->root_event_handler = nullptr;
+  }
+
+  DBG_ASSERT(nullptr == p_->parent);
+  DBG_ASSERT(nullptr == p_->root_event_handler);
+  DBG_ASSERT(nullptr == p_->previous);
+  DBG_ASSERT(nullptr == p_->next);
 
   if (p_->children_count > 0) {
-    DBG_ASSERT(p_->first_child != nullptr);
-    DBG_ASSERT(p_->last_child != nullptr);
+    DBG_ASSERT(p_->first_child);
+    DBG_ASSERT(p_->last_child);
     ClearChildren();
   }
-  DBG_ASSERT(p_->children_count == 0);
-  DBG_ASSERT(p_->first_child == nullptr);
-  DBG_ASSERT(p_->last_child == nullptr);
+  DBG_ASSERT(0 == p_->children_count);
+  DBG_ASSERT(nullptr == p_->first_child);
+  DBG_ASSERT(nullptr == p_->last_child);
 }
 
 void AbstractView::MoveTo(int x, int y) {
@@ -281,6 +290,10 @@ void AbstractView::ClearChildren() {
   p_->children_count = 0;
   p_->first_child = nullptr;
   p_->last_child = nullptr;
+}
+
+void AbstractView::OnViewDestroyed(AbstractView *view) {
+  // override in subclass
 }
 
 void AbstractView::OnAddedToParent() {
@@ -639,34 +652,32 @@ void AbstractView::OnUpdate(AbstractView *view) {
 
   if (proxy.IsLinked() && (view != this)) {
     // This view is going to be redrawn, just push back the task of the sub view
-
     proxy.PushBack(view);
     proxy.CopyContextTo(view);
-
     return;
   }
 
   if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->shell);
+    DBG_ASSERT(nullptr == p_->root_event_handler);
     p_->parent->OnUpdate(view);
     return;
   }
 
-  if (p_->shell) {
+  if (p_->root_event_handler) {
     DBG_ASSERT(nullptr == p_->parent);
-    p_->shell->OnUpdate(view);
+    p_->root_event_handler->OnUpdate(view);
   }
 }
 
-Surface *AbstractView::OnGetSurface(const AbstractView *view) const {
-  if (view->p_->parent) {
-    DBG_ASSERT(nullptr == p_->shell);
-    return view->p_->parent->OnGetSurface(view);
+Surface *AbstractView::GetSurface(const AbstractView *view) const {
+  if (p_->parent) {
+    DBG_ASSERT(nullptr == p_->root_event_handler);
+    return p_->parent->GetSurface(view);
   }
 
-  if (view->p_->shell) {
+  if (p_->root_event_handler) {
     DBG_ASSERT(nullptr == p_->parent);
-    return view->p_->shell->OnGetSurface(view);
+    return p_->root_event_handler->GetSurface(view);
   }
 
   return nullptr;
@@ -686,10 +697,6 @@ void AbstractView::TrackMouseMotion(MouseEvent *event) {
 
 void AbstractView::UntrackMouseMotion() {
 //  p_->mouse_motion_task.Unlink();
-}
-
-Surface *AbstractView::GetSurface(const AbstractView *view) {
-  return view->OnGetSurface(view);
 }
 
 }

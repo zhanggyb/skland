@@ -24,6 +24,7 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/abstract-window.hpp>
 #include <skland/gui/context.hpp>
+#include <skland/gui/linear-layout.hpp>
 
 #include "SkCanvas.h"
 
@@ -230,7 +231,9 @@ WindowFrameDefault::WindowFrameDefault()
       close_button_(nullptr),
       maximize_button_(nullptr),
       minimize_button_(nullptr),
-      title_(nullptr) {
+      title_(nullptr),
+      layout_(nullptr) {
+  CreateWidgets();
 }
 
 WindowFrameDefault::~WindowFrameDefault() {
@@ -238,13 +241,14 @@ WindowFrameDefault::~WindowFrameDefault() {
   delete maximize_button_;
   delete minimize_button_;
   delete close_button_;
+  delete layout_;
 }
 
 Rect WindowFrameDefault::GetClientGeometry() const {
   int x = border_,
       y = border_,
-      w = window()->width() - 2 * border_,
-      h = window()->height() - 2 * border_;
+      w = window()->size().width - 2 * border_,
+      h = window()->size().height - 2 * border_;
 
   switch (title_bar_position_) {
     case kTitleBarLeft: {
@@ -270,6 +274,10 @@ Rect WindowFrameDefault::GetClientGeometry() const {
   return Rect::FromXYWH(x, y, w, h);
 }
 
+AbstractView *WindowFrameDefault::GetContainer() const {
+  return title_;
+}
+
 void WindowFrameDefault::OnCloseButtonClicked(SLOT /* slot */) {
   EmitAction(AbstractWindow::kActionClose);
 }
@@ -283,25 +291,34 @@ void WindowFrameDefault::OnMinimizeButtonClicked(SLOT /* slot */) {
 }
 
 void WindowFrameDefault::CreateWidgets() {
-  close_button_ = new CloseButton;
-  close_button_->clicked().Connect(this, &WindowFrameDefault::OnCloseButtonClicked);
+//  close_button_ = new CloseButton;
+//  close_button_->clicked().Connect(this, &WindowFrameDefault::OnCloseButtonClicked);
+//
+//  minimize_button_ = new MinimizeButton;
+//  minimize_button_->clicked().Connect(this, &WindowFrameDefault::OnMinimizeButtonClicked);
+//
+//  maximize_button_ = new MaximizeButton;
+//  maximize_button_->clicked().Connect(this, &WindowFrameDefault::OnMaximizeButtonClicked);
 
-  minimize_button_ = new MinimizeButton;
-  minimize_button_->clicked().Connect(this, &WindowFrameDefault::OnMinimizeButtonClicked);
-
-  maximize_button_ = new MaximizeButton;
-  maximize_button_->clicked().Connect(this, &WindowFrameDefault::OnMaximizeButtonClicked);
-
-  title_ = new Label(window()->title());
+//  title_ = new Label(window()->title());
+  title_ = new Label("Test");
   title_->SetForeground(0xFF444444);
   title_->SetFont(Font(Typeface::kBold));
 
-  AddWidget(title_);  // put the title below other widgets
-  AddWidget(close_button_);
-  AddWidget(maximize_button_);
-  AddWidget(minimize_button_);
+//  layout_ = new LinearLayout;
 
-  LayoutWidgets(window()->width(), window()->height());
+//  AddWidget(title_);  // put the title below other widgets
+//  AddWidget(close_button_);
+//  AddWidget(maximize_button_);
+//  AddWidget(minimize_button_);
+
+//  LayoutWidgets(window()->size().width, window()->height());
+
+//  layout_->AddView(close_button_);
+//  layout_->AddView(maximize_button_);
+//  layout_->AddView(minimize_button_);
+//  layout_->AddView(title_);
+
 }
 
 void WindowFrameDefault::OnResize(int width, int height) {
@@ -310,17 +327,20 @@ void WindowFrameDefault::OnResize(int width, int height) {
 
 void WindowFrameDefault::LayoutWidgets(int width, int height) {
   title_->MoveTo(0, 0);
-  title_->Resize(window()->width(), title_bar_size_);
+  title_->Resize(window()->size().width, title_bar_size_);
 
-  int y = (title_bar_size_ - kButtonSize) / 2;
-  int x = kButtonSpace;
-  close_button_->MoveTo(x, y);
-
-  x += close_button_->width() + kButtonSpace;
-  maximize_button_->MoveTo(x, y);
-
-  x += maximize_button_->width() + kButtonSpace;
-  minimize_button_->MoveTo(x, y);
+//  title_->MoveTo(0, 0);
+//  title_->Resize(window()->size().width, title_bar_size_);
+//
+//  int y = (title_bar_size_ - kButtonSize) / 2;
+//  int x = kButtonSpace;
+//  close_button_->MoveTo(x, y);
+//
+//  x += close_button_->width() + kButtonSpace;
+//  maximize_button_->MoveTo(x, y);
+//
+//  x += maximize_button_->width() + kButtonSpace;
+//  minimize_button_->MoveTo(x, y);
 }
 
 void WindowFrameDefault::OnDraw(const Context *context) {
@@ -328,6 +348,7 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, window()->size().width, window()->size().height);
 
   // Drop shadow:
   if ((!window()->IsMaximized()) || (!window()->IsFullscreen())) {
@@ -337,13 +358,13 @@ void WindowFrameDefault::OnDraw(const Context *context) {
         4.f, 4.f, // bottom-right
         4.f, 4.f  // bottom-left
     };
-    path.AddRoundRect(window()->geometry(), radii);
+    path.AddRoundRect(geometry, radii);
     canvas->Save();
     canvas->ClipPath(path, kClipDifference, true);
     DrawShadow(canvas.get());
     canvas->Restore();
   } else {
-    path.AddRect(window()->geometry());
+    path.AddRect(geometry);
   }
 
   // Fill color:
@@ -362,10 +383,6 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   canvas->Flush();
 }
 
-void WindowFrameDefault::OnSetup() {
-  CreateWidgets();
-}
-
 int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
   int vlocation, hlocation, location;
   int x = static_cast<int>(event->surface_x()), y = static_cast<int>(event->surface_y());
@@ -376,9 +393,9 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     hlocation = kExterior;
   else if (x < Theme::shadow_margin().left + kResizingMargin.left)
     hlocation = kResizeLeft;
-  else if (x < Theme::shadow_margin().left + window()->geometry().width() - kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + window()->size().width - kResizingMargin.right)
     hlocation = kInterior;
-  else if (x < Theme::shadow_margin().left + window()->geometry().width() + kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + window()->size().width + kResizingMargin.right)
     hlocation = kResizeRight;
   else
     hlocation = kExterior;
@@ -387,9 +404,9 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     vlocation = kExterior;
   else if (y < Theme::shadow_margin().top + kResizingMargin.top)
     vlocation = kResizeTop;
-  else if (y < Theme::shadow_margin().top + window()->geometry().height() - kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + window()->size().height - kResizingMargin.bottom)
     vlocation = kInterior;
-  else if (y < Theme::shadow_margin().top + window()->geometry().height() + kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + window()->size().height + kResizingMargin.bottom)
     vlocation = kResizeBottom;
   else
     vlocation = kExterior;
@@ -435,14 +452,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
                                     250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
-                                    window()->width() - 2 * rad, 2 * rad),
+                                    window()->size().width - 2 * rad, 2 * rad),
                    nullptr);
 
   // top-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
                                     250, 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(window()->width() - rad + offset_x, -rad + offset_y,
+                   SkRect::MakeXYWH(window()->size().width - rad + offset_x, -rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -451,14 +468,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
-                                    2 * rad, window()->height() - 2 * rad),
+                                    2 * rad, window()->size().height - 2 * rad),
                    nullptr);
 
   // bottom-left
   c->drawImageRect(image,
                    SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(-rad + offset_x, window()->height() - rad + offset_y,
+                   SkRect::MakeXYWH(-rad + offset_x, window()->size().height - rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -466,16 +483,16 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250 - 2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(rad + offset_x, window()->height() - rad + offset_y,
-                                    window()->width() - 2 * rad, 2 * rad),
+                   SkRect::MakeXYWH(rad + offset_x, window()->size().height - rad + offset_y,
+                                    window()->size().width - 2 * rad, 2 * rad),
                    nullptr);
 
   // bottom-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250, 250),
-                   SkRect::MakeXYWH(window()->width() - rad + offset_x,
-                                    window()->height() - rad + offset_y,
+                   SkRect::MakeXYWH(window()->size().width - rad + offset_x,
+                                    window()->size().height - rad + offset_y,
                                     2 * rad,
                                     2 * rad),
                    nullptr);
@@ -484,8 +501,8 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
                                     250, 250 - 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(window()->width() - rad + offset_x, rad + offset_y,
-                                    2 * rad, window()->height() - 2 * rad),
+                   SkRect::MakeXYWH(window()->size().width - rad + offset_x, rad + offset_y,
+                                    2 * rad, window()->size().height - 2 * rad),
                    nullptr);
 
 }

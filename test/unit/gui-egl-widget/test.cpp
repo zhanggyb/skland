@@ -33,8 +33,8 @@ TEST_F(Test, slider_1) {
   Window *win = new Window(480, 360, "Test EGL Widget");
   win->SetAppId("EGLWidget");
 
-  EGLWidget *widget = new EGLWidget;
-  win->SetMainWidget(widget);
+//  EGLWidget *widget = new EGLWidget;
+//  win->SetMainWidget(widget);
 
   win->Show();
 

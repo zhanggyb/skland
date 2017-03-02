@@ -32,6 +32,10 @@ class Surface;
 class AbstractView;
 class Context;
 
+/**
+ * @ingroup gui
+ * @brief The base class to handle events from surface
+ */
 SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
   friend class Input;
@@ -39,8 +43,9 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   friend class Display;
 
   friend class AbstractView;
-  friend class MouseTaskProxy;
+
   friend struct RedrawTask;
+  friend class MouseTaskProxy;
   friend class RedrawTaskProxy;
 
  public:
@@ -62,21 +67,29 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
   /**
+   * @brief Callback when a view in this object is removed
+   * @param view
+   */
+  virtual void OnViewDestroyed(AbstractView *view) = 0;
+
+  /**
    * @brief A view request an update
-   * @param view This view or a sub view in hierachy
+   * @param view A view in hierachy or null to update this object
    */
   virtual void OnUpdate(AbstractView *view) = 0;
 
   /**
    * @brief Get surface for the given view
-   * @param view A view object, it is always this view or a sub view in hierachy
+   * @param view A view in hierachy or null to get shell surface for this object
    * @return A pointer to a surface or nullptr
    */
-  virtual Surface *OnGetSurface(const AbstractView *view) const = 0;
+  virtual Surface *GetSurface(const AbstractView *view) const = 0;
 
   virtual void OnDraw(const Context *context) = 0;
 
   static void Damage(AbstractEventHandler *object, int surface_x, int surface_y, int width, int height);
+
+  static void UpdateAll(AbstractView *view);
 
  private:
 

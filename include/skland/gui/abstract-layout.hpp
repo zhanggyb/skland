@@ -50,7 +50,7 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual void OnViewAdded(AbstractView *view) = 0;
 
-  virtual void OnViewRemoved(AbstractView *view) = 0;
+  virtual void OnViewDestroyed(AbstractView *view) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) final;
 

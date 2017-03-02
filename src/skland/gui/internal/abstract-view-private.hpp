@@ -36,7 +36,7 @@ struct AbstractView::Private {
         last_child(nullptr),
         parent(nullptr),
         children_count(0),
-        shell(nullptr) {}
+        root_event_handler(nullptr) {}
 
   ~Private() {}
 
@@ -49,7 +49,7 @@ struct AbstractView::Private {
   AbstractView *parent;
   int children_count;
 
-  AbstractEventHandler *shell;
+  AbstractEventHandler *root_event_handler;
 
 };
 

@@ -51,6 +51,9 @@ namespace skland {
  */
 SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
+  friend class AbstractEventHandler;
+  friend class AbstractWindow;
+
   AbstractView(const AbstractView &) = delete;
   AbstractView &operator=(const AbstractView &) = delete;
 
@@ -153,6 +156,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   void ClearChildren();
 
+  virtual void OnViewDestroyed(AbstractView *view) override;
+
   virtual void OnAddedToParent();
 
   virtual void OnRemovedFromParent(AbstractView *original_parent);
@@ -180,14 +185,14 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief A view request an update
    * @param view This view or a sub view in hierachy
    */
-  virtual void OnUpdate(AbstractView *view);
+  virtual void OnUpdate(AbstractView *view) override;
 
   /**
    * @brief Get surface for the given view
    * @param view A view object, it is always this view or a sub view in hierachy
    * @return A pointer to a surface or nullptr
    */
-  virtual Surface *OnGetSurface(const AbstractView *view) const;
+  virtual Surface *GetSurface(const AbstractView *view) const;
 
   virtual void OnSizeChanged(int width, int height) = 0;
 
@@ -206,12 +211,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   void resize(int width, int height) {
     geometry_.Resize(width, height);
   }
-
-  /**
-   * @brief Get the surface on which this view renders
-   * @return A surface object or nullptr
-   */
-  static Surface *GetSurface(const AbstractView *view);
 
  private:
 

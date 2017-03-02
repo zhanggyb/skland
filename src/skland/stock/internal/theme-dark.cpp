@@ -40,35 +40,30 @@ class WindowFrameDark final : public WindowFrameDefault {
  public:
 
   WindowFrameDark()
-      : WindowFrameDefault() {}
+      : WindowFrameDefault() {
+    title()->SetForeground(0xFF999999);
+    close_button()->SetForeground(0xFF999999);
+    close_button()->SetBackground(0xFF444444);
+    maximize_button()->SetForeground(0xFF999999);
+    maximize_button()->SetBackground(0xFF444444);
+    minimize_button()->SetForeground(0xFF999999);
+    minimize_button()->SetBackground(0xFF444444);
+  }
 
   virtual ~WindowFrameDark() {}
 
  protected:
 
-  virtual void OnSetup();
-
   virtual void OnDraw(const Context *context);
 
 };
-
-void WindowFrameDark::OnSetup() {
-  WindowFrameDefault::OnSetup();
-
-  title()->SetForeground(0xFF999999);
-  close_button()->SetForeground(0xFF999999);
-  close_button()->SetBackground(0xFF444444);
-  maximize_button()->SetForeground(0xFF999999);
-  maximize_button()->SetBackground(0xFF444444);
-  minimize_button()->SetForeground(0xFF999999);
-  minimize_button()->SetBackground(0xFF444444);
-}
 
 void WindowFrameDark::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Clear();
 
   Path path;
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, window()->size().width, window()->size().height);
 
   // Drop shadow:
   if ((!window()->IsMaximized()) || (!window()->IsFullscreen())) {
@@ -78,13 +73,13 @@ void WindowFrameDark::OnDraw(const Context *context) {
         4.f, 4.f, // bottom-right
         4.f, 4.f  // bottom-left
     };
-    path.AddRoundRect(window()->geometry(), radii);
+    path.AddRoundRect(geometry, radii);
     canvas->Save();
     canvas->ClipPath(path, kClipDifference, true);
     DrawShadow(canvas.get());
     canvas->Restore();
   } else {
-    path.AddRect(window()->geometry());
+    path.AddRect(geometry);
   }
 
   // Fill color:

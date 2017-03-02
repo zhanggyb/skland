@@ -26,6 +26,7 @@ namespace skland {
 
 class Canvas;
 class Label;
+class LinearLayout;
 
 /**
  * @ingroup stock_intern
@@ -137,12 +138,12 @@ class WindowFrameDefault : public AbstractWindowFrame {
 
   virtual Rect GetClientGeometry() const final;
 
+  virtual AbstractView *GetContainer() const final;
+
   static const int kButtonSize = 14;
   static const int kButtonSpace = 5;
 
  protected:
-
-  virtual void OnSetup() override;
 
   virtual void OnResize(int width, int height) override;
 
@@ -160,7 +161,7 @@ class WindowFrameDefault : public AbstractWindowFrame {
     * |        |                 |
     * |        |                 |
     */
-  virtual int GetMouseLocation(const MouseEvent *event) const;
+  virtual int GetMouseLocation(const MouseEvent *event) const final;
 
   void DrawShadow(Canvas *canvas);
 
@@ -195,6 +196,8 @@ class WindowFrameDefault : public AbstractWindowFrame {
   MinimizeButton *minimize_button_;
 
   Label *title_;
+
+  LinearLayout *layout_;
 
 };
 

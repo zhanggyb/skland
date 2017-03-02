@@ -33,7 +33,7 @@ class Canvas;
  *
  * @example hello.cpp
  */
-class Window : public AbstractWindow {
+SKLAND_EXPORT class Window : public AbstractWindow {
 
   Window(const Window &) = delete;
   Window &operator=(const Window &) = delete;
@@ -47,25 +47,19 @@ class Window : public AbstractWindow {
 
   virtual ~Window();
 
-  void SetMainWidget(AbstractView *widget);
-
-  AbstractView *main_widget() const { return main_widget_; }
-
  protected:
 
   virtual void OnShown() final;
 
   virtual void OnUpdate(AbstractView *view) override;
 
-  virtual Surface *OnGetSurface(const AbstractView *view) const;
+  virtual Surface *GetSurface(const AbstractView *view) const;
 
   virtual void OnKeyboardKey(KeyEvent *event) final;
 
   virtual void OnSizeChanged(int width, int height) final;
 
  private:
-
-  void SetMainWidgetGeometry();
 
   Surface *main_surface_;
 
@@ -78,8 +72,6 @@ class Window : public AbstractWindow {
   MemoryPool main_pool_;
   Buffer main_buffer_;
   std::shared_ptr<Canvas> main_canvas_;
-
-  AbstractView *main_widget_; // This will be a layout
 
 };
 

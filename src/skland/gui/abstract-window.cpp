@@ -26,32 +26,43 @@
 
 #include <skland/gui/abstract-window-frame.hpp>
 
+#include "internal/abstract-view-private.hpp"
 #include "internal/display-proxy.hpp"
 #include "internal/mouse-task-proxy.hpp"
 
 namespace skland {
 
-AbstractWindow::AbstractWindow(const char *title,
+AbstractWindow::AbstractWindow(const char *title, AbstractWindow *parent,
                                AbstractWindowFrame *frame)
-    : AbstractWindow(400, 300, title, frame) {
+    : AbstractWindow(400, 300, title, parent, frame) {
 }
 
 AbstractWindow::AbstractWindow(int width,
                                int height,
                                const char *title,
+                               AbstractWindow *parent,
                                AbstractWindowFrame *frame)
-    : AbstractView(width, height),
-      commited_(false),
+    : AbstractEventHandler(),
+      shown_(false),
       flags_(0),
-      toplevel_shell_surface_(nullptr),
-      window_frame_(nullptr) {
+      shell_surface_(nullptr),
+      window_frame_(nullptr),
+      size_(width, height),
+      title_bar_(nullptr),
+      content_view_(nullptr),
+      parent_(parent) {
   if (title) title_ = title;
 
-  toplevel_shell_surface_ = ToplevelShellSurface::Create(this, Theme::shadow_margin());
-  ShellSurface::Get(toplevel_shell_surface_)->configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
-  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(toplevel_shell_surface_);
-  toplevel->configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
-  toplevel->close().Set(this, &AbstractWindow::OnXdgToplevelClose);
+  if (nullptr == parent_) {
+    shell_surface_ = ToplevelShellSurface::Create(this, Theme::shadow_margin());
+    ShellSurface::Get(shell_surface_)->configure().Set(this, &AbstractWindow::OnXdgSurfaceConfigure);
+    ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(shell_surface_);
+    toplevel->configure().Set(this, &AbstractWindow::OnXdgToplevelConfigure);
+    toplevel->close().Set(this, &AbstractWindow::OnXdgToplevelClose);
+    toplevel->SetTitle(title);
+  } else {
+    // TODO: create popup shell surface
+  }
 
   int x = 0, y = 0;  // The input region
   x += Theme::shadow_margin().left - AbstractWindowFrame::kResizingMargin.left;
@@ -62,32 +73,40 @@ AbstractWindow::AbstractWindow(int width,
   wayland::Region input_region;
   input_region.Setup(DisplayProxy().wl_compositor());
   input_region.Add(x, y, width, height);
-  toplevel_shell_surface_->SetInputRegion(input_region);
+  shell_surface_->SetInputRegion(input_region);
 
-  toplevel->SetTitle(title);
   SetWindowFrame(frame);
 }
 
 AbstractWindow::~AbstractWindow() {
+  SetContentView(nullptr);
+
   Theme::DestroyWindowFrame(window_frame_);
-  delete toplevel_shell_surface_;
+  delete shell_surface_;
 }
 
 void AbstractWindow::SetTitle(const char *title) {
   title_ = title;
-  ToplevelShellSurface::Get(toplevel_shell_surface_)->SetTitle(title);
+  if (nullptr == parent_) {
+    ToplevelShellSurface::Get(shell_surface_)->SetTitle(title);
+  }
 }
 
 void AbstractWindow::SetAppId(const char *app_id) {
   app_id_ = app_id;
-  ToplevelShellSurface::Get(toplevel_shell_surface_)->SetAppId(app_id);
+  if (nullptr == parent_) {
+    ToplevelShellSurface::Get(shell_surface_)->SetAppId(app_id);
+  }
 }
 
 void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
-  if (window_frame == window_frame_) return;
+  if (window_frame == window_frame_)
+    return;
 
   if (window_frame_) {
+    if (title_bar_) title_bar_->p_->root_event_handler = nullptr;
     delete window_frame_;
+    title_bar_ = nullptr;
     window_frame_ = nullptr;
   }
 
@@ -96,14 +115,32 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
 
   if (window_frame_) {
     window_frame_->window_ = this;
+    title_bar_ = window_frame_->GetContainer();
+    if (title_bar_) title_bar_->p_->root_event_handler = this;
     window_frame_->window_action().Connect(this, &AbstractWindow::OnWindowAction);
-    window_frame_->OnSetup();
+    window_frame_->OnResize(size_.width, size_.height);
+  }
+}
+
+void AbstractWindow::SetContentView(AbstractView *view) {
+  if (content_view_ == view) return;
+
+  if (content_view_) {
+    content_view_->p_->root_event_handler = nullptr;
+    delete content_view_;
+  }
+
+  content_view_ = view;
+
+  if (content_view_) {
+    content_view_->p_->root_event_handler = this;
+    SetContentViewGeometry();
   }
 }
 
 void AbstractWindow::Show() {
-  if (!commited_) {
-    toplevel_shell_surface_->Commit();
+  if (!shown_) {
+    shell_surface_->Commit();
   }
 }
 
@@ -167,14 +204,10 @@ int AbstractWindow::GetMouseLocation(const MouseEvent *event) const {
 Rect AbstractWindow::GetClientGeometry() const {
   if (IsFrameless()) {
     DBG_ASSERT(nullptr == window_frame_);
-    return geometry();
+    return Rect::FromXYWH(0.f, 0.f, size_.width, size_.height);
   }
 
   return window_frame_->GetClientGeometry();
-}
-
-void AbstractWindow::OnAddedToParent() {
-  throw std::runtime_error("ERROR! Window object MUST be the root object in view hierachy!");
 }
 
 void AbstractWindow::OnMouseEnter(MouseEvent *event) {
@@ -289,9 +322,21 @@ void AbstractWindow::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
+void AbstractWindow::OnUpdate(AbstractView *view) {
+  // override in sub class
+}
+
 void AbstractWindow::OnDraw(const Context *context) {
   if (window_frame_) {
     window_frame_->OnDraw(context);
+  }
+}
+
+void AbstractWindow::OnViewDestroyed(AbstractView *view) {
+  if (view == title_bar_) {
+    title_bar_ = nullptr;
+  } else if (view == content_view_) {
+    content_view_ = nullptr;
   }
 }
 
@@ -304,19 +349,15 @@ void AbstractWindow::OnFullscreen(bool) {
 }
 
 void AbstractWindow::OnFocus(bool focus) {
-  Update();
-}
 
-void AbstractWindow::AddSubView(AbstractView *view, int pos) {
-  if (view) InsertChild(view, pos);
 }
 
 void AbstractWindow::MoveWithMouse(MouseEvent *event) const {
-  ToplevelShellSurface::Get(toplevel_shell_surface_)->Move(event->GetSeat(), event->serial());
+  ToplevelShellSurface::Get(shell_surface_)->Move(event->GetSeat(), event->serial());
 }
 
 void AbstractWindow::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
-  ToplevelShellSurface::Get(toplevel_shell_surface_)->Resize(event->GetSeat(), event->serial(), edges);
+  ToplevelShellSurface::Get(shell_surface_)->Resize(event->GetSeat(), event->serial(), edges);
 }
 
 void AbstractWindow::ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height) {
@@ -328,12 +369,12 @@ void AbstractWindow::DrawWindowFrame(AbstractWindowFrame *window_frame, const Co
 }
 
 void AbstractWindow::OnXdgSurfaceConfigure(uint32_t serial) {
-  ShellSurface *shell_surface = ShellSurface::Get(toplevel_shell_surface_);
+  ShellSurface *shell_surface = ShellSurface::Get(shell_surface_);
   shell_surface->AckConfigure(serial);
 
-  if (!commited_) {
-    commited_ = true;
-    shell_surface->ResizeWindow(width(), height());
+  if (!shown_) {
+    shown_ = true;
+    shell_surface->ResizeWindow(size_.width, size_.height);
     OnShown();
   }
 }
@@ -355,16 +396,20 @@ void AbstractWindow::OnXdgToplevelConfigure(int width, int height, int states) {
 
     width = clamp(width, min.width, max.width);
     height = clamp(height, min.height, max.height);
-    if (width == this->width() && height == this->height()) do_resize = false;
+    if (width == size_.width && height == size_.height) do_resize = false;
   } else {
     // Initialize
-    width = this->width();
-    height = this->height();
+    width = size_.width;
+    height = size_.height;
   }
 
   if (do_resize) {
-    ShellSurface::Get(toplevel_shell_surface_)->ResizeWindow(width, height);
+    ShellSurface::Get(shell_surface_)->ResizeWindow(width, height);
+    size_.width = width;
+    size_.height = height;
     OnSizeChanged(width, height);
+    if (window_frame_) window_frame_->OnResize(width, height);
+    if (content_view_) SetContentViewGeometry();
   }
 
   if (focus != IsFocused()) {
@@ -392,7 +437,7 @@ void AbstractWindow::OnXdgToplevelClose() {
 }
 
 void AbstractWindow::OnWindowAction(int action, SLOT slot) {
-  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(toplevel_shell_surface_);
+  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(shell_surface_);
 
   switch (action) {
     case kActionClose: {
@@ -419,6 +464,13 @@ void AbstractWindow::OnWindowAction(int action, SLOT slot) {
     }
     default: break;
   }
+}
+
+void AbstractWindow::SetContentViewGeometry() {
+  Rect rect = GetClientGeometry();
+
+  content_view_->MoveTo((int) rect.x(), (int) rect.y());
+  content_view_->Resize((int) rect.width(), (int) rect.height());
 }
 
 }

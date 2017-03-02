@@ -90,8 +90,8 @@ TEST_F(Test, timer_1) {
   Application app(argc, argv);
 
   Window *win = new Window(800, 600, "Simple");
-  ShmWidget* widget = new ShmWidget;
-  win->SetMainWidget(widget);
+//  ShmWidget* widget = new ShmWidget;
+//  win->SetMainWidget(widget);
 
   win->Show();
 

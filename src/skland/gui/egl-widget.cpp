@@ -58,7 +58,8 @@ void EGLWidget::OnUpdate(AbstractView *view) {
     Iterator it(this);
     if (nullptr == it.parent()) return;
 
-    Surface *parent_surface = GetSurface(it.parent());
+    it = it.parent();
+    Surface *parent_surface = it.GetSurface();
     if (nullptr == parent_surface) return;
 
     sub_surface_ = SubSurface::Create(parent_surface, this);

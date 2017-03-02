@@ -16,6 +16,8 @@
 
 #include "internal/abstract-event-handler-private.hpp"
 
+#include <skland/gui/abstract-view.hpp>
+
 namespace skland {
 
 Task AbstractEventHandler::kRedrawTaskHead;
@@ -49,6 +51,10 @@ void AbstractEventHandler::Damage(AbstractEventHandler *object, int surface_x, i
   object->p_->damaged_region_.l = surface_x;
   object->p_->damaged_region_.t = surface_y;
   object->p_->damaged_region_.Resize(width, height);
+}
+
+void AbstractEventHandler::UpdateAll(AbstractView *view) {
+  view->UpdateAll();
 }
 
 }

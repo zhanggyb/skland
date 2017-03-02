@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_ABSTRACT_WINDOW_HPP_
 #define SKLAND_GUI_ABSTRACT_WINDOW_HPP_
 
-#include "abstract-view.hpp"
+#include "abstract-event-handler.hpp"
 
 #include "../core/defines.hpp"
 #include "../core/rect.hpp"
@@ -33,7 +33,7 @@ namespace skland {
  * @ingroup gui
  * @brief Abstract class for top level windows
  */
-SKLAND_EXPORT class AbstractWindow : public AbstractView {
+SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
 
   friend class AbstractWindowFrame;
 
@@ -51,11 +51,11 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
     kActionLast
   };
 
-  AbstractWindow(const char *title,
+  AbstractWindow(const char *title, AbstractWindow *parent = nullptr,
                  AbstractWindowFrame *frame = Theme::CreateWindowFrame());
 
   AbstractWindow(int width, int height,
-                 const char *title,
+                 const char *title, AbstractWindow *parent = nullptr,
                  AbstractWindowFrame *frame = Theme::CreateWindowFrame());
 
   virtual ~AbstractWindow();
@@ -65,6 +65,8 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
   void SetAppId(const char *app_id);
 
   void SetWindowFrame(AbstractWindowFrame *window_frame);
+
+  void SetContentView(AbstractView *view);
 
   void Show();
 
@@ -76,11 +78,11 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
 
   const std::string &title() const { return title_; }
 
-  virtual Size GetMinimalSize() const override;
+  virtual Size GetMinimalSize() const;
 
-  virtual Size GetPreferredSize() const override;
+  virtual Size GetPreferredSize() const;
 
-  virtual Size GetMaximalSize() const override;
+  virtual Size GetMaximalSize() const;
 
   bool IsFullscreen() const { return 0 != (flags_ & kFlagMaskFullscreen); }
 
@@ -98,11 +100,15 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
 
   Rect GetClientGeometry() const;
 
+  const Size &size() const { return size_; }
+
+  AbstractView *content_view() const { return content_view_; }
+
  protected:
 
-  virtual void OnAddedToParent() final;
-
   virtual void OnShown() = 0;
+
+  virtual void OnSizeChanged(int width, int height) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -114,15 +120,17 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
+  virtual void OnUpdate(AbstractView *view) override;
+
   virtual void OnDraw(const Context *context) override;
+
+  virtual void OnViewDestroyed(AbstractView *view) override;
 
   virtual void OnMaximized(bool);
 
   virtual void OnFullscreen(bool);
 
   virtual void OnFocus(bool);
-
-  void AddSubView(AbstractView *view, int pos = -1);
 
   void MoveWithMouse(MouseEvent *event) const;
 
@@ -132,15 +140,13 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
 
   AbstractWindowFrame *window_frame() const { return window_frame_; }
 
-  Surface *toplevel_shell_surface() const { return toplevel_shell_surface_; }
+  Surface *shell_surface() const { return shell_surface_; }
 
   static void ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height);
 
   static void DrawWindowFrame(AbstractWindowFrame *window_frame, const Context *context);
 
-  bool commited() const {
-    return commited_;
-  }
+  bool shown() const { return shown_; }
 
  private:
 
@@ -160,16 +166,25 @@ SKLAND_EXPORT class AbstractWindow : public AbstractView {
 
   void OnWindowAction(int action, __SLOT__);
 
-  bool commited_;
+  void SetContentViewGeometry();
+
+  bool shown_;
 
   int flags_;
 
-  Surface *toplevel_shell_surface_;
+  Surface *shell_surface_;
 
   AbstractWindowFrame *window_frame_;
 
   std::string title_;
   std::string app_id_;
+
+  Size size_;
+
+  AbstractView *title_bar_;
+  AbstractView *content_view_;
+
+  AbstractWindow *parent_;
 
 };
 

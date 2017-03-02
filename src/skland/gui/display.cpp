@@ -46,12 +46,12 @@ Display::Display()
       inputs_count_(0) {
   data_.reset(new Private);
   cursors_.resize(kCursorBlank, nullptr);
-  AbstractView::InitializeRedrawTaskList();
+  AbstractEventHandler::InitializeRedrawTaskList();
   Surface::InitializeCommitTaskList();
 }
 
 Display::~Display() {
-  AbstractView::ClearRedrawTaskList();
+  AbstractEventHandler::ClearRedrawTaskList();
   Surface::ClearCommitTaskList();
 }
 

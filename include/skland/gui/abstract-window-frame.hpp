@@ -21,6 +21,7 @@
 #include "../core/margin.hpp"
 #include "../core/point.hpp"
 #include "../core/rect.hpp"
+#include "abstract-view.hpp"
 
 #include <vector>
 
@@ -60,7 +61,7 @@ class AbstractWindowFrame : public Trackable {
 
   virtual Rect GetClientGeometry() const = 0;
 
-  AbstractWindow *window() const { return window_; }
+  virtual AbstractView *GetContainer() const = 0;
 
   SignalRef<int> window_action() { return window_action_; }
 
@@ -70,17 +71,15 @@ class AbstractWindowFrame : public Trackable {
 
  protected:
 
-  virtual void OnSetup() = 0;
-
   virtual void OnResize(int width, int height) = 0;
 
   virtual void OnDraw(const Context *context) = 0;
 
   virtual int GetMouseLocation(const MouseEvent *event) const = 0;
 
-  void AddWidget(AbstractWidget *widget, int pos = 0);
-
   void EmitAction(int action) { window_action_.Emit(action); }
+
+  AbstractWindow *window() const { return window_; }
 
  private:
 

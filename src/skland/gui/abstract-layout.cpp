@@ -76,7 +76,7 @@ void AbstractLayout::RemoveView(AbstractView *view) {
     return;
 
   RemoveChild(view);
-  OnViewRemoved(view);
+  OnViewDestroyed(view);
 }
 
 void AbstractLayout::OnMouseEnter(MouseEvent *event) {

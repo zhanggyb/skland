@@ -19,6 +19,8 @@
 
 #include "input-event.hpp"
 
+#include "../core/point.hpp"
+
 #include <wayland-client.h>
 #include <linux/input-event-codes.h>
 

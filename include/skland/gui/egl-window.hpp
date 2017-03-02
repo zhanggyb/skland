@@ -57,7 +57,7 @@ class EGLWindow : public AbstractWindow {
 
   virtual void OnUpdate(AbstractView *view) final;
 
-  virtual Surface *OnGetSurface(const AbstractView *view) const final;
+  virtual Surface *GetSurface(const AbstractView *view) const final;
 
   virtual void OnSizeChanged(int width, int height) final;
 

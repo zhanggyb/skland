@@ -27,10 +27,10 @@ int main(int argc, char *argv[]) {
   Window win(320, 240, "Hello");
   win.SetAppId("Hello");
 
-  Label *label = new Label("Hello Wayland!");
-  label->SetForeground(0xFF444444);
-  label->SetFont(skland::Font(Typeface::kBold, 24.f));
-  win.SetMainWidget(label);
+//  Label *label = new Label("Hello Wayland!");
+//  label->SetForeground(0xFF444444);
+//  label->SetFont(skland::Font(Typeface::kBold, 24.f));
+//  win.SetMainWidget(label);
 
   win.Show();
 

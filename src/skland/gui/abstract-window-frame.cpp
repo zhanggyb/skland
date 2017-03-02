@@ -30,8 +30,4 @@ AbstractWindowFrame::AbstractWindowFrame()
 AbstractWindowFrame::~AbstractWindowFrame() {
 }
 
-void AbstractWindowFrame::AddWidget(AbstractWidget *widget, int pos) {
-  window_->AddSubView(widget, pos);
-}
-
 }

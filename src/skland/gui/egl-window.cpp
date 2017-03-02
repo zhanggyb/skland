@@ -42,12 +42,12 @@ EGLWindow::EGLWindow(const char *title, AbstractWindowFrame *frame)
 }
 
 EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFrame *frame)
-    : AbstractWindow(width, height, title, frame),
+    : AbstractWindow(width, height, title, nullptr, frame),
       main_surface_(nullptr),
       sub_surface_(nullptr),
       egl_surface_(nullptr),
       animating_(false) {
-  Surface *parent = toplevel_shell_surface();
+  Surface *parent = shell_surface();
 
   main_surface_ = SubSurface::Create(parent, this, parent->margin());
   DBG_ASSERT(main_surface_->parent() == parent);
@@ -79,11 +79,11 @@ EGLWindow::~EGLWindow() {
 }
 
 void EGLWindow::OnShown() {
-  Surface *shell_surface = toplevel_shell_surface();
+  Surface *shell_surface = this->shell_surface();
 
   // Create buffer:
-  int total_width = width();
-  int total_height = height();
+  int total_width = size().width;
+  int total_height = size().height;
   total_width += shell_surface->margin().lr();
   total_height += shell_surface->margin().tb();
 
@@ -111,23 +111,23 @@ void EGLWindow::OnShown() {
   main_canvas_->Clear();
 
   // initialize EGL
-  UpdateAll();
+//  UpdateAll();
 }
 
 void EGLWindow::OnUpdate(AbstractView *view) {
-  if (!visible()) return;
+  if (!shown()) return;
 
   Surface *surface = nullptr;
 
-  if (view == this) {
-    surface = this->toplevel_shell_surface();
+  if (nullptr == view) {
+    surface = this->shell_surface();
     RedrawTaskProxy redraw_task_helper(this);
     redraw_task_helper.MoveToTail();
     redraw_task_helper.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
     Damage(this, 0, 0,
-           width() + surface->margin().lr(),
-           height() + surface->margin().tb());
+           size().width + surface->margin().lr(),
+           size().height + surface->margin().tb());
     surface->Commit();
   } else {
     std::shared_ptr<Canvas> canvas;
@@ -146,18 +146,16 @@ void EGLWindow::OnUpdate(AbstractView *view) {
   }
 }
 
-Surface *EGLWindow::OnGetSurface(const AbstractView *view) const {
-  if (view == this)
-    return toplevel_shell_surface();
+Surface *EGLWindow::GetSurface(const AbstractView *view) const {
+  if (nullptr == view)
+    return shell_surface();
 
-  return nullptr != sub_surface_ ? sub_surface_ : toplevel_shell_surface();
+  return nullptr != sub_surface_ ? sub_surface_ : shell_surface();
 }
 
 void EGLWindow::OnSizeChanged(int width, int height) {
-  resize(width, height);
-
   RectI input_rect(width, height);
-  Surface *shell_surface = toplevel_shell_surface();
+  Surface *shell_surface = this->shell_surface();
 
   input_rect.left = shell_surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
   input_rect.top = shell_surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
@@ -199,9 +197,9 @@ void EGLWindow::OnSizeChanged(int width, int height) {
 
   Rect client_rect = GetClientGeometry();
   egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
-  OnResizeEGL(this->width(), this->height());
+  OnResizeEGL(size().width, size().height);
 
-  UpdateAll();
+//  UpdateAll();
 }
 
 void EGLWindow::OnDraw(const Context *context) {
