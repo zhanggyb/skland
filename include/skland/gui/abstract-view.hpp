@@ -52,7 +52,6 @@ namespace skland {
 SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   friend class AbstractEventHandler;
-  friend class AbstractWindow;
 
   AbstractView(const AbstractView &) = delete;
   AbstractView &operator=(const AbstractView &) = delete;
@@ -158,9 +157,13 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual void OnViewDestroyed(AbstractView *view) override;
 
-  virtual void OnAddedToParent();
+  virtual void OnAddedToParentView();
 
-  virtual void OnRemovedFromParent(AbstractView *original_parent);
+  virtual void OnRemovedFromParentView(AbstractView *original_parent);
+
+  virtual void OnAttachedToRootEventHandler();
+
+  virtual void OnDetachedFromRootEventHandler(AbstractEventHandler *root_event_handler);
 
   static bool SwapIndex(AbstractView *object1, AbstractView *object2);
 

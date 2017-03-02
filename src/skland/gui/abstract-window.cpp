@@ -104,7 +104,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
     return;
 
   if (window_frame_) {
-    if (title_bar_) title_bar_->p_->root_event_handler = nullptr;
+    if (title_bar_) DetachView(title_bar_);
     delete window_frame_;
     title_bar_ = nullptr;
     window_frame_ = nullptr;
@@ -116,7 +116,7 @@ void AbstractWindow::SetWindowFrame(AbstractWindowFrame *window_frame) {
   if (window_frame_) {
     window_frame_->window_ = this;
     title_bar_ = window_frame_->GetContainer();
-    if (title_bar_) title_bar_->p_->root_event_handler = this;
+    if (title_bar_) AttachView(title_bar_);
     window_frame_->window_action().Connect(this, &AbstractWindow::OnWindowAction);
     window_frame_->OnResize(size_.width, size_.height);
   }
@@ -126,14 +126,14 @@ void AbstractWindow::SetContentView(AbstractView *view) {
   if (content_view_ == view) return;
 
   if (content_view_) {
-    content_view_->p_->root_event_handler = nullptr;
+    DetachView(content_view_);
     delete content_view_;
   }
 
   content_view_ = view;
 
   if (content_view_) {
-    content_view_->p_->root_event_handler = this;
+    AttachView(content_view_);
     SetContentViewGeometry();
   }
 }
@@ -324,6 +324,10 @@ void AbstractWindow::OnKeyboardKey(KeyEvent *event) {
 
 void AbstractWindow::OnUpdate(AbstractView *view) {
   // override in sub class
+}
+
+Surface *AbstractWindow::GetSurface(const AbstractView * /* view */) const {
+  return shell_surface_;
 }
 
 void AbstractWindow::OnDraw(const Context *context) {

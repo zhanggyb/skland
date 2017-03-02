@@ -34,7 +34,7 @@ class Context;
 
 /**
  * @ingroup gui
- * @brief The base class to handle events from surface
+ * @brief The base class to handle events and interact with surface
  */
 SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
@@ -56,6 +56,21 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
  protected:
 
+  /**
+   * @brief Attach a given view to the root event handler
+   * @param view
+   *
+   * @warning This method should be used in root event handler (window object) only,
+   * the view object must be destroyed manually.
+   */
+  void AttachView(AbstractView *view);
+
+  /**
+   * @brief Detach the view from this root event handler
+   * @param view
+   */
+  void DetachView(AbstractView *view);
+
   virtual void OnMouseEnter(MouseEvent *event) = 0;
 
   virtual void OnMouseLeave(MouseEvent *event) = 0;
@@ -67,7 +82,7 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
   /**
-   * @brief Callback when a view in this object is removed
+   * @brief Callback when a view attached in this object is destroyed
    * @param view
    */
   virtual void OnViewDestroyed(AbstractView *view) = 0;
@@ -86,6 +101,10 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   virtual Surface *GetSurface(const AbstractView *view) const = 0;
 
   virtual void OnDraw(const Context *context) = 0;
+
+  virtual void OnViewAttached(AbstractView *view);
+
+  virtual void OnViewDetached(AbstractView *view);
 
   static void Damage(AbstractEventHandler *object, int surface_x, int surface_y, int width, int height);
 

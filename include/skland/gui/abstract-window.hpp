@@ -122,6 +122,8 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
 
   virtual void OnUpdate(AbstractView *view) override;
 
+  virtual Surface *GetSurface(const AbstractView *view) const override;
+
   virtual void OnDraw(const Context *context) override;
 
   virtual void OnViewDestroyed(AbstractView *view) override;
