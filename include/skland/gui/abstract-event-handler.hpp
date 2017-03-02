@@ -43,6 +43,7 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   friend class Display;
 
   friend class AbstractView;
+  friend class AbstractWindow;
 
   friend struct RedrawTask;
   friend class MouseTaskProxy;
@@ -55,21 +56,6 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   virtual ~AbstractEventHandler();
 
  protected:
-
-  /**
-   * @brief Attach a given view to the root event handler
-   * @param view
-   *
-   * @warning This method should be used in root event handler (window object) only,
-   * the view object must be destroyed manually.
-   */
-  void AttachView(AbstractView *view);
-
-  /**
-   * @brief Detach the view from this root event handler
-   * @param view
-   */
-  void DetachView(AbstractView *view);
 
   virtual void OnMouseEnter(MouseEvent *event) = 0;
 
@@ -102,9 +88,9 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
   virtual void OnDraw(const Context *context) = 0;
 
-  virtual void OnViewAttached(AbstractView *view);
+  virtual void OnViewAttached(AbstractView *view) = 0;
 
-  virtual void OnViewDetached(AbstractView *view);
+  virtual void OnViewDetached(AbstractView *view) = 0;
 
   static void Damage(AbstractEventHandler *object, int surface_x, int surface_y, int width, int height);
 
@@ -113,6 +99,21 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
  private:
 
   struct Private;
+
+  /**
+   * @brief Attach a given view to the root event handler
+   * @param view
+   *
+   * @warning This method should be used in root event handler (window object) only,
+   * the view object must be destroyed manually.
+   */
+  void AttachView(AbstractView *view);
+
+  /**
+   * @brief Detach the view from this root event handler
+   * @param view
+   */
+  void DetachView(AbstractView *view);
 
   std::unique_ptr<Private> p_;
 

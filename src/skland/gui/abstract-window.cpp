@@ -356,6 +356,14 @@ void AbstractWindow::OnFocus(bool focus) {
 
 }
 
+void AbstractWindow::OnViewAttached(AbstractView *view) {
+  // override in subclass
+}
+
+void AbstractWindow::OnViewDetached(AbstractView *view) {
+  // override in subclass
+}
+
 void AbstractWindow::MoveWithMouse(MouseEvent *event) const {
   ToplevelShellSurface::Get(shell_surface_)->Move(event->GetSeat(), event->serial());
 }

@@ -333,6 +333,14 @@ void AbstractView::OnDetachedFromRootEventHandler(AbstractEventHandler *root_eve
   // override in subclass
 }
 
+void AbstractView::OnViewAttached(AbstractView *view) {
+  // disabled in AbstractView
+}
+
+void AbstractView::OnViewDetached(AbstractView *view) {
+  // disabled in AbstractView
+}
+
 bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {
   if (object1 == nullptr || object2 == nullptr) return false;
   if (object1 == object2) return false;

@@ -134,6 +134,10 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
 
   virtual void OnFocus(bool);
 
+  virtual void OnViewAttached(AbstractView *view) override;
+
+  virtual void OnViewDetached(AbstractView *view) override;
+
   void MoveWithMouse(MouseEvent *event) const;
 
   void ResizeWithMouse(MouseEvent *event, uint32_t edges) const;

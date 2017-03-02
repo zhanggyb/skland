@@ -165,6 +165,10 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual void OnDetachedFromRootEventHandler(AbstractEventHandler *root_event_handler);
 
+  virtual void OnViewAttached(AbstractView *view) final;
+
+  virtual void OnViewDetached(AbstractView *view) final;
+
   static bool SwapIndex(AbstractView *object1, AbstractView *object2);
 
   static bool InsertSiblingBefore(AbstractView *src, AbstractView *dst);
