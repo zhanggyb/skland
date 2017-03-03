@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_MAIN_WINDOW_HPP_
 #define SKLAND_GUI_MAIN_WINDOW_HPP_
 
-#include "abstract-window.hpp"
+#include "abstract-shell-view.hpp"
 #include "memory-pool.hpp"
 #include "buffer.hpp"
 

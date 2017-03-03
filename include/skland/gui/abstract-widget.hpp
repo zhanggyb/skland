@@ -21,7 +21,7 @@
 
 namespace skland {
 
-class AbstractWindow;
+class AbstractShellView;
 
 /**
  * @brief The base class for widgets
@@ -34,7 +34,7 @@ class AbstractWindow;
  */
 class AbstractWidget : public AbstractView {
 
-  friend class AbstractWindow;
+  friend class AbstractShellView;
 
  public:
 

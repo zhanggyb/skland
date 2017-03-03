@@ -21,15 +21,14 @@
 #include "../core/margin.hpp"
 #include "../core/point.hpp"
 #include "../core/rect.hpp"
-#include "abstract-view.hpp"
 
 #include <vector>
 
 namespace skland {
 
 class MouseEvent;
-class AbstractWindow;
-class AbstractWidget;
+class AbstractView;
+class AbstractShellView;
 class Context;
 
 /**
@@ -38,12 +37,12 @@ class Context;
  *
  * A window frame provides decoration on a window, and draw background and border.
  */
-class AbstractWindowFrame : public Trackable {
+class AbstractShellFrame : public Trackable {
 
-  friend class AbstractWindow;
+  friend class AbstractShellView;
 
-  AbstractWindowFrame(const AbstractWindowFrame &) = delete;
-  AbstractWindowFrame &operator=(const AbstractWindowFrame &) = delete;
+  AbstractShellFrame(const AbstractShellFrame &) = delete;
+  AbstractShellFrame &operator=(const AbstractShellFrame &) = delete;
 
  public:
 
@@ -55,9 +54,9 @@ class AbstractWindowFrame : public Trackable {
     kTitleBarLeft
   };
 
-  AbstractWindowFrame();
+  AbstractShellFrame();
 
-  virtual ~AbstractWindowFrame();
+  virtual ~AbstractShellFrame();
 
   virtual Rect GetClientGeometry() const = 0;
 
@@ -79,11 +78,11 @@ class AbstractWindowFrame : public Trackable {
 
   void EmitAction(int action) { window_action_.Emit(action); }
 
-  AbstractWindow *window() const { return window_; }
+  AbstractShellView *shell_view() const { return shell_view_; }
 
  private:
 
-  AbstractWindow *window_;
+  AbstractShellView *shell_view_;
 
   Signal<int> window_action_;
 };

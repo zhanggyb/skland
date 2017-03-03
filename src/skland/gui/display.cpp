@@ -19,7 +19,7 @@
 #include <skland/gui/display.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
-#include <skland/gui/abstract-window.hpp>
+#include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/surface.hpp>
 
 #include "internal/display-private.hpp"

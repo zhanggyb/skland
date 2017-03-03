@@ -21,7 +21,7 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/context.hpp>
-#include <skland/gui/abstract-window-frame.hpp>
+#include <skland/gui/abstract-shell-frame.hpp>
 #include <skland/gui/toplevel-shell-surface.hpp>
 #include <skland/gui/sub-surface.hpp>
 
@@ -33,12 +33,12 @@
 
 namespace skland {
 
-Window::Window(const char *title, AbstractWindowFrame *frame)
+Window::Window(const char *title, AbstractShellFrame *frame)
     : Window(640, 480, title, frame) {
 }
 
-Window::Window(int width, int height, const char *title, AbstractWindowFrame *frame)
-    : AbstractWindow(width, height, title, nullptr, frame),
+Window::Window(int width, int height, const char *title, AbstractShellFrame *frame)
+    : AbstractShellView(width, height, title, nullptr, frame),
       main_surface_(nullptr) {
   if (frame) {
     Surface *parent = shell_surface();
@@ -147,10 +147,10 @@ void Window::OnSizeChanged(int width, int height) {
   RectI input_rect(width, height);
   Surface *shell_surface = this->shell_surface();
 
-  input_rect.left = shell_surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
-  input_rect.top = shell_surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
-  input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
-                    height + AbstractWindowFrame::kResizingMargin.tb());
+  input_rect.left = shell_surface->margin().left - AbstractShellFrame::kResizingMargin.left;
+  input_rect.top = shell_surface->margin().top - AbstractShellFrame::kResizingMargin.top;
+  input_rect.Resize(width + AbstractShellFrame::kResizingMargin.lr(),
+                    height + AbstractShellFrame::kResizingMargin.tb());
 
   wayland::Region input_region;
   input_region.Setup(DisplayProxy().wl_compositor());

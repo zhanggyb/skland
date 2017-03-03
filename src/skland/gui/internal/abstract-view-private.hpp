@@ -23,6 +23,8 @@
 
 namespace skland {
 
+class AbstractShellView;
+
 struct AbstractView::Private {
 
   Private() = delete;
@@ -36,7 +38,7 @@ struct AbstractView::Private {
         last_child(nullptr),
         parent(nullptr),
         children_count(0),
-        root_event_handler(nullptr) {}
+        shell(nullptr) {}
 
   ~Private() {}
 
@@ -49,7 +51,7 @@ struct AbstractView::Private {
   AbstractView *parent;
   int children_count;
 
-  AbstractEventHandler *root_event_handler;
+  AbstractShellView *shell;
 
 };
 

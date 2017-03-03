@@ -31,46 +31,6 @@ AbstractEventHandler::~AbstractEventHandler() {
 
 }
 
-void AbstractEventHandler::AttachView(AbstractView *view) {
-  if (view->p_->root_event_handler == this) {
-    DBG_ASSERT(nullptr == view->p_->parent);
-    return;
-  }
-
-#ifdef DEBUG
-  Surface* surface = GetSurface(nullptr);
-  if (surface->parent()) throw std::runtime_error("ERROR! Attach view to a non-window object is meanless!");
-#endif
-
-  if (view->p_->parent) {
-    DBG_ASSERT(nullptr == view->p_->root_event_handler);
-    view->p_->parent->RemoveChild(view);
-    DBG_ASSERT(nullptr == view->p_->parent);
-    DBG_ASSERT(nullptr == view->p_->previous);
-    DBG_ASSERT(nullptr == view->p_->next);
-  } else if (view->p_->root_event_handler) {
-    DBG_ASSERT(nullptr == view->p_->parent);
-    view->p_->root_event_handler->DetachView(view);
-  }
-
-  view->p_->root_event_handler = this;
-
-  OnViewAttached(view);
-  if (view->p_->root_event_handler == this)
-    view->OnAttachedToRootEventHandler();
-}
-
-void AbstractEventHandler::DetachView(AbstractView *view) {
-  if (view->p_->root_event_handler != this) return;
-
-  DBG_ASSERT(nullptr == view->p_->parent);
-  view->p_->root_event_handler = nullptr;
-
-  OnViewDetached(view);
-  if (view->p_->root_event_handler != this)
-    view->OnDetachedFromRootEventHandler(this);
-}
-
 void AbstractEventHandler::InitializeRedrawTaskList() {
   kRedrawTaskHead.PushBack(&kRedrawTaskTail);
 }
@@ -85,23 +45,11 @@ void AbstractEventHandler::ClearRedrawTaskList() {
   }
 }
 
-void AbstractEventHandler::OnViewAttached(AbstractView *view) {
-  // override in subclass
-}
-
-void AbstractEventHandler::OnViewDetached(AbstractView *view) {
-  // override in subclass
-}
-
 void AbstractEventHandler::Damage(AbstractEventHandler *object, int surface_x, int surface_y, int width, int height) {
   object->p_->is_damaged_ = true;
   object->p_->damaged_region_.l = surface_x;
   object->p_->damaged_region_.t = surface_y;
   object->p_->damaged_region_.Resize(width, height);
-}
-
-void AbstractEventHandler::UpdateAll(AbstractView *view) {
-  view->UpdateAll();
 }
 
 }

@@ -21,7 +21,7 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
-#include <skland/gui/abstract-window.hpp>
+#include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/context.hpp>
 
 #include <skland/graphic/gradient-shader.hpp>
@@ -54,10 +54,10 @@ void WindowFrameLight::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, window()->size().width, window()->size().height);
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, shell_view()->size().width, shell_view()->size().height);
 
   // Drop shadow:
-  if ((!window()->IsMaximized()) || (!window()->IsFullscreen())) {
+  if ((!shell_view()->IsMaximized()) || (!shell_view()->IsFullscreen())) {
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right

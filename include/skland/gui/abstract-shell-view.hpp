@@ -22,24 +22,25 @@
 #include "../core/defines.hpp"
 #include "../core/rect.hpp"
 
-#include "../stock/theme.hpp"
-
 #include <cstdint>
 #include <string>
 
 namespace skland {
 
+class AbstractShellFrame;
+
 /**
  * @ingroup gui
- * @brief Abstract class for top level windows
+ * @brief Abstract class to hold and manage a shell surface
  */
-SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
+SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
-  friend class AbstractWindowFrame;
+  friend class AbstractView;
+  friend class AbstractShellFrame;
 
-  AbstractWindow() = delete;
-  AbstractWindow(const AbstractWindow &) = delete;
-  AbstractWindow &operator=(const AbstractWindow &) = delete;
+  AbstractShellView() = delete;
+  AbstractShellView(const AbstractShellView &) = delete;
+  AbstractShellView &operator=(const AbstractShellView &) = delete;
 
  public:
 
@@ -51,20 +52,20 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
     kActionLast
   };
 
-  AbstractWindow(const char *title, AbstractWindow *parent = nullptr,
-                 AbstractWindowFrame *frame = Theme::CreateWindowFrame());
+  AbstractShellView(const char *title, AbstractShellView *parent = nullptr,
+                    AbstractShellFrame *frame = nullptr);
 
-  AbstractWindow(int width, int height,
-                 const char *title, AbstractWindow *parent = nullptr,
-                 AbstractWindowFrame *frame = Theme::CreateWindowFrame());
+  AbstractShellView(int width, int height,
+                    const char *title, AbstractShellView *parent = nullptr,
+                    AbstractShellFrame *frame = nullptr);
 
-  virtual ~AbstractWindow();
+  virtual ~AbstractShellView();
 
   void SetTitle(const char *title);
 
   void SetAppId(const char *app_id);
 
-  void SetWindowFrame(AbstractWindowFrame *window_frame);
+  void SetWindowFrame(AbstractShellFrame *window_frame);
 
   void SetContentView(AbstractView *view);
 
@@ -94,7 +95,7 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
 
   bool IsResizing() const { return 0 != (flags_ & kFlagMaskResizing); }
 
-  bool IsFrameless() const { return nullptr == window_frame_; }
+  bool IsFrameless() const { return nullptr == shell_frame_; }
 
   int GetMouseLocation(const MouseEvent *event) const;
 
@@ -105,6 +106,21 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
   AbstractView *content_view() const { return content_view_; }
 
  protected:
+
+  /**
+   * @brief Attach a given view to the root event handler
+   * @param view
+   *
+   * @warning This method should be used in root event handler (window object) only,
+   * the view object must be destroyed manually.
+   */
+  void AttachView(AbstractView *view);
+
+  /**
+   * @brief Detach the view from this root event handler
+   * @param view
+   */
+  void DetachView(AbstractView *view);
 
   virtual void OnShown() = 0;
 
@@ -126,7 +142,7 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
 
   virtual void OnDraw(const Context *context) override;
 
-  virtual void OnViewDestroyed(AbstractView *view) override;
+  virtual void OnViewDestroyed(AbstractView *view);
 
   virtual void OnMaximized(bool);
 
@@ -134,9 +150,9 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
 
   virtual void OnFocus(bool);
 
-  virtual void OnViewAttached(AbstractView *view) override;
+  virtual void OnViewAttached(AbstractView *view);
 
-  virtual void OnViewDetached(AbstractView *view) override;
+  virtual void OnViewDetached(AbstractView *view);
 
   void MoveWithMouse(MouseEvent *event) const;
 
@@ -144,13 +160,15 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
 
   int flags() const { return flags_; }
 
-  AbstractWindowFrame *window_frame() const { return window_frame_; }
+  AbstractShellFrame *shell_frame() const { return shell_frame_; }
 
   Surface *shell_surface() const { return shell_surface_; }
 
-  static void ResizeWindowFrame(AbstractWindowFrame *window_frame, int width, int height);
+  static void ResizeShellFrame(AbstractShellFrame *window_frame, int width, int height);
 
-  static void DrawWindowFrame(AbstractWindowFrame *window_frame, const Context *context);
+  static void DrawShellFrame(AbstractShellFrame *window_frame, const Context *context);
+
+  static void UpdateAll(AbstractView *view);
 
   bool shown() const { return shown_; }
 
@@ -180,7 +198,7 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
 
   Surface *shell_surface_;
 
-  AbstractWindowFrame *window_frame_;
+  AbstractShellFrame *shell_frame_;
 
   std::string title_;
   std::string app_id_;
@@ -190,7 +208,7 @@ SKLAND_EXPORT class AbstractWindow : public AbstractEventHandler {
   AbstractView *title_bar_;
   AbstractView *content_view_;
 
-  AbstractWindow *parent_;
+  AbstractShellView *parent_;
 
 };
 

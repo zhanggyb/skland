@@ -26,6 +26,8 @@
 
 namespace skland {
 
+class AbstractShellView;
+
 /**
  * @ingroup gui
  * @brief An abstract base class for view object
@@ -51,7 +53,7 @@ namespace skland {
  */
 SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
-  friend class AbstractEventHandler;
+  friend class AbstractShellView;
 
   AbstractView(const AbstractView &) = delete;
   AbstractView &operator=(const AbstractView &) = delete;
@@ -155,15 +157,19 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   void ClearChildren();
 
-  virtual void OnViewDestroyed(AbstractView *view) override;
+  virtual void OnViewDestroyed(AbstractView *view);
+
+  virtual void OnAddChildView(AbstractView *view);
+
+  virtual void OnRemoveChildView(AbstractView *view);
 
   virtual void OnAddedToParentView();
 
   virtual void OnRemovedFromParentView(AbstractView *original_parent);
 
-  virtual void OnAttachedToRootEventHandler();
+  virtual void OnAttachedToShellView();
 
-  virtual void OnDetachedFromRootEventHandler(AbstractEventHandler *root_event_handler);
+  virtual void OnDetachedFromShellView(AbstractShellView *shell_view);
 
   virtual void OnViewAttached(AbstractView *view) final;
 

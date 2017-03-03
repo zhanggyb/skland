@@ -17,6 +17,7 @@
 #include <skland/core/numeric.hpp>
 #include <skland/gui/mouse-event.hpp>
 
+#include <skland/gui/abstract-shell-view.hpp>
 #include "internal/redraw-task-proxy.hpp"
 #include "internal/abstract-view-private.hpp"
 
@@ -36,18 +37,21 @@ AbstractView::AbstractView(int width, int height)
 
 AbstractView::~AbstractView() {
   if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->root_event_handler);
-    AbstractView *parent = p_->parent;
-    parent->RemoveChild(this);
-    parent->OnViewDestroyed(this);
-  } else if (p_->root_event_handler) {
+    DBG_ASSERT(nullptr == p_->shell);
+    p_->parent->OnViewDestroyed(this);
+    if (p_->parent) {
+      p_->parent->RemoveChild(this);
+    }
+  } else if (p_->shell) {
     DBG_ASSERT(nullptr == p_->parent);
-    p_->root_event_handler->OnViewDestroyed(this);
-    p_->root_event_handler = nullptr;
+    p_->shell->OnViewDestroyed(this);
+    if (p_->shell) {
+      p_->shell->DetachView(this);
+    }
   }
 
   DBG_ASSERT(nullptr == p_->parent);
-  DBG_ASSERT(nullptr == p_->root_event_handler);
+  DBG_ASSERT(nullptr == p_->shell);
   DBG_ASSERT(nullptr == p_->previous);
   DBG_ASSERT(nullptr == p_->next);
 
@@ -123,16 +127,16 @@ AbstractView *AbstractView::GetChildAt(int index) const {
 
 void AbstractView::PushFrontChild(AbstractView *child) {
   if (child->p_->parent == this) {
-    DBG_ASSERT(nullptr == child->p_->root_event_handler);
+    DBG_ASSERT(nullptr == child->p_->shell);
     return;
   }
 
   if (child->p_->parent) {
-    DBG_ASSERT(nullptr == child->p_->root_event_handler);
+    DBG_ASSERT(nullptr == child->p_->shell);
     child->p_->parent->RemoveChild(child);
-  } else if (child->p_->root_event_handler) {
+  } else if (child->p_->shell) {
     DBG_ASSERT(nullptr == child->p_->parent);
-    child->p_->root_event_handler->DetachView(child);
+    child->p_->shell->DetachView(child);
   }
 
   DBG_ASSERT(child->p_->previous == nullptr);
@@ -154,21 +158,23 @@ void AbstractView::PushFrontChild(AbstractView *child) {
   child->p_->parent = this;
   p_->children_count++;
 
-  child->OnAddedToParentView();
+  OnAddChildView(child);
+  if (child->p_->parent == this)
+    child->OnAddedToParentView();
 }
 
 void AbstractView::InsertChild(AbstractView *child, int index) {
   if (child->p_->parent == this) {
-    DBG_ASSERT(nullptr == child->p_->root_event_handler);
+    DBG_ASSERT(nullptr == child->p_->shell);
     return;
   }
 
   if (child->p_->parent) {
-    DBG_ASSERT(nullptr == child->p_->root_event_handler);
+    DBG_ASSERT(nullptr == child->p_->shell);
     child->p_->parent->RemoveChild(child);
-  } else if (child->p_->root_event_handler) {
+  } else if (child->p_->shell) {
     DBG_ASSERT(nullptr == child->p_->parent);
-    child->p_->root_event_handler->DetachView(child);
+    child->p_->shell->DetachView(child);
   }
 
   DBG_ASSERT(child->p_->previous == nullptr);
@@ -225,21 +231,23 @@ void AbstractView::InsertChild(AbstractView *child, int index) {
   child->p_->parent = this;
   p_->children_count++;
 
-  child->OnAddedToParentView();
+  OnAddChildView(child);
+  if (child->p_->parent == this)
+    child->OnAddedToParentView();
 }
 
 void AbstractView::PushBackChild(AbstractView *child) {
   if (child->p_->parent == this) {
-    DBG_ASSERT(nullptr == child->p_->root_event_handler);
+    DBG_ASSERT(nullptr == child->p_->shell);
     return;
   }
 
   if (child->p_->parent) {
-    DBG_ASSERT(nullptr == child->p_->root_event_handler);
+    DBG_ASSERT(nullptr == child->p_->shell);
     child->p_->parent->RemoveChild(child);
-  } else if (child->p_->root_event_handler) {
+  } else if (child->p_->shell) {
     DBG_ASSERT(nullptr == child->p_->parent);
-    child->p_->root_event_handler->DetachView(child);
+    child->p_->shell->DetachView(child);
   }
 
   DBG_ASSERT(child->p_->previous == nullptr);
@@ -261,7 +269,9 @@ void AbstractView::PushBackChild(AbstractView *child) {
   child->p_->parent = this;
   p_->children_count++;
 
-  child->OnAddedToParentView();
+  OnAddChildView(child);
+  if (child->p_->parent == this)
+    child->OnAddedToParentView();
 }
 
 AbstractView *AbstractView::RemoveChild(AbstractView *child) {
@@ -290,22 +300,24 @@ AbstractView *AbstractView::RemoveChild(AbstractView *child) {
   child->p_->next = nullptr;
   child->p_->parent = nullptr;
 
-  child->OnRemovedFromParentView(this);
+  OnRemoveChildView(child);
+  if (child->p_->parent != this)
+    child->OnRemovedFromParentView(this);
 
   return child;
 }
 
 void AbstractView::ClearChildren() {
   AbstractView *ptr = p_->first_child;
-  AbstractView *next_ptr = nullptr;
+  AbstractView *next = nullptr;
 
   while (ptr) {
-    next_ptr = ptr->p_->next;
+    next = ptr->p_->next;
     // ptr->previous_ = nullptr;
     // ptr->next_ = nullptr;
     // ptr->parent_ = nullptr;
     delete ptr;
-    ptr = next_ptr;
+    ptr = next;
   }
 
   p_->children_count = 0;
@@ -317,6 +329,14 @@ void AbstractView::OnViewDestroyed(AbstractView *view) {
   // override in subclass
 }
 
+void AbstractView::OnAddChildView(AbstractView *view) {
+
+}
+
+void AbstractView::OnRemoveChildView(AbstractView *view) {
+
+}
+
 void AbstractView::OnAddedToParentView() {
   // override in subclass
 }
@@ -325,12 +345,12 @@ void AbstractView::OnRemovedFromParentView(AbstractView *original_parent) {
   // override in subclass
 }
 
-void AbstractView::OnAttachedToRootEventHandler() {
-  // override in subclass
+void AbstractView::OnAttachedToShellView() {
+
 }
 
-void AbstractView::OnDetachedFromRootEventHandler(AbstractEventHandler *root_event_handler) {
-  // override in subclass
+void AbstractView::OnDetachedFromShellView(AbstractShellView *shell_view) {
+
 }
 
 void AbstractView::OnViewAttached(AbstractView *view) {
@@ -695,26 +715,26 @@ void AbstractView::OnUpdate(AbstractView *view) {
   }
 
   if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->root_event_handler);
+    DBG_ASSERT(nullptr == p_->shell);
     p_->parent->OnUpdate(view);
     return;
   }
 
-  if (p_->root_event_handler) {
+  if (p_->shell) {
     DBG_ASSERT(nullptr == p_->parent);
-    p_->root_event_handler->OnUpdate(view);
+    p_->shell->OnUpdate(view);
   }
 }
 
 Surface *AbstractView::GetSurface(const AbstractView *view) const {
   if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->root_event_handler);
+    DBG_ASSERT(nullptr == p_->shell);
     return p_->parent->GetSurface(view);
   }
 
-  if (p_->root_event_handler) {
+  if (p_->shell) {
     DBG_ASSERT(nullptr == p_->parent);
-    return p_->root_event_handler->GetSurface(view);
+    return p_->shell->GetSurface(view);
   }
 
   return nullptr;

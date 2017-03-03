@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-#include <skland/gui/abstract-window-frame.hpp>
-#include <skland/gui/abstract-window.hpp>
+#include <skland/gui/abstract-shell-frame.hpp>
+#include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/push-button.hpp>
 
 namespace skland {
 
-const Margin AbstractWindowFrame::kResizingMargin(5, 5, 5, 5);
+const Margin AbstractShellFrame::kResizingMargin(5, 5, 5, 5);
 
-AbstractWindowFrame::AbstractWindowFrame()
+AbstractShellFrame::AbstractShellFrame()
     : Trackable(),
-      window_(nullptr) {
+      shell_view_(nullptr) {
 }
 
-AbstractWindowFrame::~AbstractWindowFrame() {
+AbstractShellFrame::~AbstractShellFrame() {
 }
 
 }

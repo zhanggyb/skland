@@ -18,13 +18,14 @@
 
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
-#include <skland/gui/abstract-window-frame.hpp>
+#include <skland/gui/abstract-shell-frame.hpp>
 
 #include <skland/gui/surface.hpp>
 #include <skland/gui/shell-surface.hpp>
 #include <skland/gui/toplevel-shell-surface.hpp>
 #include <skland/gui/sub-surface.hpp>
 #include <skland/gui/egl-surface.hpp>
+#include <skland/gui/abstract-view.hpp>
 
 #include <skland/graphic/canvas.hpp>
 
@@ -36,13 +37,13 @@
 
 namespace skland {
 
-EGLWindow::EGLWindow(const char *title, AbstractWindowFrame *frame)
+EGLWindow::EGLWindow(const char *title, AbstractShellFrame *frame)
     : EGLWindow(400, 300, title, frame) {
 
 }
 
-EGLWindow::EGLWindow(int width, int height, const char *title, AbstractWindowFrame *frame)
-    : AbstractWindow(width, height, title, nullptr, frame),
+EGLWindow::EGLWindow(int width, int height, const char *title, AbstractShellFrame *frame)
+    : AbstractShellView(width, height, title, nullptr, frame),
       main_surface_(nullptr),
       sub_surface_(nullptr),
       egl_surface_(nullptr),
@@ -157,10 +158,10 @@ void EGLWindow::OnSizeChanged(int width, int height) {
   RectI input_rect(width, height);
   Surface *shell_surface = this->shell_surface();
 
-  input_rect.left = shell_surface->margin().left - AbstractWindowFrame::kResizingMargin.left;
-  input_rect.top = shell_surface->margin().top - AbstractWindowFrame::kResizingMargin.top;
-  input_rect.Resize(width + AbstractWindowFrame::kResizingMargin.lr(),
-                    height + AbstractWindowFrame::kResizingMargin.tb());
+  input_rect.left = shell_surface->margin().left - AbstractShellFrame::kResizingMargin.left;
+  input_rect.top = shell_surface->margin().top - AbstractShellFrame::kResizingMargin.top;
+  input_rect.Resize(width + AbstractShellFrame::kResizingMargin.lr(),
+                    height + AbstractShellFrame::kResizingMargin.tb());
 
   wayland::Region input_region;
   input_region.Setup(DisplayProxy().wl_compositor());
@@ -168,7 +169,7 @@ void EGLWindow::OnSizeChanged(int width, int height) {
                    input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);
 
-  ResizeWindowFrame(window_frame(), width, height);
+  ResizeShellFrame(shell_frame(), width, height);
 
   // Reset buffer:
   width += shell_surface->margin().lr();
@@ -203,7 +204,7 @@ void EGLWindow::OnSizeChanged(int width, int height) {
 }
 
 void EGLWindow::OnDraw(const Context *context) {
-  if (window_frame()) DrawWindowFrame(window_frame(), context);
+  if (shell_frame()) DrawShellFrame(shell_frame(), context);
 
   if (!animating_) {
     animating_ = true;

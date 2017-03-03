@@ -19,7 +19,7 @@
 
 #include <skland/core/color.hpp>
 
-#include <skland/gui/abstract-window-frame.hpp>
+#include <skland/gui/abstract-shell-frame.hpp>
 #include <skland/gui/abstract-button.hpp>
 
 namespace skland {
@@ -125,7 +125,7 @@ class MinimizeButton final : public AbstractButton {
  * @ingroup stock_intern
  * @brief The default window frame
  */
-class WindowFrameDefault : public AbstractWindowFrame {
+class WindowFrameDefault : public AbstractShellFrame {
 
   WindowFrameDefault(const WindowFrameDefault &) = delete;
   WindowFrameDefault &operator=(const WindowFrameDefault &) = delete;
