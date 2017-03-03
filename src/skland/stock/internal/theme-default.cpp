@@ -22,6 +22,7 @@
 
 #include <skland/gui/label.hpp>
 #include <skland/gui/mouse-event.hpp>
+#include <skland/gui/key-event.hpp>
 #include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/context.hpp>
 #include <skland/gui/linear-layout.hpp>
@@ -225,28 +226,95 @@ void MinimizeButton::OnDraw(const Context *context) {
 
 // -------
 
+TitleBar::TitleBar()
+    : AbstractView(),
+      close_button_(nullptr),
+      maximize_button_(nullptr),
+      minimize_button_(nullptr) {
+  close_button_ = new CloseButton;
+  maximize_button_ = new MaximizeButton;
+  minimize_button_ = new MinimizeButton;
+
+  PushBackChild(minimize_button_);
+  PushBackChild(maximize_button_);
+  PushBackChild(close_button_);
+}
+
+TitleBar::~TitleBar() {
+
+}
+
+Size TitleBar::GetMinimalSize() const {
+  return Size(80, 22);
+}
+
+Size TitleBar::GetPreferredSize() const {
+  return Size(240, 22);
+}
+
+Size TitleBar::GetMaximalSize() const {
+  return Size(65536, 22);
+}
+
+void TitleBar::OnSizeChanged(int width, int height) {
+  resize(width, height);
+
+  Update();
+
+  int y = (height - WindowFrameDefault::kButtonSize) / 2;
+  int x = WindowFrameDefault::kButtonSpace;
+  close_button_->MoveTo(x, y);
+
+  x += close_button_->width() + WindowFrameDefault::kButtonSpace;
+  maximize_button_->MoveTo(x, y);
+
+  x += maximize_button_->width() + WindowFrameDefault::kButtonSpace;
+  minimize_button_->MoveTo(x, y);
+}
+
+void TitleBar::OnMouseEnter(MouseEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnMouseLeave(MouseEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnMouseMove(MouseEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnMouseButton(MouseEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnKeyboardKey(KeyEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnDraw(const Context *context) {
+  Paint paint;
+  paint.SetColor(0x297FF000);
+
+  context->canvas()->DrawRect(geometry(), paint);
+}
+
+// -------
+
 WindowFrameDefault::WindowFrameDefault()
     : AbstractShellFrame(),
       border_(0),
       title_bar_size_(22),
       title_bar_position_(kTitleBarTop),
-      close_button_(nullptr),
-      maximize_button_(nullptr),
-      minimize_button_(nullptr),
-      title_(nullptr),
-      layout_(nullptr) {
+      title_bar_(nullptr) {
   CreateWidgets();
 }
 
 WindowFrameDefault::~WindowFrameDefault() {
-  delete title_;
-  delete maximize_button_;
-  delete minimize_button_;
-  delete close_button_;
-  delete layout_;
+  // delete title_; // destroyed in base class
 }
 
-Rect WindowFrameDefault::GetClientGeometry() const {
+Rect WindowFrameDefault::GetContentGeometry() const {
   int x = border_,
       y = border_,
       w = shell_view()->size().width - 2 * border_,
@@ -276,10 +344,6 @@ Rect WindowFrameDefault::GetClientGeometry() const {
   return Rect::FromXYWH(x, y, w, h);
 }
 
-AbstractView *WindowFrameDefault::GetContainer() const {
-  return title_;
-}
-
 void WindowFrameDefault::OnCloseButtonClicked(SLOT /* slot */) {
   EmitAction(AbstractShellView::kActionClose);
 }
@@ -303,9 +367,12 @@ void WindowFrameDefault::CreateWidgets() {
 //  maximize_button_->clicked().Connect(this, &WindowFrameDefault::OnMaximizeButtonClicked);
 
 //  title_ = new Label(window()->title());
-  title_ = new Label("Test");
-  title_->SetForeground(0xFF444444);
-  title_->SetFont(Font(Typeface::kBold));
+//  title_ = new Label("Test");
+//  title_->SetForeground(0xFF444444);
+//  title_->SetFont(Font(Typeface::kBold));
+
+  title_bar_ = new TitleBar;
+  SetTitleBar(title_bar_);
 
 //  layout_ = new LinearLayout;
 
@@ -328,8 +395,8 @@ void WindowFrameDefault::OnResize(int width, int height) {
 }
 
 void WindowFrameDefault::LayoutWidgets(int width, int height) {
-  title_->MoveTo(0, 0);
-  title_->Resize(shell_view()->size().width, title_bar_size_);
+  title_bar_->MoveTo(0, 0);
+  title_bar_->Resize(shell_view()->size().width, title_bar_size_);
 
 //  title_->MoveTo(0, 0);
 //  title_->Resize(window()->size().width, title_bar_size_);
@@ -379,7 +446,7 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   paint.SetColor(0xEFE0E0E0);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(), paint);
+  canvas->DrawRect(GetContentGeometry(), paint);
   canvas->Restore();
 
   canvas->Flush();

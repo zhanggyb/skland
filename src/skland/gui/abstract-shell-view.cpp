@@ -45,12 +45,10 @@ AbstractShellView::AbstractShellView(int width,
                                      AbstractShellView *parent,
                                      AbstractShellFrame *frame)
     : AbstractEventHandler(),
-      shown_(false),
       flags_(0),
       shell_surface_(nullptr),
       shell_frame_(nullptr),
       size_(width, height),
-      title_bar_(nullptr),
       content_view_(nullptr),
       parent_(parent) {
   if (title) title_ = title;
@@ -77,13 +75,17 @@ AbstractShellView::AbstractShellView(int width,
   input_region.Add(x, y, width, height);
   shell_surface_->SetInputRegion(input_region);
 
-  SetWindowFrame(frame);
+  SetShellFrame(frame);
 }
 
 AbstractShellView::~AbstractShellView() {
   SetContentView(nullptr);
 
-  Theme::DestroyWindowFrame(shell_frame_);
+  if (shell_frame_) {
+    shell_frame_->shell_view_ = nullptr;
+    Theme::DestroyWindowFrame(shell_frame_);
+  }
+
   delete shell_surface_;
 }
 
@@ -101,27 +103,30 @@ void AbstractShellView::SetAppId(const char *app_id) {
   }
 }
 
-void AbstractShellView::SetWindowFrame(AbstractShellFrame *window_frame) {
-  if (window_frame == shell_frame_)
+void AbstractShellView::SetShellFrame(AbstractShellFrame *shell_frame) {
+  if (shell_frame == shell_frame_)
     return;
 
   if (shell_frame_) {
-    if (title_bar_) DetachView(title_bar_);
+    if (shell_frame_->title_bar_) DetachView(shell_frame_->title_bar_);
+    shell_frame_->shell_view_ = nullptr;
     delete shell_frame_;
-    title_bar_ = nullptr;
     shell_frame_ = nullptr;
   }
 
-  shell_frame_ = window_frame;
+  shell_frame_ = shell_frame;
   // TODO: check if there's original window using the window frame
 
   if (shell_frame_) {
     shell_frame_->shell_view_ = this;
-    title_bar_ = shell_frame_->GetContainer();
-    if (title_bar_) AttachView(title_bar_);
+    if (shell_frame_->title_bar_) {
+      AttachView(shell_frame_->title_bar_);
+    }
     shell_frame_->window_action().Connect(this, &AbstractShellView::OnWindowAction);
     shell_frame_->OnResize(size_.width, size_.height);
   }
+
+  OnUpdate(nullptr);
 }
 
 void AbstractShellView::SetContentView(AbstractView *view) {
@@ -141,7 +146,7 @@ void AbstractShellView::SetContentView(AbstractView *view) {
 }
 
 void AbstractShellView::Show() {
-  if (!shown_) {
+  if (!IsShown()) {
     shell_surface_->Commit();
   }
 }
@@ -244,7 +249,7 @@ Rect AbstractShellView::GetClientGeometry() const {
     return Rect::FromXYWH(0.f, 0.f, size_.width, size_.height);
   }
 
-  return shell_frame_->GetClientGeometry();
+  return shell_frame_->GetContentGeometry();
 }
 
 void AbstractShellView::OnMouseEnter(MouseEvent *event) {
@@ -368,17 +373,12 @@ Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
 }
 
 void AbstractShellView::OnDraw(const Context *context) {
-  if (shell_frame_) {
-    shell_frame_->OnDraw(context);
-  }
+  if (shell_frame_) shell_frame_->OnDraw(context);
 }
 
 void AbstractShellView::OnViewDestroyed(AbstractView *view) {
-  if (view == title_bar_) {
-    title_bar_ = nullptr;
-  } else if (view == content_view_) {
+  if (view == content_view_)
     content_view_ = nullptr;
-  }
 }
 
 void AbstractShellView::OnMaximized(bool maximized) {
@@ -390,7 +390,9 @@ void AbstractShellView::OnFullscreen(bool) {
 }
 
 void AbstractShellView::OnFocus(bool focus) {
-
+  if (shell_frame_) {
+    OnUpdate(nullptr);
+  }
 }
 
 void AbstractShellView::OnViewAttached(AbstractView *view) {
@@ -425,8 +427,8 @@ void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {
   ShellSurface *shell_surface = ShellSurface::Get(shell_surface_);
   shell_surface->AckConfigure(serial);
 
-  if (!shown_) {
-    shown_ = true;
+  if (!IsShown()) {
+    Bit::Set<int>(flags_, kFlagMaskShown);
     shell_surface->ResizeWindow(size_.width, size_.height);
     OnShown();
   }
@@ -461,8 +463,14 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
     size_.width = width;
     size_.height = height;
     OnSizeChanged(width, height);
-    if (shell_frame_) shell_frame_->OnResize(width, height);
-    if (content_view_) SetContentViewGeometry();
+
+    // Resize frame first, then the content view
+    if (shell_frame_) {
+      shell_frame_->OnResize(width, height);
+    }
+    if (content_view_) {
+      SetContentViewGeometry();
+    }
   }
 
   if (focus != IsFocused()) {

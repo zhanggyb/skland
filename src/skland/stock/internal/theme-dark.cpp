@@ -41,13 +41,13 @@ class WindowFrameDark final : public WindowFrameDefault {
 
   WindowFrameDark()
       : WindowFrameDefault() {
-    title()->SetForeground(0xFF999999);
-    close_button()->SetForeground(0xFF999999);
-    close_button()->SetBackground(0xFF444444);
-    maximize_button()->SetForeground(0xFF999999);
-    maximize_button()->SetBackground(0xFF444444);
-    minimize_button()->SetForeground(0xFF999999);
-    minimize_button()->SetBackground(0xFF444444);
+//    title()->SetForeground(0xFF999999);
+//    close_button()->SetForeground(0xFF999999);
+//    close_button()->SetBackground(0xFF444444);
+//    maximize_button()->SetForeground(0xFF999999);
+//    maximize_button()->SetBackground(0xFF444444);
+//    minimize_button()->SetForeground(0xFF999999);
+//    minimize_button()->SetBackground(0xFF444444);
   }
 
   virtual ~WindowFrameDark() {}
@@ -92,7 +92,7 @@ void WindowFrameDark::OnDraw(const Context *context) {
   paint.SetColor(0xFF303030);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(), paint);
+  canvas->DrawRect(GetContentGeometry(), paint);
   canvas->Restore();
 
   canvas->Flush();

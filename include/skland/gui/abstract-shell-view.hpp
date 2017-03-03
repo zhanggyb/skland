@@ -52,20 +52,47 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
     kActionLast
   };
 
+  /**
+   * @brief Constructor
+   * @param title A string of window title
+   * @param parent Parent shell view
+   * @param frame The frame used to show the background and title bar
+   */
   AbstractShellView(const char *title, AbstractShellView *parent = nullptr,
                     AbstractShellFrame *frame = nullptr);
 
+  /**
+   * @brief Constructor
+   * @param width Width of this shell view
+   * @param height Height of this shell view
+   * @param title A string of window title
+   * @param parent Parent shell view
+   * @param frame The frame used to show the background and title bar
+   */
   AbstractShellView(int width, int height,
                     const char *title, AbstractShellView *parent = nullptr,
                     AbstractShellFrame *frame = nullptr);
 
+  /**
+   * @brief Destructor
+   *
+   * This destructor will destroy the content view attached and the shell frame.
+   */
   virtual ~AbstractShellView();
 
+  /**
+   * @brief Set the title of this shell view
+   * @param title A string of the window title
+   */
   void SetTitle(const char *title);
 
+  /**
+   * @brief Set the App ID
+   * @param app_id
+   */
   void SetAppId(const char *app_id);
 
-  void SetWindowFrame(AbstractShellFrame *window_frame);
+  void SetShellFrame(AbstractShellFrame *shell_frame);
 
   void SetContentView(AbstractView *view);
 
@@ -97,6 +124,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   bool IsFrameless() const { return nullptr == shell_frame_; }
 
+  bool IsShown() const { return 0 != (flags_ & kFlagMaskShown); }
+
   int GetMouseLocation(const MouseEvent *event) const;
 
   Rect GetClientGeometry() const;
@@ -108,16 +137,13 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
  protected:
 
   /**
-   * @brief Attach a given view to the root event handler
+   * @brief Attach a given view to this shell view
    * @param view
-   *
-   * @warning This method should be used in root event handler (window object) only,
-   * the view object must be destroyed manually.
    */
   void AttachView(AbstractView *view);
 
   /**
-   * @brief Detach the view from this root event handler
+   * @brief Detach the view from this shell view
    * @param view
    */
   void DetachView(AbstractView *view);
@@ -170,8 +196,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   static void UpdateAll(AbstractView *view);
 
-  bool shown() const { return shown_; }
-
  private:
 
   enum FlagMask {
@@ -179,7 +203,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
     kFlagMaskFullscreen = 0x1 << 1,
     kFlagMaskResizing = 0x1 << 2,
     kFlagMaskFocused = 0x1 << 3,
-    kFlagMaskMinimized = 0x1 << 4
+    kFlagMaskMinimized = 0x1 << 4,
+    kFlagMaskShown = 0x1 << 5
   };
 
   void OnXdgSurfaceConfigure(uint32_t serial);
@@ -192,8 +217,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void SetContentViewGeometry();
 
-  bool shown_;
-
   int flags_;
 
   Surface *shell_surface_;
@@ -205,7 +228,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   Size size_;
 
-  AbstractView *title_bar_;
   AbstractView *content_view_;
 
   AbstractShellView *parent_;

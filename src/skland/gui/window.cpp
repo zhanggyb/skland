@@ -89,11 +89,12 @@ void Window::OnShown() {
   }
 
   OnUpdate(nullptr);
+  if (shell_frame()) UpdateAll(shell_frame()->title_bar());
   if (content_view()) UpdateAll(content_view());
 }
 
 void Window::OnUpdate(AbstractView *view) {
-  if (!shown()) return;
+  if (!IsShown()) return;
 
   Surface *surface = nullptr;
 
@@ -186,7 +187,7 @@ void Window::OnSizeChanged(int width, int height) {
   }
 
   OnUpdate(nullptr);
-  if (content_view()) UpdateAll(content_view());
+//  if (content_view()) UpdateAll(content_view());
 }
 
 }

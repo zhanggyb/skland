@@ -83,7 +83,7 @@ void WindowFrameLight::OnDraw(const Context *context) {
   paint.SetColor(0xFFE0E0E0);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(), paint);
+  canvas->DrawRect(GetContentGeometry(), paint);
   canvas->Restore();
 
   canvas->Flush();

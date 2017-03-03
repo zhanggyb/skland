@@ -116,7 +116,7 @@ void EGLWindow::OnShown() {
 }
 
 void EGLWindow::OnUpdate(AbstractView *view) {
-  if (!shown()) return;
+  if (!IsShown()) return;
 
   Surface *surface = nullptr;
 

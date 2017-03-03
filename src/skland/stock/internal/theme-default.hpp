@@ -26,7 +26,6 @@ namespace skland {
 
 class Canvas;
 class Label;
-class LinearLayout;
 
 /**
  * @ingroup stock_intern
@@ -121,6 +120,44 @@ class MinimizeButton final : public AbstractButton {
 
 };
 
+class TitleBar final : public AbstractView {
+
+ public:
+
+  TitleBar();
+
+  virtual ~TitleBar();
+
+  virtual Size GetMinimalSize() const override;
+
+  virtual Size GetPreferredSize() const override;
+
+  virtual Size GetMaximalSize() const override;
+
+ protected:
+
+  virtual void OnSizeChanged(int width, int height) override;
+
+  virtual void OnMouseEnter(MouseEvent *event) override;
+
+  virtual void OnMouseLeave(MouseEvent *event) override;
+
+  virtual void OnMouseMove(MouseEvent *event) override;
+
+  virtual void OnMouseButton(MouseEvent *event) override;
+
+  virtual void OnKeyboardKey(KeyEvent *event) override;
+
+  virtual void OnDraw(const Context *context) override;
+
+ private:
+
+  CloseButton *close_button_;
+  MaximizeButton *maximize_button_;
+  MinimizeButton *minimize_button_;
+
+};
+
 /**
  * @ingroup stock_intern
  * @brief The default window frame
@@ -136,9 +173,7 @@ class WindowFrameDefault : public AbstractShellFrame {
 
   virtual ~WindowFrameDefault();
 
-  virtual Rect GetClientGeometry() const final;
-
-  virtual AbstractView *GetContainer() const final;
+  virtual Rect GetContentGeometry() const final;
 
   static const int kButtonSize = 14;
   static const int kButtonSpace = 5;
@@ -165,14 +200,6 @@ class WindowFrameDefault : public AbstractShellFrame {
 
   void DrawShadow(Canvas *canvas);
 
-  CloseButton *close_button() const { return close_button_; }
-
-  MaximizeButton *maximize_button() const { return maximize_button_; }
-
-  MinimizeButton *minimize_button() const { return minimize_button_; }
-
-  Label *title() const { return title_; }
-
  private:
 
   void OnCloseButtonClicked(__SLOT__);
@@ -189,15 +216,7 @@ class WindowFrameDefault : public AbstractShellFrame {
   int title_bar_size_;
   TitleBarPosition title_bar_position_;
 
-  CloseButton *close_button_;
-
-  MaximizeButton *maximize_button_;
-
-  MinimizeButton *minimize_button_;
-
-  Label *title_;
-
-  LinearLayout *layout_;
+  TitleBar *title_bar_;
 
 };
 

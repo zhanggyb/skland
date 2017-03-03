@@ -58,9 +58,11 @@ class AbstractShellFrame : public Trackable {
 
   virtual ~AbstractShellFrame();
 
-  virtual Rect GetClientGeometry() const = 0;
+  void SetTitleBar(AbstractView *view);
 
-  virtual AbstractView *GetContainer() const = 0;
+  virtual Rect GetContentGeometry() const = 0;
+
+  AbstractView *title_bar() const { return title_bar_; }
 
   SignalRef<int> window_action() { return window_action_; }
 
@@ -83,6 +85,8 @@ class AbstractShellFrame : public Trackable {
  private:
 
   AbstractShellView *shell_view_;
+
+  AbstractView *title_bar_;
 
   Signal<int> window_action_;
 };

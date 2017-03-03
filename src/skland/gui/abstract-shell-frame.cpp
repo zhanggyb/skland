@@ -24,10 +24,36 @@ const Margin AbstractShellFrame::kResizingMargin(5, 5, 5, 5);
 
 AbstractShellFrame::AbstractShellFrame()
     : Trackable(),
-      shell_view_(nullptr) {
+      shell_view_(nullptr),
+      title_bar_(nullptr) {
+
 }
 
 AbstractShellFrame::~AbstractShellFrame() {
+  if (shell_view_) {
+    shell_view_->shell_frame_ = nullptr;
+    if (title_bar_) {
+      shell_view_->DetachView(title_bar_);
+    }
+    // TODO: update shell_view_
+  }
+
+  delete title_bar_;
+}
+
+void AbstractShellFrame::SetTitleBar(AbstractView *view) {
+  if (title_bar_ == view) return;
+
+  if (title_bar_) {
+    delete title_bar_;
+  }
+
+  title_bar_ = view;
+  if (title_bar_) {
+    if (shell_view_) {
+      shell_view_->AttachView(title_bar_);
+    }
+  }
 }
 
 }
