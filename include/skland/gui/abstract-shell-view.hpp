@@ -168,8 +168,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnDraw(const Context *context) override;
 
-  virtual void OnViewDestroyed(AbstractView *view);
-
   virtual void OnMaximized(bool);
 
   virtual void OnFullscreen(bool);
@@ -214,6 +212,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   void OnXdgToplevelClose();
 
   void OnWindowAction(int action, __SLOT__);
+
+  void OnContentViewDestroyed(AbstractView *view, __SLOT__);
 
   void SetContentViewGeometry();
 

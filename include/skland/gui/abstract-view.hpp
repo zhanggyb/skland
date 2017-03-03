@@ -48,7 +48,10 @@ class AbstractShellView;
  * then it shares the surface with others which is managed in one of
  * parent views.
  *
- * @see AbstractWindow
+ * An AbstractView object SHOULD always be created by new operator and MUST be
+ * destroyed by Destroy() method.
+ *
+ * @see AbstractEventHandler
  * @see Surface
  */
 SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
@@ -74,11 +77,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Create a view by given size
    */
   AbstractView(int width, int height);
-
-  /**
-   * @brief Destructor
-   */
-  virtual ~AbstractView();
 
   void MoveTo(int x, int y);
 
@@ -117,7 +115,21 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual Size GetMaximalSize() const = 0;
 
+  /**
+   * @brief Destroy and delete this object
+   *
+   * This method will emit an 'destroyed' signal before do some clean up work.
+   */
+  void Destroy();
+
+  SignalRef<AbstractView *> destroyed() { return destroyed_; }
+
  protected:
+
+  /**
+   * @brief Destructor
+   */
+  virtual ~AbstractView();
 
   AbstractView *GetChildAt(int index) const;
 
@@ -157,8 +169,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   void ClearChildren();
 
-  virtual void OnViewDestroyed(AbstractView *view);
-
   virtual void OnAddChildView(AbstractView *view);
 
   virtual void OnRemoveChildView(AbstractView *view);
@@ -170,10 +180,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   virtual void OnAttachedToShellView();
 
   virtual void OnDetachedFromShellView(AbstractShellView *shell_view);
-
-  virtual void OnViewAttached(AbstractView *view) final;
-
-  virtual void OnViewDetached(AbstractView *view) final;
 
   static bool SwapIndex(AbstractView *object1, AbstractView *object2);
 
@@ -234,6 +240,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   Rect geometry_;
 
   std::unique_ptr<Private> p_;
+
+  Signal<AbstractView *> destroyed_;
 
 };
 

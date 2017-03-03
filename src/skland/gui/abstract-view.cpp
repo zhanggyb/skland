@@ -36,30 +36,10 @@ AbstractView::AbstractView(int width, int height)
 }
 
 AbstractView::~AbstractView() {
-  if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->shell);
-    p_->parent->OnViewDestroyed(this);
-    if (p_->parent) {
-      p_->parent->RemoveChild(this);
-    }
-  } else if (p_->shell) {
-    DBG_ASSERT(nullptr == p_->parent);
-    p_->shell->OnViewDestroyed(this);
-    if (p_->shell) {
-      p_->shell->DetachView(this);
-    }
-  }
-
   DBG_ASSERT(nullptr == p_->parent);
   DBG_ASSERT(nullptr == p_->shell);
   DBG_ASSERT(nullptr == p_->previous);
   DBG_ASSERT(nullptr == p_->next);
-
-  if (p_->children_count > 0) {
-    DBG_ASSERT(p_->first_child);
-    DBG_ASSERT(p_->last_child);
-    ClearChildren();
-  }
   DBG_ASSERT(0 == p_->children_count);
   DBG_ASSERT(nullptr == p_->first_child);
   DBG_ASSERT(nullptr == p_->last_child);
@@ -99,6 +79,26 @@ bool AbstractView::IsExpandX() const {
 
 bool AbstractView::IsExpandY() const {
   return false;
+}
+
+void AbstractView::Destroy() {
+  destroyed_.Emit(this);
+
+  if (p_->parent) {
+    DBG_ASSERT(nullptr == p_->shell);
+    p_->parent->RemoveChild(this);
+  } else if (p_->shell) {
+    DBG_ASSERT(nullptr == p_->parent);
+    p_->shell->DetachView(this);
+  }
+
+  if (p_->children_count > 0) {
+    DBG_ASSERT(p_->first_child);
+    DBG_ASSERT(p_->last_child);
+    ClearChildren();
+  }
+
+  delete this;
 }
 
 AbstractView *AbstractView::GetChildAt(int index) const {
@@ -316,17 +316,13 @@ void AbstractView::ClearChildren() {
     // ptr->previous_ = nullptr;
     // ptr->next_ = nullptr;
     // ptr->parent_ = nullptr;
-    delete ptr;
+    ptr->Destroy();
     ptr = next;
   }
 
   p_->children_count = 0;
   p_->first_child = nullptr;
   p_->last_child = nullptr;
-}
-
-void AbstractView::OnViewDestroyed(AbstractView *view) {
-  // override in subclass
 }
 
 void AbstractView::OnAddChildView(AbstractView *view) {
@@ -351,14 +347,6 @@ void AbstractView::OnAttachedToShellView() {
 
 void AbstractView::OnDetachedFromShellView(AbstractShellView *shell_view) {
 
-}
-
-void AbstractView::OnViewAttached(AbstractView *view) {
-  // disabled in AbstractView
-}
-
-void AbstractView::OnViewDetached(AbstractView *view) {
-  // disabled in AbstractView
 }
 
 bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {

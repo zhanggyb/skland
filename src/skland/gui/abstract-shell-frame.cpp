@@ -38,14 +38,14 @@ AbstractShellFrame::~AbstractShellFrame() {
     // TODO: update shell_view_
   }
 
-  delete title_bar_;
+  title_bar_->Destroy();
 }
 
 void AbstractShellFrame::SetTitleBar(AbstractView *view) {
   if (title_bar_ == view) return;
 
   if (title_bar_) {
-    delete title_bar_;
+    title_bar_->Destroy();
   }
 
   title_bar_ = view;

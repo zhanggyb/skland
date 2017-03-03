@@ -134,6 +134,7 @@ void AbstractShellView::SetContentView(AbstractView *view) {
 
   if (content_view_) {
     DetachView(content_view_);
+    content_view_->destroyed().DisconnectAll(this, &AbstractShellView::OnContentViewDestroyed);
     delete content_view_;
   }
 
@@ -141,6 +142,7 @@ void AbstractShellView::SetContentView(AbstractView *view) {
 
   if (content_view_) {
     AttachView(content_view_);
+    content_view_->destroyed().Connect(this, &AbstractShellView::OnContentViewDestroyed);
     SetContentViewGeometry();
   }
 }
@@ -376,11 +378,6 @@ void AbstractShellView::OnDraw(const Context *context) {
   if (shell_frame_) shell_frame_->OnDraw(context);
 }
 
-void AbstractShellView::OnViewDestroyed(AbstractView *view) {
-  if (view == content_view_)
-    content_view_ = nullptr;
-}
-
 void AbstractShellView::OnMaximized(bool maximized) {
 
 }
@@ -525,6 +522,11 @@ void AbstractShellView::OnWindowAction(int action, SLOT slot) {
     }
     default: break;
   }
+}
+
+void AbstractShellView::OnContentViewDestroyed(AbstractView *view, SLOT slot) {
+  DBG_ASSERT(view == content_view_);
+  content_view_ = nullptr;
 }
 
 void AbstractShellView::SetContentViewGeometry() {
