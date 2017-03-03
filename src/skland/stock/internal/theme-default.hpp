@@ -22,6 +22,8 @@
 #include <skland/gui/abstract-shell-frame.hpp>
 #include <skland/gui/abstract-button.hpp>
 
+#include <skland/graphic/font.hpp>
+
 namespace skland {
 
 class Canvas;
@@ -155,6 +157,8 @@ class TitleBar final : public AbstractView {
   CloseButton *close_button_;
   MaximizeButton *maximize_button_;
   MinimizeButton *minimize_button_;
+
+  Font font_;
 
 };
 

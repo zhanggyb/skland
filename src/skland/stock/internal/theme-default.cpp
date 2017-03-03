@@ -20,16 +20,17 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
-#include <skland/gui/label.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/context.hpp>
-#include <skland/gui/linear-layout.hpp>
 
 #include <skland/stock/theme.hpp>
 
 #include "SkCanvas.h"
+#include "SkTypeface.h"
+#include "SkPaint.h"
+#include "SkTextBox.h"
 
 namespace skland {
 
@@ -41,6 +42,7 @@ CloseButton::CloseButton()
 }
 
 CloseButton::~CloseButton() {
+
 }
 
 Size CloseButton::GetPreferredSize() const {
@@ -245,7 +247,7 @@ TitleBar::~TitleBar() {
 }
 
 Size TitleBar::GetMinimalSize() const {
-  return Size(80, 22);
+  return Size(0, 0);
 }
 
 Size TitleBar::GetPreferredSize() const {
@@ -253,7 +255,7 @@ Size TitleBar::GetPreferredSize() const {
 }
 
 Size TitleBar::GetMaximalSize() const {
-  return Size(65536, 22);
+  return Size(65536, 65536);
 }
 
 void TitleBar::OnSizeChanged(int width, int height) {
@@ -264,12 +266,15 @@ void TitleBar::OnSizeChanged(int width, int height) {
   int y = (height - WindowFrameDefault::kButtonSize) / 2;
   int x = WindowFrameDefault::kButtonSpace;
   close_button_->MoveTo(x, y);
+  close_button_->Update();
 
   x += close_button_->width() + WindowFrameDefault::kButtonSpace;
   maximize_button_->MoveTo(x, y);
+  maximize_button_->Update();
 
   x += maximize_button_->width() + WindowFrameDefault::kButtonSpace;
   minimize_button_->MoveTo(x, y);
+  minimize_button_->Update();
 }
 
 void TitleBar::OnMouseEnter(MouseEvent *event) {
@@ -294,9 +299,28 @@ void TitleBar::OnKeyboardKey(KeyEvent *event) {
 
 void TitleBar::OnDraw(const Context *context) {
   Paint paint;
-  paint.SetColor(0x297FF000);
 
+  paint.SetColor(0x2919FF19);
   context->canvas()->DrawRect(geometry(), paint);
+
+  std::string text("Hello there!");
+  paint.SetColor(0xFF444444);
+  paint.SetAntiAlias(true);
+  paint.SetStyle(Paint::kStyleFill);
+  paint.SetFont(font_);
+  paint.SetTextSize(font_.GetSize());
+
+  float text_width = paint.MeasureText(text.c_str(), text.length());
+
+  SkTextBox text_box;
+  // Put the text at the center
+  text_box.setBox((geometry().l + geometry().r - text_width) / 2.f,
+                  geometry().t + 1.f, // move down a little for better look
+                  (geometry().r - geometry().l + text_width) / 2.f,
+                  geometry().b);
+  text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
+  text_box.setText(text.c_str(), text.length(), *paint.sk_paint());
+  text_box.draw(context->canvas()->sk_canvas());
 }
 
 // -------
