@@ -29,8 +29,9 @@
 #include <skland/stock/theme.hpp>
 
 #include "internal/abstract-view-private.hpp"
-#include "internal/display-proxy.hpp"
-#include "internal/mouse-task-proxy.hpp"
+#include "internal/abstract-view-iterators.hpp"
+#include "internal/display-registry.hpp"
+#include "internal/abstract-event-handler-mouse-task-iterator.hpp"
 
 namespace skland {
 
@@ -71,7 +72,7 @@ AbstractShellView::AbstractShellView(int width,
   height += AbstractShellFrame::kResizingMargin.tb();
 
   wayland::Region input_region;
-  input_region.Setup(DisplayProxy().wl_compositor());
+  input_region.Setup(Display::Registry().wl_compositor());
   input_region.Add(x, y, width, height);
   shell_surface_->SetInputRegion(input_region);
 
@@ -279,11 +280,42 @@ void AbstractShellView::OnMouseEnter(MouseEvent *event) {
       }
     }
   }
-  event->Accept();
+
+  MouseTaskIterator proxy(this);
+  DBG_ASSERT(nullptr == proxy.next());
+
+  if (shell_frame_ &&
+      shell_frame_->title_bar() &&
+      shell_frame_->title_bar()->Contain((int) event->window_x(), (int) event->window_y())) {
+    shell_frame_->title_bar()->OnMouseEnter(event);
+    if (event->IsAccepted()) {
+      proxy.PushBack(shell_frame_->title_bar());
+      ++proxy;
+      DispatchMouseEnterEvent(shell_frame_->title_bar(), event, proxy.mouse_task());
+    }
+  } else if (content_view_ && content_view_->Contain((int) event->window_x(), (int) event->window_y())) {
+    content_view_->OnMouseEnter(event);
+    if (event->IsAccepted()) {
+      proxy.PushBack(content_view_);
+      ++proxy;
+      DispatchMouseEnterEvent(content_view_, event, proxy.mouse_task());
+    }
+  }
 }
 
 void AbstractShellView::OnMouseLeave(MouseEvent *event) {
-  event->Accept();
+  MouseTaskIterator proxy(this);
+  bool need_call = true;
+  EventTask *tmp = proxy.mouse_task();
+
+  while (++proxy) {
+    tmp->Unlink();
+    tmp = proxy.mouse_task();
+    if (need_call) {
+      static_cast<AbstractView *>(proxy.mouse_task()->event_handler)->OnMouseLeave(event);
+      if (!event->IsAccepted()) need_call = false;
+    }
+  }
 }
 
 void AbstractShellView::OnMouseMove(MouseEvent *event) {
@@ -339,8 +371,8 @@ void AbstractShellView::OnMouseButton(MouseEvent *event) {
       int location = shell_frame_->GetMouseLocation(event);
 
       if (location == kTitleBar) {
-        MouseTaskProxy proxy(this);
-        if (proxy.GetNextTask()) {
+        MouseTaskIterator proxy(this);
+        if (proxy.next()) {
           // If the mouse is hover on a sub widget (mostly close/min/max button on title bar).
           event->Accept();
           return;
@@ -534,6 +566,21 @@ void AbstractShellView::SetContentViewGeometry() {
 
   content_view_->MoveTo((int) rect.x(), (int) rect.y());
   content_view_->Resize((int) rect.width(), (int) rect.height());
+}
+
+void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event, EventTask *task) {
+  AbstractView::Iterator it(view);
+  for (it = it.first_child(); it; ++it) {
+    if (it.view()->Contain((int) event->window_x(), (int) event->window_y())) {
+      it.view()->OnMouseEnter(event);
+      if (event->IsAccepted()) {
+        task->PushBack(MouseTaskIterator(it.view()).mouse_task());
+        task = static_cast<EventTask *>(task->next());
+        DispatchMouseEnterEvent(it.view(), event, task);
+      }
+      break;
+    }
+  }
 }
 
 }

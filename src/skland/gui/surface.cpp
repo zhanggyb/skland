@@ -23,8 +23,8 @@
 #include <skland/gui/sub-surface.hpp>
 #include <skland/gui/egl-surface.hpp>
 
-#include "internal/display-proxy.hpp"
-#include "internal/commit-task.hpp"
+#include "internal/display-registry.hpp"
+#include "internal/surface-commit-task.hpp"
 
 namespace skland {
 
@@ -52,7 +52,7 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)
 
   wl_surface_.enter().Set(this, &Surface::OnEnter);
   wl_surface_.leave().Set(this, &Surface::OnLeave);
-  wl_surface_.Setup(DisplayProxy().wl_compositor());
+  wl_surface_.Setup(Display::Registry().wl_compositor());
 
   commit_task_.reset(new CommitTask(this));
 }

@@ -42,11 +42,11 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   friend class Application;
   friend class Display;
 
-  friend struct RedrawTask;
-  friend class MouseTaskProxy;
-  friend class RedrawTaskProxy;
-
  public:
+
+  struct RedrawTask;
+  class MouseTaskIterator;
+  class RedrawTaskIterator;
 
   AbstractEventHandler();
 

@@ -28,7 +28,7 @@
 #include <new>
 #endif
 
-#include "internal/display-proxy.hpp"
+#include "internal/display-registry.hpp"
 
 namespace skland {
 
@@ -44,7 +44,7 @@ void MemoryPool::Setup(int32_t size) {
     throw std::runtime_error("Cannot map shared memory");
   }
 
-  wl_shm_pool_.Setup(DisplayProxy().wl_shm(), fd, size);
+  wl_shm_pool_.Setup(Display::Registry().wl_shm(), fd, size);
   size_ = size;
   close(fd);
 }

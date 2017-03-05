@@ -18,7 +18,7 @@
 #include <skland/core/defines.hpp>
 #include <skland/gui/surface.hpp>
 
-#include "internal/display-proxy.hpp"
+#include "internal/display-registry.hpp"
 
 namespace skland {
 
@@ -38,7 +38,7 @@ SubSurface::SubSurface(Surface *surface, Surface *parent)
     : surface_(surface) {
   DBG_ASSERT(surface_);
   DBG_ASSERT(parent);
-  wl_sub_surface_.Setup(DisplayProxy().wl_subcompositor(),
+  wl_sub_surface_.Setup(Display::Registry().wl_subcompositor(),
                         surface_->wl_surface_,
                         parent->wl_surface_);
   SetParent(parent);

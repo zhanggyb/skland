@@ -22,7 +22,7 @@
 #include <skland/gui/sub-surface.hpp>
 #include <skland/gui/egl-surface.hpp>
 
-#include "internal/redraw-task.hpp"
+#include "internal/abstract-event-handler-redraw-task.hpp"
 #include "internal/abstract-view-iterators.hpp"
 
 #include <GLES2/gl2.h>

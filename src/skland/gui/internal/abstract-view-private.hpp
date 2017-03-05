@@ -19,7 +19,7 @@
 
 #include <skland/gui/abstract-view.hpp>
 
-#include "redraw-task.hpp"
+#include "abstract-event-handler-redraw-task.hpp"
 
 namespace skland {
 

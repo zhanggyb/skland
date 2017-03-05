@@ -14,29 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
-#define SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
+#include "abstract-event-handler-redraw-task.hpp"
 
-#include <skland/gui/task.hpp>
+#include "abstract-event-handler-private.hpp"
 
 namespace skland {
 
-class Surface;
+void AbstractEventHandler::RedrawTask::Run() const {
+  event_handler->OnDraw(&context);
+//  event_handler->visible_ = true;
 
-struct CommitTask : public Task {
-  CommitTask(const CommitTask &) = delete;
-  CommitTask &operator=(const CommitTask &) = delete;
-
-  CommitTask(Surface *surface)
-      : Task(), surface(surface) {}
-
-  virtual ~CommitTask() {}
-
-  virtual void Run() const;
-
-  Surface *surface;
-};
-
+  if (event_handler->p_->is_damaged_) {
+    context.surface()->Damage(event_handler->p_->damaged_region_.x(),
+                              event_handler->p_->damaged_region_.y(),
+                              event_handler->p_->damaged_region_.width(),
+                              event_handler->p_->damaged_region_.height());
+    event_handler->p_->is_damaged_ = false;
+  }
 }
 
-#endif // SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
+}

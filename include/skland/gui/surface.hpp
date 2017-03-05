@@ -35,8 +35,6 @@ namespace skland {
 class Application;
 class Display;
 class AbstractEventHandler;
-class SurfaceHolder;
-struct CommitTask;
 class Buffer;
 
 class ShellSurface;
@@ -79,8 +77,6 @@ class Surface {
 
   friend class Application;
   friend class Display;
-  friend class SurfaceHolder;
-  friend struct CommitTask;
 
   friend class ShellSurface;
   friend class SubSurface;
@@ -91,6 +87,8 @@ class Surface {
   Surface &operator=(const Surface &) = delete;
 
  public:
+
+  struct CommitTask;
 
   virtual ~Surface();
 

@@ -27,9 +27,8 @@
 
 #include <skland/graphic/canvas.hpp>
 
-#include "internal/display-proxy.hpp"
-#include "internal/redraw-task.hpp"
-#include "internal/redraw-task-proxy.hpp"
+#include "internal/display-registry.hpp"
+#include "internal/abstract-event-handler-redraw-task-iterator.hpp"
 
 namespace skland {
 
@@ -46,7 +45,7 @@ Window::Window(int width, int height, const char *title, AbstractShellFrame *fra
     DBG_ASSERT(main_surface_->parent() == parent);
     DBG_ASSERT(main_surface_->below() == parent);
     wayland::Region empty_region;
-    empty_region.Setup(DisplayProxy().wl_compositor());
+    empty_region.Setup(Display::Registry().wl_compositor());
     main_surface_->SetInputRegion(empty_region);
   }
 }
@@ -100,9 +99,9 @@ void Window::OnUpdate(AbstractView *view) {
 
   if (nullptr == view) {
     surface = this->shell_surface();
-    RedrawTaskProxy redraw_task_helper(this);
-    redraw_task_helper.MoveToTail();
-    redraw_task_helper.SetContext(Context(surface, frame_canvas_));
+    RedrawTaskIterator it(this);
+    it.MoveToTail();
+    it.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
     Damage(this, 0, 0,
            size().width + surface->margin().lr(),
@@ -118,9 +117,9 @@ void Window::OnUpdate(AbstractView *view) {
       canvas = frame_canvas_;
     }
 
-    RedrawTaskProxy redraw_task_helper(view);
-    redraw_task_helper.MoveToTail();
-    redraw_task_helper.SetContext(Context(surface, canvas));
+    RedrawTaskIterator it(view);
+    it.MoveToTail();
+    it.SetContext(Context(surface, canvas));
     DBG_ASSERT(canvas);
     Damage(view, view->x() + surface->margin().left,
            view->y() + surface->margin().top,
@@ -154,7 +153,7 @@ void Window::OnSizeChanged(int width, int height) {
                     height + AbstractShellFrame::kResizingMargin.tb());
 
   wayland::Region input_region;
-  input_region.Setup(DisplayProxy().wl_compositor());
+  input_region.Setup(Display::Registry().wl_compositor());
   input_region.Add(input_rect.x(), input_rect.y(),
                    input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);

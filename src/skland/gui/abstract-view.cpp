@@ -18,8 +18,9 @@
 #include <skland/gui/mouse-event.hpp>
 
 #include <skland/gui/abstract-shell-view.hpp>
-#include "internal/redraw-task-proxy.hpp"
+
 #include "internal/abstract-view-private.hpp"
+#include "internal/abstract-event-handler-redraw-task-iterator.hpp"
 
 namespace skland {
 
@@ -693,12 +694,13 @@ void AbstractView::UpdateAll() {
 }
 
 void AbstractView::OnUpdate(AbstractView *view) {
-  RedrawTaskProxy proxy(this);
+  RedrawTaskIterator it(this);
 
-  if (proxy.IsLinked() && (view != this)) {
+  if (it.IsLinked() && (view != this)) {
     // This view is going to be redrawn, just push back the task of the sub view
-    proxy.PushBack(view);
-    proxy.CopyContextTo(view);
+    DBG_ASSERT(it.GetContext().canvas());
+    it.PushBack(view);
+    RedrawTaskIterator(view).SetContext(this);
     return;
   }
 

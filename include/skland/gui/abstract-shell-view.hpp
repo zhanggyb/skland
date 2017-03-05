@@ -29,6 +29,8 @@ namespace skland {
 
 class AbstractShellFrame;
 
+struct EventTask;
+
 /**
  * @ingroup gui
  * @brief Abstract class to hold and manage a shell surface
@@ -216,6 +218,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   void OnContentViewDestroyed(AbstractView *view, __SLOT__);
 
   void SetContentViewGeometry();
+
+  void DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event, EventTask* task);
 
   int flags_;
 

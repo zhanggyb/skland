@@ -29,9 +29,9 @@
 
 #include <skland/graphic/canvas.hpp>
 
-#include "internal/display-proxy.hpp"
-#include "internal/redraw-task.hpp"
-#include "internal/redraw-task-proxy.hpp"
+#include "internal/display-registry.hpp"
+#include "internal/abstract-event-handler-redraw-task.hpp"
+#include "internal/abstract-event-handler-redraw-task-iterator.hpp"
 
 #include <GLES2/gl2.h>
 
@@ -59,7 +59,7 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractShellFram
   DBG_ASSERT(sub_surface_->below() == main_surface_);
 
   wayland::Region empty_region;
-  empty_region.Setup(DisplayProxy().wl_compositor());
+  empty_region.Setup(Display::Registry().wl_compositor());
   main_surface_->SetInputRegion(empty_region);
   sub_surface_->SetInputRegion(empty_region);
 
@@ -122,7 +122,7 @@ void EGLWindow::OnUpdate(AbstractView *view) {
 
   if (nullptr == view) {
     surface = this->shell_surface();
-    RedrawTaskProxy redraw_task_helper(this);
+    RedrawTaskIterator redraw_task_helper(this);
     redraw_task_helper.MoveToTail();
     redraw_task_helper.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
@@ -135,7 +135,7 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     surface = main_surface_;
     canvas = main_canvas_;
 
-    RedrawTaskProxy redraw_task_helper(view);
+    RedrawTaskIterator redraw_task_helper(view);
     redraw_task_helper.MoveToTail();
     redraw_task_helper.SetContext(Context(surface, canvas));
     DBG_ASSERT(canvas);
@@ -164,7 +164,7 @@ void EGLWindow::OnSizeChanged(int width, int height) {
                     height + AbstractShellFrame::kResizingMargin.tb());
 
   wayland::Region input_region;
-  input_region.Setup(DisplayProxy().wl_compositor());
+  input_region.Setup(Display::Registry().wl_compositor());
   input_region.Add(input_rect.x(), input_rect.y(),
                    input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);

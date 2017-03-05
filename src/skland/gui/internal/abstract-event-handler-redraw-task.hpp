@@ -14,38 +14,32 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_REDRAW_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_REDRAW_TASK_HPP_
 
 #include <skland/gui/abstract-event-handler.hpp>
-#include <skland/core/rect.hpp>
-
-#include "event-task.hpp"
-#include "abstract-event-handler-redraw-task.hpp"
+#include <skland/gui/task.hpp>
+#include <skland/gui/context.hpp>
 
 namespace skland {
 
-struct AbstractEventHandler::Private {
+SKLAND_NO_EXPORT struct AbstractEventHandler::RedrawTask : public Task {
 
-  Private(AbstractEventHandler *event_handler)
-      : mouse_task(event_handler),
-        mouse_motion_task(event_handler),
-        redraw_task(event_handler),
-        is_damaged_(false) {}
+  RedrawTask(const RedrawTask &) = delete;
+  RedrawTask &operator=(const RedrawTask &) = delete;
 
-  ~Private() {}
+  RedrawTask(AbstractEventHandler *event_handler)
+      : Task(), event_handler(event_handler) {}
 
-  EventTask mouse_task;
-  EventTask mouse_motion_task;
+  virtual ~RedrawTask() {}
 
-  RedrawTask redraw_task;
+  virtual void Run() const final;
 
-  // Damage area
-  bool is_damaged_;
-  RectI damaged_region_;
+  AbstractEventHandler *event_handler;
+  Context context;
 
 };
 
 }
 
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_REDRAW_TASK_HPP_

@@ -26,7 +26,7 @@
 #include <skland/wayland/keyboard.hpp>
 #include <skland/wayland/touch.hpp>
 
-#include "internal/display-proxy.hpp"
+#include "internal/display-registry.hpp"
 #include "internal/keymap.hpp"
 #include "internal/keyboard-state.hpp"
 
@@ -78,7 +78,7 @@ Input::Input(uint32_t id, uint32_t version)
   p_.reset(new Private);
   p_->wl_seat.capabilities().Set(this, &Input::OnSeatCapabilities);
   p_->wl_seat.name().Set(this, &Input::OnSeatName);
-  p_->wl_seat.Setup(DisplayProxy().wl_registry(), id, version);
+  p_->wl_seat.Setup(Display::Registry().wl_registry(), id, version);
 }
 
 Input::~Input() {

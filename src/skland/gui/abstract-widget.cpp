@@ -22,7 +22,7 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 
-#include "internal/redraw-task.hpp"
+#include "internal/abstract-event-handler-redraw-task.hpp"
 
 namespace skland {
 

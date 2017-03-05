@@ -14,31 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_REDRAW_TASK_HPP_
-#define SKLAND_GUI_REDRAW_TASK_HPP_
-
-#include <skland/gui/task.hpp>
-#include <skland/gui/context.hpp>
+#include "surface-commit-task.hpp"
 
 namespace skland {
 
-class AbstractEventHandler;
-
-SKLAND_NO_EXPORT struct RedrawTask : public Task {
-  RedrawTask(const RedrawTask &) = delete;
-  RedrawTask &operator=(const RedrawTask &) = delete;
-
-  RedrawTask(AbstractEventHandler *event_handler)
-      : Task(), event_handler(event_handler) {}
-
-  virtual ~RedrawTask() {}
-
-  virtual void Run() const final;
-
-  AbstractEventHandler *event_handler;
-  Context context;
-};
-
+void Surface::CommitTask::Run() const {
+  surface->wl_surface_.Commit();
 }
 
-#endif // SKLAND_GUI_REDRAW_TASK_HPP_
+}
