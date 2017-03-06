@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <skland/gui/abstract-shell-view.hpp>
+#include "internal/abstract-shell-view-private.hpp"
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/mouse-event.hpp>
@@ -45,19 +45,18 @@ AbstractShellView::AbstractShellView(int width,
                                      const char *title,
                                      AbstractShellView *parent,
                                      AbstractShellFrame *frame)
-    : AbstractEventHandler(),
-      flags_(0),
-      shell_surface_(nullptr),
-      shell_frame_(nullptr),
-      size_(width, height),
-      content_view_(nullptr),
-      parent_(parent) {
-  if (title) title_ = title;
+    : AbstractEventHandler() {
+  p_.reset(new Private);
+  p_->size_.width = width;
+  p_->size_.height = height;
+  p_->parent_ = parent;
 
-  if (nullptr == parent_) {
-    shell_surface_ = ToplevelShellSurface::Create(this, Theme::shadow_margin());
-    ShellSurface::Get(shell_surface_)->configure().Set(this, &AbstractShellView::OnXdgSurfaceConfigure);
-    ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(shell_surface_);
+  if (title) p_->title_ = title;
+
+  if (nullptr == p_->parent_) {
+    p_->shell_surface_ = ToplevelShellSurface::Create(this, Theme::shadow_margin());
+    ShellSurface::Get(p_->shell_surface_)->configure().Set(this, &AbstractShellView::OnXdgSurfaceConfigure);
+    ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface_);
     toplevel->configure().Set(this, &AbstractShellView::OnXdgToplevelConfigure);
     toplevel->close().Set(this, &AbstractShellView::OnXdgToplevelClose);
     toplevel->SetTitle(title);
@@ -74,83 +73,85 @@ AbstractShellView::AbstractShellView(int width,
   wayland::Region input_region;
   input_region.Setup(Display::Registry().wl_compositor());
   input_region.Add(x, y, width, height);
-  shell_surface_->SetInputRegion(input_region);
+  p_->shell_surface_->SetInputRegion(input_region);
 
   SetShellFrame(frame);
 }
 
 AbstractShellView::~AbstractShellView() {
-  SetContentView(nullptr);
+  SetClientView(nullptr);
 
-  if (shell_frame_) {
-    shell_frame_->shell_view_ = nullptr;
-    Theme::DestroyWindowFrame(shell_frame_);
+  if (p_->shell_frame_) {
+    p_->shell_frame_->shell_view_ = nullptr;
+    Theme::DestroyWindowFrame(p_->shell_frame_);
   }
 
-  delete shell_surface_;
+  delete p_->shell_surface_;
 }
 
 void AbstractShellView::SetTitle(const char *title) {
-  title_ = title;
-  if (nullptr == parent_) {
-    ToplevelShellSurface::Get(shell_surface_)->SetTitle(title);
+  p_->title_ = title;
+  if (nullptr == p_->parent_) {
+    ToplevelShellSurface::Get(p_->shell_surface_)->SetTitle(title);
   }
 }
 
 void AbstractShellView::SetAppId(const char *app_id) {
-  app_id_ = app_id;
-  if (nullptr == parent_) {
-    ToplevelShellSurface::Get(shell_surface_)->SetAppId(app_id);
+  p_->app_id_ = app_id;
+  if (nullptr == p_->parent_) {
+    ToplevelShellSurface::Get(p_->shell_surface_)->SetAppId(app_id);
   }
 }
 
 void AbstractShellView::SetShellFrame(AbstractShellFrame *shell_frame) {
-  if (shell_frame == shell_frame_)
+  if (shell_frame == p_->shell_frame_)
     return;
 
-  if (shell_frame_) {
-    if (shell_frame_->title_bar_) DetachView(shell_frame_->title_bar_);
-    shell_frame_->shell_view_ = nullptr;
-    delete shell_frame_;
-    shell_frame_ = nullptr;
+  if (p_->shell_frame_) {
+    if (p_->shell_frame_->title_view_) DetachView(p_->shell_frame_->title_view_);
+    p_->shell_frame_->shell_view_ = nullptr;
+    delete p_->shell_frame_;
+    p_->shell_frame_ = nullptr;
   }
 
-  shell_frame_ = shell_frame;
+  p_->shell_frame_ = shell_frame;
   // TODO: check if there's original window using the window frame
 
-  if (shell_frame_) {
-    shell_frame_->shell_view_ = this;
-    if (shell_frame_->title_bar_) {
-      AttachView(shell_frame_->title_bar_);
+  if (p_->shell_frame_) {
+    p_->shell_frame_->shell_view_ = this;
+    if (p_->shell_frame_->title_view_) {
+      AttachView(p_->shell_frame_->title_view_);
     }
-    shell_frame_->window_action().Connect(this, &AbstractShellView::OnWindowAction);
-    shell_frame_->OnResize(size_.width, size_.height);
+    p_->shell_frame_->window_action().Connect(this, &AbstractShellView::OnWindowAction);
+
+    p_->shell_frame_->OnSetup();
+//    shell_frame_->OnResize(size_.width, size_.height);
   }
 
   OnUpdate(nullptr);
 }
 
-void AbstractShellView::SetContentView(AbstractView *view) {
-  if (content_view_ == view) return;
+void AbstractShellView::SetClientView(AbstractView *view) {
+  if (p_->client_view_ == view) return;
 
-  if (content_view_) {
-    DetachView(content_view_);
-    content_view_->destroyed().DisconnectAll(this, &AbstractShellView::OnContentViewDestroyed);
-    delete content_view_;
+  if (p_->client_view_) {
+    DetachView(p_->client_view_);
+    p_->client_view_->destroyed().DisconnectAll(this, &AbstractShellView::OnContentViewDestroyed);
+    delete p_->client_view_;
   }
 
-  content_view_ = view;
+  p_->client_view_ = view;
 
-  if (content_view_) {
-    AttachView(content_view_);
-    content_view_->destroyed().Connect(this, &AbstractShellView::OnContentViewDestroyed);
+  if (p_->client_view_) {
+    AttachView(p_->client_view_);
+    p_->client_view_->destroyed().Connect(this, &AbstractShellView::OnContentViewDestroyed);
     SetContentViewGeometry();
   }
 }
 
 void AbstractShellView::Show() {
   if (!IsShown()) {
-    shell_surface_->Commit();
+    p_->shell_surface_->Commit();
   }
 }
 
@@ -172,6 +173,10 @@ void AbstractShellView::Maximize(SLOT) {
 
 void AbstractShellView::Minimize(SLOT) {
 
+}
+
+const std::string &AbstractShellView::GetTitle() const {
+  return p_->title_;
 }
 
 Size AbstractShellView::GetMinimalSize() const {
@@ -206,9 +211,47 @@ Size AbstractShellView::GetMaximalSize() const {
 }
 
 int AbstractShellView::GetMouseLocation(const MouseEvent *event) const {
-  if (IsFrameless()) return kInterior;
+  if (nullptr == p_->shell_frame_) {
+    return kInterior;
+  }
 
-  return shell_frame_->GetMouseLocation(event);
+  return p_->shell_frame_->GetMouseLocation(event);
+}
+
+bool AbstractShellView::IsFullscreen() const {
+  return 0 != (p_->flags_ & kFlagMaskFullscreen);
+}
+
+bool AbstractShellView::IsMaximized() const {
+  return 0 != (p_->flags_ & kFlagMaskMaximized);
+}
+
+bool AbstractShellView::IsMinimized() const {
+  return 0 != (p_->flags_ & kFlagMaskMinimized);
+}
+
+bool AbstractShellView::IsFocused() const {
+  return 0 != (p_->flags_ & kFlagMaskFocused);
+}
+
+bool AbstractShellView::IsResizing() const {
+  return 0 != (p_->flags_ & kFlagMaskResizing);
+}
+
+bool AbstractShellView::IsFrameless() const {
+  return nullptr == p_->shell_frame_;
+}
+
+bool AbstractShellView::IsShown() const {
+  return 0 != (p_->flags_ & kFlagMaskShown);
+}
+
+const Size &AbstractShellView::GetSize() const {
+  return p_->size_;
+}
+
+AbstractView *AbstractShellView::GetClientView() const {
+  return p_->client_view_;
 }
 
 void AbstractShellView::AttachView(AbstractView *view) {
@@ -248,136 +291,261 @@ void AbstractShellView::DetachView(AbstractView *view) {
 
 Rect AbstractShellView::GetClientGeometry() const {
   if (IsFrameless()) {
-    DBG_ASSERT(nullptr == shell_frame_);
-    return Rect::FromXYWH(0.f, 0.f, size_.width, size_.height);
+    DBG_ASSERT(nullptr == p_->shell_frame_);
+    return Rect::FromXYWH(0.f, 0.f, p_->size_.width, p_->size_.height);
   }
 
-  return shell_frame_->GetContentGeometry();
+  return p_->shell_frame_->GetContentGeometry();
 }
 
 void AbstractShellView::OnMouseEnter(MouseEvent *event) {
-  if (!IsFrameless()) {
-    switch (shell_frame_->GetMouseLocation(event)) {
-      case kResizeTop: {
-        event->SetCursor(Display::cursor(kCursorTop));
-        break;
-      }
-      case kResizeBottom: {
-        event->SetCursor(Display::cursor(kCursorBottom));
-        break;
-      }
-      case kResizeLeft: {
-        event->SetCursor(Display::cursor(kCursorLeft));
-        break;
-      }
-      case kResizeRight: {
-        event->SetCursor(Display::cursor(kCursorRight));
-        break;
-      }
-      default: {
-        event->SetCursor(Display::cursor(kCursorLeftPtr));
-        break;
-      }
-    }
+  if (nullptr == p_->shell_frame_) {
+
+    return;
   }
 
-  MouseTaskIterator proxy(this);
-  DBG_ASSERT(nullptr == proxy.next());
-
-  if (shell_frame_ &&
-      shell_frame_->title_bar() &&
-      shell_frame_->title_bar()->Contain((int) event->window_x(), (int) event->window_y())) {
-    shell_frame_->title_bar()->OnMouseEnter(event);
-    if (event->IsAccepted()) {
-      proxy.PushBack(shell_frame_->title_bar());
-      ++proxy;
-      DispatchMouseEnterEvent(shell_frame_->title_bar(), event, proxy.mouse_task());
+  switch (p_->shell_frame_->GetMouseLocation(event)) {
+    case kResizeTop: {
+      event->SetCursor(Display::cursor(kCursorTop));
+      break;
     }
-  } else if (content_view_ && content_view_->Contain((int) event->window_x(), (int) event->window_y())) {
-    content_view_->OnMouseEnter(event);
-    if (event->IsAccepted()) {
-      proxy.PushBack(content_view_);
-      ++proxy;
-      DispatchMouseEnterEvent(content_view_, event, proxy.mouse_task());
+    case kResizeBottom: {
+      event->SetCursor(Display::cursor(kCursorBottom));
+      break;
+    }
+    case kResizeLeft: {
+      event->SetCursor(Display::cursor(kCursorLeft));
+      break;
+    }
+    case kResizeRight: {
+      event->SetCursor(Display::cursor(kCursorRight));
+      break;
+    }
+    case kResizeTopLeft: {
+      event->SetCursor(Display::cursor(kCursorTopLeft));
+      break;
+    }
+    case kResizeTopRight: {
+      event->SetCursor(Display::cursor(kCursorTopRight));
+      break;
+    }
+    case kResizeBottomLeft: {
+      event->SetCursor(Display::cursor(kCursorBottomLeft));
+      break;
+    }
+    case kResizeBottomRight: {
+      event->SetCursor(Display::cursor(kCursorBottomRight));
+      break;
+    }
+    case kTitleBar: {
+      AbstractView *title_bar = p_->shell_frame_->title_view_;
+      if (nullptr == title_bar) break;
+
+      MouseTaskIterator it(this);
+      while (it.next()) ++it; // move to tail
+      DBG_ASSERT(nullptr == it.next());
+
+      if (title_bar->Contain((int) event->window_x(), (int) event->window_y())) {
+        title_bar->OnMouseEnter(event);
+        if (event->IsAccepted()) {
+          it.PushBack(title_bar);
+          ++it;
+          DispatchMouseEnterEvent(title_bar, event, it.mouse_task());
+        }
+      }
+
+      break;
+    }
+    case kClientArea: {
+      if (nullptr == p_->client_view_) break;
+
+      MouseTaskIterator it(this);
+      while (it.next()) ++it; // move to tail
+      DBG_ASSERT(nullptr == it.next());
+
+      if (p_->client_view_->Contain((int) event->window_x(), (int) event->window_y())) {
+        p_->client_view_->OnMouseEnter(event);
+        if (event->IsAccepted()) {
+          it.PushBack(p_->client_view_);
+          ++it;
+          DispatchMouseEnterEvent(p_->client_view_, event, it.mouse_task());
+        }
+      }
+
+      break;
+    }
+    default: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      break;
     }
   }
 }
 
 void AbstractShellView::OnMouseLeave(MouseEvent *event) {
-  MouseTaskIterator proxy(this);
+  MouseTaskIterator it(this);
   bool need_call = true;
-  EventTask *tmp = proxy.mouse_task();
+  EventTask *task = nullptr;
+  ++it;
 
-  while (++proxy) {
-    tmp->Unlink();
-    tmp = proxy.mouse_task();
+  while (it) {
+    task = it.mouse_task();
+    ++it;
+
+    task->Unlink();
     if (need_call) {
-      static_cast<AbstractView *>(proxy.mouse_task()->event_handler)->OnMouseLeave(event);
-      if (!event->IsAccepted()) need_call = false;
+      static_cast<AbstractView *>(task->event_handler)->OnMouseLeave(event);
+      if (event->IsRejected()) need_call = false;
     }
   }
 }
 
 void AbstractShellView::OnMouseMove(MouseEvent *event) {
-  if (!IsFrameless()) {
-    switch (shell_frame_->GetMouseLocation(event)) {
-      case kResizeTop: {
-        event->SetCursor(Display::cursor(kCursorTop));
-        break;
+  if (nullptr == p_->shell_frame_) {
+
+    return;
+  }
+
+  switch (p_->shell_frame_->GetMouseLocation(event)) {
+    case kResizeTop: {
+      event->SetCursor(Display::cursor(kCursorTop));
+      break;
+    }
+    case kResizeBottom: {
+      event->SetCursor(Display::cursor(kCursorBottom));
+      break;
+    }
+    case kResizeLeft: {
+      event->SetCursor(Display::cursor(kCursorLeft));
+      break;
+    }
+    case kResizeRight: {
+      event->SetCursor(Display::cursor(kCursorRight));
+      break;
+    }
+    case kResizeTopLeft: {
+      event->SetCursor(Display::cursor(kCursorTopLeft));
+      break;
+    }
+    case kResizeTopRight: {
+      event->SetCursor(Display::cursor(kCursorTopRight));
+      break;
+    }
+    case kResizeBottomLeft: {
+      event->SetCursor(Display::cursor(kCursorBottomLeft));
+      break;
+    }
+    case kResizeBottomRight: {
+      event->SetCursor(Display::cursor(kCursorBottomRight));
+      break;
+    }
+    case kTitleBar: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+
+      AbstractView *title_view = p_->shell_frame_->title_view_;
+      if (nullptr == title_view) break;
+
+      MouseTaskIterator it(this);
+
+      if (nullptr == it.next()) {
+        DBG_ASSERT(it.mouse_task()->event_handler == this);
+        DBG_ASSERT(nullptr == it.previous());
+        if (title_view->Contain((int) event->window_x(), (int) event->window_y())) {
+          title_view->OnMouseEnter(event);
+          if (event->IsAccepted()) {
+            it.PushBack(title_view);
+            ++it;
+            DispatchMouseEnterEvent(title_view, event, it.mouse_task());
+          } else if (event->IsIgnored()) {
+            DispatchMouseEnterEvent(title_view, event, it.mouse_task());
+          }
+        }
+      } else {
+        while (it.next()) ++it; // move to tail
+        AbstractView *view = nullptr;
+        EventTask *tail = nullptr;
+        while (it.previous()) {
+          tail = it.mouse_task();
+          view = static_cast<AbstractView *>(tail->event_handler);
+          if (view->Contain((int) event->window_x(), (int) event->window_y())) {
+            break;
+          }
+          --it;
+          tail->Unlink();
+          static_cast<AbstractView *>(tail->event_handler)->OnMouseLeave(event);
+          // TODO: if need to check the response
+
+          if (nullptr == it.previous()) break;
+        }
+        DispatchMouseEnterEvent(view, event, tail);
       }
-      case kResizeBottom: {
-        event->SetCursor(Display::cursor(kCursorBottom));
-        break;
+      break;
+    }
+    case kClientArea: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+
+      if (nullptr == p_->client_view_) break;
+
+      MouseTaskIterator it(this);
+
+      if (nullptr == it.next()) {
+        DBG_ASSERT(it.mouse_task()->event_handler == this);
+        DBG_ASSERT(nullptr == it.previous());
+        if (p_->client_view_->Contain((int) event->window_x(), (int) event->window_y())) {
+          p_->client_view_->OnMouseEnter(event);
+          if (event->IsAccepted()) {
+            it.PushBack(p_->client_view_);
+            ++it;
+            DispatchMouseEnterEvent(p_->client_view_, event, it.mouse_task());
+          } else if (event->IsIgnored()) {
+            DispatchMouseEnterEvent(p_->client_view_, event, it.mouse_task());
+          }
+        }
+      } else {
+        while (it.next()) ++it; // move to tail
+        AbstractView *view = nullptr;
+        EventTask *tail = nullptr;
+        while (it.previous()) {
+          tail = it.mouse_task();
+          view = static_cast<AbstractView *>(tail->event_handler);
+          if (view->Contain((int) event->window_x(), (int) event->window_y())) {
+            break;
+          }
+          --it;
+          tail->Unlink();
+          static_cast<AbstractView *>(tail->event_handler)->OnMouseLeave(event);
+          // TODO: if need to check the response
+
+          if (nullptr == it.previous()) break;
+        }
+        DispatchMouseEnterEvent(view, event, tail);
       }
-      case kResizeLeft: {
-        event->SetCursor(Display::cursor(kCursorLeft));
-        break;
-      }
-      case kResizeRight: {
-        event->SetCursor(Display::cursor(kCursorRight));
-        break;
-      }
-      case kResizeTopLeft: {
-        event->SetCursor(Display::cursor(kCursorTopLeft));
-        break;
-      }
-      case kResizeTopRight: {
-        event->SetCursor(Display::cursor(kCursorTopRight));
-        break;
-      }
-      case kResizeBottomLeft: {
-        event->SetCursor(Display::cursor(kCursorBottomLeft));
-        break;
-      }
-      case kResizeBottomRight: {
-        event->SetCursor(Display::cursor(kCursorBottomRight));
-        break;
-      }
-      default: {
-        event->SetCursor(Display::cursor(kCursorLeftPtr));
-        break;
-      }
+
+      break;
+    }
+    default: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      break;
     }
   }
 
-  event->Accept();
+  // Now dispatch mouse move event:
+//      task = static_cast<ViewTask *>(handler->p_->mouse_motion_task.next());
+//      p_->mouse_event->response_ = InputEvent::kUnknown;
+//      while (task) {
+//        task->view->OnMouseMove(p_->mouse_event);
+//        if (!p_->mouse_event->IsAccepted()) break;
+//        task = static_cast<ViewTask *>(task->next());
+//      }
 }
 
 void AbstractShellView::OnMouseButton(MouseEvent *event) {
   if ((event->button() == kMouseButtonLeft) &&
       (event->state() == kMouseButtonPressed)) {
 
-    if (!IsFrameless()) {
-      int location = shell_frame_->GetMouseLocation(event);
+    if (p_->shell_frame_) {
+      int location = p_->shell_frame_->GetMouseLocation(event);
 
-      if (location == kTitleBar) {
-        MouseTaskIterator proxy(this);
-        if (proxy.next()) {
-          // If the mouse is hover on a sub widget (mostly close/min/max button on title bar).
-          event->Accept();
-          return;
-        }
-
+      if (location == kTitleBar && (nullptr == MouseTaskIterator(this).next())) {
         MoveWithMouse(event);
         event->Ignore();
         return;
@@ -391,7 +559,16 @@ void AbstractShellView::OnMouseButton(MouseEvent *event) {
     }
   }
 
-  event->Accept();
+  MouseTaskIterator it(this);
+  ++it;
+
+  AbstractView *view = nullptr;
+  while (it) {
+    view = static_cast<AbstractView *>(it.mouse_task()->event_handler);
+    view->OnMouseButton(event);
+    if (event->IsRejected()) break;
+    ++it;
+  }
 }
 
 void AbstractShellView::OnKeyboardKey(KeyEvent *event) {
@@ -403,11 +580,11 @@ void AbstractShellView::OnUpdate(AbstractView *view) {
 }
 
 Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
-  return shell_surface_;
+  return p_->shell_surface_;
 }
 
 void AbstractShellView::OnDraw(const Context *context) {
-  if (shell_frame_) shell_frame_->OnDraw(context);
+  if (p_->shell_frame_) p_->shell_frame_->OnDraw(context);
 }
 
 void AbstractShellView::OnMaximized(bool maximized) {
@@ -419,7 +596,7 @@ void AbstractShellView::OnFullscreen(bool) {
 }
 
 void AbstractShellView::OnFocus(bool focus) {
-  if (shell_frame_) {
+  if (p_->shell_frame_) {
     OnUpdate(nullptr);
   }
 }
@@ -433,11 +610,19 @@ void AbstractShellView::OnViewDetached(AbstractView *view) {
 }
 
 void AbstractShellView::MoveWithMouse(MouseEvent *event) const {
-  ToplevelShellSurface::Get(shell_surface_)->Move(event->GetSeat(), event->serial());
+  ToplevelShellSurface::Get(p_->shell_surface_)->Move(event->GetSeat(), event->serial());
 }
 
 void AbstractShellView::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
-  ToplevelShellSurface::Get(shell_surface_)->Resize(event->GetSeat(), event->serial(), edges);
+  ToplevelShellSurface::Get(p_->shell_surface_)->Resize(event->GetSeat(), event->serial(), edges);
+}
+
+AbstractShellFrame *AbstractShellView::shell_frame() const {
+  return p_->shell_frame_;
+}
+
+Surface *AbstractShellView::shell_surface() const {
+  return p_->shell_surface_;
 }
 
 void AbstractShellView::ResizeShellFrame(AbstractShellFrame *window_frame, int width, int height) {
@@ -453,12 +638,12 @@ void AbstractShellView::UpdateAll(AbstractView *view) {
 }
 
 void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {
-  ShellSurface *shell_surface = ShellSurface::Get(shell_surface_);
+  ShellSurface *shell_surface = ShellSurface::Get(p_->shell_surface_);
   shell_surface->AckConfigure(serial);
 
   if (!IsShown()) {
-    Bit::Set<int>(flags_, kFlagMaskShown);
-    shell_surface->ResizeWindow(size_.width, size_.height);
+    Bit::Set<int>(p_->flags_, kFlagMaskShown);
+    shell_surface->ResizeWindow(p_->size_.width, p_->size_.height);
     OnShown();
   }
 }
@@ -480,45 +665,45 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
 
     width = clamp(width, min.width, max.width);
     height = clamp(height, min.height, max.height);
-    if (width == size_.width && height == size_.height) do_resize = false;
+    if (width == p_->size_.width && height == p_->size_.height) do_resize = false;
   } else {
     // Initialize
-    width = size_.width;
-    height = size_.height;
+    width = p_->size_.width;
+    height = p_->size_.height;
   }
 
   if (do_resize) {
-    ShellSurface::Get(shell_surface_)->ResizeWindow(width, height);
-    size_.width = width;
-    size_.height = height;
+    ShellSurface::Get(p_->shell_surface_)->ResizeWindow(width, height);
+    p_->size_.width = width;
+    p_->size_.height = height;
     OnSizeChanged(width, height);
 
     // Resize frame first, then the content view
-    if (shell_frame_) {
-      shell_frame_->OnResize(width, height);
+    if (p_->shell_frame_) {
+      p_->shell_frame_->OnResize(width, height);
     }
-    if (content_view_) {
+    if (p_->client_view_) {
       SetContentViewGeometry();
     }
   }
 
   if (focus != IsFocused()) {
-    Bit::Inverse<int>(flags_, kFlagMaskFocused);
+    Bit::Inverse<int>(p_->flags_, kFlagMaskFocused);
     OnFocus(focus);
   }
 
   if (maximized != IsMaximized()) {
-    Bit::Inverse<int>(flags_, kFlagMaskMaximized);
+    Bit::Inverse<int>(p_->flags_, kFlagMaskMaximized);
     OnMaximized(maximized);
   }
 
   if (fullscreen != IsFullscreen()) {
-    Bit::Inverse<int>(flags_, kFlagMaskFullscreen);
+    Bit::Inverse<int>(p_->flags_, kFlagMaskFullscreen);
     OnFullscreen(fullscreen);
   }
 
   if (resizing != IsResizing()) {
-    Bit::Inverse<int>(flags_, kFlagMaskResizing);
+    Bit::Inverse<int>(p_->flags_, kFlagMaskResizing);
   }
 }
 
@@ -527,7 +712,7 @@ void AbstractShellView::OnXdgToplevelClose() {
 }
 
 void AbstractShellView::OnWindowAction(int action, SLOT slot) {
-  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(shell_surface_);
+  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface_);
 
   switch (action) {
     case kActionClose: {
@@ -543,7 +728,7 @@ void AbstractShellView::OnWindowAction(int action, SLOT slot) {
       break;
     }
     case kActionMinimize: {
-      Bit::Set<int>(flags_, kFlagMaskMinimized);
+      Bit::Set<int>(p_->flags_, kFlagMaskMinimized);
       toplevel->SetMinimized();
       DBG_ASSERT(IsMinimized());
       break;
@@ -557,26 +742,29 @@ void AbstractShellView::OnWindowAction(int action, SLOT slot) {
 }
 
 void AbstractShellView::OnContentViewDestroyed(AbstractView *view, SLOT slot) {
-  DBG_ASSERT(view == content_view_);
-  content_view_ = nullptr;
+  DBG_ASSERT(view == p_->client_view_);
+  p_->client_view_ = nullptr;
 }
 
 void AbstractShellView::SetContentViewGeometry() {
   Rect rect = GetClientGeometry();
 
-  content_view_->MoveTo((int) rect.x(), (int) rect.y());
-  content_view_->Resize((int) rect.width(), (int) rect.height());
+  p_->client_view_->MoveTo((int) rect.x(), (int) rect.y());
+  p_->client_view_->Resize((int) rect.width(), (int) rect.height());
 }
 
-void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event, EventTask *task) {
-  AbstractView::Iterator it(view);
+void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, EventTask *tail) {
+  DBG_ASSERT(nullptr == tail->next());
+  AbstractView::Iterator it(parent);
   for (it = it.first_child(); it; ++it) {
     if (it.view()->Contain((int) event->window_x(), (int) event->window_y())) {
       it.view()->OnMouseEnter(event);
       if (event->IsAccepted()) {
-        task->PushBack(MouseTaskIterator(it.view()).mouse_task());
-        task = static_cast<EventTask *>(task->next());
-        DispatchMouseEnterEvent(it.view(), event, task);
+        tail->PushBack(MouseTaskIterator(it.view()).mouse_task());
+        tail = static_cast<EventTask *>(tail->next());
+        DispatchMouseEnterEvent(it.view(), event, tail);
+      } else if (event->IsIgnored()) {
+        DispatchMouseEnterEvent(it.view(), event, tail);
       }
       break;
     }

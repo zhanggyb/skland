@@ -136,6 +136,16 @@ class TitleBar final : public AbstractView {
 
   virtual Size GetMaximalSize() const override;
 
+  void SetForeground(const Color &color);
+
+  void SetTitle(const std::string &title);
+
+  CloseButton *close_button() const { return close_button_; }
+
+  MaximizeButton *maximize_button() const { return maximize_button_; }
+
+  MinimizeButton *minimize_button() const { return minimize_button_; }
+
  protected:
 
   virtual void OnSizeChanged(int width, int height) override;
@@ -160,6 +170,9 @@ class TitleBar final : public AbstractView {
 
   Font font_;
 
+  Color foreground_;
+
+  std::string title_;
 };
 
 /**
@@ -183,6 +196,8 @@ class WindowFrameDefault : public AbstractShellFrame {
   static const int kButtonSpace = 5;
 
  protected:
+
+  virtual void OnSetup() final;
 
   virtual void OnResize(int width, int height) override;
 
@@ -211,10 +226,6 @@ class WindowFrameDefault : public AbstractShellFrame {
   void OnMaximizeButtonClicked(__SLOT__);
 
   void OnMinimizeButtonClicked(__SLOT__);
-
-  void CreateWidgets();
-
-  void LayoutWidgets(int width, int height);
 
   int border_;
   int title_bar_size_;

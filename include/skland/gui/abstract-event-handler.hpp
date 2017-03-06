@@ -45,6 +45,8 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
  public:
 
   struct RedrawTask;
+  struct EventTask;
+
   class MouseTaskIterator;
   class RedrawTaskIterator;
 

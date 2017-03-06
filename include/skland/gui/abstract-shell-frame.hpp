@@ -62,7 +62,7 @@ class AbstractShellFrame : public Trackable {
 
   virtual Rect GetContentGeometry() const = 0;
 
-  AbstractView *title_bar() const { return title_bar_; }
+  AbstractView *GetTitleView() const { return title_view_; }
 
   SignalRef<int> window_action() { return window_action_; }
 
@@ -71,6 +71,11 @@ class AbstractShellFrame : public Trackable {
   static const Margin kResizingMargin;
 
  protected:
+
+  /**
+   * @brief Called when this shell frame is setup in shell view
+   */
+  virtual void OnSetup() = 0;
 
   virtual void OnResize(int width, int height) = 0;
 
@@ -86,7 +91,7 @@ class AbstractShellFrame : public Trackable {
 
   AbstractShellView *shell_view_;
 
-  AbstractView *title_bar_;
+  AbstractView *title_view_;
 
   Signal<int> window_action_;
 };

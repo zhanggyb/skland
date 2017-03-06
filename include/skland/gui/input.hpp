@@ -153,13 +153,6 @@ SKLAND_EXPORT class Input : public Object {
 
   void OnTouchCancel();
 
-  /**
-   * @brief Dispatch mouse enter event on sub views
-   * @param parent
-   * @param task
-   */
-//  void DispatchMouseEnterEvent(AbstractEventHandler *parent, ViewTask *task);
-
   Display *display_;
 
   std::unique_ptr<Private> p_;

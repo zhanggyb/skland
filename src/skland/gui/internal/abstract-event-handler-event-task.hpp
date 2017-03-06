@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
-#define SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_EVENT_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_EVENT_TASK_HPP_
 
+#include <skland/gui/abstract-event-handler.hpp>
 #include <skland/gui/task.hpp>
 
 namespace skland {
 
-class AbstractEventHandler;
+SKLAND_NO_EXPORT struct AbstractEventHandler::EventTask : public Task {
 
-SKLAND_NO_EXPORT struct EventTask : public Task {
   EventTask(const EventTask &) = delete;
   EventTask &operator=(const EventTask &) = delete;
 
@@ -33,8 +33,9 @@ SKLAND_NO_EXPORT struct EventTask : public Task {
   virtual ~EventTask() {}
 
   AbstractEventHandler *event_handler;
+
 };
 
 }
 
-#endif // SKLAND_GUI_INTERNAL_EVENT_TASK_HPP_
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_EVENT_TASK_HPP_

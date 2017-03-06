@@ -96,7 +96,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void SetShellFrame(AbstractShellFrame *shell_frame);
 
-  void SetContentView(AbstractView *view);
+  void SetClientView(AbstractView *view);
 
   void Show();
 
@@ -106,7 +106,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void Minimize(__SLOT__);
 
-  const std::string &title() const { return title_; }
+  const std::string &GetTitle() const;
 
   virtual Size GetMinimalSize() const;
 
@@ -114,27 +114,27 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual Size GetMaximalSize() const;
 
-  bool IsFullscreen() const { return 0 != (flags_ & kFlagMaskFullscreen); }
+  bool IsFullscreen() const;
 
-  bool IsMaximized() const { return 0 != (flags_ & kFlagMaskMaximized); }
+  bool IsMaximized() const;
 
-  bool IsMinimized() const { return 0 != (flags_ & kFlagMaskMinimized); }
+  bool IsMinimized() const;
 
-  bool IsFocused() const { return 0 != (flags_ & kFlagMaskFocused); }
+  bool IsFocused() const;
 
-  bool IsResizing() const { return 0 != (flags_ & kFlagMaskResizing); }
+  bool IsResizing() const;
 
-  bool IsFrameless() const { return nullptr == shell_frame_; }
+  bool IsFrameless() const;
 
-  bool IsShown() const { return 0 != (flags_ & kFlagMaskShown); }
+  bool IsShown() const;
 
   int GetMouseLocation(const MouseEvent *event) const;
 
   Rect GetClientGeometry() const;
 
-  const Size &size() const { return size_; }
+  const Size &GetSize() const;
 
-  AbstractView *content_view() const { return content_view_; }
+  AbstractView *GetClientView() const;
 
  protected:
 
@@ -184,11 +184,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void ResizeWithMouse(MouseEvent *event, uint32_t edges) const;
 
-  int flags() const { return flags_; }
+  AbstractShellFrame *shell_frame() const;
 
-  AbstractShellFrame *shell_frame() const { return shell_frame_; }
-
-  Surface *shell_surface() const { return shell_surface_; }
+  Surface *shell_surface() const;
 
   static void ResizeShellFrame(AbstractShellFrame *window_frame, int width, int height);
 
@@ -197,6 +195,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   static void UpdateAll(AbstractView *view);
 
  private:
+
+  struct Private;
 
   enum FlagMask {
     kFlagMaskMaximized = 0x1 << 0,
@@ -219,22 +219,15 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void SetContentViewGeometry();
 
-  void DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event, EventTask* task);
+  /**
+   * @brief Dispatch mouse enter event on given parent view
+   * @param parent
+   * @param event
+   * @param tail
+   */
+  void DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, EventTask *tail);
 
-  int flags_;
-
-  Surface *shell_surface_;
-
-  AbstractShellFrame *shell_frame_;
-
-  std::string title_;
-  std::string app_id_;
-
-  Size size_;
-
-  AbstractView *content_view_;
-
-  AbstractShellView *parent_;
+  std::unique_ptr<Private> p_;
 
 };
 

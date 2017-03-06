@@ -35,10 +35,25 @@ SKLAND_EXPORT class InputEvent {
  public:
 
   enum Response {
-    kUnknown,
-    kAccept,
-    kIgnore,
-    kReject
+    /**
+     * @brief Unknown response
+     */
+        kUnknown,
+
+    /**
+     * @brief Accept this event and pass to next
+     */
+        kAccept,
+
+    /**
+     * @brief Ignore this event on this view and pass to next
+     */
+        kIgnore,
+
+    /**
+     * @brief Reject this event on this view and stop passing to next
+     */
+        kReject
   };
 
   InputEvent(Input *input)
@@ -53,17 +68,17 @@ SKLAND_EXPORT class InputEvent {
 
   const wayland::Seat &GetSeat() const;
 
-  void Accept() {
-    response_ = kAccept;
-  }
+  void Accept() { response_ = kAccept; }
 
-  void Ignore() {
-    response_ = kIgnore;
-  }
+  void Ignore() { response_ = kIgnore; }
 
-  bool IsAccepted() const {
-    return kAccept == response_;
-  }
+  void Reject() { response_ = kReject; }
+
+  bool IsAccepted() const { return kAccept == response_; }
+
+  bool IsIgnored() const { return kIgnore == response_; }
+
+  bool IsRejected() const { return kReject == response_; }
 
  protected:
 

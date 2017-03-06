@@ -15,8 +15,9 @@
  */
 
 #include <skland/gui/abstract-shell-frame.hpp>
-#include <skland/gui/abstract-shell-view.hpp>
-#include <skland/gui/push-button.hpp>
+
+#include <skland/gui/abstract-view.hpp>
+#include "internal/abstract-shell-view-private.hpp"
 
 namespace skland {
 
@@ -25,33 +26,33 @@ const Margin AbstractShellFrame::kResizingMargin(5, 5, 5, 5);
 AbstractShellFrame::AbstractShellFrame()
     : Trackable(),
       shell_view_(nullptr),
-      title_bar_(nullptr) {
+      title_view_(nullptr) {
 
 }
 
 AbstractShellFrame::~AbstractShellFrame() {
   if (shell_view_) {
-    shell_view_->shell_frame_ = nullptr;
-    if (title_bar_) {
-      shell_view_->DetachView(title_bar_);
+    shell_view_->p_->shell_frame_ = nullptr;
+    if (title_view_) {
+      shell_view_->DetachView(title_view_);
     }
     // TODO: update shell_view_
   }
 
-  title_bar_->Destroy();
+  title_view_->Destroy();
 }
 
 void AbstractShellFrame::SetTitleBar(AbstractView *view) {
-  if (title_bar_ == view) return;
+  if (title_view_ == view) return;
 
-  if (title_bar_) {
-    title_bar_->Destroy();
+  if (title_view_) {
+    title_view_->Destroy();
   }
 
-  title_bar_ = view;
-  if (title_bar_) {
+  title_view_ = view;
+  if (title_view_) {
     if (shell_view_) {
-      shell_view_->AttachView(title_bar_);
+      shell_view_->AttachView(title_view_);
     }
   }
 }

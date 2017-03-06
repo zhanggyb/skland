@@ -238,10 +238,6 @@ void Input::OnPointerEnter(uint32_t serial,
 
   p_->mouse_event->response_ = InputEvent::kUnknown;
   p_->mouse_event->surface_->event_handler()->OnMouseEnter(p_->mouse_event);
-//  if (p_->mouse_event->IsAccepted()) {
-//    EventTask *task = &handler->p_->mouse_task;
-//    DispatchMouseEnterEvent(handler, task);
-//  }
 }
 
 void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
@@ -251,29 +247,6 @@ void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
 
   p_->mouse_event->response_ = InputEvent::kUnknown;
   p_->mouse_event->surface_->event_handler()->OnMouseLeave(p_->mouse_event);
-
-//  if (p_->mouse_event->IsAccepted()) {
-//    ViewTask *task = &handler->p_->mouse_task;
-//    ViewTask *next = nullptr;
-//    bool need_call = true;
-//
-//    task = static_cast<ViewTask *>(task->next());
-//    while (task) {
-//      next = static_cast<ViewTask *>(task->next());
-//      task->Unlink();
-//
-//      if (need_call) {
-//        p_->mouse_event->response_ = InputEvent::kUnknown;
-//        task->view->OnMouseLeave(p_->mouse_event);
-//        if (!p_->mouse_event->IsAccepted()) {
-//          need_call = false;
-//        }
-//      }
-//
-//      task = next;
-//    }
-//  }
-//  p_->mouse_event->surface_ = nullptr;
 }
 
 void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y) {
@@ -290,41 +263,6 @@ void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surf
 
   p_->mouse_event->response_ = InputEvent::kUnknown;
   p_->mouse_event->surface_->event_handler()->OnMouseMove(p_->mouse_event);
-
-  // The following code check if the mouse enters sub views in this surface:
-
-//  ViewTask *task = &handler->p_->mouse_task;
-//  ViewTask *tail = task;
-//  while (tail->next()) {
-//    tail = static_cast<ViewTask *>(tail->next());
-//  }
-//
-//  ViewTask *previous = nullptr;
-//  while (tail->previous()) {
-//    if (tail->view->Contain((int) p_->mouse_event->window_xy_.x, (int) p_->mouse_event->window_xy_.y)) {
-//      break;
-//    }
-//    previous = static_cast<ViewTask *>(tail->previous());
-//
-//    tail->Unlink();
-//    p_->mouse_event->response_ = InputEvent::kUnknown;
-//    tail->view->OnMouseLeave(p_->mouse_event);
-//    // TODO: if need to check the 'accepted_' variable
-//
-//    tail = previous;
-//  }
-//
-//  // and recheck subviews:
-//  DispatchMouseEnterEvent(tail->view, tail);
-//
-//  // Now dispatch mouse move event:
-//  task = static_cast<ViewTask *>(handler->p_->mouse_motion_task.next());
-//  p_->mouse_event->response_ = InputEvent::kUnknown;
-//  while (task) {
-//    task->view->OnMouseMove(p_->mouse_event);
-//    if (!p_->mouse_event->IsAccepted()) break;
-//    task = static_cast<ViewTask *>(task->next());
-//  }
 }
 
 void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uint32_t state) {
@@ -338,17 +276,6 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
 
   p_->mouse_event->response_ = InputEvent::kUnknown;
   p_->mouse_event->surface_->event_handler()->OnMouseButton(p_->mouse_event);
-
-//  if (!p_->mouse_event->IsAccepted()) return;
-//
-//  MouseTaskProxy proxy(handler);
-//  while (proxy.GetNextTask()) {
-//    proxy.GetNextTask()->view->OnMouseButton(p_->mouse_event);
-//    if (!p_->mouse_event->IsAccepted()) {
-//      break;
-//    }
-//    ++proxy;
-//  }
 }
 
 void Input::OnPointerAxis(uint32_t time, uint32_t axis, wl_fixed_t value) {
@@ -395,21 +322,5 @@ void Input::OnTouchFrame() {
 void Input::OnTouchCancel() {
 
 }
-
-//void Input::DispatchMouseEnterEvent(AbstractEventHandler *parent, ViewTask *task) {
-//  AbstractEventHandler::Iterator it(parent);
-//  for (it = it.first_child(); it; ++it) {
-//    if (it.view()->Contain((int) p_->mouse_event->window_xy_.x, (int) p_->mouse_event->window_xy_.y)) {
-//      p_->mouse_event->response_ = InputEvent::kUnknown;
-//      it.view()->OnMouseEnter(p_->mouse_event);
-//      if (p_->mouse_event->IsAccepted()) {
-//        task->PushBack(&it.view()->p_->mouse_task);
-//        task = static_cast<ViewTask *>(task->next());
-//        DispatchMouseEnterEvent(it.view(), task);
-//      }
-//      break;
-//    }
-//  }
-//}
 
 }

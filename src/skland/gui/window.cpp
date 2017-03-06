@@ -58,8 +58,8 @@ void Window::OnShown() {
   Surface *shell_surface = this->shell_surface();
 
   // Create buffer:
-  int total_width = size().width;
-  int total_height = size().height;
+  int total_width = GetSize().width;
+  int total_height = GetSize().height;
   total_width += shell_surface->margin().lr();
   total_height += shell_surface->margin().tb();
 
@@ -88,8 +88,8 @@ void Window::OnShown() {
   }
 
   OnUpdate(nullptr);
-  if (shell_frame()) UpdateAll(shell_frame()->title_bar());
-  if (content_view()) UpdateAll(content_view());
+  if (shell_frame()) UpdateAll(shell_frame()->GetTitleView());
+  if (GetClientView()) UpdateAll(GetClientView());
 }
 
 void Window::OnUpdate(AbstractView *view) {
@@ -104,8 +104,8 @@ void Window::OnUpdate(AbstractView *view) {
     it.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
     Damage(this, 0, 0,
-           size().width + surface->margin().lr(),
-           size().height + surface->margin().tb());
+           GetSize().width + surface->margin().lr(),
+           GetSize().height + surface->margin().tb());
     surface->Commit();
   } else {
     std::shared_ptr<Canvas> canvas;

@@ -83,8 +83,8 @@ void EGLWindow::OnShown() {
   Surface *shell_surface = this->shell_surface();
 
   // Create buffer:
-  int total_width = size().width;
-  int total_height = size().height;
+  int total_width = GetSize().width;
+  int total_height = GetSize().height;
   total_width += shell_surface->margin().lr();
   total_height += shell_surface->margin().tb();
 
@@ -127,8 +127,8 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     redraw_task_helper.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
     Damage(this, 0, 0,
-           size().width + surface->margin().lr(),
-           size().height + surface->margin().tb());
+           GetSize().width + surface->margin().lr(),
+           GetSize().height + surface->margin().tb());
     surface->Commit();
   } else {
     std::shared_ptr<Canvas> canvas;
@@ -198,7 +198,7 @@ void EGLWindow::OnSizeChanged(int width, int height) {
 
   Rect client_rect = GetClientGeometry();
   egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
-  OnResizeEGL(size().width, size().height);
+  OnResizeEGL(GetSize().width, GetSize().height);
 
 //  UpdateAll();
 }

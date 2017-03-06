@@ -20,7 +20,7 @@
 #include <skland/gui/abstract-event-handler.hpp>
 #include <skland/core/rect.hpp>
 
-#include "event-task.hpp"
+#include "abstract-event-handler-event-task.hpp"
 #include "abstract-event-handler-redraw-task.hpp"
 
 namespace skland {

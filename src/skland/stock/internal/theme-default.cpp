@@ -28,8 +28,8 @@
 #include <skland/stock/theme.hpp>
 
 #include "SkCanvas.h"
-#include "SkTypeface.h"
-#include "SkPaint.h"
+//#include "SkTypeface.h"
+//#include "SkPaint.h"
 #include "SkTextBox.h"
 
 namespace skland {
@@ -232,7 +232,9 @@ TitleBar::TitleBar()
     : AbstractView(),
       close_button_(nullptr),
       maximize_button_(nullptr),
-      minimize_button_(nullptr) {
+      minimize_button_(nullptr),
+      font_(Typeface::kBold),
+      foreground_(0xFF444444) {
   close_button_ = new CloseButton;
   maximize_button_ = new MaximizeButton;
   minimize_button_ = new MinimizeButton;
@@ -258,6 +260,16 @@ Size TitleBar::GetMaximalSize() const {
   return Size(65536, 65536);
 }
 
+void TitleBar::SetForeground(const Color &color) {
+  foreground_ = color;
+  Update();
+}
+
+void TitleBar::SetTitle(const std::string &title) {
+  title_ = title;
+  Update();
+}
+
 void TitleBar::OnSizeChanged(int width, int height) {
   resize(width, height);
 
@@ -278,11 +290,11 @@ void TitleBar::OnSizeChanged(int width, int height) {
 }
 
 void TitleBar::OnMouseEnter(MouseEvent *event) {
-  event->Accept();
+  event->Ignore();
 }
 
 void TitleBar::OnMouseLeave(MouseEvent *event) {
-  event->Accept();
+  event->Ignore();
 }
 
 void TitleBar::OnMouseMove(MouseEvent *event) {
@@ -300,17 +312,13 @@ void TitleBar::OnKeyboardKey(KeyEvent *event) {
 void TitleBar::OnDraw(const Context *context) {
   Paint paint;
 
-  paint.SetColor(0x2919FF19);
-  context->canvas()->DrawRect(geometry(), paint);
-
-  std::string text("Hello there!");
-  paint.SetColor(0xFF444444);
+  paint.SetColor(foreground_);
   paint.SetAntiAlias(true);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font_);
   paint.SetTextSize(font_.GetSize());
 
-  float text_width = paint.MeasureText(text.c_str(), text.length());
+  float text_width = paint.MeasureText(title_.c_str(), title_.length());
 
   SkTextBox text_box;
   // Put the text at the center
@@ -319,7 +327,7 @@ void TitleBar::OnDraw(const Context *context) {
                   (geometry().r - geometry().l + text_width) / 2.f,
                   geometry().b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
-  text_box.setText(text.c_str(), text.length(), *paint.sk_paint());
+  text_box.setText(title_.c_str(), title_.length(), *paint.sk_paint());
   text_box.draw(context->canvas()->sk_canvas());
 }
 
@@ -331,18 +339,19 @@ WindowFrameDefault::WindowFrameDefault()
       title_bar_size_(22),
       title_bar_position_(kTitleBarTop),
       title_bar_(nullptr) {
-  CreateWidgets();
+  title_bar_ = new TitleBar;
+  SetTitleBar(title_bar_);
 }
 
 WindowFrameDefault::~WindowFrameDefault() {
-  // delete title_; // destroyed in base class
+
 }
 
 Rect WindowFrameDefault::GetContentGeometry() const {
   int x = border_,
       y = border_,
-      w = shell_view()->size().width - 2 * border_,
-      h = shell_view()->size().height - 2 * border_;
+      w = shell_view()->GetSize().width - 2 * border_,
+      h = shell_view()->GetSize().height - 2 * border_;
 
   switch (title_bar_position_) {
     case kTitleBarLeft: {
@@ -380,60 +389,16 @@ void WindowFrameDefault::OnMinimizeButtonClicked(SLOT /* slot */) {
   EmitAction(AbstractShellView::kActionMinimize);
 }
 
-void WindowFrameDefault::CreateWidgets() {
-//  close_button_ = new CloseButton;
-//  close_button_->clicked().Connect(this, &WindowFrameDefault::OnCloseButtonClicked);
-//
-//  minimize_button_ = new MinimizeButton;
-//  minimize_button_->clicked().Connect(this, &WindowFrameDefault::OnMinimizeButtonClicked);
-//
-//  maximize_button_ = new MaximizeButton;
-//  maximize_button_->clicked().Connect(this, &WindowFrameDefault::OnMaximizeButtonClicked);
-
-//  title_ = new Label(window()->title());
-//  title_ = new Label("Test");
-//  title_->SetForeground(0xFF444444);
-//  title_->SetFont(Font(Typeface::kBold));
-
-  title_bar_ = new TitleBar;
-  SetTitleBar(title_bar_);
-
-//  layout_ = new LinearLayout;
-
-//  AddWidget(title_);  // put the title below other widgets
-//  AddWidget(close_button_);
-//  AddWidget(maximize_button_);
-//  AddWidget(minimize_button_);
-
-//  LayoutWidgets(window()->size().width, window()->height());
-
-//  layout_->AddView(close_button_);
-//  layout_->AddView(maximize_button_);
-//  layout_->AddView(minimize_button_);
-//  layout_->AddView(title_);
-
+void WindowFrameDefault::OnSetup() {
+  title_bar_->close_button()->clicked().Connect(this, &WindowFrameDefault::OnCloseButtonClicked);
+  title_bar_->maximize_button()->clicked().Connect(this, &WindowFrameDefault::OnMaximizeButtonClicked);
+  title_bar_->minimize_button()->clicked().Connect(this, &WindowFrameDefault::OnMinimizeButtonClicked);
+  title_bar_->SetTitle(shell_view()->GetTitle());
 }
 
 void WindowFrameDefault::OnResize(int width, int height) {
-  LayoutWidgets(width, height);
-}
-
-void WindowFrameDefault::LayoutWidgets(int width, int height) {
   title_bar_->MoveTo(0, 0);
-  title_bar_->Resize(shell_view()->size().width, title_bar_size_);
-
-//  title_->MoveTo(0, 0);
-//  title_->Resize(window()->size().width, title_bar_size_);
-//
-//  int y = (title_bar_size_ - kButtonSize) / 2;
-//  int x = kButtonSpace;
-//  close_button_->MoveTo(x, y);
-//
-//  x += close_button_->width() + kButtonSpace;
-//  maximize_button_->MoveTo(x, y);
-//
-//  x += maximize_button_->width() + kButtonSpace;
-//  minimize_button_->MoveTo(x, y);
+  title_bar_->Resize(shell_view()->GetSize().width, title_bar_size_);
 }
 
 void WindowFrameDefault::OnDraw(const Context *context) {
@@ -441,7 +406,7 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, shell_view()->size().width, shell_view()->size().height);
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, shell_view()->GetSize().width, shell_view()->GetSize().height);
 
   // Drop shadow:
   if ((!shell_view()->IsMaximized()) || (!shell_view()->IsFullscreen())) {
@@ -486,9 +451,9 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     hlocation = kExterior;
   else if (x < Theme::shadow_margin().left + kResizingMargin.left)
     hlocation = kResizeLeft;
-  else if (x < Theme::shadow_margin().left + shell_view()->size().width - kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + shell_view()->GetSize().width - kResizingMargin.right)
     hlocation = kInterior;
-  else if (x < Theme::shadow_margin().left + shell_view()->size().width + kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + shell_view()->GetSize().width + kResizingMargin.right)
     hlocation = kResizeRight;
   else
     hlocation = kExterior;
@@ -497,9 +462,9 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     vlocation = kExterior;
   else if (y < Theme::shadow_margin().top + kResizingMargin.top)
     vlocation = kResizeTop;
-  else if (y < Theme::shadow_margin().top + shell_view()->size().height - kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + shell_view()->GetSize().height - kResizingMargin.bottom)
     vlocation = kInterior;
-  else if (y < Theme::shadow_margin().top + shell_view()->size().height + kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + shell_view()->GetSize().height + kResizingMargin.bottom)
     vlocation = kResizeBottom;
   else
     vlocation = kExterior;
@@ -545,14 +510,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
                                     250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
-                                    shell_view()->size().width - 2 * rad, 2 * rad),
+                                    shell_view()->GetSize().width - 2 * rad, 2 * rad),
                    nullptr);
 
   // top-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
                                     250, 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(shell_view()->size().width - rad + offset_x, -rad + offset_y,
+                   SkRect::MakeXYWH(shell_view()->GetSize().width - rad + offset_x, -rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -561,14 +526,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
-                                    2 * rad, shell_view()->size().height - 2 * rad),
+                                    2 * rad, shell_view()->GetSize().height - 2 * rad),
                    nullptr);
 
   // bottom-left
   c->drawImageRect(image,
                    SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(-rad + offset_x, shell_view()->size().height - rad + offset_y,
+                   SkRect::MakeXYWH(-rad + offset_x, shell_view()->GetSize().height - rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -576,16 +541,16 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250 - 2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(rad + offset_x, shell_view()->size().height - rad + offset_y,
-                                    shell_view()->size().width - 2 * rad, 2 * rad),
+                   SkRect::MakeXYWH(rad + offset_x, shell_view()->GetSize().height - rad + offset_y,
+                                    shell_view()->GetSize().width - 2 * rad, 2 * rad),
                    nullptr);
 
   // bottom-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250, 250),
-                   SkRect::MakeXYWH(shell_view()->size().width - rad + offset_x,
-                                    shell_view()->size().height - rad + offset_y,
+                   SkRect::MakeXYWH(shell_view()->GetSize().width - rad + offset_x,
+                                    shell_view()->GetSize().height - rad + offset_y,
                                     2 * rad,
                                     2 * rad),
                    nullptr);
@@ -594,8 +559,8 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
                                     250, 250 - 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(shell_view()->size().width - rad + offset_x, rad + offset_y,
-                                    2 * rad, shell_view()->size().height - 2 * rad),
+                   SkRect::MakeXYWH(shell_view()->GetSize().width - rad + offset_x, rad + offset_y,
+                                    2 * rad, shell_view()->GetSize().height - 2 * rad),
                    nullptr);
 
 }
