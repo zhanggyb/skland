@@ -77,7 +77,6 @@ Surface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
 }
 
 void EGLWidget::OnSizeChanged(int width, int height) {
-  resize(width, height);
   resize_ = true;
 //  egl_surface_->Resize(this->width(), this->height());
   Update();

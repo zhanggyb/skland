@@ -213,6 +213,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual Surface *GetSurface(const AbstractView *view) const;
 
+  virtual void OnPositionChanged(int x, int y) = 0;
+
   virtual void OnSizeChanged(int width, int height) = 0;
 
   void TrackMouseMotion(MouseEvent *event);

@@ -49,8 +49,6 @@ class CloseButton final : public AbstractButton {
 
  protected:
 
-  virtual void OnSizeChanged(int width, int height);
-
   virtual void OnDraw(const Context *context);
 
  private:
@@ -80,8 +78,6 @@ class MaximizeButton final : public AbstractButton {
 
  protected:
 
-  virtual void OnSizeChanged(int width, int height);
-
   virtual void OnDraw(const Context *context);
 
  private:
@@ -110,8 +106,6 @@ class MinimizeButton final : public AbstractButton {
   void SetBackground(const Color &color);
 
  protected:
-
-  virtual void OnSizeChanged(int width, int height);
 
   virtual void OnDraw(const Context *context);
 
@@ -147,6 +141,8 @@ class TitleBar final : public AbstractView {
   MinimizeButton *minimize_button() const { return minimize_button_; }
 
  protected:
+
+  virtual void OnPositionChanged(int x, int y) override;
 
   virtual void OnSizeChanged(int width, int height) override;
 

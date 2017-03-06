@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_ABSTRACT_BUTTON_HPP_
 #define SKLAND_GUI_ABSTRACT_BUTTON_HPP_
 
-#include "abstract-widget.hpp"
+#include "abstract-view.hpp"
 
 namespace skland {
 
@@ -25,13 +25,19 @@ namespace skland {
  * @ingroup gui
  * @brief The abstract class for buttons
  */
-class AbstractButton : public AbstractWidget {
+class AbstractButton : public AbstractView {
 
  public:
 
   AbstractButton();
 
   virtual ~AbstractButton();
+
+  virtual Size GetMinimalSize() const override;
+
+  virtual Size GetPreferredSize() const override;
+
+  virtual Size GetMaximalSize() const override;
 
   SignalRef<> clicked() {
     return clicked_;
@@ -60,6 +66,10 @@ class AbstractButton : public AbstractWidget {
   virtual void OnMouseButton(MouseEvent *event) override;
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
+
+  virtual void OnPositionChanged(int x, int y) override;
+
+  virtual void OnSizeChanged(int width, int height) override;
 
   void SetSensitive(bool sensitive);
 

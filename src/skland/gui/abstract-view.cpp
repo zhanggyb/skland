@@ -47,9 +47,11 @@ AbstractView::~AbstractView() {
 }
 
 void AbstractView::MoveTo(int x, int y) {
-  // TODO: check and re-layout
-
-  set_position(x, y);
+  if (geometry_.x() != x || geometry_.y() != y) {
+    geometry_.MoveTo(x, y);
+    // TODO: support layout
+    OnPositionChanged(x, y);
+  }
 }
 
 void AbstractView::Resize(int width, int height) {
@@ -62,6 +64,8 @@ void AbstractView::Resize(int width, int height) {
   height = clamp(height, min.height, max.height);
 
   if (geometry_.width() != width || geometry_.height() != height) {
+    geometry_.Resize(width, height);
+    // TODO: support layout
     OnSizeChanged(width, height);
   }
 }
@@ -708,9 +712,7 @@ void AbstractView::OnUpdate(AbstractView *view) {
     DBG_ASSERT(nullptr == p_->shell);
     p_->parent->OnUpdate(view);
     return;
-  }
-
-  if (p_->shell) {
+  } else if (p_->shell) {
     DBG_ASSERT(nullptr == p_->parent);
     p_->shell->OnUpdate(view);
   }

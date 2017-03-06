@@ -23,13 +23,25 @@
 namespace skland {
 
 AbstractButton::AbstractButton()
-    : AbstractWidget(),
+    : AbstractView(),
       flags_(0x1) {
 
 }
 
 AbstractButton::~AbstractButton() {
 
+}
+
+Size AbstractButton::GetMinimalSize() const {
+  return Size(0, 0);
+}
+
+Size AbstractButton::GetPreferredSize() const {
+  return Size(200, 200);
+}
+
+Size AbstractButton::GetMaximalSize() const {
+  return Size(65536, 65536);
 }
 
 void AbstractButton::OnMouseEnter(MouseEvent *event) {
@@ -74,6 +86,14 @@ void AbstractButton::OnMouseMove(MouseEvent *event) {
 
 void AbstractButton::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
+}
+
+void AbstractButton::OnPositionChanged(int x, int y) {
+  Update();
+}
+
+void AbstractButton::OnSizeChanged(int width, int height) {
+  Update();
 }
 
 void AbstractButton::SetSensitive(bool sensitive) {

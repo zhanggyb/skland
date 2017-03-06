@@ -59,10 +59,6 @@ void CloseButton::SetBackground(const Color &color) {
   Update();
 }
 
-void CloseButton::OnSizeChanged(int /* width */, int /* height */) {
-
-}
-
 void CloseButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
@@ -124,10 +120,6 @@ Size MaximizeButton::GetPreferredSize() const {
   return Size(WindowFrameDefault::kButtonSize, WindowFrameDefault::kButtonSize);
 }
 
-void MaximizeButton::OnSizeChanged(int /* width */, int /* height */) {
-
-}
-
 void MaximizeButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
@@ -187,10 +179,6 @@ void MinimizeButton::SetForeground(const Color &color) {
 void MinimizeButton::SetBackground(const Color &color) {
   background_ = color;
   Update();
-}
-
-void MinimizeButton::OnSizeChanged(int /* width */, int /* height */) {
-
 }
 
 void MinimizeButton::OnDraw(const Context *context) {
@@ -270,9 +258,24 @@ void TitleBar::SetTitle(const std::string &title) {
   Update();
 }
 
-void TitleBar::OnSizeChanged(int width, int height) {
-  resize(width, height);
+void TitleBar::OnPositionChanged(int x, int y) {
+  Update();
 
+  y = (height() - WindowFrameDefault::kButtonSize) / 2;
+  x = WindowFrameDefault::kButtonSpace;
+  close_button_->MoveTo(x, y);
+//  close_button_->Update();
+
+  x += close_button_->width() + WindowFrameDefault::kButtonSpace;
+  maximize_button_->MoveTo(x, y);
+//  maximize_button_->Update();
+
+  x += maximize_button_->width() + WindowFrameDefault::kButtonSpace;
+  minimize_button_->MoveTo(x, y);
+//  minimize_button_->Update();
+}
+
+void TitleBar::OnSizeChanged(int width, int height) {
   Update();
 
   int y = (height - WindowFrameDefault::kButtonSize) / 2;
