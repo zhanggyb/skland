@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
   win->SetAppId("Event-Demo");
 
   SimpleWidget *widget = new SimpleWidget;
-  win->SetClientView(widget);
+  win->SetContentView(widget);
 
   win->Show();
 

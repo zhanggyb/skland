@@ -702,7 +702,7 @@ void AbstractView::OnUpdate(AbstractView *view) {
 
   if (it.IsLinked() && (view != this)) {
     // This view is going to be redrawn, just push back the task of the sub view
-    DBG_ASSERT(it.GetContext().canvas());
+    DBG_ASSERT(it.context().canvas());
     it.PushBack(view);
     RedrawTaskIterator(view).SetContext(this);
     return;

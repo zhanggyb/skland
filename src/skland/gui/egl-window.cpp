@@ -113,6 +113,9 @@ void EGLWindow::OnShown() {
 
   // initialize EGL
 //  UpdateAll();
+  OnUpdate(nullptr);
+  if (shell_frame()) UpdateAll(shell_frame()->GetTitleView());
+  if (GetClientView()) UpdateAll(GetClientView());
 }
 
 void EGLWindow::OnUpdate(AbstractView *view) {
@@ -122,9 +125,9 @@ void EGLWindow::OnUpdate(AbstractView *view) {
 
   if (nullptr == view) {
     surface = this->shell_surface();
-    RedrawTaskIterator redraw_task_helper(this);
-    redraw_task_helper.MoveToTail();
-    redraw_task_helper.SetContext(Context(surface, frame_canvas_));
+    RedrawTaskIterator it(this);
+    it.PushToTail();
+    it.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
     Damage(this, 0, 0,
            GetSize().width + surface->margin().lr(),
@@ -135,9 +138,9 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     surface = main_surface_;
     canvas = main_canvas_;
 
-    RedrawTaskIterator redraw_task_helper(view);
-    redraw_task_helper.MoveToTail();
-    redraw_task_helper.SetContext(Context(surface, canvas));
+    RedrawTaskIterator it(view);
+    it.PushToTail();
+    it.SetContext(Context(surface, canvas));
     DBG_ASSERT(canvas);
     Damage(view, view->x() + surface->margin().left,
            view->y() + surface->margin().top,
@@ -201,6 +204,11 @@ void EGLWindow::OnSizeChanged(int width, int height) {
   OnResizeEGL(GetSize().width, GetSize().height);
 
 //  UpdateAll();
+  OnUpdate(nullptr);
+  if (shell_frame()) {
+    AbstractView *title_view = shell_frame()->GetTitleView();
+    if (title_view) title_view->Update();
+  }
 }
 
 void EGLWindow::OnDraw(const Context *context) {

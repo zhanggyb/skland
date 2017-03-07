@@ -54,6 +54,10 @@ Window::~Window() {
   delete main_surface_;
 }
 
+void Window::SetContentView(AbstractView *view) {
+  SetClientView(view);
+}
+
 void Window::OnShown() {
   Surface *shell_surface = this->shell_surface();
 
@@ -100,7 +104,7 @@ void Window::OnUpdate(AbstractView *view) {
   if (nullptr == view) {
     surface = this->shell_surface();
     RedrawTaskIterator it(this);
-    it.MoveToTail();
+    it.PushToTail();
     it.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
     Damage(this, 0, 0,
@@ -118,7 +122,7 @@ void Window::OnUpdate(AbstractView *view) {
     }
 
     RedrawTaskIterator it(view);
-    it.MoveToTail();
+    it.PushToTail();
     it.SetContext(Context(surface, canvas));
     DBG_ASSERT(canvas);
     Damage(view, view->x() + surface->margin().left,
@@ -186,6 +190,10 @@ void Window::OnSizeChanged(int width, int height) {
   }
 
   OnUpdate(nullptr);
+  if (shell_frame()) {
+    AbstractView* title_view = shell_frame()->GetTitleView();
+    if (title_view) title_view->Update();
+  }
 //  if (content_view()) UpdateAll(content_view());
 }
 

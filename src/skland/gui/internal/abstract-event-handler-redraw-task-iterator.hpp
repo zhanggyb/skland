@@ -53,7 +53,7 @@ class AbstractEventHandler::RedrawTaskIterator {
     redraw_task_->context = event_hander->p_->redraw_task.context;
   }
 
-  const Context &GetContext() const {
+  const Context &context() const {
     return redraw_task_->context;
   }
 
@@ -101,11 +101,11 @@ class AbstractEventHandler::RedrawTaskIterator {
     return it;
   }
 
-  void MoveToHead() {
+  void PushToHead() {
     kRedrawTaskHead.PushBack(redraw_task_);
   }
 
-  void MoveToTail() {
+  void PushToTail() {
     kRedrawTaskTail.PushFront(redraw_task_);
   }
 

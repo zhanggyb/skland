@@ -29,10 +29,10 @@ int main(int argc, char *argv[]) {
   Window *win = new Window(320, 240, "Dark Theme");
   win->SetAppId("Theme");
 
-//  Label *label = new Label("Hello Wayland!");
-//  label->SetForeground(0xFF777777);
-//  label->SetFont(skland::Font(Typeface::kBold, 24.f));
-//  win->SetMainWidget(label);
+  Label *label = new Label("Hello Wayland!");
+  label->SetForeground(0xFF777777);
+  label->SetFont(skland::Font(Typeface::kBold, 24.f));
+  win->SetContentView(label);
 
   win->Show();
 

@@ -142,6 +142,8 @@ class TitleBar final : public AbstractView {
 
  protected:
 
+  virtual void OnUpdate(AbstractView *view) final;
+
   virtual void OnPositionChanged(int x, int y) override;
 
   virtual void OnSizeChanged(int width, int height) override;

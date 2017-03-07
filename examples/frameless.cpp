@@ -39,8 +39,11 @@ class MainWidget : public AbstractWidget {
 
  protected:
 
+  virtual void OnPositionChanged(int x, int y) override {
+    Update();
+  }
+
   virtual void OnSizeChanged(int width, int height) override {
-    resize(width, height);
     Update();
   }
 
@@ -81,8 +84,8 @@ int main(int argc, char *argv[]) {
   Window *win = new Window(400, 360, "Frameless Window", nullptr);
   win->SetAppId("Frameless-Demo");
 
-//  MainWidget *widget = new MainWidget;
-//  win->SetMainWidget(widget);
+  MainWidget *widget = new MainWidget;
+  win->SetContentView(widget);
 
   win->Show();
 

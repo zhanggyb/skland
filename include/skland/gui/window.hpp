@@ -49,6 +49,8 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual ~Window();
 
+  void SetContentView(AbstractView *view);
+
  protected:
 
   virtual void OnShown() final;

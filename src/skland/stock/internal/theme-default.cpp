@@ -27,6 +27,8 @@
 
 #include <skland/stock/theme.hpp>
 
+#include "../../gui/internal/abstract-event-handler-redraw-task-iterator.hpp"
+
 #include "SkCanvas.h"
 //#include "SkTypeface.h"
 //#include "SkPaint.h"
@@ -256,6 +258,28 @@ void TitleBar::SetForeground(const Color &color) {
 void TitleBar::SetTitle(const std::string &title) {
   title_ = title;
   Update();
+}
+
+void TitleBar::OnUpdate(AbstractView *view) {
+  RedrawTaskIterator it(this);
+
+  if (it.IsLinked()) {
+    DBG_ASSERT(it.context().canvas());
+    if (view == this) return;
+
+    AbstractView::OnUpdate(close_button_);
+    AbstractView::OnUpdate(maximize_button_);
+    AbstractView::OnUpdate(minimize_button_);
+  } else {
+    AbstractView::OnUpdate(view);
+
+    if (view == this && it.IsLinked()) {
+      DBG_ASSERT(it.context().canvas());
+      AbstractView::OnUpdate(close_button_);
+      AbstractView::OnUpdate(maximize_button_);
+      AbstractView::OnUpdate(minimize_button_);
+    }
+  }
 }
 
 void TitleBar::OnPositionChanged(int x, int y) {

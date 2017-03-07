@@ -42,6 +42,8 @@ class Label : public AbstractWidget {
 
  protected:
 
+  virtual void OnPositionChanged(int x, int y) override;
+
   virtual void OnSizeChanged(int width, int height) override;
 
   virtual void OnMouseEnter(MouseEvent *event) override;

@@ -96,8 +96,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void SetShellFrame(AbstractShellFrame *shell_frame);
 
-  void SetClientView(AbstractView *view);
-
   void Show();
 
   void Close(__SLOT__);
@@ -134,21 +132,11 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   const Size &GetSize() const;
 
-  AbstractView *GetClientView() const;
-
  protected:
 
-  /**
-   * @brief Attach a given view to this shell view
-   * @param view
-   */
-  void AttachView(AbstractView *view);
+  void SetClientView(AbstractView *view);
 
-  /**
-   * @brief Detach the view from this shell view
-   * @param view
-   */
-  void DetachView(AbstractView *view);
+  AbstractView *GetClientView() const;
 
   virtual void OnShown() = 0;
 
@@ -216,6 +204,18 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   void OnWindowAction(int action, __SLOT__);
 
   void OnContentViewDestroyed(AbstractView *view, __SLOT__);
+
+  /**
+ * @brief Attach a given view to this shell view
+ * @param view
+ */
+  void AttachView(AbstractView *view);
+
+  /**
+   * @brief Detach the view from this shell view
+   * @param view
+   */
+  void DetachView(AbstractView *view);
 
   void SetContentViewGeometry();
 
