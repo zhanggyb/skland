@@ -20,12 +20,12 @@
 #include <skland/gui/toplevel-shell-surface.hpp>
 #include <skland/gui/popup-shell-surface.hpp>
 
-#include "internal/display-proxy.hpp"
+#include "internal/display-registry.hpp"
 
 namespace skland {
 
-Surface *ShellSurface::Create(AbstractView *view, const Margin &margin) {
-  Surface *surface = new Surface(view, margin);
+Surface *ShellSurface::Create(AbstractEventHandler *event_handler, const Margin &margin) {
+  Surface *surface = new Surface(event_handler, margin);
   surface->role_.shell_surface = new ShellSurface(surface);
   return surface;
 }
@@ -41,7 +41,7 @@ ShellSurface::ShellSurface(Surface *surface)
     : surface_(surface), parent_(nullptr) {
   DBG_ASSERT(surface_);
   role_.placeholder = nullptr;
-  xdg_surface_.Setup(DisplayProxy().xdg_shell(), surface_->wl_surface_);
+  xdg_surface_.Setup(Display::Registry().xdg_shell(), surface_->wl_surface_);
 
   PushShellSurface();
 }

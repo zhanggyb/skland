@@ -21,7 +21,7 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
-#include <skland/gui/abstract-window.hpp>
+#include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/context.hpp>
 
 #include <skland/graphic/gradient-shader.hpp>
@@ -54,22 +54,23 @@ void WindowFrameLight::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, shell_view()->GetSize().width, shell_view()->GetSize().height);
 
   // Drop shadow:
-  if ((!window()->IsMaximized()) || (!window()->IsFullscreen())) {
+  if ((!shell_view()->IsMaximized()) || (!shell_view()->IsFullscreen())) {
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right
         4.f, 4.f, // bottom-right
         4.f, 4.f  // bottom-left
     };
-    path.AddRoundRect(window()->geometry(), radii);
+    path.AddRoundRect(geometry, radii);
     canvas->Save();
     canvas->ClipPath(path, kClipDifference, true);
     DrawShadow(canvas.get());
     canvas->Restore();
   } else {
-    path.AddRect(window()->geometry());
+    path.AddRect(geometry);
   }
 
   // Fill color:
@@ -82,7 +83,7 @@ void WindowFrameLight::OnDraw(const Context *context) {
   paint.SetColor(0xEFE0E0E0);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(), paint);
+  canvas->DrawRect(GetContentGeometry(), paint);
   canvas->Restore();
 
   canvas->Flush();

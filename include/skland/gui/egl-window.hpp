@@ -17,12 +17,14 @@
 #ifndef SKLAND_GUI_EGL_WINDOW_HPP_
 #define SKLAND_GUI_EGL_WINDOW_HPP_
 
-#include "abstract-window.hpp"
+#include "abstract-shell-view.hpp"
 
 #include "../wayland/callback.hpp"
 
 #include "memory-pool.hpp"
 #include "buffer.hpp"
+
+#include "../stock/theme.hpp"
 
 namespace skland {
 
@@ -36,7 +38,7 @@ class Canvas;
  *
  * @example simple-egl.cpp
  */
-class EGLWindow : public AbstractWindow {
+class EGLWindow : public AbstractShellView {
 
   EGLWindow() = delete;
   EGLWindow(const EGLWindow &) = delete;
@@ -44,10 +46,10 @@ class EGLWindow : public AbstractWindow {
 
  public:
 
-  EGLWindow(const char *title, AbstractWindowFrame *frame = Theme::CreateWindowFrame());
+  EGLWindow(const char *title, AbstractShellFrame *frame = Theme::CreateWindowFrame());
 
   EGLWindow(int width, int height, const char *title,
-            AbstractWindowFrame *frame = Theme::CreateWindowFrame());
+            AbstractShellFrame *frame = Theme::CreateWindowFrame());
 
   virtual ~EGLWindow();
 
@@ -57,7 +59,7 @@ class EGLWindow : public AbstractWindow {
 
   virtual void OnUpdate(AbstractView *view) final;
 
-  virtual Surface *OnGetSurface(const AbstractView *view) const final;
+  virtual Surface *GetSurface(const AbstractView *view) const final;
 
   virtual void OnSizeChanged(int width, int height) final;
 

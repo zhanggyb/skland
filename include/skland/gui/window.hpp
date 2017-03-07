@@ -17,9 +17,11 @@
 #ifndef SKLAND_GUI_WINDOW_HPP_
 #define SKLAND_GUI_WINDOW_HPP_
 
-#include "abstract-window.hpp"
+#include "abstract-shell-view.hpp"
 #include "memory-pool.hpp"
 #include "buffer.hpp"
+
+#include "../stock/theme.hpp"
 
 namespace skland {
 
@@ -33,23 +35,21 @@ class Canvas;
  *
  * @example hello.cpp
  */
-class Window : public AbstractWindow {
+SKLAND_EXPORT class Window : public AbstractShellView {
 
   Window(const Window &) = delete;
   Window &operator=(const Window &) = delete;
 
  public:
 
-  Window(const char *title, AbstractWindowFrame *frame = Theme::CreateWindowFrame());
+  Window(const char *title, AbstractShellFrame *frame = Theme::CreateWindowFrame());
 
   Window(int width, int height, const char *title,
-         AbstractWindowFrame *frame = Theme::CreateWindowFrame());
+         AbstractShellFrame *frame = Theme::CreateWindowFrame());
 
   virtual ~Window();
 
-  void SetMainWidget(AbstractView *widget);
-
-  AbstractView *main_widget() const { return main_widget_; }
+  void SetContentView(AbstractView *view);
 
  protected:
 
@@ -57,15 +57,13 @@ class Window : public AbstractWindow {
 
   virtual void OnUpdate(AbstractView *view) override;
 
-  virtual Surface *OnGetSurface(const AbstractView *view) const;
+  virtual Surface *GetSurface(const AbstractView *view) const;
 
   virtual void OnKeyboardKey(KeyEvent *event) final;
 
   virtual void OnSizeChanged(int width, int height) final;
 
  private:
-
-  void SetMainWidgetGeometry();
 
   Surface *main_surface_;
 
@@ -78,8 +76,6 @@ class Window : public AbstractWindow {
   MemoryPool main_pool_;
   Buffer main_buffer_;
   std::shared_ptr<Canvas> main_canvas_;
-
-  AbstractView *main_widget_; // This will be a layout
 
 };
 

@@ -43,7 +43,7 @@ class VideoView final : public AbstractView {
 
   virtual void OnUpdate(AbstractView *view);
 
-  virtual Surface *OnGetSurface(const AbstractView *view) const;
+  virtual Surface *GetSurface(const AbstractView *view) const;
 
   virtual void OnSizeChanged(int width, int height);
 

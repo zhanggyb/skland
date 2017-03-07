@@ -42,7 +42,7 @@ void VideoView::OnUpdate(AbstractView *view) {
 
 }
 
-Surface *VideoView::OnGetSurface(const AbstractView *view) const {
+Surface *VideoView::GetSurface(const AbstractView *view) const {
   return surface_;
 }
 

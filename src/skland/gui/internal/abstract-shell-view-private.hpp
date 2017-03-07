@@ -14,47 +14,44 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_
 
-#include <skland/gui/abstract-view.hpp>
-
-#include "abstract-event-handler-redraw-task.hpp"
+#include <skland/gui/abstract-shell-view.hpp>
 
 namespace skland {
 
-class AbstractShellView;
+struct AbstractShellView::Private {
 
-struct AbstractView::Private {
-
-  Private() = delete;
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  Private(AbstractView *view)
-      : previous(nullptr),
-        next(nullptr),
-        first_child(nullptr),
-        last_child(nullptr),
-        parent(nullptr),
-        children_count(0),
-        shell(nullptr) {}
+  Private()
+      : flags_(0),
+        shell_surface_(nullptr),
+        parent_(nullptr),
+        shell_frame_(nullptr),
+        client_view_(nullptr) {}
 
   ~Private() {}
 
-  AbstractView *previous;
-  AbstractView *next;
+  int flags_;
 
-  AbstractView *first_child;
-  AbstractView *last_child;
+  std::string title_;
+  std::string app_id_;
 
-  AbstractView *parent;
-  int children_count;
+  Size size_;
 
-  AbstractShellView *shell;
+  Surface *shell_surface_;
+
+  AbstractShellView *parent_;
+
+  AbstractShellFrame *shell_frame_;
+
+  AbstractView *client_view_;
 
 };
 
-}
+} // namespace skland
 
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_

@@ -74,11 +74,11 @@ void Theme::Load(const char *name) {
   }
 }
 
-AbstractWindowFrame *Theme::CreateWindowFrame() {
-  return static_cast<AbstractWindowFrame *>(kTheme->window_frame_create_handle_());
+AbstractShellFrame *Theme::CreateWindowFrame() {
+  return static_cast<AbstractShellFrame *>(kTheme->window_frame_create_handle_());
 }
 
-void Theme::DestroyWindowFrame(AbstractWindowFrame *window_frame) {
+void Theme::DestroyWindowFrame(AbstractShellFrame *window_frame) {
   kTheme->window_frame_destroy_handle_(window_frame);
 }
 

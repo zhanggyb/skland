@@ -24,7 +24,7 @@
 namespace skland {
 
 class Surface;
-class AbstractView;
+class AbstractEventHandler;
 class ShellSurface;
 
 /**
@@ -41,9 +41,9 @@ class PopupShellSurface {
 
  public:
 
-  static Surface *Create(ShellSurface *parent, AbstractView *view, const Margin &margin = Margin());
+  static Surface *Create(ShellSurface *parent, AbstractEventHandler *view, const Margin &margin = Margin());
 
-  PopupShellSurface(AbstractView *view, const Margin &margin = Margin());
+  PopupShellSurface(AbstractEventHandler *view, const Margin &margin = Margin());
 
  private:
 

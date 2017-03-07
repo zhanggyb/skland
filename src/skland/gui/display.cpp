@@ -19,7 +19,7 @@
 #include <skland/gui/display.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
-#include <skland/gui/abstract-window.hpp>
+#include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/surface.hpp>
 
 #include "internal/display-private.hpp"
@@ -46,12 +46,12 @@ Display::Display()
       inputs_count_(0) {
   data_.reset(new Private);
   cursors_.resize(kCursorBlank, nullptr);
-  AbstractView::InitializeRedrawTaskList();
+  AbstractEventHandler::InitializeRedrawTaskList();
   Surface::InitializeCommitTaskList();
 }
 
 Display::~Display() {
-  AbstractView::ClearRedrawTaskList();
+  AbstractEventHandler::ClearRedrawTaskList();
   Surface::ClearCommitTaskList();
 }
 

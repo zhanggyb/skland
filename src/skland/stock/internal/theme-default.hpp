@@ -19,8 +19,10 @@
 
 #include <skland/core/color.hpp>
 
-#include <skland/gui/abstract-window-frame.hpp>
+#include <skland/gui/abstract-shell-frame.hpp>
 #include <skland/gui/abstract-button.hpp>
+
+#include <skland/graphic/font.hpp>
 
 namespace skland {
 
@@ -46,8 +48,6 @@ class CloseButton final : public AbstractButton {
   void SetBackground(const Color &color);
 
  protected:
-
-  virtual void OnSizeChanged(int width, int height);
 
   virtual void OnDraw(const Context *context);
 
@@ -78,8 +78,6 @@ class MaximizeButton final : public AbstractButton {
 
  protected:
 
-  virtual void OnSizeChanged(int width, int height);
-
   virtual void OnDraw(const Context *context);
 
  private:
@@ -109,8 +107,6 @@ class MinimizeButton final : public AbstractButton {
 
  protected:
 
-  virtual void OnSizeChanged(int width, int height);
-
   virtual void OnDraw(const Context *context);
 
  private:
@@ -120,11 +116,68 @@ class MinimizeButton final : public AbstractButton {
 
 };
 
+class TitleBar final : public AbstractView {
+
+ public:
+
+  TitleBar();
+
+  virtual ~TitleBar();
+
+  virtual Size GetMinimalSize() const override;
+
+  virtual Size GetPreferredSize() const override;
+
+  virtual Size GetMaximalSize() const override;
+
+  void SetForeground(const Color &color);
+
+  void SetTitle(const std::string &title);
+
+  CloseButton *close_button() const { return close_button_; }
+
+  MaximizeButton *maximize_button() const { return maximize_button_; }
+
+  MinimizeButton *minimize_button() const { return minimize_button_; }
+
+ protected:
+
+  virtual void OnUpdate(AbstractView *view) final;
+
+  virtual void OnPositionChanged(int x, int y) override;
+
+  virtual void OnSizeChanged(int width, int height) override;
+
+  virtual void OnMouseEnter(MouseEvent *event) override;
+
+  virtual void OnMouseLeave(MouseEvent *event) override;
+
+  virtual void OnMouseMove(MouseEvent *event) override;
+
+  virtual void OnMouseButton(MouseEvent *event) override;
+
+  virtual void OnKeyboardKey(KeyEvent *event) override;
+
+  virtual void OnDraw(const Context *context) override;
+
+ private:
+
+  CloseButton *close_button_;
+  MaximizeButton *maximize_button_;
+  MinimizeButton *minimize_button_;
+
+  Font font_;
+
+  Color foreground_;
+
+  std::string title_;
+};
+
 /**
  * @ingroup stock_intern
  * @brief The default window frame
  */
-class WindowFrameDefault : public AbstractWindowFrame {
+class WindowFrameDefault : public AbstractShellFrame {
 
   WindowFrameDefault(const WindowFrameDefault &) = delete;
   WindowFrameDefault &operator=(const WindowFrameDefault &) = delete;
@@ -135,12 +188,14 @@ class WindowFrameDefault : public AbstractWindowFrame {
 
   virtual ~WindowFrameDefault();
 
+  virtual Rect GetContentGeometry() const final;
+
   static const int kButtonSize = 14;
   static const int kButtonSpace = 5;
 
  protected:
 
-  virtual void OnSetup() override;
+  virtual void OnSetup() final;
 
   virtual void OnResize(int width, int height) override;
 
@@ -158,17 +213,9 @@ class WindowFrameDefault : public AbstractWindowFrame {
     * |        |                 |
     * |        |                 |
     */
-  virtual int GetMouseLocation(const MouseEvent *event) const;
+  virtual int GetMouseLocation(const MouseEvent *event) const final;
 
   void DrawShadow(Canvas *canvas);
-
-  CloseButton *close_button() const { return close_button_; }
-
-  MaximizeButton *maximize_button() const { return maximize_button_; }
-
-  MinimizeButton *minimize_button() const { return minimize_button_; }
-
-  Label *title() const { return title_; }
 
  private:
 
@@ -178,17 +225,11 @@ class WindowFrameDefault : public AbstractWindowFrame {
 
   void OnMinimizeButtonClicked(__SLOT__);
 
-  void CreateWidgets();
+  int border_;
+  int title_bar_size_;
+  TitleBarPosition title_bar_position_;
 
-  void LayoutWidgets(int width, int height);
-
-  CloseButton *close_button_;
-
-  MaximizeButton *maximize_button_;
-
-  MinimizeButton *minimize_button_;
-
-  Label *title_;
+  TitleBar *title_bar_;
 
 };
 

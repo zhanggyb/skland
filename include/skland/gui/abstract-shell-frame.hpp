@@ -27,8 +27,8 @@
 namespace skland {
 
 class MouseEvent;
-class AbstractWindow;
-class AbstractWidget;
+class AbstractView;
+class AbstractShellView;
 class Context;
 
 /**
@@ -37,12 +37,12 @@ class Context;
  *
  * A window frame provides decoration on a window, and draw background and border.
  */
-class AbstractWindowFrame : public Trackable {
+class AbstractShellFrame : public Trackable {
 
-  friend class AbstractWindow;
+  friend class AbstractShellView;
 
-  AbstractWindowFrame(const AbstractWindowFrame &) = delete;
-  AbstractWindowFrame &operator=(const AbstractWindowFrame &) = delete;
+  AbstractShellFrame(const AbstractShellFrame &) = delete;
+  AbstractShellFrame &operator=(const AbstractShellFrame &) = delete;
 
  public:
 
@@ -54,31 +54,17 @@ class AbstractWindowFrame : public Trackable {
     kTitleBarLeft
   };
 
-  AbstractWindowFrame();
+  AbstractShellFrame();
 
-  virtual ~AbstractWindowFrame();
+  virtual ~AbstractShellFrame();
 
-  Rect GetClientGeometry() const;
+  void SetTitleBar(AbstractView *view);
 
-  AbstractWindow *window() const {
-    return window_;
-  }
+  virtual Rect GetContentGeometry() const = 0;
 
-  int border() const {
-    return border_;
-  }
+  AbstractView *GetTitleView() const { return title_view_; }
 
-  TitleBarPosition title_bar_position() const {
-    return title_bar_position_;
-  }
-
-  int title_bar_size() const {
-    return title_bar_size_;
-  }
-
-  SignalRef<int> window_action() {
-    return window_action_;
-  }
+  SignalRef<int> window_action() { return window_action_; }
 
   /** The margin within which the cursor should switch to resizing,
    * the values SHOULD smaller than shadow margin */
@@ -86,6 +72,9 @@ class AbstractWindowFrame : public Trackable {
 
  protected:
 
+  /**
+   * @brief Called when this shell frame is setup in shell view
+   */
   virtual void OnSetup() = 0;
 
   virtual void OnResize(int width, int height) = 0;
@@ -94,31 +83,15 @@ class AbstractWindowFrame : public Trackable {
 
   virtual int GetMouseLocation(const MouseEvent *event) const = 0;
 
-  void AddWidget(AbstractWidget *widget, int pos = 0);
+  void EmitAction(int action) { window_action_.Emit(action); }
 
-  void EmitAction(int action) {
-    window_action_.Emit(action);
-  }
-
-  void set_border(int border) {
-    border_ = border;
-  }
-
-  void set_title_bar_size(int title_bar_size) {
-    title_bar_size_ = title_bar_size;
-  }
-
-  void set_title_bar_position(TitleBarPosition position) {
-    title_bar_position_ = position;
-  }
+  AbstractShellView *shell_view() const { return shell_view_; }
 
  private:
 
-  AbstractWindow *window_;
+  AbstractShellView *shell_view_;
 
-  int border_;
-  int title_bar_size_;
-  TitleBarPosition title_bar_position_;
+  AbstractView *title_view_;
 
   Signal<int> window_action_;
 };

@@ -21,7 +21,7 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
-#include <skland/gui/abstract-window.hpp>
+#include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/label.hpp>
 #include <skland/gui/context.hpp>
 
@@ -40,51 +40,47 @@ class WindowFrameDark final : public WindowFrameDefault {
  public:
 
   WindowFrameDark()
-      : WindowFrameDefault() {}
+      : WindowFrameDefault() {
+    TitleBar *title_bar = static_cast<TitleBar *>(this->GetTitleView());
+    title_bar->SetForeground(0xFF999999);
+    title_bar->close_button()->SetForeground(0xFF999999);
+    title_bar->close_button()->SetBackground(0xFF444444);
+    title_bar->maximize_button()->SetForeground(0xFF999999);
+    title_bar->maximize_button()->SetBackground(0xFF444444);
+    title_bar->minimize_button()->SetForeground(0xFF999999);
+    title_bar->minimize_button()->SetBackground(0xFF444444);
+  }
 
   virtual ~WindowFrameDark() {}
 
  protected:
 
-  virtual void OnSetup();
-
   virtual void OnDraw(const Context *context);
 
 };
-
-void WindowFrameDark::OnSetup() {
-  WindowFrameDefault::OnSetup();
-
-  title()->SetForeground(0xFF999999);
-  close_button()->SetForeground(0xFF999999);
-  close_button()->SetBackground(0xFF444444);
-  maximize_button()->SetForeground(0xFF999999);
-  maximize_button()->SetBackground(0xFF444444);
-  minimize_button()->SetForeground(0xFF999999);
-  minimize_button()->SetBackground(0xFF444444);
-}
 
 void WindowFrameDark::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Clear();
 
   Path path;
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, shell_view()->GetSize().width, shell_view()->GetSize().height);
 
   // Drop shadow:
-  if ((!window()->IsMaximized()) || (!window()->IsFullscreen())) {
+  if ((!shell_view()->IsMaximized()) || (!shell_view()->IsFullscreen())) {
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right
         4.f, 4.f, // bottom-right
         4.f, 4.f  // bottom-left
     };
-    path.AddRoundRect(window()->geometry(), radii);
+    path.AddRoundRect(geometry, radii);
     canvas->Save();
     canvas->ClipPath(path, kClipDifference, true);
     DrawShadow(canvas.get());
     canvas->Restore();
   } else {
-    path.AddRect(window()->geometry());
+    path.AddRect(geometry);
   }
 
   // Fill color:
@@ -97,7 +93,7 @@ void WindowFrameDark::OnDraw(const Context *context) {
   paint.SetColor(0xEF303030);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(), paint);
+  canvas->DrawRect(GetContentGeometry(), paint);
   canvas->Restore();
 
   canvas->Flush();

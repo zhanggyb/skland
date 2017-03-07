@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   Label *label = new Label("Hello Wayland!");
   label->SetForeground(0xFF777777);
   label->SetFont(skland::Font(Typeface::kBold, 24.f));
-  win->SetMainWidget(label);
+  win->SetContentView(label);
 
   win->Show();
 

@@ -14,29 +14,28 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
-#define SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_EVENT_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_EVENT_TASK_HPP_
 
+#include <skland/gui/abstract-event-handler.hpp>
 #include <skland/gui/task.hpp>
 
 namespace skland {
 
-class Surface;
+SKLAND_NO_EXPORT struct AbstractEventHandler::EventTask : public Task {
 
-struct CommitTask : public Task {
-  CommitTask(const CommitTask &) = delete;
-  CommitTask &operator=(const CommitTask &) = delete;
+  EventTask(const EventTask &) = delete;
+  EventTask &operator=(const EventTask &) = delete;
 
-  CommitTask(Surface *surface)
-      : Task(), surface(surface) {}
+  EventTask(AbstractEventHandler *event_handler = nullptr)
+      : Task(), event_handler(event_handler) {}
 
-  virtual ~CommitTask() {}
+  virtual ~EventTask() {}
 
-  virtual void Run() const;
+  AbstractEventHandler *event_handler;
 
-  Surface *surface;
 };
 
 }
 
-#endif // SKLAND_GUI_INTERNAL_COMMIT_TASK_HPP_
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_EVENT_TASK_HPP_

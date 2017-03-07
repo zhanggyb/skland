@@ -28,8 +28,5 @@
 #include "gui/application.hpp"
 #include "gui/display.hpp"
 #include "gui/output.hpp"
-#include "gui/abstract-widget.hpp"
-#include "gui/abstract-window.hpp"
-#include "skland/gui/main-window.hpp"
 
 #endif // SKLAND_SKLAND_HPP_

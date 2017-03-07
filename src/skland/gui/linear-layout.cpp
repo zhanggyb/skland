@@ -59,7 +59,6 @@ Size LinearLayout::GetPreferredSize() const {
 }
 
 void LinearLayout::OnSizeChanged(int width, int height) {
-  resize(width, height);
   Update();
 }
 

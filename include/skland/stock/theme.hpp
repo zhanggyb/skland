@@ -28,7 +28,7 @@ namespace skland {
 
 // Forward declaration
 class Application;
-class AbstractWindowFrame;
+class AbstractShellFrame;
 
 struct ColorScheme {
   ColorD outline;
@@ -61,9 +61,9 @@ class Theme {
 
   static void Load(const char *name = nullptr);
 
-  static AbstractWindowFrame *CreateWindowFrame();
+  static AbstractShellFrame *CreateWindowFrame();
 
-  static void DestroyWindowFrame(AbstractWindowFrame *window_frame);
+  static void DestroyWindowFrame(AbstractShellFrame *window_frame);
 
   static inline int shadow_radius() {
     return kTheme->shadow_radius_;

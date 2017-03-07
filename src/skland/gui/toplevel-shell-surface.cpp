@@ -20,8 +20,8 @@
 
 namespace skland {
 
-Surface *ToplevelShellSurface::Create(AbstractView *view, const Margin &margin) {
-  Surface *surface = ShellSurface::Create(view, margin);
+Surface *ToplevelShellSurface::Create(AbstractEventHandler *event_handler, const Margin &margin) {
+  Surface *surface = ShellSurface::Create(event_handler, margin);
   ShellSurface *shell_surface = ShellSurface::Get(surface);
   shell_surface->role_.toplevel_shell_surface = new ToplevelShellSurface(shell_surface);
   return surface;

@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-#include "redraw-task-proxy.hpp"
-
-#include "redraw-task.hpp"
-#include "abstract-view-private.hpp"
+#include "surface-commit-task.hpp"
 
 namespace skland {
 
-void RedrawTaskProxy::SetContext(const Context &context) {
-  view_->p_->redraw_task.context = context;
-}
-
-void RedrawTaskProxy::MoveToHead() {
-  AbstractView::kRedrawTaskHead.PushBack(&view_->p_->redraw_task);
-}
-
-void RedrawTaskProxy::MoveToTail() {
-  AbstractView::kRedrawTaskTail.PushFront(&view_->p_->redraw_task);
+void Surface::CommitTask::Run() const {
+  surface->wl_surface_.Commit();
 }
 
 }

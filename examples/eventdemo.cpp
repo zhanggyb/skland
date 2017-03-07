@@ -48,8 +48,11 @@ class SimpleWidget : public AbstractWidget {
 
  protected:
 
+  virtual void OnPositionChanged(int x, int y) override {
+    Update();
+  }
+
   virtual void OnSizeChanged(int width, int height) override {
-    resize(width, height);
     Update();
   }
 
@@ -98,7 +101,7 @@ int main(int argc, char *argv[]) {
   win->SetAppId("Event-Demo");
 
   SimpleWidget *widget = new SimpleWidget;
-  win->SetMainWidget(widget);
+  win->SetContentView(widget);
 
   win->Show();
 

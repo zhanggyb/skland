@@ -17,26 +17,16 @@
 #ifndef SKLAND_GUI_ABSTRACT_VIEW_HPP_
 #define SKLAND_GUI_ABSTRACT_VIEW_HPP_
 
-#include "../core/defines.hpp"
-#include "../core/sigcxx.hpp"
+#include "abstract-event-handler.hpp"
+
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
-
-#include "task.hpp"
 
 #include <memory>
 
 namespace skland {
 
-// Forward declarations
-class Application;
-class Display;
-class Input;
-class KeyEvent;
-class MouseEvent;
-class TouchEvent;
-class Surface;
-class Context;
+class AbstractShellView;
 
 /**
  * @ingroup gui
@@ -58,18 +48,15 @@ class Context;
  * then it shares the surface with others which is managed in one of
  * parent views.
  *
- * @see AbstractWindow
+ * An AbstractView object SHOULD always be created by new operator and MUST be
+ * destroyed by Destroy() method.
+ *
+ * @see AbstractEventHandler
  * @see Surface
  */
-SKLAND_EXPORT class AbstractView : public Trackable {
+SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
-  friend class Application;
-  friend class Display;
-  friend class Input;
-
-  friend struct RedrawTask;
-  friend class RedrawTaskProxy;
-  friend class MouseTaskProxy;
+  friend class AbstractShellView;
 
   AbstractView(const AbstractView &) = delete;
   AbstractView &operator=(const AbstractView &) = delete;
@@ -90,11 +77,6 @@ SKLAND_EXPORT class AbstractView : public Trackable {
    * @brief Create a view by given size
    */
   AbstractView(int width, int height);
-
-  /**
-   * @brief Destructor
-   */
-  virtual ~AbstractView();
 
   void MoveTo(int x, int y);
 
@@ -133,7 +115,21 @@ SKLAND_EXPORT class AbstractView : public Trackable {
 
   virtual Size GetMaximalSize() const = 0;
 
+  /**
+   * @brief Destroy and delete this object
+   *
+   * This method will emit an 'destroyed' signal before do some clean up work.
+   */
+  void Destroy();
+
+  SignalRef<AbstractView *> destroyed() { return destroyed_; }
+
  protected:
+
+  /**
+   * @brief Destructor
+   */
+  virtual ~AbstractView();
 
   AbstractView *GetChildAt(int index) const;
 
@@ -173,9 +169,17 @@ SKLAND_EXPORT class AbstractView : public Trackable {
 
   void ClearChildren();
 
-  virtual void OnAddedToParent();
+  virtual void OnAddChildView(AbstractView *view);
 
-  virtual void OnRemovedFromParent(AbstractView *original_parent);
+  virtual void OnRemoveChildView(AbstractView *view);
+
+  virtual void OnAddedToParentView();
+
+  virtual void OnRemovedFromParentView(AbstractView *original_parent);
+
+  virtual void OnAttachedToShellView();
+
+  virtual void OnDetachedFromShellView(AbstractShellView *shell_view);
 
   static bool SwapIndex(AbstractView *object1, AbstractView *object2);
 
@@ -200,28 +204,18 @@ SKLAND_EXPORT class AbstractView : public Trackable {
    * @brief A view request an update
    * @param view This view or a sub view in hierachy
    */
-  virtual void OnUpdate(AbstractView *view);
+  virtual void OnUpdate(AbstractView *view) override;
 
   /**
    * @brief Get surface for the given view
    * @param view A view object, it is always this view or a sub view in hierachy
    * @return A pointer to a surface or nullptr
    */
-  virtual Surface *OnGetSurface(const AbstractView *view) const;
+  virtual Surface *GetSurface(const AbstractView *view) const;
+
+  virtual void OnPositionChanged(int x, int y) = 0;
 
   virtual void OnSizeChanged(int width, int height) = 0;
-
-  virtual void OnMouseEnter(MouseEvent *event) = 0;
-
-  virtual void OnMouseLeave(MouseEvent *event) = 0;
-
-  virtual void OnMouseMove(MouseEvent *event) = 0;
-
-  virtual void OnMouseButton(MouseEvent *event) = 0;
-
-  virtual void OnKeyboardKey(KeyEvent *event) = 0;
-
-  virtual void OnDraw(const Context *context) = 0;
 
   void TrackMouseMotion(MouseEvent *event);
 
@@ -239,14 +233,6 @@ SKLAND_EXPORT class AbstractView : public Trackable {
     geometry_.Resize(width, height);
   }
 
-  /**
-   * @brief Get the surface on which this view renders
-   * @return A surface object or nullptr
-   */
-  static Surface *GetSurface(const AbstractView *view);
-
-  static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
-
  private:
 
   struct Private;
@@ -257,18 +243,7 @@ SKLAND_EXPORT class AbstractView : public Trackable {
 
   std::unique_ptr<Private> p_;
 
-  /**
-   * @brief Initialize the idle task list
-   */
-  static void InitializeRedrawTaskList();
-
-  /**
-   * @brief Destroy the redraw task list
-   */
-  static void ClearRedrawTaskList();
-
-  static Task kRedrawTaskHead;
-  static Task kRedrawTaskTail;
+  Signal<AbstractView *> destroyed_;
 
 };
 

@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-#include "redraw-task.hpp"
+#include "abstract-event-handler-redraw-task.hpp"
 
-#include <skland/gui/abstract-view.hpp>
-#include "abstract-view-private.hpp"
+#include "abstract-event-handler-private.hpp"
 
 namespace skland {
 
-void RedrawTask::Run() const {
-  view->OnDraw(&context);
-  view->visible_ = true;
+void AbstractEventHandler::RedrawTask::Run() const {
+  event_handler->OnDraw(&context);
+//  event_handler->visible_ = true;
 
-  if (view->p_->is_damaged_) {
-    context.surface()->Damage(view->p_->damaged_region_.x(),
-                              view->p_->damaged_region_.y(),
-                              view->p_->damaged_region_.width(),
-                              view->p_->damaged_region_.height());
-    view->p_->is_damaged_ = false;
+  if (event_handler->p_->is_damaged_) {
+    context.surface()->Damage(event_handler->p_->damaged_region_.x(),
+                              event_handler->p_->damaged_region_.y(),
+                              event_handler->p_->damaged_region_.width(),
+                              event_handler->p_->damaged_region_.height());
+    event_handler->p_->is_damaged_ = false;
   }
 }
 

@@ -20,12 +20,19 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
-#include <skland/gui/label.hpp>
 #include <skland/gui/mouse-event.hpp>
-#include <skland/gui/abstract-window.hpp>
+#include <skland/gui/key-event.hpp>
+#include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/context.hpp>
 
+#include <skland/stock/theme.hpp>
+
+#include "../../gui/internal/abstract-event-handler-redraw-task-iterator.hpp"
+
 #include "SkCanvas.h"
+//#include "SkTypeface.h"
+//#include "SkPaint.h"
+#include "SkTextBox.h"
 
 namespace skland {
 
@@ -37,6 +44,7 @@ CloseButton::CloseButton()
 }
 
 CloseButton::~CloseButton() {
+
 }
 
 Size CloseButton::GetPreferredSize() const {
@@ -51,10 +59,6 @@ void CloseButton::SetForeground(const Color &color) {
 void CloseButton::SetBackground(const Color &color) {
   background_ = color;
   Update();
-}
-
-void CloseButton::OnSizeChanged(int /* width */, int /* height */) {
-
 }
 
 void CloseButton::OnDraw(const Context *context) {
@@ -118,10 +122,6 @@ Size MaximizeButton::GetPreferredSize() const {
   return Size(WindowFrameDefault::kButtonSize, WindowFrameDefault::kButtonSize);
 }
 
-void MaximizeButton::OnSizeChanged(int /* width */, int /* height */) {
-
-}
-
 void MaximizeButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
@@ -183,10 +183,6 @@ void MinimizeButton::SetBackground(const Color &color) {
   Update();
 }
 
-void MinimizeButton::OnSizeChanged(int /* width */, int /* height */) {
-
-}
-
 void MinimizeButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
@@ -222,75 +218,214 @@ void MinimizeButton::OnDraw(const Context *context) {
 
 // -------
 
-WindowFrameDefault::WindowFrameDefault()
-    : AbstractWindowFrame(),
+TitleBar::TitleBar()
+    : AbstractView(),
       close_button_(nullptr),
       maximize_button_(nullptr),
       minimize_button_(nullptr),
-      title_(nullptr) {
-  set_border(0);
-  set_title_bar_size(22);
-  set_title_bar_position(kTitleBarTop);
+      font_(Typeface::kBold),
+      foreground_(0xFF444444) {
+  close_button_ = new CloseButton;
+  maximize_button_ = new MaximizeButton;
+  minimize_button_ = new MinimizeButton;
+
+  PushBackChild(minimize_button_);
+  PushBackChild(maximize_button_);
+  PushBackChild(close_button_);
+}
+
+TitleBar::~TitleBar() {
+
+}
+
+Size TitleBar::GetMinimalSize() const {
+  return Size(0, 0);
+}
+
+Size TitleBar::GetPreferredSize() const {
+  return Size(240, 22);
+}
+
+Size TitleBar::GetMaximalSize() const {
+  return Size(65536, 65536);
+}
+
+void TitleBar::SetForeground(const Color &color) {
+  foreground_ = color;
+  Update();
+}
+
+void TitleBar::SetTitle(const std::string &title) {
+  title_ = title;
+  Update();
+}
+
+void TitleBar::OnUpdate(AbstractView *view) {
+  RedrawTaskIterator it(this);
+
+  if (it.IsLinked()) {
+    DBG_ASSERT(it.context().canvas());
+    if (view == this) return;
+
+    AbstractView::OnUpdate(close_button_);
+    AbstractView::OnUpdate(maximize_button_);
+    AbstractView::OnUpdate(minimize_button_);
+  } else {
+    AbstractView::OnUpdate(view);
+
+    if (view == this && it.IsLinked()) {
+      DBG_ASSERT(it.context().canvas());
+      AbstractView::OnUpdate(close_button_);
+      AbstractView::OnUpdate(maximize_button_);
+      AbstractView::OnUpdate(minimize_button_);
+    }
+  }
+}
+
+void TitleBar::OnPositionChanged(int x, int y) {
+  Update();
+
+  y = (height() - WindowFrameDefault::kButtonSize) / 2;
+  x = WindowFrameDefault::kButtonSpace;
+  close_button_->MoveTo(x, y);
+//  close_button_->Update();
+
+  x += close_button_->width() + WindowFrameDefault::kButtonSpace;
+  maximize_button_->MoveTo(x, y);
+//  maximize_button_->Update();
+
+  x += maximize_button_->width() + WindowFrameDefault::kButtonSpace;
+  minimize_button_->MoveTo(x, y);
+//  minimize_button_->Update();
+}
+
+void TitleBar::OnSizeChanged(int width, int height) {
+  Update();
+
+  int y = (height - WindowFrameDefault::kButtonSize) / 2;
+  int x = WindowFrameDefault::kButtonSpace;
+  close_button_->MoveTo(x, y);
+  close_button_->Update();
+
+  x += close_button_->width() + WindowFrameDefault::kButtonSpace;
+  maximize_button_->MoveTo(x, y);
+  maximize_button_->Update();
+
+  x += maximize_button_->width() + WindowFrameDefault::kButtonSpace;
+  minimize_button_->MoveTo(x, y);
+  minimize_button_->Update();
+}
+
+void TitleBar::OnMouseEnter(MouseEvent *event) {
+  event->Ignore();
+}
+
+void TitleBar::OnMouseLeave(MouseEvent *event) {
+  event->Ignore();
+}
+
+void TitleBar::OnMouseMove(MouseEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnMouseButton(MouseEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnKeyboardKey(KeyEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnDraw(const Context *context) {
+  Paint paint;
+
+  paint.SetColor(foreground_);
+  paint.SetAntiAlias(true);
+  paint.SetStyle(Paint::kStyleFill);
+  paint.SetFont(font_);
+  paint.SetTextSize(font_.GetSize());
+
+  float text_width = paint.MeasureText(title_.c_str(), title_.length());
+
+  SkTextBox text_box;
+  // Put the text at the center
+  text_box.setBox((geometry().l + geometry().r - text_width) / 2.f,
+                  geometry().t + 1.f, // move down a little for better look
+                  (geometry().r - geometry().l + text_width) / 2.f,
+                  geometry().b);
+  text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
+  text_box.setText(title_.c_str(), title_.length(), *paint.sk_paint());
+  text_box.draw(context->canvas()->sk_canvas());
+}
+
+// -------
+
+WindowFrameDefault::WindowFrameDefault()
+    : AbstractShellFrame(),
+      border_(0),
+      title_bar_size_(22),
+      title_bar_position_(kTitleBarTop),
+      title_bar_(nullptr) {
+  title_bar_ = new TitleBar;
+  SetTitleBar(title_bar_);
 }
 
 WindowFrameDefault::~WindowFrameDefault() {
-  delete title_;
-  delete maximize_button_;
-  delete minimize_button_;
-  delete close_button_;
+
+}
+
+Rect WindowFrameDefault::GetContentGeometry() const {
+  int x = border_,
+      y = border_,
+      w = shell_view()->GetSize().width - 2 * border_,
+      h = shell_view()->GetSize().height - 2 * border_;
+
+  switch (title_bar_position_) {
+    case kTitleBarLeft: {
+      x += title_bar_size_ - border_;
+      break;
+    }
+    case kTitleBarRight: {
+      w -= title_bar_size_ + border_;
+      break;
+    }
+    case kTitleBarBottom: {
+      h -= title_bar_size_ + border_;
+      break;
+    }
+    case kTitleBarTop:
+    default: {
+      y += title_bar_size_ - border_;
+      h -= title_bar_size_ - border_;
+      break;
+    }
+  }
+
+  return Rect::FromXYWH(x, y, w, h);
 }
 
 void WindowFrameDefault::OnCloseButtonClicked(SLOT /* slot */) {
-  EmitAction(AbstractWindow::kActionClose);
+  EmitAction(AbstractShellView::kActionClose);
 }
 
 void WindowFrameDefault::OnMaximizeButtonClicked(SLOT /* slot */) {
-  EmitAction(AbstractWindow::kActionMaximize);
+  EmitAction(AbstractShellView::kActionMaximize);
 }
 
 void WindowFrameDefault::OnMinimizeButtonClicked(SLOT /* slot */) {
-  EmitAction(AbstractWindow::kActionMinimize);
+  EmitAction(AbstractShellView::kActionMinimize);
 }
 
-void WindowFrameDefault::CreateWidgets() {
-  close_button_ = new CloseButton;
-  close_button_->clicked().Connect(this, &WindowFrameDefault::OnCloseButtonClicked);
-
-  minimize_button_ = new MinimizeButton;
-  minimize_button_->clicked().Connect(this, &WindowFrameDefault::OnMinimizeButtonClicked);
-
-  maximize_button_ = new MaximizeButton;
-  maximize_button_->clicked().Connect(this, &WindowFrameDefault::OnMaximizeButtonClicked);
-
-  title_ = new Label(window()->title());
-  title_->SetForeground(0xFF444444);
-  title_->SetFont(Font(Typeface::kBold));
-
-  AddWidget(title_);  // put the title below other widgets
-  AddWidget(close_button_);
-  AddWidget(maximize_button_);
-  AddWidget(minimize_button_);
-
-  LayoutWidgets(window()->width(), window()->height());
+void WindowFrameDefault::OnSetup() {
+  title_bar_->close_button()->clicked().Connect(this, &WindowFrameDefault::OnCloseButtonClicked);
+  title_bar_->maximize_button()->clicked().Connect(this, &WindowFrameDefault::OnMaximizeButtonClicked);
+  title_bar_->minimize_button()->clicked().Connect(this, &WindowFrameDefault::OnMinimizeButtonClicked);
+  title_bar_->SetTitle(shell_view()->GetTitle());
 }
 
 void WindowFrameDefault::OnResize(int width, int height) {
-  LayoutWidgets(width, height);
-}
-
-void WindowFrameDefault::LayoutWidgets(int width, int height) {
-  title_->MoveTo(0, 0);
-  title_->Resize(window()->width(), title_bar_size());
-
-  int y = (title_bar_size() - kButtonSize) / 2;
-  int x = kButtonSpace;
-  close_button_->MoveTo(x, y);
-
-  x += close_button_->width() + kButtonSpace;
-  maximize_button_->MoveTo(x, y);
-
-  x += maximize_button_->width() + kButtonSpace;
-  minimize_button_->MoveTo(x, y);
+  title_bar_->MoveTo(0, 0);
+  title_bar_->Resize(shell_view()->GetSize().width, title_bar_size_);
 }
 
 void WindowFrameDefault::OnDraw(const Context *context) {
@@ -298,22 +433,23 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, shell_view()->GetSize().width, shell_view()->GetSize().height);
 
   // Drop shadow:
-  if ((!window()->IsMaximized()) || (!window()->IsFullscreen())) {
+  if ((!shell_view()->IsMaximized()) || (!shell_view()->IsFullscreen())) {
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right
         4.f, 4.f, // bottom-right
         4.f, 4.f  // bottom-left
     };
-    path.AddRoundRect(window()->geometry(), radii);
+    path.AddRoundRect(geometry, radii);
     canvas->Save();
     canvas->ClipPath(path, kClipDifference, true);
     DrawShadow(canvas.get());
     canvas->Restore();
   } else {
-    path.AddRect(window()->geometry());
+    path.AddRect(geometry);
   }
 
   // Fill color:
@@ -326,14 +462,10 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   paint.SetColor(0xEFE0E0E0);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(), paint);
+  canvas->DrawRect(GetContentGeometry(), paint);
   canvas->Restore();
 
   canvas->Flush();
-}
-
-void WindowFrameDefault::OnSetup() {
-  CreateWidgets();
 }
 
 int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
@@ -346,9 +478,9 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     hlocation = kExterior;
   else if (x < Theme::shadow_margin().left + kResizingMargin.left)
     hlocation = kResizeLeft;
-  else if (x < Theme::shadow_margin().left + window()->geometry().width() - kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + shell_view()->GetSize().width - kResizingMargin.right)
     hlocation = kInterior;
-  else if (x < Theme::shadow_margin().left + window()->geometry().width() + kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + shell_view()->GetSize().width + kResizingMargin.right)
     hlocation = kResizeRight;
   else
     hlocation = kExterior;
@@ -357,9 +489,9 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     vlocation = kExterior;
   else if (y < Theme::shadow_margin().top + kResizingMargin.top)
     vlocation = kResizeTop;
-  else if (y < Theme::shadow_margin().top + window()->geometry().height() - kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + shell_view()->GetSize().height - kResizingMargin.bottom)
     vlocation = kInterior;
-  else if (y < Theme::shadow_margin().top + window()->geometry().height() + kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + shell_view()->GetSize().height + kResizingMargin.bottom)
     vlocation = kResizeBottom;
   else
     vlocation = kExterior;
@@ -369,7 +501,7 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     location = kExterior;
 
   if (location == kInterior &&
-      y < Theme::shadow_margin().top + title_bar_size())
+      y < Theme::shadow_margin().top + title_bar_size_)
     location = kTitleBar;
   else if (location == kInterior)
     location = kClientArea;
@@ -382,7 +514,7 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   float offset_x = Theme::shadow_offset_x();
   float offset_y = Theme::shadow_offset_y();
 
-  if (!window()->IsFocused()) {
+  if (!shell_view()->IsFocused()) {
     rad = (int) rad / 3;
     offset_x = (int) offset_x / 3;
     offset_y = (int) offset_y / 3;
@@ -405,14 +537,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
                                     250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
-                                    window()->width() - 2 * rad, 2 * rad),
+                                    shell_view()->GetSize().width - 2 * rad, 2 * rad),
                    nullptr);
 
   // top-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
                                     250, 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(window()->width() - rad + offset_x, -rad + offset_y,
+                   SkRect::MakeXYWH(shell_view()->GetSize().width - rad + offset_x, -rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -421,14 +553,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
-                                    2 * rad, window()->height() - 2 * rad),
+                                    2 * rad, shell_view()->GetSize().height - 2 * rad),
                    nullptr);
 
   // bottom-left
   c->drawImageRect(image,
                    SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(-rad + offset_x, window()->height() - rad + offset_y,
+                   SkRect::MakeXYWH(-rad + offset_x, shell_view()->GetSize().height - rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -436,16 +568,16 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250 - 2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(rad + offset_x, window()->height() - rad + offset_y,
-                                    window()->width() - 2 * rad, 2 * rad),
+                   SkRect::MakeXYWH(rad + offset_x, shell_view()->GetSize().height - rad + offset_y,
+                                    shell_view()->GetSize().width - 2 * rad, 2 * rad),
                    nullptr);
 
   // bottom-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250, 250),
-                   SkRect::MakeXYWH(window()->width() - rad + offset_x,
-                                    window()->height() - rad + offset_y,
+                   SkRect::MakeXYWH(shell_view()->GetSize().width - rad + offset_x,
+                                    shell_view()->GetSize().height - rad + offset_y,
                                     2 * rad,
                                     2 * rad),
                    nullptr);
@@ -454,8 +586,8 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
                                     250, 250 - 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(window()->width() - rad + offset_x, rad + offset_y,
-                                    2 * rad, window()->height() - 2 * rad),
+                   SkRect::MakeXYWH(shell_view()->GetSize().width - rad + offset_x, rad + offset_y,
+                                    2 * rad, shell_view()->GetSize().height - 2 * rad),
                    nullptr);
 
 }

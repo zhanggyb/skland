@@ -44,8 +44,11 @@ class ShmWidget : public AbstractWidget {
 
  protected:
 
+  virtual void OnPositionChanged(int x, int y) override {
+    Update();
+  }
+
   virtual void OnSizeChanged(int width, int height) override {
-    resize(width, height);
     radius_ = clamp(std::min(geometry().width(), geometry().height()) / 2.f - 50.f, 50.f, 200.f);
     Update();
   }
@@ -137,7 +140,7 @@ int main(int argc, char *argv[]) {
   win->SetAppId("Simple-Shm");
 
   ShmWidget *widget = new ShmWidget;
-  win->SetMainWidget(widget);
+  win->SetContentView(widget);
 
   win->Show();
 

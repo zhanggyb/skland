@@ -14,35 +14,28 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_REDRAW_TASK_PROXY_HPP_
-#define SKLAND_GUI_INTERNAL_REDRAW_TASK_PROXY_HPP_
+#ifndef SKLAND_GUI_INTERNAL_SURFACE_COMMIT_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_SURFACE_COMMIT_TASK_HPP_
+
+#include <skland/gui/surface.hpp>
+#include <skland/gui/task.hpp>
 
 namespace skland {
 
-class AbstractView;
-class Context;
+SKLAND_NO_EXPORT struct Surface::CommitTask : public Task {
+  CommitTask(const CommitTask &) = delete;
+  CommitTask &operator=(const CommitTask &) = delete;
 
-class RedrawTaskProxy {
+  CommitTask(Surface *surface)
+      : Task(), surface(surface) {}
 
- public:
+  virtual ~CommitTask() {}
 
-  RedrawTaskProxy(AbstractView *view)
-      : view_(view) {}
+  virtual void Run() const;
 
-  ~RedrawTaskProxy() {}
-
-  void SetContext(const Context& context);
-
-  void MoveToHead();
-
-  void MoveToTail();
-
- private:
-
-  AbstractView *view_;
-
+  Surface *surface;
 };
 
-} // namespace skland
+}
 
-#endif //SKLAND_REDRAWTASKHELPER_HPP
+#endif // SKLAND_GUI_INTERNAL_SURFACE_COMMIT_TASK_HPP_

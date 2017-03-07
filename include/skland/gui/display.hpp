@@ -36,8 +36,6 @@ namespace skland {
 class Output;
 class Input;
 
-class DisplayProxy;
-
 struct Global {
   uint32_t id;
   std::string interface;
@@ -53,9 +51,10 @@ class Display : public Object {
   friend class Application;
   friend class Output;
   friend class Input;
-  friend class DisplayProxy;
 
  public:
+
+  class Registry;
 
   static const Output *GetOutputAt(int index = 0);
 

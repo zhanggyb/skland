@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_DISPLAY_PROXY_HPP_
-#define SKLAND_GUI_INTERNAL_DISPLAY_PROXY_HPP_
+#ifndef SKLAND_GUI_INTERNAL_DISPLAY_REGISTRY_HPP_
+#define SKLAND_GUI_INTERNAL_DISPLAY_REGISTRY_HPP_
 
 #include <skland/gui/display.hpp>
 #include "display-private.hpp"
 
 namespace skland {
 
-class DisplayProxy {
+class Display::Registry {
 
-  DisplayProxy(const DisplayProxy &) = delete;
-  DisplayProxy &operator=(const DisplayProxy &) = delete;
+  Registry(const Registry &) = delete;
+  Registry &operator=(const Registry &) = delete;
 
  public:
 
-  DisplayProxy()
+  Registry()
       : display_(nullptr) {
     display_ = Display::kDisplay;
   }
 
-  ~DisplayProxy() {}
+  ~Registry() {}
 
   const wayland::Display &wl_display() const {
     return display_->data_->wl_display;
