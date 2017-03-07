@@ -54,10 +54,10 @@ void WindowFrameLight::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, shell_view()->GetSize().width, shell_view()->GetSize().height);
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetShellView()->GetSize().width, GetShellView()->GetSize().height);
 
   // Drop shadow:
-  if ((!shell_view()->IsMaximized()) || (!shell_view()->IsFullscreen())) {
+  if ((!GetShellView()->IsMaximized()) || (!GetShellView()->IsFullscreen())) {
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right
@@ -83,7 +83,7 @@ void WindowFrameLight::OnDraw(const Context *context) {
   paint.SetColor(0xEFE0E0E0);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetContentGeometry(), paint);
+  canvas->DrawRect(GetClientGeometry(), paint);
   canvas->Restore();
 
   canvas->Flush();

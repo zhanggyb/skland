@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_EGL_WIDGET_HPP_
 #define SKLAND_GUI_EGL_WIDGET_HPP_
 
-#include "abstract-widget.hpp"
+#include "abstract-view.hpp"
 
 #include "../wayland/callback.hpp"
 
@@ -30,7 +30,7 @@ class EGLSurface;
  * @ingroup gui
  * @brief A widget use an EGL surface for 3D scene
  */
-class EGLWidget : public AbstractWidget {
+class EGLWidget : public AbstractView {
 
   EGLWidget(const EGLWidget &) = delete;
   EGLWidget &operator=(const EGLWidget &) = delete;

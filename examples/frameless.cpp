@@ -16,7 +16,7 @@
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
-#include <skland/gui/abstract-widget.hpp>
+#include <skland/gui/abstract-view.hpp>
 
 #include <skland/gui/context.hpp>
 #include <skland/graphic/canvas.hpp>
@@ -27,12 +27,12 @@
 
 using namespace skland;
 
-class MainWidget : public AbstractWidget {
+class MainWidget : public AbstractView {
 
  public:
 
   MainWidget()
-      : AbstractWidget() {
+      : AbstractView() {
   }
 
   virtual ~MainWidget() {}

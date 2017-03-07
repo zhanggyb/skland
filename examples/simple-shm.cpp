@@ -16,7 +16,7 @@
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
-#include <skland/gui/abstract-widget.hpp>
+#include <skland/gui/abstract-view.hpp>
 #include <skland/gui/context.hpp>
 
 #include <skland/graphic/canvas.hpp>
@@ -28,12 +28,12 @@
 
 using namespace skland;
 
-class ShmWidget : public AbstractWidget {
+class ShmWidget : public AbstractView {
 
  public:
 
   ShmWidget()
-      : AbstractWidget(), context_(nullptr), radius_(0.f), angle_(0.f), running_animation_(false) {
+      : AbstractView(), context_(nullptr), radius_(0.f), angle_(0.f), running_animation_(false) {
     color_ = 0xFF4FBF4F;
     frame_callback_.done().Set(this, &ShmWidget::OnFrame);
 

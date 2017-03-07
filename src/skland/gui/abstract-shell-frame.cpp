@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <skland/gui/abstract-shell-frame.hpp>
+#include "internal/abstract-shell-frame-private.hpp"
 
 #include <skland/gui/abstract-view.hpp>
 #include "internal/abstract-shell-view-private.hpp"
@@ -24,37 +24,40 @@ namespace skland {
 const Margin AbstractShellFrame::kResizingMargin(5, 5, 5, 5);
 
 AbstractShellFrame::AbstractShellFrame()
-    : Trackable(),
-      shell_view_(nullptr),
-      title_view_(nullptr) {
-
+    : Trackable() {
+  p_.reset(new Private);
 }
 
 AbstractShellFrame::~AbstractShellFrame() {
-  if (shell_view_) {
-    shell_view_->p_->shell_frame_ = nullptr;
-    if (title_view_) {
-      shell_view_->DetachView(title_view_);
-    }
-    // TODO: update shell_view_
+  if (p_->shell_view) {
+    p_->shell_view->p_->shell_frame = nullptr;
   }
 
-  title_view_->Destroy();
+  SetTitleView(nullptr);
+  // TODO: update shell_view_
 }
 
-void AbstractShellFrame::SetTitleBar(AbstractView *view) {
-  if (title_view_ == view) return;
+void AbstractShellFrame::SetTitleView(AbstractView *view) {
+  if (p_->title_view == view) return;
 
-  if (title_view_) {
-    title_view_->Destroy();
+  if (p_->title_view) {
+    p_->title_view->Destroy();
   }
 
-  title_view_ = view;
-  if (title_view_) {
-    if (shell_view_) {
-      shell_view_->AttachView(title_view_);
+  p_->title_view = view;
+  if (p_->title_view) {
+    if (p_->shell_view) {
+      p_->shell_view->AttachView(p_->title_view);
     }
   }
+}
+
+AbstractView *AbstractShellFrame::GetTitleView() const {
+  return p_->title_view;
+}
+
+AbstractShellView *AbstractShellFrame::GetShellView() const {
+  return p_->shell_view;
 }
 
 }

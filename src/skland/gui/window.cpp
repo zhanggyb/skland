@@ -17,7 +17,7 @@
 #include <skland/gui/window.hpp>
 
 #include <skland/gui/application.hpp>
-#include <skland/gui/abstract-widget.hpp>
+#include <skland/gui/abstract-view.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/context.hpp>
@@ -40,7 +40,7 @@ Window::Window(int width, int height, const char *title, AbstractShellFrame *fra
     : AbstractShellView(width, height, title, nullptr, frame),
       main_surface_(nullptr) {
   if (frame) {
-    Surface *parent = shell_surface();
+    Surface *parent = GetShellSurface();
     main_surface_ = SubSurface::Create(parent, this, Theme::shadow_margin());
     DBG_ASSERT(main_surface_->parent() == parent);
     DBG_ASSERT(main_surface_->below() == parent);
@@ -59,7 +59,7 @@ void Window::SetContentView(AbstractView *view) {
 }
 
 void Window::OnShown() {
-  Surface *shell_surface = this->shell_surface();
+  Surface *shell_surface = this->GetShellSurface();
 
   // Create buffer:
   int total_width = GetSize().width;
@@ -92,7 +92,7 @@ void Window::OnShown() {
   }
 
   OnUpdate(nullptr);
-  if (shell_frame()) UpdateAll(shell_frame()->GetTitleView());
+  if (GetShellFrame()) UpdateAll(GetShellFrame()->GetTitleView());
   if (GetClientView()) UpdateAll(GetClientView());
 }
 
@@ -102,7 +102,7 @@ void Window::OnUpdate(AbstractView *view) {
   Surface *surface = nullptr;
 
   if (nullptr == view) {
-    surface = this->shell_surface();
+    surface = this->GetShellSurface();
     RedrawTaskIterator it(this);
     it.PushToTail();
     it.SetContext(Context(surface, frame_canvas_));
@@ -117,7 +117,7 @@ void Window::OnUpdate(AbstractView *view) {
       surface = main_surface_;
       canvas = main_canvas_;
     } else {
-      surface = this->shell_surface();
+      surface = this->GetShellSurface();
       canvas = frame_canvas_;
     }
 
@@ -135,9 +135,9 @@ void Window::OnUpdate(AbstractView *view) {
 
 Surface *Window::GetSurface(const AbstractView *view) const {
   if (nullptr == view)
-    return shell_surface();
+    return GetShellSurface();
 
-  return nullptr != main_surface_ ? main_surface_ : shell_surface();
+  return nullptr != main_surface_ ? main_surface_ : GetShellSurface();
 }
 
 void Window::OnKeyboardKey(KeyEvent *event) {
@@ -149,7 +149,7 @@ void Window::OnKeyboardKey(KeyEvent *event) {
 
 void Window::OnSizeChanged(int width, int height) {
   RectI input_rect(width, height);
-  Surface *shell_surface = this->shell_surface();
+  Surface *shell_surface = this->GetShellSurface();
 
   input_rect.left = shell_surface->margin().left - AbstractShellFrame::kResizingMargin.left;
   input_rect.top = shell_surface->margin().top - AbstractShellFrame::kResizingMargin.top;
@@ -190,8 +190,8 @@ void Window::OnSizeChanged(int width, int height) {
   }
 
   OnUpdate(nullptr);
-  if (shell_frame()) {
-    AbstractView* title_view = shell_frame()->GetTitleView();
+  if (GetShellFrame()) {
+    AbstractView* title_view = GetShellFrame()->GetTitleView();
     if (title_view) title_view->Update();
   }
 //  if (content_view()) UpdateAll(content_view());

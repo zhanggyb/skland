@@ -7,7 +7,7 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
 
-#include <skland/gui/abstract-widget.hpp>
+#include <skland/gui/abstract-view.hpp>
 #include <skland/gui/timer.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
@@ -27,14 +27,14 @@ Test::~Test() {
 
 }
 
-class ShmWidget : public AbstractWidget {
+class ShmWidget : public AbstractView {
 
   Timer timer_;
 
  public:
 
   ShmWidget()
-      : AbstractWidget() {
+      : AbstractView() {
     timer_.SetInterval(1000); // 1s
     timer_.Start();
   }
@@ -44,7 +44,6 @@ class ShmWidget : public AbstractWidget {
  protected:
 
   virtual void OnSizeChanged(int width, int height) override {
-    resize(width, height);
     Update();
   }
 

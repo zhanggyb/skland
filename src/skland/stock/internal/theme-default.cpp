@@ -364,36 +364,36 @@ WindowFrameDefault::WindowFrameDefault()
     : AbstractShellFrame(),
       border_(0),
       title_bar_size_(22),
-      title_bar_position_(kTitleBarTop),
+      title_bar_position_(kTop),
       title_bar_(nullptr) {
   title_bar_ = new TitleBar;
-  SetTitleBar(title_bar_);
+  SetTitleView(title_bar_);
 }
 
 WindowFrameDefault::~WindowFrameDefault() {
 
 }
 
-Rect WindowFrameDefault::GetContentGeometry() const {
+Rect WindowFrameDefault::GetClientGeometry() const {
   int x = border_,
       y = border_,
-      w = shell_view()->GetSize().width - 2 * border_,
-      h = shell_view()->GetSize().height - 2 * border_;
+      w = GetShellView()->GetSize().width - 2 * border_,
+      h = GetShellView()->GetSize().height - 2 * border_;
 
   switch (title_bar_position_) {
-    case kTitleBarLeft: {
+    case kLeft: {
       x += title_bar_size_ - border_;
       break;
     }
-    case kTitleBarRight: {
+    case kRight: {
       w -= title_bar_size_ + border_;
       break;
     }
-    case kTitleBarBottom: {
+    case kBottom: {
       h -= title_bar_size_ + border_;
       break;
     }
-    case kTitleBarTop:
+    case kTop:
     default: {
       y += title_bar_size_ - border_;
       h -= title_bar_size_ - border_;
@@ -405,27 +405,27 @@ Rect WindowFrameDefault::GetContentGeometry() const {
 }
 
 void WindowFrameDefault::OnCloseButtonClicked(SLOT /* slot */) {
-  EmitAction(AbstractShellView::kActionClose);
+  EmitAction(AbstractShellView::kClose);
 }
 
 void WindowFrameDefault::OnMaximizeButtonClicked(SLOT /* slot */) {
-  EmitAction(AbstractShellView::kActionMaximize);
+  EmitAction(AbstractShellView::kMaximize);
 }
 
 void WindowFrameDefault::OnMinimizeButtonClicked(SLOT /* slot */) {
-  EmitAction(AbstractShellView::kActionMinimize);
+  EmitAction(AbstractShellView::kMinimize);
 }
 
 void WindowFrameDefault::OnSetup() {
   title_bar_->close_button()->clicked().Connect(this, &WindowFrameDefault::OnCloseButtonClicked);
   title_bar_->maximize_button()->clicked().Connect(this, &WindowFrameDefault::OnMaximizeButtonClicked);
   title_bar_->minimize_button()->clicked().Connect(this, &WindowFrameDefault::OnMinimizeButtonClicked);
-  title_bar_->SetTitle(shell_view()->GetTitle());
+  title_bar_->SetTitle(GetShellView()->GetTitle());
 }
 
 void WindowFrameDefault::OnResize(int width, int height) {
   title_bar_->MoveTo(0, 0);
-  title_bar_->Resize(shell_view()->GetSize().width, title_bar_size_);
+  title_bar_->Resize(GetShellView()->GetSize().width, title_bar_size_);
 }
 
 void WindowFrameDefault::OnDraw(const Context *context) {
@@ -433,10 +433,10 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, shell_view()->GetSize().width, shell_view()->GetSize().height);
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetShellView()->GetSize().width, GetShellView()->GetSize().height);
 
   // Drop shadow:
-  if ((!shell_view()->IsMaximized()) || (!shell_view()->IsFullscreen())) {
+  if ((!GetShellView()->IsMaximized()) || (!GetShellView()->IsFullscreen())) {
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right
@@ -462,7 +462,7 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   paint.SetColor(0xEFE0E0E0);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetContentGeometry(), paint);
+  canvas->DrawRect(GetClientGeometry(), paint);
   canvas->Restore();
 
   canvas->Flush();
@@ -475,36 +475,36 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
   // TODO: maximized or frameless
 
   if (x < (Theme::shadow_margin().left - kResizingMargin.left))
-    hlocation = kExterior;
+    hlocation = AbstractShellView::kExterior;
   else if (x < Theme::shadow_margin().left + kResizingMargin.left)
-    hlocation = kResizeLeft;
-  else if (x < Theme::shadow_margin().left + shell_view()->GetSize().width - kResizingMargin.right)
-    hlocation = kInterior;
-  else if (x < Theme::shadow_margin().left + shell_view()->GetSize().width + kResizingMargin.right)
-    hlocation = kResizeRight;
+    hlocation = AbstractShellView::kResizeLeft;
+  else if (x < Theme::shadow_margin().left + GetShellView()->GetSize().width - kResizingMargin.right)
+    hlocation = AbstractShellView::kInterior;
+  else if (x < Theme::shadow_margin().left + GetShellView()->GetSize().width + kResizingMargin.right)
+    hlocation = AbstractShellView::kResizeRight;
   else
-    hlocation = kExterior;
+    hlocation = AbstractShellView::kExterior;
 
   if (y < (Theme::shadow_margin().top - kResizingMargin.top))
-    vlocation = kExterior;
+    vlocation = AbstractShellView::kExterior;
   else if (y < Theme::shadow_margin().top + kResizingMargin.top)
-    vlocation = kResizeTop;
-  else if (y < Theme::shadow_margin().top + shell_view()->GetSize().height - kResizingMargin.bottom)
-    vlocation = kInterior;
-  else if (y < Theme::shadow_margin().top + shell_view()->GetSize().height + kResizingMargin.bottom)
-    vlocation = kResizeBottom;
+    vlocation = AbstractShellView::kResizeTop;
+  else if (y < Theme::shadow_margin().top + GetShellView()->GetSize().height - kResizingMargin.bottom)
+    vlocation = AbstractShellView::kInterior;
+  else if (y < Theme::shadow_margin().top + GetShellView()->GetSize().height + kResizingMargin.bottom)
+    vlocation = AbstractShellView::kResizeBottom;
   else
-    vlocation = kExterior;
+    vlocation = AbstractShellView::kExterior;
 
   location = vlocation | hlocation;
-  if (location & kExterior)
-    location = kExterior;
+  if (location & AbstractShellView::kExterior)
+    location = AbstractShellView::kExterior;
 
-  if (location == kInterior &&
+  if (location == AbstractShellView::kInterior &&
       y < Theme::shadow_margin().top + title_bar_size_)
-    location = kTitleBar;
-  else if (location == kInterior)
-    location = kClientArea;
+    location = AbstractShellView::kTitleBar;
+  else if (location == AbstractShellView::kInterior)
+    location = AbstractShellView::kClientArea;
 
   return location;
 }
@@ -514,7 +514,7 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   float offset_x = Theme::shadow_offset_x();
   float offset_y = Theme::shadow_offset_y();
 
-  if (!shell_view()->IsFocused()) {
+  if (!GetShellView()->IsFocused()) {
     rad = (int) rad / 3;
     offset_x = (int) offset_x / 3;
     offset_y = (int) offset_y / 3;
@@ -537,14 +537,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
                                     250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
-                                    shell_view()->GetSize().width - 2 * rad, 2 * rad),
+                                    GetShellView()->GetSize().width - 2 * rad, 2 * rad),
                    nullptr);
 
   // top-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
                                     250, 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(shell_view()->GetSize().width - rad + offset_x, -rad + offset_y,
+                   SkRect::MakeXYWH(GetShellView()->GetSize().width - rad + offset_x, -rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -553,14 +553,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
-                                    2 * rad, shell_view()->GetSize().height - 2 * rad),
+                                    2 * rad, GetShellView()->GetSize().height - 2 * rad),
                    nullptr);
 
   // bottom-left
   c->drawImageRect(image,
                    SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(-rad + offset_x, shell_view()->GetSize().height - rad + offset_y,
+                   SkRect::MakeXYWH(-rad + offset_x, GetShellView()->GetSize().height - rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -568,16 +568,16 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250 - 2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(rad + offset_x, shell_view()->GetSize().height - rad + offset_y,
-                                    shell_view()->GetSize().width - 2 * rad, 2 * rad),
+                   SkRect::MakeXYWH(rad + offset_x, GetShellView()->GetSize().height - rad + offset_y,
+                                    GetShellView()->GetSize().width - 2 * rad, 2 * rad),
                    nullptr);
 
   // bottom-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250, 250),
-                   SkRect::MakeXYWH(shell_view()->GetSize().width - rad + offset_x,
-                                    shell_view()->GetSize().height - rad + offset_y,
+                   SkRect::MakeXYWH(GetShellView()->GetSize().width - rad + offset_x,
+                                    GetShellView()->GetSize().height - rad + offset_y,
                                     2 * rad,
                                     2 * rad),
                    nullptr);
@@ -586,8 +586,8 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
                                     250, 250 - 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(shell_view()->GetSize().width - rad + offset_x, rad + offset_y,
-                                    2 * rad, shell_view()->GetSize().height - 2 * rad),
+                   SkRect::MakeXYWH(GetShellView()->GetSize().width - rad + offset_x, rad + offset_y,
+                                    2 * rad, GetShellView()->GetSize().height - 2 * rad),
                    nullptr);
 
 }

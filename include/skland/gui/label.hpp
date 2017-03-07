@@ -17,14 +17,14 @@
 #ifndef SKLAND_GUI_LABEL_HPP_
 #define SKLAND_GUI_LABEL_HPP_
 
-#include "abstract-widget.hpp"
+#include "abstract-view.hpp"
 
 #include "../core/color.hpp"
 #include "../graphic/font.hpp"
 
 namespace skland {
 
-class Label : public AbstractWidget {
+class Label : public AbstractView {
 
  public:
 

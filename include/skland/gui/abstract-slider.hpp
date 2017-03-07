@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_ABSTRACT_SLIDER_HPP_
 #define SKLAND_GUI_ABSTRACT_SLIDER_HPP_
 
-#include "abstract-widget.hpp"
+#include "abstract-view.hpp"
 #include "../core/types.hpp"
 
 #include <algorithm>
@@ -25,7 +25,7 @@
 namespace skland {
 
 template<typename T>
-class AbstractSlider : public AbstractWidget {
+class AbstractSlider : public AbstractView {
 
   AbstractSlider(const AbstractSlider &) = delete;
   AbstractSlider &operator=(const AbstractSlider &) = delete;
@@ -110,7 +110,7 @@ class AbstractSlider : public AbstractWidget {
 
 template<typename T>
 AbstractSlider<T>::AbstractSlider(Orientation orientation)
-    : AbstractWidget(),
+    : AbstractView(),
       orientation_(orientation),
       value_(T(0)),
       minimum_(T(0)),

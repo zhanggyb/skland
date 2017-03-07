@@ -14,23 +14,29 @@
  * limitations under the License.
  */
 
-#include "abstract-event-handler-redraw-task.hpp"
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_FRAME_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_FRAME_PRIVATE_HPP_
 
-#include "abstract-event-handler-private.hpp"
+#include <skland/gui/abstract-shell-frame.hpp>
 
 namespace skland {
 
-void AbstractEventHandler::RedrawTask::Run() const {
-  event_handler->OnDraw(&context);
-//  event_handler->visible_ = true;
+SKLAND_NO_EXPORT struct AbstractShellFrame::Private {
 
-  if (event_handler->p_->is_damaged) {
-    context.surface()->Damage(event_handler->p_->damaged_region.x(),
-                              event_handler->p_->damaged_region.y(),
-                              event_handler->p_->damaged_region.width(),
-                              event_handler->p_->damaged_region.height());
-    event_handler->p_->is_damaged = false;
-  }
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : shell_view(nullptr),
+        title_view(nullptr) {}
+
+  ~Private() {}
+
+  AbstractShellView *shell_view;
+  AbstractView *title_view;
+
+};
+
 }
 
-}
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_FRAME_PRIVATE_HPP_

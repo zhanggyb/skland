@@ -34,7 +34,7 @@ Label::Label(const std::string &text, const Font &font)
 }
 
 Label::Label(const std::string &text, int width, int height, const Font &font)
-    : AbstractWidget(width, height),
+    : AbstractView(width, height),
       text_(text),
       foreground_(0.2f, 0.2f, 0.2f),
       background_(0.f, 0.f, 0.f, 0.f),

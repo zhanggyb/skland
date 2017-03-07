@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_ABSTRACT_WINDOW_FRAME_HPP_
-#define SKLAND_GUI_ABSTRACT_WINDOW_FRAME_HPP_
+#ifndef SKLAND_GUI_ABSTRACT_SHELL_FRAME_HPP_
+#define SKLAND_GUI_ABSTRACT_SHELL_FRAME_HPP_
 
+#include "../core/defines.hpp"
 #include "../core/sigcxx.hpp"
 #include "../core/margin.hpp"
 #include "../core/point.hpp"
 #include "../core/rect.hpp"
 
 #include <vector>
+#include <bits/unique_ptr.h>
 
 namespace skland {
 
@@ -33,11 +35,13 @@ class Context;
 
 /**
  * @ingroup gui
- * @brief The abstract class for window frame
+ * @brief The abstract class for shell view frame
  *
- * A window frame provides decoration on a window, and draw background and border.
+ * A shell frame provides decoration on a window, draw background and
+ * border. It also provides a title view to display in the title bar
+ * area and defines the geometry of the client view.
  */
-class AbstractShellFrame : public Trackable {
+SKLAND_EXPORT class AbstractShellFrame : public Trackable {
 
   friend class AbstractShellView;
 
@@ -46,25 +50,28 @@ class AbstractShellFrame : public Trackable {
 
  public:
 
-  enum TitleBarPosition {
-    kTitleBarNone,
-    kTitleBarTop,
-    kTitleBarRight,
-    kTitleBarBottom,
-    kTitleBarLeft
+  /**
+   * @brief Enumeration value to indicate where to show title view
+   */
+  enum TitlePosition {
+    kNone,
+    kLeft,
+    kTop,
+    kRight,
+    kBottom
   };
 
   AbstractShellFrame();
 
   virtual ~AbstractShellFrame();
 
-  void SetTitleBar(AbstractView *view);
+  void SetTitleView(AbstractView *view);
 
-  virtual Rect GetContentGeometry() const = 0;
+  virtual Rect GetClientGeometry() const = 0;
 
-  AbstractView *GetTitleView() const { return title_view_; }
+  AbstractView *GetTitleView() const;
 
-  SignalRef<int> window_action() { return window_action_; }
+  SignalRef<int> action() { return action_; }
 
   /** The margin within which the cursor should switch to resizing,
    * the values SHOULD smaller than shadow margin */
@@ -83,19 +90,19 @@ class AbstractShellFrame : public Trackable {
 
   virtual int GetMouseLocation(const MouseEvent *event) const = 0;
 
-  void EmitAction(int action) { window_action_.Emit(action); }
+  void EmitAction(int action) { action_.Emit(action); }
 
-  AbstractShellView *shell_view() const { return shell_view_; }
+  AbstractShellView *GetShellView() const;
 
  private:
 
-  AbstractShellView *shell_view_;
+  struct Private;
 
-  AbstractView *title_view_;
+  std::unique_ptr<Private> p_;
 
-  Signal<int> window_action_;
+  Signal<int> action_;
 };
 
 }
 
-#endif // SKLAND_ABSTRACT_WINDOW_FRAME_HPP_
+#endif // SKLAND_GUI_ABSTRACT_SHELL_FRAME_HPP_

@@ -37,43 +37,43 @@ class Display::Registry {
   ~Registry() {}
 
   const wayland::Display &wl_display() const {
-    return display_->data_->wl_display;
+    return display_->p_->wl_display;
   }
 
   const wayland::Registry &wl_registry() const {
-    return display_->data_->wl_registry;
+    return display_->p_->wl_registry;
   }
 
   const wayland::Compositor &wl_compositor() const {
-    return display_->data_->wl_compositor;
+    return display_->p_->wl_compositor;
   }
 
   const wayland::SubCompositor &wl_subcompositor() const {
-    return display_->data_->wl_subcompositor;
+    return display_->p_->wl_subcompositor;
   }
 
   const wayland::Shm &wl_shm() const {
-    return display_->data_->wl_shm;
+    return display_->p_->wl_shm;
   }
 
   const wayland::XdgShell &xdg_shell() const {
-    return display_->data_->xdg_shell;
+    return display_->p_->xdg_shell;
   }
 
   const wayland::Shell &wl_shell() const {
-    return display_->data_->wl_shell;
+    return display_->p_->wl_shell;
   }
 
   const wayland::DataDeviceManager &wl_data_device_manager() const {
-    return display_->data_->wl_data_device_manager;
+    return display_->p_->wl_data_device_manager;
   }
 
   const egl::Display &egl_display() const {
-    return display_->data_->egl_display;
+    return display_->p_->egl_display;
   }
 
   struct xkb_context *xkb_context() const {
-    return display_->data_->xkb_context;
+    return display_->p_->xkb_context;
   }
 
  private:

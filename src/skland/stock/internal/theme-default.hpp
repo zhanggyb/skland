@@ -188,7 +188,7 @@ class WindowFrameDefault : public AbstractShellFrame {
 
   virtual ~WindowFrameDefault();
 
-  virtual Rect GetContentGeometry() const final;
+  virtual Rect GetClientGeometry() const final;
 
   static const int kButtonSize = 14;
   static const int kButtonSpace = 5;
@@ -227,7 +227,7 @@ class WindowFrameDefault : public AbstractShellFrame {
 
   int border_;
   int title_bar_size_;
-  TitleBarPosition title_bar_position_;
+  TitlePosition title_bar_position_;
 
   TitleBar *title_bar_;
 

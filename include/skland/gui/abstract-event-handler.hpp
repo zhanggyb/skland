@@ -35,6 +35,20 @@ class Context;
 /**
  * @ingroup gui
  * @brief The base class to handle events and interact with surface
+ *
+ * AbstractEventHandler is the base class for most classes in GUI
+ * module, it handles input events from input manager and interact with
+ * the surface it hold.
+ *
+ * There're 2 important sub class:
+ * 
+ * - AbstractShellView: this is the base class for windows/menus/popups, 
+ *   which have own shell surface.
+ * - AbstractView: this is the base class for views layouted and show in
+ *   a shell view.
+ *
+ * @see Input
+ * @see Surface
  */
 SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
@@ -50,20 +64,43 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   class MouseTaskIterator;
   class RedrawTaskIterator;
 
+  /**
+   * @brief Default constructor
+   */
   AbstractEventHandler();
 
+  /**
+   * @brief Destructor
+   */
   virtual ~AbstractEventHandler();
 
  protected:
 
+  /**
+   * @brief Virtual callback when mouse device enter this object
+   */
   virtual void OnMouseEnter(MouseEvent *event) = 0;
 
+  /**
+   * @brief Virtual callback when mouse device leave this object
+   */
   virtual void OnMouseLeave(MouseEvent *event) = 0;
 
+  /**
+   * @brief Virtual callback when mouse moving on this object
+   */
   virtual void OnMouseMove(MouseEvent *event) = 0;
 
+  /**
+   * @brief Virtual callback when mouse button pressed or released on
+   * this object
+   */
   virtual void OnMouseButton(MouseEvent *event) = 0;
 
+  /**
+   * @brief Virtual callback when a keyboard key pressed or released
+   * on this object
+   */
   virtual void OnKeyboardKey(KeyEvent *event) = 0;
 
   /**
@@ -79,8 +116,17 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
    */
   virtual Surface *GetSurface(const AbstractView *view) const = 0;
 
+  /**
+   * @brief Virtual callback when request draw this object with given
+   * context
+   */
   virtual void OnDraw(const Context *context) = 0;
 
+  /**
+   * @brief Mark damage area of the given object
+   *
+   * 'Damange an area in the surface' is a wayland concept.
+   */
   static void Damage(AbstractEventHandler *object, int surface_x, int surface_y, int width, int height);
 
  private:
@@ -90,8 +136,8 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   std::unique_ptr<Private> p_;
 
   /**
- * @brief Initialize the idle task list
- */
+   * @brief Initialize the idle task list for redraw windows and views
+   */
   static void InitializeRedrawTaskList();
 
   /**

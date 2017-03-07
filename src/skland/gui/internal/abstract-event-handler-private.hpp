@@ -25,24 +25,48 @@
 
 namespace skland {
 
-struct AbstractEventHandler::Private {
+/**
+ * @ingroup gui_intern
+ * @brief The structure for the private data in AbstractEventHandler
+ */
+SKLAND_NO_EXPORT struct AbstractEventHandler::Private {
 
   Private(AbstractEventHandler *event_handler)
       : mouse_task(event_handler),
         mouse_motion_task(event_handler),
         redraw_task(event_handler),
-        is_damaged_(false) {}
+        is_damaged(false) {}
 
   ~Private() {}
 
+  /**
+   * @brief An event task to handle mouse enter/leave/button events
+   */
   EventTask mouse_task;
+
+  /**
+   * @brief An event task to handle mouse move event
+   */
   EventTask mouse_motion_task;
 
+  /**
+   * @brief A redraw task to handle redraw event
+   */
   RedrawTask redraw_task;
 
-  // Damage area
-  bool is_damaged_;
-  RectI damaged_region_;
+  // TODO: there will be more tasks added later
+
+  /**
+   * @brief If need to call wayland API to damage area on the surface
+   */
+  bool is_damaged;
+
+  /**
+   * @brief The damage region
+   *
+   * This member variable works with is_damaged.
+   */
+  RectI damaged_region;
 
 };
 

@@ -86,6 +86,18 @@ bool AbstractView::IsExpandY() const {
   return false;
 }
 
+Size AbstractView::GetMinimalSize() const {
+  return Size(0, 0);
+}
+
+Size AbstractView::GetPreferredSize() const {
+  return Size(100, 100);
+}
+
+Size AbstractView::GetMaximalSize() const {
+  return Size(65536, 65536);  // TODO: use an infinite class
+}
+
 void AbstractView::Destroy() {
   destroyed_.Emit(this);
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_ABSTRACT_WINDOW_HPP_
-#define SKLAND_GUI_ABSTRACT_WINDOW_HPP_
+#ifndef SKLAND_GUI_ABSTRACT_SHELL_VIEW_HPP_
+#define SKLAND_GUI_ABSTRACT_SHELL_VIEW_HPP_
 
 #include "abstract-event-handler.hpp"
 
@@ -46,12 +46,34 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
  public:
 
+  /**
+   * @brief Enumeration values to indicate where the mouse
+   * cursor/title view/client view is located
+   *
+   * TODO: use a diagram
+   */
+  enum Location {
+    kInterior = 0,
+    kResizeTop = 1,
+    kResizeBottom = 2,
+    kResizeLeft = 4,
+    kResizeTopLeft = 5,
+    kResizeBottomLeft = 6,
+    kResizeRight = 8,
+    kResizeTopRight = 9,
+    kResizeBottomRight = 10,
+    kResizeMask = 15,
+    kExterior = 16,
+    kTitleBar = 17,
+    kClientArea = 18,
+  };
+
   enum Action {
-    kActionClose,
-    kActionMaximize,
-    kActionMinimize,
-    kActionMenu,
-    kActionLast
+    kClose,
+    kMaximize,
+    kMinimize,
+    kMenu,
+    kLast
   };
 
   /**
@@ -60,7 +82,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    * @param parent Parent shell view
    * @param frame The frame used to show the background and title bar
    */
-  AbstractShellView(const char *title, AbstractShellView *parent = nullptr,
+  AbstractShellView(const char *title,
+                    AbstractShellView *parent = nullptr,
                     AbstractShellFrame *frame = nullptr);
 
   /**
@@ -71,8 +94,10 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    * @param parent Parent shell view
    * @param frame The frame used to show the background and title bar
    */
-  AbstractShellView(int width, int height,
-                    const char *title, AbstractShellView *parent = nullptr,
+  AbstractShellView(int width,
+                    int height,
+                    const char *title,
+                    AbstractShellView *parent = nullptr,
                     AbstractShellFrame *frame = nullptr);
 
   /**
@@ -172,9 +197,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void ResizeWithMouse(MouseEvent *event, uint32_t edges) const;
 
-  AbstractShellFrame *shell_frame() const;
+  AbstractShellFrame *GetShellFrame() const;
 
-  Surface *shell_surface() const;
+  Surface *GetShellSurface() const;
 
   static void ResizeShellFrame(AbstractShellFrame *window_frame, int width, int height);
 
@@ -186,24 +211,15 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   struct Private;
 
-  enum FlagMask {
-    kFlagMaskMaximized = 0x1 << 0,
-    kFlagMaskFullscreen = 0x1 << 1,
-    kFlagMaskResizing = 0x1 << 2,
-    kFlagMaskFocused = 0x1 << 3,
-    kFlagMaskMinimized = 0x1 << 4,
-    kFlagMaskShown = 0x1 << 5
-  };
-
   void OnXdgSurfaceConfigure(uint32_t serial);
 
   void OnXdgToplevelConfigure(int width, int height, int states);
 
   void OnXdgToplevelClose();
 
-  void OnWindowAction(int action, __SLOT__);
+  void OnAction(int action, __SLOT__);
 
-  void OnContentViewDestroyed(AbstractView *view, __SLOT__);
+  void OnClientViewDestroyed(AbstractView *view, __SLOT__);
 
   /**
  * @brief Attach a given view to this shell view
@@ -233,4 +249,4 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
 }
 
-#endif // SKLAND_GUI_ABSTRACT_WINDOW_HPP_
+#endif // SKLAND_GUI_ABSTRACT_SHELL_VIEW_HPP_

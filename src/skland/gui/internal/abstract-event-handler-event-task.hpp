@@ -22,16 +22,35 @@
 
 namespace skland {
 
+/**
+ * @ingroup gui_intern
+ * @brief A task for an AbstractEventHandler object
+ *
+ * This structure is used for the private data in an AbstractEventHandler
+ * object.
+ */
 SKLAND_NO_EXPORT struct AbstractEventHandler::EventTask : public Task {
 
   EventTask(const EventTask &) = delete;
   EventTask &operator=(const EventTask &) = delete;
 
-  EventTask(AbstractEventHandler *event_handler = nullptr)
+  /**
+   * @brief Constructor
+   * @param event_handler An AbstractEventHandler object
+   *
+   * @note The parameter cannot be nullptr.
+   */
+  EventTask(AbstractEventHandler *event_handler)
       : Task(), event_handler(event_handler) {}
 
+  /**
+   * @brief Destructor
+   */
   virtual ~EventTask() {}
 
+  /**
+   * @brief A pointer to an AbstractEventHandler object
+   */
   AbstractEventHandler *event_handler;
 
 };

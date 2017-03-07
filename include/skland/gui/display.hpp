@@ -112,7 +112,7 @@ class Display : public Object {
 
   void ReleaseCursors();
 
-  std::unique_ptr<Private> data_;
+  std::unique_ptr<Private> p_;
 
   int display_fd_;
 

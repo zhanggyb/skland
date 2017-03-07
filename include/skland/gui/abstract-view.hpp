@@ -30,28 +30,23 @@ class AbstractShellView;
 
 /**
  * @ingroup gui
- * @brief An abstract base class for view object
+ * @brief An abstract base class for views
  *
- * AbstractView is an abstract base class for view object. A view object in
- * SkLand is a rectangle area on screen and handle events. It can be a window,
- * popup menu, or widgets in a window. You typically don't use this class
- * directly. Instead, you use or create a subclass.
+ * AbstractView is an abstract base class for views. A view in SkLand
+ * is a rectangle in an AbstractShellView object and handle events.
+ * You typically don't use this class directly. Instead, you use or
+ * create a subclass.
  *
  * A view can have parent and subviews, when you create a GUI
  * application, it generates a view hierachy.
  *
- * A view object can have arbitrary number of surfaces. A view which
- * does not have a parent must contains a shell surface. A view
- * without parent usually is a window or a popup menu.
+ * A view object can have arbitrary number of surfaces or shares the
+ * surface with others which is managed in one of parent views.
  *
- * If a view does not have its own wayland surface (most widgets),
- * then it shares the surface with others which is managed in one of
- * parent views.
+ * An AbstractView object SHOULD always be created by new operator and
+ * MUST be destroyed by Destroy() method.
  *
- * An AbstractView object SHOULD always be created by new operator and MUST be
- * destroyed by Destroy() method.
- *
- * @see AbstractEventHandler
+ * @see AbstractShellView
  * @see Surface
  */
 SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
@@ -109,11 +104,11 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual bool IsExpandY() const;
 
-  virtual Size GetMinimalSize() const = 0;
+  virtual Size GetMinimalSize() const;
 
-  virtual Size GetPreferredSize() const = 0;
+  virtual Size GetPreferredSize() const;
 
-  virtual Size GetMaximalSize() const = 0;
+  virtual Size GetMaximalSize() const;
 
   /**
    * @brief Destroy and delete this object

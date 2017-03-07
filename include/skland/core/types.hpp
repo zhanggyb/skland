@@ -40,27 +40,6 @@ enum CursorType {
   kCursorBlank
 };
 
-enum LocationType {
-  kInterior = 0,
-  kResizeTop = 1,
-  kResizeBottom = 2,
-  kResizeLeft = 4,
-  kResizeTopLeft = 5,
-  kResizeBottomLeft = 6,
-  kResizeRight = 8,
-  kResizeTopRight = 9,
-  kResizeBottomRight = 10,
-  kResizeMask = 15,
-  kExterior = 16,
-  kTitleBar = 17,
-  kClientArea = 18,
-};
-
-enum WindowBufferType {
-  kWindowBufferSHM,
-  kWindowBufferEGL
-};
-
 enum PixelFormat {
 
   /**

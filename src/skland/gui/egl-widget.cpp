@@ -37,7 +37,7 @@ EGLWidget::EGLWidget()
 }
 
 EGLWidget::EGLWidget(int width, int height)
-    : AbstractWidget(width, height),
+    : AbstractView(width, height),
       sub_surface_(nullptr),
       egl_surface_(nullptr),
       resize_(false),
@@ -69,7 +69,7 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 //    surface_->SetDesync();
   }
 
-  AbstractWidget::OnUpdate(view);
+  AbstractView::OnUpdate(view);
 }
 
 Surface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {

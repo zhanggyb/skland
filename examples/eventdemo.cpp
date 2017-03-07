@@ -16,7 +16,7 @@
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
-#include <skland/gui/abstract-widget.hpp>
+#include <skland/gui/abstract-view.hpp>
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
@@ -29,12 +29,12 @@
 
 using namespace skland;
 
-class SimpleWidget : public AbstractWidget {
+class SimpleWidget : public AbstractView {
 
  public:
 
   SimpleWidget()
-      : AbstractWidget(), btn_(nullptr) {
+      : AbstractView(), btn_(nullptr) {
     btn_ = new PushButton;
     btn_->MoveTo(200, 200);
     btn_->Resize(200, 200);

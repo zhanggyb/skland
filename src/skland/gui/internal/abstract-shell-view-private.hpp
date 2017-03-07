@@ -21,34 +21,90 @@
 
 namespace skland {
 
-struct AbstractShellView::Private {
+/**
+ * @ingroup gui_intern
+ * @brief A structure for private data in AbstractShellView
+ */
+SKLAND_NO_EXPORT struct AbstractShellView::Private {
 
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  Private()
-      : flags_(0),
-        shell_surface_(nullptr),
-        parent_(nullptr),
-        shell_frame_(nullptr),
-        client_view_(nullptr) {}
+  enum FlagMask {
+    kFlagMaskMaximized = 0x1 << 0,
+    kFlagMaskFullscreen = 0x1 << 1,
+    kFlagMaskResizing = 0x1 << 2,
+    kFlagMaskFocused = 0x1 << 3,
+    kFlagMaskMinimized = 0x1 << 4,
+    kFlagMaskShown = 0x1 << 5
+  };
 
+  /**
+   * @brief Constructor
+   */
+  Private()
+      : flags(0),
+        shell_surface(nullptr),
+        parent(nullptr),
+        shell_frame(nullptr),
+        client_view(nullptr) {}
+
+  /**
+   * @brief Destructor
+   */
   ~Private() {}
 
-  int flags_;
+  /**
+   * @brief Bitwise flags
+   */
+  int flags;
 
-  std::string title_;
-  std::string app_id_;
+  /**
+   * @brief Title string for the top level window
+   *
+   * TODO: support multi-language
+   */
+  std::string title;
 
-  Size size_;
+  /**
+   * @brief App ID string for the top level window
+   *
+   * TODO: support multi-language
+   */
+  std::string app_id;
 
-  Surface *shell_surface_;
+  /**
+   * @brief Window size
+   */
+  Size size;
 
-  AbstractShellView *parent_;
+  /**
+   * @brief A pointer to a shell surface created with a shell view object
+   */
+  Surface *shell_surface;
 
-  AbstractShellFrame *shell_frame_;
+  /**
+   * @brief The parent shell view object
+   *
+   * According to tge xdg-shell protocol, this member variable should be:
+   *
+   *  - A shell view object if surface is a popup shell surface
+   *  - nullptr if surface is a top level shell surface
+   */
+  AbstractShellView *parent;
 
-  AbstractView *client_view_;
+  /**
+   * @brief The shell frame (window frame) used in this shell view
+   */
+  AbstractShellFrame *shell_frame;
+
+  /**
+   * @brief The main view shows in the client area
+   *
+   * The client area is calculated through shell_frame object if it's not nullptr,
+   * or the whole window area.
+   */
+  AbstractView *client_view;
 
 };
 

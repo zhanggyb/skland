@@ -48,7 +48,7 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractShellFram
       sub_surface_(nullptr),
       egl_surface_(nullptr),
       animating_(false) {
-  Surface *parent = shell_surface();
+  Surface *parent = GetShellSurface();
 
   main_surface_ = SubSurface::Create(parent, this, parent->margin());
   DBG_ASSERT(main_surface_->parent() == parent);
@@ -80,7 +80,7 @@ EGLWindow::~EGLWindow() {
 }
 
 void EGLWindow::OnShown() {
-  Surface *shell_surface = this->shell_surface();
+  Surface *shell_surface = this->GetShellSurface();
 
   // Create buffer:
   int total_width = GetSize().width;
@@ -114,7 +114,7 @@ void EGLWindow::OnShown() {
   // initialize EGL
 //  UpdateAll();
   OnUpdate(nullptr);
-  if (shell_frame()) UpdateAll(shell_frame()->GetTitleView());
+  if (GetShellFrame()) UpdateAll(GetShellFrame()->GetTitleView());
   if (GetClientView()) UpdateAll(GetClientView());
 }
 
@@ -124,7 +124,7 @@ void EGLWindow::OnUpdate(AbstractView *view) {
   Surface *surface = nullptr;
 
   if (nullptr == view) {
-    surface = this->shell_surface();
+    surface = this->GetShellSurface();
     RedrawTaskIterator it(this);
     it.PushToTail();
     it.SetContext(Context(surface, frame_canvas_));
@@ -152,14 +152,14 @@ void EGLWindow::OnUpdate(AbstractView *view) {
 
 Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   if (nullptr == view)
-    return shell_surface();
+    return GetShellSurface();
 
-  return nullptr != sub_surface_ ? sub_surface_ : shell_surface();
+  return nullptr != sub_surface_ ? sub_surface_ : GetShellSurface();
 }
 
 void EGLWindow::OnSizeChanged(int width, int height) {
   RectI input_rect(width, height);
-  Surface *shell_surface = this->shell_surface();
+  Surface *shell_surface = this->GetShellSurface();
 
   input_rect.left = shell_surface->margin().left - AbstractShellFrame::kResizingMargin.left;
   input_rect.top = shell_surface->margin().top - AbstractShellFrame::kResizingMargin.top;
@@ -172,7 +172,7 @@ void EGLWindow::OnSizeChanged(int width, int height) {
                    input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);
 
-  ResizeShellFrame(shell_frame(), width, height);
+  ResizeShellFrame(GetShellFrame(), width, height);
 
   // Reset buffer:
   width += shell_surface->margin().lr();
@@ -205,14 +205,14 @@ void EGLWindow::OnSizeChanged(int width, int height) {
 
 //  UpdateAll();
   OnUpdate(nullptr);
-  if (shell_frame()) {
-    AbstractView *title_view = shell_frame()->GetTitleView();
+  if (GetShellFrame()) {
+    AbstractView *title_view = GetShellFrame()->GetTitleView();
     if (title_view) title_view->Update();
   }
 }
 
 void EGLWindow::OnDraw(const Context *context) {
-  if (shell_frame()) DrawShellFrame(shell_frame(), context);
+  if (GetShellFrame()) DrawShellFrame(GetShellFrame(), context);
 
   if (!animating_) {
     animating_ = true;
