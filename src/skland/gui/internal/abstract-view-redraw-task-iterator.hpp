@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_REDRAW_TASK_PROXY_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_REDRAW_TASK_PROXY_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_REDRAW_TASK_ITERATOR_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_REDRAW_TASK_ITERATOR_HPP_
 
 #include "abstract-view-private.hpp"
 #include "abstract-view-redraw-task.hpp"

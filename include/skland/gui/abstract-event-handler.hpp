@@ -116,13 +116,6 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
    */
   virtual Surface *GetSurface(const AbstractView *view) const = 0;
 
-  /**
-   * @brief Mark damage area of the given object
-   *
-   * 'Damange an area in the surface' is a wayland concept.
-   */
-  static void Damage(AbstractEventHandler *object, int surface_x, int surface_y, int width, int height);
-
  private:
 
   struct Private;

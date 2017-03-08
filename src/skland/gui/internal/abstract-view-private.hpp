@@ -25,11 +25,16 @@ namespace skland {
 
 class AbstractShellView;
 
-struct AbstractView::Private {
+SKLAND_NO_EXPORT struct AbstractView::Private {
 
   Private() = delete;
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
+
+  enum GeometryDirtyFlagMask {
+    kPositionMask = 0x1 << 0,
+    kSizeMask = 0x1 << 1
+  };
 
   Private(AbstractView *view)
       : previous(nullptr),
@@ -40,9 +45,9 @@ struct AbstractView::Private {
         children_count(0),
         shell(nullptr),
         visible(true),
-        position_dirty(false),
-        size_dirty(false),
-        redraw_task(view) {}
+        geometry_dirty_flag(0),
+        redraw_task(view),
+        is_damaged(false) {}
 
   ~Private() {}
 
@@ -59,15 +64,30 @@ struct AbstractView::Private {
 
   bool visible;
 
-  bool position_dirty;
-
-  bool size_dirty;
+  /**
+   * @brief Bitwise data to indicate if the position or size need to update
+   *
+   * Use GeometryTypeMask to check this value
+   */
+  int geometry_dirty_flag;
 
   Rect pending_geometry;
 
   Rect geometry;
 
   RedrawTask redraw_task;
+
+  /**
+   * @brief If need to call wayland API to damage area on the surface
+   */
+  bool is_damaged;
+
+  /**
+   * @brief The damage region
+   *
+   * This member variable works with is_damaged.
+   */
+  RectI damaged_region;
 
 };
 

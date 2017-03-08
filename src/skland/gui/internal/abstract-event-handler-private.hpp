@@ -33,8 +33,7 @@ SKLAND_NO_EXPORT struct AbstractEventHandler::Private {
 
   Private(AbstractEventHandler *event_handler)
       : mouse_task(event_handler),
-        mouse_motion_task(event_handler),
-        is_damaged(false) {}
+        mouse_motion_task(event_handler) {}
 
   ~Private() {}
 
@@ -49,18 +48,6 @@ SKLAND_NO_EXPORT struct AbstractEventHandler::Private {
   EventTask mouse_motion_task;
 
   // TODO: there will be more tasks added later
-
-  /**
-   * @brief If need to call wayland API to damage area on the surface
-   */
-  bool is_damaged;
-
-  /**
-   * @brief The damage region
-   *
-   * This member variable works with is_damaged.
-   */
-  RectI damaged_region;
 
 };
 

@@ -647,6 +647,20 @@ void AbstractShellView::UpdateAll(AbstractView *view) {
   view->UpdateAll();
 }
 
+void AbstractShellView::Damage(AbstractShellView *shell_view, int surface_x, int surface_y, int width, int height) {
+  shell_view->p_->is_damaged = true;
+  shell_view->p_->damaged_region.l = surface_x;
+  shell_view->p_->damaged_region.t = surface_y;
+  shell_view->p_->damaged_region.Resize(width, height);
+}
+
+void AbstractShellView::Damage(AbstractView *view, int surface_x, int surface_y, int width, int height) {
+  view->p_->is_damaged = true;
+  view->p_->damaged_region.l = surface_x;
+  view->p_->damaged_region.t = surface_y;
+  view->p_->damaged_region.Resize(width, height);
+}
+
 void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {
   ShellSurface *shell_surface = ShellSurface::Get(p_->shell_surface);
   shell_surface->AckConfigure(serial);

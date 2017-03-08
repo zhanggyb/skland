@@ -45,11 +45,4 @@ void AbstractEventHandler::ClearRedrawTaskList() {
   }
 }
 
-void AbstractEventHandler::Damage(AbstractEventHandler *object, int surface_x, int surface_y, int width, int height) {
-  object->p_->is_damaged = true;
-  object->p_->damaged_region.l = surface_x;
-  object->p_->damaged_region.t = surface_y;
-  object->p_->damaged_region.Resize(width, height);
-}
-
 }

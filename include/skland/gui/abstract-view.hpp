@@ -228,6 +228,13 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   void UntrackMouseMotion();
 
+  /**
+   * @brief Mark damage area of the given object
+   *
+   * 'Damange an area in the surface' is a wayland concept.
+   */
+  static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
+
  private:
 
   struct Private;

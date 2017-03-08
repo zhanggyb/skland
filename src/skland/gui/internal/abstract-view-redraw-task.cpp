@@ -22,24 +22,22 @@
 namespace skland {
 
 void AbstractView::RedrawTask::Run() const {
-  if (view->p_->position_dirty || view->p_->size_dirty) {
+  if (view->p_->geometry_dirty_flag) {
     Rect old = view->p_->geometry;
     view->p_->geometry = view->p_->pending_geometry;
-    view->p_->position_dirty = false;
-    view->p_->size_dirty = false;
+    view->p_->geometry_dirty_flag = 0;
     view->OnGeometryChanged(old, view->p_->geometry);
   }
 
   view->OnDraw(&context);
   view->p_->visible = true;
 
-  AbstractEventHandler *base = static_cast<AbstractEventHandler *>(view);
-  if (base->p_->is_damaged) {
-    context.surface()->Damage(base->p_->damaged_region.x(),
-                              base->p_->damaged_region.y(),
-                              base->p_->damaged_region.width(),
-                              base->p_->damaged_region.height());
-    base->p_->is_damaged = false;
+  if (view->p_->is_damaged) {
+    context.surface()->Damage(view->p_->damaged_region.x(),
+                              view->p_->damaged_region.y(),
+                              view->p_->damaged_region.width(),
+                              view->p_->damaged_region.height());
+    view->p_->is_damaged = false;
   }
 }
 

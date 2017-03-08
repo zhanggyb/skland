@@ -211,6 +211,20 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   static void UpdateAll(AbstractView *view);
 
+  /**
+   * @brief Mark damage area of the given object
+   *
+   * 'Damange an area in the surface' is a wayland concept.
+   */
+  static void Damage(AbstractShellView *shell_view, int surface_x, int surface_y, int width, int height);
+
+  /**
+   * @brief Mark damage area of the given object
+   *
+   * 'Damange an area in the surface' is a wayland concept.
+   */
+  static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
+
  private:
 
   struct Private;

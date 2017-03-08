@@ -24,14 +24,12 @@ namespace skland {
 void AbstractShellView::RedrawTask::Run() const {
   shell_view->OnDraw(&context);
 
-  AbstractEventHandler *base = static_cast<AbstractEventHandler *>(shell_view);
-
-  if (base->p_->is_damaged) {
-    context.surface()->Damage(base->p_->damaged_region.x(),
-                              base->p_->damaged_region.y(),
-                              base->p_->damaged_region.width(),
-                              base->p_->damaged_region.height());
-    base->p_->is_damaged = false;
+  if (shell_view->p_->is_damaged) {
+    context.surface()->Damage(shell_view->p_->damaged_region.x(),
+                              shell_view->p_->damaged_region.y(),
+                              shell_view->p_->damaged_region.width(),
+                              shell_view->p_->damaged_region.height());
+    shell_view->p_->is_damaged = false;
   }
 }
 

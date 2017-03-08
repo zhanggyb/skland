@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+#include "internal/abstract-view-private.hpp"
+
 #include <skland/gui/mouse-event.hpp>
 
+#include <skland/core/numeric.hpp>
 #include <skland/gui/abstract-shell-view.hpp>
 
-#include "internal/abstract-view-private.hpp"
 #include "internal/abstract-view-redraw-task-iterator.hpp"
 
 namespace skland {
@@ -46,20 +48,20 @@ AbstractView::~AbstractView() {
 }
 
 void AbstractView::MoveTo(int x, int y) {
+  p_->pending_geometry.MoveTo(x, y);
+
   if (x == p_->geometry.x() && y == p_->geometry.y()) {
-    p_->position_dirty = false;
-    p_->pending_geometry.MoveTo(x, y);
+    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kPositionMask);
     return;
   }
 
-  p_->position_dirty = true;
-  p_->pending_geometry.MoveTo(x, y);
+  Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
   OnMeasureReposition(x, y);
 }
 
 void AbstractView::Resize(int width, int height) {
   if (width == p_->geometry.width() && height == p_->geometry.height()) {
-    p_->size_dirty = false;
+    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kSizeMask);
     p_->pending_geometry.Resize(width, height);
     return;
   }
@@ -72,7 +74,7 @@ void AbstractView::Resize(int width, int height) {
   if (width < min.width || height < min.height) return;
   if (width > max.width || height > max.height) return;
 
-  p_->size_dirty = true;
+  Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
   p_->pending_geometry.Resize(width, height);
   OnMeasureResize(width, height);
 }
@@ -807,6 +809,13 @@ void AbstractView::TrackMouseMotion(MouseEvent *event) {
 
 void AbstractView::UntrackMouseMotion() {
 //  p_->mouse_motion_task.Unlink();
+}
+
+void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int width, int height) {
+  view->p_->is_damaged = true;
+  view->p_->damaged_region.l = surface_x;
+  view->p_->damaged_region.t = surface_y;
+  view->p_->damaged_region.Resize(width, height);
 }
 
 }

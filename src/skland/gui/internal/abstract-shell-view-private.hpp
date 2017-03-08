@@ -49,7 +49,8 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
         parent(nullptr),
         shell_frame(nullptr),
         client_view(nullptr),
-        redraw_task(shell_view) {}
+        redraw_task(shell_view),
+        is_damaged(false) {}
 
   /**
    * @brief Destructor
@@ -112,6 +113,18 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
    * @brief A redraw task to handle redraw event
    */
   RedrawTask redraw_task;
+
+  /**
+   * @brief If need to call wayland API to damage area on the surface
+   */
+  bool is_damaged;
+
+  /**
+   * @brief The damage region
+   *
+   * This member variable works with is_damaged.
+   */
+  RectI damaged_region;
 
 };
 
