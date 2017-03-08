@@ -14,30 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_FRAME_PRIVATE_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_FRAME_PRIVATE_HPP_
+#ifndef SKLAND_ABSTRACT_VIEW_REDRAW_TASK_HPP
+#define SKLAND_ABSTRACT_VIEW_REDRAW_TASK_HPP
 
-#include <skland/gui/abstract-shell-frame.hpp>
+#include <skland/gui/abstract-view.hpp>
+
+#include <skland/gui/task.hpp>
+#include <skland/gui/context.hpp>
 
 namespace skland {
 
-SKLAND_NO_EXPORT struct AbstractShellFrame::Private {
+SKLAND_NO_EXPORT struct AbstractView::RedrawTask : public Task {
 
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
+  RedrawTask(const RedrawTask &) = delete;
+  RedrawTask &operator=(const RedrawTask &) = delete;
 
-  Private()
-      : shell_view(nullptr),
-        title_view(nullptr) {}
+  RedrawTask(AbstractView *view)
+      : Task(), view(view) {}
 
-  ~Private() {}
+  virtual ~RedrawTask() {}
 
-  AbstractShellView *shell_view;
+  virtual void Run() const final;
 
-  AbstractView *title_view;
+  AbstractView *view;
+  Context context;
 
 };
 
 }
 
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_FRAME_PRIVATE_HPP_
+#endif // SKLAND_ABSTRACT_VIEW_REDRAW_TASK_HPP

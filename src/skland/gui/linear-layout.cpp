@@ -37,7 +37,7 @@ Size LinearLayout::GetPreferredSize() const {
 
   if (orientation_ == kVertical) {
     for (it = it.first_child(); it; ++it) {
-      if (it.view()->visible()) {
+      if (it.view()->IsVisible()) {
         tmp = it.view()->GetPreferredSize();
         size.width = std::max(size.width, tmp.width);
         size.height += (tmp.height + space);
@@ -46,7 +46,7 @@ Size LinearLayout::GetPreferredSize() const {
     }
   } else {
     for (it = it.first_child(); it; ++it) {
-      if (it.view()->visible()) {
+      if (it.view()->IsVisible()) {
         tmp = it.view()->GetPreferredSize();
         size.width += (tmp.width + space);
         size.height = std::max(size.height, tmp.height);

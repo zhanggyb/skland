@@ -22,7 +22,7 @@
 #include <skland/gui/sub-surface.hpp>
 #include <skland/gui/egl-surface.hpp>
 
-#include "internal/abstract-event-handler-redraw-task.hpp"
+#include "internal/abstract-shell-view-redraw-task.hpp"
 #include "internal/abstract-view-iterators.hpp"
 
 #include <GLES2/gl2.h>
@@ -64,8 +64,8 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 
     sub_surface_ = SubSurface::Create(parent_surface, this);
     egl_surface_ = EGLSurface::Get(sub_surface_);
-    SubSurface::Get(sub_surface_)->SetWindowPosition(x(), y());
-    egl_surface_->Resize(width(), height());
+    SubSurface::Get(sub_surface_)->SetWindowPosition(GetLeft(), GetTop());
+    egl_surface_->Resize(GetWidth(), GetHeight());
 //    surface_->SetDesync();
   }
 
@@ -77,9 +77,9 @@ Surface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
 }
 
 void EGLWidget::OnSizeChanged(int width, int height) {
-  resize_ = true;
+//  resize_ = true;
 //  egl_surface_->Resize(this->width(), this->height());
-  Update();
+//  Update();
 }
 
 void EGLWidget::OnMouseEnter(MouseEvent *event) {
@@ -108,7 +108,7 @@ void EGLWidget::OnDraw(const Context *context) {
       animating_ = true;
       if (resize_) {
         resize_ = false;
-        OnSizeChanged(width(), height());
+        OnSizeChanged(GetWidth(), GetHeight());
       }
       OnInitializeEGL();
       egl_surface_->surface()->SetupCallback(frame_callback_);

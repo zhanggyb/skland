@@ -17,25 +17,26 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_REDRAW_TASK_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_REDRAW_TASK_HPP_
 
-#include <skland/gui/abstract-event-handler.hpp>
+#include <skland/gui/abstract-shell-view.hpp>
+
 #include <skland/gui/task.hpp>
 #include <skland/gui/context.hpp>
 
 namespace skland {
 
-SKLAND_NO_EXPORT struct AbstractEventHandler::RedrawTask : public Task {
+SKLAND_NO_EXPORT struct AbstractShellView::RedrawTask : public Task {
 
   RedrawTask(const RedrawTask &) = delete;
   RedrawTask &operator=(const RedrawTask &) = delete;
 
-  RedrawTask(AbstractEventHandler *event_handler)
-      : Task(), event_handler(event_handler) {}
+  RedrawTask(AbstractShellView *event_handler)
+      : Task(), shell_view(event_handler) {}
 
   virtual ~RedrawTask() {}
 
   virtual void Run() const final;
 
-  AbstractEventHandler *event_handler;
+  AbstractShellView *shell_view;
   Context context;
 
 };

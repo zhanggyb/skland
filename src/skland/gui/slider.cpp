@@ -36,7 +36,6 @@ Slider::~Slider() {
 }
 
 void Slider::OnSizeChanged(int width, int height) {
-  resize(width, height);
   Update();
 }
 
@@ -93,18 +92,18 @@ void Slider::OnDraw(const Context *context) {
   } else {
     paint.SetColor(0xEEB0B0B0);
   }
-  canvas->DrawRect(geometry(), paint);
+  canvas->DrawRect(GetGeometry(), paint);
 
   paint.SetStyle(Paint::Style::kStyleStroke);
   paint.SetColor(0xEF444444);
   paint.SetStrokeWidth(1.f);
-  canvas->DrawLine(geometry().l, geometry().center_y(), geometry().r, geometry().center_y(), paint);
+  canvas->DrawLine(GetGeometry().l, GetGeometry().center_y(), GetGeometry().r, GetGeometry().center_y(), paint);
   paint.SetAntiAlias(true);
   paint.SetColor(0xFFDF5E00);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.f, paint);
+  canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 5.f, paint);
   paint.SetColor(0xFFFF7E00);
   paint.SetStyle(Paint::Style::kStyleFill);
-  canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 5.f, paint);
+  canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 5.f, paint);
 }
 
 }

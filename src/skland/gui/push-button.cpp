@@ -24,8 +24,7 @@
 namespace skland {
 
 PushButton::PushButton()
-    : AbstractButton() {
-  resize(90, 20);
+    : AbstractButton(90, 20) {
 }
 
 PushButton::~PushButton() {
@@ -36,9 +35,8 @@ Size PushButton::GetPreferredSize() const {
   return Size(90, 20);
 }
 
-void PushButton::OnSizeChanged(int width, int height) {
-  resize(width, height);
-  Update();
+void PushButton::OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
+
 }
 
 void PushButton::OnDraw(const Context *context) {
@@ -56,7 +54,7 @@ void PushButton::OnDraw(const Context *context) {
     }
   }
 
-  context->canvas()->DrawRect(geometry(), paint);
+  context->canvas()->DrawRect(GetGeometry(), paint);
 }
 
 }

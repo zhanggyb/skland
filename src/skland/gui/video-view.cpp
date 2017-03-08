@@ -47,8 +47,7 @@ Surface *VideoView::GetSurface(const AbstractView *view) const {
 }
 
 void VideoView::OnSizeChanged(int width, int height) {
-  resize(width, height);
-  Update();
+
 }
 
 void VideoView::OnMouseEnter(MouseEvent *event) {
@@ -75,7 +74,7 @@ void VideoView::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   Paint paint;
   paint.SetColor(0xFF29FF29);
-  canvas->DrawRect(geometry(), paint);
+  canvas->DrawRect(GetGeometry(), paint);
 }
 
 }

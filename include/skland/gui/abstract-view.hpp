@@ -27,6 +27,7 @@
 namespace skland {
 
 class AbstractShellView;
+class Context;
 
 /**
  * @ingroup gui
@@ -61,6 +62,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   class Iterator;
   class ConstIterator;
 
+  struct RedrawTask;
+  class RedrawTaskIterator;
+
   /**
    * @brief Default constructor
    *
@@ -77,21 +81,25 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   void Resize(int width, int height);
 
-  int x() const { return static_cast<int>(geometry_.x()); }
+  int GetLeft() const;
 
-  int y() const { return static_cast<int>(geometry_.y()); }
+  int GetTop() const;
 
-  int width() const { return static_cast<int>(geometry_.width()); }
+  int GetRight() const;
 
-  int height() const { return static_cast<int>(geometry_.height()); }
+  int GetBottom() const;
 
-  float center_x() const { return geometry_.center_x(); }
+  int GetWidth() const;
 
-  float center_y() const { return geometry_.center_y(); }
+  int GetHeight() const;
 
-  const Rect &geometry() const { return geometry_; }
+  float GetXCenter() const;
 
-  bool visible() const { return visible_; }
+  float GetYCenter() const;
+
+  const Rect &GetGeometry() const;
+
+  bool IsVisible() const;
 
   /**
    * @brief Update the display of this widget
@@ -125,6 +133,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Destructor
    */
   virtual ~AbstractView();
+
+  virtual void OnDraw(const Context *context) = 0;
 
   AbstractView *GetChildAt(int index) const;
 
@@ -208,33 +218,19 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  virtual void OnPositionChanged(int x, int y) = 0;
+  virtual void OnMeasureReposition(int x, int y) = 0;
 
-  virtual void OnSizeChanged(int width, int height) = 0;
+  virtual void OnMeasureResize(int width, int height) = 0;
+
+  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) = 0;
 
   void TrackMouseMotion(MouseEvent *event);
 
   void UntrackMouseMotion();
 
-  void set_visible(bool visible) {
-    visible_ = visible;
-  }
-
-  void set_position(int x, int y) {
-    geometry_.MoveTo(x, y);
-  }
-
-  void resize(int width, int height) {
-    geometry_.Resize(width, height);
-  }
-
  private:
 
   struct Private;
-
-  bool visible_;
-
-  Rect geometry_;
 
   std::unique_ptr<Private> p_;
 

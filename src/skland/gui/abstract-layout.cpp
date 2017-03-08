@@ -108,7 +108,7 @@ void AbstractLayout::OnDraw(const Context *context) {
 
   Paint paint;
   paint.SetColor(Color(r, g, b, 0.25));
-  context->canvas()->DrawRect(geometry(), paint);
+  context->canvas()->DrawRect(GetGeometry(), paint);
 //#endif
 }
 

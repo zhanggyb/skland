@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-#include "abstract-event-handler-redraw-task.hpp"
+#include "abstract-shell-view-redraw-task.hpp"
 
+#include "abstract-shell-view-private.hpp"
 #include "abstract-event-handler-private.hpp"
 
 namespace skland {
 
-void AbstractEventHandler::RedrawTask::Run() const {
-  event_handler->OnDraw(&context);
-//  event_handler->visible_ = true;
+void AbstractShellView::RedrawTask::Run() const {
+  shell_view->OnDraw(&context);
 
-  if (event_handler->p_->is_damaged) {
-    context.surface()->Damage(event_handler->p_->damaged_region.x(),
-                              event_handler->p_->damaged_region.y(),
-                              event_handler->p_->damaged_region.width(),
-                              event_handler->p_->damaged_region.height());
-    event_handler->p_->is_damaged = false;
+  AbstractEventHandler *base = static_cast<AbstractEventHandler *>(shell_view);
+
+  if (base->p_->is_damaged) {
+    context.surface()->Damage(base->p_->damaged_region.x(),
+                              base->p_->damaged_region.y(),
+                              base->p_->damaged_region.width(),
+                              base->p_->damaged_region.height());
+    base->p_->is_damaged = false;
   }
 }
 

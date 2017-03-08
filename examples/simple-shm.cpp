@@ -37,20 +37,24 @@ class ShmWidget : public AbstractView {
     color_ = 0xFF4FBF4F;
     frame_callback_.done().Set(this, &ShmWidget::OnFrame);
 
-    radius_ = clamp(std::min(geometry().width(), geometry().height()) / 2.f - 50.f, 50.f, 200.f);
+    radius_ = clamp(std::min(GetGeometry().width(), GetGeometry().height()) / 2.f - 50.f, 50.f, 200.f);
   }
 
   virtual ~ShmWidget() {}
 
  protected:
 
-  virtual void OnPositionChanged(int x, int y) override {
+  virtual void OnMeasureReposition(int x, int y) override {
     Update();
   }
 
-  virtual void OnSizeChanged(int width, int height) override {
-    radius_ = clamp(std::min(geometry().width(), geometry().height()) / 2.f - 50.f, 50.f, 200.f);
+  virtual void OnMeasureResize(int width, int height) override {
+    radius_ = clamp(std::min(GetGeometry().width(), GetGeometry().height()) / 2.f - 50.f, 50.f, 200.f);
     Update();
+  }
+
+  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) override {
+
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {
@@ -88,10 +92,10 @@ class ShmWidget : public AbstractView {
     static int padding = 5;
     std::shared_ptr<Canvas> canvas = context_->canvas();
     canvas->Save();
-    canvas->ClipRect(Rect(geometry().l + padding,
-                          geometry().t,
-                          geometry().r - padding,
-                          geometry().b - padding));
+    canvas->ClipRect(Rect(GetGeometry().l + padding,
+                          GetGeometry().t,
+                          GetGeometry().r - padding,
+                          GetGeometry().b - padding));
 
     canvas->Clear(color_);
 
@@ -101,10 +105,10 @@ class ShmWidget : public AbstractView {
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetStrokeWidth(5.f);
 
-    canvas->DrawArc(Rect(geometry().center_x() - radius_,
-                         geometry().center_y() - radius_,
-                         geometry().center_x() + radius_,
-                         geometry().center_y() + radius_),
+    canvas->DrawArc(Rect(GetGeometry().center_x() - radius_,
+                         GetGeometry().center_y() - radius_,
+                         GetGeometry().center_x() + radius_,
+                         GetGeometry().center_y() + radius_),
                     angle_, 300.f, false, paint);
 
     canvas->Restore();
@@ -116,10 +120,10 @@ class ShmWidget : public AbstractView {
 
     context_->SetupCallback(frame_callback_);
     Animate();
-    context_->Damage(context_->margin().l + x(),
-                     context_->margin().t + y(),
-                     width(),
-                     height());
+    context_->Damage(context_->margin().l + GetLeft(),
+                     context_->margin().t + GetTop(),
+                     GetWidth(),
+                     GetHeight());
     context_->Commit();
   }
 

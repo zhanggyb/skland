@@ -19,7 +19,7 @@
 
 #include <skland/gui/abstract-view.hpp>
 
-#include "abstract-event-handler-redraw-task.hpp"
+#include "abstract-view-redraw-task.hpp"
 
 namespace skland {
 
@@ -38,7 +38,11 @@ struct AbstractView::Private {
         last_child(nullptr),
         parent(nullptr),
         children_count(0),
-        shell(nullptr) {}
+        shell(nullptr),
+        visible(true),
+        position_dirty(false),
+        size_dirty(false),
+        redraw_task(view) {}
 
   ~Private() {}
 
@@ -52,6 +56,18 @@ struct AbstractView::Private {
   int children_count;
 
   AbstractShellView *shell;
+
+  bool visible;
+
+  bool position_dirty;
+
+  bool size_dirty;
+
+  Rect pending_geometry;
+
+  Rect geometry;
+
+  RedrawTask redraw_task;
 
 };
 

@@ -28,8 +28,7 @@
 namespace skland {
 
 class AbstractShellFrame;
-
-struct EventTask;
+class Context;
 
 /**
  * @ingroup gui
@@ -45,6 +44,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   AbstractShellView &operator=(const AbstractShellView &) = delete;
 
  public:
+
+  struct RedrawTask;
+  class RedrawTaskIterator;
 
   /**
    * @brief Enumeration values to indicate where the mouse
@@ -159,6 +161,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
  protected:
 
+  AbstractView *GetTitleView() const;
+
   void SetClientView(AbstractView *view);
 
   AbstractView *GetClientView() const;
@@ -181,7 +185,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual Surface *GetSurface(const AbstractView *view) const override;
 
-  virtual void OnDraw(const Context *context) override;
+  virtual void OnDraw(const Context *context);
 
   virtual void OnMaximized(bool);
 
@@ -243,6 +247,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    */
   void DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, EventTask *tail);
 
+  /**
+   * @brief The private data
+   */
   std::unique_ptr<Private> p_;
 
 };

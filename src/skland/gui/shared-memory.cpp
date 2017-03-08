@@ -31,7 +31,6 @@ SharedMemory::SharedMemory(int fd, size_t size)
 }
 
 SharedMemory::~SharedMemory() {
-  DBG_PRINT_MSG("%s\n", "unmap shared memory");
   if (data_ && munmap(data_, size_))
     DBG_PRINT_MSG("%s\n", "Failed to unmap the memory\n");
 }

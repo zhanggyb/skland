@@ -21,7 +21,7 @@
 #include <skland/core/rect.hpp>
 
 #include "abstract-event-handler-event-task.hpp"
-#include "abstract-event-handler-redraw-task.hpp"
+#include "abstract-shell-view-redraw-task.hpp"
 
 namespace skland {
 
@@ -34,7 +34,6 @@ SKLAND_NO_EXPORT struct AbstractEventHandler::Private {
   Private(AbstractEventHandler *event_handler)
       : mouse_task(event_handler),
         mouse_motion_task(event_handler),
-        redraw_task(event_handler),
         is_damaged(false) {}
 
   ~Private() {}
@@ -48,11 +47,6 @@ SKLAND_NO_EXPORT struct AbstractEventHandler::Private {
    * @brief An event task to handle mouse move event
    */
   EventTask mouse_motion_task;
-
-  /**
-   * @brief A redraw task to handle redraw event
-   */
-  RedrawTask redraw_task;
 
   // TODO: there will be more tasks added later
 

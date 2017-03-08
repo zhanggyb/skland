@@ -30,7 +30,6 @@ class KeyEvent;
 
 class Surface;
 class AbstractView;
-class Context;
 
 /**
  * @ingroup gui
@@ -56,13 +55,14 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   friend class Application;
   friend class Display;
 
+  friend class AbstractView;
+  friend class AbstractShellView;
+
  public:
 
-  struct RedrawTask;
   struct EventTask;
 
   class MouseTaskIterator;
-  class RedrawTaskIterator;
 
   /**
    * @brief Default constructor
@@ -115,12 +115,6 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
    * @return A pointer to a surface or nullptr
    */
   virtual Surface *GetSurface(const AbstractView *view) const = 0;
-
-  /**
-   * @brief Virtual callback when request draw this object with given
-   * context
-   */
-  virtual void OnDraw(const Context *context) = 0;
 
   /**
    * @brief Mark damage area of the given object

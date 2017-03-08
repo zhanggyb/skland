@@ -28,6 +28,12 @@ AbstractButton::AbstractButton()
 
 }
 
+AbstractButton::AbstractButton(int width, int height)
+    : AbstractView(width, height),
+      flags_(0x1) {
+
+}
+
 AbstractButton::~AbstractButton() {
 
 }
@@ -88,12 +94,16 @@ void AbstractButton::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnPositionChanged(int x, int y) {
+void AbstractButton::OnMeasureReposition(int x, int y) {
   Update();
 }
 
-void AbstractButton::OnSizeChanged(int width, int height) {
+void AbstractButton::OnMeasureResize(int width, int height) {
   Update();
+}
+
+void AbstractButton::OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
+
 }
 
 void AbstractButton::SetSensitive(bool sensitive) {

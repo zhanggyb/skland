@@ -28,7 +28,8 @@
 #include <skland/graphic/canvas.hpp>
 
 #include "internal/display-registry.hpp"
-#include "internal/abstract-event-handler-redraw-task-iterator.hpp"
+#include "internal/abstract-shell-view-redraw-task-iterator.hpp"
+#include "internal/abstract-view-redraw-task-iterator.hpp"
 
 namespace skland {
 
@@ -92,7 +93,8 @@ void Window::OnShown() {
   }
 
   OnUpdate(nullptr);
-  if (GetShellFrame()) UpdateAll(GetShellFrame()->GetTitleView());
+  AbstractView *title_view = GetTitleView();
+  if (title_view) UpdateAll(title_view);
   if (GetClientView()) UpdateAll(GetClientView());
 }
 
@@ -107,7 +109,8 @@ void Window::OnUpdate(AbstractView *view) {
     it.PushToTail();
     it.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
-    Damage(this, 0, 0,
+    Damage(this,
+           0, 0,
            GetSize().width + surface->margin().lr(),
            GetSize().height + surface->margin().tb());
     surface->Commit();
@@ -121,14 +124,15 @@ void Window::OnUpdate(AbstractView *view) {
       canvas = frame_canvas_;
     }
 
-    RedrawTaskIterator it(view);
+    AbstractView::RedrawTaskIterator it(view);
     it.PushToTail();
     it.SetContext(Context(surface, canvas));
     DBG_ASSERT(canvas);
-    Damage(view, view->x() + surface->margin().left,
-           view->y() + surface->margin().top,
-           view->width(),
-           view->height());
+    Damage(view,
+           view->GetLeft() + surface->margin().left,
+           view->GetTop() + surface->margin().top,
+           view->GetWidth(),
+           view->GetHeight());
     surface->Commit();
   }
 }
@@ -190,11 +194,8 @@ void Window::OnSizeChanged(int width, int height) {
   }
 
   OnUpdate(nullptr);
-  if (GetShellFrame()) {
-    AbstractView* title_view = GetShellFrame()->GetTitleView();
-    if (title_view) title_view->Update();
-  }
-//  if (content_view()) UpdateAll(content_view());
+  AbstractView *title_view = GetTitleView();
+  if (title_view) title_view->Update();
 }
 
 }

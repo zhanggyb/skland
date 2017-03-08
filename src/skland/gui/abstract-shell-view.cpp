@@ -47,7 +47,7 @@ AbstractShellView::AbstractShellView(int width,
                                      AbstractShellView *parent,
                                      AbstractShellFrame *frame)
     : AbstractEventHandler() {
-  p_.reset(new Private);
+  p_.reset(new Private(this));
   p_->size.width = width;
   p_->size.height = height;
   p_->parent = parent;
@@ -131,6 +131,14 @@ void AbstractShellView::SetShellFrame(AbstractShellFrame *shell_frame) {
   }
 
   OnUpdate(nullptr);
+}
+
+AbstractView *AbstractShellView::GetTitleView() const {
+  if (p_->shell_frame) {
+    return p_->shell_frame->GetTitleView();
+  }
+
+  return nullptr;
 }
 
 void AbstractShellView::SetClientView(AbstractView *view) {

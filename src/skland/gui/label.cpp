@@ -64,12 +64,16 @@ void Label::SetFont(const Font &font) {
   Update();
 }
 
-void Label::OnPositionChanged(int x, int y) {
+void Label::OnMeasureReposition(int x, int y) {
   Update();
 }
 
-void Label::OnSizeChanged(int width, int height) {
+void Label::OnMeasureResize(int width, int height) {
   Update();
+}
+
+void Label::OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
+
 }
 
 void Label::OnMouseEnter(MouseEvent *event) {
@@ -95,7 +99,7 @@ void Label::OnKeyboardKey(KeyEvent *event) {
 void Label::OnDraw(const Context *context) {
   Paint paint;
   paint.SetColor(background_);
-  context->canvas()->DrawRect(geometry(), paint);
+  context->canvas()->DrawRect(GetGeometry(), paint);
 
   paint.SetColor(foreground_);
   paint.SetAntiAlias(true);
@@ -107,10 +111,10 @@ void Label::OnDraw(const Context *context) {
 
   SkTextBox text_box;
   // Put the text at the center
-  text_box.setBox((geometry().l + geometry().r - text_width) / 2.f,
-                  geometry().t + 1.f, // move down a little for better look
-                  (geometry().r - geometry().l + text_width) / 2.f,
-                  geometry().b);
+  text_box.setBox((GetGeometry().l + GetGeometry().r - text_width) / 2.f,
+                  GetGeometry().t + 1.f, // move down a little for better look
+                  (GetGeometry().r - GetGeometry().l + text_width) / 2.f,
+                  GetGeometry().b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
   text_box.setText(text_.c_str(), text_.length(), *paint.sk_paint());
   text_box.draw(context->canvas()->sk_canvas());

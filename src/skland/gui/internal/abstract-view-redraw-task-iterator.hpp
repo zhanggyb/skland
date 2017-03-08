@@ -14,29 +14,30 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_REDRAW_TASK_PROXY_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_REDRAW_TASK_PROXY_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_REDRAW_TASK_PROXY_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_REDRAW_TASK_PROXY_HPP_
 
-#include "abstract-event-handler-private.hpp"
+#include "abstract-view-private.hpp"
+#include "abstract-view-redraw-task.hpp"
 
 namespace skland {
 
-class AbstractEventHandler::RedrawTaskIterator {
+class AbstractView::RedrawTaskIterator {
 
   RedrawTaskIterator() = delete;
 
  public:
 
-  RedrawTaskIterator(AbstractEventHandler *event_handler)
-      : redraw_task_(&event_handler->p_->redraw_task) {}
+  RedrawTaskIterator(AbstractView *view)
+      : redraw_task_(&view->p_->redraw_task) {}
 
   RedrawTaskIterator(const RedrawTaskIterator &orig)
       : redraw_task_(orig.redraw_task_) {}
 
   ~RedrawTaskIterator() {}
 
-  RedrawTaskIterator &operator=(const AbstractEventHandler *event_handler) {
-    redraw_task_ = &event_handler->p_->redraw_task;
+  RedrawTaskIterator &operator=(const AbstractView *view) {
+    redraw_task_ = &view->p_->redraw_task;
     return *this;
   }
 
@@ -49,8 +50,8 @@ class AbstractEventHandler::RedrawTaskIterator {
     redraw_task_->context = context;
   }
 
-  void SetContext(const AbstractEventHandler *event_hander) {
-    redraw_task_->context = event_hander->p_->redraw_task.context;
+  void SetContext(const AbstractView *view) {
+    redraw_task_->context = view->p_->redraw_task.context;
   }
 
   const Context &context() const {
@@ -61,12 +62,12 @@ class AbstractEventHandler::RedrawTaskIterator {
     return redraw_task_->IsLinked();
   }
 
-  void PushBack(AbstractEventHandler *event_handler) {
-    redraw_task_->PushBack(&event_handler->p_->redraw_task);
+  void PushBack(AbstractView *view) {
+    redraw_task_->PushBack(&view->p_->redraw_task);
   }
 
-  void PushFront(AbstractEventHandler *event_handler) {
-    redraw_task_->PushFront(&event_handler->p_->redraw_task);
+  void PushFront(AbstractView *view) {
+    redraw_task_->PushFront(&view->p_->redraw_task);
   }
 
   RedrawTask *redraw_task() const { return redraw_task_; }
@@ -119,4 +120,4 @@ class AbstractEventHandler::RedrawTaskIterator {
 
 } // namespace skland
 
-#endif // SKLAND_GUI_INTERNAL_REDRAW_TASK_PROXY_HPP_
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_REDRAW_TASK_PROXY_HPP_

@@ -30,8 +30,9 @@
 #include <skland/graphic/canvas.hpp>
 
 #include "internal/display-registry.hpp"
-#include "internal/abstract-event-handler-redraw-task.hpp"
-#include "internal/abstract-event-handler-redraw-task-iterator.hpp"
+//#include "internal/abstract-shell-view-redraw-task.hpp"
+#include "internal/abstract-shell-view-redraw-task-iterator.hpp"
+#include "internal/abstract-view-redraw-task-iterator.hpp"
 
 #include <GLES2/gl2.h>
 
@@ -65,7 +66,6 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractShellFram
 
   Rect client_rect = GetClientGeometry();
   SubSurface::Get(sub_surface_)->SetWindowPosition((int) client_rect.l, (int) client_rect.t);
-//    sub_surface_->SetDesync();  // FIXME: looks no difference between sync and desync modes
 
   egl_surface_ = EGLSurface::Get(sub_surface_);
   egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
@@ -112,9 +112,9 @@ void EGLWindow::OnShown() {
   main_canvas_->Clear();
 
   // initialize EGL
-//  UpdateAll();
   OnUpdate(nullptr);
-  if (GetShellFrame()) UpdateAll(GetShellFrame()->GetTitleView());
+  AbstractView *title_view = GetTitleView();
+  if (title_view) title_view->Update();
   if (GetClientView()) UpdateAll(GetClientView());
 }
 
@@ -129,23 +129,23 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     it.PushToTail();
     it.SetContext(Context(surface, frame_canvas_));
     DBG_ASSERT(frame_canvas_);
-    Damage(this, 0, 0,
+    Damage(this,
+           0, 0,
            GetSize().width + surface->margin().lr(),
            GetSize().height + surface->margin().tb());
     surface->Commit();
   } else {
-    std::shared_ptr<Canvas> canvas;
     surface = main_surface_;
-    canvas = main_canvas_;
+    DBG_ASSERT(main_canvas_);
 
-    RedrawTaskIterator it(view);
+    AbstractView::RedrawTaskIterator it(view);
     it.PushToTail();
-    it.SetContext(Context(surface, canvas));
-    DBG_ASSERT(canvas);
-    Damage(view, view->x() + surface->margin().left,
-           view->y() + surface->margin().top,
-           view->width(),
-           view->height());
+    it.SetContext(Context(surface, main_canvas_));
+    Damage(view,
+           view->GetLeft() + surface->margin().left,
+           view->GetTop() + surface->margin().top,
+           view->GetWidth(),
+           view->GetHeight());
     surface->Commit();
   }
 }
@@ -203,12 +203,10 @@ void EGLWindow::OnSizeChanged(int width, int height) {
   egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
   OnResizeEGL(GetSize().width, GetSize().height);
 
-//  UpdateAll();
   OnUpdate(nullptr);
-  if (GetShellFrame()) {
-    AbstractView *title_view = GetShellFrame()->GetTitleView();
-    if (title_view) title_view->Update();
-  }
+
+  AbstractView *title_view = GetTitleView();
+  if (title_view) title_view->Update();
 }
 
 void EGLWindow::OnDraw(const Context *context) {

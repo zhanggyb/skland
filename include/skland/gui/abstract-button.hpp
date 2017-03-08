@@ -27,9 +27,14 @@ namespace skland {
  */
 class AbstractButton : public AbstractView {
 
+  AbstractButton(const AbstractButton &) = delete;
+  AbstractButton &operator=(const AbstractButton &) = delete;
+
  public:
 
   AbstractButton();
+
+  AbstractButton(int width, int height);
 
   virtual ~AbstractButton();
 
@@ -67,9 +72,11 @@ class AbstractButton : public AbstractView {
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
-  virtual void OnPositionChanged(int x, int y) override;
+  virtual void OnMeasureReposition(int x, int y) override;
 
-  virtual void OnSizeChanged(int width, int height) override;
+  virtual void OnMeasureResize(int width, int height) override;
+
+  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) override;
 
   void SetSensitive(bool sensitive);
 

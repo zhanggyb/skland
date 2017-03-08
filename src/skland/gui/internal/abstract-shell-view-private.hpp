@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_
 
-#include <skland/gui/abstract-shell-view.hpp>
+#include "abstract-shell-view-redraw-task.hpp"
 
 namespace skland {
 
@@ -27,6 +27,7 @@ namespace skland {
  */
 SKLAND_NO_EXPORT struct AbstractShellView::Private {
 
+  Private() = delete;
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
@@ -42,12 +43,13 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
   /**
    * @brief Constructor
    */
-  Private()
+  Private(AbstractShellView *shell_view)
       : flags(0),
         shell_surface(nullptr),
         parent(nullptr),
         shell_frame(nullptr),
-        client_view(nullptr) {}
+        client_view(nullptr),
+        redraw_task(shell_view) {}
 
   /**
    * @brief Destructor
@@ -105,6 +107,11 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
    * or the whole window area.
    */
   AbstractView *client_view;
+
+  /**
+   * @brief A redraw task to handle redraw event
+   */
+  RedrawTask redraw_task;
 
 };
 

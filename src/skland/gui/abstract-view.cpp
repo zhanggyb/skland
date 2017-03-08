@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-#include <skland/core/numeric.hpp>
 #include <skland/gui/mouse-event.hpp>
 
 #include <skland/gui/abstract-shell-view.hpp>
 
 #include "internal/abstract-view-private.hpp"
-#include "internal/abstract-event-handler-redraw-task-iterator.hpp"
+#include "internal/abstract-view-redraw-task-iterator.hpp"
 
 namespace skland {
 
@@ -30,10 +29,10 @@ AbstractView::AbstractView()
 }
 
 AbstractView::AbstractView(int width, int height)
-    : AbstractEventHandler(),
-      visible_(false),
-      geometry_(width, height) {
+    : AbstractEventHandler() {
   p_.reset(new Private(this));
+  p_->pending_geometry.Resize(width, height);
+  p_->geometry.Resize(width, height);
 }
 
 AbstractView::~AbstractView() {
@@ -47,27 +46,75 @@ AbstractView::~AbstractView() {
 }
 
 void AbstractView::MoveTo(int x, int y) {
-  if (geometry_.x() != x || geometry_.y() != y) {
-    geometry_.MoveTo(x, y);
-    // TODO: support layout
-    OnPositionChanged(x, y);
+  if (x == p_->geometry.x() && y == p_->geometry.y()) {
+    p_->position_dirty = false;
+    p_->pending_geometry.MoveTo(x, y);
+    return;
   }
+
+  p_->position_dirty = true;
+  p_->pending_geometry.MoveTo(x, y);
+  OnMeasureReposition(x, y);
 }
 
 void AbstractView::Resize(int width, int height) {
+  if (width == p_->geometry.width() && height == p_->geometry.height()) {
+    p_->size_dirty = false;
+    p_->pending_geometry.Resize(width, height);
+    return;
+  }
+
   Size min = GetMinimalSize();
   Size max = GetMaximalSize();
 
   DBG_ASSERT(min.width < max.height && min.height < max.height);
 
-  width = clamp(width, min.width, max.width);
-  height = clamp(height, min.height, max.height);
+  if (width < min.width || height < min.height) return;
+  if (width > max.width || height > max.height) return;
 
-  if (geometry_.width() != width || geometry_.height() != height) {
-    geometry_.Resize(width, height);
-    // TODO: support layout
-    OnSizeChanged(width, height);
-  }
+  p_->size_dirty = true;
+  p_->pending_geometry.Resize(width, height);
+  OnMeasureResize(width, height);
+}
+
+int AbstractView::GetLeft() const {
+  return static_cast<int>(p_->geometry.left);
+}
+
+int AbstractView::GetTop() const {
+  return static_cast<int>(p_->geometry.top);
+}
+
+int AbstractView::GetRight() const {
+  return static_cast<int>(p_->geometry.right);
+}
+
+int AbstractView::GetBottom() const {
+  return static_cast<int>(p_->geometry.bottom);
+}
+
+int AbstractView::GetWidth() const {
+  return static_cast<int>(p_->geometry.width());
+}
+
+int AbstractView::GetHeight() const {
+  return static_cast<int>(p_->geometry.height());
+}
+
+float AbstractView::GetXCenter() const {
+  return p_->geometry.center_x();
+}
+
+float AbstractView::GetYCenter() const {
+  return p_->geometry.center_y();
+}
+
+const Rect &AbstractView::GetGeometry() const {
+  return p_->geometry;
+}
+
+bool AbstractView::IsVisible() const {
+  return p_->visible;
 }
 
 void AbstractView::Update() {
@@ -75,7 +122,7 @@ void AbstractView::Update() {
 }
 
 bool AbstractView::Contain(int x, int y) const {
-  return geometry_.Contain(x, y);
+  return p_->geometry.Contain(x, y);
 }
 
 bool AbstractView::IsExpandX() const {
@@ -95,7 +142,7 @@ Size AbstractView::GetPreferredSize() const {
 }
 
 Size AbstractView::GetMaximalSize() const {
-  return Size(65536, 65536);  // TODO: use an infinite class
+  return Size(65536, 65536);  // TODO: use an infinite type
 }
 
 void AbstractView::Destroy() {
@@ -712,11 +759,13 @@ void AbstractView::UpdateAll() {
 void AbstractView::OnUpdate(AbstractView *view) {
   RedrawTaskIterator it(this);
 
-  if (it.IsLinked() && (view != this)) {
-    // This view is going to be redrawn, just push back the task of the sub view
-    DBG_ASSERT(it.context().canvas());
-    it.PushBack(view);
-    RedrawTaskIterator(view).SetContext(this);
+  if (it.IsLinked()) {
+    if (view != this) {
+      // This view is going to be redrawn, just push back the task of the sub view
+      DBG_ASSERT(it.context().canvas());
+      it.PushBack(view);
+      RedrawTaskIterator(view).SetContext(this);
+    }
     return;
   }
 

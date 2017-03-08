@@ -27,7 +27,7 @@
 
 #include <skland/stock/theme.hpp>
 
-#include "../../gui/internal/abstract-event-handler-redraw-task-iterator.hpp"
+#include "../../gui/internal/abstract-view-redraw-task-iterator.hpp"
 
 #include "SkCanvas.h"
 //#include "SkTypeface.h"
@@ -37,10 +37,9 @@
 namespace skland {
 
 CloseButton::CloseButton()
-    : AbstractButton(),
+    : AbstractButton(WindowFrameDefault::kButtonSize, WindowFrameDefault::kButtonSize),
       foreground_(0xFF444444),
       background_(0xFF999999) {
-  resize(WindowFrameDefault::kButtonSize, WindowFrameDefault::kButtonSize);
 }
 
 CloseButton::~CloseButton() {
@@ -64,7 +63,7 @@ void CloseButton::SetBackground(const Color &color) {
 void CloseButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
-  canvas->ClipRect(geometry());
+  canvas->ClipRect(GetGeometry());
   canvas->Clear();
 
   Paint paint;
@@ -74,7 +73,7 @@ void CloseButton::OnDraw(const Context *context) {
     if (IsPressed()) {
       paint.SetColor(background_);
       paint.SetStyle(Paint::Style::kStyleFill);
-      canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 7.f, paint);
+      canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 7.f, paint);
       paint.Reset();
       paint.SetAntiAlias(true);
     }
@@ -82,26 +81,25 @@ void CloseButton::OnDraw(const Context *context) {
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetColor(foreground_);
     paint.SetStrokeWidth(1.f);
-    canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.5f, paint);
+    canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 6.5f, paint);
   }
 
   paint.SetColor(foreground_);
   paint.SetStrokeWidth(1.5f);
-  canvas->DrawLine(geometry().center_x() - 3.f, geometry().center_y() - 3.f,
-                   geometry().center_x() + 3.f, geometry().center_y() + 3.f,
+  canvas->DrawLine(GetGeometry().center_x() - 3.f, GetGeometry().center_y() - 3.f,
+                   GetGeometry().center_x() + 3.f, GetGeometry().center_y() + 3.f,
                    paint);
-  canvas->DrawLine(geometry().center_x() + 3.f, geometry().center_y() - 3.f,
-                   geometry().center_x() - 3.f, geometry().center_y() + 3.f,
+  canvas->DrawLine(GetGeometry().center_x() + 3.f, GetGeometry().center_y() - 3.f,
+                   GetGeometry().center_x() - 3.f, GetGeometry().center_y() + 3.f,
                    paint);
 
   canvas->Restore();
 }
 
 MaximizeButton::MaximizeButton()
-    : AbstractButton(),
+    : AbstractButton(WindowFrameDefault::kButtonSize, WindowFrameDefault::kButtonSize),
       foreground_(0xFF444444),
       background_(0xFF999999) {
-  resize(WindowFrameDefault::kButtonSize, WindowFrameDefault::kButtonSize);
 }
 
 MaximizeButton::~MaximizeButton() {
@@ -125,7 +123,7 @@ Size MaximizeButton::GetPreferredSize() const {
 void MaximizeButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
-  canvas->ClipRect(geometry());
+  canvas->ClipRect(GetGeometry());
   canvas->Clear();
 
   Paint paint;
@@ -135,7 +133,7 @@ void MaximizeButton::OnDraw(const Context *context) {
     if (IsPressed()) {
       paint.SetColor(background_);
       paint.SetStyle(Paint::Style::kStyleFill);
-      canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 7.f, paint);
+      canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 7.f, paint);
       paint.Reset();
       paint.SetAntiAlias(true);
     }
@@ -143,26 +141,25 @@ void MaximizeButton::OnDraw(const Context *context) {
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetColor(foreground_);
     paint.SetStrokeWidth(1.f);
-    canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.5f, paint);
+    canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 6.5f, paint);
   }
 
   paint.SetColor(foreground_);
   paint.SetStrokeWidth(1.5f);
-  canvas->DrawLine(geometry().center_x() - 4.f, geometry().center_y(),
-                   geometry().center_x() + 4.f, geometry().center_y(),
+  canvas->DrawLine(GetGeometry().center_x() - 4.f, GetGeometry().center_y(),
+                   GetGeometry().center_x() + 4.f, GetGeometry().center_y(),
                    paint);
-  canvas->DrawLine(geometry().center_x(), geometry().center_y() - 4.f,
-                   geometry().center_x(), geometry().center_y() + 4.f,
+  canvas->DrawLine(GetGeometry().center_x(), GetGeometry().center_y() - 4.f,
+                   GetGeometry().center_x(), GetGeometry().center_y() + 4.f,
                    paint);
 
   canvas->Restore();
 }
 
 MinimizeButton::MinimizeButton()
-    : AbstractButton(),
+    : AbstractButton(WindowFrameDefault::kButtonSize, WindowFrameDefault::kButtonSize),
       foreground_(0xFF444444),
       background_(0xFF999999) {
-  resize(WindowFrameDefault::kButtonSize, WindowFrameDefault::kButtonSize);
 }
 
 MinimizeButton::~MinimizeButton() {
@@ -186,7 +183,7 @@ void MinimizeButton::SetBackground(const Color &color) {
 void MinimizeButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
-  canvas->ClipRect(geometry());
+  canvas->ClipRect(GetGeometry());
   canvas->Clear();
 
   Paint paint;
@@ -196,7 +193,7 @@ void MinimizeButton::OnDraw(const Context *context) {
     if (IsPressed()) {
       paint.SetColor(background_);
       paint.SetStyle(Paint::Style::kStyleFill);
-      canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 7.f, paint);
+      canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 7.f, paint);
       paint.Reset();
       paint.SetAntiAlias(true);
     }
@@ -204,13 +201,13 @@ void MinimizeButton::OnDraw(const Context *context) {
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetColor(foreground_);
     paint.SetStrokeWidth(1.f);
-    canvas->DrawCircle(geometry().center_x(), geometry().center_y(), 6.5f, paint);
+    canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 6.5f, paint);
   }
 
   paint.SetColor(foreground_);
   paint.SetStrokeWidth(1.5f);
-  canvas->DrawLine(geometry().center_x() - 4.f, geometry().center_y(),
-                   geometry().center_x() + 4.f, geometry().center_y(),
+  canvas->DrawLine(GetGeometry().center_x() - 4.f, GetGeometry().center_y(),
+                   GetGeometry().center_x() + 4.f, GetGeometry().center_y(),
                    paint);
 
   canvas->Restore();
@@ -264,9 +261,9 @@ void TitleBar::OnUpdate(AbstractView *view) {
   RedrawTaskIterator it(this);
 
   if (it.IsLinked()) {
-    DBG_ASSERT(it.context().canvas());
     if (view == this) return;
 
+    DBG_ASSERT(it.context().canvas());
     AbstractView::OnUpdate(close_button_);
     AbstractView::OnUpdate(maximize_button_);
     AbstractView::OnUpdate(minimize_button_);
@@ -282,38 +279,36 @@ void TitleBar::OnUpdate(AbstractView *view) {
   }
 }
 
-void TitleBar::OnPositionChanged(int x, int y) {
-  Update();
-
-  y = (height() - WindowFrameDefault::kButtonSize) / 2;
+void TitleBar::OnMeasureReposition(int x, int y) {
+  y = (GetHeight() - WindowFrameDefault::kButtonSize) / 2;
   x = WindowFrameDefault::kButtonSpace;
   close_button_->MoveTo(x, y);
-//  close_button_->Update();
 
-  x += close_button_->width() + WindowFrameDefault::kButtonSpace;
+  x += close_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
   maximize_button_->MoveTo(x, y);
-//  maximize_button_->Update();
 
-  x += maximize_button_->width() + WindowFrameDefault::kButtonSpace;
+  x += maximize_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
   minimize_button_->MoveTo(x, y);
-//  minimize_button_->Update();
+
+  UpdateAll();
 }
 
-void TitleBar::OnSizeChanged(int width, int height) {
-  Update();
-
+void TitleBar::OnMeasureResize(int width, int height) {
   int y = (height - WindowFrameDefault::kButtonSize) / 2;
   int x = WindowFrameDefault::kButtonSpace;
   close_button_->MoveTo(x, y);
-  close_button_->Update();
 
-  x += close_button_->width() + WindowFrameDefault::kButtonSpace;
+  x += close_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
   maximize_button_->MoveTo(x, y);
-  maximize_button_->Update();
 
-  x += maximize_button_->width() + WindowFrameDefault::kButtonSpace;
+  x += maximize_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
   minimize_button_->MoveTo(x, y);
-  minimize_button_->Update();
+
+  UpdateAll();
+}
+
+void TitleBar::OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
+
 }
 
 void TitleBar::OnMouseEnter(MouseEvent *event) {
@@ -349,10 +344,10 @@ void TitleBar::OnDraw(const Context *context) {
 
   SkTextBox text_box;
   // Put the text at the center
-  text_box.setBox((geometry().l + geometry().r - text_width) / 2.f,
-                  geometry().t + 1.f, // move down a little for better look
-                  (geometry().r - geometry().l + text_width) / 2.f,
-                  geometry().b);
+  text_box.setBox((GetGeometry().l + GetGeometry().r - text_width) / 2.f,
+                  GetGeometry().t + 1.f, // move down a little for better look
+                  (GetGeometry().r - GetGeometry().l + text_width) / 2.f,
+                  GetGeometry().b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
   text_box.setText(title_.c_str(), title_.length(), *paint.sk_paint());
   text_box.draw(context->canvas()->sk_canvas());
@@ -425,18 +420,22 @@ void WindowFrameDefault::OnSetup() {
 
 void WindowFrameDefault::OnResize(int width, int height) {
   title_bar_->MoveTo(0, 0);
-  title_bar_->Resize(GetShellView()->GetSize().width, title_bar_size_);
+  title_bar_->Resize(width, title_bar_size_);
 }
 
 void WindowFrameDefault::OnDraw(const Context *context) {
+  AbstractShellView *shell_view = GetShellView();
+
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Clear();
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetShellView()->GetSize().width, GetShellView()->GetSize().height);
+  Rect geometry = Rect::FromXYWH(0.f, 0.f,
+                                 shell_view->GetSize().width,
+                                 shell_view->GetSize().height);
 
   // Drop shadow:
-  if ((!GetShellView()->IsMaximized()) || (!GetShellView()->IsFullscreen())) {
+  if ((!shell_view->IsMaximized()) || (!shell_view->IsFullscreen())) {
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right
@@ -470,7 +469,8 @@ void WindowFrameDefault::OnDraw(const Context *context) {
 
 int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
   int vlocation, hlocation, location;
-  int x = static_cast<int>(event->surface_x()), y = static_cast<int>(event->surface_y());
+  int x = static_cast<int>(event->surface_x()),
+      y = static_cast<int>(event->surface_y());
 
   // TODO: maximized or frameless
 

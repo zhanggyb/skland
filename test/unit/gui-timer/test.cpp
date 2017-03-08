@@ -43,8 +43,16 @@ class ShmWidget : public AbstractView {
 
  protected:
 
-  virtual void OnSizeChanged(int width, int height) override {
+  virtual void OnMeasureReposition(int x, int y) {
     Update();
+  }
+
+  virtual void OnMeasureResize(int width, int height) {
+    Update();
+  }
+
+  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
+
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {
@@ -71,7 +79,7 @@ class ShmWidget : public AbstractView {
     Paint paint;
     paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
 
-    context->canvas()->DrawRect(geometry(), paint);
+    context->canvas()->DrawRect(GetGeometry(), paint);
   }
 
 };
