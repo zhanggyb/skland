@@ -26,13 +26,10 @@ namespace wayland {
 class XdgSurface;
 class XdgPositioner;
 
-struct XdgShellMeta;
-
 class XdgShell {
 
   friend class XdgSurface;
   friend class XdgPositioner;
-  friend struct XdgShellMeta;
 
   XdgShell(const XdgShell &) = delete;
   XdgShell &operator=(const XdgShell &) = delete;
@@ -69,7 +66,9 @@ class XdgShell {
 
  private:
 
-  std::unique_ptr<XdgShellMeta> metadata_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
   Delegate<void(uint32_t)> ping_;
 

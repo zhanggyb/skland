@@ -16,7 +16,7 @@
 
 #include <skland/wayland/xdg-shell.hpp>
 
-#include "internal/xdg-shell-meta.hpp"
+#include "internal/xdg-shell-private.hpp"
 
 namespace skland {
 namespace wayland {
@@ -26,7 +26,7 @@ const struct wl_interface *XdgShell::GetInterface() {
 }
 
 XdgShell::XdgShell() {
-  metadata_.reset(new XdgShellMeta);
+  p_.reset(new Private);
 }
 
 XdgShell::~XdgShell() {
@@ -35,40 +35,40 @@ XdgShell::~XdgShell() {
 void XdgShell::Setup(const Registry &registry, uint32_t id, uint32_t version) {
   Destroy();
 
-  metadata_->zxdg_shell =
+  p_->zxdg_shell =
       static_cast<struct zxdg_shell_v6 *>(registry.Bind(id, &zxdg_shell_v6_interface, version));
-  zxdg_shell_v6_add_listener(metadata_->zxdg_shell, &XdgShellMeta::kListener, this);
+  zxdg_shell_v6_add_listener(p_->zxdg_shell, &XdgShell::Private::kListener, this);
 }
 
 void XdgShell::Destroy() {
-  if (metadata_->zxdg_shell) {
-    zxdg_shell_v6_destroy(metadata_->zxdg_shell);
-    metadata_->zxdg_shell = nullptr;
+  if (p_->zxdg_shell) {
+    zxdg_shell_v6_destroy(p_->zxdg_shell);
+    p_->zxdg_shell = nullptr;
   }
 }
 
 void XdgShell::Pong(uint32_t serial) const {
-  zxdg_shell_v6_pong(metadata_->zxdg_shell, serial);
+  zxdg_shell_v6_pong(p_->zxdg_shell, serial);
 }
 
 void XdgShell::SetUserData(void *user_data) {
-  zxdg_shell_v6_set_user_data(metadata_->zxdg_shell, user_data);
+  zxdg_shell_v6_set_user_data(p_->zxdg_shell, user_data);
 }
 
 void *XdgShell::GetUserData() const {
-  return zxdg_shell_v6_get_user_data(metadata_->zxdg_shell);
+  return zxdg_shell_v6_get_user_data(p_->zxdg_shell);
 }
 
 uint32_t XdgShell::GetVersion() const {
-  return zxdg_shell_v6_get_version(metadata_->zxdg_shell);
+  return zxdg_shell_v6_get_version(p_->zxdg_shell);
 }
 
 bool XdgShell::IsValid() const {
-  return nullptr != metadata_->zxdg_shell;
+  return nullptr != p_->zxdg_shell;
 }
 
 bool XdgShell::Equal(const void *object) const {
-  return metadata_->zxdg_shell == object;
+  return p_->zxdg_shell == object;
 }
 
 }

@@ -72,14 +72,13 @@ void EGLWidget::OnUpdate(AbstractView *view) {
   AbstractView::OnUpdate(view);
 }
 
-Surface *EGLWidget::OnGetSurface(const AbstractView * /* view */) const {
+Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
   return sub_surface_;
 }
 
-void EGLWidget::OnSizeChanged(int width, int height) {
-//  resize_ = true;
-//  egl_surface_->Resize(this->width(), this->height());
-//  Update();
+void EGLWidget::OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
+  resize_ = true;
+  egl_surface_->Resize(GetWidth(), GetHeight());
 }
 
 void EGLWidget::OnMouseEnter(MouseEvent *event) {
@@ -108,7 +107,7 @@ void EGLWidget::OnDraw(const Context *context) {
       animating_ = true;
       if (resize_) {
         resize_ = false;
-        OnSizeChanged(GetWidth(), GetHeight());
+//        OnSizeChanged(GetWidth(), GetHeight());
       }
       OnInitializeEGL();
       egl_surface_->surface()->SetupCallback(frame_callback_);

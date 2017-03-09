@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_META_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_META_HPP_
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_
+
+#include <skland/wayland/xdg-toplevel.hpp>
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-struct XdgToplevelMeta {
+struct XdgToplevel::Private {
 
-  XdgToplevelMeta(const XdgToplevelMeta &) = delete;
-  XdgToplevelMeta &operator=(const XdgToplevelMeta &) = delete;
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
 
-  XdgToplevelMeta()
+  Private()
       : zxdg_toplevel(nullptr) {}
 
-  ~XdgToplevelMeta() {
+  ~Private() {
     if (zxdg_toplevel) zxdg_toplevel_v6_destroy(zxdg_toplevel);
   }
 
@@ -52,4 +54,4 @@ struct XdgToplevelMeta {
 }
 }
 
-#endif // SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_META_HPP_
+#endif // SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_

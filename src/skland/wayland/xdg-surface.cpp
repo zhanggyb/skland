@@ -17,14 +17,14 @@
 #include <skland/wayland/xdg-surface.hpp>
 #include <skland/wayland/surface.hpp>
 
-#include "internal/xdg-surface-meta.hpp"
-#include "internal/xdg-shell-meta.hpp"
+#include "internal/xdg-surface-private.hpp"
+#include "internal/xdg-shell-private.hpp"
 
 namespace skland {
 namespace wayland {
 
 XdgSurface::XdgSurface() {
-  metadata_.reset(new XdgSurfaceMeta);
+  p_.reset(new Private);
 }
 
 XdgSurface::~XdgSurface() {
@@ -33,39 +33,39 @@ XdgSurface::~XdgSurface() {
 void XdgSurface::Setup(const XdgShell &xdg_shell, const Surface &surface) {
   Destroy();
 
-  metadata_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(xdg_shell.metadata_->zxdg_shell, surface.wl_surface_);
-  zxdg_surface_v6_add_listener(metadata_->zxdg_surface, &XdgSurfaceMeta::kListener, this);
+  p_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(xdg_shell.p_->zxdg_shell, surface.wl_surface_);
+  zxdg_surface_v6_add_listener(p_->zxdg_surface, &XdgSurface::Private::kListener, this);
 }
 
 void XdgSurface::Destroy() {
-  if (metadata_->zxdg_surface) {
-    zxdg_surface_v6_destroy(metadata_->zxdg_surface);
-    metadata_->zxdg_surface = nullptr;
+  if (p_->zxdg_surface) {
+    zxdg_surface_v6_destroy(p_->zxdg_surface);
+    p_->zxdg_surface = nullptr;
   }
 }
 
 void XdgSurface::SetWindowGeometry(int x, int y, int width, int height) const {
-  zxdg_surface_v6_set_window_geometry(metadata_->zxdg_surface, x, y, width, height);
+  zxdg_surface_v6_set_window_geometry(p_->zxdg_surface, x, y, width, height);
 }
 
 void XdgSurface::AckConfigure(uint32_t serial) const {
-  zxdg_surface_v6_ack_configure(metadata_->zxdg_surface, serial);
+  zxdg_surface_v6_ack_configure(p_->zxdg_surface, serial);
 }
 
 void XdgSurface::SetUserData(void *user_data) {
-  zxdg_surface_v6_set_user_data(metadata_->zxdg_surface, user_data);
+  zxdg_surface_v6_set_user_data(p_->zxdg_surface, user_data);
 }
 
 void *XdgSurface::GetUserData() {
-  return zxdg_surface_v6_get_user_data(metadata_->zxdg_surface);
+  return zxdg_surface_v6_get_user_data(p_->zxdg_surface);
 }
 
 uint32_t XdgSurface::GetVersion() const {
-  return zxdg_surface_v6_get_version(metadata_->zxdg_surface);
+  return zxdg_surface_v6_get_version(p_->zxdg_surface);
 }
 
 bool XdgSurface::IsValid() const {
-  return nullptr != metadata_->zxdg_surface;
+  return nullptr != p_->zxdg_surface;
 }
 
 }

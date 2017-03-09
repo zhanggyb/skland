@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_META_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_META_HPP_
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
+
+#include <skland/wayland/xdg-surface.hpp>
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-struct XdgSurfaceMeta {
+struct XdgSurface::Private {
 
-  XdgSurfaceMeta(const XdgSurfaceMeta &) = delete;
-  XdgSurfaceMeta &operator=(const XdgSurfaceMeta &) = delete;
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
 
-  XdgSurfaceMeta()
+  Private()
       : zxdg_surface(nullptr) {}
 
-  ~XdgSurfaceMeta() {
+  ~Private() {
     if (zxdg_surface) zxdg_surface_v6_destroy(zxdg_surface);
   }
 
@@ -47,4 +49,4 @@ struct XdgSurfaceMeta {
 }
 }
 
-#endif // SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_SURFACE_HPP_
+#endif // SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_

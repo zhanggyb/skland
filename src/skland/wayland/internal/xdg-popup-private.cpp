@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 
-#include "xdg-popup-meta.hpp"
-
-#include <skland/wayland/xdg-popup.hpp>
+#include "xdg-popup-private.hpp"
 
 namespace skland {
 namespace wayland {
 
-const struct zxdg_popup_v6_listener XdgPopupMeta::kListener = {
+const struct zxdg_popup_v6_listener XdgPopup::Private::kListener = {
     OnConfigure,
     OnPopupDone
 };
 
-void XdgPopupMeta::OnConfigure(void *data,
-                               struct zxdg_popup_v6 *zxdg_popup_v6,
-                               int32_t x,
-                               int32_t y,
-                               int32_t width,
-                               int32_t height) {
+void XdgPopup::Private::OnConfigure(void *data,
+                                    struct zxdg_popup_v6 *zxdg_popup_v6,
+                                    int32_t x,
+                                    int32_t y,
+                                    int32_t width,
+                                    int32_t height) {
   XdgPopup *_this = static_cast<XdgPopup *>(data);
   if (_this->configure_)
     _this->configure_(x, y, width, height);
 }
 
-void XdgPopupMeta::OnPopupDone(void *data, struct zxdg_popup_v6 *zxdg_popup_v6) {
+void XdgPopup::Private::OnPopupDone(void *data, struct zxdg_popup_v6 *zxdg_popup_v6) {
   XdgPopup *_this = static_cast<XdgPopup *>(data);
   if (_this->done_)
     _this->done_();

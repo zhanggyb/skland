@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_POPUP_META_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_POPUP_META_HPP_
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_POPUP_PRIVATE_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_POPUP_PRIVATE_HPP_
+
+#include <skland/wayland/xdg-popup.hpp>
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-struct XdgPopupMeta {
+struct XdgPopup::Private {
 
-  XdgPopupMeta(const XdgPopupMeta &) = delete;
-  XdgPopupMeta &operator=(const XdgPopupMeta &) = delete;
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
 
-  inline XdgPopupMeta()
+  Private()
       : zxdg_popup(nullptr) {}
 
-  inline ~XdgPopupMeta() {
+  ~Private() {
     if (zxdg_popup) zxdg_popup_v6_destroy(zxdg_popup);
   }
 
@@ -53,4 +55,4 @@ struct XdgPopupMeta {
 }
 }
 
-#endif // SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_POPUP_HPP_
+#endif // SKLAND_WAYLAND_INTERNAL_XDG_POPUP_PRIVATE_HPP_

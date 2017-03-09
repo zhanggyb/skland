@@ -17,7 +17,6 @@
 #include "abstract-view-redraw-task.hpp"
 
 #include "abstract-view-private.hpp"
-#include "abstract-event-handler-private.hpp"
 
 namespace skland {
 

@@ -264,6 +264,7 @@ void TitleBar::OnUpdate(AbstractView *view) {
     if (view == this) return;
 
     DBG_ASSERT(it.context().canvas());
+
     AbstractView::OnUpdate(close_button_);
     AbstractView::OnUpdate(maximize_button_);
     AbstractView::OnUpdate(minimize_button_);

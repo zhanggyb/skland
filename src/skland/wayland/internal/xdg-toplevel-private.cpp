@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-#include "xdg-toplevel-meta.hpp"
+#include "xdg-toplevel-private.hpp"
 
-#include <skland/wayland/xdg-toplevel.hpp>
 #include <skland/core/numeric.hpp>
 
 namespace skland {
 namespace wayland {
 
-const struct zxdg_toplevel_v6_listener XdgToplevelMeta::kListener = {
+const struct zxdg_toplevel_v6_listener XdgToplevel::Private::kListener = {
     OnConfigure,
     OnClose
 };
 
-void XdgToplevelMeta::OnConfigure(void *data,
-                                  struct zxdg_toplevel_v6 * /* zxdg_toplevel_v6 */,
-                                  int32_t width,
-                                  int32_t height,
-                                  struct wl_array *states) {
+void XdgToplevel::Private::OnConfigure(void *data,
+                                       struct zxdg_toplevel_v6 * /* zxdg_toplevel_v6 */,
+                                       int32_t width,
+                                       int32_t height,
+                                       struct wl_array *states) {
   XdgToplevel *_this = static_cast<XdgToplevel *>(data);
 
   if (!_this->configure_) return;
@@ -67,7 +66,7 @@ void XdgToplevelMeta::OnConfigure(void *data,
   _this->configure_(width, height, value);
 }
 
-void XdgToplevelMeta::OnClose(void *data, struct zxdg_toplevel_v6 * /* zxdg_toplevel_v6 */) {
+void XdgToplevel::Private::OnClose(void *data, struct zxdg_toplevel_v6 * /* zxdg_toplevel_v6 */) {
   XdgToplevel *_this = static_cast<XdgToplevel *>(data);
   if (_this->close_)
     _this->close_();

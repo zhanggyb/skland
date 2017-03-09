@@ -23,7 +23,6 @@ namespace skland {
 namespace wayland {
 
 class XdgPopup;
-struct XdgPositionerMeta;
 
 class XdgPositioner {
 
@@ -128,7 +127,9 @@ class XdgPositioner {
 
  private:
 
-  std::unique_ptr<XdgPositionerMeta> metadata_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
 };
 

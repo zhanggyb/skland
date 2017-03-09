@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-#include <skland/wayland/xdg-popup.hpp>
+#include "internal/xdg-popup-private.hpp"
 
-#include "internal/xdg-popup-meta.hpp"
-#include "internal/xdg-surface-meta.hpp"
-#include "internal/xdg-positioner-meta.hpp"
+#include "internal/xdg-surface-private.hpp"
+#include "internal/xdg-positioner-private.hpp"
 
 namespace skland {
 namespace wayland {
 
 XdgPopup::XdgPopup() {
-  metadata_.reset(new XdgPopupMeta);
+  p_.reset(new Private);
 }
 
 XdgPopup::~XdgPopup() {
@@ -34,34 +33,34 @@ XdgPopup::~XdgPopup() {
 void XdgPopup::Setup(const XdgSurface &xdg_surface, const XdgSurface &parent, const XdgPositioner &positioner) {
   Destroy();
 
-  metadata_->zxdg_popup =
-      zxdg_surface_v6_get_popup(xdg_surface.metadata_->zxdg_surface,
-                                parent.metadata_->zxdg_surface,
-                                positioner.metadata_->zxdg_positioner);
-  zxdg_popup_v6_add_listener(metadata_->zxdg_popup, &XdgPopupMeta::kListener, this);
+  p_->zxdg_popup =
+      zxdg_surface_v6_get_popup(xdg_surface.p_->zxdg_surface,
+                                parent.p_->zxdg_surface,
+                                positioner.p_->zxdg_positioner);
+  zxdg_popup_v6_add_listener(p_->zxdg_popup, &XdgPopup::Private::kListener, this);
 }
 
 void XdgPopup::Destroy() {
-  if (metadata_->zxdg_popup) {
-    zxdg_popup_v6_destroy(metadata_->zxdg_popup);
-    metadata_->zxdg_popup = nullptr;
+  if (p_->zxdg_popup) {
+    zxdg_popup_v6_destroy(p_->zxdg_popup);
+    p_->zxdg_popup = nullptr;
   }
 }
 
 void XdgPopup::SetUserData(void *user_data) {
-  zxdg_popup_v6_set_user_data(metadata_->zxdg_popup, user_data);
+  zxdg_popup_v6_set_user_data(p_->zxdg_popup, user_data);
 }
 
 void *XdgPopup::GetUserData() const {
-  return zxdg_popup_v6_get_user_data(metadata_->zxdg_popup);
+  return zxdg_popup_v6_get_user_data(p_->zxdg_popup);
 }
 
 uint32_t XdgPopup::GetVersion() const {
-  return zxdg_popup_v6_get_version(metadata_->zxdg_popup);
+  return zxdg_popup_v6_get_version(p_->zxdg_popup);
 }
 
 bool XdgPopup::IsValid() const {
-  return nullptr != metadata_->zxdg_popup;
+  return nullptr != p_->zxdg_popup;
 }
 
 }

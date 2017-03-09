@@ -47,9 +47,9 @@ class EGLWidget : public AbstractView {
 
   virtual void OnUpdate(AbstractView *view) final;
 
-  virtual Surface *OnGetSurface(const AbstractView *view) const final;
+  virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnSizeChanged(int width, int height) final;
+  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

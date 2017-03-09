@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-#include "xdg-shell-meta.hpp"
-#include <skland/wayland/xdg-shell.hpp>
+#include "xdg-surface-private.hpp"
 
 namespace skland {
 namespace wayland {
 
-const struct zxdg_shell_v6_listener XdgShellMeta::kListener = {
-    OnPing
+const struct zxdg_surface_v6_listener XdgSurface::Private::kListener = {
+    OnConfigure
 };
 
-void XdgShellMeta::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, uint32_t serial) {
-  XdgShell *_this = static_cast<XdgShell *>(data);
-  if (_this->ping_) {
-    _this->ping_(serial);
-  }
+void XdgSurface::Private::OnConfigure(void *data,
+                                      struct zxdg_surface_v6 * /* zxdg_surface_v6 */,
+                                      uint32_t serial) {
+  XdgSurface *_this = static_cast<XdgSurface *>(data);
+  if (_this->configure_)
+    _this->configure_(serial);
 }
 
 }

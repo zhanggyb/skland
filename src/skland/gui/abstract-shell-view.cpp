@@ -635,10 +635,6 @@ Surface *AbstractShellView::GetShellSurface() const {
   return p_->shell_surface;
 }
 
-void AbstractShellView::ResizeShellFrame(AbstractShellFrame *window_frame, int width, int height) {
-  window_frame->OnResize(width, height);
-}
-
 void AbstractShellView::DrawShellFrame(AbstractShellFrame *window_frame, const Context *context) {
   window_frame->OnDraw(context);
 }

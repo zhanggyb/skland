@@ -24,11 +24,8 @@ namespace wayland {
 
 class Seat;
 class Output;
-struct XdgToplevelMeta;
 
 class XdgToplevel {
-
-  friend struct XdgToplevelMeta;
 
   XdgToplevel(const XdgToplevel &) = delete;
   XdgToplevel &operator=(const XdgToplevel &) = delete;
@@ -102,7 +99,9 @@ class XdgToplevel {
 
  private:
 
-  std::unique_ptr<XdgToplevelMeta> metadata_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
   Delegate<void(int, int, int)> configure_;
   Delegate<void()> close_;

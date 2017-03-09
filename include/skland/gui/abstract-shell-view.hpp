@@ -205,8 +205,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   Surface *GetShellSurface() const;
 
-  static void ResizeShellFrame(AbstractShellFrame *window_frame, int width, int height);
-
   static void DrawShellFrame(AbstractShellFrame *window_frame, const Context *context);
 
   static void UpdateAll(AbstractView *view);

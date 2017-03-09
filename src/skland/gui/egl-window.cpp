@@ -172,8 +172,6 @@ void EGLWindow::OnSizeChanged(int width, int height) {
                    input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);
 
-  ResizeShellFrame(GetShellFrame(), width, height);
-
   // Reset buffer:
   width += shell_surface->margin().lr();
   height += shell_surface->margin().tb();

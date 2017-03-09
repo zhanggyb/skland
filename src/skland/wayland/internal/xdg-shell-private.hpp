@@ -14,31 +14,39 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_POSITIONER_META_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_POSITIONER_META_HPP_
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_SHELL_PRIVATE_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_SHELL_PRIVATE_HPP_
+
+#include <skland/wayland/xdg-shell.hpp>
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-struct XdgPositionerMeta {
+struct XdgShell::Private {
 
-  XdgPositionerMeta(const XdgPositionerMeta &) = delete;
-  XdgPositionerMeta &operator=(const XdgPositionerMeta &) = delete;
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
 
-  XdgPositionerMeta()
-      : zxdg_positioner(nullptr) {}
+  Private()
+      : zxdg_shell(nullptr) {}
 
-  ~XdgPositionerMeta() {
-    if (zxdg_positioner) zxdg_positioner_v6_destroy(zxdg_positioner);
+  ~Private() {
+    if (zxdg_shell) zxdg_shell_v6_destroy(zxdg_shell);
   }
 
-  struct zxdg_positioner_v6 *zxdg_positioner;
+  struct zxdg_shell_v6 *zxdg_shell;
+
+  static void OnPing(void *data,
+                     struct zxdg_shell_v6 *zxdg_shell_v6,
+                     uint32_t serial);
+
+  static const struct zxdg_shell_v6_listener kListener;
 
 };
 
 }
 }
 
-#endif // SKLAND_WAYLAND_CLIENT_INTERNAL_META_XDG_POSITIONER_HPP_
+#endif // SKLAND_WAYLAND_INTERNAL_XDG_SHELL_PRIVATE_HPP_
