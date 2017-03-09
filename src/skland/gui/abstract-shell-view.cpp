@@ -639,8 +639,8 @@ void AbstractShellView::DrawShellFrame(AbstractShellFrame *window_frame, const C
   window_frame->OnDraw(context);
 }
 
-void AbstractShellView::UpdateAll(AbstractView *view) {
-  view->UpdateAll();
+void AbstractShellView::RecursiveUpdate(AbstractView *view) {
+  view->RecursiveUpdate();
 }
 
 void AbstractShellView::Damage(AbstractShellView *shell_view, int surface_x, int surface_y, int width, int height) {
@@ -694,10 +694,11 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
   }
 
   if (do_resize) {
-    ShellSurface::Get(p_->shell_surface)->ResizeWindow(width, height);
+    ShellSurface::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
+    Size old = p_->size;
     p_->size.width = width;
     p_->size.height = height;
-    OnSizeChanged(width, height);
+    OnSizeChanged(old.width, old.height);
 
     // Resize frame first, then the content view
     if (p_->shell_frame) {

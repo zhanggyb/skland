@@ -169,7 +169,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnShown() = 0;
 
-  virtual void OnSizeChanged(int width, int height) = 0;
+  virtual void OnSizeChanged(int old_width, int old_height) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -207,7 +207,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   static void DrawShellFrame(AbstractShellFrame *window_frame, const Context *context);
 
-  static void UpdateAll(AbstractView *view);
+  static void RecursiveUpdate(AbstractView *view);
 
   /**
    * @brief Mark damage area of the given object

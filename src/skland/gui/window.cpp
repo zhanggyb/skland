@@ -94,8 +94,8 @@ void Window::OnShown() {
 
   OnUpdate(nullptr);
   AbstractView *title_view = GetTitleView();
-  if (title_view) UpdateAll(title_view);
-  if (GetClientView()) UpdateAll(GetClientView());
+  if (title_view) RecursiveUpdate(title_view);
+  if (GetClientView()) RecursiveUpdate(GetClientView());
 }
 
 void Window::OnUpdate(AbstractView *view) {
@@ -151,7 +151,10 @@ void Window::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void Window::OnSizeChanged(int width, int height) {
+void Window::OnSizeChanged(int /*old_width*/, int /*old_height*/) {
+  int width = GetSize().width;
+  int height = GetSize().height;
+
   RectI input_rect(width, height);
   Surface *shell_surface = this->GetShellSurface();
 
@@ -193,9 +196,13 @@ void Window::OnSizeChanged(int width, int height) {
     main_canvas_->Clear();
   }
 
-  OnUpdate(nullptr);
-  AbstractView *title_view = GetTitleView();
-  if (title_view) title_view->Update();
+  OnUpdate(nullptr);  // Update the background
+
+  AbstractView *view = GetTitleView();
+  if (view) RecursiveUpdate(view);
+
+  view = GetClientView();
+  if (view) RecursiveUpdate(view);
 }
 
 }

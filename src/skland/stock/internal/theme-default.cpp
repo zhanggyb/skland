@@ -257,29 +257,6 @@ void TitleBar::SetTitle(const std::string &title) {
   Update();
 }
 
-void TitleBar::OnUpdate(AbstractView *view) {
-  RedrawTaskIterator it(this);
-
-  if (it.IsLinked()) {
-    if (view == this) return;
-
-    DBG_ASSERT(it.context().canvas());
-
-    AbstractView::OnUpdate(close_button_);
-    AbstractView::OnUpdate(maximize_button_);
-    AbstractView::OnUpdate(minimize_button_);
-  } else {
-    AbstractView::OnUpdate(view);
-
-    if (view == this && it.IsLinked()) {
-      DBG_ASSERT(it.context().canvas());
-      AbstractView::OnUpdate(close_button_);
-      AbstractView::OnUpdate(maximize_button_);
-      AbstractView::OnUpdate(minimize_button_);
-    }
-  }
-}
-
 void TitleBar::OnMeasureReposition(int x, int y) {
   y = (GetHeight() - WindowFrameDefault::kButtonSize) / 2;
   x = WindowFrameDefault::kButtonSpace;
@@ -291,7 +268,7 @@ void TitleBar::OnMeasureReposition(int x, int y) {
   x += maximize_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
   minimize_button_->MoveTo(x, y);
 
-  UpdateAll();
+  RecursiveUpdate();
 }
 
 void TitleBar::OnMeasureResize(int width, int height) {
@@ -305,7 +282,7 @@ void TitleBar::OnMeasureResize(int width, int height) {
   x += maximize_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
   minimize_button_->MoveTo(x, y);
 
-  UpdateAll();
+  RecursiveUpdate();
 }
 
 void TitleBar::OnGeometryChanged(const Rect &old_geometry) {

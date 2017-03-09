@@ -203,7 +203,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   /**
    * @brief Update this view and all sub views
    */
-  void UpdateAll();
+  void RecursiveUpdate();
 
   /**
    * @brief A view request an update

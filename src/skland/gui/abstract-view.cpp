@@ -751,10 +751,10 @@ void AbstractView::MoveBackward(AbstractView *object) {
   }
 }
 
-void AbstractView::UpdateAll() {
+void AbstractView::RecursiveUpdate() {
   Update();
   for (AbstractView *sub = p_->last_child; sub; sub = sub->p_->previous) {
-    sub->UpdateAll();
+    sub->RecursiveUpdate();
   }
 }
 

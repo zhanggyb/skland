@@ -115,7 +115,7 @@ void EGLWindow::OnShown() {
   OnUpdate(nullptr);
   AbstractView *title_view = GetTitleView();
   if (title_view) title_view->Update();
-  if (GetClientView()) UpdateAll(GetClientView());
+  if (GetClientView()) RecursiveUpdate(GetClientView());
 }
 
 void EGLWindow::OnUpdate(AbstractView *view) {
@@ -157,7 +157,10 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   return nullptr != sub_surface_ ? sub_surface_ : GetShellSurface();
 }
 
-void EGLWindow::OnSizeChanged(int width, int height) {
+void EGLWindow::OnSizeChanged(int /*old_width*/, int /*old_height*/) {
+  int width = GetSize().width;
+  int height = GetSize().height;
+
   RectI input_rect(width, height);
   Surface *shell_surface = this->GetShellSurface();
 
@@ -201,10 +204,13 @@ void EGLWindow::OnSizeChanged(int width, int height) {
   egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
   OnResizeEGL(GetSize().width, GetSize().height);
 
-  OnUpdate(nullptr);
+  OnUpdate(nullptr);  // Update the background
 
-  AbstractView *title_view = GetTitleView();
-  if (title_view) title_view->Update();
+  AbstractView *view = GetTitleView();
+  if (view) RecursiveUpdate(view);
+
+  view = GetClientView();
+  if (view) RecursiveUpdate(view);
 }
 
 void EGLWindow::OnDraw(const Context *context) {
