@@ -44,9 +44,9 @@ TEST_F(Test, regular) {
 
   Application app(argc, argv);
 
-//  Window win(400, 300, "Test Window");
-//  win.SetMainWidget(new LinearLayout);
-//  win.Show();
+  Window win(400, 300, "Test Window");
+  win.SetContentView(new LinearLayout);
+  win.Show();
 
   int result = app.Run();
 

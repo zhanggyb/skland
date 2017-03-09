@@ -174,13 +174,13 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   void ClearChildren();
 
-  virtual void OnAddChildView(AbstractView *view);
+  virtual void OnAddChild(AbstractView *view);
 
-  virtual void OnRemoveChildView(AbstractView *view);
+  virtual void OnRemoveChild(AbstractView *view);
 
-  virtual void OnAddedToParentView();
+  virtual void OnAddedToParent();
 
-  virtual void OnRemovedFromParentView(AbstractView *original_parent);
+  virtual void OnRemovedFromParent(AbstractView *original_parent);
 
   virtual void OnAttachedToShellView();
 
@@ -222,7 +222,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual void OnMeasureResize(int width, int height) = 0;
 
-  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) = 0;
+  virtual void OnGeometryChanged(const Rect &old_geometry) = 0;
 
   void TrackMouseMotion(MouseEvent *event);
 

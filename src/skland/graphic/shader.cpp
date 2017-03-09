@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/shader.hpp>
-#include <skland/core/defines.hpp>
+#include "internal/shader-private.hpp"
 
-#include "internal/shader-meta.hpp"
+#include <skland/core/defines.hpp>
 
 namespace skland {
 
-Shader::Shader(ShaderMeta *metadata)
-    : metadata_(metadata) {
-  DBG_ASSERT(metadata_);
+Shader::Shader(Private *p)
+    : p_(p) {
+  DBG_ASSERT(p_);
 }
 
 Shader::Shader(const Shader &other) {
-  metadata_.reset(new ShaderMeta(other.metadata_->sk_shader));
+  p_.reset(new Private(other.p_->sk_shader));
 }
 
 Shader::~Shader() {
 }
 
 Shader &Shader::operator=(const Shader &other) {
-  *metadata_ = *other.metadata_;
+  *p_ = *other.p_;
   return *this;
 }
 

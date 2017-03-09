@@ -46,7 +46,7 @@ class Label : public AbstractView {
 
   virtual void OnMeasureResize(int width, int height) override;
 
-  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) override;
+  virtual void OnGeometryChanged(const Rect &old_geometry) override;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

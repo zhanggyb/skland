@@ -308,7 +308,7 @@ void TitleBar::OnMeasureResize(int width, int height) {
   UpdateAll();
 }
 
-void TitleBar::OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
+void TitleBar::OnGeometryChanged(const Rect &old_geometry) {
 
 }
 

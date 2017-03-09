@@ -19,13 +19,13 @@
 
 #include "font-style.hpp"
 #include "typeface.hpp"
+
 #include <memory>
 
 class SkTypeface;
 
 namespace skland {
 
-struct FontMeta;
 class Typeface;
 
 /**
@@ -147,7 +147,9 @@ class Font {
 
  private:
 
-  std::unique_ptr<FontMeta> metadata_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
 };
 

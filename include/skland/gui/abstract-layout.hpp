@@ -36,10 +36,6 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual Size GetMinimalSize() const override;
 
-  virtual Size GetPreferredSize() const override;
-
-  virtual Size GetMaximalSize() const override;
-
   void AddView(AbstractView *view);
 
   void RemoveView(AbstractView *view);
@@ -50,19 +46,17 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual void OnViewAdded(AbstractView *view) = 0;
 
-  virtual void OnViewDestroyed(AbstractView *view) = 0;
+  virtual void OnMouseEnter(MouseEvent *event) override;
 
-  virtual void OnMouseEnter(MouseEvent *event) final;
+  virtual void OnMouseLeave(MouseEvent *event) override;
 
-  virtual void OnMouseLeave(MouseEvent *event) final;
+  virtual void OnMouseMove(MouseEvent *event) override;
 
-  virtual void OnMouseMove(MouseEvent *event) final;
+  virtual void OnMouseButton(MouseEvent *event) override;
 
-  virtual void OnMouseButton(MouseEvent *event) final;
+  virtual void OnKeyboardKey(KeyEvent *event) override;
 
-  virtual void OnKeyboardKey(KeyEvent *event) final;
-
-  virtual void OnDraw(const Context *context) final;
+  virtual void OnDraw(const Context *context) override;
 
  private:
 

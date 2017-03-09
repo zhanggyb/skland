@@ -22,7 +22,6 @@
 namespace skland {
 
 class Paint;
-struct ShaderMeta;
 class GradientShader;
 
 /**
@@ -48,17 +47,15 @@ class Shader {
 
   Shader &operator=(const Shader &other);
 
-  const ShaderMeta *metadata() {
-    return metadata_.get();
-  }
-
  protected:
 
-  Shader(ShaderMeta *metadata);
+  struct Private;
+
+  Shader(Private *p);
 
  private:
 
-  std::unique_ptr<ShaderMeta> metadata_;
+  std::unique_ptr<Private> p_;
 
 };
 

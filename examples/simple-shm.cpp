@@ -33,11 +33,15 @@ class ShmWidget : public AbstractView {
  public:
 
   ShmWidget()
-      : AbstractView(), context_(nullptr), radius_(0.f), angle_(0.f), running_animation_(false) {
+      : AbstractView(),
+        context_(nullptr),
+        radius_(0.f),
+        angle_(0.f),
+        running_animation_(false) {
     color_ = 0xFF4FBF4F;
     frame_callback_.done().Set(this, &ShmWidget::OnFrame);
 
-    radius_ = clamp(std::min(GetGeometry().width(), GetGeometry().height()) / 2.f - 50.f, 50.f, 200.f);
+    radius_ = clamp(std::min(GetWidth(), GetHeight()) / 2.f - 50.f, 50.f, 200.f);
   }
 
   virtual ~ShmWidget() {}
@@ -49,12 +53,11 @@ class ShmWidget : public AbstractView {
   }
 
   virtual void OnMeasureResize(int width, int height) override {
-    radius_ = clamp(std::min(GetGeometry().width(), GetGeometry().height()) / 2.f - 50.f, 50.f, 200.f);
     Update();
   }
 
-  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) override {
-
+  virtual void OnGeometryChanged(const Rect &old_geometry) override {
+    radius_ = clamp(std::min(GetGeometry().width(), GetGeometry().height()) / 2.f - 50.f, 50.f, 200.f);
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {

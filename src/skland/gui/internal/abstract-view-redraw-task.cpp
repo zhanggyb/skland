@@ -25,7 +25,7 @@ void AbstractView::RedrawTask::Run() const {
     Rect old = view->p_->geometry;
     view->p_->geometry = view->p_->pending_geometry;
     view->p_->geometry_dirty_flag = 0;
-    view->OnGeometryChanged(old, view->p_->geometry);
+    view->OnGeometryChanged(old);
   }
 
   view->OnDraw(&context);

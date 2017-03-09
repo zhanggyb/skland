@@ -14,103 +14,102 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/font.hpp>
+#include "internal/font-private.hpp"
 
-#include "internal/font-meta.hpp"
-#include "internal/typeface-meta.hpp"
+#include "internal/typeface-private.hpp"
 
 namespace skland {
 
 Font::Font(Typeface::Style style, float size, MaskType mask_type, uint32_t flags) {
-  metadata_.reset(new FontMeta);
+  p_.reset(new Private);
   sk_sp<SkTypeface> typeface = SkTypeface::MakeDefault((SkTypeface::Style) style);
-  metadata_->sk_font = SkFont::Make(typeface, size, (SkFont::MaskType) mask_type, flags);
+  p_->sk_font = SkFont::Make(typeface, size, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const char *family_name, FontStyle font_style, float size, MaskType mask_type, uint32_t flags) {
-  metadata_.reset(new FontMeta);
+  p_.reset(new Private);
   sk_sp<SkTypeface> typeface = SkTypeface::MakeFromName(family_name, *reinterpret_cast<SkFontStyle *>(&font_style));
-  metadata_->sk_font = SkFont::Make(typeface, size, (SkFont::MaskType) mask_type, flags);
+  p_->sk_font = SkFont::Make(typeface, size, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const Typeface &typeface, float size, MaskType mask_type, uint32_t flags) {
-  metadata_.reset(new FontMeta);
-  metadata_->sk_font = SkFont::Make(typeface.metadata_->sk_typeface, size, (SkFont::MaskType) mask_type, flags);
+  p_.reset(new Private);
+  p_->sk_font = SkFont::Make(typeface.p_->sk_typeface, size, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const Typeface &typeface, float size, float scale_x, float skew_x, MaskType mask_type, uint32_t flags) {
-  metadata_.reset(new FontMeta);
-  metadata_->sk_font =
-      SkFont::Make(typeface.metadata_->sk_typeface, size, scale_x, skew_x, (SkFont::MaskType) mask_type, flags);
+  p_.reset(new Private);
+  p_->sk_font =
+      SkFont::Make(typeface.p_->sk_typeface, size, scale_x, skew_x, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const Font &other) {
-  metadata_.reset(new FontMeta);
-  metadata_->sk_font = other.metadata_->sk_font;
+  p_.reset(new Private);
+  p_->sk_font = other.p_->sk_font;
 }
 
 Font::~Font() {
 }
 
 Font &Font::operator=(const Font &other) {
-  metadata_->sk_font = other.metadata_->sk_font;
+  p_->sk_font = other.p_->sk_font;
   return *this;
 }
 
 SkTypeface *Font::GetSkTypeface() const {
-  return metadata_->sk_font->getTypeface();
+  return p_->sk_font->getTypeface();
 }
 
 float Font::GetSize() const {
-  return metadata_->sk_font->getSize();
+  return p_->sk_font->getSize();
 }
 
 float Font::GetScaleX() const {
-  return metadata_->sk_font->getScaleX();
+  return p_->sk_font->getScaleX();
 }
 
 float Font::GetSkewX() const {
-  return metadata_->sk_font->getSkewX();
+  return p_->sk_font->getSkewX();
 }
 
 uint32_t Font::GetFlags() const {
-  return metadata_->sk_font->getFlags();
+  return p_->sk_font->getFlags();
 }
 
 Font::MaskType Font::GetMaskType() const {
-  return (MaskType) metadata_->sk_font->getMaskType();
+  return (MaskType) p_->sk_font->getMaskType();
 }
 
 bool Font::IsBold() const {
-  return metadata_->sk_font->getTypeface()->isBold();
+  return p_->sk_font->getTypeface()->isBold();
 }
 
 bool Font::IsItalic() const {
-  return metadata_->sk_font->getTypeface()->isItalic();
+  return p_->sk_font->getTypeface()->isItalic();
 }
 
 bool Font::IsVertical() const {
-  return metadata_->sk_font->isVertical();
+  return p_->sk_font->isVertical();
 }
 
 bool Font::IsEmbolden() const {
-  return metadata_->sk_font->isEmbolden();
+  return p_->sk_font->isEmbolden();
 }
 
 bool Font::IsEnableAutoHints() const {
-  return metadata_->sk_font->isEnableAutoHints();
+  return p_->sk_font->isEnableAutoHints();
 }
 
 bool Font::IsEnableByteCodeHints() const {
-  return metadata_->sk_font->isEnableByteCodeHints();
+  return p_->sk_font->isEnableByteCodeHints();
 }
 
 bool Font::IsUseNonLinearMetrics() const {
-  return metadata_->sk_font->isUseNonLinearMetrics();
+  return p_->sk_font->isUseNonLinearMetrics();
 }
 
 bool Font::IsDevKern() {
-  return metadata_->sk_font->isDevKern();
+  return p_->sk_font->isDevKern();
 }
 
 int Font::TextToGlyphs(const void *text,
@@ -118,11 +117,11 @@ int Font::TextToGlyphs(const void *text,
                        TextEncoding encoding,
                        uint16_t *glyphs,
                        int max_glyph_count) const {
-  return metadata_->sk_font->textToGlyphs(text, byte_length, (SkTextEncoding) encoding, glyphs, max_glyph_count);
+  return p_->sk_font->textToGlyphs(text, byte_length, (SkTextEncoding) encoding, glyphs, max_glyph_count);
 }
 
 float Font::MeasureText(const void *text, size_t byte_length, TextEncoding encoding) const {
-  return metadata_->sk_font->measureText(text, byte_length, (SkTextEncoding) encoding);
+  return p_->sk_font->measureText(text, byte_length, (SkTextEncoding) encoding);
 }
 
 }

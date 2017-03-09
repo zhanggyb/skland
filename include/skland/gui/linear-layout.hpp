@@ -39,7 +39,11 @@ SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
 
  protected:
 
-  virtual void OnSizeChanged(int width, int height);
+  virtual void OnMeasureReposition(int x, int y);
+
+  virtual void OnMeasureResize(int width, int height);
+
+  virtual void OnGeometryChanged(const Rect &old_geometry);
 
   virtual void OnViewAdded(AbstractView *view);
 

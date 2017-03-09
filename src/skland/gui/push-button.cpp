@@ -35,7 +35,7 @@ Size PushButton::GetPreferredSize() const {
   return Size(90, 20);
 }
 
-void PushButton::OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
+void PushButton::OnGeometryChanged(const Rect &old_geometry) {
 
 }
 

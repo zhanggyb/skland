@@ -224,9 +224,9 @@ void AbstractView::PushFrontChild(AbstractView *child) {
   child->p_->parent = this;
   p_->children_count++;
 
-  OnAddChildView(child);
+  OnAddChild(child);
   if (child->p_->parent == this)
-    child->OnAddedToParentView();
+    child->OnAddedToParent();
 }
 
 void AbstractView::InsertChild(AbstractView *child, int index) {
@@ -297,9 +297,9 @@ void AbstractView::InsertChild(AbstractView *child, int index) {
   child->p_->parent = this;
   p_->children_count++;
 
-  OnAddChildView(child);
+  OnAddChild(child);
   if (child->p_->parent == this)
-    child->OnAddedToParentView();
+    child->OnAddedToParent();
 }
 
 void AbstractView::PushBackChild(AbstractView *child) {
@@ -335,9 +335,9 @@ void AbstractView::PushBackChild(AbstractView *child) {
   child->p_->parent = this;
   p_->children_count++;
 
-  OnAddChildView(child);
+  OnAddChild(child);
   if (child->p_->parent == this)
-    child->OnAddedToParentView();
+    child->OnAddedToParent();
 }
 
 AbstractView *AbstractView::RemoveChild(AbstractView *child) {
@@ -366,9 +366,9 @@ AbstractView *AbstractView::RemoveChild(AbstractView *child) {
   child->p_->next = nullptr;
   child->p_->parent = nullptr;
 
-  OnRemoveChildView(child);
+  OnRemoveChild(child);
   if (child->p_->parent != this)
-    child->OnRemovedFromParentView(this);
+    child->OnRemovedFromParent(this);
 
   return child;
 }
@@ -391,19 +391,19 @@ void AbstractView::ClearChildren() {
   p_->last_child = nullptr;
 }
 
-void AbstractView::OnAddChildView(AbstractView *view) {
+void AbstractView::OnAddChild(AbstractView *view) {
 
 }
 
-void AbstractView::OnRemoveChildView(AbstractView *view) {
+void AbstractView::OnRemoveChild(AbstractView *view) {
 
 }
 
-void AbstractView::OnAddedToParentView() {
+void AbstractView::OnAddedToParent() {
   // override in subclass
 }
 
-void AbstractView::OnRemovedFromParentView(AbstractView *original_parent) {
+void AbstractView::OnRemovedFromParent(AbstractView *original_parent) {
   // override in subclass
 }
 

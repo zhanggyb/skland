@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GRAPHIC_INTERNAL_SHADER_META_HPP_
-#define SKLAND_GRAPHIC_INTERNAL_SHADER_META_HPP_
+#ifndef SKLAND_GRAPHIC_INTERNAL_SHADER_PRIVATE_HPP_
+#define SKLAND_GRAPHIC_INTERNAL_SHADER_PRIVATE_HPP_
+
+#include <skland/graphic/shader.hpp>
 
 #include "SkShader.h"
 
@@ -25,22 +27,22 @@ namespace skland {
  * @ingroup graphic_intern
  * @brief Structure to encapsulate a sk_sp<SkShader> object
  */
-struct ShaderMeta {
+struct Shader::Private {
 
-  ShaderMeta() {}
+  Private() {}
 
-  ShaderMeta(const sk_sp<SkShader> &shader)
+  Private(const sk_sp<SkShader> &shader)
       : sk_shader(shader) {}
 
-  ShaderMeta(const ShaderMeta &other)
+  Private(const Private &other)
       : sk_shader(other.sk_shader) {}
 
-  ShaderMeta &operator=(const ShaderMeta &other) {
+  Private &operator=(const Private &other) {
     sk_shader = other.sk_shader;
     return *this;
   }
 
-  ShaderMeta &operator=(const sk_sp<SkShader> &shader) {
+  Private &operator=(const sk_sp<SkShader> &shader) {
     sk_shader = shader;
     return *this;
   }
@@ -51,4 +53,4 @@ struct ShaderMeta {
 
 }
 
-#endif  // SKLAND_GRAPHIC_INTERNAL_SHADER_META_HPP_
+#endif  // SKLAND_GRAPHIC_INTERNAL_SHADER_PRIVATE_HPP_

@@ -45,14 +45,6 @@ Size AbstractLayout::GetMinimalSize() const {
   return Size(padding_.lr(), padding_.tb());
 }
 
-Size AbstractLayout::GetPreferredSize() const {
-  return Size(400, 300);
-}
-
-Size AbstractLayout::GetMaximalSize() const {
-  return Size(65536, 65536);
-}
-
 void AbstractLayout::AddView(AbstractView *view) {
   Iterator it(view);
 
@@ -76,7 +68,6 @@ void AbstractLayout::RemoveView(AbstractView *view) {
     return;
 
   RemoveChild(view);
-  OnViewDestroyed(view);
 }
 
 void AbstractLayout::OnMouseEnter(MouseEvent *event) {

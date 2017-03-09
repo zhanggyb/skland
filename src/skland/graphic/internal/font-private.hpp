@@ -14,42 +14,43 @@
  * limitations under the License.
  */
 
+#ifndef SKLAND_GRAPHIC_INTERNAL_FONT_PRIVATE_HPP_
+#define SKLAND_GRAPHIC_INTERNAL_FONT_PRIVATE_HPP_
 
-#ifndef SKLAND_GRAPHIC_INTERNAL_TYPEFACE_META_HPP_
-#define SKLAND_GRAPHIC_INTERNAL_TYPEFACE_META_HPP_
+#include <skland/graphic/font.hpp>
 
-#include "SkTypeface.h"
+#include "SkFont.h"
 
 namespace skland {
 
 /**
  * @ingroup graphic_intern
- * @brief Structure to encapsulate a sk_sp<SkTypeface> object
+ * @brief Structure to encapsulate a sk_sp<SkFont> object
  */
-struct TypefaceMeta {
+struct Font::Private {
 
-  TypefaceMeta() {}
+  Private() {}
 
-  TypefaceMeta(const sk_sp<SkTypeface> &typeface)
-      : sk_typeface(typeface) {}
+  Private(const sk_sp<SkFont> &font)
+      : sk_font(font) {}
 
-  TypefaceMeta(const TypefaceMeta &other)
-      : sk_typeface(other.sk_typeface) {}
+  Private(const Private &other)
+      : sk_font(other.sk_font) {}
 
-  TypefaceMeta &operator=(const TypefaceMeta &other) {
-    sk_typeface = other.sk_typeface;
+  Private &operator=(const Private &other) {
+    sk_font = other.sk_font;
     return *this;
   }
 
-  TypefaceMeta &operator=(const sk_sp<SkTypeface> &typeface) {
-    sk_typeface = typeface;
+  Private &operator=(const sk_sp<SkFont> &font) {
+    sk_font = font;
     return *this;
   }
 
-  sk_sp<SkTypeface> sk_typeface;
+  sk_sp<SkFont> sk_font;
 
 };
 
 }
 
-#endif // SKLAND_GRAPHIC_INTERNAL_TYPEFACE_META_HPP_
+#endif // SKLAND_GRAPHIC_INTERNAL_FONT_META_HPP_

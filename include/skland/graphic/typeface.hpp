@@ -25,7 +25,6 @@
 namespace skland {
 
 class Font;
-struct TypefaceMeta;
 
 /**
  * @ingroup graphic
@@ -101,7 +100,9 @@ class Typeface {
 
  private:
 
-  std::unique_ptr<TypefaceMeta> metadata_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
 };
 

@@ -47,7 +47,7 @@ class MainWidget : public AbstractView {
     Update();
   }
 
-  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) override {
+  virtual void OnGeometryChanged(const Rect &old_geometry) override {
 
   }
 

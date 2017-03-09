@@ -21,8 +21,8 @@
 #include "SkPaint.h"
 #include "SkTypeface.h"
 
-#include "internal/font-meta.hpp"
-#include "internal/shader-meta.hpp"
+#include "internal/font-private.hpp"
+#include "internal/shader-private.hpp"
 
 namespace skland {
 
@@ -104,7 +104,7 @@ void Paint::SetFont(const Font &font) {
 }
 
 void Paint::SetShader(const Shader &shader) {
-  metadata_->setShader(shader.metadata_->sk_shader);
+  metadata_->setShader(shader.p_->sk_shader);
 }
 
 Paint::Align Paint::GetTextAlign() const {
