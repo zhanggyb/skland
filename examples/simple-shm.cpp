@@ -56,8 +56,8 @@ class ShmWidget : public AbstractView {
     Update();
   }
 
-  virtual void OnGeometryChanged(const Rect &old_geometry) override {
-    radius_ = clamp(std::min(GetGeometry().width(), GetGeometry().height()) / 2.f - 50.f, 50.f, 200.f);
+  virtual void OnGeometryUpdate(const Rect &new_geometry) override {
+    radius_ = clamp(std::min(new_geometry.width(), new_geometry.height()) / 2.f - 50.f, 50.f, 200.f);
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {

@@ -37,7 +37,7 @@ Shader GradientShader::MakeLinear(const Point2F *points,
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
+                                   nullptr == local_matrix ? nullptr : local_matrix->GetSkMatrix());
 
   return Shader(new Shader::Private(sk_shader));
 }
@@ -57,7 +57,7 @@ Shader GradientShader::MakeLinear(const Point2F points[],
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
+                                   nullptr == local_matrix ? nullptr : local_matrix->GetSkMatrix());
 
   return Shader(new Shader::Private(sk_shader));
 }
@@ -78,7 +78,7 @@ Shader GradientShader::MakeRadial(const Point2F &center,
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
+                                   nullptr == local_matrix ? nullptr : local_matrix->GetSkMatrix());
   return Shader(new Shader::Private(sk_shader));
 }
 
@@ -99,7 +99,7 @@ Shader GradientShader::MakeRadial(const Point2F &center,
                                    count,
                                    (SkShader::TileMode) mode,
                                    flags,
-                                   nullptr == local_matrix ? nullptr : local_matrix->sk_matrix());
+                                   nullptr == local_matrix ? nullptr : local_matrix->GetSkMatrix());
 
   return Shader(new Shader::Private(sk_shader));
 }

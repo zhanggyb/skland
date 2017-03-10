@@ -63,10 +63,16 @@ class AbstractView::RedrawTaskIterator {
   }
 
   void PushBack(AbstractView *view) {
+    if (view->p_->inhibit_redraw)
+      throw std::runtime_error("Error! The view object is inhibited to redraw!");
+
     redraw_task_->PushBack(&view->p_->redraw_task);
   }
 
   void PushFront(AbstractView *view) {
+    if (view->p_->inhibit_redraw)
+      throw std::runtime_error("Error! The view object is inhibited to redraw!");
+
     redraw_task_->PushFront(&view->p_->redraw_task);
   }
 
@@ -103,10 +109,16 @@ class AbstractView::RedrawTaskIterator {
   }
 
   void PushToHead() {
+    if (redraw_task_->view->p_->inhibit_redraw)
+      throw std::runtime_error("Error! This view object is inhibited to redraw!");
+
     kRedrawTaskHead.PushBack(redraw_task_);
   }
 
   void PushToTail() {
+    if (redraw_task_->view->p_->inhibit_redraw)
+      throw std::runtime_error("Error! This view object is inhibited to redraw!");
+
     kRedrawTaskTail.PushFront(redraw_task_);
   }
 

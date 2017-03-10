@@ -56,7 +56,7 @@ class SimpleWidget : public AbstractView {
     Update();
   }
 
-  virtual void OnGeometryChanged(const Rect &old_geometry) override {
+  virtual void OnGeometryUpdate(const Rect &new_geometry) override {
 
   }
 

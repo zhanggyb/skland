@@ -15,7 +15,6 @@
  */
 
 #include <skland/graphic/paint.hpp>
-#include <skland/graphic/font.hpp>
 #include <skland/graphic/shader.hpp>
 
 #include "SkPaint.h"
@@ -26,52 +25,65 @@
 
 namespace skland {
 
+struct Paint::Private {
+
+  Private() {}
+
+  Private(const Private &orig)
+      : sk_paint(orig.sk_paint) {}
+
+  ~Private() {}
+
+  SkPaint sk_paint;
+
+};
+
 Paint::Paint() {
-  metadata_.reset(new SkPaint);
+  p_.reset(new Private);
 }
 
 Paint::Paint(const Paint &orig) {
-  metadata_.reset(new SkPaint(*orig.metadata_));
+  p_.reset(new Private(*orig.p_));
 }
 
 Paint::~Paint() {
 }
 
 Paint &Paint::operator=(const Paint &other) {
-  *metadata_ = *other.metadata_;
+  *p_ = *other.p_;
   return *this;
 }
 
 uint32_t Paint::GetHash() const {
-  return metadata_->getHash();
+  return p_->sk_paint.getHash();
 }
 
 void Paint::Reset() {
-  metadata_->reset();
+  p_->sk_paint.reset();
 }
 
 Paint::Hinting Paint::GetHinting() const {
-  return static_cast<Hinting>(metadata_->getHinting());
+  return static_cast<Hinting>(p_->sk_paint.getHinting());
 }
 
 void Paint::SetHinting(Hinting hinting) {
-  metadata_->setHinting(static_cast<SkPaint::Hinting >(hinting));
+  p_->sk_paint.setHinting(static_cast<SkPaint::Hinting >(hinting));
 }
 
 bool Paint::IsAntiAlias() const {
-  return metadata_->isAntiAlias();
+  return p_->sk_paint.isAntiAlias();
 }
 
 void Paint::SetAntiAlias(bool aa) {
-  metadata_->setAntiAlias(aa);
+  p_->sk_paint.setAntiAlias(aa);
 }
 
 void Paint::SetStyle(Style style) {
-  metadata_->setStyle(static_cast<SkPaint::Style>(style));
+  p_->sk_paint.setStyle(static_cast<SkPaint::Style>(style));
 }
 
 Color Paint::GetColor() const {
-  uint32_t value = metadata_->getColor();
+  uint32_t value = p_->sk_paint.getColor();
   return Color::FromUCharRGBA(SkToU8(SkColorGetR(value)),
                               SkToU8(SkColorGetG(value)),
                               SkToU8(SkColorGetB(value)),
@@ -79,100 +91,104 @@ Color Paint::GetColor() const {
 }
 
 void Paint::SetColor(uint32_t argb) {
-  metadata_->setColor(argb);
+  p_->sk_paint.setColor(argb);
 }
 
 void Paint::SetColor(const Color &color) {
-  metadata_->setARGB(color.uchar_alpha(),
-                     color.uchar_red(),
-                     color.uchar_green(),
-                     color.uchar_blue());
+  p_->sk_paint.setARGB(color.uchar_alpha(),
+                       color.uchar_red(),
+                       color.uchar_green(),
+                       color.uchar_blue());
 }
 
 float Paint::GetStrokeWidth() const {
-  return metadata_->getStrokeWidth();
+  return p_->sk_paint.getStrokeWidth();
 }
 
 void Paint::SetStrokeWidth(float width) {
-  metadata_->setStrokeWidth(width);
+  p_->sk_paint.setStrokeWidth(width);
 }
 
 void Paint::SetFont(const Font &font) {
   SkTypeface *ptr = font.GetSkTypeface();
   sk_sp<SkTypeface> typeface = SkTypeface::MakeFromTypeface(ptr, ptr->style());
-  metadata_->setTypeface(typeface);
+  p_->sk_paint.setTypeface(typeface);
 }
 
 void Paint::SetShader(const Shader &shader) {
-  metadata_->setShader(shader.p_->sk_shader);
+  p_->sk_paint.setShader(shader.p_->sk_shader);
 }
 
 Paint::Align Paint::GetTextAlign() const {
-  return static_cast<Align>(metadata_->getTextAlign());
+  return static_cast<Align>(p_->sk_paint.getTextAlign());
 }
 
 void Paint::SetTextAlign(Align align) {
-  metadata_->setTextAlign(static_cast<SkPaint::Align>(align));
+  p_->sk_paint.setTextAlign(static_cast<SkPaint::Align>(align));
 }
 
 float Paint::GetTextSize() const {
-  return metadata_->getTextSize();
+  return p_->sk_paint.getTextSize();
 }
 
 void Paint::SetTextSize(float size) {
-  metadata_->setTextSize(size);
+  p_->sk_paint.setTextSize(size);
 }
 
 float Paint::GetTextScaleX() const {
-  return metadata_->getTextScaleX();
+  return p_->sk_paint.getTextScaleX();
 }
 
 void Paint::SetTextScaleX(float scale_x) {
-  metadata_->setTextScaleX(scale_x);
+  p_->sk_paint.setTextScaleX(scale_x);
 }
 
 float Paint::GetTextSkewX() const {
-  return metadata_->getTextSkewX();
+  return p_->sk_paint.getTextSkewX();
 }
 
 void Paint::SetTextSkewX(float skew_x) {
-  metadata_->setTextSkewX(skew_x);
+  p_->sk_paint.setTextSkewX(skew_x);
 }
 
 TextEncoding Paint::GetTextEncoding() const {
-  return static_cast<TextEncoding>(metadata_->getTextEncoding());
+  return static_cast<TextEncoding>(p_->sk_paint.getTextEncoding());
 }
 
 void Paint::SetTextEncoding(TextEncoding encoding) {
-  metadata_->setTextEncoding(static_cast<SkPaint::TextEncoding>(encoding));
+  p_->sk_paint.setTextEncoding(static_cast<SkPaint::TextEncoding>(encoding));
 }
 
 int Paint::TextToGlyphs(const void *text, size_t byte_length, uint16_t *glyphs) const {
-  return metadata_->textToGlyphs(text, byte_length, glyphs);
+  return p_->sk_paint.textToGlyphs(text, byte_length, glyphs);
 }
 
 bool Paint::ContainsText(const void *text, size_t byte_length) const {
-  return metadata_->containsText(text, byte_length);
+  return p_->sk_paint.containsText(text, byte_length);
 }
 
 void Paint::GlyphsToUnichars(const uint16_t glyphs[], int count, int32_t text[]) const {
-  metadata_->glyphsToUnichars(glyphs, count, text);
+  p_->sk_paint.glyphsToUnichars(glyphs, count, text);
 }
 
 int Paint::CountText(const void *text, size_t byte_length) const {
-  return metadata_->countText(text, byte_length);
+  return p_->sk_paint.countText(text, byte_length);
 }
 
 float Paint::MeasureText(const void *text, size_t length, Rect *boulds) const {
-  return metadata_->measureText(text, length, reinterpret_cast<SkRect *>(boulds));
+  return p_->sk_paint.measureText(text, length, reinterpret_cast<SkRect *>(boulds));
+}
+
+const SkPaint &Paint::GetSkPaint() const {
+  return p_->sk_paint;
 }
 
 bool operator==(const Paint &paint1, const Paint &paint2) {
-  return paint1.metadata_ == paint2.metadata_;
+  return paint1.p_ == paint2.p_;
 }
 
 bool operator!=(const Paint &paint1, const Paint &paint2) {
-  return paint1.metadata_ != paint2.metadata_;
+  return paint1.p_ != paint2.p_;
 }
 
 }

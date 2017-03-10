@@ -132,13 +132,13 @@ class Path {
 
   void Close();
 
-  SkPath *sk_path() const {
-    return metadata_.get();
-  }
+  const SkPath &GetSkPath() const;
 
  private:
 
-  std::unique_ptr<SkPath> metadata_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 };
 
 bool operator==(const Path &path1, const Path &path2);

@@ -102,7 +102,7 @@ void AbstractButton::OnMeasureResize(int width, int height) {
   Update();
 }
 
-void AbstractButton::OnGeometryChanged(const Rect &old_geometry) {
+void AbstractButton::OnGeometryUpdate(const Rect &new_geometry) {
 
 }
 

@@ -21,11 +21,12 @@
 namespace skland {
 
 void AbstractView::RedrawTask::Run() const {
+  view->p_->inhibit_redraw = true;
+
   if (view->p_->geometry_dirty_flag) {
-    Rect old = view->p_->geometry;
+    view->OnGeometryUpdate(view->p_->pending_geometry);
     view->p_->geometry = view->p_->pending_geometry;
     view->p_->geometry_dirty_flag = 0;
-    view->OnGeometryChanged(old);
   }
 
   view->OnDraw(&context);
@@ -38,6 +39,8 @@ void AbstractView::RedrawTask::Run() const {
                               view->p_->damaged_region.height());
     view->p_->is_damaged = false;
   }
+
+  view->p_->inhibit_redraw = false;
 }
 
 }

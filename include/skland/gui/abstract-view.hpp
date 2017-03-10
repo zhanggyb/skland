@@ -222,7 +222,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual void OnMeasureResize(int width, int height) = 0;
 
-  virtual void OnGeometryChanged(const Rect &old_geometry) = 0;
+  virtual void OnGeometryUpdate(const Rect &new_geometry) = 0;
 
   void TrackMouseMotion(MouseEvent *event);
 

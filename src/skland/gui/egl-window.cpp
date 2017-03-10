@@ -113,9 +113,12 @@ void EGLWindow::OnShown() {
 
   // initialize EGL
   OnUpdate(nullptr);
-  AbstractView *title_view = GetTitleView();
-  if (title_view) title_view->Update();
-  if (GetClientView()) RecursiveUpdate(GetClientView());
+
+  AbstractView *view = GetTitleView();
+  if (view) RecursiveUpdate(view);
+
+  view = GetClientView();
+  if (view) RecursiveUpdate(view);
 }
 
 void EGLWindow::OnUpdate(AbstractView *view) {
@@ -157,9 +160,9 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   return nullptr != sub_surface_ ? sub_surface_ : GetShellSurface();
 }
 
-void EGLWindow::OnSizeChanged(int /*old_width*/, int /*old_height*/) {
-  int width = GetSize().width;
-  int height = GetSize().height;
+void EGLWindow::OnResize(int new_width, int new_height) {
+  int width = new_width;
+  int height = new_height;
 
   RectI input_rect(width, height);
   Surface *shell_surface = this->GetShellSurface();

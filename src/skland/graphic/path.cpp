@@ -20,166 +20,183 @@
 
 namespace skland {
 
+struct Path::Private {
+
+  Private() {}
+
+  Private(const Private &orig)
+      : sk_path(orig.sk_path) {}
+
+  ~Private() {}
+
+  SkPath sk_path;
+
+};
+
 Path::Path() {
-  metadata_.reset(new SkPath);
+  p_.reset(new Private);
 }
 
 Path::Path(const Path &other) {
-  metadata_.reset(new SkPath(*other.metadata_));
+  p_.reset(new Private(*other.p_));
 }
 
 Path::~Path() {
 }
 
 Path &Path::operator=(const Path &other) {
-  *metadata_ = *other.metadata_;
+  *p_ = *other.p_;
   return *this;
 }
 
 bool Path::IsInterpolatable(const Path &compare) const {
-  return metadata_->isInterpolatable(*compare.metadata_);
+  return p_->sk_path.isInterpolatable(compare.p_->sk_path);
 }
 
 bool Path::Interpolate(const Path &ending, float weight, Path *out) const {
-  return metadata_->interpolate(*ending.metadata_, weight, out->metadata_.get());
+  return p_->sk_path.interpolate(ending.p_->sk_path, weight, &out->p_->sk_path);
 }
 
 void Path::AddRect(const Rect &rect, Direction dir) {
-  metadata_->addRect(reinterpret_cast<const SkRect &>(rect), static_cast<SkPath::Direction >(dir));
+  p_->sk_path.addRect(reinterpret_cast<const SkRect &>(rect), static_cast<SkPath::Direction >(dir));
 }
 
 void Path::AddRect(const Rect &rect, Direction dir, unsigned start) {
-  metadata_->addRect(reinterpret_cast<const SkRect &>(rect), static_cast<SkPath::Direction >(dir), start);
+  p_->sk_path.addRect(reinterpret_cast<const SkRect &>(rect), static_cast<SkPath::Direction >(dir), start);
 }
 
 void Path::AddRect(float left, float top, float right, float bottom, Direction dir) {
-  metadata_->addRect(left, top, right, bottom, static_cast<SkPath::Direction >(dir));
+  p_->sk_path.addRect(left, top, right, bottom, static_cast<SkPath::Direction >(dir));
 }
 
 void Path::AddRoundRect(const Rect &rect, const float radii[], Direction dir) {
-  metadata_->addRoundRect(reinterpret_cast<const SkRect &>(rect),
-                          radii, static_cast<SkPath::Direction>(dir));
+  p_->sk_path.addRoundRect(reinterpret_cast<const SkRect &>(rect),
+                           radii, static_cast<SkPath::Direction>(dir));
 }
 
 Path::FillType Path::GetFillType() const {
-  return (FillType) metadata_->getFillType();
+  return (FillType) p_->sk_path.getFillType();
 }
 
 void Path::SetFillType(FillType fill_type) {
-  metadata_->setFillType((SkPath::FillType) fill_type);
+  p_->sk_path.setFillType((SkPath::FillType) fill_type);
 }
 
 bool Path::IsInverseFillType() const {
-  return metadata_->isInverseFillType();
+  return p_->sk_path.isInverseFillType();
 }
 
 void Path::ToggleInverseFillType() {
-  metadata_->toggleInverseFillType();
+  p_->sk_path.toggleInverseFillType();
 }
 
 Path::Convexity Path::GetConvexity() const {
-  return (Convexity) metadata_->getConvexity();
+  return (Convexity) p_->sk_path.getConvexity();
 }
 
 Path::Convexity Path::GetConvexityOrUnknown() const {
-  return (Convexity) metadata_->getConvexityOrUnknown();
+  return (Convexity) p_->sk_path.getConvexityOrUnknown();
 }
 
 void Path::SetConvexity(Convexity convexity) {
-  metadata_->setConvexity((SkPath::Convexity) convexity);
+  p_->sk_path.setConvexity((SkPath::Convexity) convexity);
 }
 
 bool Path::IsConvex() const {
-  return metadata_->isConvex();
+  return p_->sk_path.isConvex();
 }
 
 void Path::Reset() {
-  metadata_->reset();
+  p_->sk_path.reset();
 }
 
 void Path::Rewind() {
-  metadata_->rewind();
+  p_->sk_path.rewind();
 }
 
 bool Path::IsEmpty() const {
-  return metadata_->isEmpty();
+  return p_->sk_path.isEmpty();
 }
 
 int Path::CountPoints() const {
-  return metadata_->countPoints();
+  return p_->sk_path.countPoints();
 }
 
 Point2F Path::GetPoint(int index) const {
-  SkPoint p = metadata_->getPoint(index);
+  SkPoint p = p_->sk_path.getPoint(index);
   return Point2F(p.fX, p.fY);
 }
 
 int Path::GetPoints(Point2F points[], int max) const {
-  return metadata_->getPoints(reinterpret_cast<SkPoint *>(points), max);
+  return p_->sk_path.getPoints(reinterpret_cast<SkPoint *>(points), max);
 }
 
 int Path::CountVerbs() const {
-  return metadata_->countVerbs();
+  return p_->sk_path.countVerbs();
 }
 
 void Path::Swap(Path &other) {
-  metadata_->swap(*other.metadata_);
+  p_->sk_path.swap(other.p_->sk_path);
 }
 
 const RectF &Path::GetBounds() const {
-  return reinterpret_cast<const RectF &>(metadata_->getBounds());
+  return reinterpret_cast<const RectF &>(p_->sk_path.getBounds());
 }
 
 void Path::UpdateBoundsCache() const {
-  metadata_->updateBoundsCache();
+  p_->sk_path.updateBoundsCache();
 }
 
 void Path::MoveTo(float x, float y) {
-  metadata_->moveTo(x, y);
+  p_->sk_path.moveTo(x, y);
 }
 
 void Path::MoveTo(const Point2F &p) {
-  metadata_->moveTo(reinterpret_cast<const SkPoint &>(p));
+  p_->sk_path.moveTo(reinterpret_cast<const SkPoint &>(p));
 }
 
 void Path::RelativeMoveTo(float dx, float dy) {
-  metadata_->rMoveTo(dx, dy);
+  p_->sk_path.rMoveTo(dx, dy);
 }
 
 void Path::LineTo(float x, float y) {
-  metadata_->lineTo(x, y);
+  p_->sk_path.lineTo(x, y);
 }
 
 void Path::LineTo(const Point2F &p) {
-  metadata_->lineTo(reinterpret_cast<const SkPoint &>(p));
+  p_->sk_path.lineTo(reinterpret_cast<const SkPoint &>(p));
 }
 
 void Path::RelativeLineTo(float dx, float dy) {
-  metadata_->rLineTo(dx, dy);
+  p_->sk_path.rLineTo(dx, dy);
 }
 
 void Path::QuadTo(float x1, float y1, float x2, float y2) {
-  metadata_->quadTo(x1, y1, x2, y2);
+  p_->sk_path.quadTo(x1, y1, x2, y2);
 }
 
 void Path::QuadTo(const Point2F &p1, const Point2F &p2) {
-  metadata_->quadTo(reinterpret_cast<const SkPoint &>(p1), reinterpret_cast<const SkPoint &>(p2));
+  p_->sk_path.quadTo(reinterpret_cast<const SkPoint &>(p1), reinterpret_cast<const SkPoint &>(p2));
 }
 
 void Path::RelativeQuadTo(float dx1, float dy1, float dx2, float dy2) {
-  metadata_->rQuadTo(dx1, dy1, dx2, dy2);
+  p_->sk_path.rQuadTo(dx1, dy1, dx2, dy2);
 }
 
 void Path::Close() {
-  metadata_->close();
+  p_->sk_path.close();
+}
+
+const SkPath &Path::GetSkPath() const {
+  return p_->sk_path;
 }
 
 bool operator==(const Path &path1, const Path &path2) {
-  return (*path1.metadata_) == (*path2.metadata_);
+  return (path1.p_->sk_path) == (path2.p_->sk_path);
 }
 
 bool operator!=(const Path &path1, const Path &path2) {
-  return (*path1.metadata_) != (*path2.metadata_);
+  return (path1.p_->sk_path) != (path2.p_->sk_path);
 }
 
 }

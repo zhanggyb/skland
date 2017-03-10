@@ -93,18 +93,15 @@ class Canvas {
 
   void Flush();
 
-  const Point2F &origin() const {
-    return origin_;
-  }
+  const Point2F &GetOrigin() const;
 
-  SkCanvas *sk_canvas() const {
-    return metadata_.get();
-  }
+  SkCanvas *GetSkCanvas() const;
 
  private:
 
-  std::unique_ptr<SkCanvas> metadata_;
-  Point2F origin_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
 };
 

@@ -47,7 +47,8 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         visible(true),
         geometry_dirty_flag(0),
         redraw_task(view),
-        is_damaged(false) {}
+        is_damaged(false),
+        inhibit_redraw(false) {}
 
   ~Private() {}
 
@@ -89,6 +90,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    */
   RectI damaged_region;
 
+  bool inhibit_redraw;
 };
 
 }

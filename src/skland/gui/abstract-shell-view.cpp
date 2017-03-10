@@ -695,10 +695,9 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
 
   if (do_resize) {
     ShellSurface::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
-    Size old = p_->size;
+    OnResize(width, height);
     p_->size.width = width;
     p_->size.height = height;
-    OnSizeChanged(old.width, old.height);
 
     // Resize frame first, then the content view
     if (p_->shell_frame) {

@@ -20,20 +20,37 @@
 
 namespace skland {
 
+struct Matrix::Private {
+
+  Private() {}
+
+  Private(const Private &orig)
+      : sk_matrix(orig.sk_matrix) {}
+
+  ~Private() {}
+
+  SkMatrix sk_matrix;
+
+};
+
 Matrix::Matrix() {
-  metadata_.reset(new SkMatrix);
+  p_.reset(new Private);
 }
 
 Matrix::Matrix(const Matrix &other) {
-  metadata_.reset(new SkMatrix(*other.metadata_));
+  p_.reset(new Private(*other.p_));
 }
 
 Matrix::~Matrix() {
 }
 
 Matrix &Matrix::operator=(const Matrix &other) {
-  *metadata_ = *other.metadata_;
+  *p_ = *other.p_;
   return *this;
+}
+
+const SkMatrix *Matrix::GetSkMatrix() const {
+  return &p_->sk_matrix;
 }
 
 }

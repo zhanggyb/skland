@@ -27,16 +27,16 @@ class AbstractShellView::RedrawTaskIterator {
 
  public:
 
-  RedrawTaskIterator(AbstractShellView *event_handler)
-      : redraw_task_(&event_handler->p_->redraw_task) {}
+  RedrawTaskIterator(AbstractShellView *shell_view)
+      : redraw_task_(&shell_view->p_->redraw_task) {}
 
   RedrawTaskIterator(const RedrawTaskIterator &orig)
       : redraw_task_(orig.redraw_task_) {}
 
   ~RedrawTaskIterator() {}
 
-  RedrawTaskIterator &operator=(const AbstractShellView *event_handler) {
-    redraw_task_ = &event_handler->p_->redraw_task;
+  RedrawTaskIterator &operator=(const AbstractShellView *shell_view) {
+    redraw_task_ = &shell_view->p_->redraw_task;
     return *this;
   }
 
@@ -49,10 +49,6 @@ class AbstractShellView::RedrawTaskIterator {
     redraw_task_->context = context;
   }
 
-  void SetContext(const AbstractShellView *event_hander) {
-    redraw_task_->context = event_hander->p_->redraw_task.context;
-  }
-
   const Context &context() const {
     return redraw_task_->context;
   }
@@ -61,12 +57,12 @@ class AbstractShellView::RedrawTaskIterator {
     return redraw_task_->IsLinked();
   }
 
-  void PushBack(AbstractShellView *event_handler) {
-    redraw_task_->PushBack(&event_handler->p_->redraw_task);
+  void PushBack(AbstractShellView *shell_view) {
+    redraw_task_->PushBack(&shell_view->p_->redraw_task);
   }
 
-  void PushFront(AbstractShellView *event_handler) {
-    redraw_task_->PushFront(&event_handler->p_->redraw_task);
+  void PushFront(AbstractShellView *shell_view) {
+    redraw_task_->PushFront(&shell_view->p_->redraw_task);
   }
 
   RedrawTask *redraw_task() const { return redraw_task_; }

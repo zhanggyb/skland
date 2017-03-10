@@ -133,13 +133,13 @@ class Paint {
     return MeasureText(text, length, nullptr);
   }
 
-  SkPaint *sk_paint() const {
-    return metadata_.get();
-  }
+  const SkPaint &GetSkPaint() const;
 
  private:
 
-  std::unique_ptr<SkPaint> metadata_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 };
 
 bool operator==(const Paint &paint1, const Paint &paint2);

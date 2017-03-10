@@ -39,13 +39,13 @@ class Matrix {
 
   Matrix &operator=(const Matrix &other);
 
-  SkMatrix *sk_matrix() const {
-    return metadata_.get();
-  }
+  const SkMatrix *GetSkMatrix() const;
 
  private:
 
-  std::unique_ptr<SkMatrix> metadata_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
 };
 

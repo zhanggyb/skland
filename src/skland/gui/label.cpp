@@ -72,7 +72,7 @@ void Label::OnMeasureResize(int width, int height) {
   Update();
 }
 
-void Label::OnGeometryChanged(const Rect &old_geometry) {
+void Label::OnGeometryUpdate(const Rect &new_geometry) {
 
 }
 
@@ -110,14 +110,15 @@ void Label::OnDraw(const Context *context) {
   float text_width = paint.MeasureText(text_.c_str(), text_.length());
 
   SkTextBox text_box;
+  const Rect &rect = GetGeometry();
   // Put the text at the center
-  text_box.setBox((GetGeometry().l + GetGeometry().r - text_width) / 2.f,
-                  GetGeometry().t + 1.f, // move down a little for better look
-                  (GetGeometry().r - GetGeometry().l + text_width) / 2.f,
-                  GetGeometry().b);
+  text_box.setBox((rect.l + rect.r - text_width) / 2.f,
+                  rect.t + 1.f, // move down a little for better look
+                  (rect.r - rect.l + text_width) / 2.f,
+                  rect.b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
-  text_box.setText(text_.c_str(), text_.length(), *paint.sk_paint());
-  text_box.draw(context->canvas()->sk_canvas());
+  text_box.setText(text_.c_str(), text_.length(), paint.GetSkPaint());
+  text_box.draw(context->canvas()->GetSkCanvas());
 }
 
 }

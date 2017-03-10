@@ -151,9 +151,9 @@ void Window::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void Window::OnSizeChanged(int /*old_width*/, int /*old_height*/) {
-  int width = GetSize().width;
-  int height = GetSize().height;
+void Window::OnResize(int new_width, int new_height) {
+  int width = new_width;
+  int height = new_height;
 
   RectI input_rect(width, height);
   Surface *shell_surface = this->GetShellSurface();

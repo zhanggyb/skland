@@ -285,7 +285,7 @@ void TitleBar::OnMeasureResize(int width, int height) {
   RecursiveUpdate();
 }
 
-void TitleBar::OnGeometryChanged(const Rect &old_geometry) {
+void TitleBar::OnGeometryUpdate(const Rect &new_geometry) {
 
 }
 
@@ -321,14 +321,15 @@ void TitleBar::OnDraw(const Context *context) {
   float text_width = paint.MeasureText(title_.c_str(), title_.length());
 
   SkTextBox text_box;
+  const Rect &rect = GetGeometry();
   // Put the text at the center
-  text_box.setBox((GetGeometry().l + GetGeometry().r - text_width) / 2.f,
-                  GetGeometry().t + 1.f, // move down a little for better look
-                  (GetGeometry().r - GetGeometry().l + text_width) / 2.f,
-                  GetGeometry().b);
+  text_box.setBox((rect.l + rect.r - text_width) / 2.f,
+                  rect.t + 1.f, // move down a little for better look
+                  (rect.r - rect.l + text_width) / 2.f,
+                  rect.b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
-  text_box.setText(title_.c_str(), title_.length(), *paint.sk_paint());
-  text_box.draw(context->canvas()->sk_canvas());
+  text_box.setText(title_.c_str(), title_.length(), paint.GetSkPaint());
+  text_box.draw(context->canvas()->GetSkCanvas());
 }
 
 // -------
@@ -499,7 +500,7 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   }
 
   // shadow map
-  SkCanvas *c = canvas->sk_canvas();
+  SkCanvas *c = canvas->GetSkCanvas();
   sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::shadow_pixmap(), nullptr, nullptr);
 
   // top-left
