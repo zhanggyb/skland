@@ -169,7 +169,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnShown() = 0;
 
-  virtual void OnResize(int new_width, int new_height) = 0;
+  virtual void OnSizeChanged(int old_width, int old_height, int new_width, int new_height) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

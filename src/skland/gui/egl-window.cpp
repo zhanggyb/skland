@@ -160,7 +160,7 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   return nullptr != sub_surface_ ? sub_surface_ : GetShellSurface();
 }
 
-void EGLWindow::OnResize(int new_width, int new_height) {
+void EGLWindow::OnSizeChanged(int old_width, int old_height, int new_width, int new_height) {
   int width = new_width;
   int height = new_height;
 
@@ -205,7 +205,7 @@ void EGLWindow::OnResize(int new_width, int new_height) {
 
   Rect client_rect = GetClientGeometry();
   egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
-  OnResizeEGL(GetSize().width, GetSize().height);
+  OnResizeEGL(width, height); // Wrong! not this width/height
 
   OnUpdate(nullptr);  // Update the background
 

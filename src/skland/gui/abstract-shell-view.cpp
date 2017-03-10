@@ -20,7 +20,6 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
-#include <skland/gui/surface.hpp>
 #include <skland/gui/shell-surface.hpp>
 #include <skland/gui/toplevel-shell-surface.hpp>
 
@@ -695,9 +694,10 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
 
   if (do_resize) {
     ShellSurface::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
-    OnResize(width, height);
+    Size old = p_->size;
     p_->size.width = width;
     p_->size.height = height;
+    OnSizeChanged(old.width, old.height, width, height);
 
     // Resize frame first, then the content view
     if (p_->shell_frame) {

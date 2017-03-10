@@ -285,7 +285,7 @@ void TitleBar::OnMeasureResize(int width, int height) {
   RecursiveUpdate();
 }
 
-void TitleBar::OnGeometryUpdate(const Rect &new_geometry) {
+void TitleBar::OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) {
 
 }
 

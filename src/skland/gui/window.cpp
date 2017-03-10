@@ -151,7 +151,7 @@ void Window::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void Window::OnResize(int new_width, int new_height) {
+void Window::OnSizeChanged(int old_width, int old_height, int new_width, int new_height) {
   int width = new_width;
   int height = new_height;
 

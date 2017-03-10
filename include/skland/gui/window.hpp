@@ -61,7 +61,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnKeyboardKey(KeyEvent *event) final;
 
-  virtual void OnResize(int new_width, int new_height) final;
+  virtual void OnSizeChanged(int old_width, int old_height, int new_width, int new_height) final;
 
  private:
 

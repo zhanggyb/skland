@@ -72,7 +72,7 @@ void Label::OnMeasureResize(int width, int height) {
   Update();
 }
 
-void Label::OnGeometryUpdate(const Rect &new_geometry) {
+void Label::OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) {
 
 }
 

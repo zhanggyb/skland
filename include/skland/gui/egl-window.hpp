@@ -61,7 +61,7 @@ class EGLWindow : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnResize(int new_width, int new_height) final;
+  virtual void OnSizeChanged(int old_width, int old_height, int new_width, int new_height) final;
 
   virtual void OnDraw(const Context *context) final;
 

@@ -66,7 +66,7 @@ void LinearLayout::OnMeasureResize(int width, int height) {
   Update();
 }
 
-void LinearLayout::OnGeometryUpdate(const Rect &new_geometry) {
+void LinearLayout::OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) {
 
 }
 

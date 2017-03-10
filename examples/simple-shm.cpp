@@ -56,7 +56,7 @@ class ShmWidget : public AbstractView {
     Update();
   }
 
-  virtual void OnGeometryUpdate(const Rect &new_geometry) override {
+  virtual void OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) override {
     radius_ = clamp(std::min(new_geometry.width(), new_geometry.height()) / 2.f - 50.f, 50.f, 200.f);
   }
 
@@ -95,10 +95,11 @@ class ShmWidget : public AbstractView {
     static int padding = 5;
     std::shared_ptr<Canvas> canvas = context_->canvas();
     canvas->Save();
-    canvas->ClipRect(Rect(GetGeometry().l + padding,
-                          GetGeometry().t,
-                          GetGeometry().r - padding,
-                          GetGeometry().b - padding));
+    const Rect& rect = GetGeometry();
+    canvas->ClipRect(Rect(rect.l + padding,
+                          rect.t,
+                          rect.r - padding,
+                          rect.b - padding));
 
     canvas->Clear(color_);
 
@@ -108,10 +109,10 @@ class ShmWidget : public AbstractView {
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetStrokeWidth(5.f);
 
-    canvas->DrawArc(Rect(GetGeometry().center_x() - radius_,
-                         GetGeometry().center_y() - radius_,
-                         GetGeometry().center_x() + radius_,
-                         GetGeometry().center_y() + radius_),
+    canvas->DrawArc(Rect(GetXCenter() - radius_,
+                         GetYCenter() - radius_,
+                         GetXCenter() + radius_,
+                         GetYCenter() + radius_),
                     angle_, 300.f, false, paint);
 
     canvas->Restore();
