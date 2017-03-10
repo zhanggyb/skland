@@ -63,30 +63,34 @@ void Window::OnShown() {
   Surface *shell_surface = this->GetShellSurface();
 
   // Create buffer:
-  int total_width = GetSize().width;
-  int total_height = GetSize().height;
-  total_width += shell_surface->margin().lr();
-  total_height += shell_surface->margin().tb();
+  int width = GetSize().width;
+  int height = GetSize().height;
+  width += shell_surface->margin().lr();
+  height += shell_surface->margin().tb();
 
-  frame_pool_.Setup(total_width * 4 * total_height);
-  frame_buffer_.Setup(frame_pool_, total_width, total_height,
-                      total_width * 4, WL_SHM_FORMAT_ARGB8888);
+  int32_t pool_size = width * 4 * height;
+  if (main_surface_) pool_size *= 2; // double buffer for 2 surfaces
+
+  pool_.Setup(pool_size);
+
+  frame_buffer_.Setup(pool_, width, height,
+                      width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&frame_buffer_);
-  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.pixel(),
-                                 frame_buffer_.size().width,
-                                 frame_buffer_.size().height));
+  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.GetData(),
+                                 frame_buffer_.GetSize().width,
+                                 frame_buffer_.GetSize().height));
   frame_canvas_->SetOrigin((float) shell_surface->margin().left,
                            (float) shell_surface->margin().top);
   frame_canvas_->Clear();
 
   if (main_surface_) {
-    main_pool_.Setup(total_width * 4 * total_height);
-    main_buffer_.Setup(main_pool_, total_width, total_height,
-                       total_width * 4, WL_SHM_FORMAT_ARGB8888);
+    main_buffer_.Setup(pool_, width, height,
+                       width * 4, WL_SHM_FORMAT_ARGB8888,
+                       width * 4 * height);
     main_surface_->Attach(&main_buffer_);
-    main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.pixel(),
-                                  main_buffer_.size().width,
-                                  main_buffer_.size().height));
+    main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.GetData(),
+                                  main_buffer_.GetSize().width,
+                                  main_buffer_.GetSize().height));
     main_canvas_->SetOrigin((float) main_surface_->margin().left,
                             (float) main_surface_->margin().top);
     main_canvas_->Clear();
@@ -173,24 +177,25 @@ void Window::OnSizeChanged(int old_width, int old_height, int new_width, int new
   width += shell_surface->margin().lr();
   height += shell_surface->margin().tb();
 
-  int total_size = width * 4 * height;
-  frame_pool_.Setup(total_size);
+  int pool_size = width * 4 * height;
+  if (main_surface_) pool_size *= 2;
 
-  frame_buffer_.Setup(frame_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+  pool_.Setup(pool_size);
+
+  frame_buffer_.Setup(pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&frame_buffer_);
-  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.pixel(),
-                                 frame_buffer_.size().width,
-                                 frame_buffer_.size().height));
+  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.GetData(),
+                                 frame_buffer_.GetSize().width,
+                                 frame_buffer_.GetSize().height));
   frame_canvas_->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
   frame_canvas_->Clear();
 
   if (main_surface_) {
-    main_pool_.Setup(total_size);
-    main_buffer_.Setup(main_pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+    main_buffer_.Setup(pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
     main_surface_->Attach(&main_buffer_);
-    main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.pixel(),
-                                  main_buffer_.size().width,
-                                  main_buffer_.size().height));
+    main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.GetData(),
+                                  main_buffer_.GetSize().width,
+                                  main_buffer_.GetSize().height));
     main_canvas_->SetOrigin(main_surface_->margin().left,
                             main_surface_->margin().top);
     main_canvas_->Clear();

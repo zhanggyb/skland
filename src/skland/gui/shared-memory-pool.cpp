@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-#include <skland/gui/memory-pool.hpp>
+#include <skland/gui/shared-memory-pool.hpp>
+
+#include <sys/mman.h>
 
 #include <stdlib.h>
 #include <malloc.h>
@@ -32,14 +34,16 @@
 
 namespace skland {
 
-void MemoryPool::Setup(int32_t size) {
+void SharedMemoryPool::Setup(int32_t size) {
   Destroy();
 
   int fd = CreateAnonymousFile(size);
   if (fd < 0) throw std::runtime_error("Cannot create anonymous file for SHM");
 
-  data_.reset(new SharedMemory(fd, (size_t) size));
-  if (data_->data() == nullptr) {
+  data_ = mmap(NULL, (size_t) size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  if (data_ == MAP_FAILED) {
+    DBG_PRINT_MSG("%s\n", "Fail to map pages of memory");
+    data_ = nullptr;
     close(fd);
     throw std::runtime_error("Cannot map shared memory");
   }
@@ -49,15 +53,20 @@ void MemoryPool::Setup(int32_t size) {
   close(fd);
 }
 
-void MemoryPool::Destroy() {
+void SharedMemoryPool::Destroy() {
   if (wl_shm_pool_.IsValid()) {
-    data_.reset();
+    DBG_ASSERT(data_);
+
+    if (munmap(data_, (size_t) size_))
+      DBG_PRINT_MSG("%s\n", "Failed to unmap the memory\n");
+
+    data_ = nullptr;
     size_ = 0;
     wl_shm_pool_.Destroy();
   }
 }
 
-int MemoryPool::CreateAnonymousFile(off_t size) {
+int SharedMemoryPool::CreateAnonymousFile(off_t size) {
   static const char temp[] = "/skland-XXXXXX";
   const char *path;
   char *name;
@@ -102,7 +111,7 @@ int MemoryPool::CreateAnonymousFile(off_t size) {
   return fd;
 }
 
-int MemoryPool::CreateTmpfileCloexec(char *tmpname) {
+int SharedMemoryPool::CreateTmpfileCloexec(char *tmpname) {
   int fd;
 
 #ifdef HAVE_MKOSTEMP

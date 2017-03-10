@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_SHM_POOL_HPP_
-#define SKLAND_GUI_SHM_POOL_HPP_
-
-#include "shared-memory.hpp"
+#ifndef SKLAND_GUI_SHARED_MEMORY_POOL_HPP_
+#define SKLAND_GUI_SHARED_MEMORY_POOL_HPP_
 
 #include <sys/types.h>
 
@@ -28,22 +26,22 @@ namespace skland {
 /**
  * @brief Shared memory pool
  */
-class MemoryPool {
+class SharedMemoryPool {
 
-  MemoryPool &operator=(const MemoryPool &) = delete;
-  MemoryPool(const MemoryPool &) = delete;
+  SharedMemoryPool &operator=(const SharedMemoryPool &) = delete;
+  SharedMemoryPool(const SharedMemoryPool &) = delete;
 
  public:
 
-  MemoryPool()
-      : size_(0) {}
+  SharedMemoryPool()
+      : size_(0), data_(nullptr) {}
 
   /**
    * @brief Destructor
    *
    * Destroy the pool, this does not unmap the memory though.
    */
-  inline ~MemoryPool() {}
+  inline ~SharedMemoryPool() {}
 
   void Setup(int32_t size);
 
@@ -57,9 +55,7 @@ class MemoryPool {
     return wl_shm_pool_;
   }
 
-  const SharedMemory::SharedPtr &data() const {
-    return data_;
-  }
+  void *data() const { return data_; };
 
  private:
 
@@ -70,10 +66,11 @@ class MemoryPool {
   wayland::ShmPool wl_shm_pool_;
 
   int32_t size_;
-  SharedMemory::SharedPtr data_;
+
+  void *data_;
 
 };
 
 }
 
-#endif // SKLAND_GUI_SHM_POOL_HPP_
+#endif // SKLAND_GUI_SHARED_MEMORY_POOL_HPP_

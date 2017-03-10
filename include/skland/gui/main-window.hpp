@@ -18,7 +18,7 @@
 #define SKLAND_GUI_MAIN_WINDOW_HPP_
 
 #include "abstract-shell-view.hpp"
-#include "memory-pool.hpp"
+#include "shared-memory-pool.hpp"
 #include "buffer.hpp"
 
 namespace skland {

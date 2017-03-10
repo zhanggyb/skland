@@ -21,7 +21,7 @@
 
 #include "../wayland/callback.hpp"
 
-#include "memory-pool.hpp"
+#include "shared-memory-pool.hpp"
 #include "buffer.hpp"
 
 #include "../stock/theme.hpp"
@@ -82,12 +82,12 @@ class EGLWindow : public AbstractShellView {
   void OnRelease();
 
   /* Properties for frame surface, JUST experimental */
-  MemoryPool frame_pool_;
+  SharedMemoryPool pool_;
+
   Buffer frame_buffer_;
   std::shared_ptr<Canvas> frame_canvas_;
 
   /* Properties for main surface, JUST experimental */
-  MemoryPool main_pool_;
   Buffer main_buffer_;
   std::shared_ptr<Canvas> main_canvas_;
 

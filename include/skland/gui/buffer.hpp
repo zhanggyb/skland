@@ -17,16 +17,20 @@
 #ifndef SKLAND_GUI_BUFFER_HPP_
 #define SKLAND_GUI_BUFFER_HPP_
 
-#include "shared-memory.hpp"
-
 #include "../core/point.hpp"
 #include "../core/size.hpp"
+#include "../core/delegate.hpp"
 
-#include "../wayland/buffer.hpp"
+#include <cstdint>
+#include <memory>
 
 namespace skland {
 
-class MemoryPool;
+namespace wayland {
+class Buffer;
+}
+
+class SharedMemoryPool;
 
 /**
  * @brief Buffer in wayland compositor
@@ -36,22 +40,16 @@ class MemoryPool;
  */
 class Buffer {
 
-  friend class MemoryPool;
-
   Buffer(const Buffer &) = delete;
   Buffer &operator=(const Buffer &) = delete;
 
  public:
 
-  Buffer()
-      : stride_(0),
-        format_(0),
-        pixel_(nullptr) {
-  }
+  Buffer();
 
-  ~Buffer() {}
+  ~Buffer();
 
-  void Setup(const MemoryPool &pool,
+  void Setup(const SharedMemoryPool &pool,
              int32_t width,
              int32_t height,
              int32_t stride,
@@ -60,53 +58,27 @@ class Buffer {
 
   void Destroy();
 
-  void SetPosition(int x, int y) {
-    position_.x = x;
-    position_.y = y;
-  }
+  void SetPosition(int x, int y);
 
-  const wayland::Buffer &wl_buffer() const {
-    return wl_buffer_;
-  }
+  const wayland::Buffer &wl_buffer() const;
 
-  const void *pixel() const {
-    return pixel_;
-  }
+  const void *GetData() const;
 
-  int32_t stride() const {
-    return stride_;
-  }
+  int32_t GetStride() const;
 
-  const Point &position() const {
-    return position_;
-  }
+  int GetOffset() const;
 
-  const Size &size() const {
-    return size_;
-  }
+  const Point &GetPosition() const;
 
-  DelegateRef<void()> release() {
-    return wl_buffer_.release();
-  }
+  const Size &GetSize() const;
+
+  DelegateRef<void()> release();
 
  private:
 
-  wayland::Buffer wl_buffer_;
+  struct Private;
 
-  /**
-   * @brief Position on surface
-   */
-  Point position_;
-
-  Size size_;
-
-  int32_t stride_;
-
-  uint32_t format_;
-
-  void *pixel_;
-
-  SharedMemory::SharedPtr data_;
+  std::unique_ptr<Private> p_;
 
 };
 

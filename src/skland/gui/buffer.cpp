@@ -15,11 +15,53 @@
  */
 
 #include <skland/gui/buffer.hpp>
-#include <skland/gui/memory-pool.hpp>
+#include <skland/gui/shared-memory-pool.hpp>
+
+#include <skland/wayland/buffer.hpp>
 
 namespace skland {
 
-void Buffer::Setup(const MemoryPool &pool,
+struct Buffer::Private {
+
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : stride(0),
+        format(0),
+        offset(0),
+        data(nullptr) {}
+
+  ~Private() {}
+
+  wayland::Buffer wl_buffer;
+
+  /**
+   * @brief Position on surface
+   */
+  Point position;
+
+  Size size;
+
+  int32_t stride;
+
+  uint32_t format;
+
+  int offset;
+
+  void *data;
+
+};
+
+Buffer::Buffer() {
+  p_.reset(new Private);
+}
+
+Buffer::~Buffer() {
+
+}
+
+void Buffer::Setup(const SharedMemoryPool &pool,
                    int32_t width,
                    int32_t height,
                    int32_t stride,
@@ -32,26 +74,59 @@ void Buffer::Setup(const MemoryPool &pool,
     throw std::runtime_error("Error! Trying to allocate buffer on small SHM pool.");
   }
 
-  wl_buffer_.Setup(pool.wl_shm_pool(), offset, width,
-                   height, stride, format);
-  size_.width = width;
-  size_.height = height;
-  stride_ = stride;
-  format_ = format;
-  data_ = pool.data();
-  pixel_ = (char *) data_->data() + offset;
+  p_->wl_buffer.Setup(pool.wl_shm_pool(), offset, width,
+                      height, stride, format);
+  p_->size.width = width;
+  p_->size.height = height;
+  p_->stride = stride;
+  p_->format = format;
+  p_->offset = offset;
+  p_->data = (char *) pool.data() + offset;
 }
 
 void Buffer::Destroy() {
-  if (wl_buffer_.IsValid()) {
-    data_.reset();
-    pixel_ = nullptr;
-    format_ = 0;
-    stride_ = 0;
-    size_.width = 0;
-    size_.height = 0;
-    wl_buffer_.Destroy();
+  if (p_->wl_buffer.IsValid()) {
+    p_->data = nullptr;
+    p_->offset = 0;
+    p_->format = 0;
+    p_->stride = 0;
+    p_->size.width = 0;
+    p_->size.height = 0;
+    p_->wl_buffer.Destroy();
   }
+}
+
+void Buffer::SetPosition(int x, int y) {
+  p_->position.x = x;
+  p_->position.y = y;
+}
+
+const wayland::Buffer &Buffer::wl_buffer() const {
+  return p_->wl_buffer;
+}
+
+const void *Buffer::GetData() const {
+  return p_->data;
+}
+
+int32_t Buffer::GetStride() const {
+  return p_->stride;
+}
+
+int Buffer::GetOffset() const {
+  return p_->offset;
+}
+
+const Point &Buffer::GetPosition() const {
+  return p_->position;
+}
+
+const Size &Buffer::GetSize() const {
+  return p_->size;
+}
+
+DelegateRef<void()> Buffer::release() {
+  return p_->wl_buffer.release();
 }
 
 }
