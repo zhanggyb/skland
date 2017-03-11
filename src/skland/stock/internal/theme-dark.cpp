@@ -93,7 +93,7 @@ void WindowFrameDark::OnDraw(const Context *context) {
   paint.SetColor(0xEF303030);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(), paint);
+  canvas->DrawRect(GetClientGeometry(GetShellView()->GetSize().width, GetShellView()->GetSize().height), paint);
   canvas->Restore();
 
   canvas->Flush();

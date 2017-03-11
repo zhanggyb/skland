@@ -98,7 +98,11 @@ class ShmWidget : public AbstractView {
 
     paint.SetColor(color_);
     paint.SetStyle(Paint::Style::kStyleFill);
-    canvas->DrawRect(Rect(rectangle_.l + padding, rectangle_.t, rectangle_.r - padding, rectangle_.b - padding), paint);
+    canvas->DrawRect(Rect(rectangle_.l + padding,
+                          rectangle_.t,
+                          rectangle_.r - padding,
+                          rectangle_.b - padding),
+                     paint);
 
     paint.SetColor(Color(0xEFFFFFFF));
     paint.SetStyle(Paint::Style::kStyleStroke);
@@ -116,7 +120,8 @@ class ShmWidget : public AbstractView {
 
     angle_ += 5.f;
     if (angle_ > 360.f) angle_ = 0.f;
-    radius_ = clamp(std::min(rectangle_.width(), rectangle_.height()) / 2.f - 50.f, 50.f, 200.f);
+    radius_ = clamp(std::min(rectangle_.width(), rectangle_.height()) / 2.f - 50.f,
+                    50.f, 200.f);
 
     context_->SetupCallback(frame_callback_);
     Animate();

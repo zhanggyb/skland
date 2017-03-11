@@ -67,7 +67,7 @@ SKLAND_EXPORT class AbstractShellFrame : public Trackable {
 
   void SetTitleView(AbstractView *view);
 
-  virtual Rect GetClientGeometry() const = 0;
+  virtual Rect GetClientGeometry(int width, int height) const = 0;
 
   AbstractView *GetTitleView() const;
 

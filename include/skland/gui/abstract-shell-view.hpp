@@ -155,7 +155,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   int GetMouseLocation(const MouseEvent *event) const;
 
-  Rect GetClientGeometry() const;
+  Rect GetClientGeometry(int width, int height) const;
 
   const Size &GetSize() const;
 

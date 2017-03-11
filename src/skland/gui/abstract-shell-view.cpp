@@ -298,13 +298,12 @@ void AbstractShellView::DetachView(AbstractView *view) {
     view->OnDetachedFromShellView(this);
 }
 
-Rect AbstractShellView::GetClientGeometry() const {
-  if (IsFrameless()) {
-    DBG_ASSERT(nullptr == p_->shell_frame);
-    return Rect::FromXYWH(0.f, 0.f, p_->size.width, p_->size.height);
+Rect AbstractShellView::GetClientGeometry(int width, int height) const {
+  if (nullptr == p_->shell_frame) {
+    return Rect::FromXYWH(0.f, 0.f, width, height);
   }
 
-  return p_->shell_frame->GetClientGeometry();
+  return p_->shell_frame->GetClientGeometry(width, height);
 }
 
 void AbstractShellView::OnMouseEnter(MouseEvent *event) {
@@ -767,7 +766,7 @@ void AbstractShellView::OnClientViewDestroyed(AbstractView *view, SLOT slot) {
 }
 
 void AbstractShellView::SetContentViewGeometry() {
-  Rect rect = GetClientGeometry();
+  Rect rect = GetClientGeometry(p_->size.width, p_->size.height);
 
   p_->client_view->MoveTo((int) rect.x(), (int) rect.y());
   p_->client_view->Resize((int) rect.width(), (int) rect.height());

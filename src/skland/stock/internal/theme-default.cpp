@@ -348,11 +348,11 @@ WindowFrameDefault::~WindowFrameDefault() {
 
 }
 
-Rect WindowFrameDefault::GetClientGeometry() const {
+Rect WindowFrameDefault::GetClientGeometry(int width, int height) const {
   int x = border_,
       y = border_,
-      w = GetShellView()->GetSize().width - 2 * border_,
-      h = GetShellView()->GetSize().height - 2 * border_;
+      w = width - 2 * border_,
+      h = height - 2 * border_;
 
   switch (title_bar_position_) {
     case kLeft: {
@@ -440,7 +440,7 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   paint.SetColor(0xEFE0E0E0);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(), paint);
+  canvas->DrawRect(GetClientGeometry(GetShellView()->GetSize().width, GetShellView()->GetSize().height), paint);
   canvas->Restore();
 
   canvas->Flush();

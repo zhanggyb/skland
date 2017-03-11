@@ -188,7 +188,7 @@ class WindowFrameDefault : public AbstractShellFrame {
 
   virtual ~WindowFrameDefault();
 
-  virtual Rect GetClientGeometry() const final;
+  virtual Rect GetClientGeometry(int width, int height) const final;
 
   static const int kButtonSize = 14;
   static const int kButtonSpace = 5;

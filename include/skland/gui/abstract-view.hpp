@@ -202,8 +202,11 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   /**
    * @brief Update this view and all sub views
+   *
+   * By default this method will update this view and all recursively update all sub views.
+   * Sub class can override this method to select part of sub views to update.
    */
-  void RecursiveUpdate();
+  virtual void RecursiveUpdate();
 
   /**
    * @brief A view request an update

@@ -56,7 +56,9 @@ void AbstractView::MoveTo(int x, int y) {
   }
 
   Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
-  OnMeasureReposition(static_cast<int>(p_->geometry.x()), static_cast<int>(p_->geometry.y()), x, y);
+  OnMeasureReposition(static_cast<int>(p_->geometry.x()),
+                      static_cast<int>(p_->geometry.y()),
+                      x, y);
 }
 
 void AbstractView::Resize(int width, int height) {
@@ -76,7 +78,9 @@ void AbstractView::Resize(int width, int height) {
 
   Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
   p_->pending_geometry.Resize(width, height);
-  OnMeasureResize(static_cast<int>(p_->geometry.width()), static_cast<int>(p_->geometry.height()), width, height);
+  OnMeasureResize(static_cast<int>(p_->geometry.width()),
+                  static_cast<int>(p_->geometry.height()),
+                  width, height);
 }
 
 int AbstractView::GetLeft() const {
@@ -391,11 +395,11 @@ void AbstractView::ClearChildren() {
   p_->last_child = nullptr;
 }
 
-void AbstractView::OnAddChild(AbstractView *view) {
-
+void AbstractView::OnAddChild(AbstractView */*view*/) {
+  // override in subclass
 }
 
-void AbstractView::OnRemoveChild(AbstractView *view) {
+void AbstractView::OnRemoveChild(AbstractView */*view*/) {
 
 }
 
@@ -403,7 +407,7 @@ void AbstractView::OnAddedToParent() {
   // override in subclass
 }
 
-void AbstractView::OnRemovedFromParent(AbstractView *original_parent) {
+void AbstractView::OnRemovedFromParent(AbstractView */*original_parent*/) {
   // override in subclass
 }
 
@@ -411,7 +415,7 @@ void AbstractView::OnAttachedToShellView() {
 
 }
 
-void AbstractView::OnDetachedFromShellView(AbstractShellView *shell_view) {
+void AbstractView::OnDetachedFromShellView(AbstractShellView */*shell_view*/) {
 
 }
 
@@ -752,7 +756,7 @@ void AbstractView::MoveBackward(AbstractView *object) {
 }
 
 void AbstractView::RecursiveUpdate() {
-  Update();
+  OnUpdate(this);
   for (AbstractView *sub = p_->last_child; sub; sub = sub->p_->previous) {
     sub->RecursiveUpdate();
   }
