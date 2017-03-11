@@ -56,7 +56,7 @@ void AbstractView::MoveTo(int x, int y) {
   }
 
   Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
-  OnMeasureReposition(x, y);
+  OnMeasureReposition(static_cast<int>(p_->geometry.x()), static_cast<int>(p_->geometry.y()), x, y);
 }
 
 void AbstractView::Resize(int width, int height) {
@@ -76,7 +76,7 @@ void AbstractView::Resize(int width, int height) {
 
   Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
   p_->pending_geometry.Resize(width, height);
-  OnMeasureResize(width, height);
+  OnMeasureResize(static_cast<int>(p_->geometry.width()), static_cast<int>(p_->geometry.height()), width, height);
 }
 
 int AbstractView::GetLeft() const {
@@ -793,6 +793,10 @@ Surface *AbstractView::GetSurface(const AbstractView *view) const {
   }
 
   return nullptr;
+}
+
+void AbstractView::OnGeometryChange(int flag, const Rect &old_geometry, const Rect &new_geometry) {
+  // override in sub class
 }
 
 void AbstractView::TrackMouseMotion(MouseEvent *event) {

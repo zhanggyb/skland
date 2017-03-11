@@ -64,16 +64,12 @@ void Label::SetFont(const Font &font) {
   Update();
 }
 
-void Label::OnMeasureReposition(int x, int y) {
+void Label::OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) {
   Update();
 }
 
-void Label::OnMeasureResize(int width, int height) {
+void Label::OnMeasureResize(int old_width, int old_height, int new_width, int new_height) {
   Update();
-}
-
-void Label::OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) {
-
 }
 
 void Label::OnMouseEnter(MouseEvent *event) {

@@ -24,9 +24,8 @@ void AbstractView::RedrawTask::Run() const {
   view->p_->inhibit_redraw = true;
 
   if (view->p_->geometry_dirty_flag) {
-    Rect old = view->p_->pending_geometry;
+    view->OnGeometryChange(view->p_->geometry_dirty_flag, view->p_->geometry, view->p_->pending_geometry);
     view->p_->geometry = view->p_->pending_geometry;
-    view->OnGeometryChanged(view->p_->geometry_dirty_flag, old, view->p_->geometry);
     view->p_->geometry_dirty_flag = 0;
   }
 

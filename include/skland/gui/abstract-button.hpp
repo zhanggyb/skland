@@ -72,11 +72,9 @@ class AbstractButton : public AbstractView {
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
-  virtual void OnMeasureReposition(int x, int y) override;
+  virtual void OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) override;
 
-  virtual void OnMeasureResize(int width, int height) override;
-
-  virtual void OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) override;
+  virtual void OnMeasureResize(int old_width, int old_height, int new_width, int new_height) override;
 
   void SetSensitive(bool sensitive);
 

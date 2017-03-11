@@ -35,10 +35,6 @@ Size PushButton::GetPreferredSize() const {
   return Size(90, 20);
 }
 
-void PushButton::OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) {
-
-}
-
 void PushButton::OnDraw(const Context *context) {
   Color regular(0.95f, 0.55f, 0.1f);
   Color down = regular - 50;

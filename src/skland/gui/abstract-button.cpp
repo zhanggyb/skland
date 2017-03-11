@@ -94,16 +94,12 @@ void AbstractButton::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnMeasureReposition(int x, int y) {
+void AbstractButton::OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) {
   Update();
 }
 
-void AbstractButton::OnMeasureResize(int width, int height) {
+void AbstractButton::OnMeasureResize(int old_width, int old_height, int new_width, int new_height) {
   Update();
-}
-
-void AbstractButton::OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) {
-
 }
 
 void AbstractButton::SetSensitive(bool sensitive) {

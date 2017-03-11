@@ -218,11 +218,41 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  virtual void OnMeasureReposition(int x, int y) = 0;
+  /**
+   * @brief Callback when the position of this view is going to be reset
+   * @param old_x
+   * @param old_y
+   * @param new_x
+   * @param new_y
+   *
+   * The sub class determines if need to update in this callback, in most cases, it's need to use Update().
+   */
+  virtual void OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) = 0;
 
-  virtual void OnMeasureResize(int width, int height) = 0;
+  /**
+   * @brief Callback when the size of this view is going to be reset
+   * @param old_width
+   * @param old_height
+   * @param new_width
+   * @param new_height
+   *
+   * The sub class determines if need to update in this callback, in most cases, it's need to use Update().
+   *
+   * @note The new size will never be smaller than the minimal size, nor bigger than the maximal size.
+   */
+  virtual void OnMeasureResize(int old_width, int old_height, int new_width, int new_height) = 0;
 
-  virtual void OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
+  /**
+   * @brief Callback when going to update the geometry of this view immediately
+   * @param flag Bitwise flag of the geometry:
+   *   - 0x1: position changed
+   *   - 0x2: size changed
+   * @param old_geometry The old geometry
+   * @param new_geometry The new geometry
+   *
+   * @note Cannot call Update() or OnUpdate(this) in this method
+   */
+  virtual void OnGeometryChange(int flag, const Rect &old_geometry, const Rect &new_geometry);
 
   void TrackMouseMotion(MouseEvent *event);
 

@@ -33,8 +33,6 @@ class PushButton : public AbstractButton {
 
  protected:
 
-  virtual void OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) override;
-
   virtual void OnDraw(const Context *context) override;
 
 };
