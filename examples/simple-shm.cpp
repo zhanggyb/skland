@@ -40,8 +40,9 @@ class ShmWidget : public AbstractView {
         running_animation_(false) {
     color_ = 0xFF4FBF4F;
     frame_callback_.done().Set(this, &ShmWidget::OnFrame);
+    rectangle_ = GetGeometry();
 
-    radius_ = clamp(std::min(GetWidth(), GetHeight()) / 2.f - 50.f, 50.f, 200.f);
+    radius_ = clamp(std::min(rectangle_.width(), rectangle_.height()) / 2.f - 50.f, 50.f, 200.f);
   }
 
   virtual ~ShmWidget() {}
@@ -49,15 +50,19 @@ class ShmWidget : public AbstractView {
  protected:
 
   virtual void OnMeasureReposition(int x, int y) override {
-    Update();
+    rectangle_.MoveTo(x, y);
+    if (!running_animation_)
+      Update();
   }
 
   virtual void OnMeasureResize(int width, int height) override {
-    Update();
+    rectangle_.Resize(width, height);
+    if (!running_animation_)
+      Update();
   }
 
   virtual void OnGeometryChanged(int flag, const Rect &old_geometry, const Rect &new_geometry) override {
-    radius_ = clamp(std::min(new_geometry.width(), new_geometry.height()) / 2.f - 50.f, 50.f, 200.f);
+
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {
@@ -83,10 +88,7 @@ class ShmWidget : public AbstractView {
   virtual void OnDraw(const Context *context) override {
     context_ = context;
 
-    if (!running_animation_) {
-      running_animation_ = true;
-      OnFrame(0);
-    }
+    OnFrame(0);
   }
 
  private:
@@ -94,33 +96,31 @@ class ShmWidget : public AbstractView {
   void Animate() {
     static int padding = 5;
     std::shared_ptr<Canvas> canvas = context_->canvas();
-    canvas->Save();
-    const Rect& rect = GetGeometry();
-    canvas->ClipRect(Rect(rect.l + padding,
-                          rect.t,
-                          rect.r - padding,
-                          rect.b - padding));
-
-    canvas->Clear(color_);
 
     Paint paint;
     paint.SetAntiAlias(true);
+
+    paint.SetColor(color_);
+    paint.SetStyle(Paint::Style::kStyleFill);
+    canvas->DrawRect(Rect(rectangle_.l + padding, rectangle_.t, rectangle_.r - padding, rectangle_.b - padding), paint);
+
     paint.SetColor(Color(0xEFFFFFFF));
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetStrokeWidth(5.f);
 
-    canvas->DrawArc(Rect(GetXCenter() - radius_,
-                         GetYCenter() - radius_,
-                         GetXCenter() + radius_,
-                         GetYCenter() + radius_),
+    canvas->DrawArc(Rect(rectangle_.center_x() - radius_,
+                         rectangle_.center_y() - radius_,
+                         rectangle_.center_x() + radius_,
+                         rectangle_.center_y() + radius_),
                     angle_, 300.f, false, paint);
-
-    canvas->Restore();
   }
 
   void OnFrame(uint32_t serial) {
+    if (!running_animation_) running_animation_ = true;
+
     angle_ += 5.f;
     if (angle_ > 360.f) angle_ = 0.f;
+    radius_ = clamp(std::min(rectangle_.width(), rectangle_.height()) / 2.f - 50.f, 50.f, 200.f);
 
     context_->SetupCallback(frame_callback_);
     Animate();
@@ -137,6 +137,8 @@ class ShmWidget : public AbstractView {
   float radius_;
   float angle_;
   bool running_animation_;
+
+  Rect rectangle_;
 };
 
 int main(int argc, char *argv[]) {
