@@ -39,11 +39,11 @@ class SimpleWidget : public AbstractView {
     btn_->MoveTo(200, 200);
     btn_->Resize(200, 200);
 
-    PushBackChild(btn_);
+    InsertChild(btn_);
   }
 
   virtual ~SimpleWidget() {
-    delete btn_;
+//    btn_->Destroy();  // btn_ is destroyed before this destructor
   }
 
  protected:

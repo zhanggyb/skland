@@ -257,6 +257,18 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual void OnGeometryChange(int flag, const Rect &old_geometry, const Rect &new_geometry);
 
+  /**
+   * @brief Dispatch mouse enter event down to the target view
+   * @param event
+   * @return
+   *   - A sub view object
+   *   - nullptr if no sub view need to handle the mouse enter event
+   *
+   * By default this method check all sub views and return the one contains the cursor position.
+   * Sub class can override this.
+   */
+  virtual AbstractView *DispatchMouseEnterEvent(MouseEvent *event);
+
   void TrackMouseMotion(MouseEvent *event);
 
   void UntrackMouseMotion();

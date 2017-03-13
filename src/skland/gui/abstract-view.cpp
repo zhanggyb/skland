@@ -21,6 +21,7 @@
 #include <skland/core/numeric.hpp>
 #include <skland/gui/abstract-shell-view.hpp>
 
+#include "internal/abstract-view-iterators.hpp"
 #include "internal/abstract-view-redraw-task-iterator.hpp"
 
 namespace skland {
@@ -801,6 +802,20 @@ Surface *AbstractView::GetSurface(const AbstractView *view) const {
 
 void AbstractView::OnGeometryChange(int flag, const Rect &old_geometry, const Rect &new_geometry) {
   // override in sub class
+}
+
+AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
+  Iterator it(this);
+  AbstractView *view = nullptr;
+
+  for (it = it.first_child(); it; ++it) {
+    if (it.view()->Contain((int) event->window_x(), (int) event->window_y())) {
+      view = it.view();
+      break;
+    }
+  }
+
+  return view;
 }
 
 void AbstractView::TrackMouseMotion(MouseEvent *event) {

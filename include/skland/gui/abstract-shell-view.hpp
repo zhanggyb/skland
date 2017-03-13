@@ -251,13 +251,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void SetContentViewGeometry();
 
-  /**
-   * @brief Dispatch mouse enter event on given parent view
-   * @param parent
-   * @param event
-   * @param tail
-   */
-  void DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, EventTask *tail);
+  void DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, MouseTaskIterator &tail);
 
   /**
    * @brief The private data

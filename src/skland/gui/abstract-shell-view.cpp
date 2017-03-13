@@ -29,7 +29,6 @@
 
 #include "internal/abstract-shell-frame-private.hpp"
 #include "internal/abstract-view-private.hpp"
-#include "internal/abstract-view-iterators.hpp"
 #include "internal/display-registry.hpp"
 #include "internal/abstract-event-handler-mouse-task-iterator.hpp"
 
@@ -358,7 +357,9 @@ void AbstractShellView::OnMouseEnter(MouseEvent *event) {
         if (event->IsAccepted()) {
           it.PushBack(title_bar);
           ++it;
-          DispatchMouseEnterEvent(title_bar, event, it.mouse_task());
+          DispatchMouseEnterEvent(title_bar, event, it);
+        } else if (event->IsIgnored()) {
+          DispatchMouseEnterEvent(title_bar, event, it);
         }
       }
 
@@ -376,7 +377,9 @@ void AbstractShellView::OnMouseEnter(MouseEvent *event) {
         if (event->IsAccepted()) {
           it.PushBack(p_->client_view);
           ++it;
-          DispatchMouseEnterEvent(p_->client_view, event, it.mouse_task());
+          DispatchMouseEnterEvent(p_->client_view, event, it);
+        } else if (event->IsIgnored()) {
+          DispatchMouseEnterEvent(p_->client_view, event, it);
         }
       }
 
@@ -453,7 +456,6 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
       if (nullptr == title_view) break;
 
       MouseTaskIterator it(this);
-
       if (nullptr == it.next()) {
         DBG_ASSERT(it.mouse_task()->event_handler == this);
         DBG_ASSERT(nullptr == it.previous());
@@ -462,9 +464,9 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
           if (event->IsAccepted()) {
             it.PushBack(title_view);
             ++it;
-            DispatchMouseEnterEvent(title_view, event, it.mouse_task());
+            DispatchMouseEnterEvent(title_view, event, it);
           } else if (event->IsIgnored()) {
-            DispatchMouseEnterEvent(title_view, event, it.mouse_task());
+            DispatchMouseEnterEvent(title_view, event, it);
           }
         }
       } else {
@@ -484,7 +486,8 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
 
           if (nullptr == it.previous()) break;
         }
-        DispatchMouseEnterEvent(view, event, tail);
+
+        DispatchMouseEnterEvent(view, event, it);
       }
       break;
     }
@@ -503,9 +506,9 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
           if (event->IsAccepted()) {
             it.PushBack(p_->client_view);
             ++it;
-            DispatchMouseEnterEvent(p_->client_view, event, it.mouse_task());
+            DispatchMouseEnterEvent(p_->client_view, event, it);
           } else if (event->IsIgnored()) {
-            DispatchMouseEnterEvent(p_->client_view, event, it.mouse_task());
+            DispatchMouseEnterEvent(p_->client_view, event, it);
           }
         }
       } else {
@@ -525,7 +528,8 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
 
           if (nullptr == it.previous()) break;
         }
-        DispatchMouseEnterEvent(view, event, tail);
+
+        DispatchMouseEnterEvent(view, event, it);
       }
 
       break;
@@ -772,19 +776,20 @@ void AbstractShellView::SetContentViewGeometry() {
   p_->client_view->Resize((int) rect.width(), (int) rect.height());
 }
 
-void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, EventTask *tail) {
-  DBG_ASSERT(nullptr == tail->next());
-  AbstractView::Iterator it(parent);
-  for (it = it.first_child(); it; ++it) {
-    if (it.view()->Contain((int) event->window_x(), (int) event->window_y())) {
-      it.view()->OnMouseEnter(event);
-      if (event->IsAccepted()) {
-        tail->PushBack(MouseTaskIterator(it.view()).mouse_task());
-        tail = static_cast<EventTask *>(tail->next());
-        DispatchMouseEnterEvent(it.view(), event, tail);
-      } else if (event->IsIgnored()) {
-        DispatchMouseEnterEvent(it.view(), event, tail);
-      }
+void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, MouseTaskIterator &tail) {
+  AbstractView *sub = parent->DispatchMouseEnterEvent(event);
+  while (sub) {
+    DBG_ASSERT(sub != parent);
+    sub->OnMouseEnter(event);
+    if (event->IsAccepted()) {
+      tail.PushBack(sub);
+      ++tail;
+      parent = sub;
+      sub = parent->DispatchMouseEnterEvent(event);
+    } else if (event->IsIgnored()) {
+      parent = sub;
+      sub = parent->DispatchMouseEnterEvent(event);
+    } else {
       break;
     }
   }
