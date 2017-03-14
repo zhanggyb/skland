@@ -115,7 +115,7 @@ bool Font::IsDevKern() {
 int Font::TextToGlyphs(const void *text,
                        size_t byte_length,
                        TextEncoding encoding,
-                       uint16_t *glyphs,
+                       GlyphID *glyphs,
                        int max_glyph_count) const {
   return p_->sk_font->textToGlyphs(text, byte_length, (SkTextEncoding) encoding, glyphs, max_glyph_count);
 }

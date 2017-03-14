@@ -33,6 +33,11 @@ Typeface::Typeface(const Typeface &other, Style style) {
   p_->sk_typeface = SkTypeface::MakeFromTypeface(other.p_->sk_typeface.get(), (SkTypeface::Style) style);
 }
 
+Typeface::Typeface(SkTypeface *family, Style style) {
+  p_.reset(new Private);
+  p_->sk_typeface = SkTypeface::MakeFromTypeface(family, (SkTypeface::Style) style);
+}
+
 Typeface::Typeface(const char *path, int index) {
   p_.reset(new Private);
   p_->sk_typeface = SkTypeface::MakeFromFile(path, index);
@@ -67,8 +72,45 @@ bool Typeface::IsFixedPitch() const {
   return p_->sk_typeface->isFixedPitch();
 }
 
-uint32_t Typeface::GetUniqueID() const {
+FontID Typeface::GetUniqueID() const {
   return p_->sk_typeface->uniqueID();
+}
+
+int Typeface::CharsToGlyphs(const void *chars, Encoding encoding, GlyphID *glyphs, int glyph_count) const {
+  return p_->sk_typeface->charsToGlyphs(chars, (SkTypeface::Encoding) encoding, glyphs, glyph_count);
+}
+
+int Typeface::CountGlyphs() const {
+  return p_->sk_typeface->countGlyphs();
+}
+
+int Typeface::CountTables() const {
+  return p_->sk_typeface->countTables();
+}
+
+int Typeface::GetTableTags(FontTableTag *tags) const {
+  return p_->sk_typeface->getTableTags(tags);
+}
+
+size_t Typeface::GetTableSize(FontTableTag tag) const {
+  return p_->sk_typeface->getTableSize(tag);
+}
+
+size_t Typeface::GetTableData(FontTableTag tag, size_t offset, size_t lengh, void *data) const {
+  return p_->sk_typeface->getTableData(tag, offset, lengh, data);
+}
+
+int Typeface::GetUnitsPerEm() const {
+  return p_->sk_typeface->getUnitsPerEm();
+}
+
+bool Typeface::GetKerningPairAdjustments(const GlyphID *glyphs, int count, int32_t *adjustments) const {
+  return p_->sk_typeface->getKerningPairAdjustments(glyphs, count, adjustments);
+}
+
+Rect Typeface::GetBounds() const {
+  SkRect rect = p_->sk_typeface->getBounds();
+  return *reinterpret_cast<Rect *>(&rect);
 }
 
 bool operator==(const Typeface &typeface1, const Typeface &typeface2) {

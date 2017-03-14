@@ -17,12 +17,19 @@
 #ifndef SKLAND_GRAPHIC_TYPEFACE_HPP_
 #define SKLAND_GRAPHIC_TYPEFACE_HPP_
 
+#include "../core/types.hpp"
 #include "../core/rect.hpp"
+
 #include "font-style.hpp"
 
 #include <memory>
 
+class SkTypeface;
+
 namespace skland {
+
+typedef uint32_t FontID;
+typedef uint32_t FontTableTag;
 
 class Font;
 
@@ -41,7 +48,6 @@ class Typeface {
     kNormal = 0,
     kBold = 0x01,
     kItalic = 0x02,
-
     kBoldItalic = 0x03
   };
 
@@ -51,11 +57,13 @@ class Typeface {
     kEncodingUTF32
   };
 
-  Typeface(Style style = kNormal);
+  Typeface(Style style = Style::kNormal);
 
   Typeface(const char *family_name, FontStyle font_style);
 
   Typeface(const Typeface &other, Style style);
+
+  Typeface(SkTypeface *family, Style style);
 
   /**
    * Create a new typeface by given file.
@@ -78,23 +86,23 @@ class Typeface {
 
   bool IsFixedPitch() const;
 
-  uint32_t GetUniqueID() const;
+  FontID GetUniqueID() const;
 
-  int CharsToGlyphs(const void *chars, Encoding encoding, uint16_t glyphs[], int glyph_count) const;
+  int CharsToGlyphs(const void *chars, Encoding encoding, GlyphID glyphs[], int glyph_count) const;
 
   int CountGlyphs() const;
 
   int CountTables() const;
 
-  int GetTableTags(uint32_t tags[]) const;
+  int GetTableTags(FontTableTag tags[]) const;
 
-  size_t GetTableSize(uint32_t tag) const;
+  size_t GetTableSize(FontTableTag tag) const;
 
-  size_t GetTableData(uint32_t tag, size_t offset, size_t lengh, void *data) const;
+  size_t GetTableData(FontTableTag tag, size_t offset, size_t lengh, void *data) const;
 
   int GetUnitsPerEm() const;
 
-  bool GetKerningPairAdjustments(const uint16_t glyphs[], int count, int32_t adjustments[]) const;
+  bool GetKerningPairAdjustments(const GlyphID glyphs[], int count, int32_t adjustments[]) const;
 
   Rect GetBounds() const;
 

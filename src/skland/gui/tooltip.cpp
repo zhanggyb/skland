@@ -20,15 +20,11 @@
 namespace skland {
 
 Tooltip::Tooltip(AbstractView *view)
-    : AbstractView(), view_(view), popup_shell_surface_(nullptr) {
+    : AbstractShellView(nullptr) {
 
 }
 
 Tooltip::~Tooltip() {
-
-}
-
-void Tooltip::Show() {
 
 }
 

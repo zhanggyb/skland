@@ -17,13 +17,13 @@
 #ifndef SKLAND_GUI_TOOLTIP_HPP_
 #define SKLAND_GUI_TOOLTIP_HPP_
 
-#include "abstract-view.hpp"
+#include "abstract-shell-view.hpp"
 
 namespace skland {
 
 class PopupShellSurface;
 
-class Tooltip : public AbstractView {
+class Tooltip : public AbstractShellView {
 
  public:
 
@@ -31,13 +31,7 @@ class Tooltip : public AbstractView {
 
   virtual ~Tooltip();
 
-  void Show();
-
  private:
-
-  AbstractView *view_;  // The view object this tooltip shows up
-
-  PopupShellSurface *popup_shell_surface_;
 
   std::string text_;
 

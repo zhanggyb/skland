@@ -17,41 +17,83 @@
 #include <skland/gui/abstract-button.hpp>
 
 #include <skland/core/numeric.hpp>
+
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 
+#include <skland/graphic/font.hpp>
+
 namespace skland {
 
-AbstractButton::AbstractButton()
-    : AbstractView(),
-      flags_(0x1) {
+struct AbstractButton::Private {
 
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  enum FlagIndex {
+
+    /**! if this button is sensitive when mouse enter/leave (need to highlight when hover) */
+        kSensitive = 0x1,
+
+    /**! if the mouse is hovering on this button */
+        kHovered = 0x1 << 1,
+
+    /**! if the mouse is pressing this button */
+        kPressed = 0x1 << 2,
+
+    /**! if the mouse need to emit a click signal */
+        kClicked = 0x1 << 3
+
+  };
+
+  Private()
+      : flags(0x1) {}
+
+  uint32_t flags;
+
+  Font font;
+
+  std::string text;
+
+};
+
+AbstractButton::AbstractButton()
+    : AbstractView() {
+  p_.reset(new Private);
 }
 
 AbstractButton::AbstractButton(int width, int height)
-    : AbstractView(width, height),
-      flags_(0x1) {
+    : AbstractView(width, height) {
+  p_.reset(new Private);
+}
 
+AbstractButton::AbstractButton(const std::string &text)
+    : AbstractView() {
+  p_.reset(new Private);
 }
 
 AbstractButton::~AbstractButton() {
 
 }
 
-Size AbstractButton::GetMinimalSize() const {
-  return Size(0, 0);
+bool AbstractButton::IsSensitive() const {
+  return (p_->flags & Private::FlagIndex::kSensitive) != 0;
+}
+
+bool AbstractButton::IsHovered() const {
+  return (p_->flags & Private::FlagIndex::kHovered) != 0;
+}
+
+bool AbstractButton::IsPressed() const {
+  return (p_->flags & Private::FlagIndex::kPressed) != 0;
 }
 
 Size AbstractButton::GetPreferredSize() const {
-  return Size(200, 200);
-}
-
-Size AbstractButton::GetMaximalSize() const {
-  return Size(65536, 65536);
+  return Size(80, 20);
 }
 
 void AbstractButton::OnMouseEnter(MouseEvent *event) {
-  Bit::Set<uint32_t>(flags_, kFlagIndexHovered);
+  Bit::Set<uint32_t>(p_->flags, Private::kHovered);
   if (IsSensitive()) {
     Update();
   }
@@ -59,7 +101,7 @@ void AbstractButton::OnMouseEnter(MouseEvent *event) {
 }
 
 void AbstractButton::OnMouseLeave() {
-  Bit::Clear<uint32_t>(flags_, kFlagIndexHovered | kFlagIndexClicked | kFlagIndexPressed);
+  Bit::Clear<uint32_t>(p_->flags, Private::kHovered | Private::kClicked | Private::kPressed);
   if (IsSensitive()) {
     Update();
   }
@@ -67,18 +109,18 @@ void AbstractButton::OnMouseLeave() {
 
 void AbstractButton::OnMouseButton(MouseEvent *event) {
   if (event->GetState() == kPressed) {
-    Bit::Set<uint32_t>(flags_, kFlagIndexPressed);
+    Bit::Set<uint32_t>(p_->flags, Private::kPressed);
     Update();
   } else {
     if (IsPressed()) {
-      Bit::Set<uint32_t>(flags_, kFlagIndexClicked);
+      Bit::Set<uint32_t>(p_->flags, Private::kClicked);
     }
-    Bit::Clear<uint32_t>(flags_, kFlagIndexPressed);
+    Bit::Clear<uint32_t>(p_->flags, Private::kPressed);
     Update();
   }
 
-  if (flags_ & kFlagIndexClicked) {
-    Bit::Clear<uint32_t>(flags_, kFlagIndexClicked);
+  if (p_->flags & Private::kClicked) {
+    Bit::Clear<uint32_t>(p_->flags, Private::kClicked);
     event->Accept();
     clicked_();
     return;
@@ -103,9 +145,9 @@ void AbstractButton::OnMeasureResize(int old_width, int old_height, int new_widt
 
 void AbstractButton::SetSensitive(bool sensitive) {
   if (sensitive) {
-    Bit::Set<uint32_t>(flags_, kFlagIndexSensitive);
+    Bit::Set<uint32_t>(p_->flags, Private::kSensitive);
   } else {
-    Bit::Clear<uint32_t>(flags_, kFlagIndexSensitive);
+    Bit::Clear<uint32_t>(p_->flags, Private::kSensitive);
   }
 }
 

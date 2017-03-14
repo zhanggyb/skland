@@ -17,6 +17,8 @@
 #ifndef SKLAND_GRAPHIC_FONT_HPP_
 #define SKLAND_GRAPHIC_FONT_HPP_
 
+#include "../core/types.hpp"
+
 #include "font-style.hpp"
 #include "typeface.hpp"
 
@@ -136,7 +138,7 @@ class Font {
   int TextToGlyphs(const void *text,
                    size_t byte_length,
                    TextEncoding encoding,
-                   uint16_t glyphs[],
+                   GlyphID glyphs[],
                    int max_glyph_count) const;
 
   int CountText(const void *text, size_t byte_length, TextEncoding encoding) {

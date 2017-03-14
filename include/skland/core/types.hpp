@@ -17,6 +17,8 @@
 #ifndef SKLAND_CORE_TYPES_HPP_
 #define SKLAND_CORE_TYPES_HPP_
 
+#include <cstdint>
+
 namespace skland {
 
 enum CursorType {
@@ -342,6 +344,8 @@ enum Orientation {
   kHorizontal,
   kVertical
 };
+
+typedef uint16_t GlyphID;
 
 }
 

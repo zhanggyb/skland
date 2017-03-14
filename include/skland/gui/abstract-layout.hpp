@@ -44,8 +44,6 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
  protected:
 
-  virtual void OnViewAdded(AbstractView *view) = 0;
-
   virtual void OnMouseEnter(MouseEvent *event) override;
 
   virtual void OnMouseLeave() override;
@@ -57,6 +55,8 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
   virtual void OnDraw(const Context *context) override;
+
+  virtual void OnViewAdded(AbstractView *view) = 0;
 
  private:
 

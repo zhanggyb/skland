@@ -36,29 +36,21 @@ class AbstractButton : public AbstractView {
 
   AbstractButton(int width, int height);
 
+  AbstractButton(const std::string& text);
+
   virtual ~AbstractButton();
 
-  virtual Size GetMinimalSize() const override;
-
   virtual Size GetPreferredSize() const override;
-
-  virtual Size GetMaximalSize() const override;
 
   SignalRef<> clicked() {
     return clicked_;
   }
 
-  bool IsSensitive() const {
-    return (flags_ & kFlagIndexSensitive) != 0;
-  }
+  bool IsSensitive() const;
 
-  bool IsHovered() const {
-    return (flags_ & kFlagIndexHovered) != 0;
-  }
+  bool IsHovered() const;
 
-  bool IsPressed() const {
-    return (flags_ & kFlagIndexPressed) != 0;
-  }
+  bool IsPressed() const;
 
  protected:
 
@@ -80,23 +72,9 @@ class AbstractButton : public AbstractView {
 
  private:
 
-  enum FlagIndex {
+  struct Private;
 
-    /**! if this button is sensitive when mouse enter/leave (need to highlight when hover) */
-        kFlagIndexSensitive = 0x1,
-
-    /**! if the mouse is hovering on this button */
-        kFlagIndexHovered = 0x1 << 1,
-
-    /**! if the mouse is pressing this button */
-        kFlagIndexPressed = 0x1 << 2,
-
-    /**! if the mouse need to emit a click signal */
-        kFlagIndexClicked = 0x1 << 3
-
-  };
-
-  uint32_t flags_;
+  std::unique_ptr<Private> p_;
 
   Signal<> clicked_;
 };
