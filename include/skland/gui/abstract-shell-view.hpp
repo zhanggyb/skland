@@ -173,7 +173,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
-  virtual void OnMouseLeave(MouseEvent *event) override;
+  virtual void OnMouseLeave() override;
 
   virtual void OnMouseMove(MouseEvent *event) override;
 

@@ -311,6 +311,8 @@ void AbstractShellView::OnMouseEnter(MouseEvent *event) {
     return;
   }
 
+  Point cursor_xy(event->GetWindowXY());
+
   switch (p_->shell_frame->GetMouseLocation(event)) {
     case kResizeTop: {
       event->SetCursor(Display::cursor(kCursorTop));
@@ -352,7 +354,7 @@ void AbstractShellView::OnMouseEnter(MouseEvent *event) {
       while (it.next()) ++it; // move to tail
       DBG_ASSERT(nullptr == it.next());
 
-      if (title_bar->Contain((int) event->window_x(), (int) event->window_y())) {
+      if (title_bar->Contain(cursor_xy.x, cursor_xy.y)) {
         title_bar->OnMouseEnter(event);
         if (event->IsAccepted()) {
           it.PushBack(title_bar);
@@ -372,7 +374,7 @@ void AbstractShellView::OnMouseEnter(MouseEvent *event) {
       while (it.next()) ++it; // move to tail
       DBG_ASSERT(nullptr == it.next());
 
-      if (p_->client_view->Contain((int) event->window_x(), (int) event->window_y())) {
+      if (p_->client_view->Contain(cursor_xy.x, cursor_xy.y)) {
         p_->client_view->OnMouseEnter(event);
         if (event->IsAccepted()) {
           it.PushBack(p_->client_view);
@@ -392,9 +394,8 @@ void AbstractShellView::OnMouseEnter(MouseEvent *event) {
   }
 }
 
-void AbstractShellView::OnMouseLeave(MouseEvent *event) {
+void AbstractShellView::OnMouseLeave() {
   MouseTaskIterator it(this);
-  bool need_call = true;
   EventTask *task = nullptr;
   ++it;
 
@@ -403,10 +404,7 @@ void AbstractShellView::OnMouseLeave(MouseEvent *event) {
     ++it;
 
     task->Unlink();
-    if (need_call) {
-      static_cast<AbstractView *>(task->event_handler)->OnMouseLeave(event);
-      if (event->IsRejected()) need_call = false;
-    }
+    static_cast<AbstractView *>(task->event_handler)->OnMouseLeave();
   }
 }
 
@@ -416,6 +414,7 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
     return;
   }
 
+  Point cursor_xy(event->GetWindowXY());
   switch (p_->shell_frame->GetMouseLocation(event)) {
     case kResizeTop: {
       event->SetCursor(Display::cursor(kCursorTop));
@@ -459,7 +458,7 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
       if (nullptr == it.next()) {
         DBG_ASSERT(it.mouse_task()->event_handler == this);
         DBG_ASSERT(nullptr == it.previous());
-        if (title_view->Contain((int) event->window_x(), (int) event->window_y())) {
+        if (title_view->Contain(cursor_xy.x, cursor_xy.y)) {
           title_view->OnMouseEnter(event);
           if (event->IsAccepted()) {
             it.PushBack(title_view);
@@ -476,12 +475,12 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
         while (it.previous()) {
           tail = it.mouse_task();
           view = static_cast<AbstractView *>(tail->event_handler);
-          if (view->Contain((int) event->window_x(), (int) event->window_y())) {
+          if (view->Contain(cursor_xy.x, cursor_xy.y)) {
             break;
           }
           --it;
           tail->Unlink();
-          static_cast<AbstractView *>(tail->event_handler)->OnMouseLeave(event);
+          static_cast<AbstractView *>(tail->event_handler)->OnMouseLeave();
           // TODO: if need to check the response
 
           if (nullptr == it.previous()) break;
@@ -501,7 +500,7 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
       if (nullptr == it.next()) {
         DBG_ASSERT(it.mouse_task()->event_handler == this);
         DBG_ASSERT(nullptr == it.previous());
-        if (p_->client_view->Contain((int) event->window_x(), (int) event->window_y())) {
+        if (p_->client_view->Contain(cursor_xy.x, cursor_xy.y)) {
           p_->client_view->OnMouseEnter(event);
           if (event->IsAccepted()) {
             it.PushBack(p_->client_view);
@@ -518,12 +517,12 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
         while (it.previous()) {
           tail = it.mouse_task();
           view = static_cast<AbstractView *>(tail->event_handler);
-          if (view->Contain((int) event->window_x(), (int) event->window_y())) {
+          if (view->Contain(cursor_xy.x, cursor_xy.y)) {
             break;
           }
           --it;
           tail->Unlink();
-          static_cast<AbstractView *>(tail->event_handler)->OnMouseLeave(event);
+          static_cast<AbstractView *>(tail->event_handler)->OnMouseLeave();
           // TODO: if need to check the response
 
           if (nullptr == it.previous()) break;
@@ -551,8 +550,8 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
 }
 
 void AbstractShellView::OnMouseButton(MouseEvent *event) {
-  if ((event->button() == kMouseButtonLeft) &&
-      (event->state() == kMouseButtonPressed)) {
+  if ((event->GetButton() == kLeft) &&
+      (event->GetState() == kPressed)) {
 
     if (p_->shell_frame) {
       int location = p_->shell_frame->GetMouseLocation(event);
@@ -622,11 +621,11 @@ void AbstractShellView::OnViewDetached(AbstractView *view) {
 }
 
 void AbstractShellView::MoveWithMouse(MouseEvent *event) const {
-  ToplevelShellSurface::Get(p_->shell_surface)->Move(event->GetSeat(), event->serial());
+  ToplevelShellSurface::Get(p_->shell_surface)->Move(event->GetSeat(), event->GetSerial());
 }
 
 void AbstractShellView::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
-  ToplevelShellSurface::Get(p_->shell_surface)->Resize(event->GetSeat(), event->serial(), edges);
+  ToplevelShellSurface::Get(p_->shell_surface)->Resize(event->GetSeat(), event->GetSerial(), edges);
 }
 
 AbstractShellFrame *AbstractShellView::GetShellFrame() const {
@@ -701,12 +700,24 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
     p_->size.width = width;
     p_->size.height = height;
 
-    // Resize frame first, then the content view
     if (p_->shell_frame) {
       p_->shell_frame->OnResize(width, height);
     }
     if (p_->client_view) {
       SetContentViewGeometry();
+    }
+
+    // surface size is changed, reset the pointer position and enter/leave widgets
+    MouseTaskIterator it(this);
+    EventTask *task = nullptr;
+    ++it;
+
+    while (it) {
+      task = it.mouse_task();
+      ++it;
+
+      task->Unlink();
+      static_cast<AbstractView *>(task->event_handler)->OnMouseLeave();
     }
   }
 

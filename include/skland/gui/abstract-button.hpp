@@ -64,7 +64,7 @@ class AbstractButton : public AbstractView {
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
-  virtual void OnMouseLeave(MouseEvent *event) override;
+  virtual void OnMouseLeave() override;
 
   virtual void OnMouseMove(MouseEvent *event) override;
 

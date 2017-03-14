@@ -293,8 +293,8 @@ void TitleBar::OnMouseEnter(MouseEvent *event) {
   event->Ignore();
 }
 
-void TitleBar::OnMouseLeave(MouseEvent *event) {
-  event->Ignore();
+void TitleBar::OnMouseLeave() {
+
 }
 
 void TitleBar::OnMouseMove(MouseEvent *event) {
@@ -448,8 +448,8 @@ void WindowFrameDefault::OnDraw(const Context *context) {
 
 int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
   int vlocation, hlocation, location;
-  int x = static_cast<int>(event->surface_x()),
-      y = static_cast<int>(event->surface_y());
+  int x = static_cast<int>(event->GetSurfaceXY().x),
+      y = static_cast<int>(event->GetSurfaceXY().y);
 
   // TODO: maximized or frameless
 

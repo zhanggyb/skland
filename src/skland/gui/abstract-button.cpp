@@ -58,16 +58,15 @@ void AbstractButton::OnMouseEnter(MouseEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnMouseLeave(MouseEvent *event) {
+void AbstractButton::OnMouseLeave() {
   Bit::Clear<uint32_t>(flags_, kFlagIndexHovered | kFlagIndexClicked | kFlagIndexPressed);
   if (IsSensitive()) {
     Update();
   }
-  event->Accept();
 }
 
 void AbstractButton::OnMouseButton(MouseEvent *event) {
-  if (event->state() == kMouseButtonPressed) {
+  if (event->GetState() == kPressed) {
     Bit::Set<uint32_t>(flags_, kFlagIndexPressed);
     Update();
   } else {

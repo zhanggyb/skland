@@ -807,9 +807,10 @@ void AbstractView::OnGeometryChange(int flag, const Rect &old_geometry, const Re
 AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
   Iterator it(this);
   AbstractView *view = nullptr;
+  Point cursor_xy(event->GetWindowXY());
 
   for (it = it.first_child(); it; ++it) {
-    if (it.view()->Contain((int) event->window_x(), (int) event->window_y())) {
+    if (it.view()->Contain(cursor_xy.x, cursor_xy.y)) {
       view = it.view();
       break;
     }

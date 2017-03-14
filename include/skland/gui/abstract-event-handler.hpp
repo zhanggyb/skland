@@ -84,7 +84,7 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   /**
    * @brief Virtual callback when mouse device leave this object
    */
-  virtual void OnMouseLeave(MouseEvent *event) = 0;
+  virtual void OnMouseLeave() = 0;
 
   /**
    * @brief Virtual callback when mouse moving on this object

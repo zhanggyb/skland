@@ -76,8 +76,8 @@ void Label::OnMouseEnter(MouseEvent *event) {
   event->Ignore();
 }
 
-void Label::OnMouseLeave(MouseEvent *event) {
-  event->Ignore();
+void Label::OnMouseLeave() {
+
 }
 
 void Label::OnMouseMove(MouseEvent *event) {

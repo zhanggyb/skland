@@ -65,8 +65,8 @@ class ShmWidget : public AbstractView {
     event->Accept();
   }
 
-  virtual void OnMouseLeave(MouseEvent *event) override {
-    event->Accept();
+  virtual void OnMouseLeave() override {
+
   }
 
   virtual void OnMouseMove(MouseEvent *event) override {

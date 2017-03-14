@@ -85,8 +85,8 @@ void EGLWidget::OnMouseEnter(MouseEvent *event) {
   event->Accept();
 }
 
-void EGLWidget::OnMouseLeave(MouseEvent *event) {
-  event->Accept();
+void EGLWidget::OnMouseLeave() {
+
 }
 
 void EGLWidget::OnMouseMove(MouseEvent *event) {

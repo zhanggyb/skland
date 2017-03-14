@@ -18,7 +18,6 @@
 
 #include <skland/gui/surface.hpp>
 #include <skland/gui/key-event.hpp>
-#include <skland/gui/mouse-event.hpp>
 #include <skland/gui/touch-event.hpp>
 
 #include <skland/wayland/seat.hpp>
@@ -29,6 +28,7 @@
 #include "internal/display-registry.hpp"
 #include "internal/keymap.hpp"
 #include "internal/keyboard-state.hpp"
+#include "internal/mouse-event-private.hpp"
 
 #include <unistd.h>
 #include <sys/mman.h>
@@ -95,7 +95,7 @@ Input::~Input() {
 }
 
 void Input::SetCursor(const Cursor *cursor) const {
-  p_->wl_pointer.SetCursor(p_->mouse_event->serial(),
+  p_->wl_pointer.SetCursor(p_->mouse_event->GetSerial(),
                            cursor->wl_surface(),
                            cursor->hotspot_x(), cursor->hotspot_y());
   cursor->Commit();
@@ -225,57 +225,48 @@ void Input::OnPointerEnter(uint32_t serial,
                            struct wl_surface *wl_surface,
                            wl_fixed_t surface_x,
                            wl_fixed_t surface_y) {
-  p_->mouse_event->serial_ = serial;
-  p_->mouse_event->surface_xy_.x = wl_fixed_to_double(surface_x);
-  p_->mouse_event->surface_xy_.y = wl_fixed_to_double(surface_y);
+  p_->mouse_event->p_->serial = serial;
+  p_->mouse_event->p_->surface_xy.x = wl_fixed_to_double(surface_x);
+  p_->mouse_event->p_->surface_xy.y = wl_fixed_to_double(surface_y);
 
-  p_->mouse_event->surface_ =
+  p_->mouse_event->p_->surface =
       static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
-  p_->mouse_event->window_xy_.x =
-      p_->mouse_event->surface_xy_.x - p_->mouse_event->surface_->margin().left;
-  p_->mouse_event->window_xy_.y =
-      p_->mouse_event->surface_xy_.y - p_->mouse_event->surface_->margin().top;
 
   p_->mouse_event->response_ = InputEvent::kUnknown;
-  p_->mouse_event->surface_->event_handler()->OnMouseEnter(p_->mouse_event);
+  p_->mouse_event->p_->surface->event_handler()->OnMouseEnter(p_->mouse_event);
 }
 
 void Input::OnPointerLeave(uint32_t serial, struct wl_surface *wl_surface) {
-  p_->mouse_event->serial_ = serial;
+  p_->mouse_event->p_->serial = serial;
 
-  p_->mouse_event->surface_ = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
+  p_->mouse_event->p_->surface = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
 
   p_->mouse_event->response_ = InputEvent::kUnknown;
-  p_->mouse_event->surface_->event_handler()->OnMouseLeave(p_->mouse_event);
+  p_->mouse_event->p_->surface->event_handler()->OnMouseLeave();
 }
 
 void Input::OnPointerMotion(uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y) {
-  p_->mouse_event->time_ = time;
-  p_->mouse_event->surface_xy_.x = wl_fixed_to_double(surface_x);
-  p_->mouse_event->surface_xy_.y = wl_fixed_to_double(surface_y);
+  p_->mouse_event->p_->time = time;
+  p_->mouse_event->p_->surface_xy.x = wl_fixed_to_double(surface_x);
+  p_->mouse_event->p_->surface_xy.y = wl_fixed_to_double(surface_y);
 
-  if (nullptr == p_->mouse_event->surface_) return;
-
-  p_->mouse_event->window_xy_.x =
-      p_->mouse_event->surface_xy_.x - p_->mouse_event->surface_->margin().left;
-  p_->mouse_event->window_xy_.y =
-      p_->mouse_event->surface_xy_.y - p_->mouse_event->surface_->margin().top;
+  if (nullptr == p_->mouse_event->p_->surface) return;
 
   p_->mouse_event->response_ = InputEvent::kUnknown;
-  p_->mouse_event->surface_->event_handler()->OnMouseMove(p_->mouse_event);
+  p_->mouse_event->p_->surface->event_handler()->OnMouseMove(p_->mouse_event);
 }
 
 void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uint32_t state) {
   p_->mouse_event->response_ = InputEvent::kUnknown;
-  p_->mouse_event->serial_ = serial;
-  p_->mouse_event->time_ = time;
-  p_->mouse_event->button_ = button;
-  p_->mouse_event->state_ = state;
+  p_->mouse_event->p_->serial = serial;
+  p_->mouse_event->p_->time = time;
+  p_->mouse_event->p_->button = button;
+  p_->mouse_event->p_->state = state;
 
-  if (nullptr == p_->mouse_event->surface_) return;
+  if (nullptr == p_->mouse_event->p_->surface) return;
 
   p_->mouse_event->response_ = InputEvent::kUnknown;
-  p_->mouse_event->surface_->event_handler()->OnMouseButton(p_->mouse_event);
+  p_->mouse_event->p_->surface->event_handler()->OnMouseButton(p_->mouse_event);
 }
 
 void Input::OnPointerAxis(uint32_t time, uint32_t axis, wl_fixed_t value) {

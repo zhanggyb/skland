@@ -24,22 +24,24 @@
 #include <wayland-client.h>
 #include <linux/input-event-codes.h>
 
+#include <memory>
+
 namespace skland {
 
 class Surface;
 
-enum MouseButtonType {
-  kMouseButtonLeft = BTN_LEFT,
-  kMouseButtonRight = BTN_RIGHT,
-  kMouseButtonMiddle = BTN_MIDDLE
+enum MouseButton {
+  kLeft = BTN_LEFT,
+  kRight = BTN_RIGHT,
+  kMiddle = BTN_MIDDLE
 };
 
 enum MouseButtonState {
-  kMouseButtonReleased = WL_POINTER_BUTTON_STATE_RELEASED,  /* 0 */
-  kMouseButtonPressed = WL_POINTER_BUTTON_STATE_PRESSED /* 1 */
+  kReleased = WL_POINTER_BUTTON_STATE_RELEASED,  /* 0 */
+  kPressed = WL_POINTER_BUTTON_STATE_PRESSED /* 1 */
 };
 
-class MouseEvent : public InputEvent {
+SKLAND_EXPORT class MouseEvent : public InputEvent {
 
   friend class Input;
 
@@ -49,79 +51,29 @@ class MouseEvent : public InputEvent {
 
  public:
 
-  MouseEvent(Input *input)
-      : InputEvent(input),
-        surface_(nullptr),
-        serial_(0),
-        time_(0),
-        button_(0),
-        state_(0),
-        axis_(0) {
-  }
+  MouseEvent(Input *input);
 
-  Surface *surface() const {
-    return surface_;
-  }
+  Surface *GetSurface() const;
 
-  uint32_t serial() const {
-    return serial_;
-  }
+  uint32_t GetSerial() const;
 
-  /**
-   * @brief The X coordinate on wayland surface
-   * @return
-   */
-  double surface_x() const {
-    return surface_xy_.x;
-  }
+  const Point2D &GetSurfaceXY() const;
 
-  /**
-   * @brief The Y coordinate on wayland surface
-   * @return
-   */
-  double surface_y() const {
-    return surface_xy_.y;
-  }
+  Point2D GetWindowXY() const;
 
-  double window_x() const {
-    return window_xy_.x;
-  }
+  uint32_t GetButton() const;
 
-  double window_y() const {
-    return window_xy_.y;
-  }
+  uint32_t GetState() const;
 
-  uint32_t button() const {
-    return button_;
-  }
-
-  uint32_t state() const {
-    return state_;
-  }
-
-  uint32_t axis() const {
-    return axis_;
-  }
+  uint32_t GetAxis() const;
 
  private:
 
-  ~MouseEvent() {}
+  struct Private;
 
-  /** The surface this pointer hovers */
-  Surface *surface_;
+  ~MouseEvent();
 
-  uint32_t serial_;
-
-  Point2D surface_xy_;
-
-  Point2D window_xy_;
-
-  uint32_t time_;
-
-  uint32_t button_;
-  uint32_t state_;
-
-  uint32_t axis_;
+  std::unique_ptr<Private> p_;
 
 };
 

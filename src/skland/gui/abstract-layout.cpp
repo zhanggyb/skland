@@ -74,8 +74,8 @@ void AbstractLayout::OnMouseEnter(MouseEvent *event) {
   event->Ignore();
 }
 
-void AbstractLayout::OnMouseLeave(MouseEvent *event) {
-  event->Ignore();
+void AbstractLayout::OnMouseLeave() {
+
 }
 
 void AbstractLayout::OnMouseMove(MouseEvent *event) {
