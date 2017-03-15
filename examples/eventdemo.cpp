@@ -35,7 +35,7 @@ class SimpleWidget : public AbstractView {
 
   SimpleWidget()
       : AbstractView(), btn_(nullptr) {
-    btn_ = new PushButton;
+    btn_ = new PushButton("Click me");
     btn_->MoveTo(200, 200);
     btn_->Resize(200, 200);
 
@@ -48,11 +48,11 @@ class SimpleWidget : public AbstractView {
 
  protected:
 
-  virtual void OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) override {
+  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) override {
     Update();
   }
 
-  virtual void OnMeasureResize(int old_width, int old_height, int new_width, int new_height) override {
+  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) override {
     Update();
   }
 

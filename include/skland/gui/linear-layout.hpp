@@ -22,6 +22,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup gui
+ * @brief Layout to arrange children in a single row or column.
+ */
 SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
 
   LinearLayout(const LinearLayout &) = delete;
@@ -33,15 +37,15 @@ SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
                const Padding &padding = Padding(5),
                int space = 5);
 
-  virtual ~LinearLayout();
-
   virtual Size GetPreferredSize() const;
 
  protected:
 
-  virtual void OnMeasureReposition(int old_x, int old_y, int new_x, int new_y);
+  virtual ~LinearLayout();
 
-  virtual void OnMeasureResize(int old_width, int old_height, int new_width, int new_height);
+  virtual void OnMove(int old_x, int old_y, int new_x, int new_y);
+
+  virtual void OnResize(int old_width, int old_height, int new_width, int new_height);
 
   virtual void OnViewAdded(AbstractView *view);
 

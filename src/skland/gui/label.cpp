@@ -18,14 +18,11 @@
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
+#include <skland/graphic/text-box.hpp>
 
 #include <skland/gui/context.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
-
-#include "SkTypeface.h"
-#include "SkPaint.h"
-#include "SkTextBox.h"
 
 namespace skland {
 
@@ -64,11 +61,11 @@ void Label::SetFont(const Font &font) {
   Update();
 }
 
-void Label::OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) {
+void Label::OnMove(int old_x, int old_y, int new_x, int new_y) {
   Update();
 }
 
-void Label::OnMeasureResize(int old_width, int old_height, int new_width, int new_height) {
+void Label::OnResize(int old_width, int old_height, int new_width, int new_height) {
   Update();
 }
 
@@ -93,9 +90,11 @@ void Label::OnKeyboardKey(KeyEvent *event) {
 }
 
 void Label::OnDraw(const Context *context) {
+  const Rect &rect = GetGeometry();
+
   Paint paint;
   paint.SetColor(background_);
-  context->canvas()->DrawRect(GetGeometry(), paint);
+  context->canvas()->DrawRect(rect, paint);
 
   paint.SetColor(foreground_);
   paint.SetAntiAlias(true);
@@ -105,16 +104,15 @@ void Label::OnDraw(const Context *context) {
 
   float text_width = paint.MeasureText(text_.c_str(), text_.length());
 
-  SkTextBox text_box;
-  const Rect &rect = GetGeometry();
+  TextBox text_box;
   // Put the text at the center
-  text_box.setBox((rect.l + rect.r - text_width) / 2.f,
+  text_box.SetBox(rect.l + (rect.width() - text_width) / 2.f,
                   rect.t + 1.f, // move down a little for better look
-                  (rect.r - rect.l + text_width) / 2.f,
+                  rect.r - (rect.width() - text_width) / 2.f,
                   rect.b);
-  text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
-  text_box.setText(text_.c_str(), text_.length(), paint.GetSkPaint());
-  text_box.draw(context->canvas()->GetSkCanvas());
+  text_box.SetSpacingAlign(TextBox::kSpacingAlignCenter);
+  text_box.SetText(text_.c_str(), text_.length(), paint);
+  text_box.Draw(*context->canvas());
 }
 
 }

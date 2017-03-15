@@ -142,11 +142,9 @@ class TitleBar final : public AbstractView {
 
  protected:
 
-  virtual void OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) override;
+  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) override;
 
-  virtual void OnMeasureResize(int old_width, int old_height, int new_width, int new_height) override;
-
-  virtual void OnGeometryChange(int flag, const Rect &old_geometry, const Rect &new_geometry) override;
+  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) override;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

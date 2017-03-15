@@ -34,8 +34,8 @@ AbstractView::AbstractView()
 AbstractView::AbstractView(int width, int height)
     : AbstractEventHandler() {
   p_.reset(new Private(this));
-  p_->pending_geometry.Resize(width, height);
   p_->geometry.Resize(width, height);
+  p_->saved_geometry.Resize(width, height);
 }
 
 AbstractView::~AbstractView() {
@@ -49,23 +49,23 @@ AbstractView::~AbstractView() {
 }
 
 void AbstractView::MoveTo(int x, int y) {
-  p_->pending_geometry.MoveTo(x, y);
+  p_->geometry.MoveTo(x, y);
 
-  if (x == p_->geometry.x() && y == p_->geometry.y()) {
+  if (x == p_->saved_geometry.x() && y == p_->saved_geometry.y()) {
     Bit::Clear<int>(p_->geometry_dirty_flag, Private::kPositionMask);
     return;
   }
 
   Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
-  OnMeasureReposition(static_cast<int>(p_->geometry.x()),
-                      static_cast<int>(p_->geometry.y()),
-                      x, y);
+  OnMove(static_cast<int>(p_->saved_geometry.x()),
+         static_cast<int>(p_->saved_geometry.y()),
+         x, y);
 }
 
 void AbstractView::Resize(int width, int height) {
-  if (width == p_->geometry.width() && height == p_->geometry.height()) {
+  if (width == p_->saved_geometry.width() && height == p_->saved_geometry.height()) {
     Bit::Clear<int>(p_->geometry_dirty_flag, Private::kSizeMask);
-    p_->pending_geometry.Resize(width, height);
+    p_->geometry.Resize(width, height);
     return;
   }
 
@@ -78,10 +78,18 @@ void AbstractView::Resize(int width, int height) {
   if (width > max.width || height > max.height) return;
 
   Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
-  p_->pending_geometry.Resize(width, height);
-  OnMeasureResize(static_cast<int>(p_->geometry.width()),
-                  static_cast<int>(p_->geometry.height()),
-                  width, height);
+  p_->geometry.Resize(width, height);
+  OnResize(static_cast<int>(p_->saved_geometry.width()),
+           static_cast<int>(p_->saved_geometry.height()),
+           width, height);
+}
+
+int AbstractView::GetX() const {
+  return static_cast<int>(p_->geometry.x());
+}
+
+int AbstractView::GetY() const {
+  return static_cast<int>(p_->geometry.y());
 }
 
 int AbstractView::GetLeft() const {
@@ -155,6 +163,8 @@ Size AbstractView::GetMaximalSize() const {
 void AbstractView::Destroy() {
   destroyed_.Emit(this);
 
+  OnDestroy();
+
   if (p_->parent) {
     DBG_ASSERT(nullptr == p_->shell);
     p_->parent->RemoveChild(this);
@@ -170,6 +180,109 @@ void AbstractView::Destroy() {
   }
 
   delete this;
+}
+
+void AbstractView::OnAddChild(AbstractView */*view*/) {
+  // override in subclass
+}
+
+void AbstractView::OnRemoveChild(AbstractView */*view*/) {
+
+}
+
+void AbstractView::OnAddedToParent() {
+  // override in subclass
+}
+
+void AbstractView::OnRemovedFromParent(AbstractView */*original_parent*/) {
+  // override in subclass
+}
+
+void AbstractView::OnAttachedToShellView() {
+
+}
+
+void AbstractView::OnDetachedFromShellView(AbstractShellView */*shell_view*/) {
+
+}
+
+void AbstractView::RecursiveUpdate() {
+  OnUpdate(this);
+  for (AbstractView *sub = p_->last_child; sub; sub = sub->p_->previous) {
+    sub->RecursiveUpdate();
+  }
+}
+
+void AbstractView::OnUpdate(AbstractView *view) {
+  RedrawTaskIterator it(this);
+
+  if (it.IsLinked()) {
+    if (view != this) {
+      // This view is going to be redrawn, just push back the task of the sub view
+      DBG_ASSERT(it.context().canvas());
+      it.PushBack(view);
+      RedrawTaskIterator(view).SetContext(this);
+    }
+    return;
+  }
+
+  if (p_->parent) {
+    DBG_ASSERT(nullptr == p_->shell);
+    p_->parent->OnUpdate(view);
+    return;
+  } else if (p_->shell) {
+    DBG_ASSERT(nullptr == p_->parent);
+    p_->shell->OnUpdate(view);
+  }
+}
+
+Surface *AbstractView::GetSurface(const AbstractView *view) const {
+  if (p_->parent) {
+    DBG_ASSERT(nullptr == p_->shell);
+    return p_->parent->GetSurface(view);
+  }
+
+  if (p_->shell) {
+    DBG_ASSERT(nullptr == p_->parent);
+    return p_->shell->GetSurface(view);
+  }
+
+  return nullptr;
+}
+
+AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
+  Iterator it(this);
+  AbstractView *view = nullptr;
+  Point cursor_xy(event->GetWindowXY());
+
+  for (it = it.first_child(); it; ++it) {
+    if (it.view()->Contain(cursor_xy.x, cursor_xy.y)) {
+      view = it.view();
+      break;
+    }
+  }
+
+  return view;
+}
+
+void AbstractView::OnDestroy() {
+  // override in sub class
+}
+
+void AbstractView::TrackMouseMotion(MouseEvent *event) {
+//  if (p_->mouse_motion_task.IsLinked()) return;
+
+//  AbstractView *window = event->surface()->event_handler();
+//
+//  ViewTask *task = &window->p_->mouse_motion_task;
+//  while (task->next()) {
+//    task = static_cast<ViewTask *>(task->next());
+//  }
+//  task->PushBack(&p_->mouse_motion_task);
+}
+
+void AbstractView::UntrackMouseMotion() {
+//  p_->mouse_motion_task.Unlink();
 }
 
 AbstractView *AbstractView::GetChildAt(int index) const {
@@ -394,30 +507,6 @@ void AbstractView::ClearChildren() {
   p_->children_count = 0;
   p_->first_child = nullptr;
   p_->last_child = nullptr;
-}
-
-void AbstractView::OnAddChild(AbstractView */*view*/) {
-  // override in subclass
-}
-
-void AbstractView::OnRemoveChild(AbstractView */*view*/) {
-
-}
-
-void AbstractView::OnAddedToParent() {
-  // override in subclass
-}
-
-void AbstractView::OnRemovedFromParent(AbstractView */*original_parent*/) {
-  // override in subclass
-}
-
-void AbstractView::OnAttachedToShellView() {
-
-}
-
-void AbstractView::OnDetachedFromShellView(AbstractShellView */*shell_view*/) {
-
 }
 
 bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {
@@ -754,85 +843,6 @@ void AbstractView::MoveBackward(AbstractView *object) {
     }
 
   }
-}
-
-void AbstractView::RecursiveUpdate() {
-  OnUpdate(this);
-  for (AbstractView *sub = p_->last_child; sub; sub = sub->p_->previous) {
-    sub->RecursiveUpdate();
-  }
-}
-
-void AbstractView::OnUpdate(AbstractView *view) {
-  RedrawTaskIterator it(this);
-
-  if (it.IsLinked()) {
-    if (view != this) {
-      // This view is going to be redrawn, just push back the task of the sub view
-      DBG_ASSERT(it.context().canvas());
-      it.PushBack(view);
-      RedrawTaskIterator(view).SetContext(this);
-    }
-    return;
-  }
-
-  if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->shell);
-    p_->parent->OnUpdate(view);
-    return;
-  } else if (p_->shell) {
-    DBG_ASSERT(nullptr == p_->parent);
-    p_->shell->OnUpdate(view);
-  }
-}
-
-Surface *AbstractView::GetSurface(const AbstractView *view) const {
-  if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->shell);
-    return p_->parent->GetSurface(view);
-  }
-
-  if (p_->shell) {
-    DBG_ASSERT(nullptr == p_->parent);
-    return p_->shell->GetSurface(view);
-  }
-
-  return nullptr;
-}
-
-void AbstractView::OnGeometryChange(int flag, const Rect &old_geometry, const Rect &new_geometry) {
-  // override in sub class
-}
-
-AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
-  Iterator it(this);
-  AbstractView *view = nullptr;
-  Point cursor_xy(event->GetWindowXY());
-
-  for (it = it.first_child(); it; ++it) {
-    if (it.view()->Contain(cursor_xy.x, cursor_xy.y)) {
-      view = it.view();
-      break;
-    }
-  }
-
-  return view;
-}
-
-void AbstractView::TrackMouseMotion(MouseEvent *event) {
-//  if (p_->mouse_motion_task.IsLinked()) return;
-
-//  AbstractView *window = event->surface()->event_handler();
-//
-//  ViewTask *task = &window->p_->mouse_motion_task;
-//  while (task->next()) {
-//    task = static_cast<ViewTask *>(task->next());
-//  }
-//  task->PushBack(&p_->mouse_motion_task);
-}
-
-void AbstractView::UntrackMouseMotion() {
-//  p_->mouse_motion_task.Unlink();
 }
 
 void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int width, int height) {

@@ -49,13 +49,13 @@ class ShmWidget : public AbstractView {
 
  protected:
 
-  virtual void OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) override {
+  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) override {
     rectangle_.MoveTo(new_x, new_y);
     if (!running_animation_)
       Update();
   }
 
-  virtual void OnMeasureResize(int old_width, int old_height, int new_width, int new_height) override {
+  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) override {
     rectangle_.Resize(new_width, new_height);
     if (!running_animation_)
       Update();

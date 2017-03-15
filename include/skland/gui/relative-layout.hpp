@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_PUSH_BUTTON_HPP_
-#define SKLAND_GUI_PUSH_BUTTON_HPP_
+#ifndef SKLAND_GUI_RELATIVE_LAYOUT_HPP_
+#define SKLAND_GUI_RELATIVE_LAYOUT_HPP_
 
-#include "abstract-button.hpp"
+#include "abstract-layout.hpp"
 
 namespace skland {
 
-/**
- * @ingroup gui
- * @brief A most commonly used button
- */
-class PushButton : public AbstractButton {
+SKLAND_EXPORT class RelativeLayout : public AbstractLayout {
 
  public:
 
-  PushButton(const std::string& text);
-
-  virtual Size GetPreferredSize() const final;
+  RelativeLayout(const Padding &padding = Padding(5));
 
  protected:
 
-  virtual ~PushButton();
+  virtual ~RelativeLayout();
 
-  virtual void OnDraw(const Context *context) override;
+  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) final;
+
+  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) final;
+
+  virtual void OnViewAdded(AbstractView *view) final;
+
+ private:
 
 };
 
 }
 
-#endif // SKLAND_GUI_PUSH_BUTTON_HPP_
+#endif // SKLAND_GUI_RELATIVE_LAYOUT_HPP_

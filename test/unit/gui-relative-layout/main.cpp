@@ -14,33 +14,9 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_PUSH_BUTTON_HPP_
-#define SKLAND_GUI_PUSH_BUTTON_HPP_
+#include <gtest/gtest.h>
 
-#include "abstract-button.hpp"
-
-namespace skland {
-
-/**
- * @ingroup gui
- * @brief A most commonly used button
- */
-class PushButton : public AbstractButton {
-
- public:
-
-  PushButton(const std::string& text);
-
-  virtual Size GetPreferredSize() const final;
-
- protected:
-
-  virtual ~PushButton();
-
-  virtual void OnDraw(const Context *context) override;
-
-};
-
+int main(int argc, char *argv[]) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
-
-#endif // SKLAND_GUI_PUSH_BUTTON_HPP_

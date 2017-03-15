@@ -47,7 +47,7 @@ struct AbstractButton::Private {
   };
 
   Private()
-      : flags(0x1) {}
+      : flags(0x1), font(Typeface::kBold) {}
 
   uint32_t flags;
 
@@ -58,7 +58,7 @@ struct AbstractButton::Private {
 };
 
 AbstractButton::AbstractButton()
-    : AbstractView() {
+    : AbstractView(80, 20) {
   p_.reset(new Private);
 }
 
@@ -68,8 +68,9 @@ AbstractButton::AbstractButton(int width, int height)
 }
 
 AbstractButton::AbstractButton(const std::string &text)
-    : AbstractView() {
+    : AbstractView(80, 20) {
   p_.reset(new Private);
+  p_->text = text;
 }
 
 AbstractButton::~AbstractButton() {
@@ -86,6 +87,24 @@ bool AbstractButton::IsHovered() const {
 
 bool AbstractButton::IsPressed() const {
   return (p_->flags & Private::FlagIndex::kPressed) != 0;
+}
+
+const Font &AbstractButton::GetFont() const {
+  return p_->font;
+}
+
+void AbstractButton::SetFont(const Font &font) {
+  p_->font = font;
+  Update();
+}
+
+const std::string &AbstractButton::GetText() const {
+  return p_->text;
+}
+
+void AbstractButton::SetText(const std::string &text) {
+  p_->text = text;
+  Update();
 }
 
 Size AbstractButton::GetPreferredSize() const {
@@ -135,11 +154,11 @@ void AbstractButton::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) {
+void AbstractButton::OnMove(int old_x, int old_y, int new_x, int new_y) {
   Update();
 }
 
-void AbstractButton::OnMeasureResize(int old_width, int old_height, int new_width, int new_height) {
+void AbstractButton::OnResize(int old_width, int old_height, int new_width, int new_height) {
   Update();
 }
 

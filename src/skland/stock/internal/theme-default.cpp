@@ -66,6 +66,8 @@ void CloseButton::OnDraw(const Context *context) {
   canvas->ClipRect(GetGeometry());
   canvas->Clear();
 
+  const Rect &rect = GetGeometry();
+
   Paint paint;
   paint.SetAntiAlias(true);
 
@@ -73,7 +75,7 @@ void CloseButton::OnDraw(const Context *context) {
     if (IsPressed()) {
       paint.SetColor(background_);
       paint.SetStyle(Paint::Style::kStyleFill);
-      canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 7.f, paint);
+      canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
       paint.SetAntiAlias(true);
     }
@@ -81,16 +83,16 @@ void CloseButton::OnDraw(const Context *context) {
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetColor(foreground_);
     paint.SetStrokeWidth(1.f);
-    canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 6.5f, paint);
+    canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
   paint.SetColor(foreground_);
   paint.SetStrokeWidth(1.5f);
-  canvas->DrawLine(GetGeometry().center_x() - 3.f, GetGeometry().center_y() - 3.f,
-                   GetGeometry().center_x() + 3.f, GetGeometry().center_y() + 3.f,
+  canvas->DrawLine(rect.center_x() - 3.f, rect.center_y() - 3.f,
+                   rect.center_x() + 3.f, rect.center_y() + 3.f,
                    paint);
-  canvas->DrawLine(GetGeometry().center_x() + 3.f, GetGeometry().center_y() - 3.f,
-                   GetGeometry().center_x() - 3.f, GetGeometry().center_y() + 3.f,
+  canvas->DrawLine(rect.center_x() + 3.f, rect.center_y() - 3.f,
+                   rect.center_x() - 3.f, rect.center_y() + 3.f,
                    paint);
 
   canvas->Restore();
@@ -126,6 +128,8 @@ void MaximizeButton::OnDraw(const Context *context) {
   canvas->ClipRect(GetGeometry());
   canvas->Clear();
 
+  const Rect &rect = GetGeometry();
+
   Paint paint;
   paint.SetAntiAlias(true);
 
@@ -133,7 +137,7 @@ void MaximizeButton::OnDraw(const Context *context) {
     if (IsPressed()) {
       paint.SetColor(background_);
       paint.SetStyle(Paint::Style::kStyleFill);
-      canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 7.f, paint);
+      canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
       paint.SetAntiAlias(true);
     }
@@ -141,16 +145,16 @@ void MaximizeButton::OnDraw(const Context *context) {
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetColor(foreground_);
     paint.SetStrokeWidth(1.f);
-    canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 6.5f, paint);
+    canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
   paint.SetColor(foreground_);
   paint.SetStrokeWidth(1.5f);
-  canvas->DrawLine(GetGeometry().center_x() - 4.f, GetGeometry().center_y(),
-                   GetGeometry().center_x() + 4.f, GetGeometry().center_y(),
+  canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
+                   rect.center_x() + 4.f, rect.center_y(),
                    paint);
-  canvas->DrawLine(GetGeometry().center_x(), GetGeometry().center_y() - 4.f,
-                   GetGeometry().center_x(), GetGeometry().center_y() + 4.f,
+  canvas->DrawLine(rect.center_x(), rect.center_y() - 4.f,
+                   rect.center_x(), rect.center_y() + 4.f,
                    paint);
 
   canvas->Restore();
@@ -186,6 +190,8 @@ void MinimizeButton::OnDraw(const Context *context) {
   canvas->ClipRect(GetGeometry());
   canvas->Clear();
 
+  const Rect &rect = GetGeometry();
+
   Paint paint;
   paint.SetAntiAlias(true);
 
@@ -193,7 +199,7 @@ void MinimizeButton::OnDraw(const Context *context) {
     if (IsPressed()) {
       paint.SetColor(background_);
       paint.SetStyle(Paint::Style::kStyleFill);
-      canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 7.f, paint);
+      canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
       paint.SetAntiAlias(true);
     }
@@ -201,13 +207,13 @@ void MinimizeButton::OnDraw(const Context *context) {
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetColor(foreground_);
     paint.SetStrokeWidth(1.f);
-    canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 6.5f, paint);
+    canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
   paint.SetColor(foreground_);
   paint.SetStrokeWidth(1.5f);
-  canvas->DrawLine(GetGeometry().center_x() - 4.f, GetGeometry().center_y(),
-                   GetGeometry().center_x() + 4.f, GetGeometry().center_y(),
+  canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
+                   rect.center_x() + 4.f, rect.center_y(),
                    paint);
 
   canvas->Restore();
@@ -257,7 +263,7 @@ void TitleBar::SetTitle(const std::string &title) {
   Update();
 }
 
-void TitleBar::OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) {
+void TitleBar::OnMove(int old_x, int old_y, int new_x, int new_y) {
   new_y = (GetHeight() - WindowFrameDefault::kButtonSize) / 2;
   new_x = WindowFrameDefault::kButtonSpace;
   close_button_->MoveTo(new_x, new_y);
@@ -271,7 +277,7 @@ void TitleBar::OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) {
   RecursiveUpdate();
 }
 
-void TitleBar::OnMeasureResize(int old_width, int old_height, int new_width, int new_height) {
+void TitleBar::OnResize(int old_width, int old_height, int new_width, int new_height) {
   int y = (new_height - WindowFrameDefault::kButtonSize) / 2;
   int x = WindowFrameDefault::kButtonSpace;
   close_button_->MoveTo(x, y);
@@ -283,10 +289,6 @@ void TitleBar::OnMeasureResize(int old_width, int old_height, int new_width, int
   minimize_button_->MoveTo(x, y);
 
   RecursiveUpdate();
-}
-
-void TitleBar::OnGeometryChange(int flag, const Rect &old_geometry, const Rect &new_geometry) {
-
 }
 
 void TitleBar::OnMouseEnter(MouseEvent *event) {
@@ -323,9 +325,9 @@ void TitleBar::OnDraw(const Context *context) {
   SkTextBox text_box;
   const Rect &rect = GetGeometry();
   // Put the text at the center
-  text_box.setBox((rect.l + rect.r - text_width) / 2.f,
+  text_box.setBox(rect.l + (rect.width() - text_width) / 2.f,
                   rect.t + 1.f, // move down a little for better look
-                  (rect.r - rect.l + text_width) / 2.f,
+                  rect.r - (rect.width() - text_width) / 2.f,
                   rect.b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
   text_box.setText(title_.c_str(), title_.length(), paint.GetSkPaint());
@@ -489,6 +491,7 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
 }
 
 void WindowFrameDefault::DrawShadow(Canvas *canvas) {
+  const Size &size = GetShellView()->GetSize();
   float rad = Theme::shadow_radius() - 1.f; // The spread radius
   float offset_x = Theme::shadow_offset_x();
   float offset_y = Theme::shadow_offset_y();
@@ -516,14 +519,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
                                     250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
-                                    GetShellView()->GetSize().width - 2 * rad, 2 * rad),
+                                    size.width - 2 * rad, 2 * rad),
                    nullptr);
 
   // top-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
                                     250, 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(GetShellView()->GetSize().width - rad + offset_x, -rad + offset_y,
+                   SkRect::MakeXYWH(size.width - rad + offset_x, -rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -532,14 +535,14 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
                    SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
                    SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
-                                    2 * rad, GetShellView()->GetSize().height - 2 * rad),
+                                    2 * rad, size.height - 2 * rad),
                    nullptr);
 
   // bottom-left
   c->drawImageRect(image,
                    SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
                                     2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(-rad + offset_x, GetShellView()->GetSize().height - rad + offset_y,
+                   SkRect::MakeXYWH(-rad + offset_x, size.height - rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -547,16 +550,16 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250 - 2 * Theme::shadow_radius(), 250),
-                   SkRect::MakeXYWH(rad + offset_x, GetShellView()->GetSize().height - rad + offset_y,
-                                    GetShellView()->GetSize().width - 2 * rad, 2 * rad),
+                   SkRect::MakeXYWH(rad + offset_x, size.height - rad + offset_y,
+                                    size.width - 2 * rad, 2 * rad),
                    nullptr);
 
   // bottom-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
                                     250, 250),
-                   SkRect::MakeXYWH(GetShellView()->GetSize().width - rad + offset_x,
-                                    GetShellView()->GetSize().height - rad + offset_y,
+                   SkRect::MakeXYWH(size.width - rad + offset_x,
+                                    size.height - rad + offset_y,
                                     2 * rad,
                                     2 * rad),
                    nullptr);
@@ -565,8 +568,8 @@ void WindowFrameDefault::DrawShadow(Canvas *canvas) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
                                     250, 250 - 2 * Theme::shadow_radius()),
-                   SkRect::MakeXYWH(GetShellView()->GetSize().width - rad + offset_x, rad + offset_y,
-                                    2 * rad, GetShellView()->GetSize().height - 2 * rad),
+                   SkRect::MakeXYWH(size.width - rad + offset_x, rad + offset_y,
+                                    2 * rad, size.height - 2 * rad),
                    nullptr);
 
 }

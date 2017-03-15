@@ -72,9 +72,9 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    */
   int geometry_dirty_flag;
 
-  Rect pending_geometry;
-
   Rect geometry;
+
+  Rect saved_geometry;
 
   RedrawTask redraw_task;
 

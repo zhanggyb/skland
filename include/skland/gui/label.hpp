@@ -24,15 +24,17 @@
 
 namespace skland {
 
-class Label : public AbstractView {
+/**
+ * @ingroup gui
+ * @brief A label displays icon or text.
+ */
+SKLAND_EXPORT class Label : public AbstractView {
 
  public:
 
   Label(const std::string &text, const Font &font = Font());
 
   Label(const std::string &text, int width, int height, const Font &font = Font());
-
-  virtual ~Label();
 
   void SetForeground(const Color &color);
 
@@ -42,9 +44,11 @@ class Label : public AbstractView {
 
  protected:
 
-  virtual void OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) override;
+  virtual ~Label();
 
-  virtual void OnMeasureResize(int old_width, int old_height, int new_width, int new_height) override;
+  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) override;
+
+  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) override;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

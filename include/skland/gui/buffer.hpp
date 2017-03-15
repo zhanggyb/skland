@@ -35,8 +35,8 @@ class SharedMemoryPool;
 /**
  * @brief Buffer in wayland compositor
  *
- * This class represents a buffer in memory. It's allocated by SHMPool and holds
- * a std::shared_ptr points to the shared memory.
+ * This class represents a native wayland buffer in memory. Use the Setup() to
+ * allocate this buffer and should allocate again if the shm pool is reset.
  */
 class Buffer {
 

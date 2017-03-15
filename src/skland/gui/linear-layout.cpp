@@ -58,11 +58,11 @@ Size LinearLayout::GetPreferredSize() const {
   return size;
 }
 
-void LinearLayout::OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) {
+void LinearLayout::OnMove(int old_x, int old_y, int new_x, int new_y) {
   Update();
 }
 
-void LinearLayout::OnMeasureResize(int old_width, int old_height, int new_width, int new_height) {
+void LinearLayout::OnResize(int old_width, int old_height, int new_width, int new_height) {
   Update();
 }
 

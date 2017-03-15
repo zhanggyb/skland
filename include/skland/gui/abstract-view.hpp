@@ -33,19 +33,18 @@ class Context;
  * @ingroup gui
  * @brief An abstract base class for views
  *
- * AbstractView is an abstract base class for views. A view in SkLand
- * is a rectangle in an AbstractShellView object and handle events.
- * You typically don't use this class directly. Instead, you use or
- * create a subclass.
+ * AbstractView is an abstract base class for views. A view in SkLand is a
+ * rectangle in an AbstractShellView object and handle events.  You typically
+ * don't use this class directly. Instead, you use or create a subclass.
  *
- * A view can have parent and subviews, when you create a GUI
- * application, it generates a view hierachy.
+ * A view can have parent and subviews, when you create a GUI application, it
+ * generates a view hierachy.
  *
- * A view object can have arbitrary number of surfaces or shares the
- * surface with others which is managed in one of parent views.
+ * A view object can have arbitrary number of surfaces or shares the surface
+ * with others which is managed in one of parent views.
  *
- * An AbstractView object SHOULD always be created by new operator and
- * MUST be destroyed by Destroy() method.
+ * An AbstractView object SHOULD always be created by new operator and MUST be
+ * destroyed by Destroy() method.
  *
  * @see AbstractShellView
  * @see Surface
@@ -80,6 +79,10 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   void MoveTo(int x, int y);
 
   void Resize(int width, int height);
+
+  int GetX() const;
+
+  int GetY() const;
 
   int GetLeft() const;
 
@@ -121,7 +124,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   /**
    * @brief Destroy and delete this object
    *
-   * This method will emit an 'destroyed' signal before do some clean up work.
+   * This method will emit an 'destroyed' signal at first and call OnDestroy()
+   * before doing some clean up work.
    */
   void Destroy();
 
@@ -131,10 +135,98 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   /**
    * @brief Destructor
+   *
+   * @note You should never use delete to destroy an AbstractView object. An
+   * AbstractView should always be created by new operator and use the
+   * Destroy() to destroy itself.
    */
   virtual ~AbstractView();
 
   virtual void OnDraw(const Context *context) = 0;
+
+  virtual void OnAddChild(AbstractView *view);
+
+  virtual void OnRemoveChild(AbstractView *view);
+
+  virtual void OnAddedToParent();
+
+  virtual void OnRemovedFromParent(AbstractView *original_parent);
+
+  virtual void OnAttachedToShellView();
+
+  virtual void OnDetachedFromShellView(AbstractShellView *shell_view);
+
+  /**
+   * @brief Update this view and all sub views
+   *
+   * By default this method will update this view and all recursively update all
+   * sub views.  Sub class can override this method to select part of sub views
+   * to update.
+   */
+  virtual void RecursiveUpdate();
+
+  /**
+   * @brief A view request an update
+   * @param view This view or a sub view in hierachy
+   */
+  virtual void OnUpdate(AbstractView *view) override;
+
+  /**
+   * @brief Get surface for the given view
+   * @param view A view object, it is always this view or a sub view in hierachy
+   * @return A pointer to a surface or nullptr
+   */
+  virtual Surface *GetSurface(const AbstractView *view) const;
+
+  /**
+   * @brief Callback when the position of this view is going to be reset
+   * @param old_x
+   * @param old_y
+   * @param new_x
+   * @param new_y
+   *
+   * The sub class determines if need to update in this callback, in most cases,
+   * it's need to use Update().
+   */
+  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) = 0;
+
+  /**
+   * @brief Callback when the size of this view is going to be reset
+   * @param old_width
+   * @param old_height
+   * @param new_width
+   * @param new_height
+   *
+   * The sub class determines if need to update in this callback, in most cases,
+   * it's need to use Update().
+   *
+   * @note The new size will never be smaller than the minimal size, nor bigger
+   * than the maximal size.
+   */
+  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) = 0;
+
+  /**
+   * @brief Dispatch mouse enter event down to the target view
+   * @param event
+   * @return
+   *   - A sub view object
+   *   - nullptr if no sub view need to handle the mouse enter event
+   *
+   * By default this method check all sub views and return the one contains the
+   * cursor position. Sub class can override this.
+   */
+  virtual AbstractView *DispatchMouseEnterEvent(MouseEvent *event);
+
+  /**
+   * @brief Callback when destroyed
+   *
+   * By default this method does nothing, sub class can override this.
+   */
+  virtual void OnDestroy();
+
+  void TrackMouseMotion(MouseEvent *event);
+
+  void UntrackMouseMotion();
 
   AbstractView *GetChildAt(int index) const;
 
@@ -174,18 +266,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   void ClearChildren();
 
-  virtual void OnAddChild(AbstractView *view);
-
-  virtual void OnRemoveChild(AbstractView *view);
-
-  virtual void OnAddedToParent();
-
-  virtual void OnRemovedFromParent(AbstractView *original_parent);
-
-  virtual void OnAttachedToShellView();
-
-  virtual void OnDetachedFromShellView(AbstractShellView *shell_view);
-
   static bool SwapIndex(AbstractView *object1, AbstractView *object2);
 
   static bool InsertSiblingBefore(AbstractView *src, AbstractView *dst);
@@ -199,79 +279,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   static void MoveForward(AbstractView *object);
 
   static void MoveBackward(AbstractView *object);
-
-  /**
-   * @brief Update this view and all sub views
-   *
-   * By default this method will update this view and all recursively update all sub views.
-   * Sub class can override this method to select part of sub views to update.
-   */
-  virtual void RecursiveUpdate();
-
-  /**
-   * @brief A view request an update
-   * @param view This view or a sub view in hierachy
-   */
-  virtual void OnUpdate(AbstractView *view) override;
-
-  /**
-   * @brief Get surface for the given view
-   * @param view A view object, it is always this view or a sub view in hierachy
-   * @return A pointer to a surface or nullptr
-   */
-  virtual Surface *GetSurface(const AbstractView *view) const;
-
-  /**
-   * @brief Callback when the position of this view is going to be reset
-   * @param old_x
-   * @param old_y
-   * @param new_x
-   * @param new_y
-   *
-   * The sub class determines if need to update in this callback, in most cases, it's need to use Update().
-   */
-  virtual void OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) = 0;
-
-  /**
-   * @brief Callback when the size of this view is going to be reset
-   * @param old_width
-   * @param old_height
-   * @param new_width
-   * @param new_height
-   *
-   * The sub class determines if need to update in this callback, in most cases, it's need to use Update().
-   *
-   * @note The new size will never be smaller than the minimal size, nor bigger than the maximal size.
-   */
-  virtual void OnMeasureResize(int old_width, int old_height, int new_width, int new_height) = 0;
-
-  /**
-   * @brief Callback when going to update the geometry of this view immediately
-   * @param flag Bitwise flag of the geometry:
-   *   - 0x1: position changed
-   *   - 0x2: size changed
-   * @param old_geometry The old geometry
-   * @param new_geometry The new geometry
-   *
-   * @note Cannot call Update() or OnUpdate(this) in this method
-   */
-  virtual void OnGeometryChange(int flag, const Rect &old_geometry, const Rect &new_geometry);
-
-  /**
-   * @brief Dispatch mouse enter event down to the target view
-   * @param event
-   * @return
-   *   - A sub view object
-   *   - nullptr if no sub view need to handle the mouse enter event
-   *
-   * By default this method check all sub views and return the one contains the cursor position.
-   * Sub class can override this.
-   */
-  virtual AbstractView *DispatchMouseEnterEvent(MouseEvent *event);
-
-  void TrackMouseMotion(MouseEvent *event);
-
-  void UntrackMouseMotion();
 
   /**
    * @brief Mark damage area of the given object

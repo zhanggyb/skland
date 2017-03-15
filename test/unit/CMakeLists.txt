@@ -53,5 +53,6 @@ if (LINUX)
     add_subdirectory(gui-slider)
     add_subdirectory(gui-egl-widget)
     add_subdirectory(gui-linear-layout)
+    add_subdirectory(gui-relative-layout)
 
 endif ()

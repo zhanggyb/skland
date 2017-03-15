@@ -23,6 +23,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup gui
+ * @brief The base abstract layout class
+ */
 SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   AbstractLayout(const AbstractLayout &) = delete;
@@ -31,8 +35,6 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
  public:
 
   AbstractLayout(const Padding &padding = Padding(5));
-
-  virtual ~AbstractLayout();
 
   virtual Size GetMinimalSize() const override;
 
@@ -43,6 +45,8 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
   const Padding &padding() const { return padding_; }
 
  protected:
+
+  virtual ~AbstractLayout();
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

@@ -21,6 +21,8 @@
 
 namespace skland {
 
+class Font;
+
 /**
  * @ingroup gui
  * @brief The abstract class for buttons
@@ -36,15 +38,11 @@ class AbstractButton : public AbstractView {
 
   AbstractButton(int width, int height);
 
-  AbstractButton(const std::string& text);
-
-  virtual ~AbstractButton();
+  AbstractButton(const std::string &text);
 
   virtual Size GetPreferredSize() const override;
 
-  SignalRef<> clicked() {
-    return clicked_;
-  }
+  SignalRef<> clicked() { return clicked_; }
 
   bool IsSensitive() const;
 
@@ -52,7 +50,17 @@ class AbstractButton : public AbstractView {
 
   bool IsPressed() const;
 
+  const Font &GetFont() const;
+
+  void SetFont(const Font &font);
+
+  const std::string &GetText() const;
+
+  void SetText(const std::string &text);
+
  protected:
+
+  virtual ~AbstractButton();
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -64,9 +72,9 @@ class AbstractButton : public AbstractView {
 
   virtual void OnKeyboardKey(KeyEvent *event) override;
 
-  virtual void OnMeasureReposition(int old_x, int old_y, int new_x, int new_y) override;
+  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) override;
 
-  virtual void OnMeasureResize(int old_width, int old_height, int new_width, int new_height) override;
+  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) override;
 
   void SetSensitive(bool sensitive);
 
