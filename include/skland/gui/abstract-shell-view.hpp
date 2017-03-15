@@ -253,6 +253,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, MouseTaskIterator &tail);
 
+  void ClearMouseTasks();
+
   /**
    * @brief The private data
    */
