@@ -35,7 +35,7 @@ AbstractView::AbstractView(int width, int height)
     : AbstractEventHandler() {
   p_.reset(new Private(this));
   p_->geometry.Resize(width, height);
-  p_->saved_geometry.Resize(width, height);
+  p_->last_geometry.Resize(width, height);
 }
 
 AbstractView::~AbstractView() {
@@ -49,39 +49,41 @@ AbstractView::~AbstractView() {
 }
 
 void AbstractView::MoveTo(int x, int y) {
+  if (p_->geometry.x() == x && p_->geometry.y() == y) return;
+
   p_->geometry.MoveTo(x, y);
 
-  if (x == p_->saved_geometry.x() && y == p_->saved_geometry.y()) {
+  if (x == p_->last_geometry.x() && y == p_->last_geometry.y()) {
     Bit::Clear<int>(p_->geometry_dirty_flag, Private::kPositionMask);
-    return;
+  } else {
+    Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
   }
 
-  Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
-  OnMove(static_cast<int>(p_->saved_geometry.x()),
-         static_cast<int>(p_->saved_geometry.y()),
-         x, y);
+  OnGeometryChange(p_->geometry_dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 void AbstractView::Resize(int width, int height) {
-  if (width == p_->saved_geometry.width() && height == p_->saved_geometry.height()) {
-    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kSizeMask);
-    p_->geometry.Resize(width, height);
-    return;
-  }
+  if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
   Size min = GetMinimalSize();
   Size max = GetMaximalSize();
 
-  DBG_ASSERT(min.width < max.height && min.height < max.height);
+  if (min.width > max.width || min.height > max.height) {
+    throw std::runtime_error("Error! Invalid minimal and maximal size!");
+  }
 
   if (width < min.width || height < min.height) return;
   if (width > max.width || height > max.height) return;
 
-  Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
   p_->geometry.Resize(width, height);
-  OnResize(static_cast<int>(p_->saved_geometry.width()),
-           static_cast<int>(p_->saved_geometry.height()),
-           width, height);
+
+  if (width == p_->last_geometry.width() && height == p_->last_geometry.height()) {
+    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kSizeMask);
+  } else {
+    Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
+  }
+
+  OnGeometryChange(p_->geometry_dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetX() const {
@@ -134,6 +136,11 @@ bool AbstractView::IsVisible() const {
 
 void AbstractView::Update() {
   OnUpdate(this);
+}
+
+void AbstractView::CancelUpdate() {
+  RedrawTaskIterator it(this);
+  it.redraw_task()->Unlink();
 }
 
 bool AbstractView::Contain(int x, int y) const {

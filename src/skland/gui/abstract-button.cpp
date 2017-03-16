@@ -154,12 +154,12 @@ void AbstractButton::OnKeyboardKey(KeyEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnMove(int old_x, int old_y, int new_x, int new_y) {
-  Update();
-}
-
-void AbstractButton::OnResize(int old_width, int old_height, int new_width, int new_height) {
-  Update();
+void AbstractButton::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  if (dirty_flag) {
+    Update();
+  } else {
+    CancelUpdate();
+  }
 }
 
 void AbstractButton::SetSensitive(bool sensitive) {

@@ -263,9 +263,9 @@ void TitleBar::SetTitle(const std::string &title) {
   Update();
 }
 
-void TitleBar::OnMove(int old_x, int old_y, int new_x, int new_y) {
-  new_y = (GetHeight() - WindowFrameDefault::kButtonSize) / 2;
-  new_x = WindowFrameDefault::kButtonSpace;
+void TitleBar::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  int new_y = (GetHeight() - WindowFrameDefault::kButtonSize) / 2;
+  int new_x = WindowFrameDefault::kButtonSpace;
   close_button_->MoveTo(new_x, new_y);
 
   new_x += close_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
@@ -273,20 +273,6 @@ void TitleBar::OnMove(int old_x, int old_y, int new_x, int new_y) {
 
   new_x += maximize_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
   minimize_button_->MoveTo(new_x, new_y);
-
-  RecursiveUpdate();
-}
-
-void TitleBar::OnResize(int old_width, int old_height, int new_width, int new_height) {
-  int y = (new_height - WindowFrameDefault::kButtonSize) / 2;
-  int x = WindowFrameDefault::kButtonSpace;
-  close_button_->MoveTo(x, y);
-
-  x += close_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
-  maximize_button_->MoveTo(x, y);
-
-  x += maximize_button_->GetWidth() + WindowFrameDefault::kButtonSpace;
-  minimize_button_->MoveTo(x, y);
 
   RecursiveUpdate();
 }

@@ -48,12 +48,9 @@ class SimpleWidget : public AbstractView {
 
  protected:
 
-  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) override {
-    Update();
-  }
-
-  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) override {
-    Update();
+  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+    if (dirty_flag) Update();
+    else CancelUpdate();
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {

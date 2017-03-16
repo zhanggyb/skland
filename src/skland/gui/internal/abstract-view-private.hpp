@@ -74,7 +74,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   Rect geometry;
 
-  Rect saved_geometry;
+  Rect last_geometry;
 
   RedrawTask redraw_task;
 

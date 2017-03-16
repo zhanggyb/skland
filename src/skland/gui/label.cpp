@@ -61,12 +61,12 @@ void Label::SetFont(const Font &font) {
   Update();
 }
 
-void Label::OnMove(int old_x, int old_y, int new_x, int new_y) {
-  Update();
-}
-
-void Label::OnResize(int old_width, int old_height, int new_width, int new_height) {
-  Update();
+void Label::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  if (dirty_flag) {
+    Update();
+  } else {
+    CancelUpdate();
+  }
 }
 
 void Label::OnMouseEnter(MouseEvent *event) {
