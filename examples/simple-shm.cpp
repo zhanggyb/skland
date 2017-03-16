@@ -45,9 +45,13 @@ class ShmWidget : public AbstractView {
 
  protected:
 
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
     if (!running_animation_)
       Update();
+  }
+
+  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {

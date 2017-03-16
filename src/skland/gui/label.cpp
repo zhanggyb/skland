@@ -61,12 +61,16 @@ void Label::SetFont(const Font &font) {
   Update();
 }
 
-void Label::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void Label::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   if (dirty_flag) {
     Update();
   } else {
     CancelUpdate();
   }
+}
+
+void Label::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+
 }
 
 void Label::OnMouseEnter(MouseEvent *event) {

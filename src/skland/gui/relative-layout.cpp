@@ -29,6 +29,11 @@ RelativeLayout::~RelativeLayout() {
 
 }
 
+void RelativeLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  if (dirty_flag) Update();
+  else CancelUpdate();
+}
+
 void RelativeLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   Iterator it(this);
 
@@ -38,13 +43,14 @@ void RelativeLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, 
   for (it = it.first_child(); it; ++it) {
     it.view()->MoveTo(it.view()->GetLeft() + dx, it.view()->GetTop() + dy);
   }
-
-  if (dirty_flag) Update();
-  else CancelUpdate();
 }
 
 void RelativeLayout::OnViewAdded(AbstractView *view) {
+  // TODO:
+}
 
+void RelativeLayout::OnViewRemoved(AbstractView *view) {
+  // TODO:
 }
 
 }

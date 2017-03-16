@@ -58,9 +58,13 @@ Size LinearLayout::GetPreferredSize() const {
   return size;
 }
 
-void LinearLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void LinearLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   if (dirty_flag) Update();
   else CancelUpdate();
+}
+
+void LinearLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+
 }
 
 void LinearLayout::OnViewAdded(AbstractView *view) {

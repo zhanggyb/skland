@@ -263,7 +263,7 @@ void TitleBar::SetTitle(const std::string &title) {
   Update();
 }
 
-void TitleBar::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void TitleBar::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   int new_y = (GetHeight() - WindowFrameDefault::kButtonSize) / 2;
   int new_x = WindowFrameDefault::kButtonSpace;
   close_button_->MoveTo(new_x, new_y);
@@ -275,6 +275,10 @@ void TitleBar::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const 
   minimize_button_->MoveTo(new_x, new_y);
 
   RecursiveUpdate();
+}
+
+void TitleBar::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+
 }
 
 void TitleBar::OnMouseEnter(MouseEvent *event) {

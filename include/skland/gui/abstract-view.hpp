@@ -52,6 +52,7 @@ class Context;
 SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   friend class AbstractShellView;
+  friend class AbstractLayout;
 
   AbstractView(const AbstractView &) = delete;
   AbstractView &operator=(const AbstractView &) = delete;
@@ -146,9 +147,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual void OnDraw(const Context *context) = 0;
 
-  virtual void OnAddChild(AbstractView *view);
+  virtual void OnChildAdded(AbstractView *view);
 
-  virtual void OnRemoveChild(AbstractView *view);
+  virtual void OnChildRemoved(AbstractView *view);
 
   virtual void OnAddedToParent();
 
@@ -179,6 +180,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @return A pointer to a surface or nullptr
    */
   virtual Surface *GetSurface(const AbstractView *view) const;
+
+  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
 
   virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
 

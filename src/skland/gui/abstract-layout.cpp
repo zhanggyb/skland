@@ -24,6 +24,7 @@
 #include <skland/graphic/paint.hpp>
 
 #include "internal/abstract-view-iterators.hpp"
+#include "internal/abstract-view-private.hpp"
 
 //#ifdef DEBUG
 #include <cstdlib>
@@ -46,28 +47,42 @@ Size AbstractLayout::GetMinimalSize() const {
 }
 
 void AbstractLayout::AddView(AbstractView *view) {
-  Iterator it(view);
-
-  // TODO: check if view already in this layout
-  if (it.parent() == this)
+  if (view->p_->layout == this) {
+    DBG_ASSERT(view->p_->layout == this);
     return;
-
-  if (it.parent()) {
-    static_cast<AbstractLayout *>(it.parent())->RemoveView(view);
   }
 
-  DBG_ASSERT(nullptr == it.parent());
+  if (view->p_->layout) {
+    view->p_->layout->RemoveView(view);
+  }
+
+  DBG_ASSERT(nullptr == view->p_->layout);
+  DBG_ASSERT(nullptr == view->p_->parent);
+
   InsertChild(view);
+  view->p_->layout = this;
+
   OnViewAdded(view);
 }
 
 void AbstractLayout::RemoveView(AbstractView *view) {
-  Iterator it(view);
-
-  if (it.parent() != this)
+  if (view->p_->layout != this) {
+    DBG_ASSERT(view->p_->parent != this);
     return;
+  }
 
   RemoveChild(view);
+  view->p_->layout = nullptr;
+
+  OnViewRemoved(view);
+}
+
+void AbstractLayout::OnChildAdded(AbstractView *view) {
+  // Use OnViewAdded() in layout class
+}
+
+void AbstractLayout::OnChildRemoved(AbstractView *view) {
+  // Use OnViewRemoved() in layout class
 }
 
 void AbstractLayout::OnMouseEnter(MouseEvent *event) {
