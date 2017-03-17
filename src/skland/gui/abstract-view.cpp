@@ -53,6 +53,8 @@ AbstractView::~AbstractView() {
 }
 
 void AbstractView::MoveTo(int x, int y) {
+  DBG_ASSERT(!p_->inhibit_redraw);
+
   if (p_->geometry.x() == x && p_->geometry.y() == y) return;
 
   p_->geometry.MoveTo(x, y);
@@ -67,6 +69,8 @@ void AbstractView::MoveTo(int x, int y) {
 }
 
 void AbstractView::Resize(int width, int height) {
+  DBG_ASSERT(!p_->inhibit_redraw);
+
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
   Size min = GetMinimalSize();

@@ -65,6 +65,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   struct RedrawTask;
   class RedrawTaskIterator;
 
+  struct Alignment;
+
   /**
    * @brief Default constructor
    *
@@ -77,8 +79,18 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   AbstractView(int width, int height);
 
+  /**
+   * @brief Move this view to the given position in window coordinate
+   * @param x
+   * @param y
+   */
   void MoveTo(int x, int y);
 
+  /**
+   * @brief Resiz this view
+   * @param width
+   * @param height
+   */
   void Resize(int width, int height);
 
   int GetX() const;
