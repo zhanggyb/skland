@@ -46,9 +46,9 @@ SKLAND_EXPORT class Label : public AbstractView {
 
   virtual ~Label();
 
-  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) override;
+  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
 
-  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) override;
+  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

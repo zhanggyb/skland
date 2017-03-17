@@ -20,6 +20,7 @@
 
 #include <skland/core/numeric.hpp>
 #include <skland/gui/abstract-shell-view.hpp>
+#include <skland/gui/abstract-layout.hpp>
 
 #include "internal/abstract-view-iterators.hpp"
 #include "internal/abstract-view-redraw-task-iterator.hpp"
@@ -35,7 +36,7 @@ AbstractView::AbstractView(int width, int height)
     : AbstractEventHandler() {
   p_.reset(new Private(this));
   p_->geometry.Resize(width, height);
-  p_->saved_geometry.Resize(width, height);
+  p_->last_geometry.Resize(width, height);
 }
 
 AbstractView::~AbstractView() {
@@ -46,42 +47,51 @@ AbstractView::~AbstractView() {
   DBG_ASSERT(0 == p_->children_count);
   DBG_ASSERT(nullptr == p_->first_child);
   DBG_ASSERT(nullptr == p_->last_child);
+
+  // layout assert:
+  DBG_ASSERT(nullptr == p_->layout);
 }
 
 void AbstractView::MoveTo(int x, int y) {
+  DBG_ASSERT(!p_->inhibit_redraw);
+
+  if (p_->geometry.x() == x && p_->geometry.y() == y) return;
+
   p_->geometry.MoveTo(x, y);
 
-  if (x == p_->saved_geometry.x() && y == p_->saved_geometry.y()) {
+  if (x == p_->last_geometry.x() && y == p_->last_geometry.y()) {
     Bit::Clear<int>(p_->geometry_dirty_flag, Private::kPositionMask);
-    return;
+  } else {
+    Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
   }
 
-  Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
-  OnMove(static_cast<int>(p_->saved_geometry.x()),
-         static_cast<int>(p_->saved_geometry.y()),
-         x, y);
+  OnGeometryWillChange(p_->geometry_dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 void AbstractView::Resize(int width, int height) {
-  if (width == p_->saved_geometry.width() && height == p_->saved_geometry.height()) {
-    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kSizeMask);
-    p_->geometry.Resize(width, height);
-    return;
-  }
+  DBG_ASSERT(!p_->inhibit_redraw);
+
+  if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
   Size min = GetMinimalSize();
   Size max = GetMaximalSize();
 
-  DBG_ASSERT(min.width < max.height && min.height < max.height);
+  if (min.width > max.width || min.height > max.height) {
+    throw std::runtime_error("Error! Invalid minimal and maximal size!");
+  }
 
   if (width < min.width || height < min.height) return;
   if (width > max.width || height > max.height) return;
 
-  Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
   p_->geometry.Resize(width, height);
-  OnResize(static_cast<int>(p_->saved_geometry.width()),
-           static_cast<int>(p_->saved_geometry.height()),
-           width, height);
+
+  if (width == p_->last_geometry.width() && height == p_->last_geometry.height()) {
+    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kSizeMask);
+  } else {
+    Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
+  }
+
+  OnGeometryWillChange(p_->geometry_dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetX() const {
@@ -136,6 +146,11 @@ void AbstractView::Update() {
   OnUpdate(this);
 }
 
+void AbstractView::CancelUpdate() {
+  RedrawTaskIterator it(this);
+  it.redraw_task()->Unlink();
+}
+
 bool AbstractView::Contain(int x, int y) const {
   return p_->geometry.Contain(x, y);
 }
@@ -165,6 +180,11 @@ void AbstractView::Destroy() {
 
   OnDestroy();
 
+  if (p_->layout) {
+    DBG_ASSERT(p_->layout == p_->parent);
+    p_->layout->RemoveView(this);
+  }
+
   if (p_->parent) {
     DBG_ASSERT(nullptr == p_->shell);
     p_->parent->RemoveChild(this);
@@ -182,11 +202,11 @@ void AbstractView::Destroy() {
   delete this;
 }
 
-void AbstractView::OnAddChild(AbstractView */*view*/) {
+void AbstractView::OnChildAdded(AbstractView */*view*/) {
   // override in subclass
 }
 
-void AbstractView::OnRemoveChild(AbstractView */*view*/) {
+void AbstractView::OnChildRemoved(AbstractView */*view*/) {
 
 }
 
@@ -342,7 +362,7 @@ void AbstractView::PushFrontChild(AbstractView *child) {
   child->p_->parent = this;
   p_->children_count++;
 
-  OnAddChild(child);
+  OnChildAdded(child);
   if (child->p_->parent == this)
     child->OnAddedToParent();
 }
@@ -415,7 +435,7 @@ void AbstractView::InsertChild(AbstractView *child, int index) {
   child->p_->parent = this;
   p_->children_count++;
 
-  OnAddChild(child);
+  OnChildAdded(child);
   if (child->p_->parent == this)
     child->OnAddedToParent();
 }
@@ -453,7 +473,7 @@ void AbstractView::PushBackChild(AbstractView *child) {
   child->p_->parent = this;
   p_->children_count++;
 
-  OnAddChild(child);
+  OnChildAdded(child);
   if (child->p_->parent == this)
     child->OnAddedToParent();
 }
@@ -484,7 +504,7 @@ AbstractView *AbstractView::RemoveChild(AbstractView *child) {
   child->p_->next = nullptr;
   child->p_->parent = nullptr;
 
-  OnRemoveChild(child);
+  OnChildRemoved(child);
   if (child->p_->parent != this)
     child->OnRemovedFromParent(this);
 

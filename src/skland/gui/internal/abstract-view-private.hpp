@@ -24,6 +24,7 @@
 namespace skland {
 
 class AbstractShellView;
+class AbstractLayout;
 
 SKLAND_NO_EXPORT struct AbstractView::Private {
 
@@ -48,7 +49,8 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         geometry_dirty_flag(0),
         redraw_task(view),
         is_damaged(false),
-        inhibit_redraw(false) {}
+        inhibit_redraw(false),
+        layout(nullptr) {}
 
   ~Private() {}
 
@@ -74,7 +76,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   Rect geometry;
 
-  Rect saved_geometry;
+  Rect last_geometry;
 
   RedrawTask redraw_task;
 
@@ -91,6 +93,9 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
   RectI damaged_region;
 
   bool inhibit_redraw;
+
+  AbstractLayout *layout;
+
 };
 
 }

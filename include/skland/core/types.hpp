@@ -345,6 +345,14 @@ enum Orientation {
   kVertical
 };
 
+enum Align {
+  kAlignUndefined,
+  kAlignLeft,
+  kAlignTop,
+  kAlignRight,
+  kAlignBottom
+};
+
 typedef uint16_t GlyphID;
 
 }

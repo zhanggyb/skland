@@ -21,7 +21,7 @@
 
 namespace skland {
 
-SKLAND_EXPORT class RelativeLayout : public AbstractLayout {
+SKLAND_EXPORT class RelativeLayout final : public AbstractLayout {
 
  public:
 
@@ -31,11 +31,13 @@ SKLAND_EXPORT class RelativeLayout : public AbstractLayout {
 
   virtual ~RelativeLayout();
 
-  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) final;
+  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry);
 
-  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) final;
+  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry);
 
-  virtual void OnViewAdded(AbstractView *view) final;
+  virtual void OnViewAdded(AbstractView *view);
+
+  virtual void OnViewRemoved(AbstractView *view);
 
  private:
 

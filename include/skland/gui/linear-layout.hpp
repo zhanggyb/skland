@@ -43,9 +43,9 @@ SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
 
   virtual ~LinearLayout();
 
-  virtual void OnMove(int old_x, int old_y, int new_x, int new_y);
+  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
 
-  virtual void OnResize(int old_width, int old_height, int new_width, int new_height);
+  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
 
   virtual void OnViewAdded(AbstractView *view);
 

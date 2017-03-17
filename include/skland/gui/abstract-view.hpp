@@ -52,6 +52,7 @@ class Context;
 SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   friend class AbstractShellView;
+  friend class AbstractLayout;
 
   AbstractView(const AbstractView &) = delete;
   AbstractView &operator=(const AbstractView &) = delete;
@@ -63,6 +64,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   struct RedrawTask;
   class RedrawTaskIterator;
+
+  struct Alignment;
 
   /**
    * @brief Default constructor
@@ -76,8 +79,18 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   AbstractView(int width, int height);
 
+  /**
+   * @brief Move this view to the given position in window coordinate
+   * @param x
+   * @param y
+   */
   void MoveTo(int x, int y);
 
+  /**
+   * @brief Resiz this view
+   * @param width
+   * @param height
+   */
   void Resize(int width, int height);
 
   int GetX() const;
@@ -108,6 +121,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Update the display of this widget
    */
   void Update();
+
+  void CancelUpdate();
 
   virtual bool Contain(int x, int y) const;
 
@@ -144,9 +159,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual void OnDraw(const Context *context) = 0;
 
-  virtual void OnAddChild(AbstractView *view);
+  virtual void OnChildAdded(AbstractView *view);
 
-  virtual void OnRemoveChild(AbstractView *view);
+  virtual void OnChildRemoved(AbstractView *view);
 
   virtual void OnAddedToParent();
 
@@ -178,32 +193,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  /**
-   * @brief Callback when the position of this view is going to be reset
-   * @param old_x
-   * @param old_y
-   * @param new_x
-   * @param new_y
-   *
-   * The sub class determines if need to update in this callback, in most cases,
-   * it's need to use Update().
-   */
-  virtual void OnMove(int old_x, int old_y, int new_x, int new_y) = 0;
+  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
 
-  /**
-   * @brief Callback when the size of this view is going to be reset
-   * @param old_width
-   * @param old_height
-   * @param new_width
-   * @param new_height
-   *
-   * The sub class determines if need to update in this callback, in most cases,
-   * it's need to use Update().
-   *
-   * @note The new size will never be smaller than the minimal size, nor bigger
-   * than the maximal size.
-   */
-  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) = 0;
+  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
 
   /**
    * @brief Dispatch mouse enter event down to the target view

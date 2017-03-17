@@ -29,26 +29,28 @@ RelativeLayout::~RelativeLayout() {
 
 }
 
-void RelativeLayout::OnMove(int old_x, int old_y, int new_x, int new_y) {
+void RelativeLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  if (dirty_flag) Update();
+  else CancelUpdate();
+}
+
+void RelativeLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   Iterator it(this);
 
-  int dx = new_x - old_x;
-  int dy = new_y - old_y;
+  int dx = (int) (new_geometry.x() - old_geometry.x());
+  int dy = (int) (new_geometry.y() - old_geometry.y());
 
   for (it = it.first_child(); it; ++it) {
     it.view()->MoveTo(it.view()->GetLeft() + dx, it.view()->GetTop() + dy);
   }
-
-  Update();
-}
-
-void RelativeLayout::OnResize(int old_width, int old_height, int new_width, int new_height) {
-  // Do nothing in this layout
-  Update();
 }
 
 void RelativeLayout::OnViewAdded(AbstractView *view) {
+  // TODO:
+}
 
+void RelativeLayout::OnViewRemoved(AbstractView *view) {
+  // TODO:
 }
 
 }

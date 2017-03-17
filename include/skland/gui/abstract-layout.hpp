@@ -48,6 +48,10 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual ~AbstractLayout();
 
+  virtual void OnChildAdded(AbstractView *view) final;
+
+  virtual void OnChildRemoved(AbstractView *view) final;
+
   virtual void OnMouseEnter(MouseEvent *event) override;
 
   virtual void OnMouseLeave() override;
@@ -61,6 +65,8 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
   virtual void OnDraw(const Context *context) override;
 
   virtual void OnViewAdded(AbstractView *view) = 0;
+
+  virtual void OnViewRemoved(AbstractView *view) = 0;
 
  private:
 

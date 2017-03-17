@@ -58,12 +58,13 @@ Size LinearLayout::GetPreferredSize() const {
   return size;
 }
 
-void LinearLayout::OnMove(int old_x, int old_y, int new_x, int new_y) {
-  Update();
+void LinearLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  if (dirty_flag) Update();
+  else CancelUpdate();
 }
 
-void LinearLayout::OnResize(int old_width, int old_height, int new_width, int new_height) {
-  Update();
+void LinearLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+
 }
 
 void LinearLayout::OnViewAdded(AbstractView *view) {

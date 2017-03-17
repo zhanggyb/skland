@@ -76,6 +76,8 @@ class AbstractView::Iterator {
 
   AbstractView *last_child() const { return view_->p_->last_child; }
 
+  AbstractLayout *layout() const { return view_->p_->layout; }
+
   AbstractView *view() const { return view_; }
 
   operator bool() const { return nullptr != view_; }
