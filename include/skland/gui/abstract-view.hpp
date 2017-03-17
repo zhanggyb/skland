@@ -65,7 +65,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   struct RedrawTask;
   class RedrawTaskIterator;
 
-  struct Alignment;
+  struct Constraint;
+  class ConstraintGroup;
 
   /**
    * @brief Default constructor

@@ -21,6 +21,9 @@
 
 #include "abstract-view-redraw-task.hpp"
 
+#include "abstract-view-constraint.hpp"
+#include "abstract-view-constraint-group.hpp"
+
 namespace skland {
 
 class AbstractShellView;
@@ -50,7 +53,11 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         redraw_task(view),
         is_damaged(false),
         inhibit_redraw(false),
-        layout(nullptr) {}
+        layout(nullptr),
+        left_constraint_group(kAlignLeft),
+        top_constraint_group(kAlignTop),
+        right_constraint_group(kAlignRight),
+        bottom_constraint_group(kAlignBottom) {}
 
   ~Private() {}
 
@@ -95,6 +102,11 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
   bool inhibit_redraw;
 
   AbstractLayout *layout;
+
+  ConstraintGroup left_constraint_group;
+  ConstraintGroup top_constraint_group;
+  ConstraintGroup right_constraint_group;
+  ConstraintGroup bottom_constraint_group;
 
 };
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ALIGNMENT_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ALIGNMENT_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_HPP_
 
 #include <skland/gui/abstract-view.hpp>
 #include <skland/core/types.hpp>
@@ -26,33 +26,28 @@ namespace skland {
  * @ingroup gui_intern
  * @brief Used to align views in layout
  */
-SKLAND_NO_EXPORT struct AbstractView::Alignment {
+struct AbstractView::Constraint {
 
-  Alignment() = delete;
-  Alignment(const Alignment &) = delete;
-  Alignment &operator=(const Alignment &) = delete;
+  Constraint() = delete;
+  Constraint(const Constraint &) = delete;
+  Constraint &operator=(const Constraint &) = delete;
 
-  Alignment(AbstractView *view)
-      : view(view),
-        base(nullptr),
-        align(kAlignUndefined),
-        distance(0),
+  Constraint(AbstractView *view)
+      : distance(0),
         contrary(nullptr),
         previous(nullptr),
-        next(nullptr) {}
+        next(nullptr),
+        group(nullptr) {}
 
-  ~Alignment() {}
+  ~Constraint() {}
 
-  AbstractView *view;
-
-  AbstractView *base;
-  Align align;
   int distance;
 
-  Alignment *contrary;
+  Constraint *contrary;
 
-  Alignment *previous;
-  Alignment *next;
+  Constraint *previous;
+  Constraint *next;
+  ConstraintGroup *group;
 
 };
 
