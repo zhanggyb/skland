@@ -60,12 +60,12 @@ void AbstractView::MoveTo(int x, int y) {
   p_->geometry.MoveTo(x, y);
 
   if (x == p_->last_geometry.x() && y == p_->last_geometry.y()) {
-    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kPositionMask);
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyTopMask);
   } else {
-    Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyTopMask);
   }
 
-  OnGeometryWillChange(p_->geometry_dirty_flag, p_->last_geometry, p_->geometry);
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 void AbstractView::Resize(int width, int height) {
@@ -86,12 +86,12 @@ void AbstractView::Resize(int width, int height) {
   p_->geometry.Resize(width, height);
 
   if (width == p_->last_geometry.width() && height == p_->last_geometry.height()) {
-    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kSizeMask);
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyBottomMask);
   } else {
-    Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyBottomMask);
   }
 
-  OnGeometryWillChange(p_->geometry_dirty_flag, p_->last_geometry, p_->geometry);
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetX() const {
@@ -103,19 +103,97 @@ int AbstractView::GetY() const {
 }
 
 int AbstractView::GetLeft() const {
+  if (p_->parent)
+    return static_cast<int>(p_->geometry.left - p_->parent->p_->geometry.left);
+
   return static_cast<int>(p_->geometry.left);
 }
 
+void AbstractView::SetLeft(int left) {
+  if (p_->parent) {
+    left += p_->parent->p_->geometry.left;
+  }
+
+  if (left == p_->geometry.left) return;
+
+  p_->geometry.left = left;
+
+  if (p_->geometry.left == p_->last_geometry.left) {
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask);
+  } else {
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask);
+  }
+
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+}
+
 int AbstractView::GetTop() const {
+  if (p_->parent)
+    return static_cast<int>(p_->geometry.top - p_->parent->p_->geometry.top);
+
   return static_cast<int>(p_->geometry.top);
 }
 
+void AbstractView::SetTop(int top) {
+  if (p_->parent) {
+    top += p_->parent->p_->geometry.top;
+  }
+
+  if (top == p_->geometry.top) return;
+
+  p_->geometry.top = top;
+
+  if (p_->geometry.top == p_->last_geometry.top) {
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyTopMask);
+  } else {
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyTopMask);
+  }
+
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+}
+
 int AbstractView::GetRight() const {
-  return static_cast<int>(p_->geometry.right);
+  return GetLeft() + static_cast<int>(p_->geometry.width());
+}
+
+void AbstractView::SetRight(int right) {
+  if (p_->parent) {
+    right += p_->parent->p_->geometry.left; // relative to parent
+  }
+
+  if (right == p_->geometry.right) return;
+
+  p_->geometry.right = right;
+
+  if (p_->geometry.right == p_->last_geometry.right) {
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask);
+  } else {
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask);
+  }
+
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetBottom() const {
-  return static_cast<int>(p_->geometry.bottom);
+  return GetTop() + static_cast<int>(p_->geometry.height());
+}
+
+void AbstractView::SetBottom(int bottom) {
+  if (p_->parent) {
+    bottom += p_->parent->p_->geometry.top; // relative to parent
+  }
+
+  if (bottom == p_->geometry.bottom) return;
+
+  p_->geometry.bottom = bottom;
+
+  if (p_->geometry.bottom == p_->last_geometry.bottom) {
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyBottomMask);
+  } else {
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyBottomMask);
+  }
+
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetWidth() const {

@@ -35,9 +35,11 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  enum GeometryDirtyFlagMask {
-    kPositionMask = 0x1 << 0,
-    kSizeMask = 0x1 << 1
+  enum DirtyFlagMask {
+    kDirtyLeftMask = 0x1 << 0,
+    kDirtyTopMask = 0x1 << 1,
+    kDirtyRightMask = 0x1 << 2,
+    kDirtyBottomMask = 0x1 << 3
   };
 
   Private(AbstractView *view)
@@ -49,7 +51,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         children_count(0),
         shell(nullptr),
         visible(true),
-        geometry_dirty_flag(0),
+        dirty_flag(0),
         redraw_task(view),
         is_damaged(false),
         inhibit_redraw(false),
@@ -79,7 +81,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    *
    * Use GeometryTypeMask to check this value
    */
-  int geometry_dirty_flag;
+  int dirty_flag;
 
   Rect geometry;
 

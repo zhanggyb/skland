@@ -133,8 +133,8 @@ void Window::OnUpdate(AbstractView *view) {
     it.SetContext(Context(surface, canvas));
     DBG_ASSERT(canvas);
     Damage(view,
-           view->GetLeft() + surface->margin().left,
-           view->GetTop() + surface->margin().top,
+           view->GetX() + surface->margin().left,
+           view->GetY() + surface->margin().top,
            view->GetWidth(),
            view->GetHeight());
     surface->Commit();

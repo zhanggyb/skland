@@ -41,7 +41,7 @@ void RelativeLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, 
   int dy = (int) (new_geometry.y() - old_geometry.y());
 
   for (it = it.first_child(); it; ++it) {
-    it.view()->MoveTo(it.view()->GetLeft() + dx, it.view()->GetTop() + dy);
+    it.view()->MoveTo(it.view()->GetX() + dx, it.view()->GetY() + dy);
   }
 }
 

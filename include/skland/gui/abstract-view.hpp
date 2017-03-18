@@ -94,20 +94,76 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   void Resize(int width, int height);
 
+  /**
+   * @brief Get X position in window coordinate
+   * @return
+   */
   int GetX() const;
 
+  /**
+   * @brief Get Y position in window coordinate
+   * @return
+   */
   int GetY() const;
 
+  /**
+   * @brief Get left position relative to parent
+   * @return
+   */
   int GetLeft() const;
 
+  /**
+   * @brief Set the left position relative to parent
+   * @param left
+   */
+  void SetLeft(int left);
+
+  /**
+   * @brief Get top position relative to parent
+   * @return
+   */
   int GetTop() const;
 
+  /**
+   * @brief Set top position relative to parent
+   * @param top
+   */
+  void SetTop(int top);
+
+  /**
+   * @brief Get right position relative to parent
+   * @return
+   */
   int GetRight() const;
 
+  /**
+   * @brief Set right position relative to parent
+   * @param right
+   */
+  void SetRight(int right);
+
+  /**
+   * @brief Get bottom position relative to parent
+   * @return
+   */
   int GetBottom() const;
 
+  /**
+   * @brief Set bottom position relative to parent
+   * @param bottom
+   */
+  void SetBottom(int bottom);
+
+  /**
+   * @brief Get the width of the geometry
+   * @return
+   */
   int GetWidth() const;
 
+  /**
+   * @brief Get the height of the geometry
+   * @return
+   */
   int GetHeight() const;
 
   float GetXCenter() const;
