@@ -17,12 +17,10 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
 
-#include <skland/gui/abstract-view.hpp>
-
 #include "abstract-view-redraw-task.hpp"
 
-#include "abstract-view-constraint.hpp"
-#include "abstract-view-constraint-group.hpp"
+#include "abstract-view-anchor.hpp"
+#include "abstract-view-anchor-group.hpp"
 
 namespace skland {
 
@@ -56,10 +54,10 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         is_damaged(false),
         inhibit_redraw(false),
         layout(nullptr),
-        left_constraint_group(kAlignLeft),
-        top_constraint_group(kAlignTop),
-        right_constraint_group(kAlignRight),
-        bottom_constraint_group(kAlignBottom) {}
+        left_anchor_group(view, kAlignLeft),
+        top_anchor_group(view, kAlignTop),
+        right_anchor_group(view, kAlignRight),
+        bottom_anchor_group(view, kAlignBottom) {}
 
   ~Private() {}
 
@@ -105,10 +103,10 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   AbstractLayout *layout;
 
-  ConstraintGroup left_constraint_group;
-  ConstraintGroup top_constraint_group;
-  ConstraintGroup right_constraint_group;
-  ConstraintGroup bottom_constraint_group;
+  AnchorGroup left_anchor_group;
+  AnchorGroup top_anchor_group;
+  AnchorGroup right_anchor_group;
+  AnchorGroup bottom_anchor_group;
 
 };
 

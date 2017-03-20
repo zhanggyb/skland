@@ -19,6 +19,7 @@
 
 #include "abstract-event-handler.hpp"
 
+#include "../core/types.hpp"
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
 
@@ -65,8 +66,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   struct RedrawTask;
   class RedrawTaskIterator;
 
-  struct Constraint;
-  class ConstraintGroup;
+  struct Anchor;
+  class AnchorGroup;
 
   /**
    * @brief Default constructor
@@ -192,6 +193,14 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   virtual Size GetPreferredSize() const;
 
   virtual Size GetMaximalSize() const;
+
+  /**
+   * @brief Add an anchor to target view for layout
+   * @param align
+   * @param distance
+   * @param target
+   */
+  void AddAnchor(Alignment align, int distance, AbstractView *target);
 
   /**
    * @brief Destroy and delete this object

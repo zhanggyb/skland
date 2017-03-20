@@ -18,7 +18,8 @@
 #define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_HPP_
 
 #include <skland/gui/abstract-view.hpp>
-#include <skland/core/types.hpp>
+
+#include <utility>
 
 namespace skland {
 
@@ -26,28 +27,29 @@ namespace skland {
  * @ingroup gui_intern
  * @brief Used to align views in layout
  */
-struct AbstractView::Constraint {
+struct AbstractView::Anchor {
 
-  Constraint() = delete;
-  Constraint(const Constraint &) = delete;
-  Constraint &operator=(const Constraint &) = delete;
+  Anchor() = delete;
+  Anchor(const Anchor &) = delete;
+  Anchor &operator=(const Anchor &) = delete;
 
-  Constraint(AbstractView *view)
-      : distance(0),
-        contrary(nullptr),
-        previous(nullptr),
-        next(nullptr),
-        group(nullptr) {}
+  ~Anchor();
 
-  ~Constraint() {}
+  Anchor *contrary;
 
-  int distance;
+  Anchor *previous;
+  Anchor *next;
+  AnchorGroup *group;
 
-  Constraint *contrary;
+  std::shared_ptr<int> distance;
 
-  Constraint *previous;
-  Constraint *next;
-  ConstraintGroup *group;
+  static std::pair<Anchor *, Anchor *> MakePair(int distance,
+                                                AbstractView *view1,
+                                                AbstractView *view2);
+
+ private:
+
+  Anchor(AbstractView *view);
 
 };
 

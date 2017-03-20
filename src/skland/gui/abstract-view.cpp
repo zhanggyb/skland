@@ -253,6 +253,68 @@ Size AbstractView::GetMaximalSize() const {
   return Size(65536, 65536);  // TODO: use an infinite type
 }
 
+void AbstractView::AddAnchor(Alignment align, int distance, AbstractView *target) {
+  if (target == p_->parent || this == target->p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else if (target->p_->parent == p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else {
+    DBG_PRINT_MSG("%s\n", "Error! Cannot add anchor to the view which have no relationship!");
+  }
+}
+
 void AbstractView::Destroy() {
   destroyed_.Emit(this);
 
@@ -421,16 +483,16 @@ void AbstractView::PushFrontChild(AbstractView *child) {
     child->p_->shell->DetachView(child);
   }
 
-  DBG_ASSERT(child->p_->previous == nullptr);
-  DBG_ASSERT(child->p_->next == nullptr);
-  DBG_ASSERT(child->p_->parent == nullptr);
+  DBG_ASSERT(nullptr == child->p_->previous);
+  DBG_ASSERT(nullptr == child->p_->next);
+  DBG_ASSERT(nullptr == child->p_->parent);
 
   if (p_->first_child) {
     p_->first_child->p_->previous = child;
     child->p_->next = p_->first_child;
   } else {
-    DBG_ASSERT(p_->last_child == nullptr);
-    DBG_ASSERT(p_->children_count == 0);
+    DBG_ASSERT(nullptr == p_->last_child);
+    DBG_ASSERT(0 == p_->children_count);
     // child->data_->next_ = nullptr;
     p_->last_child = child;
   }
@@ -459,13 +521,13 @@ void AbstractView::InsertChild(AbstractView *child, int index) {
     child->p_->shell->DetachView(child);
   }
 
-  DBG_ASSERT(child->p_->previous == nullptr);
-  DBG_ASSERT(child->p_->next == nullptr);
-  DBG_ASSERT(child->p_->parent == nullptr);
+  DBG_ASSERT(nullptr == child->p_->previous);
+  DBG_ASSERT(nullptr == child->p_->next);
+  DBG_ASSERT(nullptr == child->p_->parent);
 
-  if (p_->first_child == nullptr) {
-    DBG_ASSERT(p_->last_child == nullptr);
-    DBG_ASSERT(p_->children_count == 0);
+  if (nullptr == p_->first_child) {
+    DBG_ASSERT(nullptr == p_->last_child);
+    DBG_ASSERT(0 == p_->children_count);
     // child->data_->next_ = nullptr;
     // child->data_->previous_ = nullptr;
     p_->last_child = child;
