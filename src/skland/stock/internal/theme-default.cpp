@@ -241,18 +241,6 @@ TitleBar::~TitleBar() {
 
 }
 
-Size TitleBar::GetMinimalSize() const {
-  return Size(0, 0);
-}
-
-Size TitleBar::GetPreferredSize() const {
-  return Size(240, 22);
-}
-
-Size TitleBar::GetMaximalSize() const {
-  return Size(65536, 65536);
-}
-
 void TitleBar::SetForeground(const Color &color) {
   foreground_ = color;
   Update();

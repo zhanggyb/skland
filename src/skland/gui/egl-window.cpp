@@ -147,8 +147,8 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     it.PushToTail();
     it.SetContext(Context(surface, main_canvas_));
     Damage(view,
-           view->GetLeft() + surface->margin().left,
-           view->GetTop() + surface->margin().top,
+           view->GetX() + surface->margin().left,
+           view->GetY() + surface->margin().top,
            view->GetWidth(),
            view->GetHeight());
     surface->Commit();

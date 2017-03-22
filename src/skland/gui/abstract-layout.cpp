@@ -42,10 +42,6 @@ AbstractLayout::~AbstractLayout() {
 
 }
 
-Size AbstractLayout::GetMinimalSize() const {
-  return Size(padding_.lr(), padding_.tb());
-}
-
 void AbstractLayout::AddView(AbstractView *view) {
   if (view->p_->layout == this) {
     DBG_ASSERT(view->p_->layout == this);

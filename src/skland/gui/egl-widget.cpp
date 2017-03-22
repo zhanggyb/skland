@@ -64,7 +64,7 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 
     sub_surface_ = SubSurface::Create(parent_surface, this);
     egl_surface_ = EGLSurface::Get(sub_surface_);
-    SubSurface::Get(sub_surface_)->SetWindowPosition(GetLeft(), GetTop());
+    SubSurface::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
     egl_surface_->Resize(GetWidth(), GetHeight());
 //    surface_->SetDesync();
   }

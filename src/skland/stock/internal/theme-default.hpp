@@ -124,12 +124,6 @@ class TitleBar final : public AbstractView {
 
   virtual ~TitleBar();
 
-  virtual Size GetMinimalSize() const override;
-
-  virtual Size GetPreferredSize() const override;
-
-  virtual Size GetMaximalSize() const override;
-
   void SetForeground(const Color &color);
 
   void SetTitle(const std::string &title);

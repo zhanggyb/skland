@@ -345,7 +345,7 @@ enum Orientation {
   kVertical
 };
 
-enum Align {
+enum Alignment {
   kAlignUndefined,
   kAlignLeft,
   kAlignTop,

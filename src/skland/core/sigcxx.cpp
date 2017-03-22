@@ -72,10 +72,10 @@ Token::~Token() {
 }  // namespace details
 
 Trackable::~Trackable() {
-  UnbindAll();
+  UnbindAllSignals();
 }
 
-void Trackable::Unbind(SLOT slot) {
+void Trackable::UnbindSignal(SLOT slot) {
   if (slot->token_->binding->trackable_object == this) {
     details::Token* tmp = slot->token_;
     slot->token_ = slot->token_->next;
@@ -86,7 +86,7 @@ void Trackable::Unbind(SLOT slot) {
   }
 }
 
-void Trackable::UnbindAll() {
+void Trackable::UnbindAllSignals() {
   details::Binding *tmp = nullptr;
   details::Binding *it = last_binding_;
 
@@ -97,7 +97,7 @@ void Trackable::UnbindAll() {
   }
 }
 
-std::size_t Trackable::CountBindings() const {
+std::size_t Trackable::CountSignalBindings() const {
   std::size_t count = 0;
   for (details::Binding *it = first_binding_; it; it = it->next) {
     count++;

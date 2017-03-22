@@ -37,8 +37,6 @@ SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
                const Padding &padding = Padding(5),
                int space = 5);
 
-  virtual Size GetPreferredSize() const;
-
  protected:
 
   virtual ~LinearLayout();

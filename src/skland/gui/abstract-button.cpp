@@ -107,10 +107,6 @@ void AbstractButton::SetText(const std::string &text) {
   Update();
 }
 
-Size AbstractButton::GetPreferredSize() const {
-  return Size(80, 20);
-}
-
 void AbstractButton::OnMouseEnter(MouseEvent *event) {
   Bit::Set<uint32_t>(p_->flags, Private::kHovered);
   if (IsSensitive()) {

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ALIGNMENT_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ALIGNMENT_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_HPP_
 
 #include <skland/gui/abstract-view.hpp>
-#include <skland/core/types.hpp>
+
+#include <utility>
 
 namespace skland {
 
@@ -26,33 +27,29 @@ namespace skland {
  * @ingroup gui_intern
  * @brief Used to align views in layout
  */
-SKLAND_NO_EXPORT struct AbstractView::Alignment {
+struct AbstractView::Anchor {
 
-  Alignment() = delete;
-  Alignment(const Alignment &) = delete;
-  Alignment &operator=(const Alignment &) = delete;
+  Anchor() = delete;
+  Anchor(const Anchor &) = delete;
+  Anchor &operator=(const Anchor &) = delete;
 
-  Alignment(AbstractView *view)
-      : view(view),
-        base(nullptr),
-        align(kAlignUndefined),
-        distance(0),
-        contrary(nullptr),
-        previous(nullptr),
-        next(nullptr) {}
+  ~Anchor();
 
-  ~Alignment() {}
+  Anchor *contrary;
 
-  AbstractView *view;
+  Anchor *previous;
+  Anchor *next;
+  AnchorGroup *group;
 
-  AbstractView *base;
-  Align align;
-  int distance;
+  std::shared_ptr<int> distance;
 
-  Alignment *contrary;
+  static std::pair<Anchor *, Anchor *> MakePair(int distance,
+                                                AbstractView *view1,
+                                                AbstractView *view2);
 
-  Alignment *previous;
-  Alignment *next;
+ private:
+
+  Anchor(AbstractView *view);
 
 };
 

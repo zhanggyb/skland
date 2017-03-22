@@ -37,6 +37,9 @@ AbstractView::AbstractView(int width, int height)
   p_.reset(new Private(this));
   p_->geometry.Resize(width, height);
   p_->last_geometry.Resize(width, height);
+
+  p_->preferred_size.width = clamp(width, p_->minimal_size.width, p_->maximal_size.width);
+  p_->preferred_size.height = clamp(height, p_->minimal_size.height, p_->maximal_size.height);
 }
 
 AbstractView::~AbstractView() {
@@ -52,6 +55,122 @@ AbstractView::~AbstractView() {
   DBG_ASSERT(nullptr == p_->layout);
 }
 
+void AbstractView::SetMinimalWidth(int width) {
+  if (width > p_->maximal_size.width) return;
+
+  if (p_->preferred_size.width < width) p_->preferred_size.width = width;
+
+  p_->minimal_size.width = width;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+void AbstractView::SetMinimalHeight(int height) {
+  if (height > p_->maximal_size.height) return;
+
+  if (p_->preferred_size.height < height) p_->preferred_size.height = height;
+
+  p_->minimal_size.height = height;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+int AbstractView::GetMinimalWidth() const {
+  return p_->minimal_size.width;
+}
+
+int AbstractView::GetMinimalHeight() const {
+  return p_->minimal_size.height;
+}
+
+void AbstractView::SetPreferredWidth(int width) {
+  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+
+  p_->preferred_size.width = width;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+void AbstractView::SetPreferredHeight(int height) {
+  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
+
+  p_->preferred_size.height = height;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+int AbstractView::GetPreferredWidth() const {
+  return p_->preferred_size.width;
+}
+
+int AbstractView::GetPreferredHeight() const {
+  return p_->preferred_size.height;
+}
+
+void AbstractView::SetMaximalWidth(int width) {
+  if (width < p_->minimal_size.width) return;
+
+  if (p_->preferred_size.width > width) p_->preferred_size.width = width;
+
+  p_->maximal_size.width = width;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+void AbstractView::SetMaximalHeight(int height) {
+  if (height < p_->minimal_size.height) return;
+
+  if (p_->preferred_size.height > height) p_->preferred_size.height = height;
+
+  p_->maximal_size.height = height;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+int AbstractView::GetMaximalWidth() const {
+  return p_->maximal_size.width;
+}
+
+int AbstractView::GetMaximalHeight() const {
+  return p_->maximal_size.height;
+}
+
+void AbstractView::SetLayoutPolicyOnX(LayoutPolicy policy) {
+  p_->x_layout_policy = policy;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+LayoutPolicy AbstractView::GetLayoutPolicyOnX() const {
+  return p_->x_layout_policy;
+}
+
+void AbstractView::SetLayoutPolicyOnY(LayoutPolicy policy) {
+  p_->y_layout_policy = policy;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+LayoutPolicy AbstractView::GetLayoutPolicyOnY() const {
+  return p_->y_layout_policy;
+}
+
 void AbstractView::MoveTo(int x, int y) {
   DBG_ASSERT(!p_->inhibit_redraw);
 
@@ -60,12 +179,12 @@ void AbstractView::MoveTo(int x, int y) {
   p_->geometry.MoveTo(x, y);
 
   if (x == p_->last_geometry.x() && y == p_->last_geometry.y()) {
-    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kPositionMask);
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyTopMask);
   } else {
-    Bit::Set<int>(p_->geometry_dirty_flag, Private::kPositionMask);
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyTopMask);
   }
 
-  OnGeometryWillChange(p_->geometry_dirty_flag, p_->last_geometry, p_->geometry);
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 void AbstractView::Resize(int width, int height) {
@@ -73,8 +192,12 @@ void AbstractView::Resize(int width, int height) {
 
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
-  Size min = GetMinimalSize();
-  Size max = GetMaximalSize();
+  Size min;
+  min.width = GetMinimalWidth();
+  min.height = GetMinimalHeight();
+  Size max;
+  max.width = GetMaximalWidth();
+  max.height = GetMaximalHeight();
 
   if (min.width > max.width || min.height > max.height) {
     throw std::runtime_error("Error! Invalid minimal and maximal size!");
@@ -86,12 +209,12 @@ void AbstractView::Resize(int width, int height) {
   p_->geometry.Resize(width, height);
 
   if (width == p_->last_geometry.width() && height == p_->last_geometry.height()) {
-    Bit::Clear<int>(p_->geometry_dirty_flag, Private::kSizeMask);
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyBottomMask);
   } else {
-    Bit::Set<int>(p_->geometry_dirty_flag, Private::kSizeMask);
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyBottomMask);
   }
 
-  OnGeometryWillChange(p_->geometry_dirty_flag, p_->last_geometry, p_->geometry);
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetX() const {
@@ -103,19 +226,97 @@ int AbstractView::GetY() const {
 }
 
 int AbstractView::GetLeft() const {
+  if (p_->parent)
+    return static_cast<int>(p_->geometry.left - p_->parent->p_->geometry.left);
+
   return static_cast<int>(p_->geometry.left);
 }
 
+void AbstractView::SetLeft(int left) {
+  if (p_->parent) {
+    left += p_->parent->p_->geometry.left;
+  }
+
+  if (left == p_->geometry.left) return;
+
+  p_->geometry.left = left;
+
+  if (p_->geometry.left == p_->last_geometry.left) {
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask);
+  } else {
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask);
+  }
+
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+}
+
 int AbstractView::GetTop() const {
+  if (p_->parent)
+    return static_cast<int>(p_->geometry.top - p_->parent->p_->geometry.top);
+
   return static_cast<int>(p_->geometry.top);
 }
 
+void AbstractView::SetTop(int top) {
+  if (p_->parent) {
+    top += p_->parent->p_->geometry.top;
+  }
+
+  if (top == p_->geometry.top) return;
+
+  p_->geometry.top = top;
+
+  if (p_->geometry.top == p_->last_geometry.top) {
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyTopMask);
+  } else {
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyTopMask);
+  }
+
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+}
+
 int AbstractView::GetRight() const {
-  return static_cast<int>(p_->geometry.right);
+  return GetLeft() + static_cast<int>(p_->geometry.width());
+}
+
+void AbstractView::SetRight(int right) {
+  if (p_->parent) {
+    right += p_->parent->p_->geometry.left; // relative to parent
+  }
+
+  if (right == p_->geometry.right) return;
+
+  p_->geometry.right = right;
+
+  if (p_->geometry.right == p_->last_geometry.right) {
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask);
+  } else {
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask);
+  }
+
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetBottom() const {
-  return static_cast<int>(p_->geometry.bottom);
+  return GetTop() + static_cast<int>(p_->geometry.height());
+}
+
+void AbstractView::SetBottom(int bottom) {
+  if (p_->parent) {
+    bottom += p_->parent->p_->geometry.top; // relative to parent
+  }
+
+  if (bottom == p_->geometry.bottom) return;
+
+  p_->geometry.bottom = bottom;
+
+  if (p_->geometry.bottom == p_->last_geometry.bottom) {
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyBottomMask);
+  } else {
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyBottomMask);
+  }
+
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetWidth() const {
@@ -153,26 +354,6 @@ void AbstractView::CancelUpdate() {
 
 bool AbstractView::Contain(int x, int y) const {
   return p_->geometry.Contain(x, y);
-}
-
-bool AbstractView::IsExpandX() const {
-  return false;
-}
-
-bool AbstractView::IsExpandY() const {
-  return false;
-}
-
-Size AbstractView::GetMinimalSize() const {
-  return Size(0, 0);
-}
-
-Size AbstractView::GetPreferredSize() const {
-  return Size(100, 100);
-}
-
-Size AbstractView::GetMaximalSize() const {
-  return Size(65536, 65536);  // TODO: use an infinite type
 }
 
 void AbstractView::Destroy() {
@@ -343,16 +524,16 @@ void AbstractView::PushFrontChild(AbstractView *child) {
     child->p_->shell->DetachView(child);
   }
 
-  DBG_ASSERT(child->p_->previous == nullptr);
-  DBG_ASSERT(child->p_->next == nullptr);
-  DBG_ASSERT(child->p_->parent == nullptr);
+  DBG_ASSERT(nullptr == child->p_->previous);
+  DBG_ASSERT(nullptr == child->p_->next);
+  DBG_ASSERT(nullptr == child->p_->parent);
 
   if (p_->first_child) {
     p_->first_child->p_->previous = child;
     child->p_->next = p_->first_child;
   } else {
-    DBG_ASSERT(p_->last_child == nullptr);
-    DBG_ASSERT(p_->children_count == 0);
+    DBG_ASSERT(nullptr == p_->last_child);
+    DBG_ASSERT(0 == p_->children_count);
     // child->data_->next_ = nullptr;
     p_->last_child = child;
   }
@@ -381,13 +562,13 @@ void AbstractView::InsertChild(AbstractView *child, int index) {
     child->p_->shell->DetachView(child);
   }
 
-  DBG_ASSERT(child->p_->previous == nullptr);
-  DBG_ASSERT(child->p_->next == nullptr);
-  DBG_ASSERT(child->p_->parent == nullptr);
+  DBG_ASSERT(nullptr == child->p_->previous);
+  DBG_ASSERT(nullptr == child->p_->next);
+  DBG_ASSERT(nullptr == child->p_->parent);
 
-  if (p_->first_child == nullptr) {
-    DBG_ASSERT(p_->last_child == nullptr);
-    DBG_ASSERT(p_->children_count == 0);
+  if (nullptr == p_->first_child) {
+    DBG_ASSERT(nullptr == p_->last_child);
+    DBG_ASSERT(0 == p_->children_count);
     // child->data_->next_ = nullptr;
     // child->data_->previous_ = nullptr;
     p_->last_child = child;
@@ -527,6 +708,68 @@ void AbstractView::ClearChildren() {
   p_->children_count = 0;
   p_->first_child = nullptr;
   p_->last_child = nullptr;
+}
+
+void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distance) {
+  if (target == p_->parent || this == target->p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else if (target->p_->parent == p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else {
+    DBG_PRINT_MSG("%s\n", "Error! Cannot add anchor to the view which have no relationship!");
+  }
 }
 
 bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {
