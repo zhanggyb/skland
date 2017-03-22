@@ -25,6 +25,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup core
+ * @brief A wrapper class to use posix timer
+ */
 class PosixTimer {
 
   PosixTimer(const PosixTimer &orig) = delete;

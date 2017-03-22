@@ -25,8 +25,8 @@
 namespace skland {
 
 /**
- * @brief A trackable object class with ability to build object trees.
  * @ingroup core
+ * @brief A trackable object class with ability to build object trees.
  *
  * Object is the basic class in this project. It's usually for building GUI
  * object trees.

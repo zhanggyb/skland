@@ -40,7 +40,8 @@ struct Vector2 {
 
   template<typename U>
   inline Vector2(const Vector2<U> &other)
-      : x(T(other.x)), y(other.y) {}
+      : x(T(other.x)), y(T(other.y))
+  {}
 
   inline ~Vector2() {}
 
@@ -86,21 +87,33 @@ struct Vector2 {
   union { T y, g, t; };
 };
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline bool operator==(const Vector2<T> &v1, const Vector2<T> &v2) {
   return memcmp(&v1, &v2, sizeof(Vector2<T>)) == 0;
 }
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline bool operator!=(const Vector2<T> &v1, const Vector2<T> &v2) {
   return memcmp(&v1, &v2, sizeof(Vector2<T>)) != 0;
 }
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline Vector2<T> operator+(const Vector2<T> &v1, const Vector2<T> &v2) {
   return Vector2<T>(v1.x + v2.x, v1.y + v2.y);
 }
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline Vector2<T> operator-(const Vector2<T> &v1, const Vector2<T> &v2) {
   return Vector2<T>(v1.x - v2.x, v1.y - v2.y);
@@ -123,6 +136,11 @@ struct Vector3 {
   inline Vector3(const Vector3 &other)
       : x(other.x), y(other.y), z(other.z) {}
 
+  template<typename U>
+  inline Vector3(const Vector3<U> &other)
+      : x(T(other.x)), y(T(other.y)), z(T(other.z))
+  {}
+  
   inline Vector3 &operator=(const Vector3 &other) {
     x = other.x;
     y = other.y;
@@ -130,6 +148,14 @@ struct Vector3 {
     return *this;
   }
 
+  template<typename U>
+  inline Vector3 &operator=(const Vector3<U> &other) {
+    x = static_cast<T>(other.x);
+    y = static_cast<T>(other.y);
+    z = static_cast<T>(other.z);
+    return *this;
+  }
+  
   inline ~Vector3() {}
 
   union { T x, r, s; };
@@ -137,11 +163,17 @@ struct Vector3 {
   union { T z, b, p; };
 };
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline bool operator==(const Vector3<T> &vector1, const Vector3<T> &vector2) {
   return memcmp(&vector1, &vector2, sizeof(Vector3<T>)) == 0;
 }
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline bool operator!=(const Vector3<T> &vector1, const Vector3<T> &vector2) {
   return memcmp(&vector1, &vector2, sizeof(Vector3<T>)) != 0;
@@ -164,11 +196,25 @@ struct Vector4 {
   inline Vector4(const Vector4 &other)
       : x(other.x), y(other.y), z(other.z), w(other.w) {}
 
+  template<typename U>
+  inline Vector4(const Vector4<U> &other)
+      : x(T(other.x)), y(T(other.y)), z(T(other.z)), w(T(other.w))
+  {}
+
   inline Vector4 &operator=(const Vector4 &other) {
     x = other.x;
     y = other.y;
     z = other.z;
     w = other.w;
+    return *this;
+  }
+
+  template<typename U>
+  inline Vector4 &operator=(const Vector4<U> &other) {
+    x = static_cast<T>(other.x);
+    y = static_cast<T>(other.y);
+    z = static_cast<T>(other.z);
+    w = static_cast<T>(other.w);
     return *this;
   }
 

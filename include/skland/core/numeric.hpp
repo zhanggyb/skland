@@ -21,6 +21,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup core
+ * @brief Helper class for bit operation
+ */
 class Bit {
 
  public:
@@ -42,7 +46,10 @@ class Bit {
 
 };
 
-// clamp
+/**
+ * @ingroup core
+ * @brief Clamp given value between min and max
+ */
 template<typename T>
 inline T clamp(T x, T min_value, T max_value) {
   return std::min(std::max(x, min_value), max_value);

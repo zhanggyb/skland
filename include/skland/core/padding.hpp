@@ -21,6 +21,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup core
+ * @brief Class specifies content paddings.
+ */
 typedef core::Bounds<int> Padding;
 
 }

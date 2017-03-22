@@ -31,33 +31,35 @@ class AbstractShellView;
 class Context;
 
 /**
- * @brief Size policies to indicate how a view is resized in a layout
+ * @ingroup gui
+ * @brief Layout policy to indicate how a view is resized in a layout
  */
 enum LayoutPolicy {
-  /**
-   * Use the minimal size
-   */
-      kLayoutMinimal,
 
   /**
-   * @brief Use the preferred size
+   * Recommend to use the minimal size
    */
-      kLayoutPreferred,
+  kLayoutMinimal,
 
   /**
-   * Use the maximal size
+   * Recommend to use the preferred size
    */
-      kLayoutMaximal,
+  kLayoutPreferred,
 
   /**
-   * Use the current size and do not change
+   * Recommend to use the maximal size
    */
-      kLayoutFixed,
+  kLayoutMaximal,
 
   /**
-   * @brief Expandable to any value between minimal and maximal size
+   * Recommend to use the current size and do not change
    */
-      kLayoutExpandable
+  kLayoutFixed,
+
+  /**
+   * Recommend to expand to any value between minimal and maximal size
+   */
+  kLayoutExpandable
 };
 
 /**
@@ -117,8 +119,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    *
    * If the width is larger than maximal width, nothing will happen.
    *
-   * The preferred width will be reset to new minimal width if it's less.
-   * This method will ask for re-layout if this view is in a layout.
+   * The preferred width will be reset to new minimal width if it's less.  This
+   * method will ask for re-layout if this view is in a layout.
    */
   void SetMinimalWidth(int width);
 
@@ -128,8 +130,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    *
    * If the height is larger than maximal height, nothing will happen.
    *
-   * The preferred height will be reset to new minimal height less.
-   * This method will ask for re-layout if this view is in a layout.
+   * The preferred height will be reset to new minimal height less.  This method
+   * will ask for re-layout if this view is in a layout.
    */
   void SetMinimalHeight(int height);
 
@@ -149,8 +151,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Set the preferred width
    * @param width
    *
-   * If width is less than minimal width or larger than maximal width, nothing will happen.
-   * This method will ask for re-layout if this view is in a layout.
+   * If width is less than minimal width or larger than maximal width, nothing
+   * will happen.  This method will ask for re-layout if this view is in a
+   * layout.
    */
   void SetPreferredWidth(int width);
 
@@ -158,8 +161,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Set the preferred height
    * @param height
    *
-   * If height is less than minimal height or larger than maximal height, nothing will happen.
-   * This method will ask for re-layout if this view is in a layout.
+   * If height is less than minimal height or larger than maximal height,
+   * nothing will happen.  This method will ask for re-layout if this view is in
+   * a layout.
    */
   void SetPreferredHeight(int height);
 
@@ -192,8 +196,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    *
    * If height is less than the minimal height, nothing will happen.
    *
-   * The preferred height will be reset to the new maximal height if it's larger.
-   * This method will ask for re-layout if this view is in a layout.
+   * The preferred height will be reset to the new maximal height if it's
+   * larger. This method will ask for re-layout if this view is in a layout.
    */
   void SetMaximalHeight(int height);
 
@@ -356,8 +360,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Destructor
    *
    * @note You should never use delete to destroy an AbstractView object. An
-   * AbstractView should always be created by new operator and use the
-   * Destroy() to destroy itself.
+   * AbstractView should always be created by new operator and use the Destroy()
+   * to destroy itself.
    */
   virtual ~AbstractView();
 
@@ -503,7 +507,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    *     - If kAlignBottom: put this view at the bottom side of target view
    * @param distance
    *
-   * @note This method does not check if there's already anchors connect these 2 views.
+   * @note This method does not check if there's already anchors connect these 2
+   * views.
    */
   void AddAnchorTo(AbstractView *target, Alignment align, int distance);
 
@@ -524,7 +529,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   /**
    * @brief Mark damage area of the given object
    *
-   * 'Damange an area in the surface' is a wayland concept.
+   * 'Damange a region on the surface' is a wayland concept.
    */
   static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
 

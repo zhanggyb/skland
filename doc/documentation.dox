@@ -7,14 +7,18 @@
  * - [Get the code: checkout, build and run](md_doc_build.html)
  * - Directory structure
  *
+ * @section tutorial Tutorial
+ *
+ * - A "Hello World" example
+ *
  * @section guide Development Guides
  *
  * - C++11
+ *   - [Coding style](md_doc_coding_style.html)
  * - [Fast C++ Delegates](md_doc_delegates.html)
  * - [Signals and Slots](md_doc_signals_and_slots.html)
- * - A "Hello World" example
  * - Wayland introduction
- *  - Surface stack
+ *   - Surface stack
  * - Drawing with Google Skia
  * - Unit test
  */

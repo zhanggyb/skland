@@ -21,9 +21,24 @@
 
 namespace skland {
 
+/**
+ * @ingroup core
+ */
 typedef core::Vector2<int> Point;
+
+/**
+ * @ingroup core
+ */
 typedef core::Vector2<int> Point2I;
+
+/**
+ * @ingroup core
+ */
 typedef core::Vector2<float> Point2F;
+
+/**
+ * @ingroup core
+ */
 typedef core::Vector2<double> Point2D;
 
 }

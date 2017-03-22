@@ -25,6 +25,10 @@ namespace skland {
 
 namespace core {
 
+/**
+ * @ingroup core
+ * @brief Template class for rectangle with 4 edges (left, top, right, bottom).
+ */
 template<typename T>
 struct Rect {
 
@@ -105,9 +109,27 @@ struct Rect {
 
 } // namespace core
 
+/**
+ * @ingroup core
+ *
+ * @note This class has the same structure as SkRect in Skia, this means a
+ * pointer or reference to a Rect object can be reinterpret_cast to a SkRect.
+ */
 typedef core::Rect<float> Rect;
+
+/**
+ * @ingroup core
+ */
 typedef core::Rect<int> RectI;
+
+/**
+ * @ingroup core
+ */
 typedef core::Rect<float> RectF;
+
+/**
+ * @ingroup core
+ */
 typedef core::Rect<double> RectD;
 
 }

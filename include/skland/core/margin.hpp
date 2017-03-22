@@ -21,6 +21,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup core
+ * @brief Class specifies content margins
+ */
 typedef core::Bounds<int> Margin;
 
 }

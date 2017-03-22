@@ -20,6 +20,10 @@
 namespace skland {
 namespace core {
 
+/**
+ * @ingroup core
+ * @brief Class specifies bounds around a rectangle
+ */
 template<typename T>
 struct Bounds {
 
@@ -75,11 +79,17 @@ struct Bounds {
 
 };
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline bool operator==(const Bounds<T> &s1, const Bounds<T> &s2) {
   return memcmp(&s1, &s2, sizeof(Bounds<T>)) == 0;
 }
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline bool operator!=(const Bounds<T> &s1, const Bounds<T> &s2) {
   return memcmp(&s1, &s2, sizeof(Bounds<T>)) != 0;

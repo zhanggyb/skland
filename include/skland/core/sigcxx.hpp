@@ -45,6 +45,7 @@ class Slot;
 typedef Slot *SLOT;
 #ifndef __SLOT__
 /**
+ * @ingroup core
  * @brief A helper macro to define a slot parameter with default nullptr
  */
 #define __SLOT__ SLOT slot = nullptr
@@ -58,7 +59,7 @@ template<typename ... ParamTypes>
 class SignalToken;
 
 /**
- * @brief A simple structure works as a list node in @ref Trackable object
+ * @brief A simple structure works as a list node in Trackable object
  */
 struct Binding {
 
@@ -79,7 +80,7 @@ struct Binding {
 };
 
 /**
- * @brief A simple structure works as a list node in @ref Signal object signals
+ * @brief A simple structure works as a list node in Signal object
  */
 struct Token {
 
@@ -181,6 +182,7 @@ class SignalToken : public CallableToken<ParamTypes...> {
 /// @endcond
 
 /**
+ * @ingroup core
  * @brief Iterator and signature to a slot method
  *
  * A Slot object is created and destroyed when a signal is being emitting.

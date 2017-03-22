@@ -20,6 +20,11 @@
 namespace skland {
 
 namespace core {
+
+/**
+ * @ingroup core
+ * @brief Template structure for size
+ */
 template<typename T>
 struct Size {
 
@@ -66,32 +71,60 @@ struct Size {
   T height;
 };
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline bool operator==(const Size<T> &size1, const Size<T> &size2) {
   return ((size1.width == size2.width)
       && (size1.height == size2.height));
 }
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline bool operator!=(const Size<T> &size1, const Size<T> &size2) {
   return ((size1.width != size2.width) ||
       (size1.height != size2.height));
 }
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline Size<T> operator+(const Size<T> &size1, const Size<T> &size2) {
   return Size<T>(size1.width + size2.width, size1.height + size2.height);
 }
 
+/**
+ * @ingroup core
+ */
 template<typename T>
 inline Size<T> operator-(const Size<T> &size1, const Size<T> &size2) {
   return Size<T>(size1.width - size2.width, size1.height - size2.height);
 }
-}
 
+}  // namespace core
+
+/**
+ * @ingroup core
+ */
 typedef core::Size<int> Size;
+
+/**
+ * @ingroup core
+ */
 typedef core::Size<int> SizeI;
+
+/**
+ * @ingroup core
+ */
 typedef core::Size<float> SizeF;
+
+/**
+ * @ingroup core
+ */
 typedef core::Size<double> SizeD;
 
 }
