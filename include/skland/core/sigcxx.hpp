@@ -266,12 +266,12 @@ class Trackable {
    * @brief Count connections to the given slot method
    */
   template<typename T, typename ... ParamTypes>
-  std::size_t CountBindings(void (T::*method)(ParamTypes...)) const;
+  std::size_t CountSignalBindings(void (T::*method)(ParamTypes...)) const;
 
   /**
    * @brief Count all connections
    */
-  std::size_t CountBindings() const;
+  std::size_t CountSignalBindings() const;
 
  protected:
 
@@ -280,20 +280,22 @@ class Trackable {
    *
    * This is the fastest way to disconnect from a signal via the slot parameter.
    */
-  void Unbind(SLOT slot);
+  void UnbindSignal(SLOT slot);
 
   /**
     * @brief Break the all connections to this object
     */
-  void UnbindAll();
+  void UnbindAllSignals();
 
   /**
     * @brief Break all connections to the given slot method of this object
     */
   template<typename T, typename ... ParamTypes>
-  void UnbindAll(void (T::*method)(ParamTypes...));
+  void UnbindAllSignalsTo(void (T::*method)(ParamTypes...));
 
   virtual void AuditDestroyingToken(details::Token *token) {}
+
+ private:
 
   void PushBackBinding(details::Binding *binding);
 
@@ -326,23 +328,13 @@ class Trackable {
     trackable->InsertBinding(index, binding);
   }
 
-  details::Binding *first_binding() const {
-    return first_binding_;
-  }
-
-  details::Binding *last_binding() const {
-    return last_binding_;
-  }
-
- private:
-
   details::Binding *first_binding_;
   details::Binding *last_binding_;
 
 };
 
 template<typename T, typename ... ParamTypes>
-void Trackable::UnbindAll(void (T::*method)(ParamTypes...)) {
+void Trackable::UnbindAllSignalsTo(void (T::*method)(ParamTypes...)) {
   details::Binding *it = last_binding_;
   details::Binding *tmp = nullptr;
   details::DelegateToken<ParamTypes...> *delegate_token = nullptr;
@@ -359,7 +351,7 @@ void Trackable::UnbindAll(void (T::*method)(ParamTypes...)) {
 }
 
 template<typename T, typename ... ParamTypes>
-size_t Trackable::CountBindings(void (T::*method)(ParamTypes...)) const {
+size_t Trackable::CountSignalBindings(void (T::*method)(ParamTypes...)) const {
   std::size_t count = 0;
   details::DelegateToken<ParamTypes...> *delegate_token = nullptr;
 
@@ -478,6 +470,8 @@ class Signal : public Trackable {
 
   virtual void AuditDestroyingToken(details::Token *token) final;
 
+ private:
+
   void PushBackToken(details::Token *token);
 
   void PushFrontToken(details::Token *token);
@@ -491,8 +485,6 @@ class Signal : public Trackable {
   inline details::Token *last_token() const {
     return last_token_;
   }
-
- private:
 
   details::Token *first_token_;
   details::Token *last_token_;
@@ -757,7 +749,7 @@ bool Signal<ParamTypes...>::IsConnectedTo(const Signal<ParamTypes...> &other) co
 template<typename ... ParamTypes>
 bool Signal<ParamTypes...>::IsConnectedTo(const Trackable *obj) const {
   details::Token *token = first_token();
-  details::Binding *binding = obj->first_binding();
+  details::Binding *binding = obj->first_binding_;
 
   while (token && binding) {
 
@@ -1061,7 +1053,7 @@ class SignalRef {
   }
 
   std::size_t CountBindings() const {
-    return signal_->CountBindings();
+    return signal_->CountSignalBindings();
   }
 
  private:

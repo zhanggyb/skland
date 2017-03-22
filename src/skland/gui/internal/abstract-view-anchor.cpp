@@ -43,13 +43,10 @@ AbstractView::Anchor::~Anchor() {
 std::pair<AbstractView::Anchor *, AbstractView::Anchor *> AbstractView::Anchor::MakePair(int distance,
                                                                                          AbstractView *view1,
                                                                                          AbstractView *view2) {
-  Anchor *anchor1 = nullptr;
-  Anchor *anchor2 = nullptr;
-
   DBG_ASSERT(view1->p_->parent == view2 || view1 == view2->p_->parent || view1->p_->parent == view2->p_->parent);
 
-  anchor1 = new Anchor(view1);
-  anchor2 = new Anchor(view2);
+  Anchor *anchor1 = new Anchor(view1);
+  Anchor *anchor2 = new Anchor(view2);
   anchor1->contrary = anchor2;
   anchor2->contrary = anchor1;
   anchor1->distance.reset(new int);

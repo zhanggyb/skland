@@ -36,8 +36,6 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   AbstractLayout(const Padding &padding = Padding(5));
 
-  virtual Size GetMinimalSize() const override;
-
   void AddView(AbstractView *view);
 
   void RemoveView(AbstractView *view);

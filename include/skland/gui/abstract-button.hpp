@@ -40,8 +40,6 @@ class AbstractButton : public AbstractView {
 
   AbstractButton(const std::string &text);
 
-  virtual Size GetPreferredSize() const override;
-
   SignalRef<> clicked() { return clicked_; }
 
   bool IsSensitive() const;

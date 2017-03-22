@@ -37,6 +37,9 @@ AbstractView::AbstractView(int width, int height)
   p_.reset(new Private(this));
   p_->geometry.Resize(width, height);
   p_->last_geometry.Resize(width, height);
+
+  p_->preferred_size.width = clamp(width, p_->minimal_size.width, p_->maximal_size.width);
+  p_->preferred_size.height = clamp(height, p_->minimal_size.height, p_->maximal_size.height);
 }
 
 AbstractView::~AbstractView() {
@@ -50,6 +53,122 @@ AbstractView::~AbstractView() {
 
   // layout assert:
   DBG_ASSERT(nullptr == p_->layout);
+}
+
+void AbstractView::SetMinimalWidth(int width) {
+  if (width > p_->maximal_size.width) return;
+
+  if (p_->preferred_size.width < width) p_->preferred_size.width = width;
+
+  p_->minimal_size.width = width;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+void AbstractView::SetMinimalHeight(int height) {
+  if (height > p_->maximal_size.height) return;
+
+  if (p_->preferred_size.height < height) p_->preferred_size.height = height;
+
+  p_->minimal_size.height = height;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+int AbstractView::GetMinimalWidth() const {
+  return p_->minimal_size.width;
+}
+
+int AbstractView::GetMinimalHeight() const {
+  return p_->minimal_size.height;
+}
+
+void AbstractView::SetPreferredWidth(int width) {
+  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+
+  p_->preferred_size.width = width;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+void AbstractView::SetPreferredHeight(int height) {
+  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
+
+  p_->preferred_size.height = height;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+int AbstractView::GetPreferredWidth() const {
+  return p_->preferred_size.width;
+}
+
+int AbstractView::GetPreferredHeight() const {
+  return p_->preferred_size.height;
+}
+
+void AbstractView::SetMaximalWidth(int width) {
+  if (width < p_->minimal_size.width) return;
+
+  if (p_->preferred_size.width > width) p_->preferred_size.width = width;
+
+  p_->maximal_size.width = width;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+void AbstractView::SetMaximalHeight(int height) {
+  if (height < p_->minimal_size.height) return;
+
+  if (p_->preferred_size.height > height) p_->preferred_size.height = height;
+
+  p_->maximal_size.height = height;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+int AbstractView::GetMaximalWidth() const {
+  return p_->maximal_size.width;
+}
+
+int AbstractView::GetMaximalHeight() const {
+  return p_->maximal_size.height;
+}
+
+void AbstractView::SetLayoutPolicyOnX(LayoutPolicy policy) {
+  p_->x_layout_policy = policy;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+LayoutPolicy AbstractView::GetLayoutPolicyOnX() const {
+  return p_->x_layout_policy;
+}
+
+void AbstractView::SetLayoutPolicyOnY(LayoutPolicy policy) {
+  p_->y_layout_policy = policy;
+
+  if (p_->layout) {
+    // TODO: relayout
+  }
+}
+
+LayoutPolicy AbstractView::GetLayoutPolicyOnY() const {
+  return p_->y_layout_policy;
 }
 
 void AbstractView::MoveTo(int x, int y) {
@@ -73,8 +192,12 @@ void AbstractView::Resize(int width, int height) {
 
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
-  Size min = GetMinimalSize();
-  Size max = GetMaximalSize();
+  Size min;
+  min.width = GetMinimalWidth();
+  min.height = GetMinimalHeight();
+  Size max;
+  max.width = GetMaximalWidth();
+  max.height = GetMaximalHeight();
 
   if (min.width > max.width || min.height > max.height) {
     throw std::runtime_error("Error! Invalid minimal and maximal size!");
@@ -231,88 +354,6 @@ void AbstractView::CancelUpdate() {
 
 bool AbstractView::Contain(int x, int y) const {
   return p_->geometry.Contain(x, y);
-}
-
-bool AbstractView::IsExpandX() const {
-  return false;
-}
-
-bool AbstractView::IsExpandY() const {
-  return false;
-}
-
-Size AbstractView::GetMinimalSize() const {
-  return Size(0, 0);
-}
-
-Size AbstractView::GetPreferredSize() const {
-  return Size(100, 100);
-}
-
-Size AbstractView::GetMaximalSize() const {
-  return Size(65536, 65536);  // TODO: use an infinite type
-}
-
-void AbstractView::AddAnchor(Alignment align, int distance, AbstractView *target) {
-  if (target == p_->parent || this == target->p_->parent) {
-    switch (align) {
-      case kAlignLeft: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->left_anchor_group.PushBack(pair.first);
-        target->p_->left_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignTop: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->top_anchor_group.PushBack(pair.first);
-        target->p_->top_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignRight: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->right_anchor_group.PushBack(pair.first);
-        target->p_->right_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignBottom: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->bottom_anchor_group.PushBack(pair.first);
-        target->p_->bottom_anchor_group.PushBack(pair.second);
-        break;
-      }
-      default:break;
-    }
-  } else if (target->p_->parent == p_->parent) {
-    switch (align) {
-      case kAlignLeft: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->left_anchor_group.PushBack(pair.first);
-        target->p_->right_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignTop: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->top_anchor_group.PushBack(pair.first);
-        target->p_->bottom_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignRight: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->right_anchor_group.PushBack(pair.first);
-        target->p_->left_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignBottom: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->bottom_anchor_group.PushBack(pair.first);
-        target->p_->top_anchor_group.PushBack(pair.second);
-        break;
-      }
-      default:break;
-    }
-  } else {
-    DBG_PRINT_MSG("%s\n", "Error! Cannot add anchor to the view which have no relationship!");
-  }
 }
 
 void AbstractView::Destroy() {
@@ -667,6 +708,68 @@ void AbstractView::ClearChildren() {
   p_->children_count = 0;
   p_->first_child = nullptr;
   p_->last_child = nullptr;
+}
+
+void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distance) {
+  if (target == p_->parent || this == target->p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else if (target->p_->parent == p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else {
+    DBG_PRINT_MSG("%s\n", "Error! Cannot add anchor to the view which have no relationship!");
+  }
 }
 
 bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {

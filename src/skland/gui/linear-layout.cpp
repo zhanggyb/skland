@@ -29,35 +29,6 @@ LinearLayout::~LinearLayout() {
 
 }
 
-Size LinearLayout::GetPreferredSize() const {
-  Size size(padding().lr(), padding().tb());
-  Size tmp;
-  int space = 0;
-  ConstIterator it(this);
-
-  if (orientation_ == kVertical) {
-    for (it = it.first_child(); it; ++it) {
-      if (it.view()->IsVisible()) {
-        tmp = it.view()->GetPreferredSize();
-        size.width = std::max(size.width, tmp.width);
-        size.height += (tmp.height + space);
-        space += space_;
-      }
-    }
-  } else {
-    for (it = it.first_child(); it; ++it) {
-      if (it.view()->IsVisible()) {
-        tmp = it.view()->GetPreferredSize();
-        size.width += (tmp.width + space);
-        size.height = std::max(size.height, tmp.height);
-        space += space_;
-      }
-    }
-  }
-
-  return size;
-}
-
 void LinearLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   if (dirty_flag) Update();
   else CancelUpdate();

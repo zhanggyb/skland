@@ -31,6 +31,36 @@ class AbstractShellView;
 class Context;
 
 /**
+ * @brief Size policies to indicate how a view is resized in a layout
+ */
+enum LayoutPolicy {
+  /**
+   * Use the minimal size
+   */
+      kLayoutMinimal,
+
+  /**
+   * @brief Use the preferred size
+   */
+      kLayoutPreferred,
+
+  /**
+   * Use the maximal size
+   */
+      kLayoutMaximal,
+
+  /**
+   * Use the current size and do not change
+   */
+      kLayoutFixed,
+
+  /**
+   * @brief Expandable to any value between minimal and maximal size
+   */
+      kLayoutExpandable
+};
+
+/**
  * @ingroup gui
  * @brief An abstract base class for views
  *
@@ -80,6 +110,132 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Create a view by given size
    */
   AbstractView(int width, int height);
+
+  /**
+   * @brief Set the minimal width
+   * @param width
+   *
+   * If the width is larger than maximal width, nothing will happen.
+   *
+   * The preferred width will be reset to new minimal width if it's less.
+   * This method will ask for re-layout if this view is in a layout.
+   */
+  void SetMinimalWidth(int width);
+
+  /**
+   * @brief Set the minimal height
+   * @param height
+   *
+   * If the height is larger than maximal height, nothing will happen.
+   *
+   * The preferred height will be reset to new minimal height less.
+   * This method will ask for re-layout if this view is in a layout.
+   */
+  void SetMinimalHeight(int height);
+
+  /**
+   * @brief Get the minimal width
+   * @return
+   */
+  int GetMinimalWidth() const;
+
+  /**
+   * @brief Get the minimal height
+   * @return
+   */
+  int GetMinimalHeight() const;
+
+  /**
+   * @brief Set the preferred width
+   * @param width
+   *
+   * If width is less than minimal width or larger than maximal width, nothing will happen.
+   * This method will ask for re-layout if this view is in a layout.
+   */
+  void SetPreferredWidth(int width);
+
+  /**
+   * @brief Set the preferred height
+   * @param height
+   *
+   * If height is less than minimal height or larger than maximal height, nothing will happen.
+   * This method will ask for re-layout if this view is in a layout.
+   */
+  void SetPreferredHeight(int height);
+
+  /**
+   * @brief Get the preferred width
+   * @return
+   */
+  int GetPreferredWidth() const;
+
+  /**
+   * @brief Get the preferred height
+   * @return
+   */
+  int GetPreferredHeight() const;
+
+  /**
+   * @brief Set the maximal width
+   * @param width
+   *
+   * If width is less than the minimal width, nothing will happen.
+   *
+   * The preferred width will be reset to the new maximal width if it's larger.
+   * This method will ask for re-layout if this view is in a layout.
+   */
+  void SetMaximalWidth(int width);
+
+  /**
+   * @brief Set the maximal height
+   * @param height
+   *
+   * If height is less than the minimal height, nothing will happen.
+   *
+   * The preferred height will be reset to the new maximal height if it's larger.
+   * This method will ask for re-layout if this view is in a layout.
+   */
+  void SetMaximalHeight(int height);
+
+  /**
+   * @brief Get the maximal width
+   * @return
+   */
+  int GetMaximalWidth() const;
+
+  /**
+   * @brief Get the maximal height
+   * @return
+   */
+  int GetMaximalHeight() const;
+
+  /**
+   * @brief Set the layout policy along X
+   * @param policy
+   *
+   * This method will ask for re-layout if this view is in a layout.
+   */
+  void SetLayoutPolicyOnX(LayoutPolicy policy);
+
+  /**
+   * @brief Get the layout policy along X
+   * @return
+   */
+  LayoutPolicy GetLayoutPolicyOnX() const;
+
+  /**
+   * @brief Set the layout policy along Y
+   * @param policy
+   *
+   * This method will ask for re-layout if this view is in a layout.
+   */
+  void SetLayoutPolicyOnY(LayoutPolicy policy);
+
+  /**
+   * @brief Get the layout policy along Y
+   * @return
+   */
+  LayoutPolicy GetLayoutPolicyOnY() const;
 
   /**
    * @brief Move this view to the given position in window coordinate
@@ -184,24 +340,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   virtual bool Contain(int x, int y) const;
 
-  virtual bool IsExpandX() const;
-
-  virtual bool IsExpandY() const;
-
-  virtual Size GetMinimalSize() const;
-
-  virtual Size GetPreferredSize() const;
-
-  virtual Size GetMaximalSize() const;
-
-  /**
-   * @brief Add an anchor to target view for layout
-   * @param align
-   * @param distance
-   * @param target
-   */
-  void AddAnchor(Alignment align, int distance, AbstractView *target);
-
   /**
    * @brief Destroy and delete this object
    *
@@ -223,18 +361,44 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual ~AbstractView();
 
+  /**
+   * @brief Callback to draw this view on a canvas
+   * @param context
+   */
   virtual void OnDraw(const Context *context) = 0;
 
+  /**
+   * @brief Callback when a child view is added
+   * @param view
+   */
   virtual void OnChildAdded(AbstractView *view);
 
+  /**
+   * @brief Callback when a child view is removed
+   * @param view
+   */
   virtual void OnChildRemoved(AbstractView *view);
 
+  /**
+   * @brief Callback when this view is added to a parent
+   */
   virtual void OnAddedToParent();
 
+  /**
+   * @brief Callback when this view is removed from a parent
+   * @param original_parent
+   */
   virtual void OnRemovedFromParent(AbstractView *original_parent);
 
+  /**
+   * @brief Callback when this view is attached to a shell view
+   */
   virtual void OnAttachedToShellView();
 
+  /**
+   * @brief Callback when this view is detached to a shell view
+   * @param shell_view
+   */
   virtual void OnDetachedFromShellView(AbstractShellView *shell_view);
 
   /**
@@ -322,7 +486,26 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   AbstractView *RemoveChild(AbstractView *child);
 
+  /**
+   * @brief Destroy all children
+   */
   void ClearChildren();
+
+  /**
+   * @brief Add an anchor to target view for layout
+   * @param target
+   * @param align
+   *   - If this view is the parent of target or vice versa, add anchors on the same edge
+   *   - If this view and target view are siblings:
+   *     - If kAlignLeft: put this view at the left side of target view (connect right anchor to left anchor)
+   *     - If kAlignTop: put this view at the top side of target view
+   *     - If kAlignRight: put this view at the right side of target view
+   *     - If kAlignBottom: put this view at the bottom side of target view
+   * @param distance
+   *
+   * @note This method does not check if there's already anchors connect these 2 views.
+   */
+  void AddAnchorTo(AbstractView *target, Alignment align, int distance);
 
   static bool SwapIndex(AbstractView *object1, AbstractView *object2);
 

@@ -36,8 +36,6 @@ class AbstractSlider : public AbstractView {
 
   virtual ~AbstractSlider();
 
-  virtual Size GetPreferredSize() const override;
-
   void SetValue(const T &value);
 
   void SetRange(const T &value1, const T &value2);
@@ -122,15 +120,6 @@ AbstractSlider<T>::AbstractSlider(Orientation orientation)
 template<typename T>
 AbstractSlider<T>::~AbstractSlider() {
 
-}
-
-template<typename T>
-Size AbstractSlider<T>::GetPreferredSize() const {
-  if (orientation_ == kHorizontal) {
-    return Size(100, 20);
-  } else {
-    return Size(20, 100);
-  }
 }
 
 template<typename T>

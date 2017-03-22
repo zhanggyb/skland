@@ -49,15 +49,20 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         children_count(0),
         shell(nullptr),
         visible(true),
+        minimal_size(0, 0),
+        preferred_size(100, 100),
+        maximal_size(65536, 65536),
+        x_layout_policy(kLayoutPreferred),
+        y_layout_policy(kLayoutPreferred),
         dirty_flag(0),
         redraw_task(view),
         is_damaged(false),
         inhibit_redraw(false),
-        layout(nullptr),
         left_anchor_group(view, kAlignLeft),
         top_anchor_group(view, kAlignTop),
         right_anchor_group(view, kAlignRight),
-        bottom_anchor_group(view, kAlignBottom) {}
+        bottom_anchor_group(view, kAlignBottom),
+        layout(nullptr) {}
 
   ~Private() {}
 
@@ -73,6 +78,16 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
   AbstractShellView *shell;
 
   bool visible;
+
+  Size minimal_size;
+
+  Size preferred_size;
+
+  Size maximal_size;
+
+  LayoutPolicy x_layout_policy;
+
+  LayoutPolicy y_layout_policy;
 
   /**
    * @brief Bitwise data to indicate if the position or size need to update
@@ -101,12 +116,12 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   bool inhibit_redraw;
 
-  AbstractLayout *layout;
-
   AnchorGroup left_anchor_group;
   AnchorGroup top_anchor_group;
   AnchorGroup right_anchor_group;
   AnchorGroup bottom_anchor_group;
+
+  AbstractLayout *layout;
 
 };
 
