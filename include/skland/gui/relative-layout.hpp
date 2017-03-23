@@ -31,13 +31,11 @@ SKLAND_EXPORT class RelativeLayout final : public AbstractLayout {
 
   virtual ~RelativeLayout();
 
-  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry);
-
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry);
-
   virtual void OnViewAdded(AbstractView *view);
 
   virtual void OnViewRemoved(AbstractView *view);
+
+  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) const final;
 
  private:
 

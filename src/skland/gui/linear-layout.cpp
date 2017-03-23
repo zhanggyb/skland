@@ -29,21 +29,16 @@ LinearLayout::~LinearLayout() {
 
 }
 
-void LinearLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-  if (dirty_flag) Update();
-  else CancelUpdate();
-}
-
-void LinearLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-
-}
-
 void LinearLayout::OnViewAdded(AbstractView *view) {
   // TODO:
 }
 
 void LinearLayout::OnViewRemoved(AbstractView *view) {
   // TODO:
+}
+
+void LinearLayout::OnLayout(int dirty_flag, int left, int top, int right, int bottom) const {
+
 }
 
 }

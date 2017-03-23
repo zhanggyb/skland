@@ -116,6 +116,12 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
    */
   virtual Surface *GetSurface(const AbstractView *view) const = 0;
 
+  /**
+   * @brief Disable this virtual method
+   * @param token
+   */
+  virtual void AuditDestroyingToken(details::Token */*token*/) final;
+
  private:
 
   struct Private;

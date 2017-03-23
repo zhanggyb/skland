@@ -29,6 +29,8 @@ namespace skland {
  */
 SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
+  friend class AbstractView;
+
   AbstractLayout(const AbstractLayout &) = delete;
   AbstractLayout &operator=(const AbstractLayout &) = delete;
 
@@ -45,6 +47,10 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
  protected:
 
   virtual ~AbstractLayout();
+
+  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+
+  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
 
   virtual void OnChildAdded(AbstractView *view) final;
 
@@ -65,6 +71,8 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
   virtual void OnViewAdded(AbstractView *view) = 0;
 
   virtual void OnViewRemoved(AbstractView *view) = 0;
+
+  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) const = 0;
 
  private:
 

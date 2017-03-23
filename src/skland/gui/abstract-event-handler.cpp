@@ -31,6 +31,10 @@ AbstractEventHandler::~AbstractEventHandler() {
 
 }
 
+void AbstractEventHandler::AuditDestroyingToken(details::Token */*token*/) {
+
+}
+
 void AbstractEventHandler::InitializeRedrawTaskList() {
   kRedrawTaskHead.PushBack(&kRedrawTaskTail);
 }

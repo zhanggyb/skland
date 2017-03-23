@@ -43,14 +43,11 @@ AbstractLayout::~AbstractLayout() {
 }
 
 void AbstractLayout::AddView(AbstractView *view) {
-  if (view->p_->layout == this) {
-    DBG_ASSERT(view->p_->layout == this);
-    return;
-  }
+  DBG_ASSERT(view->p_->parent == view->p_->layout);
 
-  if (view->p_->layout) {
-    view->p_->layout->RemoveView(view);
-  }
+  if (view->p_->layout == this) return;
+
+  if (view->p_->layout) view->p_->layout->RemoveView(view);
 
   DBG_ASSERT(nullptr == view->p_->layout);
   DBG_ASSERT(nullptr == view->p_->parent);
@@ -62,15 +59,27 @@ void AbstractLayout::AddView(AbstractView *view) {
 }
 
 void AbstractLayout::RemoveView(AbstractView *view) {
-  if (view->p_->layout != this) {
-    DBG_ASSERT(view->p_->parent != this);
-    return;
-  }
+  DBG_ASSERT(view->p_->parent == view->p_->layout);
+
+  if (view->p_->layout != this) return;
 
   RemoveChild(view);
   view->p_->layout = nullptr;
 
   OnViewRemoved(view);
+}
+
+void AbstractLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  if (dirty_flag) Update();
+  else CancelUpdate();
+}
+
+void AbstractLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  OnLayout(dirty_flag,
+           static_cast<int>(new_geometry.left),
+           static_cast<int>(new_geometry.top),
+           static_cast<int>(new_geometry.right),
+           static_cast<int>(new_geometry.bottom));
 }
 
 void AbstractLayout::OnChildAdded(AbstractView *view) {
