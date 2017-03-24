@@ -20,6 +20,7 @@ add_subdirectory(core-rect)
 add_subdirectory(core-color)
 add_subdirectory(core-object)
 add_subdirectory(core-vectors)
+add_subdirectory(core-deque)
 
 if (LINUX)
     add_subdirectory(core-posix-timer)
