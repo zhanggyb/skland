@@ -15,24 +15,25 @@
  */
 
 #include "abstract-view-anchor.hpp"
-#include "abstract-view-anchor-group.hpp"
 
 #include "abstract-view-private.hpp"
+
+#include <skland/core/deque.hpp>
 
 namespace skland {
 
 AbstractView::Anchor::Anchor(AbstractView *view)
     : contrary(nullptr),
-      previous(nullptr),
-      next(nullptr),
-      group(nullptr) {}
+      previous_(nullptr),
+      next_(nullptr),
+      deque_(nullptr) {}
 
 AbstractView::Anchor::~Anchor() {
-  if (group) group->Remove(this);
+  if (deque_) deque_->Remove(this);
 
-  DBG_ASSERT(nullptr == group);
-  DBG_ASSERT(nullptr == previous);
-  DBG_ASSERT(nullptr == next);
+  DBG_ASSERT(nullptr == deque_);
+  DBG_ASSERT(nullptr == previous_);
+  DBG_ASSERT(nullptr == next_);
 
   if (contrary) {
     contrary->contrary = nullptr;

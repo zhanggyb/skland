@@ -20,8 +20,9 @@
 namespace skland {
 
 Output::Output(const wayland::Registry &registry, uint32_t id, uint32_t version)
-    : Object(),
-      display_(nullptr),
+    : previous_(nullptr),
+      next_(nullptr),
+      deque_(nullptr),
       current_refresh_rate_(0),
       preferred_refresh_rate_(0),
       server_output_id_(0),
@@ -40,14 +41,9 @@ Output::~Output() {
 
   wl_output_.Destroy();
 
-  if (display_)
-    RemoveManagedObject(display_,
-                        this,
-                        &display_,
-                        &display_->first_output_,
-                        &display_->last_output_,
-                        display_->outputs_count_);
-  DBG_ASSERT(display_ == nullptr);
+  if (deque_) deque_->Remove(this);
+
+  DBG_ASSERT(nullptr == deque_);
 }
 
 void Output::OnGeometry(int32_t x,

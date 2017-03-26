@@ -18,19 +18,20 @@
 #define SKLAND_GUI_OUTPUT_HPP_
 
 #include "../core/rect.hpp"
-#include "../core/object.hpp"
 #include "../core/size.hpp"
+#include "../core/sigcxx.hpp"
+#include "../core/deque.hpp"
+
 #include "../wayland/output.hpp"
 
 #include <string>
 
 namespace skland {
 
-class Display;
+class Output {
 
-class Output : public Object {
-
-  friend class Display;
+  template<typename T> friend
+  class Deque;
 
   Output() = delete;
   Output(const Output &) = delete;
@@ -58,6 +59,12 @@ class Output : public Object {
     return current_mode_size_;
   }
 
+  Output *previous() const { return previous_; }
+
+  Output *next() const { return next_; }
+
+  uint32_t server_output_id() const { return server_output_id_; }
+
  private:
 
   void OnGeometry(int32_t x,
@@ -78,7 +85,9 @@ class Output : public Object {
 
   void OnScale(int32_t factor);
 
-  Display *display_;  // manager object
+  Output *previous_;
+  Output *next_;
+  Deque<Output> *deque_;
 
   wayland::Output wl_output_;
 

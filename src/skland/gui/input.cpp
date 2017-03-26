@@ -73,8 +73,7 @@ struct Input::Private {
 };
 
 Input::Input(uint32_t id, uint32_t version)
-    : Object(),
-      display_(nullptr) {
+    : previous_(nullptr), next_(nullptr), deque_(nullptr) {
   p_.reset(new Private);
   p_->wl_seat.capabilities().Set(this, &Input::OnSeatCapabilities);
   p_->wl_seat.name().Set(this, &Input::OnSeatName);
@@ -84,14 +83,10 @@ Input::Input(uint32_t id, uint32_t version)
 Input::~Input() {
   p_.reset();
 
-  if (display_)
-    RemoveManagedObject(display_,
-                        this,
-                        &display_,
-                        &display_->first_input_,
-                        &display_->last_input_,
-                        display_->inputs_count_);
-  DBG_ASSERT(display_ == nullptr);
+  if (deque_)
+    deque_->Remove(this);
+
+  DBG_ASSERT(nullptr == deque_);
 }
 
 void Input::SetCursor(const Cursor *cursor) const {

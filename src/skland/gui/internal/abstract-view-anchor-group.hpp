@@ -19,6 +19,7 @@
 
 #include <skland/gui/abstract-view.hpp>
 #include <skland/core/types.hpp>
+#include <skland/core/deque.hpp>
 
 namespace skland {
 
@@ -38,8 +39,6 @@ class AbstractView::AnchorGroup {
 
   ~AnchorGroup();
 
-  Anchor *operator[](int index) const;
-
   /**
    * @brief Push front a new created anchor object
    * @param anchor
@@ -51,7 +50,7 @@ class AbstractView::AnchorGroup {
    * @param index
    * @param anchor
    */
-  void Insert(int index, Anchor *anchor);
+  void Insert(Anchor *anchor, int index);
 
   /**
    * @brief Push back a new created anchor object
@@ -63,22 +62,20 @@ class AbstractView::AnchorGroup {
 
   void Clear();
 
-  Anchor *first() const { return first_; }
+  Anchor *first() const { return deque_.first(); }
 
-  Anchor *last() const { return last_; }
+  Anchor *last() const { return deque_.last(); }
 
-  int count() const { return count_; }
+  int count() const { return deque_.count(); }
 
   Alignment alignment() const { return alignment_; }
 
  private:
 
   AbstractView *view;
-
-  Anchor *first_;
-  Anchor *last_;
-  int count_;
   Alignment alignment_;
+
+  Deque<Anchor> deque_;
 
 };
 

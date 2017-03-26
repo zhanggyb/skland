@@ -68,3 +68,78 @@ TEST_F(Test, push_front_1) {
   ASSERT_TRUE(item2->previous() == item3);
   ASSERT_TRUE(item3->previous() == nullptr);
 }
+
+TEST_F(Test, push_back_1) {
+  Item *item1 = new Item(1);
+  Item *item2 = new Item(2);
+  Item *item3 = new Item(3);
+
+  Deque<Item> deque;
+  deque.PushBack(item1);
+  deque.PushBack(item2);
+  deque.PushBack(item3);
+
+  ASSERT_TRUE(deque.count() == 3);
+  ASSERT_TRUE(item1->previous() == nullptr);
+  ASSERT_TRUE(item1->next() == item2);
+  ASSERT_TRUE(item2->next() == item3);
+  ASSERT_TRUE(item3->next() == nullptr);
+}
+
+TEST_F(Test, insert_1) {
+  Item *item1 = new Item(1);
+  Item *item2 = new Item(2);
+  Item *item3 = new Item(3);
+
+  Deque<Item> deque;
+  deque.Insert(item1);
+  deque.Insert(item2);
+  deque.Insert(item3);
+
+  ASSERT_TRUE(deque.count() == 3);
+  ASSERT_TRUE(item1->next() == nullptr);
+  ASSERT_TRUE(item1->previous() == item2);
+  ASSERT_TRUE(item2->previous() == item3);
+  ASSERT_TRUE(item3->previous() == nullptr);
+}
+
+TEST_F(Test, insert_2) {
+  Item *item1 = new Item(1);
+  Item *item2 = new Item(2);
+  Item *item3 = new Item(3);
+
+  Deque<Item> deque;
+  deque.Insert(item1);
+  deque.Insert(item2);
+  deque.Insert(item3);
+
+  Item *item4 = new Item(4);
+  deque.Insert(item4);
+
+  ASSERT_TRUE(deque.count() == 4);
+  ASSERT_TRUE(item1->previous() == item2);
+  ASSERT_TRUE(item2->previous() == item3);
+  ASSERT_TRUE(item3->previous() == item4);
+  ASSERT_TRUE(item4->previous() == nullptr);
+}
+
+TEST_F(Test, insert_3) {
+  Item *item1 = new Item(1);
+  Item *item2 = new Item(2);
+  Item *item3 = new Item(3);
+
+  Deque<Item> deque;
+  deque.Insert(item1);
+  deque.Insert(item2);
+  deque.Insert(item3);
+
+  Item *item4 = new Item(4);
+  deque.Insert(item4, -1);
+
+  ASSERT_TRUE(deque.count() == 4);
+  ASSERT_TRUE(item1->previous() == item2);
+  ASSERT_TRUE(item2->previous() == item3);
+  ASSERT_TRUE(item3->previous() == nullptr);
+  ASSERT_TRUE(item1->next() == item4);
+  ASSERT_TRUE(item4->next() == nullptr);
+}

@@ -19,6 +19,8 @@
 
 #include <skland/gui/abstract-view.hpp>
 
+#include <skland/core/deque.hpp>
+
 #include <utility>
 
 namespace skland {
@@ -27,19 +29,21 @@ namespace skland {
  * @ingroup gui_intern
  * @brief Used to align views in layout
  */
-struct AbstractView::Anchor {
+class AbstractView::Anchor {
+
+  template<typename T>
+  friend
+  class Deque;
 
   Anchor() = delete;
   Anchor(const Anchor &) = delete;
   Anchor &operator=(const Anchor &) = delete;
 
+ public:
+
   ~Anchor();
 
   Anchor *contrary;
-
-  Anchor *previous;
-  Anchor *next;
-  AnchorGroup *group;
 
   std::shared_ptr<int> distance;
 
@@ -50,6 +54,10 @@ struct AbstractView::Anchor {
  private:
 
   Anchor(AbstractView *view);
+
+  Anchor *previous_;
+  Anchor *next_;
+  Deque<Anchor> *deque_;
 
 };
 

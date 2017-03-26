@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INPUT_HPP_
 #define SKLAND_GUI_INPUT_HPP_
 
-#include "../core/object.hpp"
+#include "../core/deque.hpp"
 #include "abstract-event-handler.hpp"
 
 #include <wayland-client.h>
@@ -25,7 +25,6 @@
 
 namespace skland {
 
-class Display;
 class Cursor;
 class KeyEvent;
 class MouseEvent;
@@ -41,9 +40,9 @@ class Seat;
  * @ingroup gui
  * @brief Input manager
  */
-SKLAND_EXPORT class Input : public Object {
+SKLAND_EXPORT class Input {
 
-  friend class Display;
+  template<typename T> friend class Deque;
 
   Input() = delete;
   Input(const Input &) = delete;
@@ -153,7 +152,9 @@ SKLAND_EXPORT class Input : public Object {
 
   void OnTouchCancel();
 
-  Display *display_;
+  Input *previous_;
+  Input *next_;
+  Deque<Input> *deque_;
 
   std::unique_ptr<Private> p_;
 

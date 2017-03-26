@@ -17,8 +17,9 @@
 #ifndef SKLAND_GUI_DISPLAY_HPP_
 #define SKLAND_GUI_DISPLAY_HPP_
 
-#include "../core/object.hpp"
 #include "../core/types.hpp"
+#include "../core/sigcxx.hpp"
+#include "../core/deque.hpp"
 
 #include "cursor.hpp"
 
@@ -46,7 +47,7 @@ struct Global {
  * @ingroup gui
  * @brief The global display
  */
-class Display : public Object {
+class Display {
 
   friend class Application;
   friend class Output;
@@ -59,7 +60,7 @@ class Display : public Object {
   static const Output *GetOutputAt(int index = 0);
 
   static int outputs_count() {
-    return kDisplay->outputs_count_;
+    return kDisplay->output_deque_.count();
   }
 
   static bool has_pixel_format(uint32_t format) {
@@ -116,15 +117,8 @@ class Display : public Object {
 
   int display_fd_;
 
-  /* output list */
-  Output *first_output_;
-  Output *last_output_;
-  int outputs_count_;
-
-  /* Seat list */
-  Input *first_input_;
-  Input *last_input_;
-  int inputs_count_;
+  Deque<Output> output_deque_;
+  Deque<Input> input_deque_;
 
   std::list<Global *> globals_;
   std::set<uint32_t> pixel_formats_;

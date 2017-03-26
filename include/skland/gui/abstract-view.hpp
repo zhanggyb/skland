@@ -98,7 +98,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   struct RedrawTask;
   class RedrawTaskIterator;
 
-  struct Anchor;
+  class Anchor;
   class AnchorGroup;
 
   /**
