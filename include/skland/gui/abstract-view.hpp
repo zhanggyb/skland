@@ -333,6 +333,23 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   bool IsVisible() const;
 
+  /**
+   * @brief Add an anchor to target view for layout
+   * @param target
+   * @param align
+   *   - If this view is the parent of target or vice versa, add anchors on the same edge
+   *   - If this view and target view are siblings:
+   *     - If kAlignLeft: put this view at the left side of target view (connect right anchor to left anchor)
+   *     - If kAlignTop: put this view at the top side of target view
+   *     - If kAlignRight: put this view at the right side of target view
+   *     - If kAlignBottom: put this view at the bottom side of target view
+   * @param distance
+   *
+   * @note This method does not check if there's already anchors connect these 2
+   * views.
+   */
+  void AddAnchorTo(AbstractView *target, Alignment align, int distance);
+
   const AnchorGroup &GetAnchorGroup(Alignment align) const;
 
   /**
@@ -494,23 +511,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Destroy all children
    */
   void ClearChildren();
-
-  /**
-   * @brief Add an anchor to target view for layout
-   * @param target
-   * @param align
-   *   - If this view is the parent of target or vice versa, add anchors on the same edge
-   *   - If this view and target view are siblings:
-   *     - If kAlignLeft: put this view at the left side of target view (connect right anchor to left anchor)
-   *     - If kAlignTop: put this view at the top side of target view
-   *     - If kAlignRight: put this view at the right side of target view
-   *     - If kAlignBottom: put this view at the bottom side of target view
-   * @param distance
-   *
-   * @note This method does not check if there's already anchors connect these 2
-   * views.
-   */
-  void AddAnchorTo(AbstractView *target, Alignment align, int distance);
 
   static bool SwapIndex(AbstractView *object1, AbstractView *object2);
 

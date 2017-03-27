@@ -246,6 +246,18 @@ void AbstractView::SetLeft(int left) {
     Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask);
 
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+
+  switch (p_->x_layout_policy) {
+    case kLayoutMinimal:
+    case kLayoutPreferred:
+    case kLayoutMaximal:
+    case kLayoutFixed: {
+      SetRight(left + GetWidth());
+      break;
+    }
+    case kLayoutExpandable:break;
+    default:break;
+  }
 }
 
 int AbstractView::GetTop() const {
@@ -268,6 +280,18 @@ void AbstractView::SetTop(int top) {
     Bit::Set<int>(p_->dirty_flag, Private::kDirtyTopMask);
 
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+
+  switch (p_->y_layout_policy) {
+    case kLayoutMinimal:
+    case kLayoutPreferred:
+    case kLayoutMaximal:
+    case kLayoutFixed: {
+      SetBottom(top + GetHeight());
+      break;
+    }
+    case kLayoutExpandable:break;
+    default:break;
+  }
 }
 
 int AbstractView::GetRight() const {
@@ -331,6 +355,68 @@ const Rect &AbstractView::GetGeometry() const {
 
 bool AbstractView::IsVisible() const {
   return p_->visible;
+}
+
+void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distance) {
+  if (target == p_->parent || this == target->p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else if (target->p_->parent == p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else {
+    DBG_PRINT_MSG("%s\n", "Error! Cannot add anchor to the view which have no relationship!");
+  }
 }
 
 const AnchorGroup &AbstractView::GetAnchorGroup(Alignment align) const {
@@ -708,68 +794,6 @@ void AbstractView::ClearChildren() {
   p_->children_count = 0;
   p_->first_child = nullptr;
   p_->last_child = nullptr;
-}
-
-void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distance) {
-  if (target == p_->parent || this == target->p_->parent) {
-    switch (align) {
-      case kAlignLeft: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->left_anchor_group.PushBack(pair.first);
-        target->p_->left_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignTop: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->top_anchor_group.PushBack(pair.first);
-        target->p_->top_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignRight: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->right_anchor_group.PushBack(pair.first);
-        target->p_->right_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignBottom: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->bottom_anchor_group.PushBack(pair.first);
-        target->p_->bottom_anchor_group.PushBack(pair.second);
-        break;
-      }
-      default:break;
-    }
-  } else if (target->p_->parent == p_->parent) {
-    switch (align) {
-      case kAlignLeft: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->right_anchor_group.PushBack(pair.first);
-        target->p_->left_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignTop: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->bottom_anchor_group.PushBack(pair.first);
-        target->p_->top_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignRight: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->left_anchor_group.PushBack(pair.first);
-        target->p_->right_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignBottom: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->top_anchor_group.PushBack(pair.first);
-        target->p_->bottom_anchor_group.PushBack(pair.second);
-        break;
-      }
-      default:break;
-    }
-  } else {
-    DBG_PRINT_MSG("%s\n", "Error! Cannot add anchor to the view which have no relationship!");
-  }
 }
 
 bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {

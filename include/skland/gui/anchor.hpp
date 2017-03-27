@@ -53,6 +53,8 @@ class Anchor {
 
   int distance() const { return *distance_; }
 
+  void set_distance(int distance) { *distance_ = distance; }
+
   static std::pair<Anchor *, Anchor *> MakePair(int distance,
                                                 AbstractView *view1,
                                                 AbstractView *view2);

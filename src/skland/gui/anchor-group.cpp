@@ -31,7 +31,7 @@ AnchorGroup::AnchorGroup(AbstractView *view, Alignment align)
 }
 
 AnchorGroup::~AnchorGroup() {
-
+  Clear();
 }
 
 void AnchorGroup::PushFront(Anchor *anchor) {
