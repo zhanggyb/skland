@@ -14,33 +14,31 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_RELATIVE_LAYOUT_HPP_
-#define SKLAND_GUI_RELATIVE_LAYOUT_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_LAYOUT_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_LAYOUT_PRIVATE_HPP_
 
-#include "abstract-layout.hpp"
+#include <skland/gui/abstract-layout.hpp>
 
 namespace skland {
 
-SKLAND_EXPORT class RelativeLayout final : public AbstractLayout {
+struct AbstractLayout::Private {
 
- public:
+  Private() = delete;
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
 
-  using AbstractLayout::AbstractLayout;
+  Private(const Padding &padding = Padding(5))
+      : is_layouting(false),
+        padding(padding) {}
 
- protected:
+  ~Private() {}
 
-  virtual ~RelativeLayout();
+  bool is_layouting;
 
-  virtual void OnViewAdded(AbstractView *view);
-
-  virtual void OnViewRemoved(AbstractView *view);
-
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) const final;
-
- private:
+  Padding padding;
 
 };
 
 }
 
-#endif // SKLAND_GUI_RELATIVE_LAYOUT_HPP_
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_LAYOUT_PRIVATE_HPP_

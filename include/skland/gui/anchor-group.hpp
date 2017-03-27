@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_GROUP_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_GROUP_HPP_
+#ifndef SKLAND_GUI_ANCHOR_GROUP_HPP_
+#define SKLAND_GUI_ANCHOR_GROUP_HPP_
 
-#include <skland/gui/abstract-view.hpp>
-#include <skland/core/types.hpp>
-#include <skland/core/deque.hpp>
+#include "../core/types.hpp"
 
 namespace skland {
+
+class AbstractView;
+class Anchor;
 
 /**
  * @ingroup gui_intern
  * @brief Anchor group
  */
-class AbstractView::AnchorGroup {
+class AnchorGroup {
 
   AnchorGroup() = delete;
   AnchorGroup(const AnchorGroup &) = delete;
@@ -62,23 +63,27 @@ class AbstractView::AnchorGroup {
 
   void Clear();
 
-  Anchor *first() const { return deque_.first(); }
-
-  Anchor *last() const { return deque_.last(); }
-
-  int count() const { return deque_.count(); }
+  AbstractView *view() const { return view_; }
 
   Alignment alignment() const { return alignment_; }
 
+  Anchor *first() const { return first_; }
+
+  Anchor *last() const { return last_; }
+
+  int count() const { return count_; }
+
  private:
 
-  AbstractView *view;
+  AbstractView *view_;
   Alignment alignment_;
 
-  Deque<Anchor> deque_;
+  Anchor *first_;
+  Anchor *last_;
+  int count_;
 
 };
 
 }
 
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_GROUP_HPP_
+#endif // SKLAND_GUI_ANCHOR_GROUP_HPP_

@@ -19,8 +19,8 @@
 
 #include "abstract-view-redraw-task.hpp"
 
-#include "abstract-view-anchor.hpp"
-#include "abstract-view-anchor-group.hpp"
+#include "skland/gui/anchor.hpp"
+#include "skland/gui/anchor-group.hpp"
 
 namespace skland {
 

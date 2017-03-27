@@ -20,32 +20,40 @@
 
 namespace skland {
 
-RelativeLayout::RelativeLayout(const Padding &padding)
-    : AbstractLayout(padding) {
-
-}
-
 RelativeLayout::~RelativeLayout() {
 
 }
 
 void RelativeLayout::OnViewAdded(AbstractView *view) {
-  // TODO:
+  if (view->IsVisible())
+    Update();
 }
 
 void RelativeLayout::OnViewRemoved(AbstractView *view) {
-  // TODO:
+  if (view->IsVisible())
+    Update();
 }
 
 void RelativeLayout::OnLayout(int dirty_flag, int left, int top, int right, int bottom) const {
-//  Iterator it(this);
+  const AnchorGroup &left_group = GetAnchorGroup(kAlignLeft);
+  for (Anchor *anchor = left_group.first(); anchor; anchor = anchor->next()) {
+    anchor->contrary()->group()->view()->SetLeft(anchor->distance());
+  }
 
-//  int dx = (int) (new_geometry.x() - old_geometry.x());
-//  int dy = (int) (new_geometry.y() - old_geometry.y());
-//
-//  for (it = it.first_child(); it; ++it) {
-//    it.view()->MoveTo(it.view()->GetX() + dx, it.view()->GetY() + dy);
-//  }
+  const AnchorGroup &top_group = GetAnchorGroup(kAlignTop);
+  for (Anchor *anchor = top_group.first(); anchor; anchor = anchor->next()) {
+    anchor->contrary()->group()->view()->SetTop(anchor->distance());
+  }
+
+  const AnchorGroup &right_group = GetAnchorGroup(kAlignRight);
+  for (Anchor *anchor = right_group.first(); anchor; anchor = anchor->next()) {
+    anchor->contrary()->group()->view()->SetRight(anchor->distance());
+  }
+
+  const AnchorGroup &bottom_group = GetAnchorGroup(kAlignBottom);
+  for (Anchor *anchor = bottom_group.first(); anchor; anchor = anchor->next()) {
+    anchor->contrary()->group()->view()->SetBottom(anchor->distance());
+  }
 }
 
 }

@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_CONSTRAINT_HPP_
+#ifndef SKLAND_GUI_ANCHOR_HPP_
+#define SKLAND_GUI_ANCHOR_HPP_
 
-#include <skland/gui/abstract-view.hpp>
-
-#include <skland/core/deque.hpp>
+#include "../core/types.hpp"
 
 #include <utility>
+#include <memory>
 
 namespace skland {
+
+class AbstractView;
+class AnchorGroup;
 
 /**
  * @ingroup gui_intern
  * @brief Used to align views in layout
  */
-class AbstractView::Anchor {
+class Anchor {
 
-  template<typename T>
-  friend
-  class Deque;
+  friend class AnchorGroup;
 
   Anchor() = delete;
   Anchor(const Anchor &) = delete;
@@ -43,9 +43,15 @@ class AbstractView::Anchor {
 
   ~Anchor();
 
-  Anchor *contrary;
+  Anchor *previous() const { return previous_; }
 
-  std::shared_ptr<int> distance;
+  Anchor *next() const { return next_; }
+
+  AnchorGroup *group() const { return group_; }
+
+  Anchor *contrary() const { return contrary_; }
+
+  int distance() const { return *distance_; }
 
   static std::pair<Anchor *, Anchor *> MakePair(int distance,
                                                 AbstractView *view1,
@@ -57,10 +63,14 @@ class AbstractView::Anchor {
 
   Anchor *previous_;
   Anchor *next_;
-  Deque<Anchor> *deque_;
+  AnchorGroup *group_;
+
+  Anchor *contrary_;
+
+  std::shared_ptr<int> distance_;
 
 };
 
 }
 
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ALIGNMENT_HPP_
+#endif // SKLAND_GUI_ANCHOR_HPP_

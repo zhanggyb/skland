@@ -40,9 +40,13 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   void AddView(AbstractView *view);
 
+  void AddView(int index, AbstractView *view);
+
+  void AddView(int row, int column, AbstractView *view);
+
   void RemoveView(AbstractView *view);
 
-  const Padding &padding() const { return padding_; }
+  const Padding &GetPadding() const;
 
  protected:
 
@@ -76,7 +80,9 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
  private:
 
-  Padding padding_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
 };
 

@@ -22,6 +22,7 @@
 #include "../core/types.hpp"
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
+#include "anchor-group.hpp"
 
 #include <memory>
 
@@ -39,27 +40,27 @@ enum LayoutPolicy {
   /**
    * Recommend to use the minimal size
    */
-  kLayoutMinimal,
+      kLayoutMinimal,
 
   /**
    * Recommend to use the preferred size
    */
-  kLayoutPreferred,
+      kLayoutPreferred,
 
   /**
    * Recommend to use the maximal size
    */
-  kLayoutMaximal,
+      kLayoutMaximal,
 
   /**
    * Recommend to use the current size and do not change
    */
-  kLayoutFixed,
+      kLayoutFixed,
 
   /**
    * Recommend to expand to any value between minimal and maximal size
    */
-  kLayoutExpandable
+      kLayoutExpandable
 };
 
 /**
@@ -97,9 +98,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   struct RedrawTask;
   class RedrawTaskIterator;
-
-  class Anchor;
-  class AnchorGroup;
 
   /**
    * @brief Default constructor
@@ -335,6 +333,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   bool IsVisible() const;
 
+  const AnchorGroup &GetAnchorGroup(Alignment align) const;
+
   /**
    * @brief Update the display of this widget
    */
@@ -518,13 +518,13 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   static bool InsertSiblingAfter(AbstractView *src, AbstractView *dst);
 
-  static void MoveToFirst(AbstractView *object);
+  static void MoveToFirst(AbstractView *view);
 
-  static void MoveToLast(AbstractView *object);
+  static void MoveToLast(AbstractView *view);
 
-  static void MoveForward(AbstractView *object);
+  static void MoveForward(AbstractView *view);
 
-  static void MoveBackward(AbstractView *object);
+  static void MoveBackward(AbstractView *view);
 
   /**
    * @brief Mark damage area of the given object

@@ -23,8 +23,8 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
+#include "internal/abstract-layout-private.hpp"
 #include "internal/abstract-view-iterators.hpp"
-#include "internal/abstract-view-private.hpp"
 
 //#ifdef DEBUG
 #include <cstdlib>
@@ -33,9 +33,9 @@
 
 namespace skland {
 
-AbstractLayout::AbstractLayout(const Margin &padding)
-    : AbstractView(), padding_(padding) {
-
+AbstractLayout::AbstractLayout(const Padding &padding)
+    : AbstractView() {
+  p_.reset(new Private(padding));
 }
 
 AbstractLayout::~AbstractLayout() {
@@ -53,9 +53,6 @@ void AbstractLayout::AddView(AbstractView *view) {
   DBG_ASSERT(nullptr == view->p_->parent);
 
   InsertChild(view);
-  view->p_->layout = this;
-
-  OnViewAdded(view);
 }
 
 void AbstractLayout::RemoveView(AbstractView *view) {
@@ -64,9 +61,10 @@ void AbstractLayout::RemoveView(AbstractView *view) {
   if (view->p_->layout != this) return;
 
   RemoveChild(view);
-  view->p_->layout = nullptr;
+}
 
-  OnViewRemoved(view);
+const Padding &AbstractLayout::GetPadding() const {
+  return p_->padding;
 }
 
 void AbstractLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
@@ -75,19 +73,36 @@ void AbstractLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geomet
 }
 
 void AbstractLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  int left = static_cast<int>(new_geometry.left);
+  int top = static_cast<int>(new_geometry.top);
+  int right = static_cast<int>(new_geometry.right);
+  int bottom = static_cast<int>(new_geometry.bottom);
+
+  AbstractView *parent = static_cast<AbstractView *>(this)->p_->parent;
+  if (parent) {
+    left -= parent->p_->geometry.left;
+    top -= parent->p_->geometry.top;
+    right -= parent->p_->geometry.right;
+    bottom -= parent->p_->geometry.bottom;
+  }
+
+  p_->is_layouting = true;
   OnLayout(dirty_flag,
-           static_cast<int>(new_geometry.left),
-           static_cast<int>(new_geometry.top),
-           static_cast<int>(new_geometry.right),
-           static_cast<int>(new_geometry.bottom));
+           left + p_->padding.left,
+           top + p_->padding.top,
+           right - p_->padding.right,
+           bottom - p_->padding.bottom);
+  p_->is_layouting = false;
 }
 
 void AbstractLayout::OnChildAdded(AbstractView *view) {
-  // Use OnViewAdded() in layout class
+  view->p_->layout = this;
+  OnViewAdded(view);
 }
 
 void AbstractLayout::OnChildRemoved(AbstractView *view) {
-  // Use OnViewRemoved() in layout class
+  view->p_->layout = nullptr;
+  OnViewRemoved(view);
 }
 
 void AbstractLayout::OnMouseEnter(MouseEvent *event) {
