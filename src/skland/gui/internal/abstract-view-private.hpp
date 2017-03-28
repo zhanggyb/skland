@@ -37,7 +37,9 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
     kDirtyLeftMask = 0x1 << 0,
     kDirtyTopMask = 0x1 << 1,
     kDirtyRightMask = 0x1 << 2,
-    kDirtyBottomMask = 0x1 << 3
+    kDirtyBottomMask = 0x1 << 3,
+    kDirtyWidthMask = 0x1 << 4,
+    kDirtyHeightMask = 0x1 << 5
   };
 
   Private(AbstractView *view)

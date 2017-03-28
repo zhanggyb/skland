@@ -84,8 +84,12 @@ TEST_F(Test, regular_2) {
   PushButton * button = new PushButton("Test");
 
   layout->AddView(button);
-  button->AddAnchorTo(layout, skland::kAlignLeft, 100);
-  button->AddAnchorTo(layout, skland::kAlignTop, 100);
+  button->MoveTo(200, 200);
+
+  button->AddAnchorTo(layout, skland::kAlignLeft, 0);
+  button->AddAnchorTo(layout, skland::kAlignTop, 0);
+  button->AddAnchorTo(layout, skland::kAlignRight, 0);
+  button->AddAnchorTo(layout, skland::kAlignBottom, 0);
 
   win.SetContentView(layout);
   win.Show();

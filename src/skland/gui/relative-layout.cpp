@@ -37,22 +37,22 @@ void RelativeLayout::OnViewRemoved(AbstractView *view) {
 void RelativeLayout::OnLayout(int dirty_flag, int left, int top, int right, int bottom) const {
   const AnchorGroup &left_group = GetAnchorGroup(kAlignLeft);
   for (Anchor *anchor = left_group.first(); anchor; anchor = anchor->next()) {
-    anchor->contrary()->group()->view()->SetLeft(anchor->distance());
+    anchor->contrary()->group()->view()->SetLeft(left + anchor->distance());
   }
 
   const AnchorGroup &top_group = GetAnchorGroup(kAlignTop);
   for (Anchor *anchor = top_group.first(); anchor; anchor = anchor->next()) {
-    anchor->contrary()->group()->view()->SetTop(anchor->distance());
+    anchor->contrary()->group()->view()->SetTop(top + anchor->distance());
   }
 
   const AnchorGroup &right_group = GetAnchorGroup(kAlignRight);
   for (Anchor *anchor = right_group.first(); anchor; anchor = anchor->next()) {
-    anchor->contrary()->group()->view()->SetRight(anchor->distance());
+    anchor->contrary()->group()->view()->SetRight(right - anchor->distance());
   }
 
   const AnchorGroup &bottom_group = GetAnchorGroup(kAlignBottom);
   for (Anchor *anchor = bottom_group.first(); anchor; anchor = anchor->next()) {
-    anchor->contrary()->group()->view()->SetBottom(anchor->distance());
+    anchor->contrary()->group()->view()->SetBottom(bottom - anchor->distance());
   }
 }
 

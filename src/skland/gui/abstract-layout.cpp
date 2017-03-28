@@ -73,25 +73,15 @@ void AbstractLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geomet
 }
 
 void AbstractLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-  int left = static_cast<int>(new_geometry.left);
-  int top = static_cast<int>(new_geometry.top);
-  int right = static_cast<int>(new_geometry.right);
-  int bottom = static_cast<int>(new_geometry.bottom);
-
-  AbstractView *parent = static_cast<AbstractView *>(this)->p_->parent;
-  if (parent) {
-    left -= parent->p_->geometry.left;
-    top -= parent->p_->geometry.top;
-    right -= parent->p_->geometry.right;
-    bottom -= parent->p_->geometry.bottom;
-  }
+  int width = static_cast<int>(new_geometry.width());
+  int height = static_cast<int>(new_geometry.height());
 
   p_->is_layouting = true;
   OnLayout(dirty_flag,
-           left + p_->padding.left,
-           top + p_->padding.top,
-           right - p_->padding.right,
-           bottom - p_->padding.bottom);
+           p_->padding.left,
+           p_->padding.top,
+           width - p_->padding.right,
+           height - p_->padding.bottom);
   p_->is_layouting = false;
 }
 

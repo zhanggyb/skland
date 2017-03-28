@@ -238,26 +238,17 @@ void AbstractView::SetLeft(int left) {
 
   if (left == p_->geometry.left) return;
 
+  int width = static_cast<int>(p_->geometry.right) - left;
+  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+
   p_->geometry.left = left;
 
   if (p_->geometry.left == p_->last_geometry.left)
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask);
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyWidthMask);
   else
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask);
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyWidthMask);
 
-  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
-
-  switch (p_->x_layout_policy) {
-    case kLayoutMinimal:
-    case kLayoutPreferred:
-    case kLayoutMaximal:
-    case kLayoutFixed: {
-      SetRight(left + GetWidth());
-      break;
-    }
-    case kLayoutExpandable:break;
-    default:break;
-  }
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry) ;
 }
 
 int AbstractView::GetTop() const {
@@ -272,26 +263,17 @@ void AbstractView::SetTop(int top) {
 
   if (top == p_->geometry.top) return;
 
+  int height = static_cast<int>(p_->geometry.bottom) - top;
+  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
+
   p_->geometry.top = top;
 
   if (p_->geometry.top == p_->last_geometry.top)
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyTopMask);
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyTopMask | Private::kDirtyHeightMask);
   else
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyTopMask);
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyTopMask | Private::kDirtyHeightMask);
 
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
-
-  switch (p_->y_layout_policy) {
-    case kLayoutMinimal:
-    case kLayoutPreferred:
-    case kLayoutMaximal:
-    case kLayoutFixed: {
-      SetBottom(top + GetHeight());
-      break;
-    }
-    case kLayoutExpandable:break;
-    default:break;
-  }
 }
 
 int AbstractView::GetRight() const {
@@ -303,12 +285,15 @@ void AbstractView::SetRight(int right) {
 
   if (right == p_->geometry.right) return;
 
+  int width = right - static_cast<int>(p_->geometry.left);
+  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+
   p_->geometry.right = right;
 
   if (p_->geometry.right == p_->last_geometry.right)
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask);
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyWidthMask);
   else
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask);
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyWidthMask);
 
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
@@ -318,17 +303,19 @@ int AbstractView::GetBottom() const {
 }
 
 void AbstractView::SetBottom(int bottom) {
-  if (p_->parent)
-    bottom += p_->parent->p_->geometry.top; // relative to parent
+  if (p_->parent) bottom += p_->parent->p_->geometry.top; // relative to parent
 
   if (bottom == p_->geometry.bottom) return;
+
+  int height = bottom - static_cast<int>(p_->geometry.top);
+  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
 
   p_->geometry.bottom = bottom;
 
   if (p_->geometry.bottom == p_->last_geometry.bottom)
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyBottomMask);
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyBottomMask | Private::kDirtyHeightMask);
   else
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyBottomMask);
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyBottomMask | Private::kDirtyHeightMask);
 
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
