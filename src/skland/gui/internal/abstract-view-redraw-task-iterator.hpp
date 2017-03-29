@@ -112,14 +112,14 @@ class AbstractView::RedrawTaskIterator {
     if (redraw_task_->view->p_->inhibit_redraw)
       throw std::runtime_error("Error! This view object is inhibited to redraw!");
 
-    kRedrawTaskHead.PushBack(redraw_task_);
+    kIdleTaskHead.PushBack(redraw_task_);
   }
 
   void PushToTail() {
     if (redraw_task_->view->p_->inhibit_redraw)
       throw std::runtime_error("Error! This view object is inhibited to redraw!");
 
-    kRedrawTaskTail.PushFront(redraw_task_);
+    kIdleTaskTail.PushFront(redraw_task_);
   }
 
   operator bool() const { return nullptr != redraw_task_; }

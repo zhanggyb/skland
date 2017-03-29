@@ -19,8 +19,8 @@
 
 namespace skland {
 
-Task AbstractEventHandler::kRedrawTaskHead;
-Task AbstractEventHandler::kRedrawTaskTail;
+Task AbstractEventHandler::kIdleTaskHead;
+Task AbstractEventHandler::kIdleTaskTail;
 
 AbstractEventHandler::AbstractEventHandler()
     : Trackable() {
@@ -35,14 +35,14 @@ void AbstractEventHandler::AuditDestroyingToken(details::Token */*token*/) {
 
 }
 
-void AbstractEventHandler::InitializeRedrawTaskList() {
-  kRedrawTaskHead.PushBack(&kRedrawTaskTail);
+void AbstractEventHandler::InitializeIdleTaskList() {
+  kIdleTaskHead.PushBack(&kIdleTaskTail);
 }
 
-void AbstractEventHandler::ClearRedrawTaskList() {
-  Task *task = kRedrawTaskHead.next();
+void AbstractEventHandler::ClearIdleTaskList() {
+  Task *task = kIdleTaskHead.next();
   Task *next_task = nullptr;
-  while (task != &kRedrawTaskTail) {
+  while (task != &kIdleTaskTail) {
     next_task = task->next();
     task->Unlink();
     task = next_task;

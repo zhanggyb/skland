@@ -19,23 +19,32 @@
 
 #include <skland/gui/abstract-layout.hpp>
 
+#include "abstract-layout-layout-task.hpp"
+
 namespace skland {
 
-struct AbstractLayout::Private {
+/**
+ * @ingroup gui_intern
+ * @brief A structure for private data in AbstractLayout
+ */
+SKLAND_NO_EXPORT struct AbstractLayout::Private {
 
   Private() = delete;
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  Private(const Padding &padding = Padding(5))
+  Private(AbstractLayout *layout, const Padding &padding = Padding(5))
       : is_layouting(false),
-        padding(padding) {}
+        padding(padding),
+        layout_task(layout) {}
 
   ~Private() {}
 
   bool is_layouting;
 
   Padding padding;
+
+  LayoutTask layout_task;
 
 };
 

@@ -108,8 +108,8 @@ int Application::Run() {
   Task *task = nullptr;
 
   while (true) {
-    while (AbstractView::kRedrawTaskHead.next() != &AbstractView::kRedrawTaskTail) {
-      task = AbstractView::kRedrawTaskHead.next();
+    while (AbstractView::kIdleTaskHead.next() != &AbstractView::kIdleTaskTail) {
+      task = AbstractView::kIdleTaskHead.next();
       task->Unlink();
       task->Run();
     }

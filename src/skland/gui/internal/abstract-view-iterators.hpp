@@ -22,7 +22,11 @@
 
 namespace skland {
 
-class AbstractView::Iterator {
+/**
+ * @ingroup gui_intern
+ * @brief An iterator class to traverse in the view hierarchy
+ */
+SKLAND_NO_EXPORT class AbstractView::Iterator {
 
  public:
 
@@ -44,21 +48,41 @@ class AbstractView::Iterator {
     return *this;
   }
 
+  /**
+   * @brief Move to the next view
+   * @return A reference to this iterator
+   *
+   * @note It's recommended to use this operator
+   */
   Iterator &operator++() {
     view_ = view_->p_->next;
     return *this;
   }
 
+  /**
+   * @brief Move to the next view
+   * @return A new iterator object
+   */
   Iterator operator++(int) {
     Iterator it(view_->p_->next);
     return it;
   }
 
+  /**
+   * @brief Move to the previous view
+   * @return A reference to this iterator
+   *
+   * @note It's recommended to use this operator
+   */
   Iterator &operator--() {
     view_ = view_->p_->previous;
     return *this;
   }
 
+  /**
+   * @brief Move to the new previous view
+   * @return A new iterator object
+   */
   Iterator operator--(int) {
     Iterator it(view_->p_->previous);
     return it;
@@ -79,6 +103,8 @@ class AbstractView::Iterator {
   AbstractLayout *layout() const { return view_->p_->layout; }
 
   AbstractView *view() const { return view_; }
+
+  RedrawTask &redraw_task() const { return view_->p_->redraw_task; }
 
   operator bool() const { return nullptr != view_; }
 
@@ -110,25 +136,47 @@ class AbstractView::ConstIterator {
     return *this;
   }
 
+  /**
+   * @brief Move to the next view
+   * @return A reference to this iterator
+   *
+   * @note It's recommended to use this operator
+   */
   ConstIterator &operator++() {
     view_ = view_->p_->next;
     return *this;
   }
 
+  /**
+   * @brief Move to the next view
+   * @return A new iterator object
+   */
   ConstIterator operator++(int) {
     ConstIterator it(view_->p_->next);
     return it;
   }
 
+  /**
+   * @brief Move to the previous view
+   * @return A reference to this iterator
+   *
+   * @note It's recommended to use this operator
+   */
   ConstIterator &operator--() {
     view_ = view_->p_->previous;
     return *this;
   }
 
+  /**
+   * @brief Move to the new previous view
+   * @return A new iterator object
+   */
   ConstIterator operator--(int) {
     ConstIterator it(view_->p_->previous);
     return it;
   }
+
+  const Surface *GetSurface() const { return view_->GetSurface(view_); }
 
   const AbstractView *parent() const { return view_->p_->parent; }
 
@@ -140,7 +188,11 @@ class AbstractView::ConstIterator {
 
   const AbstractView *last_child() const { return view_->p_->last_child; }
 
+  const AbstractLayout *layout() const { return view_->p_->layout; }
+
   const AbstractView *view() const { return view_; }
+
+  const RedrawTask &redraw_task() const { return view_->p_->redraw_task; }
 
   operator bool() const { return nullptr != view_; }
 

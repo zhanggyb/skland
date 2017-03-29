@@ -14,37 +14,29 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_ABSTRACT_VIEW_REDRAW_TASK_HPP
-#define SKLAND_ABSTRACT_VIEW_REDRAW_TASK_HPP
+#ifndef SKLAND_ABSTRACT_LAYOUT_LAYOUT_TASK_HPP
+#define SKLAND_ABSTRACT_LAYOUT_LAYOUT_TASK_HPP
 
-#include <skland/gui/abstract-view.hpp>
-
-#include <skland/gui/task.hpp>
-#include <skland/gui/context.hpp>
+#include <skland/gui/abstract-layout.hpp>
 
 namespace skland {
 
-/**
- * @ingroup gui_intern
- * @brief An idle task to validate and draw a view
- */
-SKLAND_NO_EXPORT struct AbstractView::RedrawTask : public Task {
+SKLAND_NO_EXPORT struct AbstractLayout::LayoutTask : public Task {
 
-  RedrawTask(const RedrawTask &) = delete;
-  RedrawTask &operator=(const RedrawTask &) = delete;
+  LayoutTask(const LayoutTask &) = delete;
+  LayoutTask &operator=(const LayoutTask &) = delete;
 
-  RedrawTask(AbstractView *view)
-      : Task(), view(view) {}
+  LayoutTask(AbstractLayout *layout)
+      : Task(), layout(layout) {}
 
-  virtual ~RedrawTask() {}
+  virtual ~LayoutTask() {}
 
   virtual void Run() const final;
 
-  AbstractView *view;
-  Context context;
+  AbstractLayout *layout;
 
 };
 
 }
 
-#endif // SKLAND_ABSTRACT_VIEW_REDRAW_TASK_HPP
+#endif //SKLAND_ABSTRACT_LAYOUT_LAYOUT_TASK_HPP

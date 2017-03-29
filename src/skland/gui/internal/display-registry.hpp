@@ -22,7 +22,11 @@
 
 namespace skland {
 
-class Display::Registry {
+/**
+ * @ingroup gui_intern
+ * @brief An internal class to get wayland registry from a Display
+ */
+SKLAND_NO_EXPORT class Display::Registry {
 
   Registry(const Registry &) = delete;
   Registry &operator=(const Registry &) = delete;

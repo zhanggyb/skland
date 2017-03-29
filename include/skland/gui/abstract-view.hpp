@@ -325,8 +325,16 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   int GetHeight() const;
 
+  /**
+   * @brief Get the center position of geometry along X axis
+   * @return
+   */
   float GetXCenter() const;
 
+  /**
+   * @brief Get the center position of geometry along Y axis
+   * @return
+   */
   float GetYCenter() const;
 
   const Rect &GetGeometry() const;
@@ -444,8 +452,27 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual Surface *GetSurface(const AbstractView *view) const;
 
+  /**
+   * @brief Callback when any part of geometry will change
+   * @param dirty_flag Bitwise flag of which part of geometry will change
+   *   - 0: no change, this is possible if the geometry is changed back to last value by several methods
+   *   - Bitwise flag:
+   * @param old_geometry
+   * @param new_geometry
+   *
+   * The new size will never smaller than minimal size or larger than maximal size.
+   */
   virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
 
+  /**
+   * @brief Callback when the geometry changes before draw this view
+   * @param dirty_flag Bitwise flag of which part of geometry changes
+   * @param old_geometry
+   * @param new_geometry
+   *
+   * This virtual method is called only when there's new geometry need to be saved before drawing this
+   * view.
+   */
   virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
 
   /**

@@ -27,6 +27,10 @@ namespace skland {
 class AbstractShellView;
 class AbstractLayout;
 
+/**
+ * @ingroup gui_intern
+ * @brief A structure for private data in AbstractView
+ */
 SKLAND_NO_EXPORT struct AbstractView::Private {
 
   Private() = delete;

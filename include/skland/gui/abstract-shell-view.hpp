@@ -45,6 +45,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
  public:
 
+  class Iterator;
+  class ConstIterator;
+
   struct RedrawTask;
   class RedrawTaskIterator;
 

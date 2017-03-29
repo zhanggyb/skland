@@ -25,7 +25,7 @@ class AbstractView;
 class Anchor;
 
 /**
- * @ingroup gui_intern
+ * @ingroup gui
  * @brief Anchor group
  */
 class AnchorGroup {

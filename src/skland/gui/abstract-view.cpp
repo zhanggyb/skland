@@ -421,8 +421,7 @@ void AbstractView::Update() {
 }
 
 void AbstractView::CancelUpdate() {
-  RedrawTaskIterator it(this);
-  it.redraw_task()->Unlink();
+  p_->redraw_task.Unlink();
 }
 
 bool AbstractView::Contain(int x, int y) const {
@@ -488,14 +487,12 @@ void AbstractView::RecursiveUpdate() {
 }
 
 void AbstractView::OnUpdate(AbstractView *view) {
-  RedrawTaskIterator it(this);
-
-  if (it.IsLinked()) {
+  if (p_->redraw_task.IsLinked()) {
     if (view != this) {
       // This view is going to be redrawn, just push back the task of the sub view
-      DBG_ASSERT(it.context().canvas());
-      it.PushBack(view);
-      RedrawTaskIterator(view).SetContext(this);
+      DBG_ASSERT(p_->redraw_task.context.canvas());
+      p_->redraw_task.PushBack(&view->p_->redraw_task);
+      view->p_->redraw_task.context = p_->redraw_task.context;
     }
     return;
   }

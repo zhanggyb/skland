@@ -28,7 +28,7 @@ class AbstractView;
 class AnchorGroup;
 
 /**
- * @ingroup gui_intern
+ * @ingroup gui
  * @brief Used to align views in layout
  */
 class Anchor {

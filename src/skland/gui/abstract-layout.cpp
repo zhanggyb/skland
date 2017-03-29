@@ -35,7 +35,7 @@ namespace skland {
 
 AbstractLayout::AbstractLayout(const Padding &padding)
     : AbstractView() {
-  p_.reset(new Private(padding));
+  p_.reset(new Private(this, padding));
 }
 
 AbstractLayout::~AbstractLayout() {
@@ -53,6 +53,7 @@ void AbstractLayout::AddView(AbstractView *view) {
   DBG_ASSERT(nullptr == view->p_->parent);
 
   InsertChild(view);
+  Layout();
 }
 
 void AbstractLayout::RemoveView(AbstractView *view) {
@@ -61,6 +62,15 @@ void AbstractLayout::RemoveView(AbstractView *view) {
   if (view->p_->layout != this) return;
 
   RemoveChild(view);
+  Layout();
+}
+
+void AbstractLayout::Layout() {
+  if (p_->is_layouting) return;
+
+  p_->is_layouting = true;
+  OnLayout(0, p_->padding.left, p_->padding.top, p_->padding.right, p_->padding.bottom);
+  p_->is_layouting = false;
 }
 
 const Padding &AbstractLayout::GetPadding() const {

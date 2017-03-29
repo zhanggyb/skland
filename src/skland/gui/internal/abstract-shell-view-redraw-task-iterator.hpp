@@ -98,11 +98,11 @@ class AbstractShellView::RedrawTaskIterator {
   }
 
   void PushToHead() {
-    kRedrawTaskHead.PushBack(redraw_task_);
+    kIdleTaskHead.PushBack(redraw_task_);
   }
 
   void PushToTail() {
-    kRedrawTaskTail.PushFront(redraw_task_);
+    kIdleTaskTail.PushFront(redraw_task_);
   }
 
   operator bool() const { return nullptr != redraw_task_; }

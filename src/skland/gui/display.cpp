@@ -39,12 +39,12 @@ Display::Display()
     display_fd_(0) {
   p_.reset(new Private);
   cursors_.resize(kCursorBlank, nullptr);
-  AbstractEventHandler::InitializeRedrawTaskList();
+  AbstractEventHandler::InitializeIdleTaskList();
   Surface::InitializeCommitTaskList();
 }
 
 Display::~Display() {
-  AbstractEventHandler::ClearRedrawTaskList();
+  AbstractEventHandler::ClearIdleTaskList();
   Surface::ClearCommitTaskList();
 }
 

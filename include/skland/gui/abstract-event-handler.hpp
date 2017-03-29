@@ -122,6 +122,10 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
    */
   virtual void AuditDestroyingToken(details::Token */*token*/) final;
 
+  static void PushToHead(Task *task) { kIdleTaskHead.PushBack(task); }
+
+  static void PushToTail(Task *task) { kIdleTaskTail.PushFront(task); }
+
  private:
 
   struct Private;
@@ -131,15 +135,15 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   /**
    * @brief Initialize the idle task list for redraw windows and views
    */
-  static void InitializeRedrawTaskList();
+  static void InitializeIdleTaskList();
 
   /**
    * @brief Destroy the redraw task list
    */
-  static void ClearRedrawTaskList();
+  static void ClearIdleTaskList();
 
-  static Task kRedrawTaskHead;
-  static Task kRedrawTaskTail;
+  static Task kIdleTaskHead;
+  static Task kIdleTaskTail;
 
 };
 

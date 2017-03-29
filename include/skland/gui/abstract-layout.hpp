@@ -36,6 +36,8 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
  public:
 
+  struct LayoutTask;
+
   AbstractLayout(const Padding &padding = Padding(5));
 
   void AddView(AbstractView *view);
@@ -45,6 +47,8 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
   void AddView(int row, int column, AbstractView *view);
 
   void RemoveView(AbstractView *view);
+
+  void Layout();
 
   const Padding &GetPadding() const;
 
