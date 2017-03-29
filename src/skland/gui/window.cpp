@@ -28,8 +28,8 @@
 #include <skland/graphic/canvas.hpp>
 
 #include "internal/display-registry.hpp"
-#include "internal/abstract-shell-view-redraw-task-iterator.hpp"
-#include "internal/abstract-view-redraw-task-iterator.hpp"
+#include "internal/abstract-shell-view-iterators.hpp"
+#include "internal/abstract-view-iterators.hpp"
 
 namespace skland {
 
@@ -109,9 +109,9 @@ void Window::OnUpdate(AbstractView *view) {
 
   if (nullptr == view) {
     surface = this->GetShellSurface();
-    RedrawTaskIterator it(this);
-    it.PushToTail();
-    it.SetContext(Context(surface, frame_canvas_));
+    Iterator it(this);
+    PushToTail(&it.redraw_task());
+    it.redraw_task().context = Context(surface, frame_canvas_);
     DBG_ASSERT(frame_canvas_);
     Damage(this,
            0, 0,
@@ -128,9 +128,9 @@ void Window::OnUpdate(AbstractView *view) {
       canvas = frame_canvas_;
     }
 
-    AbstractView::RedrawTaskIterator it(view);
-    it.PushToTail();
-    it.SetContext(Context(surface, canvas));
+    AbstractView::Iterator it(view);
+    PushToTail(&it.redraw_task());
+    it.redraw_task().context = Context(surface, canvas);
     DBG_ASSERT(canvas);
     Damage(view,
            view->GetX() + surface->margin().left,

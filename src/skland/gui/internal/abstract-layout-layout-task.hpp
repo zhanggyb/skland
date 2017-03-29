@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_ABSTRACT_LAYOUT_LAYOUT_TASK_HPP
-#define SKLAND_ABSTRACT_LAYOUT_LAYOUT_TASK_HPP
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_LAYOUT_LAYOUT_TASK_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_LAYOUT_LAYOUT_TASK_HPP_
 
 #include <skland/gui/abstract-layout.hpp>
 
@@ -39,4 +39,4 @@ SKLAND_NO_EXPORT struct AbstractLayout::LayoutTask : public Task {
 
 }
 
-#endif //SKLAND_ABSTRACT_LAYOUT_LAYOUT_TASK_HPP
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_LAYOUT_LAYOUT_TASK_HPP_

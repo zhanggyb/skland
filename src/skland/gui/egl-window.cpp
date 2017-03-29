@@ -30,9 +30,8 @@
 #include <skland/graphic/canvas.hpp>
 
 #include "internal/display-registry.hpp"
-//#include "internal/abstract-shell-view-redraw-task.hpp"
-#include "internal/abstract-shell-view-redraw-task-iterator.hpp"
-#include "internal/abstract-view-redraw-task-iterator.hpp"
+#include "internal/abstract-shell-view-iterators.hpp"
+#include "internal/abstract-view-iterators.hpp"
 
 #include <GLES2/gl2.h>
 
@@ -130,9 +129,9 @@ void EGLWindow::OnUpdate(AbstractView *view) {
 
   if (nullptr == view) {
     surface = this->GetShellSurface();
-    RedrawTaskIterator it(this);
-    it.PushToTail();
-    it.SetContext(Context(surface, frame_canvas_));
+    Iterator it(this);
+    PushToTail(&it.redraw_task());
+    it.redraw_task().context = Context(surface, frame_canvas_);
     DBG_ASSERT(frame_canvas_);
     Damage(this,
            0, 0,
@@ -143,9 +142,9 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     surface = main_surface_;
     DBG_ASSERT(main_canvas_);
 
-    AbstractView::RedrawTaskIterator it(view);
-    it.PushToTail();
-    it.SetContext(Context(surface, main_canvas_));
+    AbstractView::Iterator it(view);
+    PushToTail(&it.redraw_task());
+    it.redraw_task().context = Context(surface, main_canvas_);
     Damage(view,
            view->GetX() + surface->margin().left,
            view->GetY() + surface->margin().top,

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_ABSTRACT_SHELL_VIEW_ITERATORS_HPP
-#define SKLAND_ABSTRACT_SHELL_VIEW_ITERATORS_HPP
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_ITERATORS_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_ITERATORS_HPP_
 
 #include "abstract-shell-view-private.hpp"
 
@@ -48,6 +48,8 @@ SKLAND_NO_EXPORT class AbstractShellView::Iterator {
   }
 
   AbstractShellView *parent() const { return shell_view_->p_->parent; }
+
+  RedrawTask &redraw_task() const { return shell_view_->p_->redraw_task; }
 
  private:
 
@@ -83,6 +85,8 @@ SKLAND_NO_EXPORT class AbstractShellView::ConstIterator {
 
   const AbstractShellView *parent() const { return shell_view_->p_->parent; }
 
+  const RedrawTask &redraw_task() const { return shell_view_->p_->redraw_task; }
+
  private:
 
   const AbstractShellView *shell_view_;
@@ -91,4 +95,4 @@ SKLAND_NO_EXPORT class AbstractShellView::ConstIterator {
 
 }
 
-#endif //SKLAND_ABSTRACT_SHELL_VIEW_ITERATORS_HPP
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_ITERATORS_HPP_

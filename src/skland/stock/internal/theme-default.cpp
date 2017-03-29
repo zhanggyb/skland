@@ -27,8 +27,6 @@
 
 #include <skland/stock/theme.hpp>
 
-#include "../../gui/internal/abstract-view-redraw-task-iterator.hpp"
-
 #include "SkCanvas.h"
 //#include "SkTypeface.h"
 //#include "SkPaint.h"

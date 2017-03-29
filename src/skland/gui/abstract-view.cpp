@@ -23,7 +23,6 @@
 #include <skland/gui/abstract-layout.hpp>
 
 #include "internal/abstract-view-iterators.hpp"
-#include "internal/abstract-view-redraw-task-iterator.hpp"
 #include "internal/abstract-layout-private.hpp"
 
 namespace skland {

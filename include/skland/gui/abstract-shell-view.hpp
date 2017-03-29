@@ -49,7 +49,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   class ConstIterator;
 
   struct RedrawTask;
-  class RedrawTaskIterator;
 
   /**
    * @brief Enumeration values to indicate where the mouse
