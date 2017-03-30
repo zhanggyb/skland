@@ -37,7 +37,7 @@ void LinearLayout::OnViewRemoved(AbstractView *view) {
   // TODO:
 }
 
-void LinearLayout::OnLayout(int dirty_flag, int left, int top, int right, int bottom) const {
+void LinearLayout::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
 
 }
 

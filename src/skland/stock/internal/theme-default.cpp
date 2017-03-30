@@ -267,6 +267,10 @@ void TitleBar::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const 
 
 }
 
+void TitleBar::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
+
+}
+
 void TitleBar::OnMouseEnter(MouseEvent *event) {
   event->Ignore();
 }

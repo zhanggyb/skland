@@ -17,6 +17,7 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
 
+#include <skland/core/padding.hpp>
 #include "abstract-view-redraw-task.hpp"
 
 #include "skland/gui/anchor.hpp"
@@ -63,11 +64,14 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         dirty_flag(0),
         redraw_task(view),
         is_damaged(false),
-        inhibit_redraw(false),
+        need_redraw(true),
+        is_drawing(false),
         left_anchor_group(view, kAlignLeft),
         top_anchor_group(view, kAlignTop),
         right_anchor_group(view, kAlignRight),
         bottom_anchor_group(view, kAlignBottom),
+        need_layout(false),
+        is_layouting(false),
         layout(nullptr) {}
 
   ~Private() {}
@@ -95,6 +99,8 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   LayoutPolicy y_layout_policy;
 
+  Padding padding;
+
   /**
    * @brief Bitwise data to indicate if the position or size need to update
    *
@@ -120,13 +126,16 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    */
   RectI damaged_region;
 
-  bool inhibit_redraw;
+  bool need_redraw;
+  bool is_drawing;
 
   AnchorGroup left_anchor_group;
   AnchorGroup top_anchor_group;
   AnchorGroup right_anchor_group;
   AnchorGroup bottom_anchor_group;
 
+  bool need_layout;
+  bool is_layouting;
   AbstractLayout *layout;
 
 };

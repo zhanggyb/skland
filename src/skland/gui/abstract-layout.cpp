@@ -23,7 +23,6 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
-#include "internal/abstract-layout-private.hpp"
 #include "internal/abstract-view-iterators.hpp"
 
 //#ifdef DEBUG
@@ -35,7 +34,8 @@ namespace skland {
 
 AbstractLayout::AbstractLayout(const Padding &padding)
     : AbstractView() {
-  p_.reset(new Private(this, padding));
+  p_->padding = padding;
+  p_->need_redraw = false;
 }
 
 AbstractLayout::~AbstractLayout() {
@@ -66,33 +66,21 @@ void AbstractLayout::RemoveView(AbstractView *view) {
 }
 
 void AbstractLayout::Layout() {
-  if (p_->is_layouting) return;
-
-  p_->is_layouting = true;
-  OnLayout(0, p_->padding.left, p_->padding.top, p_->padding.right, p_->padding.bottom);
-  p_->is_layouting = false;
-}
-
-const Padding &AbstractLayout::GetPadding() const {
-  return p_->padding;
+  p_->need_layout = true;
+  Update();
 }
 
 void AbstractLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-  if (dirty_flag) Update();
-  else CancelUpdate();
+  if (dirty_flag) {
+    Layout();
+  } else {
+    p_->need_layout = false;
+    CancelUpdate();
+  }
 }
 
 void AbstractLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-  int width = static_cast<int>(new_geometry.width());
-  int height = static_cast<int>(new_geometry.height());
-
-  p_->is_layouting = true;
-  OnLayout(dirty_flag,
-           p_->padding.left,
-           p_->padding.top,
-           width - p_->padding.right,
-           height - p_->padding.bottom);
-  p_->is_layouting = false;
+  p_->need_layout = true;
 }
 
 void AbstractLayout::OnChildAdded(AbstractView *view) {

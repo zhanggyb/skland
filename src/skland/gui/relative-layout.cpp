@@ -34,7 +34,7 @@ void RelativeLayout::OnViewRemoved(AbstractView *view) {
     Update();
 }
 
-void RelativeLayout::OnLayout(int dirty_flag, int left, int top, int right, int bottom) const {
+void RelativeLayout::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
   const AnchorGroup &left_group = GetAnchorGroup(kAlignLeft);
   for (Anchor *anchor = left_group.first(); anchor; anchor = anchor->next()) {
     anchor->contrary()->group()->view()->SetLeft(left + anchor->distance());

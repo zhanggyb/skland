@@ -22,6 +22,8 @@
 #include "../core/types.hpp"
 #include "../core/size.hpp"
 #include "../core/rect.hpp"
+#include "../core/padding.hpp"
+
 #include "anchor-group.hpp"
 
 #include <memory>
@@ -237,6 +239,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @return
    */
   LayoutPolicy GetLayoutPolicyOnY() const;
+
+  const Padding &GetPadding() const;
 
   /**
    * @brief Move this view to the given position in window coordinate
@@ -473,6 +477,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * view.
    */
   virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
+
+  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
 
   /**
    * @brief Dispatch mouse enter event down to the target view

@@ -54,6 +54,10 @@ class ShmWidget : public AbstractView {
 
   }
 
+  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final {
+
+  }
+
   virtual void OnMouseEnter(MouseEvent *event) override {
     event->Accept();
   }

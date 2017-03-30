@@ -16,95 +16,32 @@
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
-#include <skland/gui/abstract-view.hpp>
-
-#include <skland/graphic/canvas.hpp>
-#include <skland/graphic/paint.hpp>
-
-#include <skland/gui/key-event.hpp>
-#include <skland/gui/mouse-event.hpp>
-
-#include <iostream>
 #include <skland/gui/push-button.hpp>
+#include <skland/gui/relative-layout.hpp>
 
 using namespace skland;
-
-class SimpleWidget : public AbstractView {
-
- public:
-
-  SimpleWidget()
-      : AbstractView(), btn_(nullptr) {
-    btn_ = new PushButton("Click me");
-    btn_->MoveTo(200, 200);
-    btn_->Resize(200, 200);
-
-    InsertChild(btn_);
-  }
-
-  virtual ~SimpleWidget() {
-//    btn_->Destroy();  // btn_ is destroyed before this destructor
-  }
-
- protected:
-
-  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
-    if (dirty_flag) Update();
-    else CancelUpdate();
-  }
-
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
-
-  }
-
-  virtual void OnMouseEnter(MouseEvent *event) override {
-    event->Accept();
-  }
-
-  virtual void OnMouseLeave() override {
-
-  }
-
-  virtual void OnMouseMove(MouseEvent *event) override {
-    event->Ignore();
-  }
-
-  virtual void OnMouseButton(MouseEvent *event) override {
-    event->Accept();
-  }
-
-  virtual void OnKeyboardKey(KeyEvent *event) override {
-    event->Ignore();
-  }
-
-  virtual void OnDraw(const Context *context) override {
-//    Paint paint;
-//    paint.SetColor(Color(0.055f, 0.125f, 0.165f, 1.f));
-
-//    canvas->DrawRectangle(x(), y(), width(), height(), paint);
-//    canvas->Flush();
-  }
-
- private:
-
-  PushButton *btn_;
-
-};
 
 int main(int argc, char *argv[]) {
   using skland::Window;
 
   Application app(argc, argv);
 
-  std::cout << sizeof(SimpleWidget) << std::endl;
+  Window win(400, 300, "Event Demo");
+  win.SetAppId("Event-Demo");
 
-  Window *win = new Window(800, 600, "Event Demo");
-  win->SetAppId("Event-Demo");
+  RelativeLayout *layout = new RelativeLayout;
+  PushButton *button = new PushButton("Test");
 
-  SimpleWidget *widget = new SimpleWidget;
-  win->SetContentView(widget);
+  layout->AddView(button);
+  button->MoveTo(200, 200);
 
-  win->Show();
+  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
+  button->AddAnchorTo(layout, skland::kAlignTop, 20);
+  button->AddAnchorTo(layout, skland::kAlignRight, 20);
+  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
+
+  win.SetContentView(layout);
+  win.Show();
 
   return app.Run();
 }

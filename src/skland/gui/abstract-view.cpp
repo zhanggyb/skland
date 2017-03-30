@@ -23,7 +23,6 @@
 #include <skland/gui/abstract-layout.hpp>
 
 #include "internal/abstract-view-iterators.hpp"
-#include "internal/abstract-layout-private.hpp"
 
 namespace skland {
 
@@ -172,7 +171,7 @@ LayoutPolicy AbstractView::GetLayoutPolicyOnY() const {
 }
 
 void AbstractView::MoveTo(int x, int y) {
-  DBG_ASSERT(!p_->inhibit_redraw);
+  DBG_ASSERT(!p_->is_drawing);
 
   if (p_->geometry.x() == x && p_->geometry.y() == y) return;
 
@@ -187,8 +186,12 @@ void AbstractView::MoveTo(int x, int y) {
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
+const Padding &AbstractView::GetPadding() const {
+  return p_->padding;
+}
+
 void AbstractView::Resize(int width, int height) {
-  DBG_ASSERT(!p_->inhibit_redraw);
+  DBG_ASSERT(!p_->is_drawing);
 
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
@@ -416,10 +419,14 @@ const AnchorGroup &AbstractView::GetAnchorGroup(Alignment align) const {
 }
 
 void AbstractView::Update() {
+  if (p_->is_drawing) return;
+
   OnUpdate(this);
 }
 
 void AbstractView::CancelUpdate() {
+  if (p_->is_drawing) return;
+
   p_->redraw_task.Unlink();
 }
 

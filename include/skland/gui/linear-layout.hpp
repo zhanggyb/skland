@@ -45,7 +45,7 @@ SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
 
   virtual void OnViewRemoved(AbstractView *view);
 
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) const final;
+  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
 
  private:
 

@@ -73,6 +73,10 @@ void Label::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rec
 
 }
 
+void Label::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
+
+}
+
 void Label::OnMouseEnter(MouseEvent *event) {
   event->Ignore();
 }

@@ -162,6 +162,10 @@ void AbstractButton::OnGeometryChange(int dirty_flag, const Rect &old_geometry, 
 
 }
 
+void AbstractButton::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
+
+}
+
 void AbstractButton::SetSensitive(bool sensitive) {
   if (sensitive) {
     Bit::Set<uint32_t>(p_->flags, Private::kSensitive);

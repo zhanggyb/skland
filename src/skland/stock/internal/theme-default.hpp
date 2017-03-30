@@ -140,6 +140,8 @@ class TitleBar final : public AbstractView {
 
   virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
 
+  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
+
   virtual void OnMouseEnter(MouseEvent *event) override;
 
   virtual void OnMouseLeave() override;

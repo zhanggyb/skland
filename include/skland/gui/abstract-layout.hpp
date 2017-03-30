@@ -19,8 +19,6 @@
 
 #include "abstract-view.hpp"
 
-#include "../core/padding.hpp"
-
 namespace skland {
 
 /**
@@ -50,8 +48,6 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   void Layout();
 
-  const Padding &GetPadding() const;
-
  protected:
 
   virtual ~AbstractLayout();
@@ -80,13 +76,11 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual void OnViewRemoved(AbstractView *view) = 0;
 
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) const = 0;
-
  private:
 
   struct Private;
 
-  std::unique_ptr<Private> p_;
+//  std::unique_ptr<Private> p_;
 
 };
 
