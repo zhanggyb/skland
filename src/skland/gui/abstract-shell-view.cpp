@@ -607,12 +607,28 @@ Surface *AbstractShellView::GetShellSurface() const {
   return p_->shell_surface;
 }
 
-void AbstractShellView::DrawShellFrame(AbstractShellFrame *window_frame, const Context *context) {
-  window_frame->OnDraw(context);
+void AbstractShellView::RecursiveUpdate() {
+  int i = 0;
+  AbstractView *view = p_->shell_frame->GetViewAt(static_cast<AbstractShellFrame::Position>(i));
+  AbstractView *first = view;
+  AbstractView *last = nullptr;
+
+  OnUpdate(nullptr);
+
+  do {
+    ++i;
+    last = view;
+    view = p_->shell_frame->GetViewAt(static_cast<AbstractShellFrame::Position>(i));
+    if (last && last != view) last->RecursiveUpdate();
+  } while (i < AbstractShellFrame::Position::kBottom);
+
+  if (view && first != view) view->RecursiveUpdate();
+
+  if (p_->client_view) p_->client_view->RecursiveUpdate();
 }
 
-void AbstractShellView::RecursiveUpdate(AbstractView *view) {
-  view->RecursiveUpdate();
+void AbstractShellView::DrawShellFrame(AbstractShellFrame *window_frame, const Context *context) {
+  window_frame->OnDraw(context);
 }
 
 void AbstractShellView::Damage(AbstractShellView *shell_view,

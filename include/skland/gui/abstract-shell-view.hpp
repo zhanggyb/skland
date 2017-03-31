@@ -210,9 +210,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   Surface *GetShellSurface() const;
 
-  static void DrawShellFrame(AbstractShellFrame *window_frame, const Context *context);
+  void RecursiveUpdate();
 
-  static void RecursiveUpdate(AbstractView *view);
+  static void DrawShellFrame(AbstractShellFrame *window_frame, const Context *context);
 
   /**
    * @brief Mark damage area of the given object

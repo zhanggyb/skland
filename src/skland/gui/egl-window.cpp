@@ -112,14 +112,7 @@ void EGLWindow::OnShown() {
                           (float) main_surface_->margin().top);
   main_canvas_->Clear();
 
-  // initialize EGL
-  OnUpdate(nullptr);
-
-  AbstractView *view = GetTitleView();
-  if (view) RecursiveUpdate(view);
-
-  view = GetClientView();
-  if (view) RecursiveUpdate(view);
+  RecursiveUpdate();
 }
 
 void EGLWindow::OnUpdate(AbstractView *view) {
@@ -207,13 +200,7 @@ void EGLWindow::OnResize(int /*old_width*/, int /*old_height*/, int new_width, i
   egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
   OnResizeEGL((int) client_rect.width(), (int) client_rect.height());
 
-  OnUpdate(nullptr);  // Update the background
-
-  AbstractView *view = GetTitleView();
-  if (view) RecursiveUpdate(view);
-
-  view = GetClientView();
-  if (view) RecursiveUpdate(view);
+  RecursiveUpdate();
 }
 
 void EGLWindow::OnDraw(const Context *context) {

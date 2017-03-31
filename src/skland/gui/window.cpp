@@ -96,10 +96,7 @@ void Window::OnShown() {
     main_canvas_->Clear();
   }
 
-  OnUpdate(nullptr);
-  AbstractView *title_view = GetTitleView();
-  if (title_view) RecursiveUpdate(title_view);
-  if (GetClientView()) RecursiveUpdate(GetClientView());
+  RecursiveUpdate();
 }
 
 void Window::OnUpdate(AbstractView *view) {
@@ -201,13 +198,7 @@ void Window::OnResize(int /*old_width*/, int /*old_height*/, int new_width, int 
     main_canvas_->Clear();
   }
 
-  OnUpdate(nullptr);  // Update the background
-
-  AbstractView *view = GetTitleView();
-  if (view) RecursiveUpdate(view);
-
-  view = GetClientView();
-  if (view) RecursiveUpdate(view);
+  RecursiveUpdate();
 }
 
 }
