@@ -41,7 +41,7 @@ class WindowFrameDark final : public WindowFrameDefault {
 
   WindowFrameDark()
       : WindowFrameDefault() {
-    TitleBar *title_bar = static_cast<TitleBar *>(this->GetTitleView());
+    TitleBar *title_bar = static_cast<TitleBar *>(this->GetViewAt(kTop));
     title_bar->SetForeground(0xFF999999);
     title_bar->close_button()->SetForeground(0xFF999999);
     title_bar->close_button()->SetBackground(0xFF444444);

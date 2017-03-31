@@ -27,14 +27,13 @@ SKLAND_NO_EXPORT struct AbstractShellFrame::Private {
   Private &operator=(const Private &) = delete;
 
   Private()
-      : shell_view(nullptr),
-        title_view(nullptr) {}
+      : shell_view(nullptr) {}
 
   ~Private() {}
 
   AbstractShellView *shell_view;
 
-  AbstractView *title_view;
+//  AbstractView *title_view;
 
 };
 

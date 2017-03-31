@@ -68,8 +68,11 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
     kResizeBottomRight = 10,
     kResizeMask = 15,
     kExterior = 16,
-    kTitleBar = 17,
-    kClientArea = 18,
+    kLeftSide = 17,
+    kTopSide = 18,
+    kRightSide = 19,
+    kBottomSide = 20,
+    kClientArea = 21,
   };
 
   enum Action {
@@ -256,6 +259,10 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   void DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, MouseTaskIterator &tail);
 
   void ClearMouseTasks();
+
+  void AttachViewsOnFrame();
+
+  void DetachViewsOnFrame();
 
   /**
    * @brief The private data

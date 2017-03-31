@@ -33,28 +33,28 @@ AbstractShellFrame::~AbstractShellFrame() {
     p_->shell_view->p_->shell_frame = nullptr;
   }
 
-  SetTitleView(nullptr);
+//  SetTitleView(nullptr);
   // TODO: update shell_view_
 }
 
-void AbstractShellFrame::SetTitleView(AbstractView *view) {
-  if (p_->title_view == view) return;
+//void AbstractShellFrame::SetTitleView(AbstractView *view) {
+//  if (p_->title_view == view) return;
+//
+//  if (p_->title_view) {
+//    p_->title_view->Destroy();
+//  }
+//
+//  p_->title_view = view;
+//  if (p_->title_view) {
+//    if (p_->shell_view) {
+//      p_->shell_view->AttachView(p_->title_view);
+//    }
+//  }
+//}
 
-  if (p_->title_view) {
-    p_->title_view->Destroy();
-  }
-
-  p_->title_view = view;
-  if (p_->title_view) {
-    if (p_->shell_view) {
-      p_->shell_view->AttachView(p_->title_view);
-    }
-  }
-}
-
-AbstractView *AbstractShellFrame::GetTitleView() const {
-  return p_->title_view;
-}
+//AbstractView *AbstractShellFrame::GetTitleView() const {
+//  return p_->title_view;
+//}
 
 AbstractShellView *AbstractShellFrame::GetShellView() const {
   return p_->shell_view;

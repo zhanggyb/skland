@@ -53,8 +53,7 @@ SKLAND_EXPORT class AbstractShellFrame : public Trackable {
   /**
    * @brief Enumeration value to indicate where to show title view
    */
-  enum TitlePosition {
-    kNone,
+  enum Position {
     kLeft,
     kTop,
     kRight,
@@ -65,11 +64,22 @@ SKLAND_EXPORT class AbstractShellFrame : public Trackable {
 
   virtual ~AbstractShellFrame();
 
-  void SetTitleView(AbstractView *view);
+//  void SetTitleView(AbstractView *view);
 
   virtual Rect GetClientGeometry(int width, int height) const = 0;
 
-  AbstractView *GetTitleView() const;
+  /**
+   * @brief Get the view at the given position
+   * @param pos
+   * @return
+   *   - nullptr: No view at this position
+   *   - A view object: the view at this position
+   *
+   * @note Is reasonable to return the same view object on 2 connected sides (e.g. a button at the top-left corner)
+   */
+  virtual AbstractView *GetViewAt(Position pos) const = 0;
+
+//  AbstractView *GetTitleView() const;
 
   SignalRef<int> action() { return action_; }
 
