@@ -323,11 +323,11 @@ WindowFrameDefault::WindowFrameDefault()
       title_bar_position_(kTop),
       title_bar_(nullptr) {
   title_bar_ = new TitleBar;
-//  SetTitleView(title_bar_);
+  SetTitleView(title_bar_);
 }
 
 WindowFrameDefault::~WindowFrameDefault() {
-  title_bar_->Destroy();
+
 }
 
 Rect WindowFrameDefault::GetClientGeometry(int width, int height) const {
@@ -358,16 +358,6 @@ Rect WindowFrameDefault::GetClientGeometry(int width, int height) const {
   }
 
   return Rect::FromXYWH(x, y, w, h);
-}
-
-AbstractView *WindowFrameDefault::GetViewAt(Position pos) const {
-  switch (pos) {
-    case kLeft:return nullptr;
-    case kTop:return title_bar_;
-    case kRight:return nullptr;
-    case kBottom:return nullptr;
-    default:return nullptr;
-  }
 }
 
 void WindowFrameDefault::OnCloseButtonClicked(SLOT /* slot */) {
@@ -473,7 +463,7 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
 
   if (location == AbstractShellView::kInterior &&
       y < Theme::shadow_margin().top + title_bar_size_)
-    location = AbstractShellView::kTopSide;
+    location = AbstractShellView::kTitleBar;
   else if (location == AbstractShellView::kInterior)
     location = AbstractShellView::kClientArea;
 

@@ -66,18 +66,9 @@ SKLAND_EXPORT class AbstractShellFrame : public Trackable {
 
   virtual Rect GetClientGeometry(int width, int height) const = 0;
 
-  /**
-   * @brief Get the view at the given position
-   * @param pos
-   * @return
-   *   - nullptr: No view at this position
-   *   - A view object: the view at this position
-   *
-   * @note Is reasonable to return the same view object on 2 connected sides (e.g. a button at the top-left corner)
-   */
-  virtual AbstractView *GetViewAt(Position pos) const = 0;
+  void SetTitleView(AbstractView *view);
 
-//  AbstractView *GetTitleView() const;
+  AbstractView *GetTitleView() const;
 
   SignalRef<int> action() { return action_; }
 

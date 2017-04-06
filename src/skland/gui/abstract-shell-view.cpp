@@ -107,7 +107,9 @@ void AbstractShellView::SetShellFrame(AbstractShellFrame *shell_frame) {
     return;
 
   if (p_->shell_frame) {
-    DetachViewsOnFrame();
+    if (p_->shell_frame->p_->title_view) {
+      DetachView(p_->shell_frame->p_->title_view);
+    }
     p_->shell_frame->p_->shell_view = nullptr;
     delete p_->shell_frame; // This disconnect all action signals from the shell frame
   }
@@ -116,10 +118,11 @@ void AbstractShellView::SetShellFrame(AbstractShellFrame *shell_frame) {
   // TODO: check if there's original window using the window frame
 
   if (p_->shell_frame) {
-    AttachViewsOnFrame();
-    p_->shell_frame->action().Connect(this, &AbstractShellView::OnAction);
-
     p_->shell_frame->p_->shell_view = this;
+    if (p_->shell_frame->p_->title_view) {
+      AttachView(p_->shell_frame->p_->title_view);
+    }
+    p_->shell_frame->action().Connect(this, &AbstractShellView::OnAction);
     p_->shell_frame->OnSetup();
 //    shell_frame_->OnResize(size_.width, size_.height);
   }
@@ -129,11 +132,7 @@ void AbstractShellView::SetShellFrame(AbstractShellFrame *shell_frame) {
 
 AbstractView *AbstractShellView::GetTitleView() const {
   if (p_->shell_frame) {
-    AbstractView *view;
-    for (int i = 0; i <= AbstractShellFrame::Position::kBottom; i++) {
-      view = p_->shell_frame->GetViewAt(static_cast<AbstractShellFrame::Position>(i));
-      if (view) return view;
-    }
+    return p_->shell_frame->GetTitleView();
   }
 
   return nullptr;
@@ -306,9 +305,7 @@ Rect AbstractShellView::GetClientGeometry(int width, int height) const {
 }
 
 void AbstractShellView::OnMouseEnter(MouseEvent *event) {
-  if (nullptr == p_->shell_frame) {
-    return;
-  }
+  if (nullptr == p_->shell_frame) return;
 
   AbstractView *view = nullptr;
   int location = p_->shell_frame->GetMouseLocation(event);
@@ -346,20 +343,8 @@ void AbstractShellView::OnMouseEnter(MouseEvent *event) {
       event->SetCursor(Display::cursor(kCursorBottomRight));
       break;
     }
-    case kLeftSide: {
-      view = p_->shell_frame->GetViewAt(AbstractShellFrame::kLeft);
-      break;
-    }
-    case kTopSide: {
-      view = p_->shell_frame->GetViewAt(AbstractShellFrame::kTop);
-      break;
-    }
-    case kRightSide: {
-      view = p_->shell_frame->GetViewAt(AbstractShellFrame::kRight);
-      break;
-    }
-    case kBottomSide: {
-      view = p_->shell_frame->GetViewAt(AbstractShellFrame::kBottom);
+    case kTitleBar: {
+      view = p_->shell_frame->p_->title_view;
       break;
     }
     case kClientArea: {
@@ -442,24 +427,9 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
       event->SetCursor(Display::cursor(kCursorBottomRight));
       break;
     }
-    case kLeftSide: {
+    case kTitleBar: {
       event->SetCursor(Display::cursor(kCursorLeftPtr));
-      view = p_->shell_frame->GetViewAt(AbstractShellFrame::kLeft);
-      break;
-    }
-    case kTopSide: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
-      view = p_->shell_frame->GetViewAt(AbstractShellFrame::kTop);
-      break;
-    }
-    case kRightSide: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
-      view = p_->shell_frame->GetViewAt(AbstractShellFrame::kRight);
-      break;
-    }
-    case kBottomSide: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
-      view = p_->shell_frame->GetViewAt(AbstractShellFrame::kBottom);
+      view = p_->shell_frame->p_->title_view;
       break;
     }
     case kClientArea: {
@@ -527,7 +497,7 @@ void AbstractShellView::OnMouseButton(MouseEvent *event) {
     if (p_->shell_frame) {
       int location = p_->shell_frame->GetMouseLocation(event);
 
-      if (location == kTopSide && (nullptr == MouseTaskIterator(this).next())) {
+      if (location == kTitleBar && (nullptr == MouseTaskIterator(this).next())) {
         MoveWithMouse(event);
         event->Ignore();
         return;
@@ -608,23 +578,13 @@ Surface *AbstractShellView::GetShellSurface() const {
 }
 
 void AbstractShellView::RecursiveUpdate() {
-  int i = 0;
-  AbstractView *view = p_->shell_frame->GetViewAt(static_cast<AbstractShellFrame::Position>(i));
-  AbstractView *first = view;
-  AbstractView *last = nullptr;
-
   OnUpdate(nullptr);
 
-  do {
-    ++i;
-    last = view;
-    view = p_->shell_frame->GetViewAt(static_cast<AbstractShellFrame::Position>(i));
-    if (last && last != view) last->RecursiveUpdate();
-  } while (i < AbstractShellFrame::Position::kBottom);
+  AbstractView *view = p_->shell_frame->p_->title_view;
+  if (view) view->RecursiveUpdate();
 
-  if (view && first != view) view->RecursiveUpdate();
-
-  if (p_->client_view) p_->client_view->RecursiveUpdate();
+  view = p_->client_view;
+  if (view) view->RecursiveUpdate();
 }
 
 void AbstractShellView::DrawShellFrame(AbstractShellFrame *window_frame, const Context *context) {
@@ -797,22 +757,6 @@ void AbstractShellView::ClearMouseTasks() {
     ++it;
     task->Unlink();
     static_cast<AbstractView *>(task->event_handler)->OnMouseLeave();
-  }
-}
-
-void AbstractShellView::AttachViewsOnFrame() {
-  AbstractView *view = nullptr;
-  for (int i = 0; i <= AbstractShellFrame::Position::kBottom; i++) {
-    view = p_->shell_frame->GetViewAt(static_cast<AbstractShellFrame::Position>(i));
-    if (view) AttachView(view);
-  }
-}
-
-void AbstractShellView::DetachViewsOnFrame() {
-  AbstractView *view = nullptr;
-  for (int i = 0; i <= AbstractShellFrame::Position::kBottom; i++) {
-    view = p_->shell_frame->GetViewAt(static_cast<AbstractShellFrame::Position>(i));
-    if (view) DetachView(view);
   }
 }
 
