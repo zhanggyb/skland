@@ -46,10 +46,9 @@ class EGLWindow : public AbstractShellView {
 
  public:
 
-  EGLWindow(const char *title, AbstractShellFrame *frame = Theme::CreateWindowFrame());
+  EGLWindow(const char *title);
 
-  EGLWindow(int width, int height, const char *title,
-            AbstractShellFrame *frame = Theme::CreateWindowFrame());
+  EGLWindow(int width, int height, const char *title);
 
   virtual ~EGLWindow();
 

@@ -24,6 +24,7 @@
 #include <skland/gui/abstract-shell-frame.hpp>
 #include <skland/gui/toplevel-shell-surface.hpp>
 #include <skland/gui/sub-surface.hpp>
+#include <skland/gui/title-bar.hpp>
 
 #include <skland/graphic/canvas.hpp>
 
@@ -31,40 +32,68 @@
 #include "internal/abstract-shell-view-iterators.hpp"
 #include "internal/abstract-view-iterators.hpp"
 
+#include <skland/graphic/canvas.hpp>
+#include <skland/graphic/paint.hpp>
+#include <skland/graphic/path.hpp>
+
+#include "SkCanvas.h"
+//#include "SkTypeface.h"
+//#include "SkPaint.h"
+#include "SkTextBox.h"
+
+#include "internal/abstract-event-handler-mouse-task-iterator.hpp"
+
 namespace skland {
 
-Window::Window(const char *title, AbstractShellFrame *frame)
-    : Window(640, 480, title, frame) {
+const Margin Window::kResizingMargin(5, 5, 5, 5);
+
+Window::Window(const char *title)
+    : Window(640, 480, title) {
 }
 
-Window::Window(int width, int height, const char *title, AbstractShellFrame *frame)
-    : AbstractShellView(width, height, title, nullptr, frame),
-      main_surface_(nullptr) {
-  if (frame) {
-    Surface *parent = GetShellSurface();
-    main_surface_ = SubSurface::Create(parent, this, Theme::shadow_margin());
-    DBG_ASSERT(main_surface_->parent() == parent);
-    DBG_ASSERT(main_surface_->below() == parent);
-    wayland::Region empty_region;
-    empty_region.Setup(Display::Registry().wl_compositor());
-    main_surface_->SetInputRegion(empty_region);
-  }
+Window::Window(int width, int height, const char *title)
+    : AbstractShellView(width, height, title, nullptr),
+      main_surface_(nullptr), title_bar_(nullptr), content_view_(nullptr) {
+  Surface *parent = GetShellSurface();
+  main_surface_ = SubSurface::Create(parent, this, Theme::shadow_margin());
+  DBG_ASSERT(main_surface_->parent() == parent);
+  DBG_ASSERT(main_surface_->below() == parent);
+  wayland::Region empty_region;
+  empty_region.Setup(Display::Registry().wl_compositor());
+  main_surface_->SetInputRegion(empty_region);
 }
 
 Window::~Window() {
+  if (content_view_) content_view_->Destroy();
+  if (title_bar_) title_bar_->Destroy();
+
   delete main_surface_;
 }
 
 void Window::SetContentView(AbstractView *view) {
-  SetClientView(view);
+  if (content_view_ == view) return;
+
+  if (content_view_) {
+    DetachView(content_view_);
+    content_view_->destroyed().DisconnectAll(this, &Window::OnContentViewDestroyed);
+    content_view_->Destroy();
+  }
+
+  content_view_ = view;
+
+  if (content_view_) {
+    AttachView(content_view_);
+    content_view_->destroyed().Connect(this, &Window::OnContentViewDestroyed);
+    SetContentViewGeometry();
+  }
 }
 
 void Window::OnShown() {
   Surface *shell_surface = this->GetShellSurface();
 
   // Create buffer:
-  int width = GetSize().width;
-  int height = GetSize().height;
+  int width = GetWidth();
+  int height = GetHeight();
   width += shell_surface->margin().lr();
   height += shell_surface->margin().tb();
 
@@ -112,8 +141,8 @@ void Window::OnUpdate(AbstractView *view) {
     DBG_ASSERT(frame_canvas_);
     Damage(this,
            0, 0,
-           GetSize().width + surface->margin().lr(),
-           GetSize().height + surface->margin().tb());
+           GetWidth() + surface->margin().lr(),
+           GetHeight() + surface->margin().tb());
     surface->Commit();
   } else {
     std::shared_ptr<Canvas> canvas;
@@ -143,13 +172,6 @@ Surface *Window::GetSurface(const AbstractView *view) const {
     return GetShellSurface();
 
   return nullptr != main_surface_ ? main_surface_ : GetShellSurface();
-}
-
-void Window::OnKeyboardKey(KeyEvent *event) {
-  if (event->key() == kKey_ESC) {
-    Application::Exit();
-  }
-  event->Accept();
 }
 
 void Window::OnResize(int /*old_width*/, int /*old_height*/, int new_width, int new_height) {
@@ -199,6 +221,356 @@ void Window::OnResize(int /*old_width*/, int /*old_height*/, int new_width, int 
   }
 
   RecursiveUpdate();
+}
+
+void Window::OnMouseEnter(MouseEvent *event) {
+  AbstractView *view = nullptr;
+  int location = GetMouseLocation(event);
+  switch (location) {
+    case kResizeTop: {
+      event->SetCursor(Display::cursor(kCursorTop));
+      break;
+    }
+    case kResizeBottom: {
+      event->SetCursor(Display::cursor(kCursorBottom));
+      break;
+    }
+    case kResizeLeft: {
+      event->SetCursor(Display::cursor(kCursorLeft));
+      break;
+    }
+    case kResizeRight: {
+      event->SetCursor(Display::cursor(kCursorRight));
+      break;
+    }
+    case kResizeTopLeft: {
+      event->SetCursor(Display::cursor(kCursorTopLeft));
+      break;
+    }
+    case kResizeTopRight: {
+      event->SetCursor(Display::cursor(kCursorTopRight));
+      break;
+    }
+    case kResizeBottomLeft: {
+      event->SetCursor(Display::cursor(kCursorBottomLeft));
+      break;
+    }
+    case kResizeBottomRight: {
+      event->SetCursor(Display::cursor(kCursorBottomRight));
+      break;
+    }
+    case kTitleBar: {
+//      view = p_->shell_frame->p_->title_view;
+      break;
+    }
+    case kClientArea: {
+      view = content_view_;
+      break;
+    }
+    default: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      break;
+    }
+  }
+
+  if (view) DispatchMouseEnterEvent(view, event);
+}
+
+void Window::OnMouseLeave() {
+  DispatchMouseLeaveEvent();
+}
+
+void Window::OnMouseMove(MouseEvent *event) {
+  AbstractView *view = nullptr;
+  switch (GetMouseLocation(event)) {
+    case kResizeTop: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorTop));
+      break;
+    }
+    case kResizeBottom: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorBottom));
+      break;
+    }
+    case kResizeLeft: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorLeft));
+      break;
+    }
+    case kResizeRight: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorRight));
+      break;
+    }
+    case kResizeTopLeft: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorTopLeft));
+      break;
+    }
+    case kResizeTopRight: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorTopRight));
+      break;
+    }
+    case kResizeBottomLeft: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorBottomLeft));
+      break;
+    }
+    case kResizeBottomRight: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorBottomRight));
+      break;
+    }
+    case kTitleBar: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      view = title_bar_;
+      break;
+    }
+    case kClientArea: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      view = content_view_;
+      break;
+    }
+    default: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      break;
+    }
+  }
+
+  if (view) DispatchMouseEnterEvent(view, event);
+
+  // Now dispatch mouse move event:
+//      task = static_cast<ViewTask *>(handler->p_->mouse_motion_task.next());
+//      p_->mouse_event->response_ = InputEvent::kUnknown;
+//      while (task) {
+//        task->view->OnMouseMove(p_->mouse_event);
+//        if (!p_->mouse_event->IsAccepted()) break;
+//        task = static_cast<ViewTask *>(task->next());
+//      }
+}
+
+void Window::OnMouseButton(MouseEvent *event) {
+  if ((event->GetButton() == MouseButton::kLeft) &&
+      (event->GetState() == MouseButtonState::kPressed)) {
+
+    int location = GetMouseLocation(event);
+
+    if (location == kTitleBar && (nullptr == MouseTaskIterator(this).next())) {
+      MoveWithMouse(event);
+      event->Ignore();
+      return;
+    }
+
+    if (location < kResizeMask) {
+      ResizeWithMouse(event, (uint32_t) location);
+      event->Ignore();
+      return;
+    }
+  }
+
+  DispatchMouseButtonEvent(event);
+}
+
+void Window::OnKeyboardKey(KeyEvent *event) {
+  if (event->key() == kKey_ESC) {
+    Application::Exit();
+  }
+  event->Accept();
+}
+
+void Window::OnDraw(const Context *context) {
+  std::shared_ptr<Canvas> canvas = context->canvas();
+  canvas->Clear();
+
+  Path path;
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
+
+  // Drop shadow:
+  if ((!IsMaximized()) || (!IsFullscreen())) {
+    float radii[] = {
+        7.f, 7.f, // top-left
+        7.f, 7.f, // top-right
+        4.f, 4.f, // bottom-right
+        4.f, 4.f  // bottom-left
+    };
+    path.AddRoundRect(geometry, radii);
+    canvas->Save();
+    canvas->ClipPath(path, kClipDifference, true);
+    DrawShadow(canvas.get());
+    canvas->Restore();
+  } else {
+    path.AddRect(geometry);
+  }
+
+  // Fill color:
+  Paint paint;
+  paint.SetAntiAlias(true);
+  paint.SetColor(0xEFF0F0F0);
+  canvas->DrawPath(path, paint);
+
+  // Draw the client area:
+//  paint.SetColor(0xEFE0E0E0);
+//  canvas->Save();
+//  canvas->ClipPath(path, kClipIntersect, true);
+//  canvas->DrawRect(GetClientGeometry(GetWidth(), GetHeight()), paint);
+//  canvas->Restore();
+
+  canvas->Flush();
+}
+
+void Window::OnFocus(bool) {
+  OnUpdate(nullptr);
+}
+
+void Window::RecursiveUpdate() {
+  OnUpdate(nullptr);
+
+  if (title_bar_) AbstractShellView::RecursiveUpdate(title_bar_);
+  if (content_view_) AbstractShellView::RecursiveUpdate(content_view_);
+}
+
+int Window::GetMouseLocation(const MouseEvent *event) const {
+  int vlocation, hlocation, location;
+  int x = static_cast<int>(event->GetSurfaceXY().x),
+      y = static_cast<int>(event->GetSurfaceXY().y);
+
+  // TODO: maximized or frameless
+
+  if (x < (Theme::shadow_margin().left - kResizingMargin.left))
+    hlocation = AbstractShellView::kExterior;
+  else if (x < Theme::shadow_margin().left + kResizingMargin.left)
+    hlocation = AbstractShellView::kResizeLeft;
+  else if (x < Theme::shadow_margin().left + GetWidth() - kResizingMargin.right)
+    hlocation = AbstractShellView::kInterior;
+  else if (x < Theme::shadow_margin().left + GetWidth() + kResizingMargin.right)
+    hlocation = AbstractShellView::kResizeRight;
+  else
+    hlocation = AbstractShellView::kExterior;
+
+  if (y < (Theme::shadow_margin().top - kResizingMargin.top))
+    vlocation = AbstractShellView::kExterior;
+  else if (y < Theme::shadow_margin().top + kResizingMargin.top)
+    vlocation = AbstractShellView::kResizeTop;
+  else if (y < Theme::shadow_margin().top + GetHeight() - kResizingMargin.bottom)
+    vlocation = AbstractShellView::kInterior;
+  else if (y < Theme::shadow_margin().top + GetHeight() + kResizingMargin.bottom)
+    vlocation = AbstractShellView::kResizeBottom;
+  else
+    vlocation = AbstractShellView::kExterior;
+
+  location = vlocation | hlocation;
+  if (location & AbstractShellView::kExterior)
+    location = AbstractShellView::kExterior;
+
+  if (location == AbstractShellView::kInterior &&
+      y < Theme::shadow_margin().top + 22 /* title_bar_size_ */)
+    location = AbstractShellView::kTitleBar;
+  else if (location == AbstractShellView::kInterior)
+    location = AbstractShellView::kClientArea;
+
+  return location;
+}
+
+void Window::DrawShadow(Canvas *canvas) {
+  float rad = Theme::shadow_radius() - 1.f; // The spread radius
+  float offset_x = Theme::shadow_offset_x();
+  float offset_y = Theme::shadow_offset_y();
+
+  if (!IsFocused()) {
+    rad = (int) rad / 3;
+    offset_x = (int) offset_x / 3;
+    offset_y = (int) offset_y / 3;
+  }
+
+  // shadow map
+  SkCanvas *c = canvas->GetSkCanvas();
+  sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::shadow_pixmap(), nullptr, nullptr);
+
+  // top-left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 0,
+                                    2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(-rad + offset_x, -rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // top
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
+                                    250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
+                                    GetWidth() - 2 * rad, 2 * rad),
+                   nullptr);
+
+  // top-right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
+                                    250, 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, -rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
+                                    2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
+                                    2 * rad, GetHeight() - 2 * rad),
+                   nullptr);
+
+  // bottom-left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
+                                    2 * Theme::shadow_radius(), 250),
+                   SkRect::MakeXYWH(-rad + offset_x, GetHeight() - rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // bottom
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
+                                    250 - 2 * Theme::shadow_radius(), 250),
+                   SkRect::MakeXYWH(rad + offset_x, GetHeight() - rad + offset_y,
+                                    GetWidth() - 2 * rad, 2 * rad),
+                   nullptr);
+
+  // bottom-right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
+                                    250, 250),
+                   SkRect::MakeXYWH(GetWidth() - rad + offset_x,
+                                    GetHeight() - rad + offset_y,
+                                    2 * rad,
+                                    2 * rad),
+                   nullptr);
+
+  // right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
+                                    250, 250 - 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, rad + offset_y,
+                                    2 * rad, GetHeight() - 2 * rad),
+                   nullptr);
+}
+
+void Window::OnContentViewDestroyed(AbstractView *view, SLOT slot) {
+  DBG_ASSERT(view == content_view_);
+  content_view_ = nullptr;
+}
+
+void Window::SetContentViewGeometry() {
+  int x = 0;
+  int y = 0;
+  int w = GetWidth();
+  int h = GetHeight();
+  if (title_bar_) {
+    y += title_bar_->GetHeight();
+    h -= title_bar_->GetHeight();
+  }
+  content_view_->MoveTo(x, y);
+  content_view_->Resize(w, h);
 }
 
 }

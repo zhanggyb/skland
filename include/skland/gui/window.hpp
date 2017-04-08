@@ -28,6 +28,7 @@ namespace skland {
 class AbstractWidget;
 class Surface;
 class Canvas;
+class TitleBar;
 
 /**
  * @ingroup gui
@@ -42,10 +43,9 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
  public:
 
-  Window(const char *title, AbstractShellFrame *frame = Theme::CreateWindowFrame());
+  Window(const char *title);
 
-  Window(int width, int height, const char *title,
-         AbstractShellFrame *frame = Theme::CreateWindowFrame());
+  Window(int width, int height, const char *title);
 
   virtual ~Window();
 
@@ -59,11 +59,35 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  virtual void OnKeyboardKey(KeyEvent *event) final;
-
   virtual void OnResize(int old_width, int old_height, int new_width, int new_height) final;
 
+  virtual void OnMouseEnter(MouseEvent *event) override;
+
+  virtual void OnMouseLeave() override;
+
+  virtual void OnMouseMove(MouseEvent *event) override;
+
+  virtual void OnMouseButton(MouseEvent *event) override;
+
+  virtual void OnKeyboardKey(KeyEvent *event) override;
+
+  virtual void OnDraw(const Context *context) override;
+
+  virtual void OnFocus(bool);
+
+  virtual void RecursiveUpdate() override;
+
  private:
+
+  virtual int GetMouseLocation(const MouseEvent *event) const;
+
+  void DrawShadow(Canvas *canvas);
+
+  void OnContentViewDestroyed(AbstractView *view, __SLOT__);
+
+  void SetContentViewGeometry();
+
+  static const Margin kResizingMargin;
 
   Surface *main_surface_;
 
@@ -76,6 +100,9 @@ SKLAND_EXPORT class Window : public AbstractShellView {
   /* Properties for main surface, JUST experimental */
   Buffer main_buffer_;
   std::shared_ptr<Canvas> main_canvas_;
+
+  TitleBar *title_bar_;
+  AbstractView *content_view_;
 
 };
 

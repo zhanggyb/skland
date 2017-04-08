@@ -87,8 +87,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    * @param frame The frame used to show the background and title bar
    */
   AbstractShellView(const char *title,
-                    AbstractShellView *parent = nullptr,
-                    AbstractShellFrame *frame = nullptr);
+                    AbstractShellView *parent = nullptr);
 
   /**
    * @brief Constructor
@@ -101,8 +100,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   AbstractShellView(int width,
                     int height,
                     const char *title,
-                    AbstractShellView *parent = nullptr,
-                    AbstractShellFrame *frame = nullptr);
+                    AbstractShellView *parent = nullptr);
 
   /**
    * @brief Destructor
@@ -122,8 +120,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    * @param app_id
    */
   void SetAppId(const char *app_id);
-
-  void SetShellFrame(AbstractShellFrame *shell_frame);
 
   void Show();
 
@@ -155,19 +151,25 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   bool IsShown() const;
 
-  int GetMouseLocation(const MouseEvent *event) const;
+//  Rect GetClientGeometry(int width, int height) const;
 
-  Rect GetClientGeometry(int width, int height) const;
+  int GetWidth() const;
 
-  const Size &GetSize() const;
+  int GetHeight() const;
 
  protected:
 
-  AbstractView *GetTitleView() const;
+  /**
+ * @brief Attach a given view to this shell view
+ * @param view
+ */
+  void AttachView(AbstractView *view);
 
-  void SetClientView(AbstractView *view);
-
-  AbstractView *GetClientView() const;
+  /**
+   * @brief Detach the view from this shell view
+   * @param view
+   */
+  void DetachView(AbstractView *view);
 
   virtual void OnShown() = 0;
 
@@ -203,11 +205,15 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void ResizeWithMouse(MouseEvent *event, uint32_t edges) const;
 
-  AbstractShellFrame *GetShellFrame() const;
-
   Surface *GetShellSurface() const;
 
-  void RecursiveUpdate();
+  virtual void RecursiveUpdate();
+
+  void DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event);
+
+  void DispatchMouseLeaveEvent();
+
+  void DispatchMouseButtonEvent(MouseEvent *event);
 
   static void DrawShellFrame(AbstractShellFrame *window_frame, const Context *context);
 
@@ -225,6 +231,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    */
   static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
 
+  static void RecursiveUpdate(AbstractView* view);
+
  private:
 
   struct Private;
@@ -235,27 +243,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void OnXdgToplevelClose();
 
-  void OnAction(int action, __SLOT__);
-
-  void OnClientViewDestroyed(AbstractView *view, __SLOT__);
-
-  /**
- * @brief Attach a given view to this shell view
- * @param view
- */
-  void AttachView(AbstractView *view);
-
-  /**
-   * @brief Detach the view from this shell view
-   * @param view
-   */
-  void DetachView(AbstractView *view);
-
-  void SetContentViewGeometry();
-
   void DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, MouseTaskIterator &tail);
-
-  void ClearMouseTasks();
 
   /**
    * @brief The private data

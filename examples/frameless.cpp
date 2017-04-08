@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 
   Application app(argc, argv);
 
-  Window *win = new Window(400, 360, "Frameless Window", nullptr);
+  Window *win = new Window(400, 360, "Frameless Window");
   win->SetAppId("Frameless-Demo");
 
   MainWidget *widget = new MainWidget;

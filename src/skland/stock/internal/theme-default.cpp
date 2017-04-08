@@ -392,8 +392,8 @@ void WindowFrameDefault::OnDraw(const Context *context) {
 
   Path path;
   Rect geometry = Rect::FromXYWH(0.f, 0.f,
-                                 shell_view->GetSize().width,
-                                 shell_view->GetSize().height);
+                                 shell_view->GetWidth(),
+                                 shell_view->GetHeight());
 
   // Drop shadow:
   if ((!shell_view->IsMaximized()) || (!shell_view->IsFullscreen())) {
@@ -422,7 +422,7 @@ void WindowFrameDefault::OnDraw(const Context *context) {
   paint.SetColor(0xEFE0E0E0);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(GetShellView()->GetSize().width, GetShellView()->GetSize().height), paint);
+  canvas->DrawRect(GetClientGeometry(GetShellView()->GetWidth(), GetShellView()->GetHeight()), paint);
   canvas->Restore();
 
   canvas->Flush();
@@ -439,9 +439,9 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     hlocation = AbstractShellView::kExterior;
   else if (x < Theme::shadow_margin().left + kResizingMargin.left)
     hlocation = AbstractShellView::kResizeLeft;
-  else if (x < Theme::shadow_margin().left + GetShellView()->GetSize().width - kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + GetShellView()->GetWidth() - kResizingMargin.right)
     hlocation = AbstractShellView::kInterior;
-  else if (x < Theme::shadow_margin().left + GetShellView()->GetSize().width + kResizingMargin.right)
+  else if (x < Theme::shadow_margin().left + GetShellView()->GetWidth() + kResizingMargin.right)
     hlocation = AbstractShellView::kResizeRight;
   else
     hlocation = AbstractShellView::kExterior;
@@ -450,9 +450,9 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
     vlocation = AbstractShellView::kExterior;
   else if (y < Theme::shadow_margin().top + kResizingMargin.top)
     vlocation = AbstractShellView::kResizeTop;
-  else if (y < Theme::shadow_margin().top + GetShellView()->GetSize().height - kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + GetShellView()->GetHeight() - kResizingMargin.bottom)
     vlocation = AbstractShellView::kInterior;
-  else if (y < Theme::shadow_margin().top + GetShellView()->GetSize().height + kResizingMargin.bottom)
+  else if (y < Theme::shadow_margin().top + GetShellView()->GetHeight() + kResizingMargin.bottom)
     vlocation = AbstractShellView::kResizeBottom;
   else
     vlocation = AbstractShellView::kExterior;
@@ -471,7 +471,7 @@ int WindowFrameDefault::GetMouseLocation(const MouseEvent *event) const {
 }
 
 void WindowFrameDefault::DrawShadow(Canvas *canvas) {
-  const Size &size = GetShellView()->GetSize();
+  const Size size(GetShellView()->GetWidth(), GetShellView()->GetHeight());
   float rad = Theme::shadow_radius() - 1.f; // The spread radius
   float offset_x = Theme::shadow_offset_x();
   float offset_y = Theme::shadow_offset_y();

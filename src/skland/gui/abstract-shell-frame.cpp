@@ -30,7 +30,7 @@ AbstractShellFrame::AbstractShellFrame()
 
 AbstractShellFrame::~AbstractShellFrame() {
   if (p_->shell_view) {
-    p_->shell_view->p_->shell_frame = nullptr;
+//    p_->shell_view->p_->shell_frame = nullptr;
   }
 
   SetTitleView(nullptr);

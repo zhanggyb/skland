@@ -37,13 +37,13 @@
 
 namespace skland {
 
-EGLWindow::EGLWindow(const char *title, AbstractShellFrame *frame)
-    : EGLWindow(400, 300, title, frame) {
+EGLWindow::EGLWindow(const char *title)
+    : EGLWindow(400, 300, title) {
 
 }
 
-EGLWindow::EGLWindow(int width, int height, const char *title, AbstractShellFrame *frame)
-    : AbstractShellView(width, height, title, nullptr, frame),
+EGLWindow::EGLWindow(int width, int height, const char *title)
+    : AbstractShellView(width, height, title, nullptr),
       main_surface_(nullptr),
       sub_surface_(nullptr),
       egl_surface_(nullptr),
@@ -63,13 +63,13 @@ EGLWindow::EGLWindow(int width, int height, const char *title, AbstractShellFram
   main_surface_->SetInputRegion(empty_region);
   sub_surface_->SetInputRegion(empty_region);
 
-  Rect client_rect = GetClientGeometry(width, height);
-  SubSurface::Get(sub_surface_)->SetWindowPosition((int) client_rect.l, (int) client_rect.t);
-
-  egl_surface_ = EGLSurface::Get(sub_surface_);
-  egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
-
-  frame_callback_.done().Set(this, &EGLWindow::OnFrame);
+//  Rect client_rect = GetClientGeometry(width, height);
+//  SubSurface::Get(sub_surface_)->SetWindowPosition((int) client_rect.l, (int) client_rect.t);
+//
+//  egl_surface_ = EGLSurface::Get(sub_surface_);
+//  egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
+//
+//  frame_callback_.done().Set(this, &EGLWindow::OnFrame);
 }
 
 EGLWindow::~EGLWindow() {
@@ -82,8 +82,8 @@ void EGLWindow::OnShown() {
   Surface *shell_surface = this->GetShellSurface();
 
   // Create buffer:
-  int width = GetSize().width;
-  int height = GetSize().height;
+  int width = GetWidth();
+  int height = GetHeight();
   width += shell_surface->margin().lr();
   height += shell_surface->margin().tb();
 
@@ -128,8 +128,8 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     DBG_ASSERT(frame_canvas_);
     Damage(this,
            0, 0,
-           GetSize().width + surface->margin().lr(),
-           GetSize().height + surface->margin().tb());
+           GetWidth() + surface->margin().lr(),
+           GetHeight() + surface->margin().tb());
     surface->Commit();
   } else {
     surface = main_surface_;
@@ -196,15 +196,15 @@ void EGLWindow::OnResize(int /*old_width*/, int /*old_height*/, int new_width, i
                           main_surface_->margin().top);
   main_canvas_->Clear();
 
-  Rect client_rect = GetClientGeometry(new_width, new_height);
-  egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
-  OnResizeEGL((int) client_rect.width(), (int) client_rect.height());
+//  Rect client_rect = GetClientGeometry(new_width, new_height);
+//  egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
+//  OnResizeEGL((int) client_rect.width(), (int) client_rect.height());
 
   RecursiveUpdate();
 }
 
 void EGLWindow::OnDraw(const Context *context) {
-  if (GetShellFrame()) DrawShellFrame(GetShellFrame(), context);
+//  if (GetShellFrame()) DrawShellFrame(GetShellFrame(), context);
 
   if (!animating_) {
     animating_ = true;
