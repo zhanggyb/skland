@@ -26,7 +26,10 @@
 #include <skland/gui/sub-surface.hpp>
 #include <skland/gui/title-bar.hpp>
 
-#include <skland/graphic/canvas.hpp>
+#include <skland/gui/shared-memory-pool.hpp>
+#include <skland/gui/buffer.hpp>
+
+#include <skland/stock/theme.hpp>
 
 #include "internal/display-registry.hpp"
 #include "internal/abstract-shell-view-iterators.hpp"
@@ -47,45 +50,88 @@ namespace skland {
 
 const Margin Window::kResizingMargin(5, 5, 5, 5);
 
+struct Window::Private {
+
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : main_surface_(nullptr),
+        title_bar_(nullptr),
+        content_view_(nullptr) {}
+
+  ~Private() {}
+
+  Surface *main_surface_;
+
+  /* Properties for frame surface, JUST experimental */
+  SharedMemoryPool pool_;
+
+  Buffer frame_buffer_;
+  std::shared_ptr<Canvas> frame_canvas_;
+
+  /* Properties for main surface, JUST experimental */
+  Buffer main_buffer_;
+  std::shared_ptr<Canvas> main_canvas_;
+
+  TitleBar *title_bar_;
+  AbstractView *content_view_;
+
+};
+
 Window::Window(const char *title)
     : Window(640, 480, title) {
 }
 
 Window::Window(int width, int height, const char *title)
-    : AbstractShellView(width, height, title, nullptr),
-      main_surface_(nullptr), title_bar_(nullptr), content_view_(nullptr) {
+    : AbstractShellView(width, height, title, nullptr) {
+  p_.reset(new Private);
+
+  // Create a sub surface for views:
   Surface *parent = GetShellSurface();
-  main_surface_ = SubSurface::Create(parent, this, Theme::shadow_margin());
-  DBG_ASSERT(main_surface_->parent() == parent);
-  DBG_ASSERT(main_surface_->below() == parent);
+  p_->main_surface_ = SubSurface::Create(parent, this, Theme::shadow_margin());
+  DBG_ASSERT(p_->main_surface_->parent() == parent);
+  DBG_ASSERT(p_->main_surface_->below() == parent);
   wayland::Region empty_region;
   empty_region.Setup(Display::Registry().wl_compositor());
-  main_surface_->SetInputRegion(empty_region);
+  p_->main_surface_->SetInputRegion(empty_region);
+
+  // Create a title bar:
+  p_->title_bar_ = new TitleBar;
+  AttachView(p_->title_bar_);
+  p_->title_bar_->SetTitle(title);
+  p_->title_bar_->Resize(GetWidth(), 22);
 }
 
 Window::~Window() {
-  if (content_view_) content_view_->Destroy();
-  if (title_bar_) title_bar_->Destroy();
+  if (p_->content_view_) p_->content_view_->Destroy();
+  if (p_->title_bar_) p_->title_bar_->Destroy();
 
-  delete main_surface_;
+  delete p_->main_surface_;
+}
+
+AbstractView *Window::GetTitleBar() const {
+  return p_->title_bar_;
+}
+
+AbstractView *Window::GetContentView() const {
+  return p_->content_view_;
 }
 
 void Window::SetContentView(AbstractView *view) {
-  if (content_view_ == view) return;
+  if (p_->content_view_ == view) return;
 
-  if (content_view_) {
-    DetachView(content_view_);
-    content_view_->destroyed().DisconnectAll(this, &Window::OnContentViewDestroyed);
-    content_view_->Destroy();
-  }
+  if (p_->content_view_) p_->content_view_->Destroy();
+  // p_->content_view will be set to nullptr in OnViewDetached()
 
-  content_view_ = view;
+  p_->content_view_ = view;
+  if (nullptr == p_->content_view_) return;
 
-  if (content_view_) {
-    AttachView(content_view_);
-    content_view_->destroyed().Connect(this, &Window::OnContentViewDestroyed);
-    SetContentViewGeometry();
-  }
+  AttachView(p_->content_view_);
+
+  Rect geometry = GetContentGeometry();
+  p_->content_view_->MoveTo(static_cast<int>(geometry.x()), static_cast<int>(geometry.y()));
+  p_->content_view_->Resize(static_cast<int>(geometry.width()), static_cast<int>(geometry.height()));
 }
 
 void Window::OnShown() {
@@ -98,31 +144,31 @@ void Window::OnShown() {
   height += shell_surface->margin().tb();
 
   int32_t pool_size = width * 4 * height;
-  if (main_surface_) pool_size *= 2; // double buffer for 2 surfaces
+  if (p_->main_surface_) pool_size *= 2; // double buffer for 2 surfaces
 
-  pool_.Setup(pool_size);
+  p_->pool_.Setup(pool_size);
 
-  frame_buffer_.Setup(pool_, width, height,
-                      width * 4, WL_SHM_FORMAT_ARGB8888);
-  shell_surface->Attach(&frame_buffer_);
-  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.GetData(),
-                                 frame_buffer_.GetSize().width,
-                                 frame_buffer_.GetSize().height));
-  frame_canvas_->SetOrigin((float) shell_surface->margin().left,
-                           (float) shell_surface->margin().top);
-  frame_canvas_->Clear();
+  p_->frame_buffer_.Setup(p_->pool_, width, height,
+                          width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->frame_buffer_);
+  p_->frame_canvas_.reset(new Canvas((unsigned char *) p_->frame_buffer_.GetData(),
+                                     p_->frame_buffer_.GetSize().width,
+                                     p_->frame_buffer_.GetSize().height));
+  p_->frame_canvas_->SetOrigin((float) shell_surface->margin().left,
+                               (float) shell_surface->margin().top);
+  p_->frame_canvas_->Clear();
 
-  if (main_surface_) {
-    main_buffer_.Setup(pool_, width, height,
-                       width * 4, WL_SHM_FORMAT_ARGB8888,
-                       width * 4 * height);
-    main_surface_->Attach(&main_buffer_);
-    main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.GetData(),
-                                  main_buffer_.GetSize().width,
-                                  main_buffer_.GetSize().height));
-    main_canvas_->SetOrigin((float) main_surface_->margin().left,
-                            (float) main_surface_->margin().top);
-    main_canvas_->Clear();
+  if (p_->main_surface_) {
+    p_->main_buffer_.Setup(p_->pool_, width, height,
+                           width * 4, WL_SHM_FORMAT_ARGB8888,
+                           width * 4 * height);
+    p_->main_surface_->Attach(&p_->main_buffer_);
+    p_->main_canvas_.reset(new Canvas((unsigned char *) p_->main_buffer_.GetData(),
+                                      p_->main_buffer_.GetSize().width,
+                                      p_->main_buffer_.GetSize().height));
+    p_->main_canvas_->SetOrigin((float) p_->main_surface_->margin().left,
+                                (float) p_->main_surface_->margin().top);
+    p_->main_canvas_->Clear();
   }
 
   RecursiveUpdate();
@@ -137,8 +183,8 @@ void Window::OnUpdate(AbstractView *view) {
     surface = this->GetShellSurface();
     Iterator it(this);
     PushToTail(&it.redraw_task());
-    it.redraw_task().context = Context(surface, frame_canvas_);
-    DBG_ASSERT(frame_canvas_);
+    it.redraw_task().context = Context(surface, p_->frame_canvas_);
+    DBG_ASSERT(p_->frame_canvas_);
     Damage(this,
            0, 0,
            GetWidth() + surface->margin().lr(),
@@ -146,12 +192,12 @@ void Window::OnUpdate(AbstractView *view) {
     surface->Commit();
   } else {
     std::shared_ptr<Canvas> canvas;
-    if (main_surface_) {
-      surface = main_surface_;
-      canvas = main_canvas_;
+    if (p_->main_surface_) {
+      surface = p_->main_surface_;
+      canvas = p_->main_canvas_;
     } else {
       surface = this->GetShellSurface();
-      canvas = frame_canvas_;
+      canvas = p_->frame_canvas_;
     }
 
     AbstractView::Iterator it(view);
@@ -171,7 +217,7 @@ Surface *Window::GetSurface(const AbstractView *view) const {
   if (nullptr == view)
     return GetShellSurface();
 
-  return nullptr != main_surface_ ? main_surface_ : GetShellSurface();
+  return nullptr != p_->main_surface_ ? p_->main_surface_ : GetShellSurface();
 }
 
 void Window::OnResize(int /*old_width*/, int /*old_height*/, int new_width, int new_height) {
@@ -197,27 +243,34 @@ void Window::OnResize(int /*old_width*/, int /*old_height*/, int new_width, int 
   height += shell_surface->margin().tb();
 
   int pool_size = width * 4 * height;
-  if (main_surface_) pool_size *= 2;
+  if (p_->main_surface_) pool_size *= 2;
 
-  pool_.Setup(pool_size);
+  p_->pool_.Setup(pool_size);
 
-  frame_buffer_.Setup(pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-  shell_surface->Attach(&frame_buffer_);
-  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.GetData(),
-                                 frame_buffer_.GetSize().width,
-                                 frame_buffer_.GetSize().height));
-  frame_canvas_->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
-  frame_canvas_->Clear();
+  p_->frame_buffer_.Setup(p_->pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->frame_buffer_);
+  p_->frame_canvas_.reset(new Canvas((unsigned char *) p_->frame_buffer_.GetData(),
+                                     p_->frame_buffer_.GetSize().width,
+                                     p_->frame_buffer_.GetSize().height));
+  p_->frame_canvas_->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
+  p_->frame_canvas_->Clear();
 
-  if (main_surface_) {
-    main_buffer_.Setup(pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
-    main_surface_->Attach(&main_buffer_);
-    main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.GetData(),
-                                  main_buffer_.GetSize().width,
-                                  main_buffer_.GetSize().height));
-    main_canvas_->SetOrigin(main_surface_->margin().left,
-                            main_surface_->margin().top);
-    main_canvas_->Clear();
+  if (p_->main_surface_) {
+    p_->main_buffer_.Setup(p_->pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
+    p_->main_surface_->Attach(&p_->main_buffer_);
+    p_->main_canvas_.reset(new Canvas((unsigned char *) p_->main_buffer_.GetData(),
+                                      p_->main_buffer_.GetSize().width,
+                                      p_->main_buffer_.GetSize().height));
+    p_->main_canvas_->SetOrigin(p_->main_surface_->margin().left,
+                                p_->main_surface_->margin().top);
+    p_->main_canvas_->Clear();
+  }
+
+  if (p_->title_bar_) p_->title_bar_->Resize(new_width, 22);
+  if (p_->content_view_) {
+    Rect geometry = GetContentGeometry();
+    p_->content_view_->MoveTo(static_cast<int>(geometry.x()), static_cast<int>(geometry.y()));
+    p_->content_view_->Resize(static_cast<int>(geometry.width()), static_cast<int>(geometry.height()));
   }
 
   RecursiveUpdate();
@@ -260,11 +313,11 @@ void Window::OnMouseEnter(MouseEvent *event) {
       break;
     }
     case kTitleBar: {
-//      view = p_->shell_frame->p_->title_view;
+      view = p_->title_bar_;
       break;
     }
     case kClientArea: {
-      view = content_view_;
+      view = p_->content_view_;
       break;
     }
     default: {
@@ -325,12 +378,12 @@ void Window::OnMouseMove(MouseEvent *event) {
     }
     case kTitleBar: {
       event->SetCursor(Display::cursor(kCursorLeftPtr));
-      view = title_bar_;
+      view = p_->title_bar_;
       break;
     }
     case kClientArea: {
       event->SetCursor(Display::cursor(kCursorLeftPtr));
-      view = content_view_;
+      view = p_->content_view_;
       break;
     }
     default: {
@@ -387,8 +440,8 @@ void Window::OnDraw(const Context *context) {
   Path path;
   Rect geometry = Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
 
-  // Drop shadow:
   if ((!IsMaximized()) || (!IsFullscreen())) {
+    // Drop shadow:
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right
@@ -411,11 +464,11 @@ void Window::OnDraw(const Context *context) {
   canvas->DrawPath(path, paint);
 
   // Draw the client area:
-//  paint.SetColor(0xEFE0E0E0);
-//  canvas->Save();
-//  canvas->ClipPath(path, kClipIntersect, true);
-//  canvas->DrawRect(GetClientGeometry(GetWidth(), GetHeight()), paint);
-//  canvas->Restore();
+  paint.SetColor(0xEFE0E0E0);
+  canvas->Save();
+  canvas->ClipPath(path, kClipIntersect, true);
+  canvas->DrawRect(GetContentGeometry(), paint);
+  canvas->Restore();
 
   canvas->Flush();
 }
@@ -427,8 +480,24 @@ void Window::OnFocus(bool) {
 void Window::RecursiveUpdate() {
   OnUpdate(nullptr);
 
-  if (title_bar_) AbstractShellView::RecursiveUpdate(title_bar_);
-  if (content_view_) AbstractShellView::RecursiveUpdate(content_view_);
+  if (p_->title_bar_) AbstractShellView::RecursiveUpdate(p_->title_bar_);
+  if (p_->content_view_) AbstractShellView::RecursiveUpdate(p_->content_view_);
+}
+
+void Window::OnViewAttached(AbstractView */*view*/) {
+  // Finalize this virtual method
+}
+
+void Window::OnViewDetached(AbstractView *view) {
+  if (view == p_->title_bar_) {
+    p_->title_bar_ = nullptr;
+    return;
+  }
+
+  if (view == p_->content_view_) {
+    p_->content_view_ = nullptr;
+    return;
+  }
 }
 
 int Window::GetMouseLocation(const MouseEvent *event) const {
@@ -555,22 +624,16 @@ void Window::DrawShadow(Canvas *canvas) {
                    nullptr);
 }
 
-void Window::OnContentViewDestroyed(AbstractView *view, SLOT slot) {
-  DBG_ASSERT(view == content_view_);
-  content_view_ = nullptr;
-}
-
-void Window::SetContentViewGeometry() {
+Rect Window::GetContentGeometry() const {
   int x = 0;
   int y = 0;
   int w = GetWidth();
   int h = GetHeight();
-  if (title_bar_) {
-    y += title_bar_->GetHeight();
-    h -= title_bar_->GetHeight();
+  if (p_->title_bar_) {
+    y += p_->title_bar_->GetHeight();
+    h -= p_->title_bar_->GetHeight();
   }
-  content_view_->MoveTo(x, y);
-  content_view_->Resize(w, h);
+  return Rect::FromXYWH(x, y, w, h);
 }
 
 }

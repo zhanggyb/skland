@@ -24,105 +24,20 @@
 
 namespace skland {
 
-class Canvas;
-class Label;
-
 /**
- * @ingroup stock_intern
- * @brief Close button on title bar
+ * @ingroup gui
+ * @brief The default title bar on the top of window
  */
-class CloseButton final : public AbstractButton {
-
- public:
-
-  CloseButton();
-
-  virtual ~CloseButton();
-
-  virtual Size GetPreferredSize() const;
-
-  void SetForeground(const Color &color);
-
-  void SetBackground(const Color &color);
-
- protected:
-
-  virtual void OnDraw(const Context *context);
-
- private:
-
-  static const int kButtonSize = 14;
-
-  Color foreground_;
-  Color background_;
-
-};
-
-/**
- * @ingroup stock_intern
- * @brief Maximize button on title bar
- */
-class MaximizeButton final : public AbstractButton {
-
- public:
-
-  MaximizeButton();
-
-  virtual ~MaximizeButton();
-
-  virtual Size GetPreferredSize() const;
-
-  void SetForeground(const Color &color);
-
-  void SetBackground(const Color &color);
-
- protected:
-
-  virtual void OnDraw(const Context *context);
-
- private:
-
-  static const int kButtonSize = 14;
-
-  Color foreground_;
-  Color background_;
-
-};
-
-/**
- * @ingroup stock_intern
- * @brief Minimize button on title bar
- */
-class MinimizeButton final : public AbstractButton {
-
- public:
-
-  MinimizeButton();
-
-  virtual ~MinimizeButton();
-
-  virtual Size GetPreferredSize() const;
-
-  void SetForeground(const Color &color);
-
-  void SetBackground(const Color &color);
-
- protected:
-
-  virtual void OnDraw(const Context *context);
-
- private:
-
-  static const int kButtonSize = 14;
-
-  Color foreground_;
-  Color background_;
-
-};
-
 class TitleBar final : public AbstractView {
 
  public:
+
+  enum ButtonType {
+    kButtonClose,
+    kButtonMaximize,
+    kButtonMinimize,
+    kButtonFullscreen
+  };
 
   TitleBar();
 
@@ -132,11 +47,7 @@ class TitleBar final : public AbstractView {
 
   void SetTitle(const std::string &title);
 
-  CloseButton *close_button() const { return close_button_; }
-
-  MaximizeButton *maximize_button() const { return maximize_button_; }
-
-  MinimizeButton *minimize_button() const { return minimize_button_; }
+  AbstractButton *GetButton(ButtonType button_type) const;
 
  protected:
 
@@ -160,11 +71,18 @@ class TitleBar final : public AbstractView {
 
  private:
 
+  class Button;
+  class CloseButton;
+  class MaximizeButton;
+  class MinimizeButton;
+  class FullscreenButton;
+
   static const int kButtonSpace = 5;
 
   CloseButton *close_button_;
   MaximizeButton *maximize_button_;
   MinimizeButton *minimize_button_;
+  FullscreenButton *fullscreen_button_;
 
   Font font_;
 

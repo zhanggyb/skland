@@ -305,10 +305,6 @@ void AbstractShellView::RecursiveUpdate() {
   // override in sub class
 }
 
-void AbstractShellView::DrawShellFrame(AbstractShellFrame *window_frame, const Context *context) {
-  window_frame->OnDraw(context);
-}
-
 void AbstractShellView::Damage(AbstractShellView *shell_view,
                                int surface_x, int surface_y,
                                int width, int height) {

@@ -27,7 +27,6 @@
 
 namespace skland {
 
-class AbstractShellFrame;
 class Context;
 
 /**
@@ -215,8 +214,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void DispatchMouseButtonEvent(MouseEvent *event);
 
-  static void DrawShellFrame(AbstractShellFrame *window_frame, const Context *context);
-
   /**
    * @brief Mark damage area of the given object
    *
@@ -231,7 +228,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    */
   static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
 
-  static void RecursiveUpdate(AbstractView* view);
+  static void RecursiveUpdate(AbstractView *view);
 
  private:
 

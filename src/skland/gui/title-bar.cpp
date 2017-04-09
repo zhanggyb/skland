@@ -31,31 +31,70 @@
 
 namespace skland {
 
-CloseButton::CloseButton()
+class TitleBar::Button : public AbstractButton {
+ public:
+
+  Button();
+
+  virtual ~Button();
+
+  void SetForeground(const Color &color);
+
+  void SetBackground(const Color &color);
+
+  const Color &foreground() const { return foreground_; }
+
+  const Color &background() const { return background_; }
+
+ protected:
+
+  virtual void OnDraw(const Context *context) override;
+
+ private:
+
+  static const int kButtonSize = 14;
+
+  Color foreground_;
+  Color background_;
+};
+
+TitleBar::Button::Button()
     : AbstractButton(kButtonSize, kButtonSize),
       foreground_(0xFF444444),
       background_(0xFF999999) {
 }
 
-CloseButton::~CloseButton() {
+TitleBar::Button::~Button() {
 
 }
 
-Size CloseButton::GetPreferredSize() const {
-  return Size(kButtonSize, kButtonSize);
-}
-
-void CloseButton::SetForeground(const Color &color) {
+void TitleBar::Button::SetForeground(const Color &color) {
   foreground_ = color;
   Update();
 }
 
-void CloseButton::SetBackground(const Color &color) {
+void TitleBar::Button::SetBackground(const Color &color) {
   background_ = color;
   Update();
 }
 
-void CloseButton::OnDraw(const Context *context) {
+void TitleBar::Button::OnDraw(const Context *context) {
+  // override in sub class
+}
+
+class TitleBar::CloseButton : public TitleBar::Button {
+ public:
+  CloseButton()
+      : Button() {}
+
+  virtual  ~CloseButton() {}
+
+ protected:
+
+  virtual void OnDraw(const Context *context) final;
+};
+
+void TitleBar::CloseButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
   canvas->ClipRect(GetGeometry());
@@ -68,7 +107,7 @@ void CloseButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(background_);
+      paint.SetColor(background());
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -76,12 +115,12 @@ void CloseButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(foreground_);
+    paint.SetColor(foreground());
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(foreground_);
+  paint.SetColor(foreground());
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 3.f, rect.center_y() - 3.f,
                    rect.center_x() + 3.f, rect.center_y() + 3.f,
@@ -93,31 +132,19 @@ void CloseButton::OnDraw(const Context *context) {
   canvas->Restore();
 }
 
-MaximizeButton::MaximizeButton()
-    : AbstractButton(kButtonSize, kButtonSize),
-      foreground_(0xFF444444),
-      background_(0xFF999999) {
-}
+class TitleBar::MaximizeButton : public TitleBar::Button {
+ public:
+  MaximizeButton()
+      : Button() {}
 
-MaximizeButton::~MaximizeButton() {
+  virtual  ~MaximizeButton() {}
 
-}
+ protected:
 
-void MaximizeButton::SetForeground(const Color &color) {
-  foreground_ = color;
-  Update();
-}
+  virtual void OnDraw(const Context *context) final;
+};
 
-void MaximizeButton::SetBackground(const Color &color) {
-  background_ = color;
-  Update();
-}
-
-Size MaximizeButton::GetPreferredSize() const {
-  return Size(kButtonSize, kButtonSize);
-}
-
-void MaximizeButton::OnDraw(const Context *context) {
+void TitleBar::MaximizeButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
   canvas->ClipRect(GetGeometry());
@@ -130,7 +157,7 @@ void MaximizeButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(background_);
+      paint.SetColor(background());
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -138,12 +165,12 @@ void MaximizeButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(foreground_);
+    paint.SetColor(foreground());
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(foreground_);
+  paint.SetColor(foreground());
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
@@ -155,31 +182,19 @@ void MaximizeButton::OnDraw(const Context *context) {
   canvas->Restore();
 }
 
-MinimizeButton::MinimizeButton()
-    : AbstractButton(kButtonSize, kButtonSize),
-      foreground_(0xFF444444),
-      background_(0xFF999999) {
-}
+class TitleBar::MinimizeButton : public TitleBar::Button {
+ public:
+  MinimizeButton()
+      : Button() {}
 
-MinimizeButton::~MinimizeButton() {
+  virtual  ~MinimizeButton() {}
 
-}
+ protected:
 
-Size MinimizeButton::GetPreferredSize() const {
-  return Size(kButtonSize, kButtonSize);
-}
+  virtual void OnDraw(const Context *context) final;
+};
 
-void MinimizeButton::SetForeground(const Color &color) {
-  foreground_ = color;
-  Update();
-}
-
-void MinimizeButton::SetBackground(const Color &color) {
-  background_ = color;
-  Update();
-}
-
-void MinimizeButton::OnDraw(const Context *context) {
+void TitleBar::MinimizeButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Save();
   canvas->ClipRect(GetGeometry());
@@ -192,7 +207,7 @@ void MinimizeButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(background_);
+      paint.SetColor(background());
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -200,12 +215,59 @@ void MinimizeButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(foreground_);
+    paint.SetColor(foreground());
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(foreground_);
+  paint.SetColor(foreground());
+  paint.SetStrokeWidth(1.5f);
+  canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
+                   rect.center_x() + 4.f, rect.center_y(),
+                   paint);
+
+  canvas->Restore();
+}
+
+class TitleBar::FullscreenButton : public TitleBar::Button {
+ public:
+  FullscreenButton()
+      : Button() {}
+
+  virtual  ~FullscreenButton() {}
+
+ protected:
+
+  virtual void OnDraw(const Context *context) final;
+};
+
+void TitleBar::FullscreenButton::OnDraw(const Context *context) {
+  std::shared_ptr<Canvas> canvas = context->canvas();
+  canvas->Save();
+  canvas->ClipRect(GetGeometry());
+  canvas->Clear();
+
+  const Rect &rect = GetGeometry();
+
+  Paint paint;
+  paint.SetAntiAlias(true);
+
+  if (IsHovered()) {
+    if (IsPressed()) {
+      paint.SetColor(background());
+      paint.SetStyle(Paint::Style::kStyleFill);
+      canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
+      paint.Reset();
+      paint.SetAntiAlias(true);
+    }
+
+    paint.SetStyle(Paint::Style::kStyleStroke);
+    paint.SetColor(foreground());
+    paint.SetStrokeWidth(1.f);
+    canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
+  }
+
+  paint.SetColor(foreground());
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
@@ -219,12 +281,15 @@ TitleBar::TitleBar()
       close_button_(nullptr),
       maximize_button_(nullptr),
       minimize_button_(nullptr),
+      fullscreen_button_(nullptr),
       font_(Typeface::kBold),
       foreground_(0xFF444444) {
   close_button_ = new CloseButton;
   maximize_button_ = new MaximizeButton;
   minimize_button_ = new MinimizeButton;
+  fullscreen_button_ = new FullscreenButton;
 
+  PushBackChild(fullscreen_button_);
   PushBackChild(minimize_button_);
   PushBackChild(maximize_button_);
   PushBackChild(close_button_);
@@ -244,6 +309,16 @@ void TitleBar::SetTitle(const std::string &title) {
   Update();
 }
 
+AbstractButton* TitleBar::GetButton(ButtonType button_type) const {
+  switch (button_type) {
+    case kButtonClose: return close_button_;
+    case kButtonMaximize: return maximize_button_;
+    case kButtonMinimize: return minimize_button_;
+    case kButtonFullscreen: return fullscreen_button_;
+    default: return nullptr;
+  }
+}
+
 void TitleBar::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   int new_y = (GetHeight() - close_button_->GetHeight()) / 2;
   int new_x = kButtonSpace;
@@ -254,6 +329,9 @@ void TitleBar::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, co
 
   new_x += maximize_button_->GetWidth() + kButtonSpace;
   minimize_button_->MoveTo(new_x, new_y);
+
+  new_x = GetWidth() - kButtonSpace - fullscreen_button_->GetWidth();
+  fullscreen_button_->MoveTo(new_x, new_y);
 
   RecursiveUpdate();
 }

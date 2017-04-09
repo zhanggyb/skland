@@ -41,14 +41,14 @@ class WindowFrameDark final : public WindowFrameDefault {
 
   WindowFrameDark()
       : WindowFrameDefault() {
-    TitleBar *title_bar = static_cast<TitleBar *>(this->GetTitleView());
-    title_bar->SetForeground(0xFF999999);
-    title_bar->close_button()->SetForeground(0xFF999999);
-    title_bar->close_button()->SetBackground(0xFF444444);
-    title_bar->maximize_button()->SetForeground(0xFF999999);
-    title_bar->maximize_button()->SetBackground(0xFF444444);
-    title_bar->minimize_button()->SetForeground(0xFF999999);
-    title_bar->minimize_button()->SetBackground(0xFF444444);
+//    TitleBar *title_bar = static_cast<TitleBar *>(this->GetTitleView());
+//    title_bar->SetForeground(0xFF999999);
+//    title_bar->close_button()->SetForeground(0xFF999999);
+//    title_bar->close_button()->SetBackground(0xFF444444);
+//    title_bar->maximize_button()->SetForeground(0xFF999999);
+//    title_bar->maximize_button()->SetBackground(0xFF444444);
+//    title_bar->minimize_button()->SetForeground(0xFF999999);
+//    title_bar->minimize_button()->SetBackground(0xFF444444);
   }
 
   virtual ~WindowFrameDark() {}

@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   using skland::Window;
 
   Application app(argc, argv);
-  Theme::Load("dark");
+//  Theme::Load("dark");
 
   Window *win = new Window(320, 240, "Dark Theme");
   win->SetAppId("Theme");
