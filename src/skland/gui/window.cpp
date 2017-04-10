@@ -40,9 +40,6 @@
 #include <skland/graphic/path.hpp>
 
 #include "SkCanvas.h"
-//#include "SkTypeface.h"
-//#include "SkPaint.h"
-#include "SkTextBox.h"
 
 #include "internal/abstract-event-handler-mouse-task-iterator.hpp"
 

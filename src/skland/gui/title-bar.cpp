@@ -268,10 +268,19 @@ void TitleBar::FullscreenButton::OnDraw(const Context *context) {
   }
 
   paint.SetColor(foreground());
-  paint.SetStrokeWidth(1.5f);
-  canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
-                   rect.center_x() + 4.f, rect.center_y(),
-                   paint);
+  paint.SetStyle(Paint::Style::kStyleFill);
+
+  Path path;
+  path.MoveTo(-5.f, 0.f);
+  path.RelativeLineTo(3.5f, -3.5f);
+  path.RelativeLineTo(0.f, 7.f);
+  path.Close();
+
+  canvas->Translate(rect.center_x(), rect.center_y());
+  canvas->Rotate(-45.f);
+  canvas->DrawPath(path, paint);
+  canvas->Rotate(180.f);
+  canvas->DrawPath(path, paint);
 
   canvas->Restore();
 }
@@ -309,7 +318,7 @@ void TitleBar::SetTitle(const std::string &title) {
   Update();
 }
 
-AbstractButton* TitleBar::GetButton(ButtonType button_type) const {
+AbstractButton *TitleBar::GetButton(ButtonType button_type) const {
   switch (button_type) {
     case kButtonClose: return close_button_;
     case kButtonMaximize: return maximize_button_;

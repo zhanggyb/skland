@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-#include "internal/matrix-private.hpp"
+#ifndef SKLAND_MATRIX_PRIVATE_HPP
+#define SKLAND_MATRIX_PRIVATE_HPP
+
+#include <skland/graphic/matrix.hpp>
+#include "SkMatrix.h"
 
 namespace skland {
 
-Matrix::Matrix() {
-  p_.reset(new Private);
-}
+struct Matrix::Private {
 
-Matrix::Matrix(const Matrix &other) {
-  p_.reset(new Private(*other.p_));
-}
+  Private() {}
 
-Matrix::~Matrix() {
-}
+  Private(const Private &orig)
+      : sk_matrix(orig.sk_matrix) {}
 
-Matrix &Matrix::operator=(const Matrix &other) {
-  *p_ = *other.p_;
-  return *this;
-}
+  ~Private() {}
 
-const SkMatrix *Matrix::GetSkMatrix() const {
-  return &p_->sk_matrix;
-}
+  SkMatrix sk_matrix;
+
+};
 
 }
+
+#endif //SKLAND_MATRIX_PRIVATE_HPP
