@@ -27,7 +27,6 @@
 
 #include <skland/stock/theme.hpp>
 
-#include "internal/abstract-shell-frame-private.hpp"
 #include "internal/abstract-view-private.hpp"
 #include "internal/display-registry.hpp"
 #include "internal/abstract-event-handler-mouse-task-iterator.hpp"
@@ -46,6 +45,7 @@ AbstractShellView::AbstractShellView(int width,
   p_.reset(new Private(this));
   p_->size.width = width;
   p_->size.height = height;
+  p_->last_size = p_->size;
   p_->parent = parent;
 
   if (title) p_->title = title;
@@ -110,11 +110,23 @@ void AbstractShellView::Close(SLOT) {
 }
 
 void AbstractShellView::Maximize(SLOT) {
+  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface);
+  if (nullptr == toplevel) return;
 
+  if (IsMaximized()) {
+    toplevel->UnsetMaximized();
+  } else {
+    toplevel->SetMaximized();
+  }
 }
 
 void AbstractShellView::Minimize(SLOT) {
+  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface);
+  if (nullptr == toplevel) return;
 
+  Bit::Set<int>(p_->flags, Private::kFlagMaskMinimized);
+  toplevel->SetMinimized();
+  DBG_ASSERT(IsMinimized());
 }
 
 const std::string &AbstractShellView::GetTitle() const {
@@ -122,8 +134,6 @@ const std::string &AbstractShellView::GetTitle() const {
 }
 
 Size AbstractShellView::GetMinimalSize() const {
-  if (IsFrameless()) return Size(100, 100);
-
   int w = 160, h = 120;
 //  Rect client = GetClientGeometry();
 //  switch (window_frame_->title_bar_position()) {
@@ -170,11 +180,6 @@ bool AbstractShellView::IsFocused() const {
 
 bool AbstractShellView::IsResizing() const {
   return 0 != (p_->flags & Private::kFlagMaskResizing);
-}
-
-bool AbstractShellView::IsFrameless() const {
-//  return nullptr == p_->shell_frame;
-  return false;
 }
 
 bool AbstractShellView::IsShown() const {
@@ -224,14 +229,6 @@ void AbstractShellView::DetachView(AbstractView *view) {
     view->OnDetachedFromShellView(this);
 }
 
-//Rect AbstractShellView::GetClientGeometry(int width, int height) const {
-//  if (nullptr == p_->shell_frame) {
-//    return Rect::FromXYWH(0.f, 0.f, width, height);
-//  }
-//
-//  return p_->shell_frame->GetClientGeometry(width, height);
-//}
-
 void AbstractShellView::OnMouseEnter(MouseEvent *event) {
   // override in sub class
 }
@@ -261,7 +258,6 @@ Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
 }
 
 void AbstractShellView::OnDraw(const Context *context) {
-//  if (p_->shell_frame) p_->shell_frame->OnDraw(context);
   // override in sub class
 }
 
@@ -274,9 +270,6 @@ void AbstractShellView::OnFullscreen(bool) {
 }
 
 void AbstractShellView::OnFocus(bool focus) {
-//  if (p_->shell_frame) {
-//    OnUpdate(nullptr);
-//  }
   // override in sub class
 }
 
@@ -355,26 +348,18 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
 
     width = clamp(width, min.width, max.width);
     height = clamp(height, min.height, max.height);
-    if (width == p_->size.width && height == p_->size.height)
+    if (width == p_->size.width && height == p_->size.height) {
       do_resize = false;
-  } else {
-    // Initialize
-    width = p_->size.width;
-    height = p_->size.height;
+    } else {
+      p_->size.width = width;
+      p_->size.height = height;
+    }
   }
 
   if (do_resize) {
     ShellSurface::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
-    OnResize(p_->size.width, p_->size.height, width, height);
-    p_->size.width = width;
-    p_->size.height = height;
-
-//    if (p_->shell_frame) {
-//      p_->shell_frame->OnResize(width, height);
-//    }
-//    if (p_->client_view) {
-//      SetContentViewGeometry();
-//    }
+    OnResize(p_->last_size, p_->size);
+    p_->last_size = p_->size;
 
     // surface size is changed, reset the pointer position and enter/leave widgets
     DispatchMouseLeaveEvent();
@@ -403,38 +388,6 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
 void AbstractShellView::OnXdgToplevelClose() {
   Close();
 }
-
-/*
-void AbstractShellView::OnAction(int action, SLOT slot) {
-  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface);
-
-  switch (action) {
-    case kClose: {
-      Close(slot);
-      break;
-    }
-    case kMaximize: {
-      if (IsMaximized()) {
-        toplevel->UnsetMaximized();
-      } else {
-        toplevel->SetMaximized();
-      }
-      break;
-    }
-    case kMinimize: {
-      Bit::Set<int>(p_->flags, Private::kFlagMaskMinimized);
-      toplevel->SetMinimized();
-      DBG_ASSERT(IsMinimized());
-      break;
-    }
-    case kMenu: {
-      fprintf(stderr, "menu\n");
-      break;
-    }
-    default: break;
-  }
-}
-*/
 
 void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event) {
   Point cursor = event->GetWindowXY();

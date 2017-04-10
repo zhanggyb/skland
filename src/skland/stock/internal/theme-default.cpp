@@ -82,15 +82,15 @@ Rect WindowFrameDefault::GetClientGeometry(int width, int height) const {
 }
 
 void WindowFrameDefault::OnCloseButtonClicked(SLOT /* slot */) {
-  EmitAction(AbstractShellView::kClose);
+//  EmitAction(AbstractShellView::kClose);
 }
 
 void WindowFrameDefault::OnMaximizeButtonClicked(SLOT /* slot */) {
-  EmitAction(AbstractShellView::kMaximize);
+//  EmitAction(AbstractShellView::kMaximize);
 }
 
 void WindowFrameDefault::OnMinimizeButtonClicked(SLOT /* slot */) {
-  EmitAction(AbstractShellView::kMinimize);
+//  EmitAction(AbstractShellView::kMinimize);
 }
 
 void WindowFrameDefault::OnSetup() {

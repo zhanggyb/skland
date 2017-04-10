@@ -30,10 +30,7 @@ Surface *ToplevelShellSurface::Create(AbstractEventHandler *event_handler, const
 ToplevelShellSurface *ToplevelShellSurface::Get(const Surface *surface) {
   ShellSurface *shell_surface = ShellSurface::Get(surface);
 
-  if (nullptr == shell_surface) return nullptr;
-
-  if (shell_surface->parent_)
-    return nullptr;
+  if (nullptr == shell_surface || shell_surface->parent_) return nullptr;
 
   return shell_surface->role_.toplevel_shell_surface;
 }

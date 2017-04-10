@@ -60,7 +60,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) final;
+  virtual void OnResize(const Size& old_size, const Size& new_size) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

@@ -154,9 +154,9 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   return nullptr != sub_surface_ ? sub_surface_ : GetShellSurface();
 }
 
-void EGLWindow::OnResize(int /*old_width*/, int /*old_height*/, int new_width, int new_height) {
-  int width = new_width;
-  int height = new_height;
+void EGLWindow::OnResize(const Size& old_size, const Size& new_size) {
+  int width = new_size.width;
+  int height = new_size.height;
 
   RectI input_rect(width, height);
   Surface *shell_surface = this->GetShellSurface();

@@ -71,14 +71,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
     kClientArea = 18
   };
 
-  enum Action {
-    kClose,
-    kMaximize,
-    kMinimize,
-    kMenu,
-    kLast
-  };
-
   /**
    * @brief Constructor
    * @param title A string of window title
@@ -146,11 +138,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   bool IsResizing() const;
 
-  bool IsFrameless() const;
-
   bool IsShown() const;
-
-//  Rect GetClientGeometry(int width, int height) const;
 
   int GetWidth() const;
 
@@ -172,7 +160,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnShown() = 0;
 
-  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) = 0;
+  virtual void OnResize(const Size &old_size, const Size &new_size) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

@@ -36,7 +36,8 @@ class TitleBar final : public AbstractView {
     kButtonClose,
     kButtonMaximize,
     kButtonMinimize,
-    kButtonFullscreen
+    kButtonFullscreen,
+    kButtonMenu
   };
 
   TitleBar();
