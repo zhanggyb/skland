@@ -93,7 +93,7 @@ Window::Window(int width, int height, const char *title)
   p_->main_surface->SetInputRegion(empty_region);
 
   // Create the default title bar:
-  TitleBar* titlebar = new TitleBar;
+  TitleBar *titlebar = new TitleBar;
   p_->title_bar = titlebar;
   AttachView(p_->title_bar);
 
@@ -159,25 +159,25 @@ void Window::OnShown() {
   p_->pool.Setup(pool_size);
 
   p_->frame_buffer.Setup(p_->pool, width, height,
-                          width * 4, WL_SHM_FORMAT_ARGB8888);
+                         width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
   p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer.GetData(),
-                                     p_->frame_buffer.GetSize().width,
-                                     p_->frame_buffer.GetSize().height));
+                                    p_->frame_buffer.GetSize().width,
+                                    p_->frame_buffer.GetSize().height));
   p_->frame_canvas->SetOrigin((float) shell_surface->margin().left,
-                               (float) shell_surface->margin().top);
+                              (float) shell_surface->margin().top);
   p_->frame_canvas->Clear();
 
   if (p_->main_surface) {
     p_->main_buffer.Setup(p_->pool, width, height,
-                           width * 4, WL_SHM_FORMAT_ARGB8888,
-                           width * 4 * height);
+                          width * 4, WL_SHM_FORMAT_ARGB8888,
+                          width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
     p_->main_canvas.reset(new Canvas((unsigned char *) p_->main_buffer.GetData(),
-                                      p_->main_buffer.GetSize().width,
-                                      p_->main_buffer.GetSize().height));
+                                     p_->main_buffer.GetSize().width,
+                                     p_->main_buffer.GetSize().height));
     p_->main_canvas->SetOrigin((float) p_->main_surface->margin().left,
-                                (float) p_->main_surface->margin().top);
+                               (float) p_->main_surface->margin().top);
     p_->main_canvas->Clear();
   }
 
@@ -260,8 +260,8 @@ void Window::OnResize(const Size &old_size, const Size &new_size) {
   p_->frame_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
   p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer.GetData(),
-                                     p_->frame_buffer.GetSize().width,
-                                     p_->frame_buffer.GetSize().height));
+                                    p_->frame_buffer.GetSize().width,
+                                    p_->frame_buffer.GetSize().height));
   p_->frame_canvas->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
   p_->frame_canvas->Clear();
 
@@ -269,10 +269,10 @@ void Window::OnResize(const Size &old_size, const Size &new_size) {
     p_->main_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
     p_->main_canvas.reset(new Canvas((unsigned char *) p_->main_buffer.GetData(),
-                                      p_->main_buffer.GetSize().width,
-                                      p_->main_buffer.GetSize().height));
+                                     p_->main_buffer.GetSize().width,
+                                     p_->main_buffer.GetSize().height));
     p_->main_canvas->SetOrigin(p_->main_surface->margin().left,
-                                p_->main_surface->margin().top);
+                               p_->main_surface->margin().top);
     p_->main_canvas->Clear();
   }
 
@@ -449,9 +449,9 @@ void Window::OnDraw(const Context *context) {
 
   Path path;
   Rect geometry = Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
+  bool drop_shadow = !(IsMaximized() || IsFullscreen());
 
-  if ((!IsMaximized()) || (!IsFullscreen())) {
-    // Drop shadow:
+  if (drop_shadow) {
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right
