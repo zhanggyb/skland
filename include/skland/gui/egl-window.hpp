@@ -18,13 +18,7 @@
 #define SKLAND_GUI_EGL_WINDOW_HPP_
 
 #include "abstract-shell-view.hpp"
-
-#include "../wayland/callback.hpp"
-
-#include "shared-memory-pool.hpp"
-#include "buffer.hpp"
-
-#include "../stock/theme.hpp"
+#include "../core/margin.hpp"
 
 namespace skland {
 
@@ -60,9 +54,17 @@ class EGLWindow : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnResize(const Size& old_size, const Size& new_size) final;
+  virtual void OnResize(const Size &old_size, const Size &new_size) final;
+
+  virtual void OnMouseMove(MouseEvent *event) override;
+
+  virtual void OnMouseButton(MouseEvent *event) override;
+
+  virtual void OnKeyboardKey(KeyEvent *event) override;
 
   virtual void OnDraw(const Context *context) final;
+
+  virtual void OnFocus(bool);
 
   virtual void OnInitializeEGL();
 
@@ -76,29 +78,19 @@ class EGLWindow : public AbstractShellView {
 
  private:
 
+  struct Private;
+
+  int GetMouseLocation(const MouseEvent *event) const;
+
   void OnFrame(uint32_t serial);
 
   void OnRelease();
 
-  /* Properties for frame surface, JUST experimental */
-  SharedMemoryPool pool_;
+  void DrawShadow(Canvas *canvas);
 
-  Buffer frame_buffer_;
-  std::shared_ptr<Canvas> frame_canvas_;
+  static const Margin kResizingMargin;
 
-  /* Properties for main surface, JUST experimental */
-  Buffer main_buffer_;
-  std::shared_ptr<Canvas> main_canvas_;
-
-  Surface *main_surface_;
-
-  Surface *sub_surface_;
-
-  EGLSurface *egl_surface_;
-
-  wayland::Callback frame_callback_;
-
-  bool animating_;
+  std::unique_ptr<Private> p_;
 
 };
 

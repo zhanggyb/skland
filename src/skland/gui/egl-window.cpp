@@ -25,57 +25,87 @@
 #include <skland/gui/toplevel-shell-surface.hpp>
 #include <skland/gui/sub-surface.hpp>
 #include <skland/gui/egl-surface.hpp>
-#include <skland/gui/abstract-view.hpp>
+#include <skland/gui/title-bar.hpp>
 
-#include <skland/graphic/canvas.hpp>
+#include <skland/gui/shared-memory-pool.hpp>
+#include <skland/gui/buffer.hpp>
 
 #include "internal/display-registry.hpp"
 #include "internal/abstract-shell-view-iterators.hpp"
 #include "internal/abstract-view-iterators.hpp"
+#include "internal/abstract-event-handler-mouse-task-iterator.hpp"
+
+#include <skland/graphic/canvas.hpp>
+#include <skland/graphic/paint.hpp>
+#include <skland/graphic/path.hpp>
+
+#include <skland/stock/theme.hpp>
+
+#include "SkCanvas.h"
 
 #include <GLES2/gl2.h>
 
 namespace skland {
 
+struct EGLWindow::Private {
+
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : sub_surface(nullptr),
+        egl_surface(nullptr),
+        animating(false) {}
+
+  ~Private() {}
+
+  /* Properties for frame surface, JUST experimental */
+  SharedMemoryPool pool;
+
+  Buffer frame_buffer_;
+  std::shared_ptr<Canvas> frame_canvas;
+
+  Surface *sub_surface;
+
+  EGLSurface *egl_surface;
+
+  wayland::Callback frame_callback;
+
+  bool animating;
+
+};
+
+const Margin EGLWindow::kResizingMargin(5, 5, 5, 5);
+
 EGLWindow::EGLWindow(const char *title)
     : EGLWindow(400, 300, title) {
-
 }
 
 EGLWindow::EGLWindow(int width, int height, const char *title)
-    : AbstractShellView(width, height, title, nullptr),
-      main_surface_(nullptr),
-      sub_surface_(nullptr),
-      egl_surface_(nullptr),
-      animating_(false) {
+    : AbstractShellView(width, height, title, nullptr) {
+  p_.reset(new Private);
+
   Surface *parent = GetShellSurface();
 
-  main_surface_ = SubSurface::Create(parent, this, parent->margin());
-  DBG_ASSERT(main_surface_->parent() == parent);
-  DBG_ASSERT(main_surface_->below() == parent);
-
-  sub_surface_ = SubSurface::Create(main_surface_, this);
-  DBG_ASSERT(sub_surface_->parent() == main_surface_);
-  DBG_ASSERT(sub_surface_->below() == main_surface_);
+  p_->sub_surface = SubSurface::Create(parent, this);
+  DBG_ASSERT(p_->sub_surface->parent() == parent);
+  DBG_ASSERT(p_->sub_surface->below() == parent);
 
   wayland::Region empty_region;
   empty_region.Setup(Display::Registry().wl_compositor());
-  main_surface_->SetInputRegion(empty_region);
-  sub_surface_->SetInputRegion(empty_region);
+  p_->sub_surface->SetInputRegion(empty_region);
 
-//  Rect client_rect = GetClientGeometry(width, height);
-//  SubSurface::Get(sub_surface_)->SetWindowPosition((int) client_rect.l, (int) client_rect.t);
-//
-//  egl_surface_ = EGLSurface::Get(sub_surface_);
-//  egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
-//
-//  frame_callback_.done().Set(this, &EGLWindow::OnFrame);
+  SubSurface::Get(p_->sub_surface)->SetWindowPosition(0, 0);
+
+  p_->egl_surface = EGLSurface::Get(p_->sub_surface);
+  p_->egl_surface->Resize(GetWidth(), GetHeight());
+
+  p_->frame_callback.done().Set(this, &EGLWindow::OnFrame);
 }
 
 EGLWindow::~EGLWindow() {
-  delete egl_surface_;
-  delete sub_surface_;
-  delete main_surface_;
+  delete p_->egl_surface;
+  delete p_->sub_surface;
 }
 
 void EGLWindow::OnShown() {
@@ -87,30 +117,19 @@ void EGLWindow::OnShown() {
   width += shell_surface->margin().lr();
   height += shell_surface->margin().tb();
 
-  int32_t pool_size = width * 4 * height * 2;
+  int32_t pool_size = width * 4 * height;
 
-  pool_.Setup(pool_size);
+  p_->pool.Setup(pool_size);
 
-  frame_buffer_.Setup(pool_, width, height,
-                      width * 4, WL_SHM_FORMAT_ARGB8888);
-  shell_surface->Attach(&frame_buffer_);
-  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.GetData(),
-                                 frame_buffer_.GetSize().width,
-                                 frame_buffer_.GetSize().height));
-  frame_canvas_->SetOrigin((float) shell_surface->margin().left,
-                           (float) shell_surface->margin().top);
-  frame_canvas_->Clear();
-
-  main_buffer_.Setup(pool_, width, height,
-                     width * 4, WL_SHM_FORMAT_ARGB8888,
-                     width * 4 * height);
-  main_surface_->Attach(&main_buffer_);
-  main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.GetData(),
-                                main_buffer_.GetSize().width,
-                                main_buffer_.GetSize().height));
-  main_canvas_->SetOrigin((float) main_surface_->margin().left,
-                          (float) main_surface_->margin().top);
-  main_canvas_->Clear();
+  p_->frame_buffer_.Setup(p_->pool, width, height,
+                          width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->frame_buffer_);
+  p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer_.GetData(),
+                                    p_->frame_buffer_.GetSize().width,
+                                    p_->frame_buffer_.GetSize().height));
+  p_->frame_canvas->SetOrigin((float) shell_surface->margin().left,
+                              (float) shell_surface->margin().top);
+  p_->frame_canvas->Clear();
 
   RecursiveUpdate();
 }
@@ -124,25 +143,12 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     surface = this->GetShellSurface();
     Iterator it(this);
     PushToTail(&it.redraw_task());
-    it.redraw_task().context = Context(surface, frame_canvas_);
-    DBG_ASSERT(frame_canvas_);
+    it.redraw_task().context = Context(surface, p_->frame_canvas);
+    DBG_ASSERT(p_->frame_canvas);
     Damage(this,
            0, 0,
            GetWidth() + surface->margin().lr(),
            GetHeight() + surface->margin().tb());
-    surface->Commit();
-  } else {
-    surface = main_surface_;
-    DBG_ASSERT(main_canvas_);
-
-    AbstractView::Iterator it(view);
-    PushToTail(&it.redraw_task());
-    it.redraw_task().context = Context(surface, main_canvas_);
-    Damage(view,
-           view->GetX() + surface->margin().left,
-           view->GetY() + surface->margin().top,
-           view->GetWidth(),
-           view->GetHeight());
     surface->Commit();
   }
 }
@@ -151,10 +157,10 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   if (nullptr == view)
     return GetShellSurface();
 
-  return nullptr != sub_surface_ ? sub_surface_ : GetShellSurface();
+  return nullptr != p_->sub_surface ? p_->sub_surface : GetShellSurface();
 }
 
-void EGLWindow::OnResize(const Size& old_size, const Size& new_size) {
+void EGLWindow::OnResize(const Size &old_size, const Size &new_size) {
   int width = new_size.width;
   int height = new_size.height;
 
@@ -176,41 +182,160 @@ void EGLWindow::OnResize(const Size& old_size, const Size& new_size) {
   width += shell_surface->margin().lr();
   height += shell_surface->margin().tb();
 
-  int pool_size = width * 4 * height * 2;
-  pool_.Setup(pool_size);
+  int pool_size = width * 4 * height;
+  p_->pool.Setup(pool_size);
 
-  frame_buffer_.Setup(pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-  shell_surface->Attach(&frame_buffer_);
-  frame_canvas_.reset(new Canvas((unsigned char *) frame_buffer_.GetData(),
-                                 frame_buffer_.GetSize().width,
-                                 frame_buffer_.GetSize().height));
-  frame_canvas_->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
-  frame_canvas_->Clear();
+  p_->frame_buffer_.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->frame_buffer_);
+  p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer_.GetData(),
+                                    p_->frame_buffer_.GetSize().width,
+                                    p_->frame_buffer_.GetSize().height));
+  p_->frame_canvas->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
+  p_->frame_canvas->Clear();
 
-  main_buffer_.Setup(pool_, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
-  main_surface_->Attach(&main_buffer_);
-  main_canvas_.reset(new Canvas((unsigned char *) main_buffer_.GetData(),
-                                main_buffer_.GetSize().width,
-                                main_buffer_.GetSize().height));
-  main_canvas_->SetOrigin(main_surface_->margin().left,
-                          main_surface_->margin().top);
-  main_canvas_->Clear();
-
-//  Rect client_rect = GetClientGeometry(new_width, new_height);
-//  egl_surface_->Resize((int) client_rect.width(), (int) client_rect.height());
-//  OnResizeEGL((int) client_rect.width(), (int) client_rect.height());
+  p_->egl_surface->Resize(new_size.width, new_size.height);
+  OnResizeEGL(new_size.width, new_size.height);
 
   RecursiveUpdate();
 }
 
-void EGLWindow::OnDraw(const Context *context) {
-//  if (GetShellFrame()) DrawShellFrame(GetShellFrame(), context);
+void EGLWindow::OnMouseMove(MouseEvent *event) {
+  AbstractView *view = nullptr;
+  switch (GetMouseLocation(event)) {
+    case kResizeTop: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorTop));
+      break;
+    }
+    case kResizeBottom: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorBottom));
+      break;
+    }
+    case kResizeLeft: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorLeft));
+      break;
+    }
+    case kResizeRight: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorRight));
+      break;
+    }
+    case kResizeTopLeft: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorTopLeft));
+      break;
+    }
+    case kResizeTopRight: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorTopRight));
+      break;
+    }
+    case kResizeBottomLeft: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorBottomLeft));
+      break;
+    }
+    case kResizeBottomRight: {
+      DispatchMouseLeaveEvent();
+      event->SetCursor(Display::cursor(kCursorBottomRight));
+      break;
+    }
+    case kTitleBar: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+//      view = p_->title_bar;
+      break;
+    }
+    case kClientArea: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+//      view = p_->content_view;
+      break;
+    }
+    default: {
+      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      break;
+    }
+  }
 
-  if (!animating_) {
-    animating_ = true;
-    egl_surface_->surface()->SetupCallback(frame_callback_);
+  if (view) DispatchMouseEnterEvent(view, event);
+}
+
+void EGLWindow::OnMouseButton(MouseEvent *event) {
+  if ((event->GetButton() == MouseButton::kLeft) &&
+      (event->GetState() == MouseButtonState::kPressed)) {
+
+    int location = GetMouseLocation(event);
+
+    if (location == kTitleBar && (nullptr == MouseTaskIterator(this).next())) {
+      MoveWithMouse(event);
+      event->Ignore();
+      return;
+    }
+
+    if (location < kResizeMask) {
+      ResizeWithMouse(event, (uint32_t) location);
+      event->Ignore();
+      return;
+    }
+  }
+
+  DispatchMouseButtonEvent(event);
+}
+
+void EGLWindow::OnKeyboardKey(KeyEvent *event) {
+
+}
+
+void EGLWindow::OnDraw(const Context *context) {
+  std::shared_ptr<Canvas> canvas = context->canvas();
+  canvas->Clear();
+
+  Path path;
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
+
+  if ((!IsMaximized()) || (!IsFullscreen())) {
+    // Drop shadow:
+//    float radii[] = {
+//        7.f, 7.f, // top-left
+//        7.f, 7.f, // top-right
+//        4.f, 4.f, // bottom-right
+//        4.f, 4.f  // bottom-left
+//    };
+//    path.AddRoundRect(geometry, radii);
+    path.AddRect(geometry);
+    canvas->Save();
+    canvas->ClipPath(path, kClipDifference, true);
+    DrawShadow(canvas.get());
+    canvas->Restore();
+  } else {
+    path.AddRect(geometry);
+  }
+
+  // Fill color:
+//  Paint paint;
+//  paint.SetAntiAlias(true);
+//  paint.SetColor(0xEFF0F0F0);
+//  canvas->DrawPath(path, paint);
+
+  // Draw the client area:
+//  paint.SetColor(0xEFE0E0E0);
+//  canvas->Save();
+//  canvas->ClipPath(path, kClipIntersect, true);
+//  canvas->DrawRect(Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight()), paint);
+//  canvas->Restore();
+
+  canvas->Flush();
+
+  if (!p_->animating) {
+    p_->animating = true;
+    p_->egl_surface->surface()->SetupCallback(p_->frame_callback);
     OnInitializeEGL();
   }
+}
+
+void EGLWindow::OnFocus(bool) {
+  OnUpdate(nullptr);
 }
 
 void EGLWindow::OnInitializeEGL() {
@@ -228,21 +353,145 @@ void EGLWindow::OnRenderEGL() {
 }
 
 bool EGLWindow::MakeCurrent() {
-  return egl_surface_->MakeCurrent();
+  return p_->egl_surface->MakeCurrent();
 }
 
 void EGLWindow::SwapBuffers() {
-  if (egl_surface_->SwapBuffers())
-    egl_surface_->surface()->Commit();
+  if (p_->egl_surface->SwapBuffers())
+    p_->egl_surface->surface()->Commit();
+}
+
+int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
+  int vlocation, hlocation, location;
+  int x = static_cast<int>(event->GetSurfaceXY().x),
+      y = static_cast<int>(event->GetSurfaceXY().y);
+
+  // TODO: maximized or frameless
+
+  if (x < (Theme::shadow_margin().left - kResizingMargin.left))
+    hlocation = AbstractShellView::kExterior;
+  else if (x < Theme::shadow_margin().left + kResizingMargin.left)
+    hlocation = AbstractShellView::kResizeLeft;
+  else if (x < Theme::shadow_margin().left + GetWidth() - kResizingMargin.right)
+    hlocation = AbstractShellView::kInterior;
+  else if (x < Theme::shadow_margin().left + GetWidth() + kResizingMargin.right)
+    hlocation = AbstractShellView::kResizeRight;
+  else
+    hlocation = AbstractShellView::kExterior;
+
+  if (y < (Theme::shadow_margin().top - kResizingMargin.top))
+    vlocation = AbstractShellView::kExterior;
+  else if (y < Theme::shadow_margin().top + kResizingMargin.top)
+    vlocation = AbstractShellView::kResizeTop;
+  else if (y < Theme::shadow_margin().top + GetHeight() - kResizingMargin.bottom)
+    vlocation = AbstractShellView::kInterior;
+  else if (y < Theme::shadow_margin().top + GetHeight() + kResizingMargin.bottom)
+    vlocation = AbstractShellView::kResizeBottom;
+  else
+    vlocation = AbstractShellView::kExterior;
+
+  location = vlocation | hlocation;
+  if (location & AbstractShellView::kExterior)
+    location = AbstractShellView::kExterior;
+
+  if (location == AbstractShellView::kInterior &&
+      y < Theme::shadow_margin().top + 22 /* title_bar_size_ */)
+    location = AbstractShellView::kTitleBar;
+  else if (location == AbstractShellView::kInterior)
+    location = AbstractShellView::kClientArea;
+
+  return location;
 }
 
 void EGLWindow::OnFrame(uint32_t serial) {
-  egl_surface_->surface()->SetupCallback(frame_callback_);
+  p_->egl_surface->surface()->SetupCallback(p_->frame_callback);
   OnRenderEGL();
 }
 
 void EGLWindow::OnRelease() {
 //  fprintf(stderr, "on release\n");
+}
+
+void EGLWindow::DrawShadow(Canvas *canvas) {
+  float rad = Theme::shadow_radius() - 1.f; // The spread radius
+  float offset_x = Theme::shadow_offset_x();
+  float offset_y = Theme::shadow_offset_y();
+
+  if (!IsFocused()) {
+    rad = (int) rad / 3;
+    offset_x = (int) offset_x / 3;
+    offset_y = (int) offset_y / 3;
+  }
+
+  // shadow map
+  SkCanvas *c = canvas->GetSkCanvas();
+  sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::shadow_pixmap(), nullptr, nullptr);
+
+  // top-left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 0,
+                                    2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(-rad + offset_x, -rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // top
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
+                                    250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
+                                    GetWidth() - 2 * rad, 2 * rad),
+                   nullptr);
+
+  // top-right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
+                                    250, 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, -rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
+                                    2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
+                                    2 * rad, GetHeight() - 2 * rad),
+                   nullptr);
+
+  // bottom-left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
+                                    2 * Theme::shadow_radius(), 250),
+                   SkRect::MakeXYWH(-rad + offset_x, GetHeight() - rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // bottom
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
+                                    250 - 2 * Theme::shadow_radius(), 250),
+                   SkRect::MakeXYWH(rad + offset_x, GetHeight() - rad + offset_y,
+                                    GetWidth() - 2 * rad, 2 * rad),
+                   nullptr);
+
+  // bottom-right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
+                                    250, 250),
+                   SkRect::MakeXYWH(GetWidth() - rad + offset_x,
+                                    GetHeight() - rad + offset_y,
+                                    2 * rad,
+                                    2 * rad),
+                   nullptr);
+
+  // right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
+                                    250, 250 - 2 * Theme::shadow_radius()),
+                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, rad + offset_y,
+                                    2 * rad, GetHeight() - 2 * rad),
+                   nullptr);
 }
 
 }

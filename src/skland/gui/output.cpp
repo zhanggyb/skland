@@ -29,11 +29,11 @@ struct Output::Private {
   Private &operator=(const Private &) = delete;
 
   Private()
-      : current_refresh_rate_(0),
-        preferred_refresh_rate_(0),
-        subpixel_(0),
-        transform_(WL_OUTPUT_TRANSFORM_NORMAL),
-        scale_(1),
+      : current_refresh_rate(0),
+        preferred_refresh_rate(0),
+        subpixel(0),
+        transform(WL_OUTPUT_TRANSFORM_NORMAL),
+        scale(1),
         id(0),
         version(0) {}
 
@@ -50,12 +50,12 @@ struct Output::Private {
   /** The size of a mode, given in physical hardware units of the output device */
   Size current_mode_size_;
   Size preferred_mode_size_;
-  int32_t current_refresh_rate_;
-  int32_t preferred_refresh_rate_;
+  int32_t current_refresh_rate;
+  int32_t preferred_refresh_rate;
 
-  int subpixel_;  /**< enum value of wl_output_subpixel */
-  int transform_; /**< enum value of wl_output_transform */
-  int scale_;
+  int subpixel;  /**< enum value of wl_output_subpixel */
+  int transform; /**< enum value of wl_output_transform */
+  int scale;
 
   /* vertical refresh rate in mHz */
 
@@ -121,10 +121,10 @@ void Output::OnGeometry(int32_t x,
   p_->position_.y = y;
   p_->physical_size_.width = physical_width;
   p_->physical_size_.height = physical_height;
-  p_->subpixel_ = subpixel;
+  p_->subpixel = subpixel;
   p_->make_ = make;
   p_->model_ = model;
-  p_->transform_ = transform;
+  p_->transform = transform;
 }
 
 void Output::OnMode(uint32_t flags,
@@ -134,11 +134,11 @@ void Output::OnMode(uint32_t flags,
   if (flags & WL_OUTPUT_MODE_CURRENT) {
     p_->current_mode_size_.width = width;
     p_->current_mode_size_.height = height;
-    p_->current_refresh_rate_ = refresh;
+    p_->current_refresh_rate = refresh;
   } else if (flags & WL_OUTPUT_MODE_PREFERRED) {
     p_->preferred_mode_size_.width = width;
     p_->preferred_mode_size_.height = height;
-    p_->preferred_refresh_rate_ = refresh;
+    p_->preferred_refresh_rate = refresh;
   }
 }
 
@@ -147,7 +147,7 @@ void Output::OnDone() {
 }
 
 void Output::OnScale(int32_t factor) {
-  p_->scale_ = factor;
+  p_->scale = factor;
 }
 
 }

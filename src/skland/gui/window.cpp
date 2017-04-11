@@ -34,6 +34,7 @@
 #include "internal/display-registry.hpp"
 #include "internal/abstract-shell-view-iterators.hpp"
 #include "internal/abstract-view-iterators.hpp"
+#include "internal/abstract-event-handler-mouse-task-iterator.hpp"
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
@@ -41,11 +42,7 @@
 
 #include "SkCanvas.h"
 
-#include "internal/abstract-event-handler-mouse-task-iterator.hpp"
-
 namespace skland {
-
-const Margin Window::kResizingMargin(5, 5, 5, 5);
 
 struct Window::Private {
 
@@ -76,6 +73,8 @@ struct Window::Private {
 
 };
 
+const Margin Window::kResizingMargin(5, 5, 5, 5);
+
 Window::Window(const char *title)
     : Window(640, 480, title) {
 }
@@ -93,7 +92,7 @@ Window::Window(int width, int height, const char *title)
   empty_region.Setup(Display::Registry().wl_compositor());
   p_->main_surface->SetInputRegion(empty_region);
 
-  // Create a title bar:
+  // Create the default title bar:
   TitleBar* titlebar = new TitleBar;
   p_->title_bar = titlebar;
   AttachView(p_->title_bar);
