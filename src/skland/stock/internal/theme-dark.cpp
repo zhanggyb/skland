@@ -41,14 +41,14 @@ class WindowFrameDark final : public WindowFrameDefault {
 
   WindowFrameDark()
       : WindowFrameDefault() {
-    TitleBar *title_bar = static_cast<TitleBar *>(this->GetTitleView());
-    title_bar->SetForeground(0xFF999999);
-    title_bar->close_button()->SetForeground(0xFF999999);
-    title_bar->close_button()->SetBackground(0xFF444444);
-    title_bar->maximize_button()->SetForeground(0xFF999999);
-    title_bar->maximize_button()->SetBackground(0xFF444444);
-    title_bar->minimize_button()->SetForeground(0xFF999999);
-    title_bar->minimize_button()->SetBackground(0xFF444444);
+//    TitleBar *title_bar = static_cast<TitleBar *>(this->GetTitleView());
+//    title_bar->SetForeground(0xFF999999);
+//    title_bar->close_button()->SetForeground(0xFF999999);
+//    title_bar->close_button()->SetBackground(0xFF444444);
+//    title_bar->maximize_button()->SetForeground(0xFF999999);
+//    title_bar->maximize_button()->SetBackground(0xFF444444);
+//    title_bar->minimize_button()->SetForeground(0xFF999999);
+//    title_bar->minimize_button()->SetBackground(0xFF444444);
   }
 
   virtual ~WindowFrameDark() {}
@@ -64,7 +64,7 @@ void WindowFrameDark::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetShellView()->GetSize().width, GetShellView()->GetSize().height);
+  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetShellView()->GetWidth(), GetShellView()->GetHeight());
 
   // Drop shadow:
   if ((!GetShellView()->IsMaximized()) || (!GetShellView()->IsFullscreen())) {
@@ -93,7 +93,7 @@ void WindowFrameDark::OnDraw(const Context *context) {
   paint.SetColor(0xEF303030);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(GetShellView()->GetSize().width, GetShellView()->GetSize().height), paint);
+  canvas->DrawRect(GetClientGeometry(GetShellView()->GetWidth(), GetShellView()->GetHeight()), paint);
   canvas->Restore();
 
   canvas->Flush();

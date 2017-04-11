@@ -42,7 +42,8 @@ class Seat;
  */
 SKLAND_EXPORT class Input {
 
-  template<typename T> friend class Deque;
+  template<typename T> friend
+  class Deque;
 
   Input() = delete;
   Input(const Input &) = delete;
@@ -57,6 +58,10 @@ SKLAND_EXPORT class Input {
   void SetCursor(const Cursor *cursor) const;
 
   const wayland::Seat &GetSeat() const;
+
+  uint32_t GetID() const;
+
+  uint32_t GetVersion() const;
 
  private:
 

@@ -527,6 +527,14 @@ Surface *AbstractView::GetSurface(const AbstractView *view) const {
   return nullptr;
 }
 
+void AbstractView::OnEnterOutput(const Output *output) {
+
+}
+
+void AbstractView::OnLeaveOutput(const Output *output) {
+
+}
+
 AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
   Iterator it(this);
   AbstractView *view = nullptr;

@@ -33,6 +33,7 @@ namespace skland {
 
 class Paint;
 class Path;
+class Matrix;
 
 /**
  * @ingroup graphic
@@ -69,6 +70,18 @@ class Canvas {
   void DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint);
 
   void Translate(float dx, float dy);
+
+  void Scale(float sx, float sy);
+
+  void Rotate(float degrees);
+
+  void Rotate(float degrees, float px, float py);
+
+  void Skew(float sx, float sy);
+
+  void Concat(const Matrix &matrix);
+
+  void SetMatrix(const Matrix &matrix);
 
   /**
    * @brief Reset matrix and translate to origin

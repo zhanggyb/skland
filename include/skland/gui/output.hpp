@@ -22,11 +22,14 @@
 #include "../core/sigcxx.hpp"
 #include "../core/deque.hpp"
 
-#include "../wayland/output.hpp"
-
 #include <string>
+#include <memory>
 
 namespace skland {
+
+namespace wayland {
+class Output;
+}
 
 class Output {
 
@@ -39,7 +42,7 @@ class Output {
 
  public:
 
-  Output(const wayland::Registry &registry, uint32_t id, uint32_t version);
+  Output(uint32_t id, uint32_t version);
 
   virtual ~Output();
 
@@ -47,25 +50,23 @@ class Output {
     return destroyed_;
   }
 
-  const std::string &make() const {
-    return make_;
-  }
+  const std::string &GetMake() const;
 
-  const std::string &model() const {
-    return model_;
-  }
+  const std::string &GetModel() const;
 
-  const Size &current_mode_size() const {
-    return current_mode_size_;
-  }
+  const wayland::Output &GetOutput() const;
+
+  uint32_t GetID() const;
+
+  uint32_t GetVersion() const;
 
   Output *previous() const { return previous_; }
 
   Output *next() const { return next_; }
 
-  uint32_t server_output_id() const { return server_output_id_; }
-
  private:
+
+  struct Private;
 
   void OnGeometry(int32_t x,
                   int32_t y,
@@ -89,30 +90,7 @@ class Output {
   Output *next_;
   Deque<Output> *deque_;
 
-  wayland::Output wl_output_;
-
-  /** position within the global compositor space */
-  Point position_;
-
-  /** physical_width width in millimeters of the output */
-  Size physical_size_;
-
-  /** The size of a mode, given in physical hardware units of the output device */
-  Size current_mode_size_;
-  Size preferred_mode_size_;
-  int32_t current_refresh_rate_;
-  int32_t preferred_refresh_rate_;
-
-  uint32_t server_output_id_;
-
-  int subpixel_;  /**< enum value of wl_output_subpixel */
-  int transform_; /**< enum value of wl_output_transform */
-  int scale_;
-
-  /* vertical refresh rate in mHz */
-
-  std::string make_;
-  std::string model_;
+  std::unique_ptr<Private> p_;
 
   Signal<Output *> destroyed_;
   // TODO: user data

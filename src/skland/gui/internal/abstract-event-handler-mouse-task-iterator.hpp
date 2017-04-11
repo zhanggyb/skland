@@ -181,10 +181,10 @@ SKLAND_NO_EXPORT class AbstractEventHandler::MouseTaskIterator {
 
 };
 
-bool operator==(const AbstractEventHandler::MouseTaskIterator &it1,
-                const AbstractEventHandler::MouseTaskIterator &it2) {
-  return it1.mouse_task_ == it2.mouse_task_;
-}
+//bool operator==(const AbstractEventHandler::MouseTaskIterator &it1,
+//                const AbstractEventHandler::MouseTaskIterator &it2) {
+//  return it1.mouse_task_ == it2.mouse_task_;
+//}
 
 }
 

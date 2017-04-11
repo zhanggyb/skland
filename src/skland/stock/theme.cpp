@@ -65,12 +65,10 @@ void Theme::Load(const char *name) {
   std::string upper_name(name);
   std::transform(upper_name.begin(), upper_name.end(), upper_name.begin(), ::toupper);
 
+  kTheme->Reset();
   if (upper_name == "DARK") {
-    kTheme->Reset();
     kTheme->window_frame_create_handle_ = WindowFrameDarkCreate;
     kTheme->window_frame_destroy_handle_ = WindowFrameDarkDestroy;
-  } else {
-    kTheme->Reset();
   }
 }
 

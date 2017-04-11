@@ -18,16 +18,14 @@
 #define SKLAND_GUI_WINDOW_HPP_
 
 #include "abstract-shell-view.hpp"
-#include "shared-memory-pool.hpp"
-#include "buffer.hpp"
-
-#include "../stock/theme.hpp"
+#include "../core/margin.hpp"
 
 namespace skland {
 
 class AbstractWidget;
 class Surface;
 class Canvas;
+class TitleBar;
 
 /**
  * @ingroup gui
@@ -42,12 +40,15 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
  public:
 
-  Window(const char *title, AbstractShellFrame *frame = Theme::CreateWindowFrame());
+  Window(const char *title);
 
-  Window(int width, int height, const char *title,
-         AbstractShellFrame *frame = Theme::CreateWindowFrame());
+  Window(int width, int height, const char *title);
 
   virtual ~Window();
+
+  AbstractView *GetTitleBar() const;
+
+  AbstractView *GetContentView() const;
 
   void SetContentView(AbstractView *view);
 
@@ -59,23 +60,41 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  virtual void OnKeyboardKey(KeyEvent *event) final;
+  virtual void OnResize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) final;
+  virtual void OnMouseEnter(MouseEvent *event) override;
+
+  virtual void OnMouseLeave() override;
+
+  virtual void OnMouseMove(MouseEvent *event) override;
+
+  virtual void OnMouseButton(MouseEvent *event) override;
+
+  virtual void OnKeyboardKey(KeyEvent *event) override;
+
+  virtual void OnDraw(const Context *context) override;
+
+  virtual void OnFocus(bool);
+
+  virtual void RecursiveUpdate() override;
+
+  virtual void OnViewAttached(AbstractView *view) final;
+
+  virtual void OnViewDetached(AbstractView *view) final;
 
  private:
 
-  Surface *main_surface_;
+  struct Private;
 
-  /* Properties for frame surface, JUST experimental */
-  SharedMemoryPool pool_;
+  int GetMouseLocation(const MouseEvent *event) const;
 
-  Buffer frame_buffer_;
-  std::shared_ptr<Canvas> frame_canvas_;
+  void DrawShadow(Canvas *canvas);
 
-  /* Properties for main surface, JUST experimental */
-  Buffer main_buffer_;
-  std::shared_ptr<Canvas> main_canvas_;
+  Rect GetContentGeometry() const;
+
+  static const Margin kResizingMargin;
+
+  std::unique_ptr<Private> p_;
 
 };
 

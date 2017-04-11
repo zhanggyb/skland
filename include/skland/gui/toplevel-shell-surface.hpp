@@ -25,6 +25,7 @@ namespace skland {
 class AbstractEventHandler;
 class Surface;
 class ShellSurface;
+class Output;
 
 /**
  * @ingroup gui
@@ -44,47 +45,37 @@ class ToplevelShellSurface {
 
   static ToplevelShellSurface *Get(const Surface *surface);
 
-  void SetTitle(const char *title) {
-    xdg_toplevel_.SetTitle(title);
-  }
+  void SetTitle(const char *title) const;
 
-  void SetAppId(const char *id) {
-    xdg_toplevel_.SetAppId(id);
-  }
+  void SetAppId(const char *id) const;
 
-  void Move(const wayland::Seat &seat, uint32_t serial) const {
-    xdg_toplevel_.Move(seat, serial);
-  }
+  void Move(const wayland::Seat &seat, uint32_t serial) const;
 
-  void Resize(const wayland::Seat &seat, uint32_t serial, uint32_t edges) const {
-    xdg_toplevel_.Resize(seat, serial, edges);
-  }
+  void Resize(const wayland::Seat &seat, uint32_t serial, uint32_t edges) const;
 
-  void SetMaximized() const {
-    xdg_toplevel_.SetMaximized();
-  }
+  void SetMaximized() const;
 
-  void UnsetMaximized() const {
-    xdg_toplevel_.UnsetMaximized();
-  }
+  void UnsetMaximized() const;
 
-  void SetMinimized() const {
-    xdg_toplevel_.SetMinimized();
-  }
+  void SetFullscreen(const Output &output) const;
 
-  DelegateRef<void(int, int, int)> configure() { return xdg_toplevel_.configure(); }
+  void UnsetFullscreen(const Output &output) const;
 
-  DelegateRef<void()> close() { return xdg_toplevel_.close(); }
+  void SetMinimized() const;
+
+  DelegateRef<void(int, int, int)> configure();
+
+  DelegateRef<void()> close();
 
  private:
+
+  struct Private;
 
   ToplevelShellSurface(ShellSurface *shell_surface);
 
   ~ToplevelShellSurface();
 
-  ShellSurface *shell_surface_;
-
-  wayland::XdgToplevel xdg_toplevel_;
+  std::unique_ptr<Private> p_;
 
 };
 

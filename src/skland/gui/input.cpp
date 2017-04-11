@@ -39,8 +39,14 @@ namespace skland {
 
 struct Input::Private {
 
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
   Private()
-      : key_event(nullptr), mouse_event(nullptr), touch_event(nullptr) {}
+      : key_event(nullptr),
+        mouse_event(nullptr),
+        touch_event(nullptr),
+        id(0), version(0) {}
 
   ~Private() {
     keyboard_state.Destroy();
@@ -70,14 +76,19 @@ struct Input::Private {
   Keymap keymap;
   KeyboardState keyboard_state;
 
+  uint32_t id;
+  uint32_t version;
 };
 
 Input::Input(uint32_t id, uint32_t version)
     : previous_(nullptr), next_(nullptr), deque_(nullptr) {
   p_.reset(new Private);
+  p_->id = id;
+  p_->version = version;
+
   p_->wl_seat.capabilities().Set(this, &Input::OnSeatCapabilities);
   p_->wl_seat.name().Set(this, &Input::OnSeatName);
-  p_->wl_seat.Setup(Display::Registry().wl_registry(), id, version);
+  p_->wl_seat.Setup(Display::Registry().wl_registry(), p_->id, p_->version);
 }
 
 Input::~Input() {
@@ -98,6 +109,14 @@ void Input::SetCursor(const Cursor *cursor) const {
 
 const wayland::Seat &Input::GetSeat() const {
   return p_->wl_seat;
+}
+
+uint32_t Input::GetID() const {
+  return p_->id;
+}
+
+uint32_t Input::GetVersion() const {
+  return p_->version;
 }
 
 void Input::OnSeatCapabilities(uint32_t capabilities) {

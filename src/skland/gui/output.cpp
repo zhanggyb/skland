@@ -17,33 +17,96 @@
 #include <skland/gui/output.hpp>
 #include <skland/gui/display.hpp>
 
+#include <skland/wayland/output.hpp>
+
+#include "internal/display-registry.hpp"
+
 namespace skland {
 
-Output::Output(const wayland::Registry &registry, uint32_t id, uint32_t version)
+struct Output::Private {
+
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : current_refresh_rate_(0),
+        preferred_refresh_rate_(0),
+        subpixel_(0),
+        transform_(WL_OUTPUT_TRANSFORM_NORMAL),
+        scale_(1),
+        id(0),
+        version(0) {}
+
+  ~Private() {}
+
+  wayland::Output wl_output;
+
+  /** position within the global compositor space */
+  Point position_;
+
+  /** physical_width width in millimeters of the output */
+  Size physical_size_;
+
+  /** The size of a mode, given in physical hardware units of the output device */
+  Size current_mode_size_;
+  Size preferred_mode_size_;
+  int32_t current_refresh_rate_;
+  int32_t preferred_refresh_rate_;
+
+  int subpixel_;  /**< enum value of wl_output_subpixel */
+  int transform_; /**< enum value of wl_output_transform */
+  int scale_;
+
+  /* vertical refresh rate in mHz */
+
+  std::string make_;
+  std::string model_;
+
+  uint32_t id;
+  uint32_t version;
+};
+
+Output::Output(uint32_t id, uint32_t version)
     : previous_(nullptr),
       next_(nullptr),
-      deque_(nullptr),
-      current_refresh_rate_(0),
-      preferred_refresh_rate_(0),
-      server_output_id_(0),
-      subpixel_(0),
-      transform_(WL_OUTPUT_TRANSFORM_NORMAL),
-      scale_(1) {
-  wl_output_.geometry().Set(this, &Output::OnGeometry);
-  wl_output_.mode().Set(this, &Output::OnMode);
-  wl_output_.done().Set(this, &Output::OnDone);
-  wl_output_.scale().Set(this, &Output::OnScale);
-  wl_output_.Setup(registry, id, version);
+      deque_(nullptr) {
+  p_.reset(new Private);
+  p_->id = id;
+  p_->version = version;
+
+  p_->wl_output.geometry().Set(this, &Output::OnGeometry);
+  p_->wl_output.mode().Set(this, &Output::OnMode);
+  p_->wl_output.done().Set(this, &Output::OnDone);
+  p_->wl_output.scale().Set(this, &Output::OnScale);
+
+  p_->wl_output.Setup(Display::Registry().wl_registry(), p_->id, p_->version);
 }
 
 Output::~Output() {
   destroyed_.Emit(this);
-
-  wl_output_.Destroy();
-
+  p_->wl_output.Destroy();
   if (deque_) deque_->Remove(this);
-
   DBG_ASSERT(nullptr == deque_);
+}
+
+const std::string &Output::GetMake() const {
+  return p_->make_;
+}
+
+const std::string &Output::GetModel() const {
+  return p_->model_;
+}
+
+const wayland::Output &Output::GetOutput() const {
+  return p_->wl_output;
+}
+
+uint32_t Output::GetID() const {
+  return p_->id;
+}
+
+uint32_t Output::GetVersion() const {
+  return p_->version;
 }
 
 void Output::OnGeometry(int32_t x,
@@ -54,14 +117,14 @@ void Output::OnGeometry(int32_t x,
                         const char *make,
                         const char *model,
                         int32_t transform) {
-  position_.x = x;
-  position_.y = y;
-  physical_size_.width = physical_width;
-  physical_size_.height = physical_height;
-  subpixel_ = subpixel;
-  make_ = make;
-  model_ = model;
-  transform_ = transform;
+  p_->position_.x = x;
+  p_->position_.y = y;
+  p_->physical_size_.width = physical_width;
+  p_->physical_size_.height = physical_height;
+  p_->subpixel_ = subpixel;
+  p_->make_ = make;
+  p_->model_ = model;
+  p_->transform_ = transform;
 }
 
 void Output::OnMode(uint32_t flags,
@@ -69,22 +132,22 @@ void Output::OnMode(uint32_t flags,
                     int32_t height,
                     int32_t refresh) {
   if (flags & WL_OUTPUT_MODE_CURRENT) {
-    current_mode_size_.width = width;
-    current_mode_size_.height = height;
-    current_refresh_rate_ = refresh;
+    p_->current_mode_size_.width = width;
+    p_->current_mode_size_.height = height;
+    p_->current_refresh_rate_ = refresh;
   } else if (flags & WL_OUTPUT_MODE_PREFERRED) {
-    preferred_mode_size_.width = width;
-    preferred_mode_size_.height = height;
-    preferred_refresh_rate_ = refresh;
+    p_->preferred_mode_size_.width = width;
+    p_->preferred_mode_size_.height = height;
+    p_->preferred_refresh_rate_ = refresh;
   }
 }
 
 void Output::OnDone() {
-  wl_output_.SetUserData(this);
+  p_->wl_output.SetUserData(this);
 }
 
 void Output::OnScale(int32_t factor) {
-  scale_ = factor;
+  p_->scale_ = factor;
 }
 
 }

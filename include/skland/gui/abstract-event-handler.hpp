@@ -30,6 +30,7 @@ class KeyEvent;
 
 class Surface;
 class AbstractView;
+class Output;
 
 /**
  * @ingroup gui
@@ -54,6 +55,7 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   friend class Input;
   friend class Application;
   friend class Display;
+  friend class Surface;
 
   friend class AbstractView;
   friend class AbstractShellView;
@@ -115,6 +117,10 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
    * @return A pointer to a surface or nullptr
    */
   virtual Surface *GetSurface(const AbstractView *view) const = 0;
+
+  virtual void OnEnterOutput(const Output *output) = 0;
+
+  virtual void OnLeaveOutput(const Output *output) = 0;
 
   /**
    * @brief Disable this virtual method

@@ -47,10 +47,9 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
       : flags(0),
         shell_surface(nullptr),
         parent(nullptr),
-        shell_frame(nullptr),
-        client_view(nullptr),
         redraw_task(shell_view),
-        is_damaged(false) {}
+        is_damaged(false),
+        output(nullptr) {}
 
   /**
    * @brief Destructor
@@ -77,9 +76,14 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
   std::string app_id;
 
   /**
-   * @brief Window size
+   * @brief Current window size
    */
   Size size;
+
+  /**
+   * @brief Last valid window size
+   */
+  Size last_size;
 
   /**
    * @brief A pointer to a shell surface created with a shell view object
@@ -95,19 +99,6 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
    *  - nullptr if surface is a top level shell surface
    */
   AbstractShellView *parent;
-
-  /**
-   * @brief The shell frame (window frame) used in this shell view
-   */
-  AbstractShellFrame *shell_frame;
-
-  /**
-   * @brief The main view shows in the client area
-   *
-   * The client area is calculated through shell_frame object if it's not nullptr,
-   * or the whole window area.
-   */
-  AbstractView *client_view;
 
   /**
    * @brief A redraw task to handle redraw event
@@ -126,6 +117,7 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
    */
   RectI damaged_region;
 
+  const Output *output;
 };
 
 } // namespace skland

@@ -46,10 +46,9 @@ class EGLWindow : public AbstractShellView {
 
  public:
 
-  EGLWindow(const char *title, AbstractShellFrame *frame = Theme::CreateWindowFrame());
+  EGLWindow(const char *title);
 
-  EGLWindow(int width, int height, const char *title,
-            AbstractShellFrame *frame = Theme::CreateWindowFrame());
+  EGLWindow(int width, int height, const char *title);
 
   virtual ~EGLWindow();
 
@@ -61,7 +60,7 @@ class EGLWindow : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnResize(int old_width, int old_height, int new_width, int new_height) final;
+  virtual void OnResize(const Size& old_size, const Size& new_size) final;
 
   virtual void OnDraw(const Context *context) final;
 

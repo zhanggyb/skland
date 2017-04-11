@@ -167,8 +167,8 @@ void SimpleEGLWindow::OnRenderEGL() {
   rotation[2][0] = -sin(angle);
   rotation[2][2] = cos(angle);
 
-  Rect client_rect = GetClientGeometry(GetSize().width, GetSize().height);
-  glViewport(0, 0, (int) client_rect.width(), (int) client_rect.height());
+//  Rect client_rect = GetClientGeometry(GetWidth(), GetHeight());
+//  glViewport(0, 0, (int) client_rect.width(), (int) client_rect.height());
 
   glUniformMatrix4fv(rotation_uniform, 1, GL_FALSE,
                      (GLfloat *) rotation);
