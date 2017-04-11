@@ -48,7 +48,8 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
         shell_surface(nullptr),
         parent(nullptr),
         redraw_task(shell_view),
-        is_damaged(false) {}
+        is_damaged(false),
+        output(nullptr) {}
 
   /**
    * @brief Destructor
@@ -116,6 +117,7 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
    */
   RectI damaged_region;
 
+  const Output *output;
 };
 
 } // namespace skland

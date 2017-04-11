@@ -109,7 +109,16 @@ void AbstractShellView::Close(SLOT) {
   //  delete this;
 }
 
-void AbstractShellView::Maximize(SLOT) {
+void AbstractShellView::Minimize(SLOT) {
+  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface);
+  if (nullptr == toplevel) return;
+
+  Bit::Set<int>(p_->flags, Private::kFlagMaskMinimized);
+  toplevel->SetMinimized();
+  DBG_ASSERT(IsMinimized());
+}
+
+void AbstractShellView::ToggleMaximize(SLOT) {
   ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
@@ -120,13 +129,16 @@ void AbstractShellView::Maximize(SLOT) {
   }
 }
 
-void AbstractShellView::Minimize(SLOT) {
+void AbstractShellView::ToggleFullscreen(SLOT slot) {
   ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
-  Bit::Set<int>(p_->flags, Private::kFlagMaskMinimized);
-  toplevel->SetMinimized();
-  DBG_ASSERT(IsMinimized());
+  if (p_->output) {
+    if (IsFullscreen())
+      toplevel->UnsetFullscreen(*p_->output);
+    else
+      toplevel->SetFullscreen(*p_->output);
+  }
 }
 
 const std::string &AbstractShellView::GetTitle() const {
@@ -255,6 +267,18 @@ void AbstractShellView::OnUpdate(AbstractView *view) {
 
 Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
   return p_->shell_surface;
+}
+
+void AbstractShellView::OnEnterOutput(const Output *output) {
+  p_->output = output;
+}
+
+void AbstractShellView::OnLeaveOutput(const Output *output) {
+  if (p_->output != output) {
+    fprintf(stderr, "Warning! Registered output object does not match!\n");
+  }
+
+  p_->output = nullptr;
 }
 
 void AbstractShellView::OnDraw(const Context *context) {

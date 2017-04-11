@@ -455,6 +455,10 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual Surface *GetSurface(const AbstractView *view) const;
 
+  virtual void OnEnterOutput(const Output *output) override;
+
+  virtual void OnLeaveOutput(const Output *output) override;
+
   /**
    * @brief Callback when any part of geometry will change
    * @param dirty_flag Bitwise flag of which part of geometry will change

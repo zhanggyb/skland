@@ -140,11 +140,14 @@ void Surface::OnEnter(struct wl_output *wl_output) {
     wl_surface_.SetUserData(this);
     is_user_data_set_ = true;
   }
-  // TODO: call function in view_
+
+  Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
+  event_handler_->OnEnterOutput(output);
 }
 
 void Surface::OnLeave(struct wl_output *wl_output) {
-  // TODO: call function in view_
+  Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
+  event_handler_->OnEnterOutput(output);
 }
 
 void Surface::Clear() {

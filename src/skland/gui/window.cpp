@@ -105,10 +105,13 @@ Window::Window(int width, int height, const char *title)
   button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Close));
 
   button = titlebar->GetButton(TitleBar::kButtonMaximize);
-  button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Maximize));
+  button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::ToggleMaximize));
 
   button = titlebar->GetButton(TitleBar::kButtonMinimize);
   button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Minimize));
+
+  button = titlebar->GetButton(TitleBar::kButtonFullscreen);
+  button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::ToggleFullscreen));
 }
 
 Window::~Window() {

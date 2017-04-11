@@ -160,7 +160,7 @@ void Display::AddOutput(Output *output, int index) {
 
 void Display::DestroyOutput(uint32_t id) {
   for (Output *output = output_deque_.first(); output; output = output->next()) {
-    if (output->server_output_id() == id) {
+    if (output->GetID() == id) {
       delete output;
       break;
     }
@@ -219,7 +219,7 @@ void Display::OnGlobal(uint32_t id,
     p_->wl_cursor_theme.Load(NULL, 24, p_->wl_shm);
     InitializeCursors();
   } else if (strcmp(interface, wl_output_interface.name) == 0) {
-    Output *output = new Output(p_->wl_registry, id, version);
+    Output *output = new Output(id, version);
     AddOutput(output);
   } else if (strcmp(interface, XdgShell::GetInterface()->name) == 0) {
     p_->xdg_shell.ping().Set(this, &Display::OnXdgShellPing);
