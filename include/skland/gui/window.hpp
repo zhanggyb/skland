@@ -76,8 +76,6 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnFocus(bool);
 
-  virtual void RecursiveUpdate() override;
-
   virtual void OnViewAttached(AbstractView *view) final;
 
   virtual void OnViewDetached(AbstractView *view) final;

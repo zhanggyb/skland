@@ -200,8 +200,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   Surface *GetShellSurface() const;
 
-  virtual void RecursiveUpdate();
-
   void DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event);
 
   void DispatchMouseLeaveEvent();

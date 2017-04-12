@@ -181,7 +181,10 @@ void Window::OnShown() {
     p_->main_canvas->Clear();
   }
 
-  RecursiveUpdate();
+  OnUpdate(nullptr);
+  AbstractShellView::RecursiveUpdate(p_->title_bar);
+  AbstractShellView::RecursiveUpdate(p_->content_view);
+
 }
 
 void Window::OnUpdate(AbstractView *view) {
@@ -276,14 +279,20 @@ void Window::OnResize(const Size &old_size, const Size &new_size) {
     p_->main_canvas->Clear();
   }
 
-  if (p_->title_bar) p_->title_bar->Resize(new_size.width, 22);
+  OnUpdate(nullptr);
+
+  if (p_->title_bar) {
+    p_->title_bar->Resize(new_size.width, 22);
+  }
+
   if (p_->content_view) {
     Rect geometry = GetContentGeometry();
     p_->content_view->MoveTo(static_cast<int>(geometry.x()), static_cast<int>(geometry.y()));
     p_->content_view->Resize(static_cast<int>(geometry.width()), static_cast<int>(geometry.height()));
   }
 
-  RecursiveUpdate();
+  AbstractShellView::RecursiveUpdate(p_->title_bar);
+  AbstractShellView::RecursiveUpdate(p_->content_view);
 }
 
 void Window::OnMouseEnter(MouseEvent *event) {
@@ -485,13 +494,6 @@ void Window::OnDraw(const Context *context) {
 
 void Window::OnFocus(bool) {
   OnUpdate(nullptr);
-}
-
-void Window::RecursiveUpdate() {
-  OnUpdate(nullptr);
-
-  if (p_->title_bar) AbstractShellView::RecursiveUpdate(p_->title_bar);
-  if (p_->content_view) AbstractShellView::RecursiveUpdate(p_->content_view);
 }
 
 void Window::OnViewAttached(AbstractView */*view*/) {

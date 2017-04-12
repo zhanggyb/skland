@@ -131,7 +131,7 @@ void EGLWindow::OnShown() {
                               (float) shell_surface->margin().top);
   p_->frame_canvas->Clear();
 
-  RecursiveUpdate();
+  OnUpdate(nullptr);
 }
 
 void EGLWindow::OnUpdate(AbstractView *view) {
@@ -196,7 +196,7 @@ void EGLWindow::OnResize(const Size &old_size, const Size &new_size) {
   p_->egl_surface->Resize(new_size.width, new_size.height);
   OnResizeEGL(new_size.width, new_size.height);
 
-  RecursiveUpdate();
+  OnUpdate(nullptr);
 }
 
 void EGLWindow::OnMouseMove(MouseEvent *event) {

@@ -317,11 +317,6 @@ Surface *AbstractShellView::GetShellSurface() const {
   return p_->shell_surface;
 }
 
-void AbstractShellView::RecursiveUpdate() {
-  OnUpdate(nullptr);
-  // override in sub class
-}
-
 void AbstractShellView::Damage(AbstractShellView *shell_view,
                                int surface_x, int surface_y,
                                int width, int height) {
@@ -380,6 +375,16 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
     }
   }
 
+  if (maximized != IsMaximized()) {
+    Bit::Inverse<int>(p_->flags, Private::kFlagMaskMaximized);
+    OnMaximized(maximized);
+  }
+
+  if (fullscreen != IsFullscreen()) {
+    Bit::Inverse<int>(p_->flags, Private::kFlagMaskFullscreen);
+    OnFullscreen(fullscreen);
+  }
+
   if (do_resize) {
     ShellSurface::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
     OnResize(p_->last_size, p_->size);
@@ -394,17 +399,8 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
     OnFocus(focus);
   }
 
-  if (maximized != IsMaximized()) {
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskMaximized);
-    OnMaximized(maximized);
-  }
-
-  if (fullscreen != IsFullscreen()) {
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskFullscreen);
-    OnFullscreen(fullscreen);
-  }
-
   if (resizing != IsResizing()) {
+    // TODO: no need to use this flag
     Bit::Inverse<int>(p_->flags, Private::kFlagMaskResizing);
   }
 }
