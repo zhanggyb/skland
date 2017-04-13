@@ -25,6 +25,12 @@
 #include "../wayland/region.hpp"
 #include "../wayland/subsurface.hpp"
 #include "../wayland/callback.hpp"
+#include "../wayland/xdg-surface.hpp"
+#include "../wayland/xdg-toplevel.hpp"
+#include "../wayland/xdg-popup.hpp"
+#include "../wayland/xdg-positioner.hpp"
+
+#include "../egl/surface.hpp"
 
 #include "task.hpp"
 
@@ -36,51 +42,46 @@ class Application;
 class Display;
 class AbstractEventHandler;
 class Buffer;
-
-class ShellSurface;
-class SubSurface;
-class EGLSurface;
+class Output;
 
 /**
  * @ingroup gui
  * @brief Surface for views
  *
- * Surface is an important concept in SkLand, it represents a native
- * wayland surface to display views.
+ * Surface represents a native wayland surface to display views.
  *
- * A surface can have parent or arbitrary sub surfaces and acts as
- * different roles. According to wayland protocol, a surface without a
- * parent must be a shell surface, a shell surface is usually managed
- * in a window object, but can also be used to display a popup view
- * such as menu or tooltip.
+ * A surface can have parent or arbitrary sub surfaces and acts as different
+ * roles.
  *
- * A surface which has a parent is called a sub surface, it's usually
- * used in special widgets (e.g. video widget, or EGL widget) as such
- * widgets need their own surface to display something.
+ * According to wayland protocol, a surface without a parent must be a shell
+ * surface, a shell surface is created and managed in a AbstractShellView
+ * object to display window, popup menu or tooltip etc.
  *
- * Each shell surface or sub surface can also be a EGL surface to
- * display 3D scene, otherwise, it displays 2D contents through
- * wayland shared memory buffer.
+ * A surface which has a parent is called a sub surface, it's usually used in
+ * special widgets (e.g. video widget, or EGL widget) as such widgets need their
+ * own surface to display something.
  *
- * All surfaces in an SkLand application are stacked by the order
- * defined in wayland protocol. [TODO: use an image to show the
- * surface stack.]
+ * Each shell surface or sub surface can also be a EGL surface to display 3D
+ * scene, otherwise, it displays 2D contents through wayland shared memory
+ * buffer.
  *
- * @note You cannot create or delete a Surface object directly, it's
- * created or gotten through ShellSurface/SubSurface/EGLSurface.
+ * All surfaces in an SkLand application are stacked by the order defined in
+ * wayland protocol. [TODO: use an image to show the surface stack.]
  *
- * @see ShellSurface
- * @see SubSurface
- * @see EGLSurface
+ * This class has several nested classes to identify and control the surface
+ * role. You cannot create or delete a surface object directly. Instead, you
+ * need to use the nested class. For example:
+ *
+ *   - Create a toplevel shell surface with Surface::Shell::Toplevel::Create()
+ *   - Create a sub surface with Surface::Sub::Create()
+ *
+ * You can also use Surface::EGL::Get() to transform a 2D surface to 3D surface,
+ * and delete the Surface::EGL object will transform back to 2D.
  */
 class Surface {
 
   friend class Application;
   friend class Display;
-
-  friend class ShellSurface;
-  friend class SubSurface;
-  friend class EGLSurface;
 
   Surface() = delete;
   Surface(const Surface &) = delete;
@@ -88,7 +89,247 @@ class Surface {
 
  public:
 
-  struct CommitTask;
+  /**
+   * @brief Shell surface role
+   */
+  class Shell {
+
+    friend class Surface;
+
+    Shell() = delete;
+    Shell(const Shell &) = delete;
+    Shell &operator=(const Shell &) = delete;
+
+   public:
+
+    /**
+     * @brief Toplevel shell surface role
+     */
+    class Toplevel {
+
+      friend class Shell;
+
+      Toplevel() = delete;
+      Toplevel(const Toplevel &) = delete;
+      Toplevel &operator=(const Toplevel &) = delete;
+
+     public:
+
+      /**
+       * @brief Create a toplevel shell surface
+       */
+      static Surface *Create(AbstractEventHandler *event_handler,
+                             const Margin &margin = Margin());
+
+      static Toplevel *Get(const Surface *surface);
+
+      void SetTitle(const char *title) const;
+
+      void SetAppId(const char *id) const;
+
+      void Move(const wayland::Seat &seat, uint32_t serial) const;
+
+      void Resize(const wayland::Seat &seat, uint32_t serial, uint32_t edges) const;
+
+      void SetMaximized() const;
+
+      void UnsetMaximized() const;
+
+      void SetFullscreen(const Output &output) const;
+
+      void UnsetFullscreen(const Output &output) const;
+
+      void SetMinimized() const;
+
+      DelegateRef<void(int, int, int)> configure() { return xdg_toplevel_.configure(); }
+
+      DelegateRef<void()> close() { return xdg_toplevel_.close(); }
+
+     private:
+
+      Toplevel(Shell *shell_surface);
+
+      ~Toplevel();
+
+      Shell *shell_;
+      wayland::XdgToplevel xdg_toplevel_;
+
+    };
+
+    /**
+     * @brief Popup shell surface role
+     */
+    class Popup {
+
+      friend class Shell;
+
+      Popup() = delete;
+      Popup(const Popup &) = delete;
+      Popup &operator=(const Popup &) = delete;
+
+     public:
+
+      /**
+       * @brief Create a popup shell surface
+       */
+      static Surface *Create(Shell *parent,
+                             AbstractEventHandler *view,
+                             const Margin &margin = Margin());
+
+     private:
+
+      Popup(Shell *shell);
+
+      ~Popup();
+
+      Shell *shell_;
+
+      wayland::XdgPopup xdg_popup_;
+      wayland::XdgPositioner xdg_positioner_;
+
+    };
+
+    static Shell *Get(const Surface *surface);
+
+    void ResizeWindow(int width, int height) const;
+
+    void AckConfigure(uint32_t serial) const {
+      xdg_surface_.AckConfigure(serial);
+    }
+
+    Surface *surface() const { return surface_; }
+
+    DelegateRef<void(uint32_t)> configure() { return xdg_surface_.configure(); }
+
+   private:
+
+    static Surface *Create(AbstractEventHandler *event_handler,
+                           const Margin &margin = Margin());
+
+    Shell(Surface *surface);
+
+    ~Shell();
+
+    void Push();
+
+    void Remove();
+
+    Surface *surface_;
+
+    wayland::XdgSurface xdg_surface_;
+
+    Shell *parent_;
+
+    union {
+      void *placeholder;
+      Toplevel *toplevel;
+      Popup *popup;
+    } role_;
+  };
+
+  /**
+   * @brief Sub surface role
+   */
+  class Sub {
+
+    friend class Surface;
+
+   public:
+
+    /**
+     * @brief Create a sub surface
+     */
+    static Surface *Create(Surface *parent,
+                           AbstractEventHandler *event_handler,
+                           const Margin &margin = Margin());
+
+    static Sub *Get(const Surface *surface);
+
+    void PlaceAbove(Surface *sibling);
+
+    void PlaceBelow(Surface *sibling);
+
+    void SetRelativePosition(int x, int y);
+
+    void SetWindowPosition(int x, int y);
+
+    Surface *surface() const { return surface_; }
+
+   private:
+
+    Sub(Surface *surface, Surface *parent);
+
+    ~Sub();
+
+    void SetParent(Surface *parent);
+
+    /**
+   * @brief Move the local surface list and insert above target dst surface
+   * @param dst
+   */
+    void MoveAbove(Surface *dst);
+
+    /**
+     * @brief Move the local surface list and insert below target dst surface
+     * @param dst
+     */
+    void MoveBelow(Surface *dst);
+
+    void InsertAbove(Surface *sibling);
+
+    void InsertBelow(Surface *sibling);
+
+    Surface *surface_;
+
+    wayland::SubSurface wl_sub_surface_;
+
+  };
+
+  /**
+   * @brief EGL surface role
+   */
+  class EGL {
+
+    EGL() = delete;
+    EGL(const EGL &) = delete;
+    EGL &operator=(const EGL &) = delete;
+
+   public:
+
+    /**
+     * @brief Get the EGL surface
+     *
+     * If the surface is not an EGL surface, this method will create one and
+     * change the surface behavior. Delete the EGL object returned by this
+     * method will turn this surface back to 2D.
+     */
+    static EGL *Get(Surface *surface);
+
+    virtual ~EGL();
+
+    bool MakeCurrent();
+
+    bool SwapBuffers();
+
+    bool SwapBuffersWithDamage(int x, int y, int width, int height);
+
+    bool SwapInterval(EGLint interval = 0);
+
+    void Resize(int width, int height, int dx = 0, int dy = 0) {
+      egl_surface_.Resize(width, height, dx, dy);
+    }
+
+    Surface *surface() const { return surface_; }
+
+   private:
+
+    EGL(Surface *surface);
+
+    Surface *surface_;
+
+    egl::Surface egl_surface_;
+
+  };
 
   virtual ~Surface();
 
@@ -184,6 +425,8 @@ class Surface {
 
  private:
 
+  struct CommitTask;
+
   Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
 
   void OnEnter(struct wl_output *wl_output);
@@ -238,12 +481,12 @@ class Surface {
 
   std::unique_ptr<CommitTask> commit_task_;
 
-  EGLSurface *egl_surface_role_;
+  EGL *egl_;
 
   union {
     void *placeholder;
-    ShellSurface *shell_surface;
-    SubSurface *sub_surface;
+    Shell *shell;
+    Sub *sub;
   } role_;
 
   // global surface stack:

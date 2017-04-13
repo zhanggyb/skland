@@ -22,8 +22,6 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/context.hpp>
 #include <skland/gui/abstract-shell-frame.hpp>
-#include <skland/gui/toplevel-shell-surface.hpp>
-#include <skland/gui/sub-surface.hpp>
 #include <skland/gui/title-bar.hpp>
 
 #include <skland/gui/shared-memory-pool.hpp>
@@ -85,7 +83,7 @@ Window::Window(int width, int height, const char *title)
 
   // Create a sub surface for views:
   Surface *parent = GetShellSurface();
-  p_->main_surface = SubSurface::Create(parent, this, Theme::shadow_margin());
+  p_->main_surface = Surface::Sub::Create(parent, this, Theme::shadow_margin());
   DBG_ASSERT(p_->main_surface->parent() == parent);
   DBG_ASSERT(p_->main_surface->below() == parent);
   wayland::Region empty_region;

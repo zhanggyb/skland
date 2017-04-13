@@ -21,10 +21,6 @@
 #include <skland/gui/abstract-shell-frame.hpp>
 
 #include <skland/gui/surface.hpp>
-#include <skland/gui/shell-surface.hpp>
-#include <skland/gui/toplevel-shell-surface.hpp>
-#include <skland/gui/sub-surface.hpp>
-#include <skland/gui/egl-surface.hpp>
 #include <skland/gui/title-bar.hpp>
 
 #include <skland/gui/shared-memory-pool.hpp>
@@ -67,7 +63,7 @@ struct EGLWindow::Private {
 
   Surface *sub_surface;
 
-  EGLSurface *egl_surface;
+  Surface::EGL *egl_surface;
 
   wayland::Callback frame_callback;
 
@@ -87,7 +83,7 @@ EGLWindow::EGLWindow(int width, int height, const char *title)
 
   Surface *parent = GetShellSurface();
 
-  p_->sub_surface = SubSurface::Create(parent, this);
+  p_->sub_surface = Surface::Sub::Create(parent, this);
   DBG_ASSERT(p_->sub_surface->parent() == parent);
   DBG_ASSERT(p_->sub_surface->below() == parent);
 
@@ -95,9 +91,9 @@ EGLWindow::EGLWindow(int width, int height, const char *title)
   empty_region.Setup(Display::Registry().wl_compositor());
   p_->sub_surface->SetInputRegion(empty_region);
 
-  SubSurface::Get(p_->sub_surface)->SetWindowPosition(0, 0);
+  Surface::Sub::Get(p_->sub_surface)->SetWindowPosition(0, 0);
 
-  p_->egl_surface = EGLSurface::Get(p_->sub_surface);
+  p_->egl_surface = Surface::EGL::Get(p_->sub_surface);
   p_->egl_surface->Resize(GetWidth(), GetHeight());
 
   p_->frame_callback.done().Set(this, &EGLWindow::OnFrame);

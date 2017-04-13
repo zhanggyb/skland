@@ -15,7 +15,6 @@
  */
 
 #include <skland/gui/tooltip.hpp>
-#include <skland/gui/popup-shell-surface.hpp>
 
 namespace skland {
 

@@ -20,11 +20,9 @@
 #include "abstract-view.hpp"
 
 #include "../wayland/callback.hpp"
+#include "surface.hpp"
 
 namespace skland {
-
-class SubSurface;
-class EGLSurface;
 
 /**
  * @ingroup gui
@@ -75,7 +73,7 @@ class EGLWidget : public AbstractView {
 
   Surface *sub_surface_;
 
-  EGLSurface *egl_surface_;
+  Surface::EGL *egl_surface_;
 
   wayland::Callback frame_callback_;
 

@@ -20,9 +20,6 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
-#include <skland/gui/shell-surface.hpp>
-#include <skland/gui/toplevel-shell-surface.hpp>
-
 #include <skland/gui/abstract-shell-frame.hpp>
 
 #include <skland/stock/theme.hpp>
@@ -51,9 +48,9 @@ AbstractShellView::AbstractShellView(int width,
   if (title) p_->title = title;
 
   if (nullptr == p_->parent) {
-    p_->shell_surface = ToplevelShellSurface::Create(this, Theme::shadow_margin());
-    ShellSurface::Get(p_->shell_surface)->configure().Set(this, &AbstractShellView::OnXdgSurfaceConfigure);
-    ToplevelShellSurface *top_level_role = ToplevelShellSurface::Get(p_->shell_surface);
+    p_->shell_surface = Surface::Shell::Toplevel::Create(this, Theme::shadow_margin());
+    Surface::Shell::Get(p_->shell_surface)->configure().Set(this, &AbstractShellView::OnXdgSurfaceConfigure);
+    Surface::Shell::Toplevel *top_level_role = Surface::Shell::Toplevel::Get(p_->shell_surface);
     top_level_role->configure().Set(this, &AbstractShellView::OnXdgToplevelConfigure);
     top_level_role->close().Set(this, &AbstractShellView::OnXdgToplevelClose);
     top_level_role->SetTitle(title);
@@ -80,14 +77,14 @@ AbstractShellView::~AbstractShellView() {
 void AbstractShellView::SetTitle(const char *title) {
   p_->title = title;
   if (nullptr == p_->parent) {
-    ToplevelShellSurface::Get(p_->shell_surface)->SetTitle(title);
+    Surface::Shell::Toplevel::Get(p_->shell_surface)->SetTitle(title);
   }
 }
 
 void AbstractShellView::SetAppId(const char *app_id) {
   p_->app_id = app_id;
   if (nullptr == p_->parent) {
-    ToplevelShellSurface::Get(p_->shell_surface)->SetAppId(app_id);
+    Surface::Shell::Toplevel::Get(p_->shell_surface)->SetAppId(app_id);
   }
 }
 
@@ -110,7 +107,7 @@ void AbstractShellView::Close(SLOT) {
 }
 
 void AbstractShellView::Minimize(SLOT) {
-  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface);
+  Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
   Bit::Set<int>(p_->flags, Private::kFlagMaskMinimized);
@@ -119,7 +116,7 @@ void AbstractShellView::Minimize(SLOT) {
 }
 
 void AbstractShellView::ToggleMaximize(SLOT) {
-  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface);
+  Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
   if (IsMaximized()) {
@@ -130,7 +127,7 @@ void AbstractShellView::ToggleMaximize(SLOT) {
 }
 
 void AbstractShellView::ToggleFullscreen(SLOT slot) {
-  ToplevelShellSurface *toplevel = ToplevelShellSurface::Get(p_->shell_surface);
+  Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
   if (p_->output) {
@@ -306,11 +303,11 @@ void AbstractShellView::OnViewDetached(AbstractView *view) {
 }
 
 void AbstractShellView::MoveWithMouse(MouseEvent *event) const {
-  ToplevelShellSurface::Get(p_->shell_surface)->Move(event->GetSeat(), event->GetSerial());
+  Surface::Shell::Toplevel::Get(p_->shell_surface)->Move(event->GetSeat(), event->GetSerial());
 }
 
 void AbstractShellView::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
-  ToplevelShellSurface::Get(p_->shell_surface)->Resize(event->GetSeat(), event->GetSerial(), edges);
+  Surface::Shell::Toplevel::Get(p_->shell_surface)->Resize(event->GetSeat(), event->GetSerial(), edges);
 }
 
 Surface *AbstractShellView::GetShellSurface() const {
@@ -340,7 +337,7 @@ void AbstractShellView::RecursiveUpdate(AbstractView *view) {
 }
 
 void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {
-  ShellSurface *shell_surface = ShellSurface::Get(p_->shell_surface);
+  Surface::Shell *shell_surface = Surface::Shell::Get(p_->shell_surface);
   shell_surface->AckConfigure(serial);
 
   if (!IsShown()) {
@@ -386,7 +383,7 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
   }
 
   if (do_resize) {
-    ShellSurface::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
+    Surface::Shell::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
     OnResize(p_->last_size, p_->size);
     p_->last_size = p_->size;
 

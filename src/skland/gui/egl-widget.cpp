@@ -19,9 +19,6 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
-#include <skland/gui/sub-surface.hpp>
-#include <skland/gui/egl-surface.hpp>
-
 #include "internal/abstract-shell-view-redraw-task.hpp"
 #include "internal/abstract-view-iterators.hpp"
 
@@ -62,9 +59,9 @@ void EGLWidget::OnUpdate(AbstractView *view) {
     Surface *parent_surface = it.GetSurface();
     if (nullptr == parent_surface) return;
 
-    sub_surface_ = SubSurface::Create(parent_surface, this);
-    egl_surface_ = EGLSurface::Get(sub_surface_);
-    SubSurface::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
+    sub_surface_ = Surface::Sub::Create(parent_surface, this);
+    egl_surface_ = Surface::EGL::Get(sub_surface_);
+    Surface::Sub::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
     egl_surface_->Resize(GetWidth(), GetHeight());
 //    surface_->SetDesync();
   }
