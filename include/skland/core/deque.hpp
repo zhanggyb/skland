@@ -35,6 +35,8 @@ class Deque {
 
     virtual ~Element();
 
+   protected:
+
     Element *previous() const { return previous_; }
 
     Element *next() const { return next_; }
@@ -46,6 +48,72 @@ class Deque {
     Element *previous_;
     Element *next_;
     Deque *deque_;
+
+  };
+
+  class Iterator {
+
+   public:
+
+    explicit Iterator(Element *element = nullptr)
+        : p_(element) {}
+
+    Iterator(const Iterator &orig)
+        : p_(orig.p_) {}
+
+    ~Iterator() {}
+
+    Iterator &operator=(const Iterator &other) {
+      p_ = other.p_;
+      return *this;
+    }
+
+    Iterator &operator++() {
+      p_ = p_->next_;
+      return *this;
+    }
+
+    Iterator operator++(int) {
+      Iterator retval;
+      retval.p_ = p_->next_;
+      return retval;
+    }
+
+    Iterator &operator--() {
+      p_ = p_->previous_;
+      return *this;
+    }
+
+    Iterator operator--(int) {
+      Iterator retval;
+      retval.p_ = p_->previous_;
+      return retval;
+    }
+
+    bool operator==(const Iterator &other) const {
+      return p_ == other.p_;
+    }
+
+    bool operator==(const Element *element) const {
+      return p_ == element;
+    }
+
+    bool operator!=(const Iterator &other) const {
+      return p_ != other.p_;
+    }
+
+    bool operator!=(const Element *element) const {
+      return p_ != element;
+    }
+
+    template<typename T>
+    T *cast() const {
+      return static_cast<T *>(p_);
+    }
+
+   private:
+
+    Element *p_;
 
   };
 
@@ -65,11 +133,21 @@ class Deque {
 
   Element *operator[](int index) const;
 
+  Iterator begin() const {
+    return Iterator(first_);
+  }
+
+  Iterator end() const {
+    return Iterator(nullptr);
+  }
+
+  int count() const { return count_; }
+
+ protected:
+
   Element *first() const { return first_; }
 
   Element *last() const { return last_; }
-
-  int count() const { return count_; }
 
  private:
 

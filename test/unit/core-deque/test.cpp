@@ -19,6 +19,14 @@ class Item : public Deque::Element {
 
   int id() const { return id_; };
 
+  Item* _previous() const {
+    return static_cast<Item*>(Deque::Element::previous());
+  }
+
+  Item* _next() const {
+    return static_cast<Item*>(Deque::Element::next());
+  }
+
  private:
 
   int id_;
@@ -44,10 +52,10 @@ TEST_F(Test, push_front_1) {
   deque.PushFront(item3);
 
   ASSERT_TRUE(deque.count() == 3);
-  ASSERT_TRUE(item1->next() == nullptr);
-  ASSERT_TRUE(item1->previous() == item2);
-  ASSERT_TRUE(item2->previous() == item3);
-  ASSERT_TRUE(item3->previous() == nullptr);
+  ASSERT_TRUE(item1->_next() == nullptr);
+  ASSERT_TRUE(item1->_previous() == item2);
+  ASSERT_TRUE(item2->_previous() == item3);
+  ASSERT_TRUE(item3->_previous() == nullptr);
 }
 
 TEST_F(Test, push_back_1) {
@@ -61,10 +69,10 @@ TEST_F(Test, push_back_1) {
   deque.PushBack(item3);
 
   ASSERT_TRUE(deque.count() == 3);
-  ASSERT_TRUE(item1->previous() == nullptr);
-  ASSERT_TRUE(item1->next() == item2);
-  ASSERT_TRUE(item2->next() == item3);
-  ASSERT_TRUE(item3->next() == nullptr);
+  ASSERT_TRUE(item1->_previous() == nullptr);
+  ASSERT_TRUE(item1->_next() == item2);
+  ASSERT_TRUE(item2->_next() == item3);
+  ASSERT_TRUE(item3->_next() == nullptr);
 }
 
 TEST_F(Test, insert_1) {
@@ -78,10 +86,10 @@ TEST_F(Test, insert_1) {
   deque.Insert(item3);
 
   ASSERT_TRUE(deque.count() == 3);
-  ASSERT_TRUE(item1->next() == nullptr);
-  ASSERT_TRUE(item1->previous() == item2);
-  ASSERT_TRUE(item2->previous() == item3);
-  ASSERT_TRUE(item3->previous() == nullptr);
+  ASSERT_TRUE(item1->_next() == nullptr);
+  ASSERT_TRUE(item1->_previous() == item2);
+  ASSERT_TRUE(item2->_previous() == item3);
+  ASSERT_TRUE(item3->_previous() == nullptr);
 }
 
 TEST_F(Test, insert_2) {
@@ -98,10 +106,10 @@ TEST_F(Test, insert_2) {
   deque.Insert(item4);
 
   ASSERT_TRUE(deque.count() == 4);
-  ASSERT_TRUE(item1->previous() == item2);
-  ASSERT_TRUE(item2->previous() == item3);
-  ASSERT_TRUE(item3->previous() == item4);
-  ASSERT_TRUE(item4->previous() == nullptr);
+  ASSERT_TRUE(item1->_previous() == item2);
+  ASSERT_TRUE(item2->_previous() == item3);
+  ASSERT_TRUE(item3->_previous() == item4);
+  ASSERT_TRUE(item4->_previous() == nullptr);
 }
 
 TEST_F(Test, insert_3) {
@@ -118,9 +126,9 @@ TEST_F(Test, insert_3) {
   deque.Insert(item4, -1);
 
   ASSERT_TRUE(deque.count() == 4);
-  ASSERT_TRUE(item1->previous() == item2);
-  ASSERT_TRUE(item2->previous() == item3);
-  ASSERT_TRUE(item3->previous() == nullptr);
-  ASSERT_TRUE(item1->next() == item4);
-  ASSERT_TRUE(item4->next() == nullptr);
+  ASSERT_TRUE(item1->_previous() == item2);
+  ASSERT_TRUE(item2->_previous() == item3);
+  ASSERT_TRUE(item3->_previous() == nullptr);
+  ASSERT_TRUE(item1->_next() == item4);
+  ASSERT_TRUE(item4->_next() == nullptr);
 }

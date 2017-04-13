@@ -37,7 +37,6 @@ EGLWidget::EGLWidget(int width, int height)
     : AbstractView(width, height),
       sub_surface_(nullptr),
       egl_surface_(nullptr),
-      resize_(false),
       animating_(false) {
   frame_callback_.done().Set(this, &EGLWidget::OnFrame);
 }
@@ -73,9 +72,17 @@ Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
   return sub_surface_;
 }
 
-void EGLWidget::OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
-  resize_ = true;
+void EGLWidget::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  Update();
+}
+
+void EGLWidget::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   egl_surface_->Resize(GetWidth(), GetHeight());
+  OnResizeEGL();
+}
+
+void EGLWidget::OnLayout(int, int, int, int, int) {
+
 }
 
 void EGLWidget::OnMouseEnter(MouseEvent *event) {
@@ -102,10 +109,6 @@ void EGLWidget::OnDraw(const Context *context) {
   if (!animating_) {
     if (egl_surface_->MakeCurrent()) {
       animating_ = true;
-      if (resize_) {
-        resize_ = false;
-//        OnSizeChanged(GetWidth(), GetHeight());
-      }
       OnInitializeEGL();
       egl_surface_->surface()->SetupCallback(frame_callback_);
       egl_surface_->SwapBuffers();

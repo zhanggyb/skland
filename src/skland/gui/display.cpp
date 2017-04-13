@@ -159,8 +159,8 @@ void Display::AddOutput(Output *output, int index) {
 
 void Display::DestroyOutput(uint32_t id) {
   Output *output = nullptr;
-  for (Deque::Element *it = output_deque_.first(); it; it = it->next()) {
-    output = static_cast<Output *>(it);
+  for (Deque::Iterator it = output_deque_.begin(); it != output_deque_.end(); ++it) {
+    output = it.cast<Output>();
     if (output->GetID() == id) {
       delete output;
       break;
