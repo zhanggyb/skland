@@ -117,8 +117,8 @@ class Display {
 
   int display_fd_;
 
-  Deque<Output> output_deque_;
-  Deque<Input> input_deque_;
+  Deque output_deque_;
+  Deque input_deque_;
 
   std::list<Global *> globals_;
   std::set<uint32_t> pixel_formats_;

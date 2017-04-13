@@ -40,10 +40,7 @@ class Seat;
  * @ingroup gui
  * @brief Input manager
  */
-SKLAND_EXPORT class Input {
-
-  template<typename T> friend
-  class Deque;
+SKLAND_EXPORT class Input : public Deque::Element {
 
   Input() = delete;
   Input(const Input &) = delete;
@@ -156,10 +153,6 @@ SKLAND_EXPORT class Input {
   void OnTouchFrame();
 
   void OnTouchCancel();
-
-  Input *previous_;
-  Input *next_;
-  Deque<Input> *deque_;
 
   std::unique_ptr<Private> p_;
 

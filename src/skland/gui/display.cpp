@@ -19,7 +19,6 @@
 #include <skland/gui/display.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
-#include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/surface.hpp>
 
 #include "internal/display-private.hpp"
@@ -151,7 +150,7 @@ void Display::Disconnect() noexcept {
 }
 
 const Output *Display::GetOutputAt(int index) {
-  return kDisplay->output_deque_[index];
+  return static_cast<Output *>(kDisplay->output_deque_[index]);
 }
 
 void Display::AddOutput(Output *output, int index) {
@@ -159,7 +158,9 @@ void Display::AddOutput(Output *output, int index) {
 }
 
 void Display::DestroyOutput(uint32_t id) {
-  for (Output *output = output_deque_.first(); output; output = output->next()) {
+  Output *output = nullptr;
+  for (Deque::Element *it = output_deque_.first(); it; it = it->next()) {
+    output = static_cast<Output *>(it);
     if (output->GetID() == id) {
       delete output;
       break;

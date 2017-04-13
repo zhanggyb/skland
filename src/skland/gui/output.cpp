@@ -67,9 +67,7 @@ struct Output::Private {
 };
 
 Output::Output(uint32_t id, uint32_t version)
-    : previous_(nullptr),
-      next_(nullptr),
-      deque_(nullptr) {
+    : Deque::Element() {
   p_.reset(new Private);
   p_->id = id;
   p_->version = version;
@@ -85,8 +83,6 @@ Output::Output(uint32_t id, uint32_t version)
 Output::~Output() {
   destroyed_.Emit(this);
   p_->wl_output.Destroy();
-  if (deque_) deque_->Remove(this);
-  DBG_ASSERT(nullptr == deque_);
 }
 
 const std::string &Output::GetMake() const {

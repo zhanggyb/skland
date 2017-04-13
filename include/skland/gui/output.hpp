@@ -31,10 +31,7 @@ namespace wayland {
 class Output;
 }
 
-class Output {
-
-  template<typename T> friend
-  class Deque;
+class Output: public Deque::Element {
 
   Output() = delete;
   Output(const Output &) = delete;
@@ -60,10 +57,6 @@ class Output {
 
   uint32_t GetVersion() const;
 
-  Output *previous() const { return previous_; }
-
-  Output *next() const { return next_; }
-
  private:
 
   struct Private;
@@ -85,10 +78,6 @@ class Output {
   void OnDone();
 
   void OnScale(int32_t factor);
-
-  Output *previous_;
-  Output *next_;
-  Deque<Output> *deque_;
 
   std::unique_ptr<Private> p_;
 

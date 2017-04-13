@@ -81,7 +81,7 @@ struct Input::Private {
 };
 
 Input::Input(uint32_t id, uint32_t version)
-    : previous_(nullptr), next_(nullptr), deque_(nullptr) {
+    : Deque::Element() {
   p_.reset(new Private);
   p_->id = id;
   p_->version = version;
@@ -93,11 +93,6 @@ Input::Input(uint32_t id, uint32_t version)
 
 Input::~Input() {
   p_.reset();
-
-  if (deque_)
-    deque_->Remove(this);
-
-  DBG_ASSERT(nullptr == deque_);
 }
 
 void Input::SetCursor(const Cursor *cursor) const {

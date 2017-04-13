@@ -8,37 +8,18 @@
 
 using namespace skland;
 
-class Item {
-
-  template<typename T>
-  friend
-  class skland::Deque;
+class Item : public Deque::Element {
 
  public:
 
   Item(int id)
-      : previous_(nullptr),
-        next_(nullptr),
-        deque_(nullptr),
-        id_(id) {}
+      : id_(id) {}
 
-  ~Item() {
-    if (deque_) deque_->Remove(this);
-  }
+  virtual ~Item() {}
 
   int id() const { return id_; };
 
-  Item *previous() const { return previous_; }
-
-  Item *next() const { return next_; }
-
-  Deque<Item> *deque() const { return deque_; }
-
  private:
-
-  Item *previous_;
-  Item *next_;
-  Deque<Item> *deque_;
 
   int id_;
 
@@ -57,7 +38,7 @@ TEST_F(Test, push_front_1) {
   Item *item2 = new Item(2);
   Item *item3 = new Item(3);
 
-  Deque<Item> deque;
+  Deque deque;
   deque.PushFront(item1);
   deque.PushFront(item2);
   deque.PushFront(item3);
@@ -74,7 +55,7 @@ TEST_F(Test, push_back_1) {
   Item *item2 = new Item(2);
   Item *item3 = new Item(3);
 
-  Deque<Item> deque;
+  Deque deque;
   deque.PushBack(item1);
   deque.PushBack(item2);
   deque.PushBack(item3);
@@ -91,7 +72,7 @@ TEST_F(Test, insert_1) {
   Item *item2 = new Item(2);
   Item *item3 = new Item(3);
 
-  Deque<Item> deque;
+  Deque deque;
   deque.Insert(item1);
   deque.Insert(item2);
   deque.Insert(item3);
@@ -108,7 +89,7 @@ TEST_F(Test, insert_2) {
   Item *item2 = new Item(2);
   Item *item3 = new Item(3);
 
-  Deque<Item> deque;
+  Deque deque;
   deque.Insert(item1);
   deque.Insert(item2);
   deque.Insert(item3);
@@ -128,7 +109,7 @@ TEST_F(Test, insert_3) {
   Item *item2 = new Item(2);
   Item *item3 = new Item(3);
 
-  Deque<Item> deque;
+  Deque deque;
   deque.Insert(item1);
   deque.Insert(item2);
   deque.Insert(item3);
