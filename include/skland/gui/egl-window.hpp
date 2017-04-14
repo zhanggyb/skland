@@ -54,7 +54,7 @@ class EGLWindow : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnResize(const Size &old_size, const Size &new_size) final;
+  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
 
   virtual void OnMouseMove(MouseEvent *event) override;
 
@@ -66,11 +66,11 @@ class EGLWindow : public AbstractShellView {
 
   virtual void OnFocus(bool);
 
-  virtual void OnInitializeEGL();
+  virtual void OnInitialize();
 
-  virtual void OnResizeEGL(int width, int height);
+  virtual void OnResize(int width, int height);
 
-  virtual void OnRenderEGL();
+  virtual void OnRender();
 
   bool MakeCurrent();
 

@@ -56,7 +56,6 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 
     sub_surface_ = Surface::Sub::Create(parent_surface, this);
     egl_surface_ = Surface::EGL::Get(sub_surface_);
-    Surface::Sub::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
     wayland::Region region;
     sub_surface_->SetInputRegion(region);
 //    egl_surface_->Resize(GetWidth(), GetHeight());
@@ -76,11 +75,15 @@ void EGLWidget::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, c
   else
     CancelUpdate();
 
-  if (egl_surface_) egl_surface_->Resize((int) new_geometry.width(), (int) new_geometry.height());
+  if (egl_surface_) {
+    Surface::Sub::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
+    egl_surface_->Resize((int) new_geometry.width(), (int) new_geometry.height());
+    OnResize((int) new_geometry.width(), (int) new_geometry.height());
+  }
 }
 
 void EGLWidget::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-  OnResizeEGL();
+
 }
 
 void EGLWidget::OnLayout(int, int, int, int, int) {
@@ -109,42 +112,49 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 
 void EGLWidget::OnDraw(const Context *context) {
   if (!animating_) {
-    if (egl_surface_->MakeCurrent()) {
-      animating_ = true;
-      OnInitializeEGL();
-      egl_surface_->surface()->SetupCallback(frame_callback_);
-      egl_surface_->SwapBuffers();
-      egl_surface_->surface()->Commit();
-    }
+    animating_ = true;
+    egl_surface_->surface()->SetupCallback(frame_callback_);
+    OnInitialize();
+    egl_surface_->surface()->Commit();
   }
 }
 
-void EGLWidget::OnInitializeEGL() {
+void EGLWidget::OnInitialize() {
+  egl_surface_->MakeCurrent();
+
   glClearColor(0.1, 0.1, .85, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
+
+  egl_surface_->SwapBuffers();
 }
 
-void EGLWidget::OnResizeEGL() {
+void EGLWidget::OnResize(int width, int height) {
 
 }
 
-void EGLWidget::OnRenderEGL() {
+void EGLWidget::OnRender() {
+  egl_surface_->MakeCurrent();
+
   glClearColor(0.36, 0.85, 0.27, 0.9);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
+
+  egl_surface_->SwapBuffers();
+}
+
+bool EGLWidget::MakeCurrent() {
+  return egl_surface_->MakeCurrent();
+}
+
+void EGLWidget::SwapBuffers() {
+  egl_surface_->SwapBuffers();
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-  static int count = 0;
-  count++;
-  fprintf(stderr, "on frame: %d\n", count);
-  if (egl_surface_->MakeCurrent()) {
-    OnRenderEGL();
-    egl_surface_->surface()->SetupCallback(frame_callback_);
-    egl_surface_->SwapBuffers();
-    egl_surface_->surface()->Commit();
-  }
+  egl_surface_->surface()->SetupCallback(frame_callback_);
+  OnRender();
+  egl_surface_->surface()->Commit();
 }
 
 }

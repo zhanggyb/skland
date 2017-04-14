@@ -78,11 +78,11 @@ class SimpleEGLWindow : public EGLWindow {
 
  protected:
 
-  virtual void OnInitializeEGL() override;
+  virtual void OnInitialize() override;
 
-  virtual void OnResizeEGL(int width, int height) override;
+  virtual void OnResize(int width, int height) override;
 
-  virtual void OnRenderEGL() override;
+  virtual void OnRender() override;
 
  private:
   GLuint program;
@@ -93,7 +93,7 @@ class SimpleEGLWindow : public EGLWindow {
 
 };
 
-void SimpleEGLWindow::OnInitializeEGL() {
+void SimpleEGLWindow::OnInitialize() {
   MakeCurrent();
 
   GLuint frag, vert;
@@ -131,11 +131,11 @@ void SimpleEGLWindow::OnInitializeEGL() {
   SwapBuffers();
 }
 
-void SimpleEGLWindow::OnResizeEGL(int width, int height) {
+void SimpleEGLWindow::OnResize(int width, int height) {
 
 }
 
-void SimpleEGLWindow::OnRenderEGL() {
+void SimpleEGLWindow::OnRender() {
   MakeCurrent();
 
   static const GLfloat verts[3][2] = {
@@ -172,7 +172,7 @@ void SimpleEGLWindow::OnRenderEGL() {
   glUniformMatrix4fv(rotation_uniform, 1, GL_FALSE,
                      (GLfloat *) rotation);
 
-  glClearColor(0.0, 0.0, 0.0, 1.0);
+  glClearColor(0.0, 0.0, 0.0, .75);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 0, verts);

@@ -116,6 +116,8 @@ void AbstractShellView::Minimize(SLOT) {
 }
 
 void AbstractShellView::ToggleMaximize(SLOT) {
+  if (IsFullscreen()) return;
+
   Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
@@ -384,7 +386,7 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
 
   if (do_resize) {
     Surface::Shell::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
-    OnResize(p_->last_size, p_->size);
+    OnSizeChange(p_->last_size, p_->size);
     p_->last_size = p_->size;
 
     // surface size is changed, reset the pointer position and enter/leave widgets

@@ -156,7 +156,7 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   return nullptr != p_->sub_surface ? p_->sub_surface : GetShellSurface();
 }
 
-void EGLWindow::OnResize(const Size &old_size, const Size &new_size) {
+void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
   int width = new_size.width;
   int height = new_size.height;
 
@@ -190,7 +190,7 @@ void EGLWindow::OnResize(const Size &old_size, const Size &new_size) {
   p_->frame_canvas->Clear();
 
   p_->egl_surface->Resize(new_size.width, new_size.height);
-  OnResizeEGL(new_size.width, new_size.height);
+  OnResize(new_size.width, new_size.height);
 
   OnUpdate(nullptr);
 }
@@ -326,7 +326,7 @@ void EGLWindow::OnDraw(const Context *context) {
   if (!p_->animating) {
     p_->animating = true;
     p_->egl_surface->surface()->SetupCallback(p_->frame_callback);
-    OnInitializeEGL();
+    OnInitialize();
   }
 }
 
@@ -334,18 +334,22 @@ void EGLWindow::OnFocus(bool) {
   OnUpdate(nullptr);
 }
 
-void EGLWindow::OnInitializeEGL() {
+void EGLWindow::OnInitialize() {
 
 }
 
-void EGLWindow::OnResizeEGL(int /*width*/, int /*height*/) {
+void EGLWindow::OnResize(int /*width*/, int /*height*/) {
 
 }
 
-void EGLWindow::OnRenderEGL() {
+void EGLWindow::OnRender() {
+  p_->egl_surface->MakeCurrent();
+
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
+
+  p_->egl_surface->SwapBuffers();
 }
 
 bool EGLWindow::MakeCurrent() {
@@ -353,8 +357,7 @@ bool EGLWindow::MakeCurrent() {
 }
 
 void EGLWindow::SwapBuffers() {
-  if (p_->egl_surface->SwapBuffers())
-    p_->egl_surface->surface()->Commit();
+  p_->egl_surface->SwapBuffers();
 }
 
 int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
@@ -401,7 +404,8 @@ int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
 
 void EGLWindow::OnFrame(uint32_t serial) {
   p_->egl_surface->surface()->SetupCallback(p_->frame_callback);
-  OnRenderEGL();
+  OnRender();
+  p_->egl_surface->surface()->Commit();
 }
 
 void EGLWindow::OnRelease() {

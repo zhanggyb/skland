@@ -65,11 +65,15 @@ class EGLWidget : public AbstractView {
 
   virtual void OnDraw(const Context *context) final;
 
-  virtual void OnInitializeEGL();
+  virtual void OnInitialize();
 
-  virtual void OnResizeEGL();
+  virtual void OnResize(int width, int height);
 
-  virtual void OnRenderEGL();
+  virtual void OnRender();
+
+  bool MakeCurrent();
+
+  void SwapBuffers();
 
  private:
 

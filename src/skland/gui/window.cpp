@@ -230,7 +230,7 @@ Surface *Window::GetSurface(const AbstractView *view) const {
   return nullptr != p_->main_surface ? p_->main_surface : GetShellSurface();
 }
 
-void Window::OnResize(const Size &old_size, const Size &new_size) {
+void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   int width = new_size.width;
   int height = new_size.height;
 
