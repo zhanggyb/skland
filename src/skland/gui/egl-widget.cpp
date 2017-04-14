@@ -51,17 +51,15 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 
   if (nullptr == sub_surface_) {
     DBG_ASSERT(nullptr == egl_surface_);
-    Iterator it(this);
-    if (nullptr == it.parent()) return;
-
-    it = it.parent();
-    Surface *parent_surface = it.GetSurface();
+    Surface *parent_surface = AbstractView::GetSurface(this);
     if (nullptr == parent_surface) return;
 
     sub_surface_ = Surface::Sub::Create(parent_surface, this);
     egl_surface_ = Surface::EGL::Get(sub_surface_);
     Surface::Sub::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
-    egl_surface_->Resize(GetWidth(), GetHeight());
+    wayland::Region region;
+    sub_surface_->SetInputRegion(region);
+//    egl_surface_->Resize(GetWidth(), GetHeight());
 //    surface_->SetDesync();
   }
 
@@ -73,11 +71,15 @@ Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
 }
 
 void EGLWidget::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-  Update();
+  if (dirty_flag)
+    Update();
+  else
+    CancelUpdate();
+
+  if (egl_surface_) egl_surface_->Resize((int) new_geometry.width(), (int) new_geometry.height());
 }
 
 void EGLWidget::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-  egl_surface_->Resize(GetWidth(), GetHeight());
   OnResizeEGL();
 }
 
