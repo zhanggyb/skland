@@ -85,8 +85,6 @@ class EGLWindow : public AbstractShellView {
 
   void OnRelease();
 
-  void DrawShadow(Canvas *canvas);
-
   std::unique_ptr<Private> p_;
 
 };

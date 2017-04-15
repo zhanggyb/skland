@@ -44,8 +44,6 @@ class TitleBar final : public AbstractView {
 
   virtual ~TitleBar();
 
-  void SetForeground(const Color &color);
-
   void SetTitle(const std::string &title);
 
   AbstractButton *GetButton(ButtonType button_type) const;
@@ -86,8 +84,6 @@ class TitleBar final : public AbstractView {
   FullscreenButton *fullscreen_button_;
 
   Font font_;
-
-  Color foreground_;
 
   std::string title_;
 };

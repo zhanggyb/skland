@@ -27,23 +27,6 @@ class SkPixmap;
 
 namespace skland {
 
-// Forward declaration
-class Application;
-class AbstractShellFrame;
-
-struct ColorScheme {
-  ColorD outline;
-  ColorD item;
-  ColorD inner;
-  ColorD inner_selected;
-  ColorD text;
-  ColorD text_selected;
-  bool shaded;
-  short shadetop;
-  short shadedown;
-  bool alpha_check;
-};
-
 typedef void *(*ThemeCreateHandle)();
 typedef void(*ThemeDestroyHandle)(void *p);
 
@@ -59,6 +42,32 @@ class Theme {
   Theme &operator=(const Theme &) = delete;
 
  public:
+
+  struct ColorScheme {
+
+    ColorScheme()
+        : outline(),
+          item(),
+          inner(0xEFF0F0F0),
+          inner_selected(0xEFE0E0E0),
+          text(0xFF444444),
+          text_selected(0xFF999999),
+          shaded(false),
+          shadetop(0),
+          shadedown(0),
+          alpha_check(false) {}
+
+    Color outline;
+    Color item;
+    Color inner;
+    Color inner_selected;
+    Color text;
+    Color text_selected;
+    bool shaded;
+    short shadetop;
+    short shadedown;
+    bool alpha_check;
+  };
 
   static void Load(const char *name = nullptr);
 
@@ -86,11 +95,19 @@ class Theme {
 
   static const int kShadowImageHeight = 250;
 
+  static const ColorScheme &GetWindowColorScheme() {
+    return kTheme->window_color_scheme_;
+  }
+
  protected:
 
   Theme();
 
   virtual ~Theme();
+
+  ColorScheme &window_color_scheme() {
+    return window_color_scheme_;
+  };
 
  private:
 
@@ -122,6 +139,8 @@ class Theme {
   static SkPixmap *kShadowPixmap;
 
   std::string name_;
+
+  ColorScheme window_color_scheme_;
 
   static Theme *kTheme;
 

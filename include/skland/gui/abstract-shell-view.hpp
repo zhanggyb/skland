@@ -208,6 +208,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void DispatchMouseButtonEvent(MouseEvent *event);
 
+  void DropShadow(const Context *context);
+
   /**
    * @brief Mark damage area of the given object
    *

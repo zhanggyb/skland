@@ -22,11 +22,15 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
+#include <skland/graphic/canvas.hpp>
+
 #include <skland/stock/theme.hpp>
 
 #include "internal/abstract-view-private.hpp"
 #include "internal/display-registry.hpp"
 #include "internal/abstract-event-handler-mouse-task-iterator.hpp"
+
+#include "SkCanvas.h"
 
 namespace skland {
 
@@ -490,6 +494,89 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent
       break;
     }
   }
+}
+
+
+void AbstractShellView::DropShadow(const Context *context) {
+  float rad = Theme::GetShadowRadius() - 1.f; // The spread radius
+  float offset_x = Theme::GetShadowOffsetX();
+  float offset_y = Theme::GetShadowOffsetY();
+
+  if (!IsFocused()) {
+    rad = (int) rad / 3;
+    offset_x = (int) offset_x / 3;
+    offset_y = (int) offset_y / 3;
+  }
+
+  // shadow map
+  SkCanvas *c = context->canvas()->GetSkCanvas();
+  sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::GetShadowPixmap(), nullptr, nullptr);
+
+  // top-left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 0,
+                                    2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius()),
+                   SkRect::MakeXYWH(-rad + offset_x, -rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // top
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(2 * Theme::GetShadowRadius(), 0,
+                                    250 - 2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius()),
+                   SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
+                                    GetWidth() - 2 * rad, 2 * rad),
+                   nullptr);
+
+  // top-right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 0,
+                                    250, 2 * Theme::GetShadowRadius()),
+                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, -rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 2 * Theme::GetShadowRadius(),
+                                    2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius()),
+                   SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
+                                    2 * rad, GetHeight() - 2 * rad),
+                   nullptr);
+
+  // bottom-left
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(0, 250 - 2 * Theme::GetShadowRadius(),
+                                    2 * Theme::GetShadowRadius(), 250),
+                   SkRect::MakeXYWH(-rad + offset_x, GetHeight() - rad + offset_y,
+                                    2 * rad, 2 * rad),
+                   nullptr);
+
+  // bottom
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius(),
+                                    250 - 2 * Theme::GetShadowRadius(), 250),
+                   SkRect::MakeXYWH(rad + offset_x, GetHeight() - rad + offset_y,
+                                    GetWidth() - 2 * rad, 2 * rad),
+                   nullptr);
+
+  // bottom-right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius(),
+                                    250, 250),
+                   SkRect::MakeXYWH(GetWidth() - rad + offset_x,
+                                    GetHeight() - rad + offset_y,
+                                    2 * rad,
+                                    2 * rad),
+                   nullptr);
+
+  // right
+  c->drawImageRect(image,
+                   SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius(),
+                                    250, 250 - 2 * Theme::GetShadowRadius()),
+                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, rad + offset_y,
+                                    2 * rad, GetHeight() - 2 * rad),
+                   nullptr);
 }
 
 }

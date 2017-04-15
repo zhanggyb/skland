@@ -17,6 +17,7 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
 #include <skland/gui/label.hpp>
+#include <skland/stock/theme.hpp>
 
 using namespace skland;
 
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]) {
   using skland::Window;
 
   Application app(argc, argv);
-//  Theme::Load("dark");
+  Theme::Load("dark");
 
   Window *win = new Window(320, 240, "Dark Theme");
   win->SetAppId("Theme");

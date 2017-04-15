@@ -16,6 +16,8 @@
 
 #include <skland/gui/window.hpp>
 
+#include <skland/core/assert.hpp>
+
 #include <skland/gui/application.hpp>
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/mouse-event.hpp>
@@ -36,9 +38,6 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
-#include <skland/core/assert.hpp>
-
-#include "SkCanvas.h"
 
 namespace skland {
 
@@ -464,7 +463,7 @@ void Window::OnDraw(const Context *context) {
     path.AddRoundRect(geometry, radii);
     canvas->Save();
     canvas->ClipPath(path, kClipDifference, true);
-    DrawShadow(canvas.get());
+    DropShadow(context);
     canvas->Restore();
   } else {
     path.AddRect(geometry);
@@ -473,11 +472,11 @@ void Window::OnDraw(const Context *context) {
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(0xEFF0F0F0);
+  paint.SetColor(Theme::GetWindowColorScheme().inner);
   canvas->DrawPath(path, paint);
 
   // Draw the client area:
-  paint.SetColor(0xEFE0E0E0);
+  paint.SetColor(Theme::GetWindowColorScheme().inner_selected);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
   canvas->DrawRect(GetContentGeometry(), paint);
@@ -546,88 +545,6 @@ int Window::GetMouseLocation(const MouseEvent *event) const {
     location = AbstractShellView::kClientArea;
 
   return location;
-}
-
-void Window::DrawShadow(Canvas *canvas) {
-  float rad = Theme::GetShadowRadius() - 1.f; // The spread radius
-  float offset_x = Theme::GetShadowOffsetX();
-  float offset_y = Theme::GetShadowOffsetY();
-
-  if (!IsFocused()) {
-    rad = (int) rad / 3;
-    offset_x = (int) offset_x / 3;
-    offset_y = (int) offset_y / 3;
-  }
-
-  // shadow map
-  SkCanvas *c = canvas->GetSkCanvas();
-  sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::GetShadowPixmap(), nullptr, nullptr);
-
-  // top-left
-  c->drawImageRect(image,
-                   SkRect::MakeLTRB(0, 0,
-                                    2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius()),
-                   SkRect::MakeXYWH(-rad + offset_x, -rad + offset_y,
-                                    2 * rad, 2 * rad),
-                   nullptr);
-
-  // top
-  c->drawImageRect(image,
-                   SkRect::MakeLTRB(2 * Theme::GetShadowRadius(), 0,
-                                    250 - 2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius()),
-                   SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
-                                    GetWidth() - 2 * rad, 2 * rad),
-                   nullptr);
-
-  // top-right
-  c->drawImageRect(image,
-                   SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 0,
-                                    250, 2 * Theme::GetShadowRadius()),
-                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, -rad + offset_y,
-                                    2 * rad, 2 * rad),
-                   nullptr);
-
-  // left
-  c->drawImageRect(image,
-                   SkRect::MakeLTRB(0, 2 * Theme::GetShadowRadius(),
-                                    2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius()),
-                   SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
-                                    2 * rad, GetHeight() - 2 * rad),
-                   nullptr);
-
-  // bottom-left
-  c->drawImageRect(image,
-                   SkRect::MakeLTRB(0, 250 - 2 * Theme::GetShadowRadius(),
-                                    2 * Theme::GetShadowRadius(), 250),
-                   SkRect::MakeXYWH(-rad + offset_x, GetHeight() - rad + offset_y,
-                                    2 * rad, 2 * rad),
-                   nullptr);
-
-  // bottom
-  c->drawImageRect(image,
-                   SkRect::MakeLTRB(2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius(),
-                                    250 - 2 * Theme::GetShadowRadius(), 250),
-                   SkRect::MakeXYWH(rad + offset_x, GetHeight() - rad + offset_y,
-                                    GetWidth() - 2 * rad, 2 * rad),
-                   nullptr);
-
-  // bottom-right
-  c->drawImageRect(image,
-                   SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius(),
-                                    250, 250),
-                   SkRect::MakeXYWH(GetWidth() - rad + offset_x,
-                                    GetHeight() - rad + offset_y,
-                                    2 * rad,
-                                    2 * rad),
-                   nullptr);
-
-  // right
-  c->drawImageRect(image,
-                   SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius(),
-                                    250, 250 - 2 * Theme::GetShadowRadius()),
-                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, rad + offset_y,
-                                    2 * rad, GetHeight() - 2 * rad),
-                   nullptr);
 }
 
 Rect Window::GetContentGeometry() const {

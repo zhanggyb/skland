@@ -85,8 +85,6 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   int GetMouseLocation(const MouseEvent *event) const;
 
-  void DrawShadow(Canvas *canvas);
-
   Rect GetContentGeometry() const;
 
   std::unique_ptr<Private> p_;

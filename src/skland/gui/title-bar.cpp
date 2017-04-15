@@ -23,6 +23,7 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
+#include <skland/stock/theme.hpp>
 
 #include "SkCanvas.h"
 //#include "SkTypeface.h"
@@ -38,14 +39,6 @@ class TitleBar::Button : public AbstractButton {
 
   virtual ~Button();
 
-  void SetForeground(const Color &color);
-
-  void SetBackground(const Color &color);
-
-  const Color &foreground() const { return foreground_; }
-
-  const Color &background() const { return background_; }
-
  protected:
 
   virtual void OnDraw(const Context *context) override;
@@ -53,29 +46,14 @@ class TitleBar::Button : public AbstractButton {
  private:
 
   static const int kButtonSize = 14;
-
-  Color foreground_;
-  Color background_;
 };
 
 TitleBar::Button::Button()
-    : AbstractButton(kButtonSize, kButtonSize),
-      foreground_(0xFF444444),
-      background_(0xFF999999) {
+    : AbstractButton(kButtonSize, kButtonSize) {
 }
 
 TitleBar::Button::~Button() {
 
-}
-
-void TitleBar::Button::SetForeground(const Color &color) {
-  foreground_ = color;
-  Update();
-}
-
-void TitleBar::Button::SetBackground(const Color &color) {
-  background_ = color;
-  Update();
 }
 
 void TitleBar::Button::OnDraw(const Context *context) {
@@ -107,7 +85,7 @@ void TitleBar::CloseButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(background());
+      paint.SetColor(Theme::GetWindowColorScheme().text_selected);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -115,12 +93,12 @@ void TitleBar::CloseButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(foreground());
+    paint.SetColor(Theme::GetWindowColorScheme().text);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(foreground());
+  paint.SetColor(Theme::GetWindowColorScheme().text);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 3.f, rect.center_y() - 3.f,
                    rect.center_x() + 3.f, rect.center_y() + 3.f,
@@ -157,7 +135,7 @@ void TitleBar::MaximizeButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(background());
+      paint.SetColor(Theme::GetWindowColorScheme().text_selected);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -165,12 +143,12 @@ void TitleBar::MaximizeButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(foreground());
+    paint.SetColor(Theme::GetWindowColorScheme().text);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(foreground());
+  paint.SetColor(Theme::GetWindowColorScheme().text);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
@@ -207,7 +185,7 @@ void TitleBar::MinimizeButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(background());
+      paint.SetColor(Theme::GetWindowColorScheme().text_selected);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -215,12 +193,12 @@ void TitleBar::MinimizeButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(foreground());
+    paint.SetColor(Theme::GetWindowColorScheme().text);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(foreground());
+  paint.SetColor(Theme::GetWindowColorScheme().text);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
@@ -254,7 +232,7 @@ void TitleBar::FullscreenButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(background());
+      paint.SetColor(Theme::GetWindowColorScheme().text_selected);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -262,12 +240,12 @@ void TitleBar::FullscreenButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(foreground());
+    paint.SetColor(Theme::GetWindowColorScheme().text);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(foreground());
+  paint.SetColor(Theme::GetWindowColorScheme().text);
   paint.SetStyle(Paint::Style::kStyleFill);
 
   Path path;
@@ -291,8 +269,7 @@ TitleBar::TitleBar()
       maximize_button_(nullptr),
       minimize_button_(nullptr),
       fullscreen_button_(nullptr),
-      font_(Typeface::kBold),
-      foreground_(0xFF444444) {
+      font_(Typeface::kBold) {
   close_button_ = new CloseButton;
   maximize_button_ = new MaximizeButton;
   minimize_button_ = new MinimizeButton;
@@ -306,11 +283,6 @@ TitleBar::TitleBar()
 
 TitleBar::~TitleBar() {
 
-}
-
-void TitleBar::SetForeground(const Color &color) {
-  foreground_ = color;
-  Update();
 }
 
 void TitleBar::SetTitle(const std::string &title) {
@@ -376,7 +348,7 @@ void TitleBar::OnKeyboardKey(KeyEvent *event) {
 void TitleBar::OnDraw(const Context *context) {
   Paint paint;
 
-  paint.SetColor(foreground_);
+  paint.SetColor(Theme::GetWindowColorScheme().text);
   paint.SetAntiAlias(true);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font_);
