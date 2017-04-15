@@ -16,6 +16,7 @@
 
 #include <skland/gui/anchor.hpp>
 #include <skland/gui/anchor-group.hpp>
+#include <skland/core/assert.hpp>
 
 #include "internal/abstract-view-iterators.hpp"
 
@@ -30,9 +31,9 @@ Anchor::Anchor(AbstractView *view)
 Anchor::~Anchor() {
   if (group_) group_->Remove(this);
 
-  DBG_ASSERT(nullptr == group_);
-  DBG_ASSERT(nullptr == previous_);
-  DBG_ASSERT(nullptr == next_);
+  _ASSERT(nullptr == group_);
+  _ASSERT(nullptr == previous_);
+  _ASSERT(nullptr == next_);
 
   if (contrary_) {
     contrary_->contrary_ = nullptr;

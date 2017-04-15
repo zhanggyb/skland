@@ -34,6 +34,7 @@
 #include <sys/mman.h>
 
 #include <iostream>
+#include <skland/core/assert.hpp>
 
 namespace skland {
 
@@ -116,7 +117,7 @@ uint32_t Input::GetVersion() const {
 
 void Input::OnSeatCapabilities(uint32_t capabilities) {
   if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD) {
-    DBG_ASSERT(!p_->wl_keyboard.IsValid());
+    _ASSERT(!p_->wl_keyboard.IsValid());
     p_->wl_keyboard.keymap().Set(this, &Input::OnKeyboardKeymap);
     p_->wl_keyboard.enter().Set(this, &Input::OnKeyboardEnter);
     p_->wl_keyboard.leave().Set(this, &Input::OnKeyboardLeave);
@@ -125,11 +126,11 @@ void Input::OnSeatCapabilities(uint32_t capabilities) {
     p_->wl_keyboard.repeat_info().Set(this, &Input::OnKeyboardRepeatInfo);
     p_->wl_keyboard.Setup(p_->wl_seat);
 
-    DBG_ASSERT(p_->key_event == nullptr);
+    _ASSERT(p_->key_event == nullptr);
     p_->key_event = new KeyEvent(this);
   }
   if (capabilities & WL_SEAT_CAPABILITY_POINTER) {
-    DBG_ASSERT(!p_->wl_pointer.IsValid());
+    _ASSERT(!p_->wl_pointer.IsValid());
     p_->wl_pointer.enter().Set(this, &Input::OnPointerEnter);
     p_->wl_pointer.leave().Set(this, &Input::OnPointerLeave);
     p_->wl_pointer.motion().Set(this, &Input::OnPointerMotion);
@@ -141,11 +142,11 @@ void Input::OnSeatCapabilities(uint32_t capabilities) {
     p_->wl_pointer.axis_discrete().Set(this, &Input::OnPointerAxisDiscrete);
     p_->wl_pointer.Setup(p_->wl_seat);
 
-    DBG_ASSERT(p_->mouse_event == nullptr);
+    _ASSERT(p_->mouse_event == nullptr);
     p_->mouse_event = new MouseEvent(this);
   }
   if (capabilities & WL_SEAT_CAPABILITY_TOUCH) {
-    DBG_ASSERT(!p_->wl_touch.IsValid());
+    _ASSERT(!p_->wl_touch.IsValid());
     p_->wl_touch.down().Set(this, &Input::OnTouchDown);
     p_->wl_touch.up().Set(this, &Input::OnTouchUp);
     p_->wl_touch.motion().Set(this, &Input::OnTouchMotion);
@@ -153,7 +154,7 @@ void Input::OnSeatCapabilities(uint32_t capabilities) {
     p_->wl_touch.cancel().Set(this, &Input::OnTouchCancel);
     p_->wl_touch.Setup(p_->wl_seat);
 
-    DBG_ASSERT(p_->touch_event == nullptr);
+    _ASSERT(p_->touch_event == nullptr);
     p_->touch_event = new TouchEvent(this);
   }
 }

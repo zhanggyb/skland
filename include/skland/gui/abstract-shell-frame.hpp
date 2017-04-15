@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_ABSTRACT_SHELL_FRAME_HPP_
 #define SKLAND_GUI_ABSTRACT_SHELL_FRAME_HPP_
 
-#include "../core/defines.hpp"
+#include "../core/export.hpp"
 #include "../core/sigcxx.hpp"
 #include "../core/margin.hpp"
 #include "../core/point.hpp"

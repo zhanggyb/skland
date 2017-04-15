@@ -26,6 +26,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <skland/core/assert.hpp>
 
 namespace skland {
 
@@ -47,10 +48,10 @@ EGLWidget::~EGLWidget() {
 }
 
 void EGLWidget::OnUpdate(AbstractView *view) {
-  DBG_ASSERT(view == this);
+  _ASSERT(view == this);
 
   if (nullptr == sub_surface_) {
-    DBG_ASSERT(nullptr == egl_surface_);
+    _ASSERT(nullptr == egl_surface_);
     Surface *parent_surface = AbstractView::GetSurface(this);
     if (nullptr == parent_surface) return;
 

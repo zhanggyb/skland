@@ -18,17 +18,18 @@
 #define SKLAND_CORE_TRACE_HPP_
 
 #include <string>
+#include <ctime>
 
 #ifdef TRACE
 
-#define TRACE(fmt, args...) \
+#define _TRACE(fmt, args...) \
   do { \
     Trace trace(__PRETTY_FUNCTION__, fmt, args); \
   } while(0)
 
 #else // NOT TRACE
 
-#define TRACE(fmt, args...) ((void)0)
+#define _TRACE(fmt, args...) ((void)0)
 
 #endif  // TRACE
 
@@ -47,7 +48,9 @@ class Trace {
 
   Trace(const char *func_name, const char *format, ...);
 
-  ~Trace();
+  ~Trace() {
+    --kDepth;
+  }
 
   void Log(const char *func_name, const char *format, ...);
 
@@ -55,7 +58,7 @@ class Trace {
 
  private:
 
-  void LogMessage(int depth, int align, const char *format, va_list args);
+  int SaveLine(int depth, int align, const char *format, va_list args);
 
   static std::string kFileName;
 

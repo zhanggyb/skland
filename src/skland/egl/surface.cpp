@@ -15,14 +15,11 @@
  */
 
 #include <skland/egl/surface.hpp>
-#include <skland/core/defines.hpp>
+#include <skland/core/assert.hpp>
 #include <skland/wayland/surface.hpp>
 #include <skland/egl/display.hpp>
 
 #include <stdlib.h>
-#include <stdio.h>
-
-#include <GLES2/gl2.h>
 
 namespace skland {
 namespace egl {
@@ -35,7 +32,7 @@ Surface::Surface()
 
 Surface::~Surface() {
   if (egl_surface_) {
-    DBG_ASSERT(wl_egl_window_);
+    _ASSERT(wl_egl_window_);
     wl_egl_window_destroy(wl_egl_window_);
   }
 }
@@ -56,7 +53,7 @@ void Surface::Setup(const egl::Display &egl_display,
 
 void Surface::Destroy() {
   if (egl_surface_) {
-    DBG_ASSERT(wl_egl_window_);
+    _ASSERT(wl_egl_window_);
     wl_egl_window_destroy(wl_egl_window_);
     wl_egl_window_ = nullptr;
     egl_surface_ = nullptr;

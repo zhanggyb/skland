@@ -125,7 +125,7 @@ int Application::Run() {
 
     ret = Display::kDisplay->p_->wl_display.Flush();
     if (ret < 0 && errno == EAGAIN) {
-      DBG_PRINT_MSG("%s\n", "Error when flush display");
+      _DEBUG("%s\n", "Error when flush display");
       ep[0].events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
       ep[0].data.ptr = NULL;
       epoll_ctl(kInstance->epoll_fd_, EPOLL_CTL_MOD,
@@ -226,7 +226,7 @@ void Application::HandleEpollEvents(uint32_t events) {
 }
 
 void Application::HandleSignalInt(int) {
-  DBG_PRINT_MSG("%s\n", "Get SIGINT");
+  _DEBUG("%s\n", "Get SIGINT");
   Application::Get()->Exit();
 }
 

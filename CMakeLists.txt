@@ -26,6 +26,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules/
 
 option(BUILD_UNIT_TEST "Build unit test code" OFF)
 option(BUILD_SHARED_LIBRARY "Build shared library" OFF)
+option(TRACE "Turn trace mode on/off" ON)   # Turn on in development stage
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(APPLE TRUE)
@@ -47,6 +48,10 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
 else ()
     set(CMAKE_CXX_FLAGS "-O3 -std=c++11")
+endif ()
+
+if (TRACE)
+    add_definitions(-DTRACE)
 endif ()
 
 if (LINUX)
@@ -101,12 +106,12 @@ if (BUILD_DOCUMENTATION)
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM)
-#    add_custom_command(TARGET doc
-#            POST_BUILD
-#            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/doc ${CMAKE_CURRENT_BINARY_DIR}/html/doc
-#            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#            COMMENT "Copy \"${CMAKE_CURRENT_SOURCE_DIR}/doc\" to \"${CMAKE_CURRENT_BINARY_DIR}/html\""
-#            VERBATIM)
+    #    add_custom_command(TARGET doc
+    #            POST_BUILD
+    #            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/doc ${CMAKE_CURRENT_BINARY_DIR}/html/doc
+    #            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    #            COMMENT "Copy \"${CMAKE_CURRENT_SOURCE_DIR}/doc\" to \"${CMAKE_CURRENT_BINARY_DIR}/html\""
+    #            VERBATIM)
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share/doc)
 endif ()
 

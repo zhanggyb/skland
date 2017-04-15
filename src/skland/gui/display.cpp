@@ -192,7 +192,7 @@ void Display::OnError(void *object_id, uint32_t code, const char *message) {
     object_name = "xdg_shell";
   }
 
-  DBG_PRINT_MSG("Error from %s: %s (%d)\n", object_name, message, code);
+  _DEBUG("Error from %s: %s (%d)\n", object_name, message, code);
 }
 
 void Display::OnDeleteId(uint32_t id) {

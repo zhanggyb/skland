@@ -20,6 +20,7 @@
 #include <skland/gui/buffer.hpp>
 
 #include <skland/gui/output.hpp>
+#include <skland/core/assert.hpp>
 
 #include "internal/display-registry.hpp"
 #include "internal/surface-commit-task.hpp"
@@ -47,7 +48,7 @@ void Surface::Shell::ResizeWindow(int width, int height) const {
 
 Surface::Shell::Shell(Surface *surface)
     : surface_(surface), parent_(nullptr) {
-  DBG_ASSERT(surface_);
+  _ASSERT(surface_);
   role_.placeholder = nullptr;
   xdg_surface_.Setup(Display::Registry().xdg_shell(), surface_->wl_surface_);
 
@@ -62,24 +63,24 @@ Surface::Shell::~Shell() {
 
   xdg_surface_.Destroy();
 
-  DBG_ASSERT(surface_->role_.shell == this);
+  _ASSERT(surface_->role_.shell == this);
   surface_->role_.shell = nullptr;
 }
 
 void Surface::Shell::Push() {
-  DBG_ASSERT(nullptr == surface_->parent_);
-  DBG_ASSERT(nullptr == surface_->up_);
-  DBG_ASSERT(nullptr == surface_->down_);
+  _ASSERT(nullptr == surface_->parent_);
+  _ASSERT(nullptr == surface_->up_);
+  _ASSERT(nullptr == surface_->down_);
 
-  DBG_ASSERT(Surface::kShellSurfaceCount >= 0);
+  _ASSERT(Surface::kShellSurfaceCount >= 0);
 
   if (Surface::kTop) {
     Surface::kTop->up_ = surface_;
     surface_->down_ = Surface::kTop;
     Surface::kTop = surface_;
   } else {
-    DBG_ASSERT(Surface::kShellSurfaceCount == 0);
-    DBG_ASSERT(nullptr == Surface::kBottom);
+    _ASSERT(Surface::kShellSurfaceCount == 0);
+    _ASSERT(nullptr == Surface::kBottom);
     Surface::kBottom = surface_;
     Surface::kTop = surface_;
   }
@@ -88,26 +89,26 @@ void Surface::Shell::Push() {
 }
 
 void Surface::Shell::Remove() {
-  DBG_ASSERT(nullptr == surface_->parent_);
+  _ASSERT(nullptr == surface_->parent_);
 
   if (surface_->up_) {
     surface_->up_->down_ = surface_->down_;
   } else {
-    DBG_ASSERT(Surface::kTop == surface_);
+    _ASSERT(Surface::kTop == surface_);
     Surface::kTop = surface_->down_;
   }
 
   if (surface_->down_) {
     surface_->down_->up_ = surface_->up_;
   } else {
-    DBG_ASSERT(Surface::kBottom == surface_);
+    _ASSERT(Surface::kBottom == surface_);
     Surface::kBottom = surface_->up_;
   }
 
   surface_->up_ = nullptr;
   surface_->down_ = nullptr;
   Surface::kShellSurfaceCount--;
-  DBG_ASSERT(Surface::kShellSurfaceCount >= 0);
+  _ASSERT(Surface::kShellSurfaceCount >= 0);
 }
 
 // ------
@@ -162,7 +163,7 @@ void Surface::Shell::Toplevel::SetMinimized() const {
 }
 
 Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
-  DBG_ASSERT(shell_surface);
+  _ASSERT(shell_surface);
   shell_ = shell_surface;
   xdg_toplevel_.Setup(shell_->xdg_surface_);
 }
@@ -170,8 +171,8 @@ Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
 Surface::Shell::Toplevel::~Toplevel() {
   xdg_toplevel_.Destroy();
 
-  DBG_ASSERT(shell_->role_.toplevel == this);
-  DBG_ASSERT(nullptr == shell_->parent_);
+  _ASSERT(shell_->role_.toplevel == this);
+  _ASSERT(nullptr == shell_->parent_);
   shell_->role_.toplevel = nullptr;
 }
 
@@ -193,8 +194,8 @@ Surface::Shell::Popup::Popup(Shell *shell)
 Surface::Shell::Popup::~Popup() {
   xdg_popup_.Destroy();
 
-  DBG_ASSERT(shell_->parent_);
-  DBG_ASSERT(shell_->role_.popup == this);
+  _ASSERT(shell_->parent_);
+  _ASSERT(shell_->role_.popup == this);
 
   shell_->parent_ = nullptr;
   shell_->role_.popup = nullptr;
@@ -217,8 +218,8 @@ Surface::Sub *Surface::Sub::Get(const Surface *surface) {
 
 Surface::Sub::Sub(Surface *surface, Surface *parent)
     : surface_(surface) {
-  DBG_ASSERT(surface_);
-  DBG_ASSERT(parent);
+  _ASSERT(surface_);
+  _ASSERT(parent);
   wl_sub_surface_.Setup(Display::Registry().wl_subcompositor(),
                         surface_->wl_surface_,
                         parent->wl_surface_);
@@ -226,7 +227,7 @@ Surface::Sub::Sub(Surface *surface, Surface *parent)
 }
 
 Surface::Sub::~Sub() {
-  DBG_ASSERT(surface_->role_.sub == this);
+  _ASSERT(surface_->role_.sub == this);
 
   // Delete all sub surfaces of this one:
   Surface *p = nullptr;
@@ -292,7 +293,7 @@ void Surface::Sub::SetWindowPosition(int x, int y) {
 }
 
 void Surface::Sub::SetParent(Surface *parent) {
-  DBG_ASSERT(surface_->parent_ == nullptr &&
+  _ASSERT(surface_->parent_ == nullptr &&
       surface_->up_ == nullptr &&
       surface_->down_ == nullptr);
 
@@ -381,7 +382,7 @@ void Surface::Sub::MoveBelow(Surface *dst) {
 }
 
 void Surface::Sub::InsertAbove(Surface *sibling) {
-  DBG_ASSERT(surface_->parent_ == sibling->parent_ ||
+  _ASSERT(surface_->parent_ == sibling->parent_ ||
       surface_ == sibling->parent_ ||
       surface_->parent_ == sibling);
   if (sibling->above_) sibling->above_->below_ = surface_;
@@ -391,7 +392,7 @@ void Surface::Sub::InsertAbove(Surface *sibling) {
 }
 
 void Surface::Sub::InsertBelow(Surface *sibling) {
-  DBG_ASSERT(surface_->parent_ == sibling->parent_ ||
+  _ASSERT(surface_->parent_ == sibling->parent_ ||
       surface_ == sibling->parent_ ||
       surface_->parent_ == sibling);
   if (sibling->below_) sibling->below_->above_ = surface_;
@@ -459,7 +460,7 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)
       buffer_scale_(1),
       is_user_data_set_(false),
       egl_(nullptr) {
-  DBG_ASSERT(nullptr != event_handler_);
+  _ASSERT(nullptr != event_handler_);
   role_.placeholder = nullptr;
 
   wl_surface_.enter().Set(this, &Surface::OnEnter);

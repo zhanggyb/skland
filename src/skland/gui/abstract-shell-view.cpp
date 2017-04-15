@@ -16,6 +16,8 @@
 
 #include "internal/abstract-shell-view-private.hpp"
 
+#include <skland/core/assert.hpp>
+
 #include <skland/gui/application.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
@@ -112,7 +114,7 @@ void AbstractShellView::Minimize(SLOT) {
 
   Bit::Set<int>(p_->flags, Private::kFlagMaskMinimized);
   toplevel->SetMinimized();
-  DBG_ASSERT(IsMinimized());
+  _ASSERT(IsMinimized());
 }
 
 void AbstractShellView::ToggleMaximize(SLOT) {
@@ -207,18 +209,18 @@ int AbstractShellView::GetHeight() const {
 
 void AbstractShellView::AttachView(AbstractView *view) {
   if (view->p_->shell == this) {
-    DBG_ASSERT(nullptr == view->p_->parent);
+    _ASSERT(nullptr == view->p_->parent);
     return;
   }
 
   if (view->p_->parent) {
-    DBG_ASSERT(nullptr == view->p_->shell);
+    _ASSERT(nullptr == view->p_->shell);
     view->p_->parent->RemoveChild(view);
-    DBG_ASSERT(nullptr == view->p_->parent);
-    DBG_ASSERT(nullptr == view->p_->previous);
-    DBG_ASSERT(nullptr == view->p_->next);
+    _ASSERT(nullptr == view->p_->parent);
+    _ASSERT(nullptr == view->p_->previous);
+    _ASSERT(nullptr == view->p_->next);
   } else if (view->p_->shell) {
-    DBG_ASSERT(nullptr == view->p_->parent);
+    _ASSERT(nullptr == view->p_->parent);
     view->p_->shell->DetachView(view);
   }
 
@@ -232,7 +234,7 @@ void AbstractShellView::AttachView(AbstractView *view) {
 void AbstractShellView::DetachView(AbstractView *view) {
   if (view->p_->shell != this) return;
 
-  DBG_ASSERT(nullptr == view->p_->parent);
+  _ASSERT(nullptr == view->p_->parent);
   view->p_->shell = nullptr;
 
   OnViewDetached(view);
@@ -362,7 +364,7 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
   if (width > 0 && height > 0) {
     Size min = this->GetMinimalSize();
     Size max = this->GetMaximalSize();
-    DBG_ASSERT(min.width < max.width && min.height < max.height);
+    _ASSERT(min.width < max.width && min.height < max.height);
 
     width = clamp(width, min.width, max.width);
     height = clamp(height, min.height, max.height);
@@ -413,8 +415,8 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *
   MouseTaskIterator it(this);
 
   if (nullptr == it.next()) {
-    DBG_ASSERT(it.mouse_task()->event_handler == this);
-    DBG_ASSERT(nullptr == it.previous());
+    _ASSERT(it.mouse_task()->event_handler == this);
+    _ASSERT(nullptr == it.previous());
     if (view->Contain(cursor.x, cursor.y)) {
       view->OnMouseEnter(event);
       if (event->IsAccepted()) {
@@ -474,7 +476,7 @@ void AbstractShellView::DispatchMouseButtonEvent(MouseEvent *event) {
 void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, MouseTaskIterator &tail) {
   AbstractView *sub = parent->DispatchMouseEnterEvent(event);
   while (sub) {
-    DBG_ASSERT(sub != parent);
+    _ASSERT(sub != parent);
     sub->OnMouseEnter(event);
     if (event->IsAccepted()) {
       tail.PushBack(sub);

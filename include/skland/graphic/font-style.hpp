@@ -17,7 +17,7 @@
 #ifndef SKLAND_GRAPHIC_FONT_STYLE_HPP_
 #define SKLAND_GRAPHIC_FONT_STYLE_HPP_
 
-#include "../core/defines.hpp"
+#include "../core/export.hpp"
 
 #include <memory>
 

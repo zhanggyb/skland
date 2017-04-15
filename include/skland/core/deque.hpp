@@ -17,7 +17,7 @@
 #ifndef SKLAND_CORE_DEQUE_HPP_
 #define SKLAND_CORE_DEQUE_HPP_
 
-#include "defines.hpp"
+#include "export.hpp"
 
 namespace skland {
 

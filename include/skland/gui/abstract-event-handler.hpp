@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_ABSTRACT_EVENT_HANDLER_HPP_
 #define SKLAND_GUI_ABSTRACT_EVENT_HANDLER_HPP_
 
-#include "../core/defines.hpp"
+#include "skland/core/debug.hpp"
 #include "../core/sigcxx.hpp"
 
 #include "task.hpp"

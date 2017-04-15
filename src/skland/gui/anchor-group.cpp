@@ -17,7 +17,8 @@
 #include <skland/gui/anchor-group.hpp>
 #include <skland/gui/anchor.hpp>
 
-#include <skland/core/defines.hpp>
+#include <skland/core/debug.hpp>
+#include <skland/core/assert.hpp>
 
 namespace skland {
 
@@ -35,16 +36,16 @@ AnchorGroup::~AnchorGroup() {
 }
 
 void AnchorGroup::PushFront(Anchor *anchor) {
-  DBG_ASSERT(nullptr == anchor->group_);
-  DBG_ASSERT(nullptr == anchor->previous_);
-  DBG_ASSERT(nullptr == anchor->next_);
+  _ASSERT(nullptr == anchor->group_);
+  _ASSERT(nullptr == anchor->previous_);
+  _ASSERT(nullptr == anchor->next_);
 
   if (first_) {
     first_->previous_ = anchor;
     anchor->next_ = first_;
   } else {
-    DBG_ASSERT(nullptr == last_);
-    DBG_ASSERT(0 == count_);
+    _ASSERT(nullptr == last_);
+    _ASSERT(0 == count_);
   }
   first_ = anchor;
 
@@ -53,16 +54,16 @@ void AnchorGroup::PushFront(Anchor *anchor) {
 }
 
 void AnchorGroup::PushBack(Anchor *anchor) {
-  DBG_ASSERT(nullptr == anchor->group_);
-  DBG_ASSERT(nullptr == anchor->previous_);
-  DBG_ASSERT(nullptr == anchor->next_);
+  _ASSERT(nullptr == anchor->group_);
+  _ASSERT(nullptr == anchor->previous_);
+  _ASSERT(nullptr == anchor->next_);
 
   if (last_) {
     last_->next_ = anchor;
     anchor->previous_ = last_;
   } else {
-    DBG_ASSERT(nullptr == first_);
-    DBG_ASSERT(0 == count_);
+    _ASSERT(nullptr == first_);
+    _ASSERT(0 == count_);
     first_ = anchor;
   }
   last_ = anchor;
@@ -72,13 +73,13 @@ void AnchorGroup::PushBack(Anchor *anchor) {
 }
 
 void AnchorGroup::Insert(Anchor *anchor, int index) {
-  DBG_ASSERT(nullptr == anchor->group_);
-  DBG_ASSERT(nullptr == anchor->previous_);
-  DBG_ASSERT(nullptr == anchor->next_);
+  _ASSERT(nullptr == anchor->group_);
+  _ASSERT(nullptr == anchor->previous_);
+  _ASSERT(nullptr == anchor->next_);
 
   if (nullptr == first_) {
-    DBG_ASSERT(nullptr == last_);
-    DBG_ASSERT(0 == count_);
+    _ASSERT(nullptr == last_);
+    _ASSERT(0 == count_);
     last_ = anchor;
     first_ = anchor;
   } else {
@@ -126,24 +127,24 @@ void AnchorGroup::Insert(Anchor *anchor, int index) {
 Anchor *AnchorGroup::Remove(Anchor *anchor) {
   if (anchor->group_ != this) return nullptr;
 
-  DBG_ASSERT(count_ > 0);
+  _ASSERT(count_ > 0);
 
   if (anchor->previous_) {
     anchor->previous_->next_ = anchor->next_;
   } else {
-    DBG_ASSERT(first_ == anchor);
+    _ASSERT(first_ == anchor);
     first_ = anchor->next_;
   }
 
   if (anchor->next_) {
     anchor->next_->previous_ = anchor->previous_;
   } else {
-    DBG_ASSERT(last_ == anchor);
+    _ASSERT(last_ == anchor);
     last_ = anchor->previous_;
   }
 
   count_--;
-  DBG_ASSERT(count_ >= 0);
+  _ASSERT(count_ >= 0);
 
   anchor->previous_ = nullptr;
   anchor->next_ = nullptr;

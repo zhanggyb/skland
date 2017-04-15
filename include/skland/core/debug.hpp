@@ -14,27 +14,29 @@
  * limitations under the License.
  */
 
-#include "internal/shader-private.hpp"
+#ifndef SKLAND_CORE_DEFINES_HPP_
+#define SKLAND_CORE_DEFINES_HPP_
 
-#include <skland/core/assert.hpp>
+#ifdef DEBUG
 
-namespace skland {
+//#ifdef __UNIX__
+#include <string.h>
+#define FILE_BASE_NAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+//#else
+//#include <string.h>
+//#define FILE_BASE_FILENAME (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
+//#endif
 
-Shader::Shader(Private *p)
-    : p_(p) {
-  _ASSERT(p_);
-}
+#include <stdio.h>
+#define _DEBUG(fmt, args...) \
+    do { \
+        fprintf(stderr, "%s:%d:%s(): " fmt, FILE_BASE_NAME, __LINE__, __FUNCTION__, args); \
+    } while (0)
 
-Shader::Shader(const Shader &other) {
-  p_.reset(new Private(other.p_->sk_shader));
-}
+#else // NOT DEBUG
 
-Shader::~Shader() {
-}
+#define _DEBUG(fmt, args...) ((void)0)
 
-Shader &Shader::operator=(const Shader &other) {
-  *p_ = *other.p_;
-  return *this;
-}
+#endif // END DEBUG
 
-}
+#endif // SKLAND_CORE_DEFINES_HPP_

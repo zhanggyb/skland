@@ -37,6 +37,7 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
+#include <skland/core/assert.hpp>
 
 #include "SkCanvas.h"
 
@@ -84,8 +85,8 @@ Window::Window(int width, int height, const char *title)
   // Create a sub surface for views:
   Surface *parent = GetShellSurface();
   p_->main_surface = Surface::Sub::Create(parent, this, Theme::shadow_margin());
-  DBG_ASSERT(p_->main_surface->parent() == parent);
-  DBG_ASSERT(p_->main_surface->below() == parent);
+  _ASSERT(p_->main_surface->parent() == parent);
+  _ASSERT(p_->main_surface->below() == parent);
   wayland::Region empty_region;
   empty_region.Setup(Display::Registry().wl_compositor());
   p_->main_surface->SetInputRegion(empty_region);
@@ -194,7 +195,7 @@ void Window::OnUpdate(AbstractView *view) {
     Iterator it(this);
     PushToTail(&it.redraw_task());
     it.redraw_task().context = Context(surface, p_->frame_canvas);
-    DBG_ASSERT(p_->frame_canvas);
+    _ASSERT(p_->frame_canvas);
     Damage(this,
            0, 0,
            GetWidth() + surface->margin().lr(),
@@ -213,7 +214,7 @@ void Window::OnUpdate(AbstractView *view) {
     AbstractView::Iterator it(view);
     PushToTail(&it.redraw_task());
     it.redraw_task().context = Context(surface, canvas);
-    DBG_ASSERT(canvas);
+    _ASSERT(canvas);
     Damage(view,
            view->GetX() + surface->margin().left,
            view->GetY() + surface->margin().top,

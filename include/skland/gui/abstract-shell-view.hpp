@@ -19,7 +19,7 @@
 
 #include "abstract-event-handler.hpp"
 
-#include "../core/defines.hpp"
+#include "skland/core/debug.hpp"
 #include "../core/rect.hpp"
 
 #include <cstdint>

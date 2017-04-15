@@ -44,7 +44,7 @@ TEST_F(Test, constructor_1) {
   TestCase t;
   t.TestDepth1();
 
-  TRACE(__PRETTY_FUNCTION__, "%s", "Another message");
+  _TRACE("%s", "Another message");
 
   ASSERT_TRUE(true);
 }

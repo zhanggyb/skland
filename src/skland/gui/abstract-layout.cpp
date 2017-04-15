@@ -28,6 +28,7 @@
 //#ifdef DEBUG
 #include <cstdlib>
 #include <skland/gui/timer.hpp>
+#include <skland/core/assert.hpp>
 //#endif
 
 namespace skland {
@@ -43,21 +44,21 @@ AbstractLayout::~AbstractLayout() {
 }
 
 void AbstractLayout::AddView(AbstractView *view) {
-  DBG_ASSERT(view->p_->parent == view->p_->layout);
+  _ASSERT(view->p_->parent == view->p_->layout);
 
   if (view->p_->layout == this) return;
 
   if (view->p_->layout) view->p_->layout->RemoveView(view);
 
-  DBG_ASSERT(nullptr == view->p_->layout);
-  DBG_ASSERT(nullptr == view->p_->parent);
+  _ASSERT(nullptr == view->p_->layout);
+  _ASSERT(nullptr == view->p_->parent);
 
   InsertChild(view);
   Layout();
 }
 
 void AbstractLayout::RemoveView(AbstractView *view) {
-  DBG_ASSERT(view->p_->parent == view->p_->layout);
+  _ASSERT(view->p_->parent == view->p_->layout);
 
   if (view->p_->layout != this) return;
 

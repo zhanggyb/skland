@@ -16,6 +16,8 @@
 
 #include <skland/core/deque.hpp>
 
+#include <skland/core/assert.hpp>
+
 namespace skland {
 
 Deque::Element::Element()
@@ -38,16 +40,16 @@ Deque::~Deque() {
 }
 
 void Deque::PushFront(Element *item) {
-  DBG_ASSERT(nullptr == item->deque_);
-  DBG_ASSERT(nullptr == item->previous_);
-  DBG_ASSERT(nullptr == item->next_);
+  _ASSERT(nullptr == item->deque_);
+  _ASSERT(nullptr == item->previous_);
+  _ASSERT(nullptr == item->next_);
 
   if (first_) {
     first_->previous_ = item;
     item->next_ = first_;
   } else {
-    DBG_ASSERT(nullptr == last_);
-    DBG_ASSERT(0 == count_);
+    _ASSERT(nullptr == last_);
+    _ASSERT(0 == count_);
   }
   first_ = item;
 
@@ -56,16 +58,16 @@ void Deque::PushFront(Element *item) {
 }
 
 void Deque::PushBack(Element *item) {
-  DBG_ASSERT(nullptr == item->deque_);
-  DBG_ASSERT(nullptr == item->previous_);
-  DBG_ASSERT(nullptr == item->next_);
+  _ASSERT(nullptr == item->deque_);
+  _ASSERT(nullptr == item->previous_);
+  _ASSERT(nullptr == item->next_);
 
   if (last_) {
     last_->next_ = item;
     item->previous_ = last_;
   } else {
-    DBG_ASSERT(nullptr == first_);
-    DBG_ASSERT(0 == count_);
+    _ASSERT(nullptr == first_);
+    _ASSERT(0 == count_);
     first_ = item;
   }
   last_ = item;
@@ -75,13 +77,13 @@ void Deque::PushBack(Element *item) {
 }
 
 void Deque::Insert(Element *item, int index) {
-  DBG_ASSERT(nullptr == item->deque_);
-  DBG_ASSERT(nullptr == item->previous_);
-  DBG_ASSERT(nullptr == item->next_);
+  _ASSERT(nullptr == item->deque_);
+  _ASSERT(nullptr == item->previous_);
+  _ASSERT(nullptr == item->next_);
 
   if (nullptr == first_) {
-    DBG_ASSERT(nullptr == last_);
-    DBG_ASSERT(0 == count_);
+    _ASSERT(nullptr == last_);
+    _ASSERT(0 == count_);
     last_ = item;
     first_ = item;
   } else {
@@ -129,24 +131,24 @@ void Deque::Insert(Element *item, int index) {
 Deque::Element *Deque::Remove(Element *item) {
   if (item->deque_ != this) return nullptr;
 
-  DBG_ASSERT(count_ > 0);
+  _ASSERT(count_ > 0);
 
   if (item->previous_) {
     item->previous_->next_ = item->next_;
   } else {
-    DBG_ASSERT(first_ == item);
+    _ASSERT(first_ == item);
     first_ = item->next_;
   }
 
   if (item->next_) {
     item->next_->previous_ = item->previous_;
   } else {
-    DBG_ASSERT(last_ == item);
+    _ASSERT(last_ == item);
     last_ = item->previous_;
   }
 
   count_--;
-  DBG_ASSERT(count_ >= 0);
+  _ASSERT(count_ >= 0);
 
   item->previous_ = nullptr;
   item->next_ = nullptr;

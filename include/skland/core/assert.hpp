@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-#include "internal/shader-private.hpp"
+#ifndef SKLAND_CORE_ASSERT_HPP_
+#define SKLAND_CORE_ASSERT_HPP_
 
-#include <skland/core/assert.hpp>
+#ifdef DEBUG
 
-namespace skland {
+#include <cassert>
+#define _ASSERT(expr) \
+  do { \
+    assert(expr); \
+  } while (0)
 
-Shader::Shader(Private *p)
-    : p_(p) {
-  _ASSERT(p_);
-}
+#else // NOT DEBUG
 
-Shader::Shader(const Shader &other) {
-  p_.reset(new Private(other.p_->sk_shader));
-}
+#define _ASSERT(expr) ((void)0)
 
-Shader::~Shader() {
-}
+#endif  // DEBUG
 
-Shader &Shader::operator=(const Shader &other) {
-  *p_ = *other.p_;
-  return *this;
-}
-
-}
+#endif // SKLAND_CORE_ASSERT_HPP_

@@ -40,6 +40,7 @@
 #include "SkCanvas.h"
 
 #include <GLES2/gl2.h>
+#include <skland/core/assert.hpp>
 
 namespace skland {
 
@@ -84,8 +85,8 @@ EGLWindow::EGLWindow(int width, int height, const char *title)
   Surface *parent = GetShellSurface();
 
   p_->sub_surface = Surface::Sub::Create(parent, this);
-  DBG_ASSERT(p_->sub_surface->parent() == parent);
-  DBG_ASSERT(p_->sub_surface->below() == parent);
+  _ASSERT(p_->sub_surface->parent() == parent);
+  _ASSERT(p_->sub_surface->below() == parent);
 
   wayland::Region empty_region;
   empty_region.Setup(Display::Registry().wl_compositor());
@@ -140,7 +141,7 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     Iterator it(this);
     PushToTail(&it.redraw_task());
     it.redraw_task().context = Context(surface, p_->frame_canvas);
-    DBG_ASSERT(p_->frame_canvas);
+    _ASSERT(p_->frame_canvas);
     Damage(this,
            0, 0,
            GetWidth() + surface->margin().lr(),

@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_TASK_HPP_
 #define SKLAND_GUI_TASK_HPP_
 
-#include "../core/defines.hpp"
+#include "../core/export.hpp"
 
 namespace skland {
 

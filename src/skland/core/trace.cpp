@@ -34,13 +34,9 @@ Trace::Trace(const char *func_name, const char *format, ...) {
   sprintf(str, "%s: %s", func_name, format);
   va_list args;
   va_start(args, format);
-  LogMessage(kDepth, kDepth * 2, str, args);
+  SaveLine(kDepth, kDepth * 2, str, args);
   va_end(args);
   ++kDepth;
-}
-
-Trace::~Trace() {
-  --kDepth;
 }
 
 void Trace::Log(const char *func_name, const char *format, ...) {
@@ -48,7 +44,7 @@ void Trace::Log(const char *func_name, const char *format, ...) {
   sprintf(str, "%s: %s", func_name, format);
   va_list args;
   va_start(args, format);
-  LogMessage(kDepth, kDepth * 2, str, args);
+  SaveLine(kDepth, kDepth * 2, str, args);
   va_end(args);
 }
 
@@ -56,13 +52,16 @@ void Trace::SetFileName(const std::string &filename) {
   kFileName = filename;
 }
 
-void Trace::LogMessage(int depth, int align, const char *format, va_list args) {
+int Trace::SaveLine(int depth, int align, const char *format, va_list args) {
+  // TODO: make sure method is thread save
+
   FILE *fp = fopen(kFileName.c_str(), "a+");
-  if (fp == NULL) return;
+  if (fp == NULL) return 0;
 
   time_t t;
   time(&t);
 
+  // TODO: use std::locale
   char time_stamp[32] = {0};
   strftime(time_stamp, sizeof(time_stamp),
            "%Y%m%d.%H%M%S", localtime(&t));
@@ -79,6 +78,8 @@ void Trace::LogMessage(int depth, int align, const char *format, va_list args) {
   len += fwrite("\n", 1, 1, fp);
   fflush(fp);
   fclose(fp);
+
+  return len;
 }
 
 }

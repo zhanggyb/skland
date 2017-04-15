@@ -16,6 +16,8 @@
 
 #include <skland/gui/shared-memory-pool.hpp>
 
+#include <skland/core/debug.hpp>
+
 #include <sys/mman.h>
 
 #include <stdlib.h>
@@ -28,6 +30,7 @@
 #ifdef HAVE_POSIX_FALLOCATE
 #include <fcntl.h>
 #include <new>
+#include <skland/core/assert.hpp>
 #endif
 
 #include "internal/display-registry.hpp"
@@ -42,7 +45,7 @@ void SharedMemoryPool::Setup(int32_t size) {
 
   data_ = mmap(NULL, (size_t) size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
   if (data_ == MAP_FAILED) {
-    DBG_PRINT_MSG("%s\n", "Fail to map pages of memory");
+    _DEBUG("%s\n", "Fail to map pages of memory");
     data_ = nullptr;
     close(fd);
     throw std::runtime_error("Cannot map shared memory");
@@ -55,10 +58,10 @@ void SharedMemoryPool::Setup(int32_t size) {
 
 void SharedMemoryPool::Destroy() {
   if (wl_shm_pool_.IsValid()) {
-    DBG_ASSERT(data_);
+    _ASSERT(data_);
 
     if (munmap(data_, (size_t) size_))
-      DBG_PRINT_MSG("%s\n", "Failed to unmap the memory\n");
+      _DEBUG("%s\n", "Failed to unmap the memory\n");
 
     data_ = nullptr;
     size_ = 0;
