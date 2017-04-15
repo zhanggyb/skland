@@ -18,7 +18,6 @@
 
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
-#include <skland/gui/abstract-shell-frame.hpp>
 
 #include <skland/gui/surface.hpp>
 #include <skland/gui/title-bar.hpp>
@@ -71,8 +70,6 @@ struct EGLWindow::Private {
   bool animating;
 
 };
-
-const Margin EGLWindow::kResizingMargin(5, 5, 5, 5);
 
 EGLWindow::EGLWindow(const char *title)
     : EGLWindow(400, 300, title) {
@@ -164,10 +161,10 @@ void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
   RectI input_rect(width, height);
   Surface *shell_surface = this->GetShellSurface();
 
-  input_rect.left = shell_surface->margin().left - AbstractShellFrame::kResizingMargin.left;
-  input_rect.top = shell_surface->margin().top - AbstractShellFrame::kResizingMargin.top;
-  input_rect.Resize(width + AbstractShellFrame::kResizingMargin.lr(),
-                    height + AbstractShellFrame::kResizingMargin.tb());
+  input_rect.left = shell_surface->margin().left - kResizingMargin.left;
+  input_rect.top = shell_surface->margin().top - kResizingMargin.top;
+  input_rect.Resize(width + kResizingMargin.lr(),
+                    height + kResizingMargin.tb());
 
   wayland::Region input_region;
   input_region.Setup(Display::Registry().wl_compositor());
@@ -368,24 +365,24 @@ int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
 
   // TODO: maximized or frameless
 
-  if (x < (Theme::shadow_margin().left - kResizingMargin.left))
+  if (x < (Theme::GetShadowMargin().left - kResizingMargin.left))
     hlocation = AbstractShellView::kExterior;
-  else if (x < Theme::shadow_margin().left + kResizingMargin.left)
+  else if (x < Theme::GetShadowMargin().left + kResizingMargin.left)
     hlocation = AbstractShellView::kResizeLeft;
-  else if (x < Theme::shadow_margin().left + GetWidth() - kResizingMargin.right)
+  else if (x < Theme::GetShadowMargin().left + GetWidth() - kResizingMargin.right)
     hlocation = AbstractShellView::kInterior;
-  else if (x < Theme::shadow_margin().left + GetWidth() + kResizingMargin.right)
+  else if (x < Theme::GetShadowMargin().left + GetWidth() + kResizingMargin.right)
     hlocation = AbstractShellView::kResizeRight;
   else
     hlocation = AbstractShellView::kExterior;
 
-  if (y < (Theme::shadow_margin().top - kResizingMargin.top))
+  if (y < (Theme::GetShadowMargin().top - kResizingMargin.top))
     vlocation = AbstractShellView::kExterior;
-  else if (y < Theme::shadow_margin().top + kResizingMargin.top)
+  else if (y < Theme::GetShadowMargin().top + kResizingMargin.top)
     vlocation = AbstractShellView::kResizeTop;
-  else if (y < Theme::shadow_margin().top + GetHeight() - kResizingMargin.bottom)
+  else if (y < Theme::GetShadowMargin().top + GetHeight() - kResizingMargin.bottom)
     vlocation = AbstractShellView::kInterior;
-  else if (y < Theme::shadow_margin().top + GetHeight() + kResizingMargin.bottom)
+  else if (y < Theme::GetShadowMargin().top + GetHeight() + kResizingMargin.bottom)
     vlocation = AbstractShellView::kResizeBottom;
   else
     vlocation = AbstractShellView::kExterior;
@@ -395,7 +392,7 @@ int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
     location = AbstractShellView::kExterior;
 
   if (location == AbstractShellView::kInterior &&
-      y < Theme::shadow_margin().top + 22 /* title_bar_size_ */)
+      y < Theme::GetShadowMargin().top + 22 /* title_bar_size_ */)
     location = AbstractShellView::kTitleBar;
   else if (location == AbstractShellView::kInterior)
     location = AbstractShellView::kClientArea;
@@ -414,9 +411,9 @@ void EGLWindow::OnRelease() {
 }
 
 void EGLWindow::DrawShadow(Canvas *canvas) {
-  float rad = Theme::shadow_radius() - 1.f; // The spread radius
-  float offset_x = Theme::shadow_offset_x();
-  float offset_y = Theme::shadow_offset_y();
+  float rad = Theme::GetShadowRadius() - 1.f; // The spread radius
+  float offset_x = Theme::GetShadowOffsetX();
+  float offset_y = Theme::GetShadowOffsetY();
 
   if (!IsFocused()) {
     rad = (int) rad / 3;
@@ -426,59 +423,59 @@ void EGLWindow::DrawShadow(Canvas *canvas) {
 
   // shadow map
   SkCanvas *c = canvas->GetSkCanvas();
-  sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::shadow_pixmap(), nullptr, nullptr);
+  sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::GetShadowPixmap(), nullptr, nullptr);
 
   // top-left
   c->drawImageRect(image,
                    SkRect::MakeLTRB(0, 0,
-                                    2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
+                                    2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius()),
                    SkRect::MakeXYWH(-rad + offset_x, -rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
   // top
   c->drawImageRect(image,
-                   SkRect::MakeLTRB(2 * Theme::shadow_radius(), 0,
-                                    250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius()),
+                   SkRect::MakeLTRB(2 * Theme::GetShadowRadius(), 0,
+                                    250 - 2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius()),
                    SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
                                     GetWidth() - 2 * rad, 2 * rad),
                    nullptr);
 
   // top-right
   c->drawImageRect(image,
-                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 0,
-                                    250, 2 * Theme::shadow_radius()),
+                   SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 0,
+                                    250, 2 * Theme::GetShadowRadius()),
                    SkRect::MakeXYWH(GetWidth() - rad + offset_x, -rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
   // left
   c->drawImageRect(image,
-                   SkRect::MakeLTRB(0, 2 * Theme::shadow_radius(),
-                                    2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius()),
+                   SkRect::MakeLTRB(0, 2 * Theme::GetShadowRadius(),
+                                    2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius()),
                    SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
                                     2 * rad, GetHeight() - 2 * rad),
                    nullptr);
 
   // bottom-left
   c->drawImageRect(image,
-                   SkRect::MakeLTRB(0, 250 - 2 * Theme::shadow_radius(),
-                                    2 * Theme::shadow_radius(), 250),
+                   SkRect::MakeLTRB(0, 250 - 2 * Theme::GetShadowRadius(),
+                                    2 * Theme::GetShadowRadius(), 250),
                    SkRect::MakeXYWH(-rad + offset_x, GetHeight() - rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
   // bottom
   c->drawImageRect(image,
-                   SkRect::MakeLTRB(2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
-                                    250 - 2 * Theme::shadow_radius(), 250),
+                   SkRect::MakeLTRB(2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius(),
+                                    250 - 2 * Theme::GetShadowRadius(), 250),
                    SkRect::MakeXYWH(rad + offset_x, GetHeight() - rad + offset_y,
                                     GetWidth() - 2 * rad, 2 * rad),
                    nullptr);
 
   // bottom-right
   c->drawImageRect(image,
-                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 250 - 2 * Theme::shadow_radius(),
+                   SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius(),
                                     250, 250),
                    SkRect::MakeXYWH(GetWidth() - rad + offset_x,
                                     GetHeight() - rad + offset_y,
@@ -488,8 +485,8 @@ void EGLWindow::DrawShadow(Canvas *canvas) {
 
   // right
   c->drawImageRect(image,
-                   SkRect::MakeLTRB(250 - 2 * Theme::shadow_radius(), 2 * Theme::shadow_radius(),
-                                    250, 250 - 2 * Theme::shadow_radius()),
+                   SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius(),
+                                    250, 250 - 2 * Theme::GetShadowRadius()),
                    SkRect::MakeXYWH(GetWidth() - rad + offset_x, rad + offset_y,
                                     2 * rad, GetHeight() - 2 * rad),
                    nullptr);

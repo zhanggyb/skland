@@ -22,8 +22,6 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
-#include <skland/gui/abstract-shell-frame.hpp>
-
 #include <skland/stock/theme.hpp>
 
 #include "internal/abstract-view-private.hpp"
@@ -31,6 +29,8 @@
 #include "internal/abstract-event-handler-mouse-task-iterator.hpp"
 
 namespace skland {
+
+const Margin AbstractShellView::kResizingMargin(5, 5, 5, 5);
 
 AbstractShellView::AbstractShellView(const char *title, AbstractShellView *parent)
     : AbstractShellView(400, 300, title, parent) {
@@ -50,7 +50,7 @@ AbstractShellView::AbstractShellView(int width,
   if (title) p_->title = title;
 
   if (nullptr == p_->parent) {
-    p_->shell_surface = Surface::Shell::Toplevel::Create(this, Theme::shadow_margin());
+    p_->shell_surface = Surface::Shell::Toplevel::Create(this, Theme::GetShadowMargin());
     Surface::Shell::Get(p_->shell_surface)->configure().Set(this, &AbstractShellView::OnXdgSurfaceConfigure);
     Surface::Shell::Toplevel *top_level_role = Surface::Shell::Toplevel::Get(p_->shell_surface);
     top_level_role->configure().Set(this, &AbstractShellView::OnXdgToplevelConfigure);
@@ -61,10 +61,10 @@ AbstractShellView::AbstractShellView(int width,
   }
 
   int x = 0, y = 0;  // The input region
-  x += Theme::shadow_margin().left - AbstractShellFrame::kResizingMargin.left;
-  y += Theme::shadow_margin().top - AbstractShellFrame::kResizingMargin.top;
-  width += AbstractShellFrame::kResizingMargin.lr();
-  height += AbstractShellFrame::kResizingMargin.tb();
+  x += Theme::GetShadowMargin().left - kResizingMargin.left;
+  y += Theme::GetShadowMargin().top - kResizingMargin.top;
+  width += kResizingMargin.lr();
+  height += kResizingMargin.tb();
 
   wayland::Region input_region;
   input_region.Setup(Display::Registry().wl_compositor());

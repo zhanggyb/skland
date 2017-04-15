@@ -19,8 +19,8 @@
 
 extern "C" {
 
-void *WindowFrameLightCreate();
-void WindowFrameLightDestroy(void *p);
+void *ThemeLightCreate();
+void ThemeLightDestroy(void *p);
 
 }
 

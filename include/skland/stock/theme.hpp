@@ -21,6 +21,7 @@
 #include "../core/margin.hpp"
 
 #include <vector>
+#include <string>
 
 class SkPixmap;
 
@@ -43,8 +44,8 @@ struct ColorScheme {
   bool alpha_check;
 };
 
-typedef void *(*WindowFrameCreateHandle)();
-typedef void(*WindowFrameDestroyHandle)(void *p);
+typedef void *(*ThemeCreateHandle)();
+typedef void(*ThemeDestroyHandle)(void *p);
 
 /**
  * @ingroup stock
@@ -54,68 +55,73 @@ class Theme {
 
   friend class Application;
 
-  Theme(const Theme &orig) = delete;
-  Theme &operator=(const Theme &other) = delete;
+  Theme(const Theme &) = delete;
+  Theme &operator=(const Theme &) = delete;
 
  public:
 
   static void Load(const char *name = nullptr);
 
-  static AbstractShellFrame *CreateWindowFrame();
-
-  static void DestroyWindowFrame(AbstractShellFrame *window_frame);
-
-  static inline int shadow_radius() {
-    return kTheme->shadow_radius_;
+  static inline int GetShadowRadius() {
+    return kShadowRadius;
   }
 
-  static inline int shadow_offset_x() {
-    return kTheme->shadow_offset_x_;
+  static inline int GetShadowOffsetX() {
+    return kShadowOffsetX;
   }
 
-  static inline int shadow_offset_y() {
-    return kTheme->shadow_offset_y_;
+  static inline int GetShadowOffsetY() {
+    return kShadowOffsetY;
   }
 
-  static inline const Margin &shadow_margin() {
-    return kTheme->shadow_margin_;
+  static inline const Margin &GetShadowMargin() {
+    return kShadowMargin;
   }
 
-  static inline const SkPixmap *shadow_pixmap() {
-    return kTheme->shadow_pixmap_;
+  static inline const SkPixmap *GetShadowPixmap() {
+    return kShadowPixmap;
   }
 
   static const int kShadowImageWidth = 250;
 
   static const int kShadowImageHeight = 250;
 
-  void Reset();
-
- private:
-
-  static void Initialize();
-
-  static void Release();
+ protected:
 
   Theme();
 
-  ~Theme();
+  virtual ~Theme();
 
-  void GenerateShadowImage();
+ private:
 
-  int shadow_radius_;
+  /**
+   * @brief Initialize static properties
+   *
+   * This method is called only in Application
+   */
+  static void Initialize();
 
-  int shadow_offset_x_;
-  int shadow_offset_y_;
+  /**
+   * @brief Release the memory allocated for theme
+   *
+   * This method is called only in Application
+   */
+  static void Release();
 
-  Margin shadow_margin_;
+  static void GenerateShadowImage();
 
-  std::vector<uint32_t> shadow_pixels_;
+  static int kShadowRadius;
 
-  SkPixmap *shadow_pixmap_;
+  static int kShadowOffsetX;
+  static int kShadowOffsetY;
 
-  WindowFrameCreateHandle window_frame_create_handle_;
-  WindowFrameDestroyHandle window_frame_destroy_handle_;
+  static Margin kShadowMargin;
+
+  static std::vector<uint32_t> kShadowPixels;
+
+  static SkPixmap *kShadowPixmap;
+
+  std::string name_;
 
   static Theme *kTheme;
 

@@ -18,7 +18,6 @@
 #define SKLAND_GUI_EGL_WINDOW_HPP_
 
 #include "abstract-shell-view.hpp"
-#include "../core/margin.hpp"
 
 namespace skland {
 
@@ -87,8 +86,6 @@ class EGLWindow : public AbstractShellView {
   void OnRelease();
 
   void DrawShadow(Canvas *canvas);
-
-  static const Margin kResizingMargin;
 
   std::unique_ptr<Private> p_;
 

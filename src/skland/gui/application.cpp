@@ -24,6 +24,8 @@
 #include <iostream>
 #include <stdlib.h>
 
+#include <skland/core/debug.hpp>
+
 #include <skland/gui/timer.hpp>
 #include <skland/stock/theme.hpp>
 
@@ -66,7 +68,6 @@ Application::Application(int argc, char *argv[])
 
   // Load theme
   Theme::Initialize();
-  Theme::Load();  // TODO: use an argument to specify the theme name
 
   epoll_fd_ = CreateEpollFd();
   WatchEpollFd(epoll_fd_, Display::kDisplay->display_fd_,

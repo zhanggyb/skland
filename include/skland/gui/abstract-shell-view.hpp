@@ -19,8 +19,8 @@
 
 #include "abstract-event-handler.hpp"
 
-#include "skland/core/debug.hpp"
 #include "../core/rect.hpp"
+#include "../core/margin.hpp"
 
 #include <cstdint>
 #include <string>
@@ -145,6 +145,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   int GetWidth() const;
 
   int GetHeight() const;
+
+  static const Margin kResizingMargin;
 
  protected:
 

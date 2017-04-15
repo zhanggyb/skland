@@ -15,23 +15,15 @@
  */
 
 #include "theme-dark.hpp"
-#include "theme-default.hpp"
 
-#include <skland/graphic/canvas.hpp>
-#include <skland/graphic/paint.hpp>
-#include <skland/graphic/path.hpp>
-
-#include <skland/gui/abstract-shell-view.hpp>
-#include <skland/gui/label.hpp>
-#include <skland/gui/context.hpp>
-
-#include <skland/graphic/gradient-shader.hpp>
+#include <skland/stock/theme.hpp>
 
 namespace skland {
 
 /**
  * @brief The default window frame
  */
+/*
 class WindowFrameDark final : public WindowFrameDefault {
 
   WindowFrameDark(const WindowFrameDark &orig) = delete;
@@ -58,7 +50,9 @@ class WindowFrameDark final : public WindowFrameDefault {
   virtual void OnDraw(const Context *context);
 
 };
+*/
 
+/*
 void WindowFrameDark::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Clear();
@@ -98,14 +92,19 @@ void WindowFrameDark::OnDraw(const Context *context) {
 
   canvas->Flush();
 }
+*/
+
+class ThemeDark: public Theme {
+
+};
 
 }
 
-void *WindowFrameDarkCreate() {
-  return new skland::WindowFrameDark;
+void *ThemeDarkCreate() {
+  return new skland::ThemeDark;
 }
 
-void WindowFrameDarkDestroy(void *p) {
-  skland::WindowFrameDark *frame = static_cast<skland::WindowFrameDark *>(p);
-  delete frame;
+void ThemeDarkDestroy(void *p) {
+  skland::ThemeDark *theme = static_cast<skland::ThemeDark *>(p);
+  delete theme;
 }

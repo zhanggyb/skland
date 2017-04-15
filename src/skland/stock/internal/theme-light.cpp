@@ -15,22 +15,15 @@
  */
 
 #include "theme-light.hpp"
-#include "theme-default.hpp"
 
-#include <skland/graphic/canvas.hpp>
-#include <skland/graphic/paint.hpp>
-#include <skland/graphic/path.hpp>
-
-#include <skland/gui/abstract-shell-view.hpp>
-#include <skland/gui/context.hpp>
-
-#include <skland/graphic/gradient-shader.hpp>
+#include <skland/stock/theme.hpp>
 
 namespace skland {
 
 /**
  * @brief The default window frame
  */
+/*
 class WindowFrameLight final : public WindowFrameDefault {
 
   WindowFrameLight(const WindowFrameLight &orig) = delete;
@@ -49,6 +42,9 @@ class WindowFrameLight final : public WindowFrameDefault {
 
 };
 
+*/
+
+/*
 void WindowFrameLight::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
   canvas->Clear();
@@ -88,15 +84,20 @@ void WindowFrameLight::OnDraw(const Context *context) {
 
   canvas->Flush();
 }
+*/
+
+class ThemeLight: public Theme {
+
+};
 
 }
 
-void *WindowFrameLightCreate() {
-  return new skland::WindowFrameLight;
+void *ThemeLightCreate() {
+  return new skland::ThemeLight;
 }
 
-void WindowFrameLightDestroy(void *p) {
-  skland::WindowFrameLight *frame = static_cast<skland::WindowFrameLight *>(p);
-  delete frame;
+void ThemeLightDestroy(void *p) {
+  skland::ThemeLight *theme = static_cast<skland::ThemeLight *>(p);
+  delete theme;
 }
 

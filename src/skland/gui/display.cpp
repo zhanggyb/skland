@@ -16,6 +16,8 @@
 
 #include <skland/core/exceptions.hpp>
 
+#include <skland/core/debug.hpp>
+
 #include <skland/gui/display.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>

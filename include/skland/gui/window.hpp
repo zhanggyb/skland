@@ -18,7 +18,6 @@
 #define SKLAND_GUI_WINDOW_HPP_
 
 #include "abstract-shell-view.hpp"
-#include "../core/margin.hpp"
 
 namespace skland {
 
@@ -89,8 +88,6 @@ SKLAND_EXPORT class Window : public AbstractShellView {
   void DrawShadow(Canvas *canvas);
 
   Rect GetContentGeometry() const;
-
-  static const Margin kResizingMargin;
 
   std::unique_ptr<Private> p_;
 
