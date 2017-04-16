@@ -1,3 +1,5 @@
+enable_language(ASM)
+
 # To first approximation, the Skia library comprises all .cpp files under src/.
 file(GLOB_RECURSE srcs ${SKIA_SOURCE_DIR}/src/*.cpp)
 
@@ -63,12 +65,14 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/sksl/SkSLMain.cpp)
 # Skia sure ships a lot of code no one uses.
 remove_srcs(${SKIA_SOURCE_DIR}/src/svg/*
         ${SKIA_SOURCE_DIR}/src/views/*
-        ${SKIA_SOURCE_DIR}/src/xml/*
-        ${SKIA_SOURCE_DIR}/src/jumper/*)
+        ${SKIA_SOURCE_DIR}/src/xml/*)
 foreach (include svg views gpu/vk)
     file(GLOB globed_include ${SKIA_SOURCE_DIR}/include/${include})
     list(REMOVE_ITEM public_includes ${globed_include})
 endforeach ()
+
+# Add assembly code in jumper module
+list(APPEND srcs ${SKIA_SOURCE_DIR}/src/jumper/SkJumper_generated.S)
 
 # Remove OS-specific source files.
 if (NOT UNIX)
