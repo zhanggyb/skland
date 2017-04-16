@@ -14,30 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_FRAME_PRIVATE_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_FRAME_PRIVATE_HPP_
+#ifndef SKLAND_MATRIX_PRIVATE_HPP
+#define SKLAND_MATRIX_PRIVATE_HPP
 
-#include <skland/gui/abstract-shell-frame.hpp>
+#include <skland/graphic/matrix.hpp>
+#include "SkMatrix.h"
 
 namespace skland {
 
-SKLAND_NO_EXPORT struct AbstractShellFrame::Private {
+struct Matrix::Private {
 
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
+  Private() {}
 
-  Private()
-      : shell_view(nullptr),
-        title_view(nullptr) {}
+  Private(const Private &orig)
+      : sk_matrix(orig.sk_matrix) {}
 
   ~Private() {}
 
-  AbstractShellView *shell_view;
-
-  AbstractView *title_view;
+  SkMatrix sk_matrix;
 
 };
 
 }
 
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_FRAME_PRIVATE_HPP_
+#endif //SKLAND_MATRIX_PRIVATE_HPP

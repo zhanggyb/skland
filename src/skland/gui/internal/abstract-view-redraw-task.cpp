@@ -21,26 +21,39 @@
 namespace skland {
 
 void AbstractView::RedrawTask::Run() const {
-  view->p_->inhibit_redraw = true;
+  view->p_->is_drawing = true;
 
   if (view->p_->dirty_flag) {
     view->OnGeometryChange(view->p_->dirty_flag, view->p_->last_geometry, view->p_->geometry);
     view->p_->last_geometry = view->p_->geometry;
-    view->p_->dirty_flag = 0;
   }
 
-  view->OnDraw(&context);
-  view->p_->visible = true;
+  if (view->p_->need_layout) {
+    view->p_->is_layouting = true;
+    view->OnLayout(view->p_->dirty_flag,
+                   view->p_->padding.left,
+                   view->p_->padding.top,
+                   static_cast<int>(view->p_->geometry.width()) - view->p_->padding.right,
+                   static_cast<int>(view->p_->geometry.height()) - view->p_->padding.bottom);
+    view->p_->is_layouting = false;
+  }
+
+  if (view->p_->need_redraw)   // This boolean flag is reset in AbstractLayout
+    view->OnDraw(&context);
 
   if (view->p_->is_damaged) {
     context.surface()->Damage(view->p_->damaged_region.x(),
                               view->p_->damaged_region.y(),
                               view->p_->damaged_region.width(),
                               view->p_->damaged_region.height());
-    view->p_->is_damaged = false;
   }
 
-  view->p_->inhibit_redraw = false;
+  view->p_->dirty_flag = 0;
+  view->p_->need_layout = false;
+  view->p_->is_damaged = false;
+  view->p_->visible = true;
+
+  view->p_->is_drawing = false;
 }
 
 }

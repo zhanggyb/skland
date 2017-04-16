@@ -20,7 +20,7 @@
 
 #include <skland/wayland/display.hpp>
 
-#include <skland/core/defines.hpp>
+#include <skland/core/assert.hpp>
 #include <malloc.h>
 
 #ifndef ARRAY_LENGTH
@@ -81,13 +81,13 @@ void Display::Setup(const wayland::Display &wl_display) {
 
   egl_display_ = GetEGLDisplay(EGL_PLATFORM_WAYLAND_KHR,
                                wl_display.wl_display_, NULL);
-  DBG_ASSERT(egl_display_);
+  _ASSERT(egl_display_);
 
   ret = eglInitialize(egl_display_, &major_, &minor_);
-  DBG_ASSERT(ret == EGL_TRUE);
+  _ASSERT(ret == EGL_TRUE);
 
   ret = eglBindAPI(EGL_OPENGL_ES_API);
-  DBG_ASSERT(ret == EGL_TRUE);
+  _ASSERT(ret == EGL_TRUE);
 
   eglGetConfigs(egl_display_, NULL, 0, &count);
 
@@ -102,10 +102,10 @@ void Display::Setup(const wayland::Display &wl_display) {
     }
   }
   free(configs);
-  DBG_ASSERT(egl_config_);
+  _ASSERT(egl_config_);
 
   egl_context_ = eglCreateContext(egl_display_, egl_config_, EGL_NO_CONTEXT, context_attribs);
-  DBG_ASSERT(egl_context_);
+  _ASSERT(egl_context_);
 
   static const struct {
     const char *extension, *entrypoint;

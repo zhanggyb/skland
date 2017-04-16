@@ -30,17 +30,17 @@ Object::Object()
 
 Object::~Object() {
   if (parent_) parent_->RemoveChild(this);
-  DBG_ASSERT(previous_ == nullptr);
-  DBG_ASSERT(next_ == nullptr);
+  _ASSERT(previous_ == nullptr);
+  _ASSERT(next_ == nullptr);
 
   if (children_count_ > 0) {
-    DBG_ASSERT(first_child_ != nullptr);
-    DBG_ASSERT(last_child_ != nullptr);
+    _ASSERT(first_child_ != nullptr);
+    _ASSERT(last_child_ != nullptr);
     ClearChildren();
   }
-  DBG_ASSERT(children_count_ == 0);
-  DBG_ASSERT(first_child_ == nullptr);
-  DBG_ASSERT(last_child_ == nullptr);
+  _ASSERT(children_count_ == 0);
+  _ASSERT(first_child_ == nullptr);
+  _ASSERT(last_child_ == nullptr);
 }
 
 Object *Object::GetChildAt(int index) const {
@@ -76,16 +76,16 @@ void Object::PushFrontChild(Object *child) {
     }
   }
 
-  DBG_ASSERT(child->previous_ == nullptr);
-  DBG_ASSERT(child->next_ == nullptr);
-  DBG_ASSERT(child->parent_ == nullptr);
+  _ASSERT(child->previous_ == nullptr);
+  _ASSERT(child->next_ == nullptr);
+  _ASSERT(child->parent_ == nullptr);
 
   if (first_child_) {
     first_child_->previous_ = child;
     child->next_ = first_child_;
   } else {
-    DBG_ASSERT(last_child_ == nullptr);
-    DBG_ASSERT(children_count_ == 0);
+    _ASSERT(last_child_ == nullptr);
+    _ASSERT(children_count_ == 0);
     // child->next_ = nullptr;
     last_child_ = child;
   }
@@ -107,13 +107,13 @@ void Object::InsertChild(Object *child, int index) {
     }
   }
 
-  DBG_ASSERT(child->previous_ == nullptr);
-  DBG_ASSERT(child->next_ == nullptr);
-  DBG_ASSERT(child->parent_ == nullptr);
+  _ASSERT(child->previous_ == nullptr);
+  _ASSERT(child->next_ == nullptr);
+  _ASSERT(child->parent_ == nullptr);
 
   if (first_child_ == nullptr) {
-    DBG_ASSERT(last_child_ == nullptr);
-    DBG_ASSERT(children_count_ == 0);
+    _ASSERT(last_child_ == nullptr);
+    _ASSERT(children_count_ == 0);
     // child->next_ = nullptr;
     // child->previous_ = nullptr;
     last_child_ = child;
@@ -173,16 +173,16 @@ void Object::PushBackChild(Object *child) {
     }
   }
 
-  DBG_ASSERT(child->previous_ == nullptr);
-  DBG_ASSERT(child->next_ == nullptr);
-  DBG_ASSERT(child->parent_ == nullptr);
+  _ASSERT(child->previous_ == nullptr);
+  _ASSERT(child->next_ == nullptr);
+  _ASSERT(child->parent_ == nullptr);
 
   if (last_child_) {
     last_child_->next_ = child;
     child->previous_ = last_child_;
   } else {
-    DBG_ASSERT(first_child_ == nullptr);
-    DBG_ASSERT(children_count_ == 0);
+    _ASSERT(first_child_ == nullptr);
+    _ASSERT(children_count_ == 0);
     // child->previous_ = nullptr;
     first_child_ = child;
   }
@@ -198,24 +198,24 @@ void Object::PushBackChild(Object *child) {
 Object *Object::RemoveChild(Object *child) {
   if (child->parent_ != this) return nullptr;
 
-  DBG_ASSERT(children_count_ > 0);
+  _ASSERT(children_count_ > 0);
 
   if (child->previous_) {
     child->previous_->next_ = child->next_;
   } else {
-    DBG_ASSERT(first_child_ == child);
+    _ASSERT(first_child_ == child);
     first_child_ = child->next_;
   }
 
   if (child->next_) {
     child->next_->previous_ = child->previous_;
   } else {
-    DBG_ASSERT(last_child_ == child);
+    _ASSERT(last_child_ == child);
     last_child_ = child->previous_;
   }
 
   children_count_--;
-  DBG_ASSERT(children_count_ >= 0);
+  _ASSERT(children_count_ >= 0);
 
   child->previous_ = nullptr;
   child->next_ = nullptr;
@@ -263,7 +263,7 @@ bool Object::SwapIndex(Object *object1, Object *object2) {
 
   if (object1->next_ == object2) {    // view1 is just the previous sibling of view2
 
-    DBG_ASSERT(object2->previous_ == object1);
+    _ASSERT(object2->previous_ == object1);
     tmp1 = object1->previous_;
     tmp2 = object2->next_;
     object2->previous_ = tmp1;
@@ -278,7 +278,7 @@ bool Object::SwapIndex(Object *object1, Object *object2) {
     else object2->parent_->last_child_ = object2;
 
   } else if (object1->previous_ == object2) {
-    DBG_ASSERT(object2->next_ == object1);
+    _ASSERT(object2->next_ == object1);
 
     tmp1 = object2->previous_;
     tmp2 = object1->next_;
@@ -337,14 +337,14 @@ bool Object::InsertSiblingBefore(Object *src, Object *dst) {
       if (dst->previous_) {
         dst->previous_->next_ = dst->next_;
       } else {
-        DBG_ASSERT(dst->parent_->first_child_ == dst);
+        _ASSERT(dst->parent_->first_child_ == dst);
         dst->parent_->first_child_ = dst->next_;
       }
 
       if (dst->next_) {
         dst->next_->previous_ = dst->previous_;
       } else {
-        DBG_ASSERT(dst->parent_->last_child_ == dst);
+        _ASSERT(dst->parent_->last_child_ == dst);
         dst->parent_->last_child_ = dst->previous_;
       }
 
@@ -357,7 +357,7 @@ bool Object::InsertSiblingBefore(Object *src, Object *dst) {
       if (tmp) {
         tmp->next_ = dst;
       } else {
-        DBG_ASSERT(src->parent_->first_child_ == src);
+        _ASSERT(src->parent_->first_child_ == src);
         dst->parent_->first_child_ = dst;
       }
 
@@ -368,9 +368,9 @@ bool Object::InsertSiblingBefore(Object *src, Object *dst) {
     }
 
   }
-  DBG_ASSERT(dst->parent_ == nullptr);
-  DBG_ASSERT(dst->next_ == nullptr);
-  DBG_ASSERT(dst->previous_ == nullptr);
+  _ASSERT(dst->parent_ == nullptr);
+  _ASSERT(dst->next_ == nullptr);
+  _ASSERT(dst->previous_ == nullptr);
 
   Object *tmp = src->previous_;
 
@@ -380,7 +380,7 @@ bool Object::InsertSiblingBefore(Object *src, Object *dst) {
   if (tmp) {
     tmp->next_ = dst;
   } else {
-    DBG_ASSERT(src->parent_->first_child_ == src);
+    _ASSERT(src->parent_->first_child_ == src);
     src->parent_->first_child_ = dst;
   }
 
@@ -405,14 +405,14 @@ bool Object::InsertSiblingAfter(Object *src, Object *dst) {
       if (dst->previous_) {
         dst->previous_->next_ = dst->next_;
       } else {
-        DBG_ASSERT(dst->parent_->first_child_ == dst);
+        _ASSERT(dst->parent_->first_child_ == dst);
         dst->parent_->first_child_ = dst->next_;
       }
 
       if (dst->next_) {
         dst->next_->previous_ = dst->previous_;
       } else {
-        DBG_ASSERT(dst->parent_->last_child_ == dst);
+        _ASSERT(dst->parent_->last_child_ == dst);
         dst->parent_->last_child_ = dst->previous_;
       }
 
@@ -425,7 +425,7 @@ bool Object::InsertSiblingAfter(Object *src, Object *dst) {
       if (tmp) {
         tmp->previous_ = dst;
       } else {
-        DBG_ASSERT(src->parent_->last_child_ == src);
+        _ASSERT(src->parent_->last_child_ == src);
         dst->parent_->last_child_ = dst;
       }
 
@@ -437,9 +437,9 @@ bool Object::InsertSiblingAfter(Object *src, Object *dst) {
 
   }
 
-  DBG_ASSERT(dst->parent_ == nullptr);
-  DBG_ASSERT(dst->next_ == nullptr);
-  DBG_ASSERT(dst->previous_ == nullptr);
+  _ASSERT(dst->parent_ == nullptr);
+  _ASSERT(dst->next_ == nullptr);
+  _ASSERT(dst->previous_ == nullptr);
 
   Object *tmp = src->next_;
 
@@ -449,7 +449,7 @@ bool Object::InsertSiblingAfter(Object *src, Object *dst) {
   if (tmp) {
     tmp->previous_ = dst;
   } else {
-    DBG_ASSERT(src->parent_->last_child_ == src);
+    _ASSERT(src->parent_->last_child_ == src);
     src->parent_->last_child_ = dst;
   }
 
@@ -463,7 +463,7 @@ void Object::MoveToFirst(Object *object) {
   if (object->parent_) {
 
     if (object->parent_->first_child_ == object) {
-      DBG_ASSERT(object->previous_ == 0);
+      _ASSERT(object->previous_ == 0);
       return;    // already at first
     }
 
@@ -471,7 +471,7 @@ void Object::MoveToFirst(Object *object) {
     if (object->next_) {
       object->next_->previous_ = object->previous_;
     } else {
-      DBG_ASSERT(object->parent_->last_child_ == object);
+      _ASSERT(object->parent_->last_child_ == object);
       object->parent_->last_child_ = object->previous_;
     }
 
@@ -486,7 +486,7 @@ void Object::MoveToLast(Object *object) {
   if (object->parent_) {
 
     if (object->parent_->last_child_ == object) {
-      DBG_ASSERT(object->next_ == 0);
+      _ASSERT(object->next_ == 0);
       return;    // already at last
     }
 
@@ -495,7 +495,7 @@ void Object::MoveToLast(Object *object) {
     if (object->previous_) {
       object->previous_->next_ = object->next_;
     } else {
-      DBG_ASSERT(object->parent_->first_child_ == object);
+      _ASSERT(object->parent_->first_child_ == object);
       object->parent_->first_child_ = object->next_;
     }
 
@@ -517,7 +517,7 @@ void Object::MoveForward(Object *object) {
       if (object->previous_) {
         object->previous_->next_ = tmp;
       } else {
-        DBG_ASSERT(object->parent_->first_child_ == object);
+        _ASSERT(object->parent_->first_child_ == object);
         object->parent_->first_child_ = tmp;
       }
 
@@ -529,19 +529,19 @@ void Object::MoveForward(Object *object) {
       tmp->next_ = object;
 
       if (object->next_ == 0) {
-        DBG_ASSERT(object->parent_->last_child_ == tmp);
+        _ASSERT(object->parent_->last_child_ == tmp);
         object->parent_->last_child_ = object;
       }
 
       if (object->previous_) {
-        DBG_ASSERT(object->previous_->next_ == object);
+        _ASSERT(object->previous_->next_ == object);
       }
       if (object->next_) {
-        DBG_ASSERT(object->next_->previous_ == object);
+        _ASSERT(object->next_->previous_ == object);
       }
 
     } else {
-      DBG_ASSERT(object->parent_->last_child_ == object);
+      _ASSERT(object->parent_->last_child_ == object);
     }
 
   }
@@ -558,7 +558,7 @@ void Object::MoveBackward(Object *object) {
       if (object->next_) {
         object->next_->previous_ = tmp;
       } else {
-        DBG_ASSERT(object->parent_->last_child_ == object);
+        _ASSERT(object->parent_->last_child_ == object);
         object->parent_->last_child_ = tmp;
       }
 
@@ -570,19 +570,19 @@ void Object::MoveBackward(Object *object) {
       tmp->previous_ = object;
 
       if (object->previous_ == 0) {
-        DBG_ASSERT(object->parent_->first_child_ == tmp);
+        _ASSERT(object->parent_->first_child_ == tmp);
         object->parent_->first_child_ = object;
       }
 
       if (object->previous_) {
-        DBG_ASSERT(object->previous_->next_ == object);
+        _ASSERT(object->previous_->next_ == object);
       }
       if (object->next_) {
-        DBG_ASSERT(object->next_->previous_ == object);
+        _ASSERT(object->next_->previous_ == object);
       }
 
     } else {
-      DBG_ASSERT(object->parent_->first_child_ == object);
+      _ASSERT(object->parent_->first_child_ == object);
     }
 
   }

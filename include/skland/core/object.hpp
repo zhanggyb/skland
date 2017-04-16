@@ -18,7 +18,7 @@
 #define SKLAND_CORE_OBJECT_HPP_
 
 #include "sigcxx.hpp"
-#include "defines.hpp"
+#include "assert.hpp"
 
 #include <string>
 
@@ -207,28 +207,28 @@ void Object::PushFrontManagedObject(M *_this,
                                     T **last,
                                     int &count) {
   if (*manager) {
-    DBG_ASSERT(nullptr == object->parent_);
+    _ASSERT(nullptr == object->parent_);
     if ((*manager) == _this) {
       return;
     } else {
       RemoveManagedObject(_this, object, manager, first, last, count);
     }
   } else if (object->parent_) {
-    DBG_ASSERT(nullptr == (*manager));
+    _ASSERT(nullptr == (*manager));
     object->parent_->RemoveChild(object);
   }
 
-  DBG_ASSERT(nullptr == object->previous_);
-  DBG_ASSERT(nullptr == object->next_);
-  DBG_ASSERT(nullptr == object->parent_);
-  DBG_ASSERT(nullptr == (*manager));
+  _ASSERT(nullptr == object->previous_);
+  _ASSERT(nullptr == object->next_);
+  _ASSERT(nullptr == object->parent_);
+  _ASSERT(nullptr == (*manager));
 
   if (*first) {
     (*first)->previous_ = object;
     object->next_ = (*first);
   } else {
-    DBG_ASSERT(nullptr == (*last));
-    DBG_ASSERT(0 == count);
+    _ASSERT(nullptr == (*last));
+    _ASSERT(0 == count);
     // object->next_ = nullptr;
     (*last) = object;
   }
@@ -248,7 +248,7 @@ void Object::InsertManagedObject(M *_this,
                                  int &count,
                                  int index) {
   if (*manager) {
-    DBG_ASSERT(nullptr == object->parent_);
+    _ASSERT(nullptr == object->parent_);
     if ((*manager) == _this) {
       return;
     } else {
@@ -258,14 +258,14 @@ void Object::InsertManagedObject(M *_this,
     object->parent_->RemoveChild(object);
   }
 
-  DBG_ASSERT(nullptr == object->previous_);
-  DBG_ASSERT(nullptr == object->next_);
-  DBG_ASSERT(nullptr == object->parent_);
-  DBG_ASSERT(nullptr == (*manager));
+  _ASSERT(nullptr == object->previous_);
+  _ASSERT(nullptr == object->next_);
+  _ASSERT(nullptr == object->parent_);
+  _ASSERT(nullptr == (*manager));
 
   if (nullptr == (*first)) {
-    DBG_ASSERT(nullptr == (*last));
-    DBG_ASSERT(0 == count);
+    _ASSERT(nullptr == (*last));
+    _ASSERT(0 == count);
     // object->next_ = nullptr;
     // object->previous_ = nullptr;
     (*last) = object;
@@ -323,7 +323,7 @@ void Object::PushBackManagedObject(M *_this,
                                    T **last,
                                    int &count) {
   if (*manager) {
-    DBG_ASSERT(nullptr == object->parent_);
+    _ASSERT(nullptr == object->parent_);
     if (_this == (*manager)) {
       return;
     } else {
@@ -333,17 +333,17 @@ void Object::PushBackManagedObject(M *_this,
     object->parent_->RemoveChild(object);
   }
 
-  DBG_ASSERT(nullptr == object->previous_);
-  DBG_ASSERT(nullptr == object->next_);
-  DBG_ASSERT(nullptr == object->parent_);
-  DBG_ASSERT(nullptr == (*manager));
+  _ASSERT(nullptr == object->previous_);
+  _ASSERT(nullptr == object->next_);
+  _ASSERT(nullptr == object->parent_);
+  _ASSERT(nullptr == (*manager));
 
   if (*last) {
     (*last)->next_ = object;
     object->previous_ = (*last);
   } else {
-    DBG_ASSERT(nullptr == (*first));
-    DBG_ASSERT(0 == count);
+    _ASSERT(nullptr == (*first));
+    _ASSERT(0 == count);
     // object->previous_ = nullptr;
     (*first) = object;
   }
@@ -363,25 +363,25 @@ T *Object::RemoveManagedObject(M *_this,
                                int &count) {
   if ((*manager) != _this) return nullptr;
 
-  DBG_ASSERT(nullptr == object->parent_);
-  DBG_ASSERT(count > 0);
+  _ASSERT(nullptr == object->parent_);
+  _ASSERT(count > 0);
 
   if (object->previous_) {
     object->previous_->next_ = object->next_;
   } else {
-    DBG_ASSERT((*first) == object);
+    _ASSERT((*first) == object);
     (*first) = static_cast<T *>(object->next_);
   }
 
   if (object->next_) {
     object->next_->previous_ = object->previous_;
   } else {
-    DBG_ASSERT((*last) == object);
+    _ASSERT((*last) == object);
     (*last) = static_cast<T *>(object->previous_);
   }
 
   count--;
-  DBG_ASSERT(count >= 0);
+  _ASSERT(count >= 0);
 
   object->previous_ = nullptr;
   object->next_ = nullptr;

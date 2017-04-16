@@ -57,7 +57,7 @@ void Case1::Run() {
 
 void Case1::OnGlobal(uint32_t id, const char *interface, uint32_t version) {
   if (strcmp(interface, wl_output_interface.name) == 0) {
-    output_ = new Output(registry_, id, version);
+    output_ = new Output(id, version);
   }
 }
 

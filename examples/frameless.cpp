@@ -48,6 +48,10 @@ class MainWidget : public AbstractView {
 
   }
 
+  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final {
+
+  }
+
   virtual void OnMouseEnter(MouseEvent *event) override {
     event->Accept();
   }
@@ -82,7 +86,7 @@ int main(int argc, char *argv[]) {
 
   Application app(argc, argv);
 
-  Window *win = new Window(400, 360, "Frameless Window", nullptr);
+  Window *win = new Window(400, 360, "Frameless Window");
   win->SetAppId("Frameless-Demo");
 
   MainWidget *widget = new MainWidget;

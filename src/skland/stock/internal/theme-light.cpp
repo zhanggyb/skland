@@ -15,88 +15,33 @@
  */
 
 #include "theme-light.hpp"
-#include "theme-default.hpp"
 
-#include <skland/graphic/canvas.hpp>
-#include <skland/graphic/paint.hpp>
-#include <skland/graphic/path.hpp>
-
-#include <skland/gui/abstract-shell-view.hpp>
-#include <skland/gui/context.hpp>
-
-#include <skland/graphic/gradient-shader.hpp>
+#include <skland/stock/theme.hpp>
 
 namespace skland {
 
 /**
- * @brief The default window frame
+ * @brief The default light theme
  */
-class WindowFrameLight final : public WindowFrameDefault {
-
-  WindowFrameLight(const WindowFrameLight &orig) = delete;
-  WindowFrameLight &operator=(const WindowFrameLight &other) = delete;
+class ThemeLight : public Theme {
 
  public:
 
-  WindowFrameLight()
-      : WindowFrameDefault() {}
+  ThemeLight()
+      : Theme() {}
 
-  virtual ~WindowFrameLight() {}
-
- protected:
-
-  virtual void OnDraw(const Context *context);
+  ~ThemeLight() {}
 
 };
 
-void WindowFrameLight::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->canvas();
-  canvas->Clear();
-
-  Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetShellView()->GetSize().width, GetShellView()->GetSize().height);
-
-  // Drop shadow:
-  if ((!GetShellView()->IsMaximized()) || (!GetShellView()->IsFullscreen())) {
-    float radii[] = {
-        7.f, 7.f, // top-left
-        7.f, 7.f, // top-right
-        4.f, 4.f, // bottom-right
-        4.f, 4.f  // bottom-left
-    };
-    path.AddRoundRect(geometry, radii);
-    canvas->Save();
-    canvas->ClipPath(path, kClipDifference, true);
-    DrawShadow(canvas.get());
-    canvas->Restore();
-  } else {
-    path.AddRect(geometry);
-  }
-
-  // Fill color:
-  Paint paint;
-  paint.SetAntiAlias(true);
-  paint.SetColor(0xEFF0F0F0);
-  canvas->DrawPath(path, paint);
-
-  // Draw the client area:
-  paint.SetColor(0xEFE0E0E0);
-  canvas->Save();
-  canvas->ClipPath(path, kClipIntersect, true);
-  canvas->DrawRect(GetClientGeometry(GetShellView()->GetSize().width, GetShellView()->GetSize().height), paint);
-  canvas->Restore();
-
-  canvas->Flush();
 }
 
+void *ThemeLightCreate() {
+  return new skland::ThemeLight;
 }
 
-void *WindowFrameLightCreate() {
-  return new skland::WindowFrameLight;
-}
-
-void WindowFrameLightDestroy(void *p) {
-  skland::WindowFrameLight *frame = static_cast<skland::WindowFrameLight *>(p);
-  delete frame;
+void ThemeLightDestroy(void *p) {
+  skland::ThemeLight *theme = static_cast<skland::ThemeLight *>(p);
+  delete theme;
 }
 

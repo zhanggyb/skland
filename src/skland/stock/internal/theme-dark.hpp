@@ -19,8 +19,8 @@
 
 extern "C" {
 
-void *WindowFrameDarkCreate();
-void WindowFrameDarkDestroy(void *p);
+void *ThemeDarkCreate();
+void ThemeDarkDestroy(void *p);
 
 }
 

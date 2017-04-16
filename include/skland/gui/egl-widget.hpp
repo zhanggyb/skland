@@ -20,11 +20,9 @@
 #include "abstract-view.hpp"
 
 #include "../wayland/callback.hpp"
+#include "surface.hpp"
 
 namespace skland {
-
-class SubSurface;
-class EGLSurface;
 
 /**
  * @ingroup gui
@@ -49,7 +47,11 @@ class EGLWidget : public AbstractView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) final;
+  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+
+  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+
+  virtual void OnLayout(int, int, int, int, int) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -63,11 +65,15 @@ class EGLWidget : public AbstractView {
 
   virtual void OnDraw(const Context *context) final;
 
-  virtual void OnInitializeEGL();
+  virtual void OnInitialize();
 
-  virtual void OnResizeEGL();
+  virtual void OnResize(int width, int height);
 
-  virtual void OnRenderEGL();
+  virtual void OnRender();
+
+  bool MakeCurrent();
+
+  void SwapBuffers();
 
  private:
 
@@ -75,11 +81,10 @@ class EGLWidget : public AbstractView {
 
   Surface *sub_surface_;
 
-  EGLSurface *egl_surface_;
+  Surface::EGL *egl_surface_;
 
   wayland::Callback frame_callback_;
 
-  bool resize_;
   bool animating_;
 
 };

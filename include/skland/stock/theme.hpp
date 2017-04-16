@@ -21,30 +21,14 @@
 #include "../core/margin.hpp"
 
 #include <vector>
+#include <string>
 
 class SkPixmap;
 
 namespace skland {
 
-// Forward declaration
-class Application;
-class AbstractShellFrame;
-
-struct ColorScheme {
-  ColorD outline;
-  ColorD item;
-  ColorD inner;
-  ColorD inner_selected;
-  ColorD text;
-  ColorD text_selected;
-  bool shaded;
-  short shadetop;
-  short shadedown;
-  bool alpha_check;
-};
-
-typedef void *(*WindowFrameCreateHandle)();
-typedef void(*WindowFrameDestroyHandle)(void *p);
+typedef void *(*ThemeCreateHandle)();
+typedef void(*ThemeDestroyHandle)(void *p);
 
 /**
  * @ingroup stock
@@ -54,68 +38,109 @@ class Theme {
 
   friend class Application;
 
-  Theme(const Theme &orig) = delete;
-  Theme &operator=(const Theme &other) = delete;
+  Theme(const Theme &) = delete;
+  Theme &operator=(const Theme &) = delete;
 
  public:
 
+  struct ColorScheme {
+
+    ColorScheme()
+        : outline(),
+          item(),
+          inner(0xEFF0F0F0),
+          inner_selected(0xEFE0E0E0),
+          text(0xFF444444),
+          text_selected(0xFF999999),
+          shaded(false),
+          shadetop(0),
+          shadedown(0),
+          alpha_check(false) {}
+
+    Color outline;
+    Color item;
+    Color inner;
+    Color inner_selected;
+    Color text;
+    Color text_selected;
+    bool shaded;
+    short shadetop;
+    short shadedown;
+    bool alpha_check;
+  };
+
   static void Load(const char *name = nullptr);
 
-  static AbstractShellFrame *CreateWindowFrame();
-
-  static void DestroyWindowFrame(AbstractShellFrame *window_frame);
-
-  static inline int shadow_radius() {
-    return kTheme->shadow_radius_;
+  static inline int GetShadowRadius() {
+    return kShadowRadius;
   }
 
-  static inline int shadow_offset_x() {
-    return kTheme->shadow_offset_x_;
+  static inline int GetShadowOffsetX() {
+    return kShadowOffsetX;
   }
 
-  static inline int shadow_offset_y() {
-    return kTheme->shadow_offset_y_;
+  static inline int GetShadowOffsetY() {
+    return kShadowOffsetY;
   }
 
-  static inline const Margin &shadow_margin() {
-    return kTheme->shadow_margin_;
+  static inline const Margin &GetShadowMargin() {
+    return kShadowMargin;
   }
 
-  static inline const SkPixmap *shadow_pixmap() {
-    return kTheme->shadow_pixmap_;
+  static inline const SkPixmap *GetShadowPixmap() {
+    return kShadowPixmap;
   }
 
   static const int kShadowImageWidth = 250;
 
   static const int kShadowImageHeight = 250;
 
-  void Reset();
+  static const ColorScheme &GetWindowColorScheme() {
+    return kTheme->window_color_scheme_;
+  }
 
- private:
-
-  static void Initialize();
-
-  static void Release();
+ protected:
 
   Theme();
 
-  ~Theme();
+  virtual ~Theme();
 
-  void GenerateShadowImage();
+  ColorScheme &window_color_scheme() {
+    return window_color_scheme_;
+  };
 
-  int shadow_radius_;
+ private:
 
-  int shadow_offset_x_;
-  int shadow_offset_y_;
+  /**
+   * @brief Initialize static properties
+   *
+   * This method is called only in Application
+   */
+  static void Initialize();
 
-  Margin shadow_margin_;
+  /**
+   * @brief Release the memory allocated for theme
+   *
+   * This method is called only in Application
+   */
+  static void Release();
 
-  std::vector<uint32_t> shadow_pixels_;
+  static void GenerateShadowImage();
 
-  SkPixmap *shadow_pixmap_;
+  static int kShadowRadius;
 
-  WindowFrameCreateHandle window_frame_create_handle_;
-  WindowFrameDestroyHandle window_frame_destroy_handle_;
+  static int kShadowOffsetX;
+  static int kShadowOffsetY;
+
+  static Margin kShadowMargin;
+
+  static std::vector<uint32_t> kShadowPixels;
+
+  static SkPixmap *kShadowPixmap;
+
+  std::string name_;
+
+  ColorScheme window_color_scheme_;
 
   static Theme *kTheme;
 

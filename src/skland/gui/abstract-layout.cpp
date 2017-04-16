@@ -24,18 +24,19 @@
 #include <skland/graphic/paint.hpp>
 
 #include "internal/abstract-view-iterators.hpp"
-#include "internal/abstract-view-private.hpp"
 
 //#ifdef DEBUG
 #include <cstdlib>
 #include <skland/gui/timer.hpp>
+#include <skland/core/assert.hpp>
 //#endif
 
 namespace skland {
 
-AbstractLayout::AbstractLayout(const Margin &padding)
-    : AbstractView(), padding_(padding) {
-
+AbstractLayout::AbstractLayout(const Padding &padding)
+    : AbstractView() {
+  p_->padding = padding;
+  p_->need_redraw = false;
 }
 
 AbstractLayout::~AbstractLayout() {
@@ -43,42 +44,54 @@ AbstractLayout::~AbstractLayout() {
 }
 
 void AbstractLayout::AddView(AbstractView *view) {
-  if (view->p_->layout == this) {
-    DBG_ASSERT(view->p_->layout == this);
-    return;
-  }
+  _ASSERT(view->p_->parent == view->p_->layout);
 
-  if (view->p_->layout) {
-    view->p_->layout->RemoveView(view);
-  }
+  if (view->p_->layout == this) return;
 
-  DBG_ASSERT(nullptr == view->p_->layout);
-  DBG_ASSERT(nullptr == view->p_->parent);
+  if (view->p_->layout) view->p_->layout->RemoveView(view);
+
+  _ASSERT(nullptr == view->p_->layout);
+  _ASSERT(nullptr == view->p_->parent);
 
   InsertChild(view);
-  view->p_->layout = this;
-
-  OnViewAdded(view);
+  Layout();
 }
 
 void AbstractLayout::RemoveView(AbstractView *view) {
-  if (view->p_->layout != this) {
-    DBG_ASSERT(view->p_->parent != this);
-    return;
-  }
+  _ASSERT(view->p_->parent == view->p_->layout);
+
+  if (view->p_->layout != this) return;
 
   RemoveChild(view);
-  view->p_->layout = nullptr;
+  Layout();
+}
 
-  OnViewRemoved(view);
+void AbstractLayout::Layout() {
+  p_->need_layout = true;
+  Update();
+}
+
+void AbstractLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  if (dirty_flag) {
+    Layout();
+  } else {
+    p_->need_layout = false;
+    CancelUpdate();
+  }
+}
+
+void AbstractLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  p_->need_layout = true;
 }
 
 void AbstractLayout::OnChildAdded(AbstractView *view) {
-  // Use OnViewAdded() in layout class
+  view->p_->layout = this;
+  OnViewAdded(view);
 }
 
 void AbstractLayout::OnChildRemoved(AbstractView *view) {
-  // Use OnViewRemoved() in layout class
+  view->p_->layout = nullptr;
+  OnViewRemoved(view);
 }
 
 void AbstractLayout::OnMouseEnter(MouseEvent *event) {

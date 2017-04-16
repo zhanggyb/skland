@@ -16,14 +16,15 @@
 
 #include "internal/abstract-view-private.hpp"
 
-#include <skland/gui/mouse-event.hpp>
-
 #include <skland/core/numeric.hpp>
+#include <skland/core/assert.hpp>
+#include <skland/core/debug.hpp>
+
 #include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/abstract-layout.hpp>
+#include <skland/gui/mouse-event.hpp>
 
 #include "internal/abstract-view-iterators.hpp"
-#include "internal/abstract-view-redraw-task-iterator.hpp"
 
 namespace skland {
 
@@ -43,16 +44,16 @@ AbstractView::AbstractView(int width, int height)
 }
 
 AbstractView::~AbstractView() {
-  DBG_ASSERT(nullptr == p_->parent);
-  DBG_ASSERT(nullptr == p_->shell);
-  DBG_ASSERT(nullptr == p_->previous);
-  DBG_ASSERT(nullptr == p_->next);
-  DBG_ASSERT(0 == p_->children_count);
-  DBG_ASSERT(nullptr == p_->first_child);
-  DBG_ASSERT(nullptr == p_->last_child);
+  _ASSERT(nullptr == p_->parent);
+  _ASSERT(nullptr == p_->shell);
+  _ASSERT(nullptr == p_->previous);
+  _ASSERT(nullptr == p_->next);
+  _ASSERT(0 == p_->children_count);
+  _ASSERT(nullptr == p_->first_child);
+  _ASSERT(nullptr == p_->last_child);
 
   // layout assert:
-  DBG_ASSERT(nullptr == p_->layout);
+  _ASSERT(nullptr == p_->layout);
 }
 
 void AbstractView::SetMinimalWidth(int width) {
@@ -172,7 +173,7 @@ LayoutPolicy AbstractView::GetLayoutPolicyOnY() const {
 }
 
 void AbstractView::MoveTo(int x, int y) {
-  DBG_ASSERT(!p_->inhibit_redraw);
+  _ASSERT(!p_->is_drawing);
 
   if (p_->geometry.x() == x && p_->geometry.y() == y) return;
 
@@ -187,8 +188,12 @@ void AbstractView::MoveTo(int x, int y) {
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
+const Padding &AbstractView::GetPadding() const {
+  return p_->padding;
+}
+
 void AbstractView::Resize(int width, int height) {
-  DBG_ASSERT(!p_->inhibit_redraw);
+  _ASSERT(!p_->is_drawing);
 
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
@@ -233,21 +238,21 @@ int AbstractView::GetLeft() const {
 }
 
 void AbstractView::SetLeft(int left) {
-  if (p_->parent) {
-    left += p_->parent->p_->geometry.left;
-  }
+  if (p_->parent) left += p_->parent->p_->geometry.left;
 
   if (left == p_->geometry.left) return;
 
+  int width = static_cast<int>(p_->geometry.right) - left;
+  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+
   p_->geometry.left = left;
 
-  if (p_->geometry.left == p_->last_geometry.left) {
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask);
-  } else {
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask);
-  }
+  if (p_->geometry.left == p_->last_geometry.left)
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyWidthMask);
+  else
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyWidthMask);
 
-  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry) ;
 }
 
 int AbstractView::GetTop() const {
@@ -258,19 +263,19 @@ int AbstractView::GetTop() const {
 }
 
 void AbstractView::SetTop(int top) {
-  if (p_->parent) {
-    top += p_->parent->p_->geometry.top;
-  }
+  if (p_->parent) top += p_->parent->p_->geometry.top;
 
   if (top == p_->geometry.top) return;
 
+  int height = static_cast<int>(p_->geometry.bottom) - top;
+  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
+
   p_->geometry.top = top;
 
-  if (p_->geometry.top == p_->last_geometry.top) {
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyTopMask);
-  } else {
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyTopMask);
-  }
+  if (p_->geometry.top == p_->last_geometry.top)
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyTopMask | Private::kDirtyHeightMask);
+  else
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyTopMask | Private::kDirtyHeightMask);
 
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
@@ -280,19 +285,19 @@ int AbstractView::GetRight() const {
 }
 
 void AbstractView::SetRight(int right) {
-  if (p_->parent) {
-    right += p_->parent->p_->geometry.left; // relative to parent
-  }
+  if (p_->parent) right += p_->parent->p_->geometry.left; // relative to parent
 
   if (right == p_->geometry.right) return;
 
+  int width = right - static_cast<int>(p_->geometry.left);
+  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+
   p_->geometry.right = right;
 
-  if (p_->geometry.right == p_->last_geometry.right) {
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask);
-  } else {
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask);
-  }
+  if (p_->geometry.right == p_->last_geometry.right)
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyWidthMask);
+  else
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyWidthMask);
 
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
@@ -302,19 +307,19 @@ int AbstractView::GetBottom() const {
 }
 
 void AbstractView::SetBottom(int bottom) {
-  if (p_->parent) {
-    bottom += p_->parent->p_->geometry.top; // relative to parent
-  }
+  if (p_->parent) bottom += p_->parent->p_->geometry.top; // relative to parent
 
   if (bottom == p_->geometry.bottom) return;
 
+  int height = bottom - static_cast<int>(p_->geometry.top);
+  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
+
   p_->geometry.bottom = bottom;
 
-  if (p_->geometry.bottom == p_->last_geometry.bottom) {
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyBottomMask);
-  } else {
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyBottomMask);
-  }
+  if (p_->geometry.bottom == p_->last_geometry.bottom)
+    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyBottomMask | Private::kDirtyHeightMask);
+  else
+    Bit::Set<int>(p_->dirty_flag, Private::kDirtyBottomMask | Private::kDirtyHeightMask);
 
   OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
@@ -343,13 +348,88 @@ bool AbstractView::IsVisible() const {
   return p_->visible;
 }
 
+void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distance) {
+  if (target == p_->parent || this == target->p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else if (target->p_->parent == p_->parent) {
+    switch (align) {
+      case kAlignLeft: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->right_anchor_group.PushBack(pair.first);
+        target->p_->left_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignTop: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->bottom_anchor_group.PushBack(pair.first);
+        target->p_->top_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignRight: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->left_anchor_group.PushBack(pair.first);
+        target->p_->right_anchor_group.PushBack(pair.second);
+        break;
+      }
+      case kAlignBottom: {
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        p_->top_anchor_group.PushBack(pair.first);
+        target->p_->bottom_anchor_group.PushBack(pair.second);
+        break;
+      }
+      default:break;
+    }
+  } else {
+    _DEBUG("%s\n", "Error! Cannot add anchor to the view which have no relationship!");
+  }
+}
+
+const AnchorGroup &AbstractView::GetAnchorGroup(Alignment align) const {
+  switch (align) {
+    case kAlignLeft:return p_->left_anchor_group;
+    case kAlignTop:return p_->top_anchor_group;
+    case kAlignRight:return p_->right_anchor_group;
+    case kAlignBottom:return p_->bottom_anchor_group;
+    default:return p_->left_anchor_group;
+  }
+}
+
 void AbstractView::Update() {
+  if (p_->is_drawing) return;
+
   OnUpdate(this);
 }
 
 void AbstractView::CancelUpdate() {
-  RedrawTaskIterator it(this);
-  it.redraw_task()->Unlink();
+  if (p_->is_drawing) return;
+
+  p_->redraw_task.Unlink();
 }
 
 bool AbstractView::Contain(int x, int y) const {
@@ -362,21 +442,21 @@ void AbstractView::Destroy() {
   OnDestroy();
 
   if (p_->layout) {
-    DBG_ASSERT(p_->layout == p_->parent);
+    _ASSERT(p_->layout == p_->parent);
     p_->layout->RemoveView(this);
   }
 
   if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->shell);
+    _ASSERT(nullptr == p_->shell);
     p_->parent->RemoveChild(this);
   } else if (p_->shell) {
-    DBG_ASSERT(nullptr == p_->parent);
+    _ASSERT(nullptr == p_->parent);
     p_->shell->DetachView(this);
   }
 
   if (p_->children_count > 0) {
-    DBG_ASSERT(p_->first_child);
-    DBG_ASSERT(p_->last_child);
+    _ASSERT(p_->first_child);
+    _ASSERT(p_->last_child);
     ClearChildren();
   }
 
@@ -415,40 +495,46 @@ void AbstractView::RecursiveUpdate() {
 }
 
 void AbstractView::OnUpdate(AbstractView *view) {
-  RedrawTaskIterator it(this);
-
-  if (it.IsLinked()) {
+  if (p_->redraw_task.IsLinked()) {
     if (view != this) {
       // This view is going to be redrawn, just push back the task of the sub view
-      DBG_ASSERT(it.context().canvas());
-      it.PushBack(view);
-      RedrawTaskIterator(view).SetContext(this);
+      _ASSERT(p_->redraw_task.context.canvas());
+      p_->redraw_task.PushBack(&view->p_->redraw_task);
+      view->p_->redraw_task.context = p_->redraw_task.context;
     }
     return;
   }
 
   if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->shell);
+    _ASSERT(nullptr == p_->shell);
     p_->parent->OnUpdate(view);
     return;
   } else if (p_->shell) {
-    DBG_ASSERT(nullptr == p_->parent);
+    _ASSERT(nullptr == p_->parent);
     p_->shell->OnUpdate(view);
   }
 }
 
 Surface *AbstractView::GetSurface(const AbstractView *view) const {
   if (p_->parent) {
-    DBG_ASSERT(nullptr == p_->shell);
+    _ASSERT(nullptr == p_->shell);
     return p_->parent->GetSurface(view);
   }
 
   if (p_->shell) {
-    DBG_ASSERT(nullptr == p_->parent);
+    _ASSERT(nullptr == p_->parent);
     return p_->shell->GetSurface(view);
   }
 
   return nullptr;
+}
+
+void AbstractView::OnEnterOutput(const Output *output) {
+
+}
+
+void AbstractView::OnLeaveOutput(const Output *output) {
+
 }
 
 AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
@@ -512,28 +598,28 @@ AbstractView *AbstractView::GetChildAt(int index) const {
 
 void AbstractView::PushFrontChild(AbstractView *child) {
   if (child->p_->parent == this) {
-    DBG_ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell);
     return;
   }
 
   if (child->p_->parent) {
-    DBG_ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell);
     child->p_->parent->RemoveChild(child);
   } else if (child->p_->shell) {
-    DBG_ASSERT(nullptr == child->p_->parent);
+    _ASSERT(nullptr == child->p_->parent);
     child->p_->shell->DetachView(child);
   }
 
-  DBG_ASSERT(nullptr == child->p_->previous);
-  DBG_ASSERT(nullptr == child->p_->next);
-  DBG_ASSERT(nullptr == child->p_->parent);
+  _ASSERT(nullptr == child->p_->previous);
+  _ASSERT(nullptr == child->p_->next);
+  _ASSERT(nullptr == child->p_->parent);
 
   if (p_->first_child) {
     p_->first_child->p_->previous = child;
     child->p_->next = p_->first_child;
   } else {
-    DBG_ASSERT(nullptr == p_->last_child);
-    DBG_ASSERT(0 == p_->children_count);
+    _ASSERT(nullptr == p_->last_child);
+    _ASSERT(0 == p_->children_count);
     // child->data_->next_ = nullptr;
     p_->last_child = child;
   }
@@ -550,25 +636,25 @@ void AbstractView::PushFrontChild(AbstractView *child) {
 
 void AbstractView::InsertChild(AbstractView *child, int index) {
   if (child->p_->parent == this) {
-    DBG_ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell);
     return;
   }
 
   if (child->p_->parent) {
-    DBG_ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell);
     child->p_->parent->RemoveChild(child);
   } else if (child->p_->shell) {
-    DBG_ASSERT(nullptr == child->p_->parent);
+    _ASSERT(nullptr == child->p_->parent);
     child->p_->shell->DetachView(child);
   }
 
-  DBG_ASSERT(nullptr == child->p_->previous);
-  DBG_ASSERT(nullptr == child->p_->next);
-  DBG_ASSERT(nullptr == child->p_->parent);
+  _ASSERT(nullptr == child->p_->previous);
+  _ASSERT(nullptr == child->p_->next);
+  _ASSERT(nullptr == child->p_->parent);
 
   if (nullptr == p_->first_child) {
-    DBG_ASSERT(nullptr == p_->last_child);
-    DBG_ASSERT(0 == p_->children_count);
+    _ASSERT(nullptr == p_->last_child);
+    _ASSERT(0 == p_->children_count);
     // child->data_->next_ = nullptr;
     // child->data_->previous_ = nullptr;
     p_->last_child = child;
@@ -623,28 +709,28 @@ void AbstractView::InsertChild(AbstractView *child, int index) {
 
 void AbstractView::PushBackChild(AbstractView *child) {
   if (child->p_->parent == this) {
-    DBG_ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell);
     return;
   }
 
   if (child->p_->parent) {
-    DBG_ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell);
     child->p_->parent->RemoveChild(child);
   } else if (child->p_->shell) {
-    DBG_ASSERT(nullptr == child->p_->parent);
+    _ASSERT(nullptr == child->p_->parent);
     child->p_->shell->DetachView(child);
   }
 
-  DBG_ASSERT(child->p_->previous == nullptr);
-  DBG_ASSERT(child->p_->next == nullptr);
-  DBG_ASSERT(child->p_->parent == nullptr);
+  _ASSERT(child->p_->previous == nullptr);
+  _ASSERT(child->p_->next == nullptr);
+  _ASSERT(child->p_->parent == nullptr);
 
   if (p_->last_child) {
     p_->last_child->p_->next = child;
     child->p_->previous = p_->last_child;
   } else {
-    DBG_ASSERT(p_->first_child == nullptr);
-    DBG_ASSERT(p_->children_count == 0);
+    _ASSERT(p_->first_child == nullptr);
+    _ASSERT(p_->children_count == 0);
     // child->data_->previous_ = nullptr;
     p_->first_child = child;
   }
@@ -662,24 +748,24 @@ void AbstractView::PushBackChild(AbstractView *child) {
 AbstractView *AbstractView::RemoveChild(AbstractView *child) {
   if (child->p_->parent != this) return nullptr;
 
-  DBG_ASSERT(p_->children_count > 0);
+  _ASSERT(p_->children_count > 0);
 
   if (child->p_->previous) {
     child->p_->previous->p_->next = child->p_->next;
   } else {
-    DBG_ASSERT(p_->first_child == child);
+    _ASSERT(p_->first_child == child);
     p_->first_child = child->p_->next;
   }
 
   if (child->p_->next) {
     child->p_->next->p_->previous = child->p_->previous;
   } else {
-    DBG_ASSERT(p_->last_child == child);
+    _ASSERT(p_->last_child == child);
     p_->last_child = child->p_->previous;
   }
 
   p_->children_count--;
-  DBG_ASSERT(p_->children_count >= 0);
+  _ASSERT(p_->children_count >= 0);
 
   child->p_->previous = nullptr;
   child->p_->next = nullptr;
@@ -710,68 +796,6 @@ void AbstractView::ClearChildren() {
   p_->last_child = nullptr;
 }
 
-void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distance) {
-  if (target == p_->parent || this == target->p_->parent) {
-    switch (align) {
-      case kAlignLeft: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->left_anchor_group.PushBack(pair.first);
-        target->p_->left_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignTop: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->top_anchor_group.PushBack(pair.first);
-        target->p_->top_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignRight: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->right_anchor_group.PushBack(pair.first);
-        target->p_->right_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignBottom: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->bottom_anchor_group.PushBack(pair.first);
-        target->p_->bottom_anchor_group.PushBack(pair.second);
-        break;
-      }
-      default:break;
-    }
-  } else if (target->p_->parent == p_->parent) {
-    switch (align) {
-      case kAlignLeft: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->right_anchor_group.PushBack(pair.first);
-        target->p_->left_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignTop: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->bottom_anchor_group.PushBack(pair.first);
-        target->p_->top_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignRight: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->left_anchor_group.PushBack(pair.first);
-        target->p_->right_anchor_group.PushBack(pair.second);
-        break;
-      }
-      case kAlignBottom: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
-        p_->top_anchor_group.PushBack(pair.first);
-        target->p_->bottom_anchor_group.PushBack(pair.second);
-        break;
-      }
-      default:break;
-    }
-  } else {
-    DBG_PRINT_MSG("%s\n", "Error! Cannot add anchor to the view which have no relationship!");
-  }
-}
-
 bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {
   if (object1 == nullptr || object2 == nullptr) return false;
   if (object1 == object2) return false;
@@ -783,7 +807,7 @@ bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {
 
   if (object1->p_->next == object2) {    // view1 is just the previous sibling of view2
 
-    DBG_ASSERT(object2->p_->previous == object1);
+    _ASSERT(object2->p_->previous == object1);
     tmp1 = object1->p_->previous;
     tmp2 = object2->p_->next;
     object2->p_->previous = tmp1;
@@ -798,7 +822,7 @@ bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {
     else object2->p_->parent->p_->last_child = object2;
 
   } else if (object1->p_->previous == object2) {
-    DBG_ASSERT(object2->p_->next == object1);
+    _ASSERT(object2->p_->next == object1);
 
     tmp1 = object2->p_->previous;
     tmp2 = object1->p_->next;
@@ -857,14 +881,14 @@ bool AbstractView::InsertSiblingBefore(AbstractView *src, AbstractView *dst) {
       if (dst->p_->previous) {
         dst->p_->previous->p_->next = dst->p_->next;
       } else {
-        DBG_ASSERT(dst->p_->parent->p_->first_child == dst);
+        _ASSERT(dst->p_->parent->p_->first_child == dst);
         dst->p_->parent->p_->first_child = dst->p_->next;
       }
 
       if (dst->p_->next) {
         dst->p_->next->p_->previous = dst->p_->previous;
       } else {
-        DBG_ASSERT(dst->p_->parent->p_->last_child == dst);
+        _ASSERT(dst->p_->parent->p_->last_child == dst);
         dst->p_->parent->p_->last_child = dst->p_->previous;
       }
 
@@ -877,7 +901,7 @@ bool AbstractView::InsertSiblingBefore(AbstractView *src, AbstractView *dst) {
       if (tmp) {
         tmp->p_->next = dst;
       } else {
-        DBG_ASSERT(src->p_->parent->p_->first_child == src);
+        _ASSERT(src->p_->parent->p_->first_child == src);
         dst->p_->parent->p_->first_child = dst;
       }
 
@@ -888,9 +912,9 @@ bool AbstractView::InsertSiblingBefore(AbstractView *src, AbstractView *dst) {
     }
 
   }
-  DBG_ASSERT(dst->p_->parent == nullptr);
-  DBG_ASSERT(dst->p_->next == nullptr);
-  DBG_ASSERT(dst->p_->previous == nullptr);
+  _ASSERT(dst->p_->parent == nullptr);
+  _ASSERT(dst->p_->next == nullptr);
+  _ASSERT(dst->p_->previous == nullptr);
 
   AbstractView *tmp = src->p_->previous;
 
@@ -900,7 +924,7 @@ bool AbstractView::InsertSiblingBefore(AbstractView *src, AbstractView *dst) {
   if (tmp) {
     tmp->p_->next = dst;
   } else {
-    DBG_ASSERT(src->p_->parent->p_->first_child == src);
+    _ASSERT(src->p_->parent->p_->first_child == src);
     src->p_->parent->p_->first_child = dst;
   }
 
@@ -925,14 +949,14 @@ bool AbstractView::InsertSiblingAfter(AbstractView *src, AbstractView *dst) {
       if (dst->p_->previous) {
         dst->p_->previous->p_->next = dst->p_->next;
       } else {
-        DBG_ASSERT(dst->p_->parent->p_->first_child == dst);
+        _ASSERT(dst->p_->parent->p_->first_child == dst);
         dst->p_->parent->p_->first_child = dst->p_->next;
       }
 
       if (dst->p_->next) {
         dst->p_->next->p_->previous = dst->p_->previous;
       } else {
-        DBG_ASSERT(dst->p_->parent->p_->last_child == dst);
+        _ASSERT(dst->p_->parent->p_->last_child == dst);
         dst->p_->parent->p_->last_child = dst->p_->previous;
       }
 
@@ -945,7 +969,7 @@ bool AbstractView::InsertSiblingAfter(AbstractView *src, AbstractView *dst) {
       if (tmp) {
         tmp->p_->previous = dst;
       } else {
-        DBG_ASSERT(src->p_->parent->p_->last_child == src);
+        _ASSERT(src->p_->parent->p_->last_child == src);
         dst->p_->parent->p_->last_child = dst;
       }
 
@@ -957,9 +981,9 @@ bool AbstractView::InsertSiblingAfter(AbstractView *src, AbstractView *dst) {
 
   }
 
-  DBG_ASSERT(dst->p_->parent == nullptr);
-  DBG_ASSERT(dst->p_->next == nullptr);
-  DBG_ASSERT(dst->p_->previous == nullptr);
+  _ASSERT(dst->p_->parent == nullptr);
+  _ASSERT(dst->p_->next == nullptr);
+  _ASSERT(dst->p_->previous == nullptr);
 
   AbstractView *tmp = src->p_->next;
 
@@ -969,7 +993,7 @@ bool AbstractView::InsertSiblingAfter(AbstractView *src, AbstractView *dst) {
   if (tmp) {
     tmp->p_->previous = dst;
   } else {
-    DBG_ASSERT(src->p_->parent->p_->last_child == src);
+    _ASSERT(src->p_->parent->p_->last_child == src);
     src->p_->parent->p_->last_child = dst;
   }
 
@@ -979,130 +1003,130 @@ bool AbstractView::InsertSiblingAfter(AbstractView *src, AbstractView *dst) {
   return true;
 }
 
-void AbstractView::MoveToFirst(AbstractView *object) {
-  if (object->p_->parent) {
+void AbstractView::MoveToFirst(AbstractView *view) {
+  if (view->p_->parent) {
 
-    if (object->p_->parent->p_->first_child == object) {
-      DBG_ASSERT(object->p_->previous == 0);
+    if (view->p_->parent->p_->first_child == view) {
+      _ASSERT(view->p_->previous == 0);
       return;    // already at first
     }
 
-    object->p_->previous->p_->next = object->p_->next;
-    if (object->p_->next) {
-      object->p_->next->p_->previous = object->p_->previous;
+    view->p_->previous->p_->next = view->p_->next;
+    if (view->p_->next) {
+      view->p_->next->p_->previous = view->p_->previous;
     } else {
-      DBG_ASSERT(object->p_->parent->p_->last_child == object);
-      object->p_->parent->p_->last_child = object->p_->previous;
+      _ASSERT(view->p_->parent->p_->last_child == view);
+      view->p_->parent->p_->last_child = view->p_->previous;
     }
 
-    object->p_->previous = 0;
-    object->p_->next = object->p_->parent->p_->first_child;
-    object->p_->parent->p_->first_child->p_->previous = object;
-    object->p_->parent->p_->first_child = object;
+    view->p_->previous = 0;
+    view->p_->next = view->p_->parent->p_->first_child;
+    view->p_->parent->p_->first_child->p_->previous = view;
+    view->p_->parent->p_->first_child = view;
   }
 }
 
-void AbstractView::MoveToLast(AbstractView *object) {
-  if (object->p_->parent) {
+void AbstractView::MoveToLast(AbstractView *view) {
+  if (view->p_->parent) {
 
-    if (object->p_->parent->p_->last_child == object) {
-      DBG_ASSERT(object->p_->next == 0);
+    if (view->p_->parent->p_->last_child == view) {
+      _ASSERT(view->p_->next == 0);
       return;    // already at last
     }
 
-    object->p_->next->p_->previous = object->p_->previous;
+    view->p_->next->p_->previous = view->p_->previous;
 
-    if (object->p_->previous) {
-      object->p_->previous->p_->next = object->p_->next;
+    if (view->p_->previous) {
+      view->p_->previous->p_->next = view->p_->next;
     } else {
-      DBG_ASSERT(object->p_->parent->p_->first_child == object);
-      object->p_->parent->p_->first_child = object->p_->next;
+      _ASSERT(view->p_->parent->p_->first_child == view);
+      view->p_->parent->p_->first_child = view->p_->next;
     }
 
-    object->p_->next = 0;
-    object->p_->previous = object->p_->parent->p_->last_child;
-    object->p_->parent->p_->last_child->p_->next = object;
-    object->p_->parent->p_->last_child = object;
+    view->p_->next = 0;
+    view->p_->previous = view->p_->parent->p_->last_child;
+    view->p_->parent->p_->last_child->p_->next = view;
+    view->p_->parent->p_->last_child = view;
   }
 }
 
-void AbstractView::MoveForward(AbstractView *object) {
-  if (object->p_->parent) {
+void AbstractView::MoveForward(AbstractView *view) {
+  if (view->p_->parent) {
 
-    if (object->p_->next) {
+    if (view->p_->next) {
 
-      AbstractView *tmp = object->p_->next;
+      AbstractView *tmp = view->p_->next;
 
-      tmp->p_->previous = object->p_->previous;
-      if (object->p_->previous) {
-        object->p_->previous->p_->next = tmp;
+      tmp->p_->previous = view->p_->previous;
+      if (view->p_->previous) {
+        view->p_->previous->p_->next = tmp;
       } else {
-        DBG_ASSERT(object->p_->parent->p_->first_child == object);
-        object->p_->parent->p_->first_child = tmp;
+        _ASSERT(view->p_->parent->p_->first_child == view);
+        view->p_->parent->p_->first_child = tmp;
       }
 
-      object->p_->previous = tmp;
-      object->p_->next = tmp->p_->next;
+      view->p_->previous = tmp;
+      view->p_->next = tmp->p_->next;
       if (tmp->p_->next) {
-        tmp->p_->next->p_->previous = object;
+        tmp->p_->next->p_->previous = view;
       }
-      tmp->p_->next = object;
+      tmp->p_->next = view;
 
-      if (object->p_->next == 0) {
-        DBG_ASSERT(object->p_->parent->p_->last_child == tmp);
-        object->p_->parent->p_->last_child = object;
+      if (view->p_->next == 0) {
+        _ASSERT(view->p_->parent->p_->last_child == tmp);
+        view->p_->parent->p_->last_child = view;
       }
 
-      if (object->p_->previous) {
-        DBG_ASSERT(object->p_->previous->p_->next == object);
+      if (view->p_->previous) {
+        _ASSERT(view->p_->previous->p_->next == view);
       }
-      if (object->p_->next) {
-        DBG_ASSERT(object->p_->next->p_->previous == object);
+      if (view->p_->next) {
+        _ASSERT(view->p_->next->p_->previous == view);
       }
 
     } else {
-      DBG_ASSERT(object->p_->parent->p_->last_child == object);
+      _ASSERT(view->p_->parent->p_->last_child == view);
     }
 
   }
 }
 
-void AbstractView::MoveBackward(AbstractView *object) {
-  if (object->p_->parent) {
+void AbstractView::MoveBackward(AbstractView *view) {
+  if (view->p_->parent) {
 
-    if (object->p_->previous) {
+    if (view->p_->previous) {
 
-      AbstractView *tmp = object->p_->previous;
+      AbstractView *tmp = view->p_->previous;
 
-      tmp->p_->next = object->p_->next;
-      if (object->p_->next) {
-        object->p_->next->p_->previous = tmp;
+      tmp->p_->next = view->p_->next;
+      if (view->p_->next) {
+        view->p_->next->p_->previous = tmp;
       } else {
-        DBG_ASSERT(object->p_->parent->p_->last_child == object);
-        object->p_->parent->p_->last_child = tmp;
+        _ASSERT(view->p_->parent->p_->last_child == view);
+        view->p_->parent->p_->last_child = tmp;
       }
 
-      object->p_->next = tmp;
-      object->p_->previous = tmp->p_->previous;
+      view->p_->next = tmp;
+      view->p_->previous = tmp->p_->previous;
       if (tmp->p_->previous) {
-        tmp->p_->previous->p_->next = object;
+        tmp->p_->previous->p_->next = view;
       }
-      tmp->p_->previous = object;
+      tmp->p_->previous = view;
 
-      if (object->p_->previous == 0) {
-        DBG_ASSERT(object->p_->parent->p_->first_child == tmp);
-        object->p_->parent->p_->first_child = object;
+      if (view->p_->previous == 0) {
+        _ASSERT(view->p_->parent->p_->first_child == tmp);
+        view->p_->parent->p_->first_child = view;
       }
 
-      if (object->p_->previous) {
-        DBG_ASSERT(object->p_->previous->p_->next == object);
+      if (view->p_->previous) {
+        _ASSERT(view->p_->previous->p_->next == view);
       }
-      if (object->p_->next) {
-        DBG_ASSERT(object->p_->next->p_->previous == object);
+      if (view->p_->next) {
+        _ASSERT(view->p_->next->p_->previous == view);
       }
 
     } else {
-      DBG_ASSERT(object->p_->parent->p_->first_child == object);
+      _ASSERT(view->p_->parent->p_->first_child == view);
     }
 
   }

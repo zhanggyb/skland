@@ -18,19 +18,20 @@
 #define SKLAND_GUI_OUTPUT_HPP_
 
 #include "../core/rect.hpp"
-#include "../core/object.hpp"
 #include "../core/size.hpp"
-#include "../wayland/output.hpp"
+#include "../core/sigcxx.hpp"
+#include "../core/deque.hpp"
 
 #include <string>
+#include <memory>
 
 namespace skland {
 
-class Display;
+namespace wayland {
+class Output;
+}
 
-class Output : public Object {
-
-  friend class Display;
+class Output: public Deque::Element {
 
   Output() = delete;
   Output(const Output &) = delete;
@@ -38,7 +39,7 @@ class Output : public Object {
 
  public:
 
-  Output(const wayland::Registry &registry, uint32_t id, uint32_t version);
+  Output(uint32_t id, uint32_t version);
 
   virtual ~Output();
 
@@ -46,19 +47,19 @@ class Output : public Object {
     return destroyed_;
   }
 
-  const std::string &make() const {
-    return make_;
-  }
+  const std::string &GetMake() const;
 
-  const std::string &model() const {
-    return model_;
-  }
+  const std::string &GetModel() const;
 
-  const Size &current_mode_size() const {
-    return current_mode_size_;
-  }
+  const wayland::Output &GetOutput() const;
+
+  uint32_t GetID() const;
+
+  uint32_t GetVersion() const;
 
  private:
+
+  struct Private;
 
   void OnGeometry(int32_t x,
                   int32_t y,
@@ -78,32 +79,7 @@ class Output : public Object {
 
   void OnScale(int32_t factor);
 
-  Display *display_;  // manager object
-
-  wayland::Output wl_output_;
-
-  /** position within the global compositor space */
-  Point position_;
-
-  /** physical_width width in millimeters of the output */
-  Size physical_size_;
-
-  /** The size of a mode, given in physical hardware units of the output device */
-  Size current_mode_size_;
-  Size preferred_mode_size_;
-  int32_t current_refresh_rate_;
-  int32_t preferred_refresh_rate_;
-
-  uint32_t server_output_id_;
-
-  int subpixel_;  /**< enum value of wl_output_subpixel */
-  int transform_; /**< enum value of wl_output_transform */
-  int scale_;
-
-  /* vertical refresh rate in mHz */
-
-  std::string make_;
-  std::string model_;
+  std::unique_ptr<Private> p_;
 
   Signal<Output *> destroyed_;
   // TODO: user data

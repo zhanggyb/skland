@@ -29,6 +29,8 @@ namespace skland {
  */
 class Matrix {
 
+  friend class Canvas;
+
  public:
 
   Matrix();

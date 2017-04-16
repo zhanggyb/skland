@@ -16,10 +16,11 @@
 
 #include <skland/core/exceptions.hpp>
 
+#include <skland/core/debug.hpp>
+
 #include <skland/gui/display.hpp>
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
-#include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/surface.hpp>
 
 #include "internal/display-private.hpp"
@@ -35,23 +36,16 @@ namespace skland {
 Display *Display::kDisplay = nullptr;
 
 Display::Display()
-    : Object(),
-//      xkb_context_(nullptr),
-      display_fd_(0),
-      first_output_(nullptr),
-      last_output_(nullptr),
-      outputs_count_(0),
-      first_input_(nullptr),
-      last_input_(nullptr),
-      inputs_count_(0) {
+    ://      xkb_context_(nullptr),
+    display_fd_(0) {
   p_.reset(new Private);
   cursors_.resize(kCursorBlank, nullptr);
-  AbstractEventHandler::InitializeRedrawTaskList();
+  AbstractEventHandler::InitializeIdleTaskList();
   Surface::InitializeCommitTaskList();
 }
 
 Display::~Display() {
-  AbstractEventHandler::ClearRedrawTaskList();
+  AbstractEventHandler::ClearIdleTaskList();
   Surface::ClearCommitTaskList();
 }
 
@@ -136,8 +130,8 @@ void Display::Disconnect() noexcept {
 
   // TODO: other operations
 
-  ClearManagedObject(this, &first_output_, &last_output_, outputs_count_);
-  ClearManagedObject(this, &first_input_, &last_input_, inputs_count_);
+  output_deque_.Clear();
+  input_deque_.Clear();
 //  ClearManagedObject(this, &first_window_, &last_window_, windows_count_);
   Surface::Clear();
 
@@ -158,25 +152,18 @@ void Display::Disconnect() noexcept {
 }
 
 const Output *Display::GetOutputAt(int index) {
-  return kDisplay->GetManagedObjectAt(index,
-                                      kDisplay->first_output_,
-                                      kDisplay->last_output_,
-                                      kDisplay->outputs_count_);
+  return static_cast<Output *>(kDisplay->output_deque_[index]);
 }
 
 void Display::AddOutput(Output *output, int index) {
-  InsertManagedObject(this,
-                      output,
-                      &output->display_,
-                      &first_output_,
-                      &last_output_,
-                      outputs_count_,
-                      index);
+  output_deque_.Insert(output, index);
 }
 
 void Display::DestroyOutput(uint32_t id) {
-  for (Output *output = first_output_; output; output = static_cast<Output *>(output->next())) {
-    if (output->server_output_id_ == id) {
+  Output *output = nullptr;
+  for (Deque::Iterator it = output_deque_.begin(); it != output_deque_.end(); ++it) {
+    output = it.cast<Output>();
+    if (output->GetID() == id) {
       delete output;
       break;
     }
@@ -184,13 +171,7 @@ void Display::DestroyOutput(uint32_t id) {
 }
 
 void Display::AddInput(Input *input, int index) {
-  InsertManagedObject(this,
-                      input,
-                      &input->display_,
-                      &first_input_,
-                      &last_input_,
-                      inputs_count_,
-                      index);
+  input_deque_.Insert(input, index);
 }
 
 void Display::OnError(void *object_id, uint32_t code, const char *message) {
@@ -213,7 +194,7 @@ void Display::OnError(void *object_id, uint32_t code, const char *message) {
     object_name = "xdg_shell";
   }
 
-  DBG_PRINT_MSG("Error from %s: %s (%d)\n", object_name, message, code);
+  _DEBUG("Error from %s: %s (%d)\n", object_name, message, code);
 }
 
 void Display::OnDeleteId(uint32_t id) {
@@ -241,7 +222,7 @@ void Display::OnGlobal(uint32_t id,
     p_->wl_cursor_theme.Load(NULL, 24, p_->wl_shm);
     InitializeCursors();
   } else if (strcmp(interface, wl_output_interface.name) == 0) {
-    Output *output = new Output(p_->wl_registry, id, version);
+    Output *output = new Output(id, version);
     AddOutput(output);
   } else if (strcmp(interface, XdgShell::GetInterface()->name) == 0) {
     p_->xdg_shell.ping().Set(this, &Display::OnXdgShellPing);

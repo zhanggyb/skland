@@ -16,13 +16,13 @@
 
 #include "internal/shader-private.hpp"
 
-#include <skland/core/defines.hpp>
+#include <skland/core/assert.hpp>
 
 namespace skland {
 
 Shader::Shader(Private *p)
     : p_(p) {
-  DBG_ASSERT(p_);
+  _ASSERT(p_);
 }
 
 Shader::Shader(const Shader &other) {

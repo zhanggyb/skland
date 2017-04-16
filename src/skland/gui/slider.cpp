@@ -74,7 +74,7 @@ void Slider::OnSetValue(const int &value) {
 }
 
 void Slider::OnSetMinimum(const int &minimum) {
-  int new_minimum = minimum - minimum % step();
+  // int new_minimum = minimum - minimum % step();
 
   set_minimum(minimum);
 }

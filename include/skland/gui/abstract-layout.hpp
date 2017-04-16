@@ -19,8 +19,6 @@
 
 #include "abstract-view.hpp"
 
-#include "../core/padding.hpp"
-
 namespace skland {
 
 /**
@@ -29,22 +27,34 @@ namespace skland {
  */
 SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
+  friend class AbstractView;
+
   AbstractLayout(const AbstractLayout &) = delete;
   AbstractLayout &operator=(const AbstractLayout &) = delete;
 
  public:
 
+  struct LayoutTask;
+
   AbstractLayout(const Padding &padding = Padding(5));
 
   void AddView(AbstractView *view);
 
+  void AddView(int index, AbstractView *view);
+
+  void AddView(int row, int column, AbstractView *view);
+
   void RemoveView(AbstractView *view);
 
-  const Padding &padding() const { return padding_; }
+  void Layout();
 
  protected:
 
   virtual ~AbstractLayout();
+
+  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+
+  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
 
   virtual void OnChildAdded(AbstractView *view) final;
 
@@ -68,7 +78,9 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
  private:
 
-  Padding padding_;
+  struct Private;
+
+//  std::unique_ptr<Private> p_;
 
 };
 

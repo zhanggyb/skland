@@ -34,13 +34,20 @@
 #include <sys/mman.h>
 
 #include <iostream>
+#include <skland/core/assert.hpp>
 
 namespace skland {
 
 struct Input::Private {
 
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
   Private()
-      : key_event(nullptr), mouse_event(nullptr), touch_event(nullptr) {}
+      : key_event(nullptr),
+        mouse_event(nullptr),
+        touch_event(nullptr),
+        id(0), version(0) {}
 
   ~Private() {
     keyboard_state.Destroy();
@@ -70,28 +77,23 @@ struct Input::Private {
   Keymap keymap;
   KeyboardState keyboard_state;
 
+  uint32_t id;
+  uint32_t version;
 };
 
 Input::Input(uint32_t id, uint32_t version)
-    : Object(),
-      display_(nullptr) {
+    : Deque::Element() {
   p_.reset(new Private);
+  p_->id = id;
+  p_->version = version;
+
   p_->wl_seat.capabilities().Set(this, &Input::OnSeatCapabilities);
   p_->wl_seat.name().Set(this, &Input::OnSeatName);
-  p_->wl_seat.Setup(Display::Registry().wl_registry(), id, version);
+  p_->wl_seat.Setup(Display::Registry().wl_registry(), p_->id, p_->version);
 }
 
 Input::~Input() {
   p_.reset();
-
-  if (display_)
-    RemoveManagedObject(display_,
-                        this,
-                        &display_,
-                        &display_->first_input_,
-                        &display_->last_input_,
-                        display_->inputs_count_);
-  DBG_ASSERT(display_ == nullptr);
 }
 
 void Input::SetCursor(const Cursor *cursor) const {
@@ -105,9 +107,17 @@ const wayland::Seat &Input::GetSeat() const {
   return p_->wl_seat;
 }
 
+uint32_t Input::GetID() const {
+  return p_->id;
+}
+
+uint32_t Input::GetVersion() const {
+  return p_->version;
+}
+
 void Input::OnSeatCapabilities(uint32_t capabilities) {
   if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD) {
-    DBG_ASSERT(!p_->wl_keyboard.IsValid());
+    _ASSERT(!p_->wl_keyboard.IsValid());
     p_->wl_keyboard.keymap().Set(this, &Input::OnKeyboardKeymap);
     p_->wl_keyboard.enter().Set(this, &Input::OnKeyboardEnter);
     p_->wl_keyboard.leave().Set(this, &Input::OnKeyboardLeave);
@@ -116,11 +126,11 @@ void Input::OnSeatCapabilities(uint32_t capabilities) {
     p_->wl_keyboard.repeat_info().Set(this, &Input::OnKeyboardRepeatInfo);
     p_->wl_keyboard.Setup(p_->wl_seat);
 
-    DBG_ASSERT(p_->key_event == nullptr);
+    _ASSERT(p_->key_event == nullptr);
     p_->key_event = new KeyEvent(this);
   }
   if (capabilities & WL_SEAT_CAPABILITY_POINTER) {
-    DBG_ASSERT(!p_->wl_pointer.IsValid());
+    _ASSERT(!p_->wl_pointer.IsValid());
     p_->wl_pointer.enter().Set(this, &Input::OnPointerEnter);
     p_->wl_pointer.leave().Set(this, &Input::OnPointerLeave);
     p_->wl_pointer.motion().Set(this, &Input::OnPointerMotion);
@@ -132,11 +142,11 @@ void Input::OnSeatCapabilities(uint32_t capabilities) {
     p_->wl_pointer.axis_discrete().Set(this, &Input::OnPointerAxisDiscrete);
     p_->wl_pointer.Setup(p_->wl_seat);
 
-    DBG_ASSERT(p_->mouse_event == nullptr);
+    _ASSERT(p_->mouse_event == nullptr);
     p_->mouse_event = new MouseEvent(this);
   }
   if (capabilities & WL_SEAT_CAPABILITY_TOUCH) {
-    DBG_ASSERT(!p_->wl_touch.IsValid());
+    _ASSERT(!p_->wl_touch.IsValid());
     p_->wl_touch.down().Set(this, &Input::OnTouchDown);
     p_->wl_touch.up().Set(this, &Input::OnTouchUp);
     p_->wl_touch.motion().Set(this, &Input::OnTouchMotion);
@@ -144,7 +154,7 @@ void Input::OnSeatCapabilities(uint32_t capabilities) {
     p_->wl_touch.cancel().Set(this, &Input::OnTouchCancel);
     p_->wl_touch.Setup(p_->wl_seat);
 
-    DBG_ASSERT(p_->touch_event == nullptr);
+    _ASSERT(p_->touch_event == nullptr);
     p_->touch_event = new TouchEvent(this);
   }
 }

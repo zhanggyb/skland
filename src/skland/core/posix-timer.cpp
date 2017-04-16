@@ -15,9 +15,9 @@
  */
 
 #include <skland/core/posix-timer.hpp>
+#include <skland/core/debug.hpp>
 
 #include <errno.h>
-#include <skland/core/defines.hpp>
 
 namespace skland {
 
@@ -31,7 +31,7 @@ PosixTimer::PosixTimer()
 PosixTimer::~PosixTimer() {
   if (0 != id_) {
     if (0 != timer_delete(id_)) {
-      DBG_PRINT_MSG("%s\n", "Not a valid POSIX timer id");
+      _DEBUG("%s\n", "Not a valid POSIX timer id");
     }
   }
 }
@@ -50,7 +50,7 @@ void PosixTimer::Stop() {
 
   ret = timer_settime(id_, 0, &ts, 0);
   if (ret < 0) {
-    DBG_PRINT_MSG("%s\n", "Fail to stop timer");
+    _DEBUG("%s\n", "Fail to stop timer");
   }
 
   is_armed_ = false;
@@ -75,13 +75,13 @@ timer_t PosixTimer::Create() {
 
   int ret = timer_create(CLOCK_REALTIME, &sev, &timer);
   if (ret < 0) {
-    DBG_PRINT_MSG("%s\n", "Fail to create timer");
+    _DEBUG("%s\n", "Fail to create timer");
     if (ret == EAGAIN) {
-      DBG_PRINT_MSG("%s\n", "Temporary error during kernel allocation of timer structures.");
+      _DEBUG("%s\n", "Temporary error during kernel allocation of timer structures.");
     } else if (ret == EINVAL) {
-      DBG_PRINT_MSG("%s\n", "Clock ID, sigev_notify, sigev_signo, or sigev_notify_thread_id is invalid.");
+      _DEBUG("%s\n", "Clock ID, sigev_notify, sigev_signo, or sigev_notify_thread_id is invalid.");
     } else if (ret == ENOMEM) {
-      DBG_PRINT_MSG("%s\n", "Could not allocate memory.");
+      _DEBUG("%s\n", "Could not allocate memory.");
     }
     return 0;
   }
@@ -102,7 +102,7 @@ bool PosixTimer::SetTime() {
 
   ret = timer_settime(id_, 0, &ts, 0);
   if (ret < 0) {
-    DBG_PRINT_MSG("%s\n", "Fail to set timer");
+    _DEBUG("%s\n", "Fail to set timer");
     return false;
   } else {
     return true;

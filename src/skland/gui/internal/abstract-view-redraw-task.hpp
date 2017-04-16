@@ -24,6 +24,10 @@
 
 namespace skland {
 
+/**
+ * @ingroup gui_intern
+ * @brief An idle task to validate and draw a view
+ */
 SKLAND_NO_EXPORT struct AbstractView::RedrawTask : public Task {
 
   RedrawTask(const RedrawTask &) = delete;

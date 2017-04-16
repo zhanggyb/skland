@@ -39,9 +39,9 @@ Size PushButton::GetPreferredSize() const {
 void PushButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
 
-  Color regular(0.95f, 0.55f, 0.1f);
-  Color down = regular - 50;
-  Color hover = regular + 25;
+  Color regular(0.65f, 0.65f, 0.65f);
+  Color down = regular - 35;
+  Color hover = regular + 15;
 
   const Rect &rect = GetGeometry();
 

@@ -20,11 +20,15 @@
 #include <skland/gui/window.hpp>
 #include <skland/gui/relative-layout.hpp>
 #include <skland/gui/push-button.hpp>
+#include <skland/gui/anchor-group.hpp>
+#include <skland/gui/anchor.hpp>
 
 using skland::Application;
 using skland::Window;
 using skland::RelativeLayout;
 using skland::PushButton;
+using skland::Anchor;
+using skland::AnchorGroup;
 
 Test::Test()
     : testing::Test() {
@@ -39,7 +43,7 @@ Test::~Test() {
  *
  * Expected result: display and resize a default window
  */
-TEST_F(Test, regular) {
+TEST_F(Test, regular_1) {
   int argc = 1;
   char argv1[] = "show";  // to avoid compile warning
   char *argv[] = {argv1};
@@ -53,6 +57,39 @@ TEST_F(Test, regular) {
 
   layout->AddView(button);
   button->MoveTo(100, 100);
+
+  win.SetContentView(layout);
+  win.Show();
+
+  int result = app.Run();
+
+  ASSERT_TRUE(result == 0);
+}
+
+/**
+ * @brief Show a relative layout in a simple window
+ *
+ * Expected result: display and resize a default window
+ */
+TEST_F(Test, regular_2) {
+  int argc = 1;
+  char argv1[] = "show";  // to avoid compile warning
+  char *argv[] = {argv1};
+
+  Application app(argc, argv);
+
+  Window win(400, 300, "Test Window");
+
+  RelativeLayout* layout = new RelativeLayout;
+  PushButton * button = new PushButton("Test");
+
+  layout->AddView(button);
+  button->MoveTo(200, 200);
+
+  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
+  button->AddAnchorTo(layout, skland::kAlignTop, 20);
+  button->AddAnchorTo(layout, skland::kAlignRight, 20);
+  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
 
   win.SetContentView(layout);
   win.Show();

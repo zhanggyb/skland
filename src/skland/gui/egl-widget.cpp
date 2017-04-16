@@ -19,9 +19,6 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
-#include <skland/gui/sub-surface.hpp>
-#include <skland/gui/egl-surface.hpp>
-
 #include "internal/abstract-shell-view-redraw-task.hpp"
 #include "internal/abstract-view-iterators.hpp"
 
@@ -29,6 +26,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <skland/core/assert.hpp>
 
 namespace skland {
 
@@ -40,7 +38,6 @@ EGLWidget::EGLWidget(int width, int height)
     : AbstractView(width, height),
       sub_surface_(nullptr),
       egl_surface_(nullptr),
-      resize_(false),
       animating_(false) {
   frame_callback_.done().Set(this, &EGLWidget::OnFrame);
 }
@@ -51,21 +48,18 @@ EGLWidget::~EGLWidget() {
 }
 
 void EGLWidget::OnUpdate(AbstractView *view) {
-  DBG_ASSERT(view == this);
+  _ASSERT(view == this);
 
   if (nullptr == sub_surface_) {
-    DBG_ASSERT(nullptr == egl_surface_);
-    Iterator it(this);
-    if (nullptr == it.parent()) return;
-
-    it = it.parent();
-    Surface *parent_surface = it.GetSurface();
+    _ASSERT(nullptr == egl_surface_);
+    Surface *parent_surface = AbstractView::GetSurface(this);
     if (nullptr == parent_surface) return;
 
-    sub_surface_ = SubSurface::Create(parent_surface, this);
-    egl_surface_ = EGLSurface::Get(sub_surface_);
-    SubSurface::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
-    egl_surface_->Resize(GetWidth(), GetHeight());
+    sub_surface_ = Surface::Sub::Create(parent_surface, this);
+    egl_surface_ = Surface::EGL::Get(sub_surface_);
+    wayland::Region region;
+    sub_surface_->SetInputRegion(region);
+//    egl_surface_->Resize(GetWidth(), GetHeight());
 //    surface_->SetDesync();
   }
 
@@ -76,9 +70,25 @@ Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
   return sub_surface_;
 }
 
-void EGLWidget::OnGeometryChanged(const Rect &old_geometry, const Rect &new_geometry) {
-  resize_ = true;
-  egl_surface_->Resize(GetWidth(), GetHeight());
+void EGLWidget::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+  if (dirty_flag)
+    Update();
+  else
+    CancelUpdate();
+
+  if (egl_surface_) {
+    Surface::Sub::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
+    egl_surface_->Resize((int) new_geometry.width(), (int) new_geometry.height());
+    OnResize((int) new_geometry.width(), (int) new_geometry.height());
+  }
+}
+
+void EGLWidget::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+
+}
+
+void EGLWidget::OnLayout(int, int, int, int, int) {
+
 }
 
 void EGLWidget::OnMouseEnter(MouseEvent *event) {
@@ -103,46 +113,49 @@ void EGLWidget::OnKeyboardKey(KeyEvent *event) {
 
 void EGLWidget::OnDraw(const Context *context) {
   if (!animating_) {
-    if (egl_surface_->MakeCurrent()) {
-      animating_ = true;
-      if (resize_) {
-        resize_ = false;
-//        OnSizeChanged(GetWidth(), GetHeight());
-      }
-      OnInitializeEGL();
-      egl_surface_->surface()->SetupCallback(frame_callback_);
-      egl_surface_->SwapBuffers();
-      egl_surface_->surface()->Commit();
-    }
+    animating_ = true;
+    egl_surface_->surface()->SetupCallback(frame_callback_);
+    OnInitialize();
+    egl_surface_->surface()->Commit();
   }
 }
 
-void EGLWidget::OnInitializeEGL() {
+void EGLWidget::OnInitialize() {
+  egl_surface_->MakeCurrent();
+
   glClearColor(0.1, 0.1, .85, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
+
+  egl_surface_->SwapBuffers();
 }
 
-void EGLWidget::OnResizeEGL() {
+void EGLWidget::OnResize(int width, int height) {
 
 }
 
-void EGLWidget::OnRenderEGL() {
+void EGLWidget::OnRender() {
+  egl_surface_->MakeCurrent();
+
   glClearColor(0.36, 0.85, 0.27, 0.9);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
+
+  egl_surface_->SwapBuffers();
+}
+
+bool EGLWidget::MakeCurrent() {
+  return egl_surface_->MakeCurrent();
+}
+
+void EGLWidget::SwapBuffers() {
+  egl_surface_->SwapBuffers();
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-  static int count = 0;
-  count++;
-  fprintf(stderr, "on frame: %d\n", count);
-  if (egl_surface_->MakeCurrent()) {
-    OnRenderEGL();
-    egl_surface_->surface()->SetupCallback(frame_callback_);
-    egl_surface_->SwapBuffers();
-    egl_surface_->surface()->Commit();
-  }
+  egl_surface_->surface()->SetupCallback(frame_callback_);
+  OnRender();
+  egl_surface_->surface()->Commit();
 }
 
 }

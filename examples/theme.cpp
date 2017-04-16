@@ -17,6 +17,7 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
 #include <skland/gui/label.hpp>
+#include <skland/stock/theme.hpp>
 
 using namespace skland;
 

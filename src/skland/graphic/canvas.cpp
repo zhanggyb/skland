@@ -18,6 +18,8 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
+#include "internal/matrix-private.hpp"
+
 #include "SkBitmap.h"
 #include "SkCanvas.h"
 
@@ -97,6 +99,30 @@ void Canvas::DrawText(const void *text, size_t byte_length, float x, float y, co
 
 void Canvas::Translate(float dx, float dy) {
   p_->sk_canvas.translate(dx, dy);
+}
+
+void Canvas::Scale(float sx, float sy) {
+  p_->sk_canvas.scale(sx, sy);
+}
+
+void Canvas::Rotate(float degrees) {
+  p_->sk_canvas.rotate(degrees);
+}
+
+void Canvas::Rotate(float degrees, float px, float py) {
+  p_->sk_canvas.rotate(degrees, px, py);
+}
+
+void Canvas::Skew(float sx, float sy) {
+  p_->sk_canvas.skew(sx, sy);
+}
+
+void Canvas::Concat(const Matrix &matrix) {
+  p_->sk_canvas.concat(matrix.p_->sk_matrix);
+}
+
+void Canvas::SetMatrix(const Matrix &matrix) {
+  p_->sk_canvas.setMatrix(matrix.p_->sk_matrix);
 }
 
 void Canvas::ResetMatrix() {

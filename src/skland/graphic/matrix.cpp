@@ -14,24 +14,9 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/matrix.hpp>
-
-#include "SkMatrix.h"
+#include "internal/matrix-private.hpp"
 
 namespace skland {
-
-struct Matrix::Private {
-
-  Private() {}
-
-  Private(const Private &orig)
-      : sk_matrix(orig.sk_matrix) {}
-
-  ~Private() {}
-
-  SkMatrix sk_matrix;
-
-};
 
 Matrix::Matrix() {
   p_.reset(new Private);
