@@ -56,7 +56,7 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontMgr_custom*.cpp)
 # skslc main()
 remove_srcs(${SKIA_SOURCE_DIR}/src/sksl/SkSLMain.cpp)
 # remove the special splicer source, TODO: config cmake to detect clang and SSE
-remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
+# remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages.cpp)
 # remove_srcs(${SKIA_SOURCE_DIR}/src/splicer/SkSplicer_stages_lowp.cpp)
 
 
@@ -152,6 +152,7 @@ find_package(ZLIB)
 # For libraries that don't have find_package() scripts, we do it ourselves:
 find_path(WEBP_INCLUDE_DIRS "webp/decode.h")
 find_library(WEBP_LIBRARIES "webp")
+find_library(WEBPMUX_LIBRARY "webpmux")
 find_library(WEBPDEMUX_LIBRARY "webpdemux")
 
 find_path(OSMESA_INCLUDE_DIRS "GL/osmesa.h")
@@ -223,6 +224,9 @@ endif ()
 if (WEBP_INCLUDE_DIRS AND WEBP_LIBRARIES)
     list(APPEND private_includes ${WEBP_INCLUDE_DIRS})
     list(APPEND libs ${WEBP_LIBRARIES})
+    if (WEBPMUX_LIBRARY)
+        list(APPEND libs ${WEBPMUX_LIBRARY})
+    endif ()
     if (WEBPDEMUX_LIBRARY)
         list(APPEND libs ${WEBPDEMUX_LIBRARY})
     endif ()
