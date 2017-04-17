@@ -33,8 +33,6 @@ class Shader {
   friend class Paint;
   friend class GradientShader;
 
-  Shader() = delete;
-
  public:
 
   enum TileMode {
@@ -43,11 +41,15 @@ class Shader {
     kTileModeMirror
   };
 
+  Shader();
+
   Shader(const Shader &other);
 
   ~Shader();
 
   Shader &operator=(const Shader &other);
+
+  operator bool() const;
 
  protected:
 

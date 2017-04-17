@@ -20,6 +20,10 @@
 
 namespace skland {
 
+Shader::Shader() {
+  p_.reset(new Private);
+}
+
 Shader::Shader(Private *p)
     : p_(p) {
   _ASSERT(p_);
@@ -30,11 +34,16 @@ Shader::Shader(const Shader &other) {
 }
 
 Shader::~Shader() {
+
 }
 
 Shader &Shader::operator=(const Shader &other) {
   *p_ = *other.p_;
   return *this;
+}
+
+Shader::operator bool() const {
+  return p_->sk_shader.get() != nullptr;
 }
 
 }

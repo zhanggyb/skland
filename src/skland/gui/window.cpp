@@ -38,6 +38,7 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
+#include <skland/graphic/gradient-shader.hpp>
 
 namespace skland {
 
@@ -452,7 +453,8 @@ void Window::OnDraw(const Context *context) {
   Path path;
   Rect geometry = Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
   bool drop_shadow = !(IsMaximized() || IsFullscreen());
-  const Theme::Schema& schema = Theme::GetWindowSchema();
+  const Theme::Schema &window_schema = Theme::GetWindowSchema();
+  const Theme::Schema &title_bar_schema = Theme::GetTitleBarSchema();
 
   if (drop_shadow) {
     float radii[] = {
@@ -473,21 +475,32 @@ void Window::OnDraw(const Context *context) {
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  if (schema.background_active_shader) {
-    paint.SetShader(*schema.background_active_shader);
+  if (window_schema.background_active_shader) {
+    paint.SetShader(window_schema.background_active_shader);
   } else {
-    paint.SetColor(schema.background_active);
+    paint.SetColor(window_schema.background_active);
   }
   canvas->DrawPath(path, paint);
+  paint.SetShader(Shader());  // Clear shader
 
   // Draw the client area:
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
 
-  if (schema.foreground_active_shader) {
-    paint.SetShader(*schema.foreground_active_shader);
+  if (p_->title_bar) {
+    if (title_bar_schema.background_active_shader) {
+      paint.SetShader(title_bar_schema.background_active_shader);
+    } else {
+      paint.SetColor(title_bar_schema.background_active);
+    }
+    canvas->DrawRect(p_->title_bar->GetGeometry(), paint);
+    paint.SetShader(Shader());  // Clear shader
+  }
+
+  if (window_schema.foreground_active_shader) {
+    paint.SetShader(window_schema.foreground_active_shader);
   } else {
-    paint.SetColor(schema.foreground_active);
+    paint.SetColor(window_schema.foreground_active);
   }
   canvas->DrawRect(GetContentGeometry(), paint);
   canvas->Restore();

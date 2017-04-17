@@ -61,31 +61,31 @@ class Theme {
     ~Schema() {}
 
     Color outline;
-    std::unique_ptr<Shader> outline_shader;
+    Shader outline_shader;
 
     Color outline_active;
-    std::unique_ptr<Shader> outline_active_shader;
+    Shader outline_active_shader;
 
     Color outline_highlight;
-    std::unique_ptr<Shader> outline_highlight_shader;
+    Shader outline_highlight_shader;
 
     Color background;
-    std::unique_ptr<Shader> background_shader;
+    Shader background_shader;
 
     Color background_active;
-    std::unique_ptr<Shader> background_active_shader;
+    Shader background_active_shader;
 
     Color background_highlight;
-    std::unique_ptr<Shader> background_highlight_shader;
+    Shader background_highlight_shader;
 
     Color foreground;
-    std::unique_ptr<Shader> foreground_shader;
+    Shader foreground_shader;
 
     Color foreground_active;
-    std::unique_ptr<Shader> foreground_active_shader;
+    Shader foreground_active_shader;
 
     Color foreground_highlight;
-    std::unique_ptr<Shader> foreground_highlight_shader;
+    Shader foreground_highlight_shader;
   };
 
   static void Load(const char *name = nullptr);

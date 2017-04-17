@@ -87,7 +87,7 @@ class ShmWidget : public AbstractView {
  private:
 
   void Animate() {
-    static int padding = 5;
+    static int padding = 0;
     std::shared_ptr<Canvas> canvas = context_->canvas();
 
     const Rect &rect = GetGeometry();
