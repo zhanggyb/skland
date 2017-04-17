@@ -20,6 +20,8 @@
 #include "../core/color.hpp"
 #include "../core/margin.hpp"
 
+#include "../graphic/shader.hpp"
+
 #include <vector>
 #include <string>
 
@@ -43,30 +45,47 @@ class Theme {
 
  public:
 
-  struct ColorScheme {
+  struct Schema {
 
-    ColorScheme()
-        : outline(),
-          item(),
-          inner(0xEFF0F0F0),
-          inner_selected(0xEFE0E0E0),
-          text(0xFF444444),
-          text_selected(0xFF999999),
-          shaded(false),
-          shadetop(0),
-          shadedown(0),
-          alpha_check(false) {}
+    Schema()
+        : outline(0x0),
+          outline_active(0x0),
+          outline_highlight(0x0),
+          background(0xEFF0F0F0),
+          background_active(0xEFE0E0E0),
+          background_highlight(background_active + 25),
+          foreground(0xFF444444),
+          foreground_active(0xFF999999),
+          foreground_highlight(foreground_active + 25) {}
+
+    ~Schema() {}
 
     Color outline;
-    Color item;
-    Color inner;
-    Color inner_selected;
-    Color text;
-    Color text_selected;
-    bool shaded;
-    short shadetop;
-    short shadedown;
-    bool alpha_check;
+    std::unique_ptr<Shader> outline_shader;
+
+    Color outline_active;
+    std::unique_ptr<Shader> outline_active_shader;
+
+    Color outline_highlight;
+    std::unique_ptr<Shader> outline_highlight_shader;
+
+    Color background;
+    std::unique_ptr<Shader> background_shader;
+
+    Color background_active;
+    std::unique_ptr<Shader> background_active_shader;
+
+    Color background_highlight;
+    std::unique_ptr<Shader> background_highlight_shader;
+
+    Color foreground;
+    std::unique_ptr<Shader> foreground_shader;
+
+    Color foreground_active;
+    std::unique_ptr<Shader> foreground_active_shader;
+
+    Color foreground_highlight;
+    std::unique_ptr<Shader> foreground_highlight_shader;
   };
 
   static void Load(const char *name = nullptr);
@@ -95,8 +114,12 @@ class Theme {
 
   static const int kShadowImageHeight = 250;
 
-  static const ColorScheme &GetWindowColorScheme() {
-    return kTheme->window_color_scheme_;
+  static const Schema &GetWindowSchema() {
+    return kTheme->window_schema_;
+  }
+
+  static const Schema &GetTitleBarSchema() {
+    return kTheme->title_bar_schema_;
   }
 
  protected:
@@ -105,9 +128,13 @@ class Theme {
 
   virtual ~Theme();
 
-  ColorScheme &window_color_scheme() {
-    return window_color_scheme_;
+  Schema &window_schema() {
+    return window_schema_;
   };
+
+  Schema &title_bar_schema() {
+    return title_bar_schema_;
+  }
 
  private:
 
@@ -140,7 +167,9 @@ class Theme {
 
   std::string name_;
 
-  ColorScheme window_color_scheme_;
+  Schema window_schema_;
+
+  Schema title_bar_schema_;
 
   static Theme *kTheme;
 

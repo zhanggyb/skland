@@ -33,6 +33,8 @@ class Shader {
   friend class Paint;
   friend class GradientShader;
 
+  Shader() = delete;
+
  public:
 
   enum TileMode {

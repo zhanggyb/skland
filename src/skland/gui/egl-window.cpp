@@ -261,7 +261,7 @@ void EGLWindow::OnMouseButton(MouseEvent *event) {
 
     int location = GetMouseLocation(event);
 
-    if (location == kTitleBar && (nullptr == MouseTaskIterator(this).next())) {
+    if (location == kClientArea && (nullptr == MouseTaskIterator(this).next())) {
       MoveWithMouse(event);
       event->Ignore();
       return;
@@ -391,10 +391,11 @@ int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
   if (location & AbstractShellView::kExterior)
     location = AbstractShellView::kExterior;
 
-  if (location == AbstractShellView::kInterior &&
-      y < Theme::GetShadowMargin().top + 22 /* title_bar_size_ */)
-    location = AbstractShellView::kTitleBar;
-  else if (location == AbstractShellView::kInterior)
+//  if (location == AbstractShellView::kInterior &&
+//      y < Theme::GetShadowMargin().top + 22 /* title_bar_size_ */)
+//    location = AbstractShellView::kTitleBar;
+//  else
+  if (location == AbstractShellView::kInterior)
     location = AbstractShellView::kClientArea;
 
   return location;

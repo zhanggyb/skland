@@ -28,7 +28,19 @@ class ThemeLight : public Theme {
  public:
 
   ThemeLight()
-      : Theme() {}
+      : Theme() {
+    window_schema().background = 0xEFF0F0F0;
+    window_schema().background_active = 0xEFE0E0E0;
+    window_schema().foreground = 0xFF444444;
+    window_schema().foreground_active = 0xFF999999;
+
+    title_bar_schema().background = 0xEFF0F0F0;
+    title_bar_schema().background_active = 0xEFE0E0E0;
+    title_bar_schema().background_highlight = title_bar_schema().background_active + 55;
+    title_bar_schema().foreground = 0xFF444444;
+    title_bar_schema().foreground_active = 0xFF999999;
+    title_bar_schema().foreground_highlight = title_bar_schema().foreground_active + 55;
+  }
 
   ~ThemeLight() {}
 

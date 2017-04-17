@@ -23,18 +23,27 @@ namespace skland {
 /**
  * @brief The built-in dark theme
  */
-class ThemeDark: public Theme {
+class ThemeDark : public Theme {
 
  public:
 
-  ThemeDark() {
-    window_color_scheme().inner = 0xEF202020;
-    window_color_scheme().inner_selected = 0xEF303030;
-    window_color_scheme().text = 0xFF999999;
-    window_color_scheme().text_selected = 0xFF444444;
+  ThemeDark()
+      : Theme() {
+    window_schema().background = 0xEF202020;
+    window_schema().background_active = 0xEF303030;
+    window_schema().foreground = 0xFF999999;
+    window_schema().foreground_active = 0xFF444444;
+
+    title_bar_schema().background = 0xEF202020;
+    title_bar_schema().background_active = 0xEF303030;
+    title_bar_schema().background_highlight = title_bar_schema().background_active + 55;
+    title_bar_schema().foreground = 0xFF999999;
+    title_bar_schema().foreground_active = 0xFF444444;
+    title_bar_schema().foreground_highlight = title_bar_schema().foreground_active + 55;
   }
 
   ~ThemeDark() {}
+
 };
 
 }

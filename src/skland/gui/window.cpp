@@ -472,11 +472,11 @@ void Window::OnDraw(const Context *context) {
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(Theme::GetWindowColorScheme().inner);
+  paint.SetColor(Theme::GetWindowSchema().background);
   canvas->DrawPath(path, paint);
 
   // Draw the client area:
-  paint.SetColor(Theme::GetWindowColorScheme().inner_selected);
+  paint.SetColor(Theme::GetWindowSchema().background_active);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
   canvas->DrawRect(GetContentGeometry(), paint);
