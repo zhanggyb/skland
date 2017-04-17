@@ -452,6 +452,7 @@ void Window::OnDraw(const Context *context) {
   Path path;
   Rect geometry = Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
   bool drop_shadow = !(IsMaximized() || IsFullscreen());
+  const Theme::Schema& schema = Theme::GetWindowSchema();
 
   if (drop_shadow) {
     float radii[] = {
@@ -472,13 +473,22 @@ void Window::OnDraw(const Context *context) {
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(Theme::GetWindowSchema().background);
+  if (schema.background_active_shader) {
+    paint.SetShader(*schema.background_active_shader);
+  } else {
+    paint.SetColor(schema.background_active);
+  }
   canvas->DrawPath(path, paint);
 
   // Draw the client area:
-  paint.SetColor(Theme::GetWindowSchema().background_active);
   canvas->Save();
   canvas->ClipPath(path, kClipIntersect, true);
+
+  if (schema.foreground_active_shader) {
+    paint.SetShader(*schema.foreground_active_shader);
+  } else {
+    paint.SetColor(schema.foreground_active);
+  }
   canvas->DrawRect(GetContentGeometry(), paint);
   canvas->Restore();
 

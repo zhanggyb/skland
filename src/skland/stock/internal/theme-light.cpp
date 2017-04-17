@@ -30,9 +30,9 @@ class ThemeLight : public Theme {
   ThemeLight()
       : Theme() {
     window_schema().background = 0xEFF0F0F0;
-    window_schema().background_active = 0xEFE0E0E0;
-    window_schema().foreground = 0xFF444444;
-    window_schema().foreground_active = 0xFF999999;
+    window_schema().background_active = 0xEFF0F0F0;
+    window_schema().foreground = 0xEFE0E0E0;
+    window_schema().foreground_active = 0xEFE0E0E0;
 
     title_bar_schema().background = 0xEFF0F0F0;
     title_bar_schema().background_active = 0xEFE0E0E0;

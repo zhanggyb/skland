@@ -84,6 +84,9 @@ if (LINUX)
     endif ()
 endif ()
 
+find_library(DL_LIBRARY "dl")
+set(LIBS ${LIBS} ${DL_LIBRARY})
+
 # ----------------------------------------------------------------------------
 # Document build option
 # ----------------------------------------------------------------------------
@@ -179,7 +182,6 @@ if (APPLE)
 else()
 message(STATUS "  Install path: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "  Use Wayland client library: ${WAYLAND_CLIENT_LIBRARIES}")
-message(STATUS "  Use Cairo library: ${CAIRO_LIBRARIES}")
 if (EGL_FOUND)
 message(STATUS "  Use EGL library: ${EGL_LIBRARIES}")
 endif ()

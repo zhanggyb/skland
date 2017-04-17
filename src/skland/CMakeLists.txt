@@ -91,7 +91,7 @@ target_include_directories(skland
         PRIVATE "${PROJECT_BINARY_DIR}/deps/wayland-protocols/unstable/xdg-shell")
 
 if (LINUX)
-    target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client dl)
+    target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client)
 else ()
     target_link_libraries(skland ${LIBS} skia)
 endif ()

@@ -30,9 +30,9 @@ class ThemeDark : public Theme {
   ThemeDark()
       : Theme() {
     window_schema().background = 0xEF202020;
-    window_schema().background_active = 0xEF303030;
-    window_schema().foreground = 0xFF999999;
-    window_schema().foreground_active = 0xFF444444;
+    window_schema().background_active = 0xEF202020;
+    window_schema().foreground = 0xEF303030;
+    window_schema().foreground_active = 0xEF303030;
 
     title_bar_schema().background = 0xEF202020;
     title_bar_schema().background_active = 0xEF303030;
