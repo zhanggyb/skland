@@ -31,8 +31,6 @@ class PushButton : public AbstractButton {
 
   PushButton(const std::string& text);
 
-  virtual Size GetPreferredSize() const final;
-
  protected:
 
   virtual ~PushButton();

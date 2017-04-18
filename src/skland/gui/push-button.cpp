@@ -21,6 +21,8 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/text-box.hpp>
+#include <skland/graphic/path.hpp>
+#include <skland/graphic/gradient-shader.hpp>
 
 #include <skland/stock/theme.hpp>
 
@@ -28,38 +30,76 @@ namespace skland {
 
 PushButton::PushButton(const std::string &text)
     : AbstractButton(text) {
+
 }
 
 PushButton::~PushButton() {
 
 }
 
-Size PushButton::GetPreferredSize() const {
-  return Size(90, 20);
-}
-
 void PushButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
 
-  const Rect &rect = GetGeometry();
+  Path path;
+  const Rect &geometry = GetGeometry();
+  Rect inner_rect = geometry.Shrink(0.5f);
+  const Theme::Schema &button_schema = Theme::GetData().button;
+  Shader shader;
+  Point2F points[2];
+  points[0].x = geometry.left;
+  points[0].y = geometry.top;
+  points[1].x = geometry.left;
+  points[1].y = geometry.bottom;
+
+  float radii[] = {
+      4.f, 4.f,
+      4.f, 4.f,
+      4.f, 4.f,
+      4.f, 4.f
+  };
+
+  path.AddRoundRect(inner_rect, radii);
 
   Paint paint;
-  paint.SetColor(Theme::GetData().button.background.color);
+  paint.SetAntiAlias(true);
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetData().button.background_active.color);
+      if (button_schema.background_active.shaded) {
+        shader = Theme::GradientShaderHelper::MakeLinear(points, button_schema.background_active);
+        paint.SetShader(shader);
+      } else {
+        paint.SetColor(Theme::GetData().button.background_active.color);
+      }
     } else {
-      paint.SetColor(Theme::GetData().button.background_highlight.color);
+      if (button_schema.background_highlight.shaded) {
+        shader = Theme::GradientShaderHelper::MakeLinear(points, button_schema.background_highlight);
+        paint.SetShader(shader);
+      } else {
+        paint.SetColor(Theme::GetData().button.background_highlight.color);
+      }
+    }
+  } else {
+    if (button_schema.background.shaded) {
+      shader = Theme::GradientShaderHelper::MakeLinear(points, button_schema.background);
+      paint.SetShader(shader);
+    } else {
+      paint.SetColor(Theme::GetData().button.background.color);
     }
   }
 
-  canvas->DrawRect(rect, paint);
+  canvas->DrawPath(path, paint);
+  paint.SetShader(Shader());
+
+  paint.SetStyle(Paint::Style::kStyleStroke);
+  paint.SetColor(button_schema.outline.color);
+  path.Reset();
+  path.AddRoundRect(inner_rect, radii);
+  canvas->DrawPath(path, paint);
 
   const Font &font = GetFont();
   const std::string &text = GetText();
 
-  paint.SetColor(Theme::GetData().button.foreground_active.color);
-  paint.SetAntiAlias(true);
+  paint.SetColor(button_schema.foreground_active.color);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font);
   paint.SetTextSize(font.GetSize());
@@ -68,10 +108,10 @@ void PushButton::OnDraw(const Context *context) {
 
   TextBox text_box;
   // Put the text at the center
-  text_box.SetBox(rect.l + (rect.width() - text_width) / 2.f,
-                  rect.t + 1.f, // move down a little for better look
-                  rect.r - (rect.width() - text_width) / 2.f,
-                  rect.b);
+  text_box.SetBox(geometry.l + (geometry.width() - text_width) / 2.f,
+                  geometry.t + 1.f, // move down a little for better look
+                  geometry.r - (geometry.width() - text_width) / 2.f,
+                  geometry.b);
   text_box.SetSpacingAlign(TextBox::kSpacingAlignCenter);
   text_box.SetText(text.c_str(), text.length(), paint);
   text_box.Draw(*canvas);

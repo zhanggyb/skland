@@ -88,6 +88,14 @@ struct Rect {
     bottom = top + height;
   }
 
+  inline Rect Shrink(T value) const {
+    return Rect(this->left + value, this->top + value, this->right - value, this->bottom - value);
+  }
+
+  inline Rect Expand(T value) const {
+    return Rect(this->left - value, this->top - value, this->right + value, this->bottom + value);
+  }
+
   inline T x() const { return left; }
 
   inline T y() const { return top; }

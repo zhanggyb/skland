@@ -19,6 +19,7 @@
 
 #include "../core/color.hpp"
 #include "../core/margin.hpp"
+#include "../core/point.hpp"
 
 #include "../graphic/shader.hpp"
 
@@ -103,6 +104,14 @@ class Theme {
     Schema title_bar;
 
     Schema button;
+
+  };
+
+  class GradientShaderHelper {
+
+   public:
+
+    static Shader MakeLinear(const Point2F points[2], const Schema::ShadedColor& color);
 
   };
 

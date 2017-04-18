@@ -17,6 +17,8 @@
 #include <skland/stock/theme.hpp>
 #include <iostream>
 #include <skland/core/assert.hpp>
+#include <skland/skland.hpp>
+#include <skland/graphic/gradient-shader.hpp>
 
 #include "SkBlurMaskFilter.h"
 #include "SkPath.h"
@@ -38,6 +40,14 @@ std::vector<uint32_t> Theme::kShadowPixels;
 SkPixmap *Theme::kShadowPixmap = nullptr;
 
 Theme *Theme::kTheme = nullptr;
+
+Shader Theme::GradientShaderHelper::MakeLinear(const Point2F *points, const Schema::ShadedColor &color) {
+  return GradientShader::MakeLinear(points,
+                                    color.shaded_colors.data(),
+                                    color.shaded_positions.data(),
+                                    color.shaded_count,
+                                    Shader::TileMode::kTileModeClamp);
+}
 
 void Theme::Initialize() {
   if (kTheme) return;

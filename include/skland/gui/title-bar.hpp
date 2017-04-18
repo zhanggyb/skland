@@ -40,17 +40,37 @@ class TitleBar final : public AbstractView {
     kButtonMenu
   };
 
+  /**
+   * @brief Default constructor
+   */
   TitleBar();
 
-  virtual ~TitleBar();
-
+  /**
+   * @brief Set the title text
+   * @param title
+   */
   void SetTitle(const std::string &title);
 
+  /**
+   * @brief Get a window action button
+   * @param button_type
+   * @return
+   */
   AbstractButton *GetButton(ButtonType button_type) const;
 
+  /**
+   * @brief The height of this title bar
+   *
+   * This value is the height when placed on top or width when placed on left/right side.
+   */
   static const int kHeight = 22;
 
  protected:
+
+  /**
+   * @brief Destructor
+   */
+  virtual ~TitleBar();
 
   virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
 

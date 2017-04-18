@@ -51,8 +51,24 @@ class ThemeLight : public Theme {
     data().title_bar.foreground_highlight.color = data().title_bar.foreground_active.color + 55;
 
     data().button.background.color = 0xFF4E4E4E;
+    data().button.background.shaded = true;
+    data().button.background.shaded_count = 2;
+    data().button.background.shaded_colors.resize(2);
+    data().button.background.shaded_colors[0] = 0xFF5E5E5E;
+    data().button.background.shaded_colors[1] = 0xFF3E3E3E;
+    data().button.background.shaded_positions.resize(2);
+    data().button.background.shaded_positions[0] = 0.f;
+    data().button.background.shaded_positions[1] = 1.f;
     data().button.background_active.color = 0xFFB67E3E;
-    data().button.background_highlight.color = data().button.background_active.color + 25;
+    data().button.background_active.shaded = true;
+    data().button.background_active.shaded_count = 2;
+    data().button.background_active.shaded_colors.resize(2);
+    data().button.background_active.shaded_colors[0] = 0xFF8B5C2D;
+    data().button.background_active.shaded_colors[1] = 0xFFCD9866;
+    data().button.background_active.shaded_positions.resize(2);
+    data().button.background_active.shaded_positions[0] = 0.f;
+    data().button.background_active.shaded_positions[1] = 1.f;
+    data().button.background_highlight.color = data().button.background.color + 25;
     data().button.foreground.color = 0xFF444444;
     data().button.foreground_active.color = 0xFFEEEEEE;
     data().button.foreground_highlight.color = data().button.foreground_active.color + 25;
