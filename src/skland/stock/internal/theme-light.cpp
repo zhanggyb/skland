@@ -17,7 +17,6 @@
 #include "theme-light.hpp"
 
 #include <skland/stock/theme.hpp>
-#include <skland/graphic/gradient-shader.hpp>
 
 namespace skland {
 
@@ -30,25 +29,27 @@ class ThemeLight : public Theme {
 
   ThemeLight()
       : Theme() {
-    window_schema().background = 0xEFF0F0F0;
-    window_schema().background_active = 0xEFF0F0F0;
-    window_schema().foreground = 0xEFE0E0E0;
-    window_schema().foreground_active = 0xEFEEEEEE;
+    data().window.background.color = 0xEFF0F0F0;
+    data().window.background_active.color = 0xEFF0F0F0;
+    data().window.foreground.color = 0xEFE0E0E0;
+    data().window.foreground_active.color = 0xEFE7E7E7;
 
-    title_bar_schema().background = 0xEFF0F0F0;
-    Point2F points[2];
-    points[0].x = 0.f;
-    points[0].y = 0.f;
-    points[1].x = 0.f;
-    points[1].y = 22.f;
-    uint32_t colors[2] = {0xFFDDDDDD, 0xFFCCCCCC};
-    float pos[2] = {0.f, 1.f};
-    title_bar_schema().background_active_shader =
-        GradientShader::MakeLinear(points, colors, pos, 2, Shader::TileMode::kTileModeClamp);
-    title_bar_schema().background_highlight = title_bar_schema().background_active + 55;
-    title_bar_schema().foreground = 0xFF444444;
-    title_bar_schema().foreground_active = 0xFF444444;
-    title_bar_schema().foreground_highlight = title_bar_schema().foreground_active + 55;
+    data().title_bar.background.color = 0xEFF0F0F0;
+
+    data().title_bar.background_active.shaded = true;
+    data().title_bar.background_active.shaded_count = 2;
+    data().title_bar.background_active.shaded_colors.resize(2);
+    data().title_bar.background_active.shaded_colors[0] = 0xFFDDDDDD;
+    data().title_bar.background_active.shaded_colors[1] = 0xFFCCCCCC;
+    data().title_bar.background_active.shaded_positions.resize(2);
+    data().title_bar.background_active.shaded_positions[0] = 0.f;
+    data().title_bar.background_active.shaded_positions[1] = 1.f;
+
+
+    data().title_bar.background_highlight.color = data().title_bar.background_active.color + 55;
+    data().title_bar.foreground.color = 0xFF444444;
+    data().title_bar.foreground_active.color = 0xFF444444;
+    data().title_bar.foreground_highlight.color = data().title_bar.foreground_active.color + 55;
   }
 
   ~ThemeLight() {}

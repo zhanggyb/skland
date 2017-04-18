@@ -47,45 +47,63 @@ class Theme {
 
   struct Schema {
 
-    Schema()
-        : outline(0x0),
-          outline_active(0x0),
-          outline_highlight(0x0),
-          background(0xEFF0F0F0),
-          background_active(0xEFE0E0E0),
-          background_highlight(background_active + 25),
-          foreground(0xFF444444),
-          foreground_active(0xFF999999),
-          foreground_highlight(foreground_active + 25) {}
+    struct ShadedColor {
+
+      ShadedColor()
+          : shaded(false), shaded_count(0) {}
+
+      ~ShadedColor() {}
+
+      Color color;
+      bool shaded;
+      int shaded_count;
+      std::vector<uint32_t> shaded_colors;
+      std::vector<float> shaded_positions;
+
+    };
+
+    Schema() {
+      background.color = 0xEFF0F0F0;
+      background_active.color = 0xEFF0F0F0;
+      background_highlight.color = background_active.color + 25;
+      foreground.color = 0xFF444444;
+      foreground_active.color = 0xFF999999;
+      foreground_highlight.color = foreground_active.color + 25;
+    }
 
     ~Schema() {}
 
-    Color outline;
-    Shader outline_shader;
+    // TODO: use image
+    ShadedColor outline;
 
-    Color outline_active;
-    Shader outline_active_shader;
+    ShadedColor outline_active;
 
-    Color outline_highlight;
-    Shader outline_highlight_shader;
+    ShadedColor outline_highlight;
 
-    Color background;
-    Shader background_shader;
+    ShadedColor background;
 
-    Color background_active;
-    Shader background_active_shader;
+    ShadedColor background_active;
 
-    Color background_highlight;
-    Shader background_highlight_shader;
+    ShadedColor background_highlight;
 
-    Color foreground;
-    Shader foreground_shader;
+    ShadedColor foreground;
 
-    Color foreground_active;
-    Shader foreground_active_shader;
+    ShadedColor foreground_active;
 
-    Color foreground_highlight;
-    Shader foreground_highlight_shader;
+    ShadedColor foreground_highlight;
+
+  };
+
+  struct Data {
+
+    std::string name;
+
+    Schema window;
+
+    Schema title_bar;
+
+    Schema button;
+
   };
 
   static void Load(const char *name = nullptr);
@@ -114,13 +132,7 @@ class Theme {
 
   static const int kShadowImageHeight = 250;
 
-  static const Schema &GetWindowSchema() {
-    return kTheme->window_schema_;
-  }
-
-  static const Schema &GetTitleBarSchema() {
-    return kTheme->title_bar_schema_;
-  }
+  static const Data &GetData() { return kTheme->data_; }
 
  protected:
 
@@ -128,13 +140,7 @@ class Theme {
 
   virtual ~Theme();
 
-  Schema &window_schema() {
-    return window_schema_;
-  };
-
-  Schema &title_bar_schema() {
-    return title_bar_schema_;
-  }
+  Data &data() { return data_; }
 
  private:
 
@@ -165,13 +171,9 @@ class Theme {
 
   static SkPixmap *kShadowPixmap;
 
-  std::string name_;
-
-  Schema window_schema_;
-
-  Schema title_bar_schema_;
-
   static Theme *kTheme;
+
+  Data data_;
 
 };
 

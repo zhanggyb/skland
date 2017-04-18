@@ -89,7 +89,7 @@ void Theme::Load(const char *name) {
   if (upper_name == "LIGHT") {
     handle = ThemeLightCreate;
     kTheme = static_cast<Theme *>(handle());
-    kTheme->name_ = name;
+    kTheme->data_.name = name;
   } else if (upper_name == "DARK") {
     handle = ThemeDarkCreate;
     kTheme = static_cast<Theme *>(handle());

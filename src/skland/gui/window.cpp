@@ -94,7 +94,7 @@ Window::Window(int width, int height, const char *title)
   AttachView(p_->title_bar);
 
   titlebar->SetTitle(title);
-  titlebar->Resize(GetWidth(), 22);
+  titlebar->Resize(GetWidth(), TitleBar::kHeight);
 
   AbstractButton *button = titlebar->GetButton(TitleBar::kButtonClose);
   button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Close));
@@ -277,7 +277,7 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   OnUpdate(nullptr);
 
   if (p_->title_bar) {
-    p_->title_bar->Resize(new_size.width, 22);
+    p_->title_bar->Resize(new_size.width, TitleBar::kHeight);
     AbstractShellView::RecursiveUpdate(p_->title_bar);
   }
 
@@ -453,8 +453,14 @@ void Window::OnDraw(const Context *context) {
   Path path;
   Rect geometry = Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
   bool drop_shadow = !(IsMaximized() || IsFullscreen());
-  const Theme::Schema &window_schema = Theme::GetWindowSchema();
-  const Theme::Schema &title_bar_schema = Theme::GetTitleBarSchema();
+  const Theme::Schema &window_schema = Theme::GetData().window;
+  const Theme::Schema &title_bar_schema = Theme::GetData().title_bar;
+  Shader shader;
+  Point2F points[2];
+  points[0].x = 0.f;
+  points[0].y = 0.f;
+  points[1].x = 0.f;
+  points[1].y = GetHeight();
 
   if (drop_shadow) {
     float radii[] = {
@@ -475,10 +481,15 @@ void Window::OnDraw(const Context *context) {
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  if (window_schema.background_active_shader) {
-    paint.SetShader(window_schema.background_active_shader);
+  if (window_schema.background_active.shaded) {
+    shader = GradientShader::MakeLinear(points,
+                                        window_schema.background_active.shaded_colors.data(),
+                                        window_schema.background_active.shaded_positions.data(),
+                                        window_schema.background_active.shaded_count,
+                                        Shader::TileMode::kTileModeClamp);
+    paint.SetShader(shader);
   } else {
-    paint.SetColor(window_schema.background_active);
+    paint.SetColor(window_schema.background_active.color);
   }
   canvas->DrawPath(path, paint);
   paint.SetShader(Shader());  // Clear shader
@@ -488,19 +499,30 @@ void Window::OnDraw(const Context *context) {
   canvas->ClipPath(path, kClipIntersect, true);
 
   if (p_->title_bar) {
-    if (title_bar_schema.background_active_shader) {
-      paint.SetShader(title_bar_schema.background_active_shader);
+    if (title_bar_schema.background_active.shaded) {
+      points[1].y = TitleBar::kHeight;
+      shader = GradientShader::MakeLinear(points,
+                                          title_bar_schema.background_active.shaded_colors.data(),
+                                          title_bar_schema.background_active.shaded_positions.data(),
+                                          title_bar_schema.background_active.shaded_count,
+                                          Shader::TileMode::kTileModeClamp);
+      paint.SetShader(shader);
     } else {
-      paint.SetColor(title_bar_schema.background_active);
+      paint.SetColor(title_bar_schema.background_active.color);
     }
     canvas->DrawRect(p_->title_bar->GetGeometry(), paint);
     paint.SetShader(Shader());  // Clear shader
   }
 
-  if (window_schema.foreground_active_shader) {
-    paint.SetShader(window_schema.foreground_active_shader);
+  if (window_schema.foreground_active.shaded) {
+    points[1].y = GetHeight();
+    shader = GradientShader::MakeLinear(points,
+                                        window_schema.foreground_active.shaded_colors.data(),
+                                        window_schema.foreground_active.shaded_positions.data(),
+                                        window_schema.foreground_active.shaded_count,
+                                        Shader::TileMode::kTileModeClamp);
   } else {
-    paint.SetColor(window_schema.foreground_active);
+    paint.SetColor(window_schema.foreground_active.color);
   }
   canvas->DrawRect(GetContentGeometry(), paint);
   canvas->Restore();
@@ -562,7 +584,7 @@ int Window::GetMouseLocation(const MouseEvent *event) const {
     location = AbstractShellView::kExterior;
 
   if (location == AbstractShellView::kInterior &&
-      y < Theme::GetShadowMargin().top + 22 /* title_bar_size_ */)
+      y < Theme::GetShadowMargin().top + TitleBar::kHeight)
     location = AbstractShellView::kTitleBar;
   else if (location == AbstractShellView::kInterior)
     location = AbstractShellView::kClientArea;

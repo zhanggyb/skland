@@ -48,6 +48,8 @@ class TitleBar final : public AbstractView {
 
   AbstractButton *GetButton(ButtonType button_type) const;
 
+  static const int kHeight = 22;
+
  protected:
 
   virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;

@@ -85,7 +85,7 @@ void TitleBar::CloseButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetTitleBarSchema().foreground_highlight);
+      paint.SetColor(Theme::GetData().title_bar.foreground_highlight.color);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -93,12 +93,12 @@ void TitleBar::CloseButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+    paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 3.f, rect.center_y() - 3.f,
                    rect.center_x() + 3.f, rect.center_y() + 3.f,
@@ -135,7 +135,7 @@ void TitleBar::MaximizeButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetTitleBarSchema().foreground_highlight);
+      paint.SetColor(Theme::GetData().title_bar.foreground_highlight.color);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -143,12 +143,12 @@ void TitleBar::MaximizeButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+    paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
@@ -185,7 +185,7 @@ void TitleBar::MinimizeButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetTitleBarSchema().foreground_highlight);
+      paint.SetColor(Theme::GetData().title_bar.foreground_highlight.color);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -193,12 +193,12 @@ void TitleBar::MinimizeButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+    paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
@@ -232,7 +232,7 @@ void TitleBar::FullscreenButton::OnDraw(const Context *context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+      paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -240,12 +240,12 @@ void TitleBar::FullscreenButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+    paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
   paint.SetStyle(Paint::Style::kStyleFill);
 
   Path path;
@@ -348,7 +348,7 @@ void TitleBar::OnKeyboardKey(KeyEvent *event) {
 void TitleBar::OnDraw(const Context *context) {
   Paint paint;
 
-  paint.SetColor(Theme::GetTitleBarSchema().foreground_active);
+  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
   paint.SetAntiAlias(true);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font_);
