@@ -22,6 +22,8 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/text-box.hpp>
 
+#include <skland/stock/theme.hpp>
+
 namespace skland {
 
 PushButton::PushButton(const std::string &text)
@@ -39,19 +41,15 @@ Size PushButton::GetPreferredSize() const {
 void PushButton::OnDraw(const Context *context) {
   std::shared_ptr<Canvas> canvas = context->canvas();
 
-  Color regular(0.65f, 0.65f, 0.65f);
-  Color down = regular - 35;
-  Color hover = regular + 15;
-
   const Rect &rect = GetGeometry();
 
   Paint paint;
-  paint.SetColor(regular);
+  paint.SetColor(Theme::GetData().button.background.color);
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(down);
+      paint.SetColor(Theme::GetData().button.background_active.color);
     } else {
-      paint.SetColor(hover);
+      paint.SetColor(Theme::GetData().button.background_highlight.color);
     }
   }
 
@@ -60,7 +58,7 @@ void PushButton::OnDraw(const Context *context) {
   const Font &font = GetFont();
   const std::string &text = GetText();
 
-  paint.SetColor(0xFF444444);
+  paint.SetColor(Theme::GetData().button.foreground_active.color);
   paint.SetAntiAlias(true);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font);

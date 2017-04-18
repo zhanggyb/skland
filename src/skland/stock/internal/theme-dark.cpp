@@ -49,6 +49,13 @@ class ThemeDark : public Theme {
     data().title_bar.foreground.color = 0xFF999999;
     data().title_bar.foreground_active.color = 0xFFA0A0A0;
     data().title_bar.foreground_highlight.color = data().title_bar.foreground_active.color + 55;
+
+    data().button.background.color = 0xFF4E4E4E;
+    data().button.background_active.color = 0xFFB67E3E;
+    data().button.background_highlight.color = data().button.background_active.color + 25;
+    data().button.foreground.color = 0xFF444444;
+    data().button.foreground_active.color = 0xFFEEEEEE;
+    data().button.foreground_highlight.color = data().button.foreground_active.color + 25;
   }
 
   ~ThemeDark() {}
