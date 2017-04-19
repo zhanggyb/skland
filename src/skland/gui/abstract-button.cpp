@@ -58,7 +58,7 @@ struct AbstractButton::Private {
 };
 
 AbstractButton::AbstractButton()
-    : AbstractView(80, 24) {
+    : AbstractView(80, 20) {
   p_.reset(new Private);
 }
 
@@ -68,7 +68,7 @@ AbstractButton::AbstractButton(int width, int height)
 }
 
 AbstractButton::AbstractButton(const std::string &text)
-    : AbstractView(80, 24) {
+    : AbstractView(80, 20) {
   p_.reset(new Private);
   p_->text = text;
 }
@@ -122,24 +122,25 @@ void AbstractButton::OnMouseLeave() {
   }
 }
 
-void AbstractButton::OnMouseButton(MouseEvent *event) {
-  if (event->GetState() == kPressed) {
-    Bit::Set<uint32_t>(p_->flags, Private::kPressed);
-    Update();
-  } else {
-    if (IsPressed()) {
-      Bit::Set<uint32_t>(p_->flags, Private::kClicked);
-    }
-    Bit::Clear<uint32_t>(p_->flags, Private::kPressed);
-    Update();
+void AbstractButton::OnMouseDown(MouseEvent *event) {
+  Bit::Set<uint32_t>(p_->flags, Private::kPressed);
+  Update();
+  event->Accept();
+}
+
+void AbstractButton::OnMouseUp(MouseEvent *event) {
+  if (IsPressed()) {
+    Bit::Set<uint32_t>(p_->flags, Private::kClicked);
   }
+  Bit::Clear<uint32_t>(p_->flags, Private::kPressed);
+  Update();
 
   if (p_->flags & Private::kClicked) {
     Bit::Clear<uint32_t>(p_->flags, Private::kClicked);
-    event->Accept();
     clicked_();
-    return;
   }
+
+  event->Accept();
 }
 
 void AbstractButton::OnMouseMove(MouseEvent *event) {
@@ -147,6 +148,10 @@ void AbstractButton::OnMouseMove(MouseEvent *event) {
 }
 
 void AbstractButton::OnKeyDown(KeyEvent *event) {
+  event->Accept();
+}
+
+void AbstractButton::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 

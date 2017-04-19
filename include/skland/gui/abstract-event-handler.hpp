@@ -93,17 +93,26 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
   virtual void OnMouseMove(MouseEvent *event) = 0;
 
   /**
-   * @brief Virtual callback when mouse button pressed or released on
-   * this object
+   * @brief Virtual callback when mouse button pressed on this object
    */
-  virtual void OnMouseButton(MouseEvent *event) = 0;
+  virtual void OnMouseDown(MouseEvent *event) = 0;
+
+  /**
+   * @brief Virtual callback when mouse button released on this object
+   * @param event
+   */
+  virtual void OnMouseUp(MouseEvent *event) = 0;
 
   /**
    * @brief Virtual callback when a keyboard key is prssed down on this object
    */
   virtual void OnKeyDown(KeyEvent *event) = 0;
 
-//  virtual void OnKeyUp(KeyEvent *event) = 0;
+  /**
+   * @brief Virtual callback when a keyboard key is released on this object
+   * @param event
+   */
+  virtual void OnKeyUp(KeyEvent *event) = 0;
 
   /**
    * @brief A view request an update

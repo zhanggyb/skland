@@ -57,7 +57,9 @@ class EGLWindow : public AbstractShellView {
 
   virtual void OnMouseMove(MouseEvent *event) override;
 
-  virtual void OnMouseButton(MouseEvent *event) override;
+  virtual void OnMouseDown(MouseEvent *event) override;
+
+  virtual void OnMouseUp(MouseEvent *event) override;
 
   virtual void OnKeyDown(KeyEvent *event) override;
 

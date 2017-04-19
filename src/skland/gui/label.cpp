@@ -89,11 +89,19 @@ void Label::OnMouseMove(MouseEvent *event) {
   event->Ignore();
 }
 
-void Label::OnMouseButton(MouseEvent *event) {
+void Label::OnMouseDown(MouseEvent *event) {
+  event->Ignore();
+}
+
+void Label::OnMouseUp(MouseEvent *event) {
   event->Ignore();
 }
 
 void Label::OnKeyDown(KeyEvent *event) {
+  event->Ignore();
+}
+
+void Label::OnKeyUp(KeyEvent *event) {
   event->Ignore();
 }
 

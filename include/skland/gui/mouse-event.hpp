@@ -31,14 +31,14 @@ namespace skland {
 class Surface;
 
 enum MouseButton {
-  kLeft = BTN_LEFT,
-  kRight = BTN_RIGHT,
-  kMiddle = BTN_MIDDLE
+  kMouseButtonLeft = BTN_LEFT,
+  kMouseButtonRight = BTN_RIGHT,
+  kMouseButtonMiddle = BTN_MIDDLE
 };
 
 enum MouseButtonState {
-  kReleased = WL_POINTER_BUTTON_STATE_RELEASED,  /* 0 */
-  kPressed = WL_POINTER_BUTTON_STATE_PRESSED /* 1 */
+  kMouseButtonReleased = WL_POINTER_BUTTON_STATE_RELEASED,  /* 0 */
+  kMouseButtonPressed = WL_POINTER_BUTTON_STATE_PRESSED /* 1 */
 };
 
 SKLAND_EXPORT class MouseEvent : public InputEvent {

@@ -258,11 +258,19 @@ void AbstractShellView::OnMouseMove(MouseEvent *event) {
   // override in sub class
 }
 
-void AbstractShellView::OnMouseButton(MouseEvent *event) {
+void AbstractShellView::OnMouseDown(MouseEvent *event) {
+  // override in sub class
+}
+
+void AbstractShellView::OnMouseUp(MouseEvent *event) {
   // override in sub class
 }
 
 void AbstractShellView::OnKeyDown(KeyEvent *event) {
+  // override in sub class
+}
+
+void AbstractShellView::OnKeyUp(KeyEvent *event) {
   // override in sub class
 }
 
@@ -464,14 +472,31 @@ void AbstractShellView::DispatchMouseLeaveEvent() {
   }
 }
 
-void AbstractShellView::DispatchMouseButtonEvent(MouseEvent *event) {
+void AbstractShellView::DispatchMouseDownEvent(MouseEvent *event) {
+  _ASSERT(event->GetState() == kMouseButtonPressed);
+
   MouseTaskIterator it(this);
   ++it;
 
   AbstractView *view = nullptr;
   while (it) {
     view = static_cast<AbstractView *>(it.mouse_task()->event_handler);
-    view->OnMouseButton(event);
+    view->OnMouseDown(event);
+    if (event->IsRejected()) break;
+    ++it;
+  }
+}
+
+void AbstractShellView::DispatchMouseUpEvent(MouseEvent *event) {
+  _ASSERT(event->GetState() == kMouseButtonReleased);
+
+  MouseTaskIterator it(this);
+  ++it;
+
+  AbstractView *view = nullptr;
+  while (it) {
+    view = static_cast<AbstractView *>(it.mouse_task()->event_handler);
+    view->OnMouseUp(event);
     if (event->IsRejected()) break;
     ++it;
   }
@@ -495,7 +520,6 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent
     }
   }
 }
-
 
 void AbstractShellView::DropShadow(const Context *context) {
   float rad = Theme::GetShadowRadius() - 1.f; // The spread radius

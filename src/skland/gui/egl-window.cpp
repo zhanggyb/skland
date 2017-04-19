@@ -255,9 +255,9 @@ void EGLWindow::OnMouseMove(MouseEvent *event) {
   if (view) DispatchMouseEnterEvent(view, event);
 }
 
-void EGLWindow::OnMouseButton(MouseEvent *event) {
-  if ((event->GetButton() == MouseButton::kLeft) &&
-      (event->GetState() == MouseButtonState::kPressed)) {
+void EGLWindow::OnMouseDown(MouseEvent *event) {
+  if ((event->GetButton() == MouseButton::kMouseButtonLeft) &&
+      (event->GetState() == MouseButtonState::kMouseButtonPressed)) {
 
     int location = GetMouseLocation(event);
 
@@ -274,7 +274,11 @@ void EGLWindow::OnMouseButton(MouseEvent *event) {
     }
   }
 
-  DispatchMouseButtonEvent(event);
+  DispatchMouseDownEvent(event);
+}
+
+void EGLWindow::OnMouseUp(MouseEvent *event) {
+
 }
 
 void EGLWindow::OnKeyDown(KeyEvent *event) {

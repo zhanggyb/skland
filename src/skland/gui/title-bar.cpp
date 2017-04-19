@@ -329,11 +329,19 @@ void TitleBar::OnMouseMove(MouseEvent *event) {
   event->Accept();
 }
 
-void TitleBar::OnMouseButton(MouseEvent *event) {
+void TitleBar::OnMouseDown(MouseEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnMouseUp(MouseEvent *event) {
   event->Accept();
 }
 
 void TitleBar::OnKeyDown(KeyEvent *event) {
+  event->Accept();
+}
+
+void TitleBar::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 

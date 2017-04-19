@@ -66,9 +66,13 @@ class AbstractButton : public AbstractView {
 
   virtual void OnMouseMove(MouseEvent *event) override;
 
-  virtual void OnMouseButton(MouseEvent *event) override;
+  virtual void OnMouseDown(MouseEvent *event) override;
+
+  virtual void OnMouseUp(MouseEvent *event) override;
 
   virtual void OnKeyDown(KeyEvent *event) override;
+
+  virtual void OnKeyUp(KeyEvent *event) override;
 
   virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
 

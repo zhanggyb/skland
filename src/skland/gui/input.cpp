@@ -287,7 +287,12 @@ void Input::OnPointerButton(uint32_t serial, uint32_t time, uint32_t button, uin
   if (nullptr == p_->mouse_event->p_->surface) return;
 
   p_->mouse_event->response_ = InputEvent::kUnknown;
-  p_->mouse_event->p_->surface->event_handler()->OnMouseButton(p_->mouse_event);
+
+  if (state == WL_POINTER_BUTTON_STATE_PRESSED) {
+    p_->mouse_event->p_->surface->event_handler()->OnMouseDown(p_->mouse_event);
+  } else if (state == WL_POINTER_BUTTON_STATE_RELEASED) {
+    p_->mouse_event->p_->surface->event_handler()->OnMouseUp(p_->mouse_event);
+  }
 }
 
 void Input::OnPointerAxis(uint32_t time, uint32_t axis, wl_fixed_t value) {

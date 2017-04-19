@@ -64,11 +64,19 @@ class MainWidget : public AbstractView {
     event->Ignore();
   }
 
-  virtual void OnMouseButton(MouseEvent *event) override {
+  virtual void OnMouseDown(MouseEvent *event) override {
+    event->Ignore();
+  }
+
+  virtual void OnMouseUp(MouseEvent *event) override {
     event->Ignore();
   }
 
   virtual void OnKeyDown(KeyEvent *event) override {
+    event->Ignore();
+  }
+
+  virtual void OnKeyUp(KeyEvent *event) override {
     event->Ignore();
   }
 

@@ -62,7 +62,7 @@ void VideoView::OnMouseMove(MouseEvent *event) {
 
 }
 
-void VideoView::OnMouseButton(MouseEvent *event) {
+void VideoView::OnMouseDown(MouseEvent *event) {
 
 }
 

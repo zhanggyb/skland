@@ -58,9 +58,13 @@ SKLAND_EXPORT class Label : public AbstractView {
 
   virtual void OnMouseMove(MouseEvent *event) override;
 
-  virtual void OnMouseButton(MouseEvent *event) override;
+  virtual void OnMouseDown(MouseEvent *event) override;
+
+  virtual void OnMouseUp(MouseEvent *event) override;
 
   virtual void OnKeyDown(KeyEvent *event) override;
+
+  virtual void OnKeyUp(KeyEvent *event) override;
 
   virtual void OnDraw(const Context *context) override;
 

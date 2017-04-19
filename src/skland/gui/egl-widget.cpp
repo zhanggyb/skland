@@ -103,11 +103,19 @@ void EGLWidget::OnMouseMove(MouseEvent *event) {
   event->Accept();
 }
 
-void EGLWidget::OnMouseButton(MouseEvent *event) {
+void EGLWidget::OnMouseDown(MouseEvent *event) {
+  event->Accept();
+}
+
+void EGLWidget::OnMouseUp(MouseEvent *event) {
   event->Accept();
 }
 
 void EGLWidget::OnKeyDown(KeyEvent *event) {
+  event->Accept();
+}
+
+void EGLWidget::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 

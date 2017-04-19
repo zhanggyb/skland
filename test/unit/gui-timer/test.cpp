@@ -67,7 +67,7 @@ class ShmWidget : public AbstractView {
     event->Ignore();
   }
 
-  virtual void OnMouseButton(MouseEvent *event) override {
+  virtual void OnMouseDown(MouseEvent *event) override {
     event->Ignore();
   }
 

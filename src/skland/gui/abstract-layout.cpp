@@ -106,11 +106,19 @@ void AbstractLayout::OnMouseMove(MouseEvent *event) {
   event->Ignore();
 }
 
-void AbstractLayout::OnMouseButton(MouseEvent *event) {
+void AbstractLayout::OnMouseDown(MouseEvent *event) {
+  event->Ignore();
+}
+
+void AbstractLayout::OnMouseUp(MouseEvent *event) {
   event->Ignore();
 }
 
 void AbstractLayout::OnKeyDown(KeyEvent *event) {
+  event->Ignore();
+}
+
+void AbstractLayout::OnKeyUp(KeyEvent *event) {
   event->Ignore();
 }
 

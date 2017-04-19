@@ -417,9 +417,8 @@ void Window::OnMouseMove(MouseEvent *event) {
 //      }
 }
 
-void Window::OnMouseButton(MouseEvent *event) {
-  if ((event->GetButton() == MouseButton::kLeft) &&
-      (event->GetState() == MouseButtonState::kPressed)) {
+void Window::OnMouseDown(MouseEvent *event) {
+  if (event->GetButton() == MouseButton::kMouseButtonLeft) {
 
     int location = GetMouseLocation(event);
 
@@ -436,7 +435,11 @@ void Window::OnMouseButton(MouseEvent *event) {
     }
   }
 
-  DispatchMouseButtonEvent(event);
+  DispatchMouseDownEvent(event);
+}
+
+void Window::OnMouseUp(MouseEvent *event) {
+  DispatchMouseUpEvent(event);
 }
 
 void Window::OnKeyDown(KeyEvent *event) {
