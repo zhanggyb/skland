@@ -201,6 +201,11 @@ void Input::OnKeyboardEnter(uint32_t serial, struct wl_surface *wl_surface, stru
   p_->key_event->serial_ = serial;
 //  keyboard_event_.surface_ = static_cast<Surface*>(wl_surface_get_user_data((wl_surface)));
   // TODO: use the keys
+//  void *p = nullptr;
+//  int count = 0;
+//  wl_array_for_each(p, keys) {
+//    count++;
+//  }
 }
 
 void Input::OnKeyboardLeave(uint32_t serial, struct wl_surface *wl_surface) {
@@ -213,6 +218,12 @@ void Input::OnKeyboardKey(uint32_t serial, uint32_t time, uint32_t key, uint32_t
   p_->key_event->time_ = serial;
   p_->key_event->key_ = key;
   p_->key_event->state_ = state;
+
+  if (state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+    // OnKeyDown;
+  } else if (state == WL_KEYBOARD_KEY_STATE_RELEASED) {
+    // OnKeyUp;
+  }
 }
 
 void Input::OnKeyboardModifiers(uint32_t serial,

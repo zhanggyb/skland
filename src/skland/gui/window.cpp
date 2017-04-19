@@ -439,7 +439,7 @@ void Window::OnMouseButton(MouseEvent *event) {
   DispatchMouseButtonEvent(event);
 }
 
-void Window::OnKeyboardKey(KeyEvent *event) {
+void Window::OnKeyDown(KeyEvent *event) {
   if (event->key() == kKey_ESC) {
     Application::Exit();
   }

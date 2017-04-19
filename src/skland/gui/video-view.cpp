@@ -66,7 +66,7 @@ void VideoView::OnMouseButton(MouseEvent *event) {
 
 }
 
-void VideoView::OnKeyboardKey(KeyEvent *event) {
+void VideoView::OnKeyDown(KeyEvent *event) {
 
 }
 

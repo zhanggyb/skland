@@ -86,7 +86,7 @@ class TitleBar final : public AbstractView {
 
   virtual void OnMouseButton(MouseEvent *event) override;
 
-  virtual void OnKeyboardKey(KeyEvent *event) override;
+  virtual void OnKeyDown(KeyEvent *event) override;
 
   virtual void OnDraw(const Context *context) override;
 

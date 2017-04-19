@@ -262,7 +262,7 @@ void AbstractShellView::OnMouseButton(MouseEvent *event) {
   // override in sub class
 }
 
-void AbstractShellView::OnKeyboardKey(KeyEvent *event) {
+void AbstractShellView::OnKeyDown(KeyEvent *event) {
   // override in sub class
 }
 

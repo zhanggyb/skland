@@ -110,7 +110,7 @@ void AbstractLayout::OnMouseButton(MouseEvent *event) {
   event->Ignore();
 }
 
-void AbstractLayout::OnKeyboardKey(KeyEvent *event) {
+void AbstractLayout::OnKeyDown(KeyEvent *event) {
   event->Ignore();
 }
 

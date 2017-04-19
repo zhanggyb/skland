@@ -48,7 +48,6 @@ class Surface {
   friend class egl::Surface;
 
   Surface(const Surface &) = delete;
-
   Surface &operator=(const Surface &) = delete;
 
  public:

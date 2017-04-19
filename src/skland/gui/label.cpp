@@ -93,7 +93,7 @@ void Label::OnMouseButton(MouseEvent *event) {
   event->Ignore();
 }
 
-void Label::OnKeyboardKey(KeyEvent *event) {
+void Label::OnKeyDown(KeyEvent *event) {
   event->Ignore();
 }
 

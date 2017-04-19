@@ -277,7 +277,7 @@ void EGLWindow::OnMouseButton(MouseEvent *event) {
   DispatchMouseButtonEvent(event);
 }
 
-void EGLWindow::OnKeyboardKey(KeyEvent *event) {
+void EGLWindow::OnKeyDown(KeyEvent *event) {
 
 }
 

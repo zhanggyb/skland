@@ -174,7 +174,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnMouseButton(MouseEvent *event) override;
 
-  virtual void OnKeyboardKey(KeyEvent *event) override;
+  virtual void OnKeyDown(KeyEvent *event) override;
 
   virtual void OnUpdate(AbstractView *view) override;
 

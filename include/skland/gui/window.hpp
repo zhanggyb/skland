@@ -69,7 +69,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnMouseButton(MouseEvent *event) override;
 
-  virtual void OnKeyboardKey(KeyEvent *event) override;
+  virtual void OnKeyDown(KeyEvent *event) override;
 
   virtual void OnDraw(const Context *context) override;
 

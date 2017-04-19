@@ -167,7 +167,7 @@ void Canvas::Restore() {
 }
 
 int Canvas::GetSaveCount() const {
-  p_->sk_canvas.getSaveCount();
+  return p_->sk_canvas.getSaveCount();
 }
 
 void Canvas::RestoreToCount(int save_count) {

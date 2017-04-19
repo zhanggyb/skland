@@ -68,7 +68,7 @@ class MainWidget : public AbstractView {
     event->Ignore();
   }
 
-  virtual void OnKeyboardKey(KeyEvent *event) override {
+  virtual void OnKeyDown(KeyEvent *event) override {
     event->Ignore();
   }
 

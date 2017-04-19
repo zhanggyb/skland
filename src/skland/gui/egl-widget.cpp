@@ -107,7 +107,7 @@ void EGLWidget::OnMouseButton(MouseEvent *event) {
   event->Accept();
 }
 
-void EGLWidget::OnKeyboardKey(KeyEvent *event) {
+void EGLWidget::OnKeyDown(KeyEvent *event) {
   event->Accept();
 }
 

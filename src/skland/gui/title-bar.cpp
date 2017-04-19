@@ -333,7 +333,7 @@ void TitleBar::OnMouseButton(MouseEvent *event) {
   event->Accept();
 }
 
-void TitleBar::OnKeyboardKey(KeyEvent *event) {
+void TitleBar::OnKeyDown(KeyEvent *event) {
   event->Accept();
 }
 

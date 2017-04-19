@@ -55,7 +55,7 @@ class VideoView final : public AbstractView {
 
   virtual void OnMouseButton(MouseEvent *event);
 
-  virtual void OnKeyboardKey(KeyEvent *event);
+  virtual void OnKeyDown(KeyEvent *event);
 
   virtual void OnDraw(const Context *context);
 

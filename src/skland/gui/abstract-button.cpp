@@ -146,7 +146,7 @@ void AbstractButton::OnMouseMove(MouseEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnKeyboardKey(KeyEvent *event) {
+void AbstractButton::OnKeyDown(KeyEvent *event) {
   event->Accept();
 }
 
