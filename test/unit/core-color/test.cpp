@@ -63,7 +63,7 @@ TEST_F(Test, argb_1) {
   uint32_t argb = 0xFFEEDDCC;
   ColorD c(argb);
 
-  ASSERT_TRUE(argb = c.argb());
+  ASSERT_TRUE(argb == c.argb());
 }
 
 TEST_F(Test, operator_1) {
@@ -77,10 +77,21 @@ TEST_F(Test, operator_1) {
   ASSERT_TRUE(result);
 }
 
+TEST_F(Test, operator_2) {
+  uint32_t argb = 0xFF4E4E4E;
+  Color color;
+  color = argb;
+
+  ASSERT_TRUE(argb == color.argb());
+}
+
 TEST_F(Test, cast_1) {
   Color c(1.f, 1.f, 1.f, 1.f);
 
   SkColor4f* sk_color = reinterpret_cast<SkColor4f*>(&c);
 
-  ASSERT_TRUE(sk_color->fR == 1.f && sk_color->fG == 1.f && sk_color->fB == 1.f && sk_color->fA);
+  ASSERT_TRUE((sk_color->fR == 1.f) &&
+      (sk_color->fG == 1.f) &&
+      (sk_color->fB == 1.f) &&
+      (sk_color->fA == 1.f));
 }

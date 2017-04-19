@@ -73,19 +73,19 @@ class TitleBar::CloseButton : public TitleBar::Button {
 };
 
 void TitleBar::CloseButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->canvas();
-  canvas->Save();
-  canvas->ClipRect(GetGeometry());
-  canvas->Clear();
-
+  Canvas* canvas = context->canvas();
   const Rect &rect = GetGeometry();
+
+  Canvas::ClipGuard guard(canvas, rect);
+
+  canvas->Clear();
 
   Paint paint;
   paint.SetAntiAlias(true);
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetData().title_bar.foreground_highlight.color);
+      paint.SetColor(Theme::GetData().title_bar.highlight.foreground.color);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -93,12 +93,12 @@ void TitleBar::CloseButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+    paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 3.f, rect.center_y() - 3.f,
                    rect.center_x() + 3.f, rect.center_y() + 3.f,
@@ -106,8 +106,6 @@ void TitleBar::CloseButton::OnDraw(const Context *context) {
   canvas->DrawLine(rect.center_x() + 3.f, rect.center_y() - 3.f,
                    rect.center_x() - 3.f, rect.center_y() + 3.f,
                    paint);
-
-  canvas->Restore();
 }
 
 class TitleBar::MaximizeButton : public TitleBar::Button {
@@ -123,19 +121,19 @@ class TitleBar::MaximizeButton : public TitleBar::Button {
 };
 
 void TitleBar::MaximizeButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->canvas();
-  canvas->Save();
-  canvas->ClipRect(GetGeometry());
-  canvas->Clear();
-
+  Canvas* canvas = context->canvas();
   const Rect &rect = GetGeometry();
+
+  Canvas::ClipGuard guard(canvas, rect);
+
+  canvas->Clear();
 
   Paint paint;
   paint.SetAntiAlias(true);
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetData().title_bar.foreground_highlight.color);
+      paint.SetColor(Theme::GetData().title_bar.highlight.foreground.color);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -143,12 +141,12 @@ void TitleBar::MaximizeButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+    paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
@@ -156,8 +154,6 @@ void TitleBar::MaximizeButton::OnDraw(const Context *context) {
   canvas->DrawLine(rect.center_x(), rect.center_y() - 4.f,
                    rect.center_x(), rect.center_y() + 4.f,
                    paint);
-
-  canvas->Restore();
 }
 
 class TitleBar::MinimizeButton : public TitleBar::Button {
@@ -173,19 +169,19 @@ class TitleBar::MinimizeButton : public TitleBar::Button {
 };
 
 void TitleBar::MinimizeButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->canvas();
-  canvas->Save();
-  canvas->ClipRect(GetGeometry());
-  canvas->Clear();
-
+  Canvas* canvas = context->canvas();
   const Rect &rect = GetGeometry();
+
+  Canvas::ClipGuard guard(canvas, rect);
+
+  canvas->Clear();
 
   Paint paint;
   paint.SetAntiAlias(true);
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetData().title_bar.foreground_highlight.color);
+      paint.SetColor(Theme::GetData().title_bar.highlight.foreground.color);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -193,18 +189,16 @@ void TitleBar::MinimizeButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+    paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
                    paint);
-
-  canvas->Restore();
 }
 
 class TitleBar::FullscreenButton : public TitleBar::Button {
@@ -220,19 +214,19 @@ class TitleBar::FullscreenButton : public TitleBar::Button {
 };
 
 void TitleBar::FullscreenButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->canvas();
-  canvas->Save();
-  canvas->ClipRect(GetGeometry());
-  canvas->Clear();
-
+  Canvas* canvas = context->canvas();
   const Rect &rect = GetGeometry();
+
+  Canvas::ClipGuard guard(canvas, rect);
+
+  canvas->Clear();
 
   Paint paint;
   paint.SetAntiAlias(true);
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+      paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -240,12 +234,12 @@ void TitleBar::FullscreenButton::OnDraw(const Context *context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+    paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
   paint.SetStyle(Paint::Style::kStyleFill);
 
   Path path;
@@ -259,8 +253,6 @@ void TitleBar::FullscreenButton::OnDraw(const Context *context) {
   canvas->DrawPath(path, paint);
   canvas->Rotate(180.f);
   canvas->DrawPath(path, paint);
-
-  canvas->Restore();
 }
 
 TitleBar::TitleBar()
@@ -348,7 +340,7 @@ void TitleBar::OnKeyboardKey(KeyEvent *event) {
 void TitleBar::OnDraw(const Context *context) {
   Paint paint;
 
-  paint.SetColor(Theme::GetData().title_bar.foreground_active.color);
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
   paint.SetAntiAlias(true);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font_);

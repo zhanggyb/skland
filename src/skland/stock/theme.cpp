@@ -41,12 +41,12 @@ SkPixmap *Theme::kShadowPixmap = nullptr;
 
 Theme *Theme::kTheme = nullptr;
 
-Shader Theme::GradientShaderHelper::MakeLinear(const Point2F *points, const Schema::ShadedColor &color) {
-  return GradientShader::MakeLinear(points,
-                                    color.shaded_colors.data(),
-                                    color.shaded_positions.data(),
-                                    color.shaded_count,
-                                    Shader::TileMode::kTileModeClamp);
+Shader Theme::Helper::GradientShader::MakeLinear(const Point2F *points, const Schema::ShadedColor &color) {
+  return skland::GradientShader::MakeLinear(points,
+                                            color.shaded_colors.data(),
+                                            color.shaded_positions.data(),
+                                            color.shaded_count,
+                                            Shader::TileMode::kTileModeClamp);
 }
 
 void Theme::Initialize() {

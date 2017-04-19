@@ -99,6 +99,7 @@ void Label::OnKeyboardKey(KeyEvent *event) {
 
 void Label::OnDraw(const Context *context) {
   const Rect &rect = GetGeometry();
+  Canvas::ClipGuard guard(context->canvas(), rect);
 
   Paint paint;
   paint.SetColor(background_);

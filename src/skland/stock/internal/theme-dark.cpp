@@ -29,33 +29,51 @@ class ThemeDark : public Theme {
 
   ThemeDark()
       : Theme() {
-    data().window.background.color = 0xEF202020;
-    data().window.background_active.color = 0xEF202020;
-    data().window.foreground.color = 0xEF303030;
-    data().window.foreground_active.color = 0xEF404040;
+    data().window.inactive.outline.color = 0xEF494949;
+    data().window.inactive.background.color = 0xEF202020;
+    data().window.active.background.color = 0xEF202020;
+    data().window.inactive.foreground.color = 0xEF303030;
+    data().window.active.foreground.color = 0xEF404040;
 
-    data().title_bar.background.color = 0xEF202020;
+    data().title_bar.inactive.background.color = 0xEF202020;
 
-    data().title_bar.background_active.shaded = true;
-    data().title_bar.background_active.shaded_count = 2;
-    data().title_bar.background_active.shaded_colors.resize(2);
-    data().title_bar.background_active.shaded_colors[0] = 0xFF303030;
-    data().title_bar.background_active.shaded_colors[1] = 0xFF292929;
-    data().title_bar.background_active.shaded_positions.resize(2);
-    data().title_bar.background_active.shaded_positions[0] = 0.f;
-    data().title_bar.background_active.shaded_positions[1] = 1.f;
+    data().title_bar.active.background.shaded = true;
+    data().title_bar.active.background.shaded_count = 2;
+    data().title_bar.active.background.shaded_colors.resize(2);
+    data().title_bar.active.background.shaded_colors[0] = 0xFF303030;
+    data().title_bar.active.background.shaded_colors[1] = 0xFF292929;
+    data().title_bar.active.background.shaded_positions.resize(2);
+    data().title_bar.active.background.shaded_positions[0] = 0.f;
+    data().title_bar.active.background.shaded_positions[1] = 1.f;
 
-    data().title_bar.background_highlight.color = data().title_bar.background_active.color + 55;
-    data().title_bar.foreground.color = 0xFF999999;
-    data().title_bar.foreground_active.color = 0xFFA0A0A0;
-    data().title_bar.foreground_highlight.color = data().title_bar.foreground_active.color + 55;
+    data().title_bar.highlight.background.color = data().title_bar.active.background.color + 55;
+    data().title_bar.inactive.foreground.color = 0xFFAAAAAA;
+    data().title_bar.active.foreground.color = 0xFFBBBBBB;
+    data().title_bar.highlight.foreground.color = data().title_bar.active.foreground.color + 55;
 
-    data().button.background.color = 0xFF4E4E4E;
-    data().button.background_active.color = 0xFFB67E3E;
-    data().button.background_highlight.color = data().button.background_active.color + 25;
-    data().button.foreground.color = 0xFF444444;
-    data().button.foreground_active.color = 0xFFEEEEEE;
-    data().button.foreground_highlight.color = data().button.foreground_active.color + 25;
+    data().button.inactive.outline.color = 0x7F000000;
+    data().button.inactive.background.color = 0xFF4E4E4E;
+    data().button.inactive.background.shaded = true;
+    data().button.inactive.background.shaded_count = 2;
+    data().button.inactive.background.shaded_colors.resize(2);
+    data().button.inactive.background.shaded_colors[0] = 0xFF5E5E5E;
+    data().button.inactive.background.shaded_colors[1] = 0xFF3E3E3E;
+    data().button.inactive.background.shaded_positions.resize(2);
+    data().button.inactive.background.shaded_positions[0] = 0.f;
+    data().button.inactive.background.shaded_positions[1] = 1.f;
+    data().button.active.background.color = 0xFFB67E3E;
+    data().button.active.background.shaded = true;
+    data().button.active.background.shaded_count = 2;
+    data().button.active.background.shaded_colors.resize(2);
+    data().button.active.background.shaded_colors[0] = 0xFF8B5C2D;
+    data().button.active.background.shaded_colors[1] = 0xFFCD9866;
+    data().button.active.background.shaded_positions.resize(2);
+    data().button.active.background.shaded_positions[0] = 0.f;
+    data().button.active.background.shaded_positions[1] = 1.f;
+    data().button.highlight.background.color = data().button.inactive.background.color + 25;
+    data().button.inactive.foreground.color = 0xFF444444;
+    data().button.active.foreground.color = 0xFFEEEEEE;
+    data().button.highlight.foreground.color = data().button.active.foreground.color + 25;
   }
 
   ~ThemeDark() {}

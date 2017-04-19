@@ -447,7 +447,7 @@ void Window::OnKeyboardKey(KeyEvent *event) {
 }
 
 void Window::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->canvas();
+  Canvas* canvas = context->canvas();
   canvas->Clear();
 
   Path path;
@@ -463,6 +463,7 @@ void Window::OnDraw(const Context *context) {
   points[1].y = GetHeight();
 
   if (drop_shadow) {
+    geometry = geometry.Shrink(0.5f);
     float radii[] = {
         7.f, 7.f, // top-left
         7.f, 7.f, // top-right
@@ -470,10 +471,8 @@ void Window::OnDraw(const Context *context) {
         4.f, 4.f  // bottom-left
     };
     path.AddRoundRect(geometry, radii);
-    canvas->Save();
-    canvas->ClipPath(path, kClipDifference, true);
+    Canvas::ClipGuard guard(canvas, path, kClipDifference, true);
     DropShadow(context);
-    canvas->Restore();
   } else {
     path.AddRect(geometry);
   }
@@ -481,53 +480,58 @@ void Window::OnDraw(const Context *context) {
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  if (window_schema.background_active.shaded) {
+  if (window_schema.active.background.shaded) {
     shader = GradientShader::MakeLinear(points,
-                                        window_schema.background_active.shaded_colors.data(),
-                                        window_schema.background_active.shaded_positions.data(),
-                                        window_schema.background_active.shaded_count,
+                                        window_schema.active.background.shaded_colors.data(),
+                                        window_schema.active.background.shaded_positions.data(),
+                                        window_schema.active.background.shaded_count,
                                         Shader::TileMode::kTileModeClamp);
     paint.SetShader(shader);
   } else {
-    paint.SetColor(window_schema.background_active.color);
+    paint.SetColor(window_schema.active.background.color);
   }
   canvas->DrawPath(path, paint);
   paint.SetShader(Shader());  // Clear shader
 
-  // Draw the client area:
-  canvas->Save();
-  canvas->ClipPath(path, kClipIntersect, true);
+  // Draw outline
+  if (drop_shadow) {
+    paint.SetColor(window_schema.inactive.outline.color);
+    paint.SetStyle(Paint::Style::kStyleStroke);
+    canvas->DrawPath(path, paint);
+  }
 
+  // Draw the client area:
+  Canvas::ClipGuard guard(canvas, path, kClipIntersect, true);
+
+  paint.SetStyle(Paint::Style::kStyleFill);
   if (p_->title_bar) {
-    if (title_bar_schema.background_active.shaded) {
+    if (title_bar_schema.active.background.shaded) {
       points[1].y = TitleBar::kHeight;
       shader = GradientShader::MakeLinear(points,
-                                          title_bar_schema.background_active.shaded_colors.data(),
-                                          title_bar_schema.background_active.shaded_positions.data(),
-                                          title_bar_schema.background_active.shaded_count,
+                                          title_bar_schema.active.background.shaded_colors.data(),
+                                          title_bar_schema.active.background.shaded_positions.data(),
+                                          title_bar_schema.active.background.shaded_count,
                                           Shader::TileMode::kTileModeClamp);
       paint.SetShader(shader);
     } else {
-      paint.SetColor(title_bar_schema.background_active.color);
+      paint.SetColor(title_bar_schema.active.background.color);
     }
     canvas->DrawRect(p_->title_bar->GetGeometry(), paint);
     paint.SetShader(Shader());  // Clear shader
   }
 
-  if (window_schema.foreground_active.shaded) {
+  if (window_schema.active.foreground.shaded) {
     points[1].y = GetHeight();
     shader = GradientShader::MakeLinear(points,
-                                        window_schema.foreground_active.shaded_colors.data(),
-                                        window_schema.foreground_active.shaded_positions.data(),
-                                        window_schema.foreground_active.shaded_count,
+                                        window_schema.active.foreground.shaded_colors.data(),
+                                        window_schema.active.foreground.shaded_positions.data(),
+                                        window_schema.active.foreground.shaded_count,
                                         Shader::TileMode::kTileModeClamp);
   } else {
-    paint.SetColor(window_schema.foreground_active.color);
+    paint.SetColor(window_schema.active.foreground.color);
   }
   canvas->DrawRect(GetContentGeometry(), paint);
-  canvas->Restore();
-
-  canvas->Flush();
+//  canvas->Flush();
 }
 
 void Window::OnFocus(bool) {

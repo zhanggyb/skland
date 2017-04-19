@@ -58,7 +58,7 @@ struct AbstractButton::Private {
 };
 
 AbstractButton::AbstractButton()
-    : AbstractView(80, 20) {
+    : AbstractView(80, 24) {
   p_.reset(new Private);
 }
 
@@ -68,7 +68,7 @@ AbstractButton::AbstractButton(int width, int height)
 }
 
 AbstractButton::AbstractButton(const std::string &text)
-    : AbstractView(80, 20) {
+    : AbstractView(80, 24) {
   p_.reset(new Private);
   p_->text = text;
 }

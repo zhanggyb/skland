@@ -41,11 +41,17 @@ class Matrix;
  */
 class Canvas {
 
-  Canvas() = delete;
   Canvas(const Canvas &) = delete;
   Canvas &operator=(const Canvas &) = delete;
 
  public:
+
+  class ClipGuard;
+
+  /**
+   * @brief Create an empty canvas with no backing device/pixels, and zero dimentions
+   */
+  Canvas();
 
   Canvas(unsigned char *pixel, int width, int height,
          int format = kPixelFormatABGR8888);
@@ -104,6 +110,10 @@ class Canvas {
 
   void Restore();
 
+  int GetSaveCount() const;
+
+  void RestoreToCount(int save_count);
+
   void Flush();
 
   const Point2F &GetOrigin() const;
@@ -115,6 +125,48 @@ class Canvas {
   struct Private;
 
   std::unique_ptr<Private> p_;
+
+};
+
+class Canvas::ClipGuard {
+
+  ClipGuard() = delete;
+  ClipGuard(const ClipGuard &) = delete;
+  ClipGuard &operator=(const ClipGuard &) = delete;
+
+ public:
+
+  ClipGuard(Canvas *canvas, const Rect &rect, bool antialias = false)
+      : canvas_(canvas) {
+    canvas_->Save();
+    canvas_->ClipRect(rect, antialias);
+  }
+
+  ClipGuard(Canvas *canvas, const Rect &rect, ClipOperation op, bool antialias = false)
+      : canvas_(canvas) {
+    canvas_->Save();
+    canvas_->ClipRect(rect, op, antialias);
+  }
+
+  ClipGuard(Canvas *canvas, const Path &path, bool antialias = false)
+      : canvas_(canvas) {
+    canvas_->Save();
+    canvas_->ClipPath(path, antialias);
+  }
+
+  ClipGuard(Canvas *canvas, const Path &path, ClipOperation op, bool antialias = false)
+      : canvas_(canvas) {
+    canvas_->Save();
+    canvas_->ClipPath(path, op, antialias);
+  }
+
+  ~ClipGuard() {
+    canvas_->Restore();
+  }
+
+ private:
+
+  Canvas *canvas_;
 
 };
 

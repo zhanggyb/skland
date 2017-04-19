@@ -66,7 +66,7 @@ class Context {
 
   Surface *surface() const { return surface_; }
 
-  const std::shared_ptr<Canvas> &canvas() const { return canvas_; }
+  Canvas* canvas() const { return canvas_.get(); }
 
  private:
 

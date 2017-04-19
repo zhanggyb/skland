@@ -88,7 +88,7 @@ class ShmWidget : public AbstractView {
 
   void Animate() {
     static int padding = 0;
-    std::shared_ptr<Canvas> canvas = context_->canvas();
+    Canvas* canvas = context_->canvas();
 
     const Rect &rect = GetGeometry();
     float radius_ = clamp(std::min(rect.width(), rect.height()) / 2.f - 50.f,

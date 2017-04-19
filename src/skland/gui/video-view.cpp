@@ -71,7 +71,7 @@ void VideoView::OnKeyboardKey(KeyEvent *event) {
 }
 
 void VideoView::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->canvas();
+  Canvas* canvas = context->canvas();
   Paint paint;
   paint.SetColor(0xFF29FF29);
   canvas->DrawRect(GetGeometry(), paint);

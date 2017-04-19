@@ -39,6 +39,10 @@ struct Canvas::Private {
 
 };
 
+Canvas::Canvas() {
+  p_.reset(new Private);
+}
+
 Canvas::Canvas(unsigned char *pixel, int width, int height, int format) {
   size_t stride = (size_t) width * 4;
 
@@ -160,6 +164,14 @@ void Canvas::Save() {
 
 void Canvas::Restore() {
   p_->sk_canvas.restore();
+}
+
+int Canvas::GetSaveCount() const {
+  p_->sk_canvas.getSaveCount();
+}
+
+void Canvas::RestoreToCount(int save_count) {
+  p_->sk_canvas.restoreToCount(save_count);
 }
 
 void Canvas::Flush() {

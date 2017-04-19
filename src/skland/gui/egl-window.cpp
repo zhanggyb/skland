@@ -282,7 +282,7 @@ void EGLWindow::OnKeyboardKey(KeyEvent *event) {
 }
 
 void EGLWindow::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->canvas();
+  Canvas* canvas = context->canvas();
   canvas->Clear();
 
   Path path;

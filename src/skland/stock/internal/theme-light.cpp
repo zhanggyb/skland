@@ -29,49 +29,59 @@ class ThemeLight : public Theme {
 
   ThemeLight()
       : Theme() {
-    data().window.background.color = 0xEFF0F0F0;
-    data().window.background_active.color = 0xEFF0F0F0;
-    data().window.foreground.color = 0xEFE0E0E0;
-    data().window.foreground_active.color = 0xEFE7E7E7;
+    data().window.inactive.outline.color = 0xEF999999;
+    data().window.inactive.background.color = 0xEFF0F0F0;
+    data().window.active.background.color = 0xEFF0F0F0;
+    data().window.inactive.foreground.color = 0xEFE0E0E0;
+    data().window.active.foreground.color = 0xEFE7E7E7;
 
-    data().title_bar.background.color = 0xEFF0F0F0;
+    data().title_bar.inactive.background.color = 0xEFF0F0F0;
 
-    data().title_bar.background_active.shaded = true;
-    data().title_bar.background_active.shaded_count = 2;
-    data().title_bar.background_active.shaded_colors.resize(2);
-    data().title_bar.background_active.shaded_colors[0] = 0xFFDDDDDD;
-    data().title_bar.background_active.shaded_colors[1] = 0xFFCCCCCC;
-    data().title_bar.background_active.shaded_positions.resize(2);
-    data().title_bar.background_active.shaded_positions[0] = 0.f;
-    data().title_bar.background_active.shaded_positions[1] = 1.f;
+    data().title_bar.active.background.shaded = true;
+    data().title_bar.active.background.shaded_count = 2;
+    data().title_bar.active.background.shaded_colors.resize(2);
+    data().title_bar.active.background.shaded_colors[0] = 0xFFDDDDDD;
+    data().title_bar.active.background.shaded_colors[1] = 0xFFCCCCCC;
+    data().title_bar.active.background.shaded_positions.resize(2);
+    data().title_bar.active.background.shaded_positions[0] = 0.f;
+    data().title_bar.active.background.shaded_positions[1] = 1.f;
 
-    data().title_bar.background_highlight.color = data().title_bar.background_active.color + 55;
-    data().title_bar.foreground.color = 0xFF444444;
-    data().title_bar.foreground_active.color = 0xFF444444;
-    data().title_bar.foreground_highlight.color = data().title_bar.foreground_active.color + 55;
+    data().title_bar.highlight.background.color = data().title_bar.active.background.color + 55;
+    data().title_bar.inactive.foreground.color = 0xFF444444;
+    data().title_bar.active.foreground.color = 0xFF444444;
+    data().title_bar.highlight.foreground.color = data().title_bar.active.foreground.color + 55;
 
-    data().button.background.color = 0xFF4E4E4E;
-    data().button.background.shaded = true;
-    data().button.background.shaded_count = 2;
-    data().button.background.shaded_colors.resize(2);
-    data().button.background.shaded_colors[0] = 0xFF5E5E5E;
-    data().button.background.shaded_colors[1] = 0xFF3E3E3E;
-    data().button.background.shaded_positions.resize(2);
-    data().button.background.shaded_positions[0] = 0.f;
-    data().button.background.shaded_positions[1] = 1.f;
-    data().button.background_active.color = 0xFFB67E3E;
-    data().button.background_active.shaded = true;
-    data().button.background_active.shaded_count = 2;
-    data().button.background_active.shaded_colors.resize(2);
-    data().button.background_active.shaded_colors[0] = 0xFF8B5C2D;
-    data().button.background_active.shaded_colors[1] = 0xFFCD9866;
-    data().button.background_active.shaded_positions.resize(2);
-    data().button.background_active.shaded_positions[0] = 0.f;
-    data().button.background_active.shaded_positions[1] = 1.f;
-    data().button.background_highlight.color = data().button.background.color + 25;
-    data().button.foreground.color = 0xFF444444;
-    data().button.foreground_active.color = 0xFFEEEEEE;
-    data().button.foreground_highlight.color = data().button.foreground_active.color + 25;
+    data().button.inactive.outline.color = 0xEF999999;
+    data().button.inactive.background.color = 0xFFE0E0E0;
+    data().button.inactive.background.shaded = true;
+    data().button.inactive.background.shaded_count = 2;
+    data().button.inactive.background.shaded_colors.resize(2);
+    data().button.inactive.background.shaded_colors[0] = 0xFFDDDDDD;
+    data().button.inactive.background.shaded_colors[1] = 0xFFCCCCCC;
+    data().button.inactive.background.shaded_positions.resize(2);
+    data().button.inactive.background.shaded_positions[0] = 0.f;
+    data().button.inactive.background.shaded_positions[1] = 1.f;
+    data().button.inactive.foreground.color = 0xFF444444;
+    data().button.active.background.color = 0xFFB67E3E;
+    data().button.active.background.shaded = true;
+    data().button.active.background.shaded_count = 2;
+    data().button.active.background.shaded_colors.resize(2);
+    data().button.active.background.shaded_colors[0] = 0xFFAAAAAA;
+    data().button.active.background.shaded_colors[1] = 0xFFBBBBBB;
+    data().button.active.background.shaded_positions.resize(2);
+    data().button.active.background.shaded_positions[0] = 0.f;
+    data().button.active.background.shaded_positions[1] = 1.f;
+    data().button.active.foreground.color = 0xFFEEEEEE;
+    data().button.highlight.background.color = data().button.inactive.background.color + 25;
+    data().button.highlight.background.shaded = true;
+    data().button.highlight.background.shaded_count = 2;
+    data().button.highlight.background.shaded_colors.resize(2);
+    data().button.highlight.background.shaded_colors[0] = 0xFFE7E7E7;
+    data().button.highlight.background.shaded_colors[1] = 0xFFD5D5D5;
+    data().button.highlight.background.shaded_positions.resize(2);
+    data().button.highlight.background.shaded_positions[0] = 0.f;
+    data().button.highlight.background.shaded_positions[1] = 1.f;
+    data().button.highlight.foreground.color = data().button.active.foreground.color + 25;
   }
 
   ~ThemeLight() {}

@@ -38,12 +38,15 @@ PushButton::~PushButton() {
 }
 
 void PushButton::OnDraw(const Context *context) {
-  std::shared_ptr<Canvas> canvas = context->canvas();
+  Canvas* canvas = context->canvas();
+  Canvas::ClipGuard guard(canvas, GetGeometry());
+
+  canvas->Clear();
 
   Path path;
   const Rect &geometry = GetGeometry();
   Rect inner_rect = geometry.Shrink(0.5f);
-  const Theme::Schema &button_schema = Theme::GetData().button;
+  const Theme::Schema &schema = Theme::GetData().button;
   Shader shader;
   Point2F points[2];
   points[0].x = geometry.left;
@@ -64,26 +67,26 @@ void PushButton::OnDraw(const Context *context) {
   paint.SetAntiAlias(true);
   if (IsHovered()) {
     if (IsPressed()) {
-      if (button_schema.background_active.shaded) {
-        shader = Theme::GradientShaderHelper::MakeLinear(points, button_schema.background_active);
+      if (schema.active.background.shaded) {
+        shader = Theme::Helper::GradientShader::MakeLinear(points, schema.active.background);
         paint.SetShader(shader);
       } else {
-        paint.SetColor(Theme::GetData().button.background_active.color);
+        paint.SetColor(Theme::GetData().button.active.background.color);
       }
     } else {
-      if (button_schema.background_highlight.shaded) {
-        shader = Theme::GradientShaderHelper::MakeLinear(points, button_schema.background_highlight);
+      if (schema.highlight.background.shaded) {
+        shader = Theme::Helper::GradientShader::MakeLinear(points, schema.highlight.background);
         paint.SetShader(shader);
       } else {
-        paint.SetColor(Theme::GetData().button.background_highlight.color);
+        paint.SetColor(Theme::GetData().button.highlight.background.color);
       }
     }
   } else {
-    if (button_schema.background.shaded) {
-      shader = Theme::GradientShaderHelper::MakeLinear(points, button_schema.background);
+    if (schema.inactive.background.shaded) {
+      shader = Theme::Helper::GradientShader::MakeLinear(points, schema.inactive.background);
       paint.SetShader(shader);
     } else {
-      paint.SetColor(Theme::GetData().button.background.color);
+      paint.SetColor(Theme::GetData().button.inactive.background.color);
     }
   }
 
@@ -91,7 +94,7 @@ void PushButton::OnDraw(const Context *context) {
   paint.SetShader(Shader());
 
   paint.SetStyle(Paint::Style::kStyleStroke);
-  paint.SetColor(button_schema.outline.color);
+  paint.SetColor(schema.inactive.outline.color);
   path.Reset();
   path.AddRoundRect(inner_rect, radii);
   canvas->DrawPath(path, paint);
@@ -99,7 +102,7 @@ void PushButton::OnDraw(const Context *context) {
   const Font &font = GetFont();
   const std::string &text = GetText();
 
-  paint.SetColor(button_schema.foreground_active.color);
+  paint.SetColor(schema.inactive.foreground.color);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font);
   paint.SetTextSize(font.GetSize());

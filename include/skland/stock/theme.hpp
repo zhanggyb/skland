@@ -55,6 +55,23 @@ class Theme {
 
       ~ShadedColor() {}
 
+      ShadedColor(const ShadedColor &orig)
+          : color(orig.color),
+            shaded(orig.shaded),
+            shaded_count(orig.shaded_count),
+            shaded_colors(orig.shaded_colors),
+            shaded_positions(orig.shaded_positions) {
+      }
+
+      ShadedColor &operator=(const ShadedColor &other) {
+        color = other.color;
+        shaded = other.shaded;
+        shaded_count = other.shaded_count;
+        shaded_colors = other.shaded_colors;
+        shaded_positions = other.shaded_positions;
+        return *this;
+      }
+
       Color color;
       bool shaded;
       int shaded_count;
@@ -63,35 +80,49 @@ class Theme {
 
     };
 
+    struct ShadedColorGroup {
+
+      ShadedColorGroup() {}
+
+      ~ShadedColorGroup() {}
+
+      ShadedColorGroup(const ShadedColorGroup &orig)
+          : foreground(orig.foreground),
+            background(orig.background),
+            outline(orig.outline) {
+      }
+
+      ShadedColorGroup &operator=(const ShadedColorGroup &other) {
+        foreground = other.foreground;
+        background = other.background;
+        outline = other.outline;
+        return *this;
+      }
+
+      ShadedColor foreground;
+      ShadedColor background;
+      ShadedColor outline;
+
+    };
+
     Schema() {
-      background.color = 0xEFF0F0F0;
-      background_active.color = 0xEFF0F0F0;
-      background_highlight.color = background_active.color + 25;
-      foreground.color = 0xFF444444;
-      foreground_active.color = 0xFF999999;
-      foreground_highlight.color = foreground_active.color + 25;
+
+      active.foreground.color = 0xFF000000; // black
+      active.background.color = 0xFFFFFFFF; // white
+      active.outline.color = 0xFF000000;  // black
+
+      inactive = active;
+      highlight = highlight;
+
     }
 
     ~Schema() {}
 
     // TODO: use image
-    ShadedColor outline;
 
-    ShadedColor outline_active;
-
-    ShadedColor outline_highlight;
-
-    ShadedColor background;
-
-    ShadedColor background_active;
-
-    ShadedColor background_highlight;
-
-    ShadedColor foreground;
-
-    ShadedColor foreground_active;
-
-    ShadedColor foreground_highlight;
+    ShadedColorGroup active;
+    ShadedColorGroup inactive;
+    ShadedColorGroup highlight;
 
   };
 
@@ -107,11 +138,13 @@ class Theme {
 
   };
 
-  class GradientShaderHelper {
+  struct Helper {
 
-   public:
+    struct GradientShader {
 
-    static Shader MakeLinear(const Point2F points[2], const Schema::ShadedColor& color);
+      static Shader MakeLinear(const Point2F points[2], const Schema::ShadedColor &color);
+
+    };
 
   };
 
