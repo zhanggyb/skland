@@ -39,9 +39,13 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
  public:
 
-  Window(const char *title);
+  enum FlagMask {
+    kFlagMaskFrameless = 0x1 << 0
+  };
 
-  Window(int width, int height, const char *title);
+  Window(const char *title, int flags = 0);
+
+  Window(int width, int height, const char *title, int flags = 0);
 
   virtual ~Window();
 
@@ -81,13 +85,13 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnViewDetached(AbstractView *view) final;
 
- private:
-
-  struct Private;
-
   int GetMouseLocation(const MouseEvent *event) const;
 
   Rect GetContentGeometry() const;
+
+ private:
+
+  struct Private;
 
   std::unique_ptr<Private> p_;
 

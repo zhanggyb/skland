@@ -27,6 +27,36 @@
 
 using namespace skland;
 
+class FramelessWindow : public skland::Window {
+
+ public:
+
+  FramelessWindow(const char *title, int flags)
+      : FramelessWindow(400, 300, title, flags) {
+
+  }
+
+  FramelessWindow(int width, int height, const char *title, int flags)
+      : Window(width, height, title, flags) {}
+
+  virtual ~FramelessWindow() {}
+
+  virtual void OnMouseDown(MouseEvent *event) override {
+    if (event->GetButton() == MouseButton::kMouseButtonLeft) {
+      int location = GetMouseLocation(event);
+      if (location == kClientArea) {
+        MoveWithMouse(event);
+        return;
+      }
+      if (location < kResizeMask) {
+        ResizeWithMouse(event, (uint32_t) location);
+        return;
+      }
+    }
+  }
+
+};
+
 class MainWidget : public AbstractView {
 
  public:
@@ -82,7 +112,7 @@ class MainWidget : public AbstractView {
 
   virtual void OnDraw(const Context *context) override {
     Paint paint;
-    paint.SetColor(Color(0.855f, 0.855f, 0.165f, 1.f));
+    paint.SetColor(Color(0.855f, 0.855f, 0.165f, .9f));
 
     context->canvas()->DrawRect(GetGeometry(), paint);
   }
@@ -94,7 +124,7 @@ int main(int argc, char *argv[]) {
 
   Application app(argc, argv);
 
-  Window *win = new Window(400, 360, "Frameless Window");
+  FramelessWindow *win = new FramelessWindow("Frameless Window", Window::kFlagMaskFrameless);
   win->SetAppId("Frameless-Demo");
 
   MainWidget *widget = new MainWidget;

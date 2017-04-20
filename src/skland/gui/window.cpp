@@ -50,7 +50,8 @@ struct Window::Private {
   Private()
       : main_surface(nullptr),
         title_bar(nullptr),
-        content_view(nullptr) {}
+        content_view(nullptr),
+        flags(0) {}
 
   ~Private() {}
 
@@ -69,44 +70,48 @@ struct Window::Private {
   TitleBar *title_bar;
   AbstractView *content_view;
 
+  int flags;
 };
 
-Window::Window(const char *title)
-    : Window(640, 480, title) {
+Window::Window(const char *title, int flags)
+    : Window(640, 480, title, flags) {
 }
 
-Window::Window(int width, int height, const char *title)
+Window::Window(int width, int height, const char *title, int flags)
     : AbstractShellView(width, height, title, nullptr) {
   p_.reset(new Private);
+  p_->flags = flags;
 
   // Create a sub surface for views:
-  Surface *parent = GetShellSurface();
-  p_->main_surface = Surface::Sub::Create(parent, this, Theme::GetShadowMargin());
-  _ASSERT(p_->main_surface->parent() == parent);
-  _ASSERT(p_->main_surface->below() == parent);
-  wayland::Region empty_region;
-  empty_region.Setup(Display::Registry().wl_compositor());
-  p_->main_surface->SetInputRegion(empty_region);
+  if (!(flags & kFlagMaskFrameless)) {
+    Surface *parent = GetShellSurface();
+    p_->main_surface = Surface::Sub::Create(parent, this, Theme::GetShadowMargin());
+    _ASSERT(p_->main_surface->parent() == parent);
+    _ASSERT(p_->main_surface->below() == parent);
+    wayland::Region empty_region;
+    empty_region.Setup(Display::Registry().wl_compositor());
+    p_->main_surface->SetInputRegion(empty_region);
 
-  // Create the default title bar:
-  TitleBar *titlebar = new TitleBar;
-  p_->title_bar = titlebar;
-  AttachView(p_->title_bar);
+    // Create the default title bar:
+    TitleBar *titlebar = new TitleBar;
+    p_->title_bar = titlebar;
+    AttachView(p_->title_bar);
 
-  titlebar->SetTitle(title);
-  titlebar->Resize(GetWidth(), TitleBar::kHeight);
+    titlebar->SetTitle(title);
+    titlebar->Resize(GetWidth(), TitleBar::kHeight);
 
-  AbstractButton *button = titlebar->GetButton(TitleBar::kButtonClose);
-  button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Close));
+    AbstractButton *button = titlebar->GetButton(TitleBar::kButtonClose);
+    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Close));
 
-  button = titlebar->GetButton(TitleBar::kButtonMaximize);
-  button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::ToggleMaximize));
+    button = titlebar->GetButton(TitleBar::kButtonMaximize);
+    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::ToggleMaximize));
 
-  button = titlebar->GetButton(TitleBar::kButtonMinimize);
-  button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Minimize));
+    button = titlebar->GetButton(TitleBar::kButtonMinimize);
+    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Minimize));
 
-  button = titlebar->GetButton(TitleBar::kButtonFullscreen);
-  button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::ToggleFullscreen));
+    button = titlebar->GetButton(TitleBar::kButtonFullscreen);
+    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::ToggleFullscreen));
+  }
 }
 
 Window::~Window() {
@@ -450,7 +455,9 @@ void Window::OnKeyDown(KeyEvent *event) {
 }
 
 void Window::OnDraw(const Context *context) {
-  Canvas* canvas = context->canvas();
+  if (p_->flags & kFlagMaskFrameless) return;
+
+  Canvas *canvas = context->canvas();
   canvas->Clear();
 
   Path path;
