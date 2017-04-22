@@ -15,6 +15,7 @@
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
 # core module
+add_subdirectory(core-delegate)
 add_subdirectory(core-margin)
 add_subdirectory(core-rect)
 add_subdirectory(core-color)

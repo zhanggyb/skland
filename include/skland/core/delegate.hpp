@@ -219,8 +219,7 @@ class Delegate<ReturnType(ParamTypes...)> {
    * @return True if pointer to a method is set, false otherwise
    */
   operator bool() const {
-    // Support method delegate only, no need to check other members:
-    return data_.method_pointer != nullptr;
+    return (nullptr != data_.object_pointer) && (nullptr != data_.method_stub) && (nullptr != data_.method_pointer);
   }
 
   /**
@@ -322,9 +321,11 @@ inline bool operator>(const Delegate<ReturnType(ParamTypes...)> &src,
  */
 template<typename ReturnType, typename ... ParamTypes>
 class DelegateRef<ReturnType(ParamTypes...)> {
- public:
 
   DelegateRef() = delete;
+  DelegateRef &operator=(const DelegateRef &) = delete;
+
+ public:
 
   DelegateRef(Delegate<ReturnType(ParamTypes...)> &delegate)
       : delegate_(&delegate) {}
@@ -334,8 +335,8 @@ class DelegateRef<ReturnType(ParamTypes...)> {
 
   ~DelegateRef() {}
 
-  DelegateRef &operator=(const DelegateRef &orig) {
-    delegate_ = orig.delegate_;
+  DelegateRef &operator=(Delegate<ReturnType(ParamTypes...)> &delegate) {
+    delegate_ = &delegate;
     return *this;
   }
 
@@ -354,12 +355,12 @@ class DelegateRef<ReturnType(ParamTypes...)> {
   }
 
   template<typename T>
-  bool IsAssignedTo(T *obj, ReturnType (T::*method)(ParamTypes...)) {
+  bool IsAssignedTo(T *obj, ReturnType (T::*method)(ParamTypes...)) const {
     return delegate_->Equal(obj, method);
   }
 
   template<typename T>
-  bool IsAssignedTo(T *obj, ReturnType (T::*method)(ParamTypes...) const) {
+  bool IsAssignedTo(T *obj, ReturnType (T::*method)(ParamTypes...) const) const {
     return delegate_->Equal(obj, method);
   }
 
@@ -371,6 +372,6 @@ class DelegateRef<ReturnType(ParamTypes...)> {
   Delegate<ReturnType(ParamTypes...)> *delegate_;
 };
 
-} // namespace sigcxx
+} // namespace skland
 
 #endif  // SKLAND_CORE_DELEGATE_HPP_

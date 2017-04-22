@@ -975,6 +975,7 @@ template<typename ... ParamTypes>
 class SignalRef {
 
   SignalRef() = delete;
+  SignalRef &operator=(const SignalRef &) = delete;
 
  public:
 
@@ -987,11 +988,6 @@ class SignalRef {
   }
 
   ~SignalRef() {}
-
-  SignalRef &operator=(const SignalRef &other) {
-    signal_ = other.signal_;
-    return *this;
-  }
 
   template<typename T>
   void Connect(T *obj, void (T::*method)(ParamTypes..., SLOT), int index = -1) {

@@ -132,10 +132,19 @@ class Surface {
 
   static const struct wl_surface_listener kListener;
 
-  struct wl_surface *wl_surface_;
+  const int a1_ = 0;
+  const int b1_ = 0;
+  const int c1_ = 0;
+  const int d1_ = 0;
 
   Delegate<void(struct wl_output *)> enter_;
   Delegate<void(struct wl_output *)> leave_;
+  struct wl_surface *wl_surface_;
+
+  const int a2_ = 0;
+  const int b2_ = 0;
+  const int c2_ = 0;
+  const int d2_ = 0;
 
 };
 

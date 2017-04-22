@@ -549,6 +549,7 @@ Point Surface::GetWindowPosition() const {
 }
 
 void Surface::OnEnter(struct wl_output *wl_output) {
+  fprintf(stderr, "enter\n");
   if (!is_user_data_set_) {
     wl_surface_.SetUserData(this);
     is_user_data_set_ = true;
@@ -559,6 +560,7 @@ void Surface::OnEnter(struct wl_output *wl_output) {
 }
 
 void Surface::OnLeave(struct wl_output *wl_output) {
+  fprintf(stderr, "leave\n");
   Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
   event_handler_->OnEnterOutput(output);
 }

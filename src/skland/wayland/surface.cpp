@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "skland/wayland/surface.hpp"
+#include <skland/wayland/surface.hpp>
 
 namespace skland {
 namespace wayland {
@@ -25,12 +25,12 @@ const struct wl_surface_listener Surface::kListener = {
 };
 
 void Surface::OnEnter(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
-  Surface *_this = static_cast<Surface *>(data);
+  const Surface *_this = static_cast<const Surface *>(data);
   if (_this->enter_) _this->enter_(wl_output);
 }
 
 void Surface::OnLeave(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
-  Surface *_this = static_cast<Surface *>(data);
+  const Surface *_this = static_cast<const Surface *>(data);
   if (_this->leave_) _this->leave_(wl_output);
 }
 
