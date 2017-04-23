@@ -31,7 +31,7 @@ namespace wayland {
 class Output;
 }
 
-class Output: public Deque::Element {
+class Output : public Deque::Element {
 
   Output() = delete;
   Output(const Output &) = delete;

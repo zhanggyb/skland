@@ -6,8 +6,6 @@
 
 #include <skland/core/delegate.hpp>
 
-#include "SkColor.h"
-
 using namespace skland;
 
 class Mockup {
@@ -16,7 +14,7 @@ class Mockup {
 
   Mockup() : count_(0) {}
 
-  ~Mockup() {}
+  virtual ~Mockup() {}
 
   int Foo(int param) {
     count_ = param;
@@ -27,12 +25,29 @@ class Mockup {
     return count_;
   }
 
+  virtual int VirtualFoo(int param) const {
+    return param + count_;
+  }
+
   int count() const { return count_; }
 
  private:
 
   int count_;
 
+};
+
+class MockupSub : public Mockup {
+
+ public:
+
+  MockupSub() : Mockup() {}
+
+  virtual ~MockupSub() {}
+
+  virtual int VirtualFoo(int param) const override {
+    return param - count();
+  }
 };
 
 Test::Test()
@@ -65,6 +80,21 @@ TEST_F(Test, constructor4) {
   Mockup obj;
   Delegate<int(int)> d = Delegate<int(int)>::FromMethod(&obj, &Mockup::ConstFoo);
   ASSERT_TRUE(0 == d(1));
+}
+
+/*
+ * Delegate to virtual
+ */
+TEST_F(Test, constructor5) {
+  Mockup* obj = new MockupSub;
+  Delegate<int(int)> d = Delegate<int(int)>::FromMethod(obj, &Mockup::VirtualFoo);
+  obj->Foo(1);  // count_ == 1
+
+  int result = d(2);
+
+  delete obj;
+
+  ASSERT_TRUE(result == 1);
 }
 
 /*
@@ -122,3 +152,4 @@ TEST_F(Test, delegate_ref_1) {
 
   ASSERT_TRUE((!r1) && (!r2));
 }
+
