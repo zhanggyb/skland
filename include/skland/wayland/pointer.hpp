@@ -39,9 +39,7 @@ class Pointer {
 
   void Setup(const Seat &seat) {
     Destroy();
-
     wl_pointer_ = wl_seat_get_pointer(seat.wl_seat_);
-    wl_pointer_add_listener(wl_pointer_, &kListener, this);
   }
 
   void Destroy() {
@@ -49,6 +47,10 @@ class Pointer {
       wl_pointer_destroy(wl_pointer_);
       wl_pointer_ = nullptr;
     }
+  }
+
+  void AddListener(const struct wl_pointer_listener *listener, void *user_data) {
+    wl_pointer_add_listener(wl_pointer_, listener, user_data);
   }
 
   void SetCursor(uint32_t serial, const Surface &surface, int32_t hotspot_x, int32_t hotspot_y) const {
@@ -71,125 +73,10 @@ class Pointer {
     return nullptr != wl_pointer_;
   }
 
-  DelegateRef<void(uint32_t, struct wl_surface *,
-                   wl_fixed_t, wl_fixed_t)> enter() {
-    return enter_;
-  }
-
-  DelegateRef<void(uint32_t, struct wl_surface *)> leave() {
-    return leave_;
-  }
-
-  DelegateRef<void(uint32_t, wl_fixed_t, wl_fixed_t)> motion() {
-    return motion_;
-  }
-
-  DelegateRef<void(uint32_t, uint32_t, uint32_t, uint32_t)> button() {
-    return button_;
-  }
-
-  DelegateRef<void(uint32_t, uint32_t, wl_fixed_t)> axis() {
-    return axis_;
-  }
-
-  DelegateRef<void()> frame() {
-    return frame_;
-  }
-
-  DelegateRef<void(uint32_t)> axis_source() {
-    return axis_source_;
-  }
-
-  DelegateRef<void(uint32_t, uint32_t)> axis_stop() {
-    return axis_stop_;
-  }
-
-  DelegateRef<void(uint32_t, int32_t)> axis_discrete() {
-    return axis_discrete_;
-  }
-
  private:
-
-  static void OnEnter(void *data,
-                      struct wl_pointer *wl_pointer,
-                      uint32_t serial,
-                      struct wl_surface *wl_surface,
-                      wl_fixed_t surface_x,
-                      wl_fixed_t surface_y);
-
-  static void OnLeave(void *data,
-                      struct wl_pointer *wl_pointer,
-                      uint32_t serial,
-                      struct wl_surface *wl_surface);
-
-  static void OnMotion(void *data,
-                       struct wl_pointer *wl_pointer,
-                       uint32_t time,
-                       wl_fixed_t surface_x,
-                       wl_fixed_t surface_y);
-
-  static void OnButton(void *data,
-                       struct wl_pointer *wl_pointer,
-                       uint32_t serial,
-                       uint32_t time,
-                       uint32_t button,
-                       uint32_t state);
-
-  static void OnAxis(void *data,
-                     struct wl_pointer *wl_pointer,
-                     uint32_t time,
-                     uint32_t axis,
-                     wl_fixed_t value);
-
-  static void OnFrame(void *data,
-                      struct wl_pointer *wl_pointer);
-
-  static void OnAxisSource(void *data,
-                           struct wl_pointer *wl_pointer,
-                           uint32_t axis_source);
-
-  static void OnAxisStop(void *data,
-                         struct wl_pointer *wl_pointer,
-                         uint32_t time,
-                         uint32_t axis);
-
-  static void OnAxisDiscrete(void *data,
-                             struct wl_pointer *wl_pointer,
-                             uint32_t axis,
-                             int32_t discrete);
-
-  static const struct wl_pointer_listener kListener;
 
   struct wl_pointer *wl_pointer_;
 
-  Delegate<void(uint32_t,
-                struct wl_surface *,
-                wl_fixed_t,
-                wl_fixed_t)> enter_;
-
-  Delegate<void(uint32_t,
-                struct wl_surface *)> leave_;
-
-  Delegate<void(uint32_t,
-                wl_fixed_t,
-                wl_fixed_t)> motion_;
-
-  Delegate<void(uint32_t,
-                uint32_t,
-                uint32_t,
-                uint32_t)> button_;
-
-  Delegate<void(uint32_t,
-                uint32_t,
-                wl_fixed_t)> axis_;
-
-  Delegate<void()> frame_;
-
-  Delegate<void(uint32_t)> axis_source_;
-
-  Delegate<void(uint32_t, uint32_t)> axis_stop_;
-
-  Delegate<void(uint32_t, int32_t)> axis_discrete_;
 };
 
 }

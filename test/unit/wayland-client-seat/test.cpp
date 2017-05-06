@@ -54,8 +54,9 @@ void Case1::Run() {
 //  registry_.global_remove().Set(this, &Case1::OnGlobalRemove);
   registry_.Setup(display_);
 
-  seat_.capabilities().Set(this, &Case1::OnCapabilities);
-  seat_.name().Set(this, &Case1::OnName);
+  // TODO: use wl_seat_listener
+//  seat_.capabilities().Set(this, &Case1::OnCapabilities);
+//  seat_.name().Set(this, &Case1::OnName);
 
   display_.Roundtrip();
   display_.Roundtrip();  // twice
