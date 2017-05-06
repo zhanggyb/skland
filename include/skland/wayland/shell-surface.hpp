@@ -36,9 +36,7 @@ class ShellSurface {
 
   void Setup(const Shell &shell, const Surface &surface) {
     Destroy();
-
     wl_shell_surface_ = wl_shell_get_shell_surface(shell.wl_shell_, surface.wl_surface_);
-    wl_shell_surface_add_listener(wl_shell_surface_, &kListener, this);
   }
 
   void Destroy() {
@@ -46,6 +44,10 @@ class ShellSurface {
       wl_shell_surface_destroy(wl_shell_surface_);
       wl_shell_surface_ = nullptr;
     }
+  }
+
+  void AddListener(const struct wl_shell_surface_listener *listener, void *user_data) {
+    wl_shell_surface_add_listener(wl_shell_surface_, listener, user_data);
   }
 
   void SetUserData(void *user_data) {
@@ -64,40 +66,10 @@ class ShellSurface {
     return nullptr != wl_shell_surface_;
   }
 
-  DelegateRef<void(uint32_t)> ping() {
-    return ping_;
-  }
-
-  DelegateRef<void(uint32_t, int, int)> configure() {
-    return configure_;
-  }
-
-  DelegateRef<void()> done() {
-    return done_;
-  }
-
  private:
-
-  static void OnPing(void *data,
-                     struct wl_shell_surface *wl_shell_surface,
-                     uint32_t serial);
-
-  static void OnConfigure(void *data,
-                          struct wl_shell_surface *wl_shell_surface,
-                          uint32_t edges,
-                          int32_t width,
-                          int32_t height);
-
-  static void OnPopupDone(void *data,
-                          struct wl_shell_surface *wl_shell_surface);
-
-  static const struct wl_shell_surface_listener kListener;
 
   struct wl_shell_surface *wl_shell_surface_;
 
-  Delegate<void(uint32_t)> ping_;
-  Delegate<void(uint32_t, int, int)> configure_;
-  Delegate<void()> done_;
 };
 
 }

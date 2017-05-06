@@ -19,6 +19,8 @@
 
 #include "../core/export.hpp"
 
+#include <cstdint>
+
 namespace skland {
 
 SKLAND_EXPORT class Task {
@@ -59,6 +61,21 @@ SKLAND_EXPORT class Task {
 
   Task *previous_;
   Task *next_;
+
+};
+
+class AbstractEpollTask: public Task {
+
+ public:
+
+  AbstractEpollTask()
+      : Task() {
+
+  }
+
+  virtual ~AbstractEpollTask() {}
+
+  virtual void Run(uint32_t events) = 0;
 
 };
 

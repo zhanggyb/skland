@@ -18,6 +18,7 @@
 #define SKLAND_GUI_CONTEXT_HPP_
 
 #include "surface.hpp"
+#include "callback.hpp"
 
 namespace skland {
 
@@ -48,8 +49,8 @@ class Context {
     return *this;
   }
 
-  void SetupCallback(wayland::Callback &callback) const {
-    surface_->SetupCallback(callback);
+  void SetupCallback(Callback &callback) const {
+    callback.Setup(*surface_);
   }
 
   const Margin &margin() const {

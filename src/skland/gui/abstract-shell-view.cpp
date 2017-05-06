@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "internal/abstract-shell-view-private.hpp"
+#include "internal/abstract-shell-view_private.hpp"
 
 #include <skland/core/assert.hpp>
 
@@ -26,9 +26,9 @@
 
 #include <skland/stock/theme.hpp>
 
-#include "internal/abstract-view-private.hpp"
-#include "internal/display-registry.hpp"
-#include "internal/abstract-event-handler-mouse-task-iterator.hpp"
+#include "internal/abstract-view_private.hpp"
+#include "internal/display_registry.hpp"
+#include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include "SkCanvas.h"
 
@@ -55,10 +55,7 @@ AbstractShellView::AbstractShellView(int width,
 
   if (nullptr == p_->parent) {
     p_->shell_surface = Surface::Shell::Toplevel::Create(this, Theme::GetShadowMargin());
-    Surface::Shell::Get(p_->shell_surface)->configure().Set(this, &AbstractShellView::OnXdgSurfaceConfigure);
     Surface::Shell::Toplevel *top_level_role = Surface::Shell::Toplevel::Get(p_->shell_surface);
-    top_level_role->configure().Set(this, &AbstractShellView::OnXdgToplevelConfigure);
-    top_level_role->close().Set(this, &AbstractShellView::OnXdgToplevelClose);
     top_level_role->SetTitle(title);
   } else {
     // TODO: create popup shell surface
@@ -364,12 +361,10 @@ void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {
 }
 
 void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states) {
-  using wayland::XdgToplevel;
-
-  bool maximized = (0 != (states & XdgToplevel::kStateMaskMaximized));
-  bool fullscreen = (0 != (states & XdgToplevel::kStateMaskFullscreen));
-  bool resizing = (0 != (states & XdgToplevel::kStateMaskResizing));
-  bool focus = (0 != (states & XdgToplevel::kStateMaskActivated));
+  bool maximized = (0 != (states & Surface::Shell::Toplevel::kStateMaskMaximized));
+  bool fullscreen = (0 != (states & Surface::Shell::Toplevel::kStateMaskFullscreen));
+  bool resizing = (0 != (states & Surface::Shell::Toplevel::kStateMaskResizing));
+  bool focus = (0 != (states & Surface::Shell::Toplevel::kStateMaskActivated));
 
   bool do_resize = true;
 

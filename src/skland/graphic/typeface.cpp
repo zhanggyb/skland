@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "internal/typeface-private.hpp"
+#include "internal/typeface_private.hpp"
 
 namespace skland {
 

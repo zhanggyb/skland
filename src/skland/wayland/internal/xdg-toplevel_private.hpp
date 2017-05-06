@@ -14,31 +14,33 @@
  * limitations under the License.
  */
 
-#include <stdexcept>
-#include "keyboard-state.hpp"
-#include "keymap.hpp"
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_
+
+#include <skland/wayland/xdg-toplevel.hpp>
+
+#include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
+namespace wayland {
 
-KeyboardState::~KeyboardState() {
-  if (xkb_state_) xkb_state_unref(xkb_state_);
-}
+struct XdgToplevel::Private {
 
-void KeyboardState::Setup(const Keymap &keymap) {
-  Destroy();
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
 
-  xkb_state_ = xkb_state_new(keymap.xkb_keymap_);
-  if (nullptr == xkb_state_) {
-    xkb_keymap_unref(keymap.xkb_keymap_);
-    throw std::runtime_error("FATAL! Cannot create keyboard state!");
+  Private()
+      : zxdg_toplevel(nullptr) {}
+
+  ~Private() {
+    if (zxdg_toplevel) zxdg_toplevel_v6_destroy(zxdg_toplevel);
   }
-}
 
-void KeyboardState::Destroy() {
-  if (xkb_state_) {
-    xkb_state_unref(xkb_state_);
-    xkb_state_ = nullptr;
-  }
-}
+  struct zxdg_toplevel_v6 *zxdg_toplevel;
+
+};
 
 }
+}
+
+#endif // SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_

@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-#include "xdg-surface-private.hpp"
+#include "abstract-shell-view_redraw-task.hpp"
+
+#include "abstract-shell-view_private.hpp"
 
 namespace skland {
-namespace wayland {
 
-const struct zxdg_surface_v6_listener XdgSurface::Private::kListener = {
-    OnConfigure
-};
+void AbstractShellView::RedrawTask::Run() const {
+  shell_view->OnDraw(&context);
 
-void XdgSurface::Private::OnConfigure(void *data,
-                                      struct zxdg_surface_v6 * /* zxdg_surface_v6 */,
-                                      uint32_t serial) {
-  XdgSurface *_this = static_cast<XdgSurface *>(data);
-  if (_this->configure_)
-    _this->configure_(serial);
+  if (shell_view->p_->is_damaged) {
+    context.surface()->Damage(shell_view->p_->damaged_region.x(),
+                              shell_view->p_->damaged_region.y(),
+                              shell_view->p_->damaged_region.width(),
+                              shell_view->p_->damaged_region.height());
+    shell_view->p_->is_damaged = false;
+  }
 }
 
-}
 }

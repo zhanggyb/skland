@@ -16,7 +16,7 @@
 
 #include "keymap.hpp"
 
-#include "display-registry.hpp"
+#include "display_registry.hpp"
 
 namespace skland {
 

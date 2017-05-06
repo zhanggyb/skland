@@ -17,7 +17,9 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_
 
-#include "abstract-shell-view-redraw-task.hpp"
+#include "abstract-shell-view_redraw-task.hpp"
+
+#include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 
@@ -118,6 +120,7 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
   RectI damaged_region;
 
   const Output *output;
+
 };
 
 } // namespace skland

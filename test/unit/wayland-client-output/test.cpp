@@ -65,14 +65,16 @@ class Case1 {
 void Case1::Run() {
   display_.Connect(NULL);
 
-  registry_.global().Set(this, &Case1::OnGlobal);
-  registry_.global_remove().Set(this, &Case1::OnGlobalRemove);
+  // TODO: user wl_registry_listener
+//  registry_.global().Set(this, &Case1::OnGlobal);
+//  registry_.global_remove().Set(this, &Case1::OnGlobalRemove);
   registry_.Setup(display_);
 
-  output_.geometry().Set(this, &Case1::OnGeometry);
-  output_.mode().Set(this, &Case1::OnMode);
-  output_.done().Set(this, &Case1::OnDone);
-  output_.scale().Set(this, &Case1::OnScale);
+  // TODO: use listener and static methods
+//  output_.geometry().Set(this, &Case1::OnGeometry);
+//  output_.mode().Set(this, &Case1::OnMode);
+//  output_.done().Set(this, &Case1::OnDone);
+//  output_.scale().Set(this, &Case1::OnScale);
 
   display_.Dispatch();
   display_.Roundtrip();
@@ -129,10 +131,12 @@ class Wrapper {
  public:
 
   Wrapper(const Registry &registry, uint32_t id, uint32_t version) {
-    output_.geometry().Set(this, &Wrapper::OnGeometry);
-    output_.mode().Set(this, &Wrapper::OnMode);
-    output_.done().Set(this, &Wrapper::OnDone);
-    output_.scale().Set(this, &Wrapper::OnScale);
+
+    // TODO: use listener and static methods
+//    output_.geometry().Set(this, &Wrapper::OnGeometry);
+//    output_.mode().Set(this, &Wrapper::OnMode);
+//    output_.done().Set(this, &Wrapper::OnDone);
+//    output_.scale().Set(this, &Wrapper::OnScale);
     output_.Setup(registry, id, version);
     output_.SetUserData(this);  // this line sometimes does not work, move into OnDone()
   }
@@ -207,8 +211,9 @@ class Case2 {
 void Case2::Run() {
   display_.Connect(NULL);
 
-  registry_.global().Set(this, &Case2::OnGlobal);
-  registry_.global_remove().Set(this, &Case2::OnGlobalRemove);
+  // TODO: use wl_registry_listener
+//  registry_.global().Set(this, &Case2::OnGlobal);
+//  registry_.global_remove().Set(this, &Case2::OnGlobalRemove);
   registry_.Setup(display_);
 
   display_.Dispatch();

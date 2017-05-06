@@ -18,7 +18,7 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
-#include "internal/matrix-private.hpp"
+#include "internal/matrix_private.hpp"
 
 #include "SkBitmap.h"
 #include "SkCanvas.h"

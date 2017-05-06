@@ -18,7 +18,7 @@
 #include <skland/gui/anchor-group.hpp>
 #include <skland/core/assert.hpp>
 
-#include "internal/abstract-view-iterators.hpp"
+#include "internal/abstract-view_iterators.hpp"
 
 namespace skland {
 

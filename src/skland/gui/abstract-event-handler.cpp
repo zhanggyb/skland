@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "internal/abstract-view-private.hpp"
-#include "internal/abstract-event-handler-private.hpp"
+#include "internal/abstract-view_private.hpp"
+#include "internal/abstract-event-handler_private.hpp"
 
 namespace skland {
 

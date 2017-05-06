@@ -19,7 +19,7 @@
 
 #include "abstract-view.hpp"
 
-#include "../wayland/callback.hpp"
+#include "callback.hpp"
 #include "surface.hpp"
 
 namespace skland {
@@ -87,7 +87,7 @@ class EGLWidget : public AbstractView {
 
   Surface::EGL *egl_surface_;
 
-  wayland::Callback frame_callback_;
+  Callback frame_callback_;
 
   bool animating_;
 

@@ -19,8 +19,8 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
-#include "internal/abstract-shell-view-redraw-task.hpp"
-#include "internal/abstract-view-iterators.hpp"
+#include "internal/abstract-shell-view_redraw-task.hpp"
+#include "internal/abstract-view_iterators.hpp"
 
 #include <GLES2/gl2.h>
 
@@ -122,7 +122,7 @@ void EGLWidget::OnKeyUp(KeyEvent *event) {
 void EGLWidget::OnDraw(const Context *context) {
   if (!animating_) {
     animating_ = true;
-    egl_surface_->surface()->SetupCallback(frame_callback_);
+    frame_callback_.Setup(*egl_surface_->surface());
     OnInitialize();
     egl_surface_->surface()->Commit();
   }
@@ -161,7 +161,7 @@ void EGLWidget::SwapBuffers() {
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-  egl_surface_->surface()->SetupCallback(frame_callback_);
+  frame_callback_.Setup(*egl_surface_->surface());
   OnRender();
   egl_surface_->surface()->Commit();
 }

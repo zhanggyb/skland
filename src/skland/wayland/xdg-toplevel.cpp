@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#include "internal/xdg-toplevel-private.hpp"
+#include "internal/xdg-toplevel_private.hpp"
 
 #include <skland/wayland/seat.hpp>
 #include <skland/wayland/output.hpp>
 
-#include "internal/xdg-surface-private.hpp"
+#include "internal/xdg-surface_private.hpp"
 
 namespace skland {
 namespace wayland {
@@ -35,7 +35,6 @@ void XdgToplevel::Setup(const XdgSurface &xdg_surface) {
   Destroy();
 
   p_->zxdg_toplevel = zxdg_surface_v6_get_toplevel(xdg_surface.p_->zxdg_surface);
-  zxdg_toplevel_v6_add_listener(p_->zxdg_toplevel, &XdgToplevel::Private::kListener, this);
 }
 
 void XdgToplevel::Destroy() {
@@ -43,6 +42,10 @@ void XdgToplevel::Destroy() {
     zxdg_toplevel_v6_destroy(p_->zxdg_toplevel);
     p_->zxdg_toplevel = nullptr;
   }
+}
+
+void XdgToplevel::AddListener(const struct zxdg_toplevel_v6_listener *listener, void *user_data) {
+  zxdg_toplevel_v6_add_listener(p_->zxdg_toplevel, listener, user_data);
 }
 
 void XdgToplevel::SetParent(const XdgToplevel &parent) const {

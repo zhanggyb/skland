@@ -53,6 +53,10 @@ struct Buffer::Private {
 
 };
 
+const struct wl_buffer_listener Buffer::kListener = {
+    OnRelease
+};
+
 Buffer::Buffer() {
   p_.reset(new Private);
 }
@@ -76,6 +80,7 @@ void Buffer::Setup(const SharedMemoryPool &pool,
 
   p_->wl_buffer.Setup(pool.wl_shm_pool(), offset, width,
                       height, stride, format);
+  p_->wl_buffer.AddListener(&kListener, this);
   p_->size.width = width;
   p_->size.height = height;
   p_->stride = stride;
@@ -125,8 +130,9 @@ const Size &Buffer::GetSize() const {
   return p_->size;
 }
 
-DelegateRef<void()> Buffer::release() {
-  return p_->wl_buffer.release();
+void Buffer::OnRelease(void *data, struct wl_buffer */*buffer*/) {
+  Buffer *_this = static_cast<Buffer *>(data);
+  if (_this->release_) _this->release_();
 }
 
 }

@@ -19,7 +19,7 @@
 
 #include <skland/wayland/output.hpp>
 
-#include "internal/display-registry.hpp"
+#include "internal/display_registry.hpp"
 
 namespace skland {
 
@@ -66,18 +66,71 @@ struct Output::Private {
   uint32_t version;
 };
 
+const struct wl_output_listener Output::kListener = {
+    OnGeometry,
+    OnMode,
+    OnDone,
+    OnScale
+};
+
+void Output::OnGeometry(void *data,
+                        struct wl_output * /* wl_output */,
+                        int32_t x,
+                        int32_t y,
+                        int32_t physical_width,
+                        int32_t physical_height,
+                        int32_t subpixel,
+                        const char *make,
+                        const char *model,
+                        int32_t transform) {
+  Output *_this = static_cast<Output *>(data);
+
+  _this->p_->position_.x = x;
+  _this->p_->position_.y = y;
+  _this->p_->physical_size_.width = physical_width;
+  _this->p_->physical_size_.height = physical_height;
+  _this->p_->subpixel = subpixel;
+  _this->p_->make_ = make;
+  _this->p_->model_ = model;
+  _this->p_->transform = transform;
+}
+
+void Output::OnMode(void *data,
+                    struct wl_output * /* wl_output */,
+                    uint32_t flags,
+                    int32_t width,
+                    int32_t height,
+                    int32_t refresh) {
+  Output *_this = static_cast<Output *>(data);
+
+  if (flags & WL_OUTPUT_MODE_CURRENT) {
+    _this->p_->current_mode_size_.width = width;
+    _this->p_->current_mode_size_.height = height;
+    _this->p_->current_refresh_rate = refresh;
+  } else if (flags & WL_OUTPUT_MODE_PREFERRED) {
+    _this->p_->preferred_mode_size_.width = width;
+    _this->p_->preferred_mode_size_.height = height;
+    _this->p_->preferred_refresh_rate = refresh;
+  }
+}
+
+void Output::OnDone(void *data, struct wl_output * /* wl_output */) {
+//  Output *_this = static_cast<Output *>(data);
+}
+
+void Output::OnScale(void *data, struct wl_output * /* wl_output */, int32_t factor) {
+  Output *_this = static_cast<Output *>(data);
+  _this->p_->scale = factor;
+}
+
 Output::Output(uint32_t id, uint32_t version)
     : Deque::Element() {
   p_.reset(new Private);
   p_->id = id;
   p_->version = version;
 
-  p_->wl_output.geometry().Set(this, &Output::OnGeometry);
-  p_->wl_output.mode().Set(this, &Output::OnMode);
-  p_->wl_output.done().Set(this, &Output::OnDone);
-  p_->wl_output.scale().Set(this, &Output::OnScale);
-
   p_->wl_output.Setup(Display::Registry().wl_registry(), p_->id, p_->version);
+  p_->wl_output.AddListener(&kListener, this);
 }
 
 Output::~Output() {
@@ -103,47 +156,6 @@ uint32_t Output::GetID() const {
 
 uint32_t Output::GetVersion() const {
   return p_->version;
-}
-
-void Output::OnGeometry(int32_t x,
-                        int32_t y,
-                        int32_t physical_width,
-                        int32_t physical_height,
-                        int32_t subpixel,
-                        const char *make,
-                        const char *model,
-                        int32_t transform) {
-  p_->position_.x = x;
-  p_->position_.y = y;
-  p_->physical_size_.width = physical_width;
-  p_->physical_size_.height = physical_height;
-  p_->subpixel = subpixel;
-  p_->make_ = make;
-  p_->model_ = model;
-  p_->transform = transform;
-}
-
-void Output::OnMode(uint32_t flags,
-                    int32_t width,
-                    int32_t height,
-                    int32_t refresh) {
-  if (flags & WL_OUTPUT_MODE_CURRENT) {
-    p_->current_mode_size_.width = width;
-    p_->current_mode_size_.height = height;
-    p_->current_refresh_rate = refresh;
-  } else if (flags & WL_OUTPUT_MODE_PREFERRED) {
-    p_->preferred_mode_size_.width = width;
-    p_->preferred_mode_size_.height = height;
-    p_->preferred_refresh_rate = refresh;
-  }
-}
-
-void Output::OnDone() {
-  p_->wl_output.SetUserData(this);
-}
-
-void Output::OnScale(int32_t factor) {
-  p_->scale = factor;
 }
 
 }

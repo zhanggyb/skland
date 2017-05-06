@@ -33,7 +33,7 @@
 #include <skland/core/assert.hpp>
 #endif
 
-#include "internal/display-registry.hpp"
+#include "internal/display_registry.hpp"
 
 namespace skland {
 

@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-#include <skland/wayland/callback.hpp>
+#include "surface_shell_private.hpp"
+
+#include <skland/gui/abstract-shell-view.hpp>
 
 namespace skland {
-namespace wayland {
 
-const struct wl_callback_listener Callback::kListener = {
-    OnDone
+const struct zxdg_surface_v6_listener Surface::Shell::Private::kListener = {
+    OnConfigure
 };
 
-void Callback::OnDone(void *data, struct wl_callback *wl_callback, uint32_t callback_data) {
-  Callback *_this = static_cast<Callback *>(data);
-  if (_this->done_) _this->done_(callback_data);
+void Surface::Shell::Private::OnConfigure(void *data,
+                                          struct zxdg_surface_v6 *zxdg_surface_v6,
+                                          uint32_t serial) {
+  Shell *_this = static_cast<Shell *>(data);
+  AbstractShellView *shell_view = dynamic_cast<AbstractShellView *>(_this->surface_->event_handler_);
+  if (shell_view)
+    shell_view->OnXdgSurfaceConfigure(serial);
 }
 
-}
 }

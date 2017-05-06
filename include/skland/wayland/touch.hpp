@@ -39,9 +39,7 @@ class Touch {
 
   void Setup(const Seat &seat) {
     Destroy();
-
     wl_touch_ = wl_seat_get_touch(seat.wl_seat_);
-    wl_touch_add_listener(wl_touch_, &kListener, this);
   }
 
   void Destroy() {
@@ -49,6 +47,10 @@ class Touch {
       wl_touch_destroy(wl_touch_);
       wl_touch_ = nullptr;
     }
+  }
+
+  void AddListener(const struct wl_touch_listener *listener, void *user_data) {
+    wl_touch_add_listener(wl_touch_, listener, user_data);
   }
 
   void SetUserData(void *user_data) {

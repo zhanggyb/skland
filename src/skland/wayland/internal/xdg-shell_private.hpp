@@ -14,39 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_SHELL_PRIVATE_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_SHELL_PRIVATE_HPP_
 
-#include <skland/wayland/xdg-surface.hpp>
+#include <skland/wayland/xdg-shell.hpp>
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-struct XdgSurface::Private {
+struct XdgShell::Private {
 
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
   Private()
-      : zxdg_surface(nullptr) {}
+      : zxdg_shell(nullptr) {}
 
   ~Private() {
-    if (zxdg_surface) zxdg_surface_v6_destroy(zxdg_surface);
+    if (zxdg_shell) zxdg_shell_v6_destroy(zxdg_shell);
   }
 
-  struct zxdg_surface_v6 *zxdg_surface;
-
-  static const struct zxdg_surface_v6_listener kListener;
-
-  static void OnConfigure(void *data,
-                          struct zxdg_surface_v6 *zxdg_surface_v6,
-                          uint32_t serial);
+  struct zxdg_shell_v6 *zxdg_shell;
 
 };
 
 }
 }
 
-#endif // SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
+#endif // SKLAND_WAYLAND_INTERNAL_XDG_SHELL_PRIVATE_HPP_

@@ -24,7 +24,6 @@
 #include "../wayland/surface.hpp"
 #include "../wayland/region.hpp"
 #include "../wayland/subsurface.hpp"
-#include "../wayland/callback.hpp"
 #include "../wayland/xdg-surface.hpp"
 #include "../wayland/xdg-toplevel.hpp"
 #include "../wayland/xdg-popup.hpp"
@@ -82,6 +81,7 @@ class Surface {
 
   friend class Application;
   friend class Display;
+  friend class Callback;
 
   Surface() = delete;
   Surface(const Surface &) = delete;
@@ -115,6 +115,25 @@ class Surface {
 
      public:
 
+      enum StatesMask {
+        /**
+         * the surface is maximized
+         */
+            kStateMaskMaximized = 0x1, /* 1 */
+        /**
+         * the surface is fullscreen
+         */
+            kStateMaskFullscreen = 0x1 << 1,  /* 2 */
+        /**
+         * the surface is being resized
+         */
+            kStateMaskResizing = 0x1 << 2, /* 4 */
+        /**
+         * the surface is now activated
+         */
+            kStateMaskActivated = 0x1 << 3, /* 8 */
+      };
+
       /**
        * @brief Create a toplevel shell surface
        */
@@ -141,11 +160,9 @@ class Surface {
 
       void SetMinimized() const;
 
-      DelegateRef<void(int, int, int)> configure() { return xdg_toplevel_.configure(); }
-
-      DelegateRef<void()> close() { return xdg_toplevel_.close(); }
-
      private:
+
+      struct Private;
 
       Toplevel(Shell *shell_surface);
 
@@ -199,9 +216,9 @@ class Surface {
 
     Surface *surface() const { return surface_; }
 
-    DelegateRef<void(uint32_t)> configure() { return xdg_surface_.configure(); }
-
    private:
+
+    struct Private;
 
     static Surface *Create(AbstractEventHandler *event_handler,
                            const Margin &margin = Margin());
@@ -225,6 +242,7 @@ class Surface {
       Toplevel *toplevel;
       Popup *popup;
     } role_;
+
   };
 
   /**
@@ -375,10 +393,6 @@ class Surface {
     wl_surface_.SetOpaqueRegion(region);
   }
 
-  void SetupCallback(wayland::Callback &callback) {
-    callback.Setup(wl_surface_);
-  }
-
   Surface *GetShellSurface();
 
   /**
@@ -428,10 +442,6 @@ class Surface {
   struct CommitTask;
 
   Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
-
-  void OnEnter(struct wl_output *wl_output);
-
-  void OnLeave(struct wl_output *wl_output);
 
   CommitMode mode_;
 
@@ -520,6 +530,14 @@ class Surface {
    * @brief The count of shell surface
    */
   static int kShellSurfaceCount;
+
+  static void OnEnter(void *data, struct wl_surface *wl_surface,
+                      struct wl_output *wl_output);
+
+  static void OnLeave(void *data, struct wl_surface *wl_surface,
+                      struct wl_output *wl_output);
+
+  static const struct wl_surface_listener kListener;
 
   static Task kCommitTaskHead;
   static Task kCommitTaskTail;

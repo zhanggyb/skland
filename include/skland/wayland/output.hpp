@@ -45,9 +45,11 @@ class Output {
 
   void Setup(const Registry &registry, uint32_t id, uint32_t version) {
     Destroy();
-
     wl_output_ = static_cast<struct wl_output *>(registry.Bind(id, &wl_output_interface, version));
-    wl_output_add_listener(wl_output_, &kListener, this);
+  }
+
+  void AddListener(const struct wl_output_listener* listener, void *user_data) {
+    wl_output_add_listener(wl_output_, listener, user_data);
   }
 
   void Destroy() {
@@ -83,62 +85,9 @@ class Output {
     return wl_output_ == object;
   }
 
-  DelegateRef<void(int32_t, int32_t, int32_t, int32_t, int32_t,
-                   const char *, const char *, int32_t)> geometry() {
-    return geometry_;
-  }
-
-  DelegateRef<void(uint32_t, int32_t, int32_t, int32_t)> mode() {
-    return mode_;
-  }
-
-  DelegateRef<void()> done() {
-    return done_;
-  }
-
-  DelegateRef<void(int32_t)> scale() {
-    return scale_;
-  }
-
  private:
 
-  static void OnGeometry(void *data,
-                         struct wl_output *wl_output,
-                         int32_t x,
-                         int32_t y,
-                         int32_t physical_width,
-                         int32_t physical_height,
-                         int32_t subpixel,
-                         const char *make,
-                         const char *model,
-                         int32_t transform);
-
-  static void OnMode(void *data,
-                     struct wl_output *wl_output,
-                     uint32_t flags,
-                     int32_t width,
-                     int32_t height,
-                     int32_t refresh);
-
-  static void OnDone(void *data,
-                     struct wl_output *wl_output);
-
-  static void OnScale(void *data,
-                      struct wl_output *wl_output,
-                      int32_t factor);
-
-  static const struct wl_output_listener kListener;
-
   struct wl_output *wl_output_;
-
-  Delegate<void(int32_t, int32_t, int32_t, int32_t, int32_t,
-                const char *, const char *, int32_t)> geometry_;
-
-  Delegate<void(uint32_t, int32_t, int32_t, int32_t)> mode_;
-
-  Delegate<void()> done_;
-
-  Delegate<void(int32_t)> scale_;
 
 };
 

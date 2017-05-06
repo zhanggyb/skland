@@ -20,8 +20,8 @@
 #include "SkPaint.h"
 #include "SkTypeface.h"
 
-#include "internal/font-private.hpp"
-#include "internal/shader-private.hpp"
+#include "internal/font_private.hpp"
+#include "internal/shader_private.hpp"
 
 namespace skland {
 

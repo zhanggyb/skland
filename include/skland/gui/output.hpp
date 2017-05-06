@@ -22,6 +22,8 @@
 #include "../core/sigcxx.hpp"
 #include "../core/deque.hpp"
 
+#include <wayland-client.h>
+
 #include <string>
 #include <memory>
 
@@ -61,28 +63,36 @@ class Output : public Deque::Element {
 
   struct Private;
 
-  void OnGeometry(int32_t x,
-                  int32_t y,
-                  int32_t physical_width,
-                  int32_t physical_height,
-                  int32_t subpixel,
-                  const char *make,
-                  const char *model,
-                  int32_t transform);
-
-  void OnMode(uint32_t flags,
-              int32_t width,
-              int32_t height,
-              int32_t refresh);
-
-  void OnDone();
-
-  void OnScale(int32_t factor);
-
   std::unique_ptr<Private> p_;
 
   Signal<Output *> destroyed_;
-  // TODO: user data
+
+  static void OnGeometry(void *data,
+                         struct wl_output *wl_output,
+                         int32_t x,
+                         int32_t y,
+                         int32_t physical_width,
+                         int32_t physical_height,
+                         int32_t subpixel,
+                         const char *make,
+                         const char *model,
+                         int32_t transform);
+
+  static void OnMode(void *data,
+                     struct wl_output *wl_output,
+                     uint32_t flags,
+                     int32_t width,
+                     int32_t height,
+                     int32_t refresh);
+
+  static void OnDone(void *data,
+                     struct wl_output *wl_output);
+
+  static void OnScale(void *data,
+                      struct wl_output *wl_output,
+                      int32_t factor);
+
+  static const struct wl_output_listener kListener;
 };
 
 }

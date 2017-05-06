@@ -14,39 +14,47 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_XDG_POPUP_HPP_
-#define SKLAND_WAYLAND_XDG_POPUP_HPP_
+#ifndef SKLAND_CALLBACK_HPP
+#define SKLAND_CALLBACK_HPP
 
-#include "xdg-surface.hpp"
-#include "xdg-positioner.hpp"
+#include "../core/delegate.hpp"
 
-// Forward declaration
-struct zxdg_popup_v6_listener;
+#include <memory>
 
 namespace skland {
-namespace wayland {
 
-class XdgPopup {
+class Display;
+class Surface;
+
+/**
+ * @ingroup gui
+ * @brief Callback class in gui module
+ */
+class Callback {
+
+  Callback(const Callback &) = delete;
+  Callback &operator=(const Callback &) = delete;
 
  public:
 
-  XdgPopup();
+  Callback();
 
-  ~XdgPopup();
+  Callback(const Display &display);
 
-  void Setup(const XdgSurface &xdg_surface, const XdgSurface &parent, const XdgPositioner &positioner);
+  Callback(const Surface &surface);
 
-  void Destroy();
+  ~Callback();
 
-  void AddListener(const struct zxdg_popup_v6_listener *listener, void *user_data);
+  void Setup(const Display &display);
 
-  void SetUserData(void *user_data);
+  void Setup(const Surface &surface);
 
-  void *GetUserData() const;
-
-  uint32_t GetVersion() const;
-
-  bool IsValid() const;
+  /**
+   * @brief A delegate to the 'done' event
+   */
+  DelegateRef<void(uint32_t)> done() {
+    return done_;
+  }
 
  private:
 
@@ -54,9 +62,10 @@ class XdgPopup {
 
   std::unique_ptr<Private> p_;
 
+  Delegate<void(uint32_t)> done_;
+
 };
 
 }
-}
 
-#endif // SKLAND_WAYLAND_XDG_POPUP_HPP_
+#endif //SKLAND_CALLBACK_HPP

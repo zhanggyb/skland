@@ -19,8 +19,6 @@
 
 #include "shm-pool.hpp"
 
-#include <skland/core/delegate.hpp>
-
 namespace skland {
 namespace wayland {
 
@@ -49,9 +47,11 @@ class Buffer {
              int32_t stride,
              uint32_t format) {
     Destroy();
-
     wl_buffer_ = wl_shm_pool_create_buffer(shm_pool.wl_shm_pool_, offset, width, height, stride, format);
-    wl_buffer_add_listener(wl_buffer_, &kListener, this);
+  }
+
+  void AddListener(const struct wl_buffer_listener *listener, void *user_data) {
+    wl_buffer_add_listener(wl_buffer_, listener, user_data);
   }
 
   void Destroy() {
@@ -81,19 +81,9 @@ class Buffer {
     return wl_buffer_ == object;
   }
 
-  DelegateRef<void()> release() {
-    return release_;
-  }
-
  private:
 
-  static void OnRelease(void *data, struct wl_buffer *buffer);
-
-  static const struct wl_buffer_listener kListener;
-
   struct wl_buffer *wl_buffer_;
-
-  Delegate<void()> release_;
 
 };
 

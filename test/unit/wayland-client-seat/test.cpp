@@ -49,12 +49,14 @@ class Case1 {
 void Case1::Run() {
   display_.Connect(NULL);
 
-  registry_.global().Set(this, &Case1::OnGlobal);
-  registry_.global_remove().Set(this, &Case1::OnGlobalRemove);
+  // TODO: user wl_registry_listener
+//  registry_.global().Set(this, &Case1::OnGlobal);
+//  registry_.global_remove().Set(this, &Case1::OnGlobalRemove);
   registry_.Setup(display_);
 
-  seat_.capabilities().Set(this, &Case1::OnCapabilities);
-  seat_.name().Set(this, &Case1::OnName);
+  // TODO: use wl_seat_listener
+//  seat_.capabilities().Set(this, &Case1::OnCapabilities);
+//  seat_.name().Set(this, &Case1::OnName);
 
   display_.Roundtrip();
   display_.Roundtrip();  // twice

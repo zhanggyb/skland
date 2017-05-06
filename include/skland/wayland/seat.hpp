@@ -50,9 +50,7 @@ class Seat {
 
   void Setup(const Registry &registry, uint32_t id, uint32_t version) {
     Destroy();
-
     wl_seat_ = static_cast<struct wl_seat *>(registry.Bind(id, &wl_seat_interface, version));
-    wl_seat_add_listener(wl_seat_, &kListener, this);
   }
 
   void Destroy() {
@@ -60,6 +58,10 @@ class Seat {
       wl_seat_destroy(wl_seat_);
       wl_seat_ = nullptr;
     }
+  }
+
+  void AddListener(const struct wl_seat_listener *listener, void *user_data) {
+    wl_seat_add_listener(wl_seat_, listener, user_data);
   }
 
   void SetUserData(void *user_data) {
@@ -82,26 +84,10 @@ class Seat {
     return wl_seat_ == object;
   }
 
-  DelegateRef<void(uint32_t)> capabilities() {
-    return capabilities_;
-  }
-
-  DelegateRef<void(const char *)> name() {
-    return name_;
-  }
-
  private:
-
-  static void OnCapabilities(void *data, struct wl_seat *wl_seat, uint32_t capabilities);
-
-  static void OnName(void *data, struct wl_seat *wl_seat, const char *name);
-
-  static const struct wl_seat_listener kListener;
 
   struct wl_seat *wl_seat_;
 
-  Delegate<void(uint32_t)> capabilities_;
-  Delegate<void(const char *)> name_;
 };
 
 }

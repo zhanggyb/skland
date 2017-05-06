@@ -32,7 +32,7 @@
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/surface.hpp>
 
-#include "internal/display-private.hpp"
+#include "internal/display_private.hpp"
 
 /**
  * Compile-time computation of number of items in a hardcoded array.
@@ -52,10 +52,15 @@ namespace skland {
 Application *Application::kInstance = nullptr;
 
 Application::Application(int argc, char *argv[])
-    : running_(false), epoll_fd_(0) {
+    : running_(false) {
 
   if (kInstance != nullptr)
     throw std::runtime_error("Error! There should be only one application instance!");
+
+  // Set log handler to a lambda function
+  wl_log_set_handler_client([](const char *format, va_list args) {
+    vfprintf(stderr, format, args);
+  });
 
   Display::kDisplay = new Display;
 
@@ -69,22 +74,12 @@ Application::Application(int argc, char *argv[])
   // Load theme
   Theme::Initialize();
 
-  epoll_fd_ = CreateEpollFd();
-  WatchEpollFd(epoll_fd_, Display::kDisplay->display_fd_,
-               EPOLLIN | EPOLLERR | EPOLLHUP, NULL);
-
-  // Set log handler to a lambda function
-  wl_log_set_handler_client([](const char *format, va_list args) {
-    vfprintf(stderr, format, args);
-  });
-
   kInstance = this;
 
   Timer::SaveProgramTime();
 }
 
 Application::~Application() {
-  close(epoll_fd_);
   Display::kDisplay->Disconnect();
 
   Theme::Release();
@@ -128,16 +123,18 @@ int Application::Run() {
     if (ret < 0 && errno == EAGAIN) {
       _DEBUG("%s\n", "Error when flush display");
       ep[0].events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
-      ep[0].data.ptr = NULL;
-      epoll_ctl(kInstance->epoll_fd_, EPOLL_CTL_MOD,
+      ep[0].data.ptr = Display::kDisplay->epoll_task_;
+      epoll_ctl(Display::kDisplay->epoll_fd_, EPOLL_CTL_MOD,
                 Display::kDisplay->display_fd_, &ep[0]);
     } else if (ret < 0) {
       break;
     }
 
-    count = epoll_wait(kInstance->epoll_fd_, ep, kMaxEpollEvents, -1);
+    Display::EpollTask* epoll_task = nullptr;
+    count = epoll_wait(Display::kDisplay->epoll_fd_, ep, kMaxEpollEvents, -1);
     for (int i = 0; i < count; i++) {
-      HandleEpollEvents(ep[i].events);
+      epoll_task = static_cast<Display::EpollTask*>(ep[i].data.ptr);
+      epoll_task->Run(ep[i].events);
     }
   }
 
@@ -148,82 +145,6 @@ void Application::Exit() {
   kInstance->running_ = false;
 
   // TODO: check if need to clean other resources
-}
-
-int Application::CreateEpollFd() {
-  int fd = 0;
-
-#ifdef EPOLL_CLOEXEC
-  fd = epoll_create1(EPOLL_CLOEXEC);
-  if (fd >= 0)
-    return fd;
-  if (errno != EINVAL)
-    return -1;
-#endif
-
-  fd = epoll_create(1);
-  return SetCloexecOrClose(fd);
-}
-
-int Application::SetCloexecOrClose(int fd) {
-  if (SetCloexec(fd) != 0) {
-    close(fd);
-    return -1;
-  }
-  return fd;
-}
-
-int Application::SetCloexec(int fd) {
-  long flags;
-
-  if (fd == -1)
-    return -1;
-
-  flags = fcntl(fd, F_GETFD);
-  if (flags == -1)
-    return -1;
-
-  if (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1)
-    return -1;
-
-  return 0;
-}
-
-void Application::WatchEpollFd(int epoll_fd, int fd, uint32_t events, void *data) {
-  struct epoll_event ep;
-  ep.events = events;
-  ep.data.ptr = data;
-  epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ep);
-}
-
-void Application::UnwatchEpollFd(int epoll_fd, int fd) {
-  epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
-}
-
-void Application::HandleEpollEvents(uint32_t events) {
-  if (events & EPOLLERR || events & EPOLLHUP) {
-    Exit();
-    return;
-  }
-  if (events & EPOLLIN) {
-    if (Display::kDisplay->p_->wl_display.Dispatch() == -1) {
-      Exit();
-      return;
-    }
-  }
-  if (events & EPOLLOUT) {
-    struct epoll_event ep;
-    int ret = Display::kDisplay->p_->wl_display.Flush();
-    if (ret == 0) {
-      ep.events = EPOLLIN | EPOLLERR | EPOLLHUP;
-      ep.data.ptr = NULL;
-      epoll_ctl(kInstance->epoll_fd_, EPOLL_CTL_MOD,
-                Display::kDisplay->display_fd_, &ep);
-    } else if (ret == -1 && errno != EAGAIN) {
-      Exit();
-      return;
-    }
-  }
 }
 
 void Application::HandleSignalInt(int) {

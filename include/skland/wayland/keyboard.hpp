@@ -18,7 +18,6 @@
 #define SKLAND_WAYLAND_KEYBOARD_HPP_
 
 #include "seat.hpp"
-#include <skland/core/delegate.hpp>
 
 namespace skland {
 namespace wayland {
@@ -39,9 +38,7 @@ class Keyboard {
 
   void Setup(const Seat &seat) {
     Destroy();
-
     wl_keyboard_ = wl_seat_get_keyboard(seat.wl_seat_);
-    wl_keyboard_add_listener(wl_keyboard_, &kListener, this);
   }
 
   void Destroy() {
@@ -49,6 +46,10 @@ class Keyboard {
       wl_keyboard_destroy(wl_keyboard_);
       wl_keyboard_ = nullptr;
     }
+  }
+
+  void AddListener(const struct wl_keyboard_listener *listener, void *user_data) {
+    wl_keyboard_add_listener(wl_keyboard_, listener, user_data);
   }
 
   void SetUserData(void *user_data) {
@@ -67,84 +68,9 @@ class Keyboard {
     return nullptr != wl_keyboard_;
   }
 
-  DelegateRef<void(uint32_t, int32_t, uint32_t)> keymap() {
-    return keymap_;
-  }
-
-  DelegateRef<void(uint32_t, struct wl_surface *, struct wl_array *)> enter() {
-    return enter_;
-  }
-
-  DelegateRef<void(uint32_t, struct wl_surface *)> leave() {
-    return leave_;
-  }
-
-  DelegateRef<void(uint32_t, uint32_t, uint32_t, uint32_t)> key() {
-    return key_;
-  }
-
-  DelegateRef<void(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t)> modifiers() {
-    return modifiers_;
-  }
-
-  DelegateRef<void(int32_t, int32_t)> repeat_info() {
-    return repeat_info_;
-  }
-
  private:
 
-  static void OnKeymap(void *data,
-                       struct wl_keyboard *wl_keyboard,
-                       uint32_t format,
-                       int32_t fd,
-                       uint32_t size);
-
-  static void OnEnter(void *data,
-                      struct wl_keyboard *wl_keyboard,
-                      uint32_t serial,
-                      struct wl_surface *wl_surface,
-                      struct wl_array *keys);
-
-  static void OnLeave(void *data,
-                      struct wl_keyboard *wl_keyboard,
-                      uint32_t serial,
-                      struct wl_surface *wl_surface);
-
-  static void OnKey(void *data,
-                    struct wl_keyboard *wl_keyboard,
-                    uint32_t serial,
-                    uint32_t time,
-                    uint32_t key,
-                    uint32_t state);
-
-  static void OnModifiers(void *data,
-                          struct wl_keyboard *wl_keyboard,
-                          uint32_t serial,
-                          uint32_t mods_depressed,
-                          uint32_t mods_latched,
-                          uint32_t mods_locked,
-                          uint32_t group);
-
-  static void OnRepeatInfo(void *data,
-                           struct wl_keyboard *wl_keyboard,
-                           int32_t rate,
-                           int32_t delay);
-
-  static const struct wl_keyboard_listener kListener;
-
   struct wl_keyboard *wl_keyboard_;
-
-  Delegate<void(uint32_t, int32_t, uint32_t)> keymap_;
-
-  Delegate<void(uint32_t, struct wl_surface *, struct wl_array *)> enter_;
-
-  Delegate<void(uint32_t, struct wl_surface *)> leave_;
-
-  Delegate<void(uint32_t, uint32_t, uint32_t, uint32_t)> key_;
-
-  Delegate<void(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t)> modifiers_;
-
-  Delegate<void(int32_t, int32_t)> repeat_info_;
 
 };
 

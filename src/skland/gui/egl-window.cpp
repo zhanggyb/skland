@@ -20,15 +20,16 @@
 #include <skland/gui/mouse-event.hpp>
 
 #include <skland/gui/surface.hpp>
+#include <skland/gui/callback.hpp>
 #include <skland/gui/title-bar.hpp>
 
 #include <skland/gui/shared-memory-pool.hpp>
 #include <skland/gui/buffer.hpp>
 
-#include "internal/display-registry.hpp"
-#include "internal/abstract-shell-view-iterators.hpp"
-#include "internal/abstract-view-iterators.hpp"
-#include "internal/abstract-event-handler-mouse-task-iterator.hpp"
+#include "internal/display_registry.hpp"
+#include "internal/abstract-shell-view_iterators.hpp"
+#include "internal/abstract-view_iterators.hpp"
+#include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
@@ -65,7 +66,7 @@ struct EGLWindow::Private {
 
   Surface::EGL *egl_surface;
 
-  wayland::Callback frame_callback;
+  Callback frame_callback;
 
   bool animating;
 
@@ -327,7 +328,7 @@ void EGLWindow::OnDraw(const Context *context) {
 
   if (!p_->animating) {
     p_->animating = true;
-    p_->egl_surface->surface()->SetupCallback(p_->frame_callback);
+    p_->frame_callback.Setup(*p_->egl_surface->surface());
     OnInitialize();
   }
 }
@@ -406,7 +407,7 @@ int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
 }
 
 void EGLWindow::OnFrame(uint32_t serial) {
-  p_->egl_surface->surface()->SetupCallback(p_->frame_callback);
+  p_->frame_callback.Setup(*p_->egl_surface->surface());
   OnRender();
   p_->egl_surface->surface()->Commit();
 }

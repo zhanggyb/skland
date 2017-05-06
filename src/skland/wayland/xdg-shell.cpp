@@ -16,7 +16,7 @@
 
 #include <skland/wayland/xdg-shell.hpp>
 
-#include "internal/xdg-shell-private.hpp"
+#include "internal/xdg-shell_private.hpp"
 
 namespace skland {
 namespace wayland {
@@ -37,7 +37,10 @@ void XdgShell::Setup(const Registry &registry, uint32_t id, uint32_t version) {
 
   p_->zxdg_shell =
       static_cast<struct zxdg_shell_v6 *>(registry.Bind(id, &zxdg_shell_v6_interface, version));
-  zxdg_shell_v6_add_listener(p_->zxdg_shell, &XdgShell::Private::kListener, this);
+}
+
+void XdgShell::AddListener(const struct zxdg_shell_v6_listener *listener, void *user_data) {
+  zxdg_shell_v6_add_listener(p_->zxdg_shell, listener, user_data);
 }
 
 void XdgShell::Destroy() {

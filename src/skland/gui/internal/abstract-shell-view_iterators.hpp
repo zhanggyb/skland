@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_ITERATORS_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_ITERATORS_HPP_
 
-#include "abstract-shell-view-private.hpp"
+#include "abstract-shell-view_private.hpp"
 
 namespace skland {
 

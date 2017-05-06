@@ -52,6 +52,7 @@ class Display {
   friend class Application;
   friend class Output;
   friend class Input;
+  friend class Callback;
 
  public:
 
@@ -78,20 +79,7 @@ class Display {
  private:
 
   struct Private;
-
-  void OnError(void *object_id,
-               uint32_t code,
-               const char *message);
-
-  void OnDeleteId(uint32_t id);
-
-  void OnGlobal(uint32_t id,
-                const char *interface,
-                uint32_t version);
-
-  void OnGlobalRemove(uint32_t name);
-
-  void OnFormat(uint32_t format);
+  class EpollTask;
 
   void OnXdgShellPing(uint32_t serial);
 
@@ -113,9 +101,39 @@ class Display {
 
   void ReleaseCursors();
 
+  /**
+ * @brief Create an epoll file descriptor
+ * @return a nonnegative file descriptor or -1
+ */
+  int CreateEpollFd();
+
+  /**
+   * @brief Set close-on-exec or close the epoll file descriptor
+   * @param fd The epoll file descriptor created in CreateEpollFd()
+   * @return a nonnegative file descriptor or -1
+   */
+  int SetCloexecOrClose(int fd);
+
+  /**
+   * @brief Set close-on-exec flag of the given file descripor
+   * @param fd The epoll file descriptor passed from CreateEpollFd()
+   * @return
+   *     0 - success
+   *    -1 - fail
+   */
+  int SetCloexec(int fd);
+
+  static void WatchEpollFd(int epoll_fd, int fd, uint32_t events, void *data);
+
+  static void UnwatchEpollFd(int epoll_fd, int fd);
+
   std::unique_ptr<Private> p_;
 
+  int epoll_fd_;
+  EpollTask *epoll_task_;
+
   int display_fd_;
+  uint32_t display_fd_events_;
 
   Deque output_deque_;
   Deque input_deque_;

@@ -14,39 +14,30 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_SHELL_PRIVATE_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_SHELL_PRIVATE_HPP_
+#ifndef SKLAND_SURFACE_SHELL_TOPLEVEL_PRIVATE_HPP
+#define SKLAND_SURFACE_SHELL_TOPLEVEL_PRIVATE_HPP
 
-#include <skland/wayland/xdg-shell.hpp>
+#include <skland/gui/surface.hpp>
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
-namespace wayland {
 
-struct XdgShell::Private {
+struct Surface::Shell::Toplevel::Private {
 
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
+  static void OnConfigure(void *data,
+                          struct zxdg_toplevel_v6 *zxdg_toplevel_v6,
+                          int32_t width,
+                          int32_t height,
+                          struct wl_array *states);
 
-  Private()
-      : zxdg_shell(nullptr) {}
+  static void OnClose(void *data,
+                      struct zxdg_toplevel_v6 *zxdg_toplevel_v6);
 
-  ~Private() {
-    if (zxdg_shell) zxdg_shell_v6_destroy(zxdg_shell);
-  }
-
-  struct zxdg_shell_v6 *zxdg_shell;
-
-  static void OnPing(void *data,
-                     struct zxdg_shell_v6 *zxdg_shell_v6,
-                     uint32_t serial);
-
-  static const struct zxdg_shell_v6_listener kListener;
+  static const struct zxdg_toplevel_v6_listener kListener;
 
 };
 
 }
-}
 
-#endif // SKLAND_WAYLAND_INTERNAL_XDG_SHELL_PRIVATE_HPP_
+#endif //SKLAND_SURFACE_SHELL_TOPLEVEL_PRIVATE_HPP

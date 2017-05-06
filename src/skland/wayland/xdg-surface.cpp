@@ -17,8 +17,8 @@
 #include <skland/wayland/xdg-surface.hpp>
 #include <skland/wayland/surface.hpp>
 
-#include "internal/xdg-surface-private.hpp"
-#include "internal/xdg-shell-private.hpp"
+#include "internal/xdg-surface_private.hpp"
+#include "internal/xdg-shell_private.hpp"
 
 namespace skland {
 namespace wayland {
@@ -34,7 +34,6 @@ void XdgSurface::Setup(const XdgShell &xdg_shell, const Surface &surface) {
   Destroy();
 
   p_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(xdg_shell.p_->zxdg_shell, surface.wl_surface_);
-  zxdg_surface_v6_add_listener(p_->zxdg_surface, &XdgSurface::Private::kListener, this);
 }
 
 void XdgSurface::Destroy() {
@@ -42,6 +41,10 @@ void XdgSurface::Destroy() {
     zxdg_surface_v6_destroy(p_->zxdg_surface);
     p_->zxdg_surface = nullptr;
   }
+}
+
+void XdgSurface::AddListener(const struct zxdg_surface_v6_listener *listener, void *user_data) {
+  zxdg_surface_v6_add_listener(p_->zxdg_surface, listener, user_data);
 }
 
 void XdgSurface::SetWindowGeometry(int x, int y, int width, int height) const {

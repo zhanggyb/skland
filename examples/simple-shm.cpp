@@ -25,6 +25,7 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <iostream>
+#include <skland/gui/callback.hpp>
 
 using namespace skland;
 
@@ -139,7 +140,7 @@ class ShmWidget : public AbstractView {
     context_->Commit();
   }
 
-  wayland::Callback frame_callback_;
+  Callback frame_callback_;
   const Context *context_;
   Color color_;
   float angle_;

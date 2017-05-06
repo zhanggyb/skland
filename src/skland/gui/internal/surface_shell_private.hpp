@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-#include "xdg-shell-private.hpp"
-#include <skland/wayland/xdg-shell.hpp>
+#ifndef SKLAND_GUI_INTERNAL_SURFACE_SHELL_PRIVATE_HPP
+#define SKLAND_GUI_INTERNAL_SURFACE_SHELL_PRIVATE_HPP
+
+#include <skland/gui/surface.hpp>
+
+#include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
-namespace wayland {
 
-const struct zxdg_shell_v6_listener XdgShell::Private::kListener = {
-    OnPing
+struct Surface::Shell::Private {
+
+  static void OnConfigure(void *data,
+                          struct zxdg_surface_v6 *zxdg_surface_v6,
+                          uint32_t serial);
+
+  static const struct zxdg_surface_v6_listener kListener;
+
 };
 
-void XdgShell::Private::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, uint32_t serial) {
-  XdgShell *_this = static_cast<XdgShell *>(data);
-  if (_this->ping_) {
-    _this->ping_(serial);
-  }
 }
 
-}
-}
+#endif // SKLAND_GUI_INTERNAL_SURFACE_SHELL_PRIVATE_HPP

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include "abstract-view-redraw-task.hpp"
+#include "abstract-view_redraw-task.hpp"
 
-#include "abstract-view-private.hpp"
+#include "abstract-view_private.hpp"
 
 namespace skland {
 

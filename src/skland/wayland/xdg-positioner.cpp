@@ -16,8 +16,8 @@
 
 #include <skland/wayland/xdg-positioner.hpp>
 
-#include "internal/xdg-positioner-private.hpp"
-#include "internal/xdg-shell-private.hpp"
+#include "internal/xdg-positioner_private.hpp"
+#include "internal/xdg-shell_private.hpp"
 
 namespace skland {
 namespace wayland {

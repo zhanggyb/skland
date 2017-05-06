@@ -14,30 +14,33 @@
  * limitations under the License.
  */
 
-#include "skland/wayland/seat.hpp"
-#include "skland/wayland/registry.hpp"
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
+
+#include <skland/wayland/xdg-surface.hpp>
+
+#include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-const struct wl_seat_listener Seat::kListener = {
-    OnCapabilities,
-    OnName
+struct XdgSurface::Private {
+
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : zxdg_surface(nullptr) {}
+
+  ~Private() {
+    if (zxdg_surface) zxdg_surface_v6_destroy(zxdg_surface);
+  }
+
+  struct zxdg_surface_v6 *zxdg_surface;
+
 };
 
-void Seat::OnCapabilities(void *data, struct wl_seat *wl_seat, uint32_t capabilities) {
-  Seat *_this = static_cast<Seat *>(data);
-  if (_this->capabilities_) {
-    _this->capabilities_.Invoke(capabilities);
-  }
+}
 }
 
-void Seat::OnName(void *data, struct wl_seat *wl_seat, const char *name) {
-  Seat *_this = static_cast<Seat *>(data);
-  if (_this->name_) {
-    _this->name_.Invoke(name);
-  }
-}
-
-}
-}
+#endif // SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_

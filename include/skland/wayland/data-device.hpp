@@ -36,10 +36,8 @@ class DataDevice {
 
   void Setup(const DataDeviceManager &data_device_manager, const Seat &seat) {
     Destroy();
-
     wl_data_device_ =
         wl_data_device_manager_get_data_device(data_device_manager.wl_data_device_manager_, seat.wl_seat_);
-    wl_data_device_add_listener(wl_data_device_, &kListener, this);
   }
 
   void Destroy() {
@@ -49,37 +47,11 @@ class DataDevice {
     }
   }
 
+  void AddListener(const struct wl_data_device_listener* listener, void *user_data) {
+    wl_data_device_add_listener(wl_data_device_, listener, user_data);
+  }
+
  private:
-
-  static const struct wl_data_device_listener kListener;
-
-  static void OnDataOffer(void *data,
-                          struct wl_data_device *wl_data_device,
-                          struct wl_data_offer *id);
-
-  static void OnEnter(void *data,
-                      struct wl_data_device *wl_data_device,
-                      uint32_t serial,
-                      struct wl_surface *surface,
-                      wl_fixed_t x,
-                      wl_fixed_t y,
-                      struct wl_data_offer *id);
-
-  static void OnLeave(void *data,
-                      struct wl_data_device *wl_data_device);
-
-  static void OnMotion(void *data,
-                       struct wl_data_device *wl_data_device,
-                       uint32_t time,
-                       wl_fixed_t x,
-                       wl_fixed_t y);
-
-  static void OnDrop(void *data,
-                     struct wl_data_device *wl_data_device);
-
-  static void OnSelection(void *data,
-                          struct wl_data_device *wl_data_device,
-                          struct wl_data_offer *id);
 
   struct wl_data_device *wl_data_device_;
 
