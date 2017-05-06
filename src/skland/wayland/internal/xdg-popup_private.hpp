@@ -38,18 +38,6 @@ struct XdgPopup::Private {
 
   struct zxdg_popup_v6 *zxdg_popup;
 
-  static const struct zxdg_popup_v6_listener kListener;
-
-  static void OnConfigure(void *data,
-                          struct zxdg_popup_v6 *zxdg_popup_v6,
-                          int32_t x,
-                          int32_t y,
-                          int32_t width,
-                          int32_t height);
-
-  static void OnPopupDone(void *data,
-                          struct zxdg_popup_v6 *zxdg_popup_v6);
-
 };
 
 }

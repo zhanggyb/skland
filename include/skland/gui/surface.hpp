@@ -24,7 +24,6 @@
 #include "../wayland/surface.hpp"
 #include "../wayland/region.hpp"
 #include "../wayland/subsurface.hpp"
-#include "../wayland/callback.hpp"
 #include "../wayland/xdg-surface.hpp"
 #include "../wayland/xdg-toplevel.hpp"
 #include "../wayland/xdg-popup.hpp"
@@ -82,6 +81,7 @@ class Surface {
 
   friend class Application;
   friend class Display;
+  friend class Callback;
 
   Surface() = delete;
   Surface(const Surface &) = delete;
@@ -391,10 +391,6 @@ class Surface {
 
   void SetOpaqueRegion(const wayland::Region &region) {
     wl_surface_.SetOpaqueRegion(region);
-  }
-
-  void SetupCallback(wayland::Callback &callback) {
-    callback.Setup(wl_surface_);
   }
 
   Surface *GetShellSurface();

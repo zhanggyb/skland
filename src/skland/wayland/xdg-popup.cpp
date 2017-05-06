@@ -32,12 +32,10 @@ XdgPopup::~XdgPopup() {
 
 void XdgPopup::Setup(const XdgSurface &xdg_surface, const XdgSurface &parent, const XdgPositioner &positioner) {
   Destroy();
-
   p_->zxdg_popup =
       zxdg_surface_v6_get_popup(xdg_surface.p_->zxdg_surface,
                                 parent.p_->zxdg_surface,
                                 positioner.p_->zxdg_positioner);
-  zxdg_popup_v6_add_listener(p_->zxdg_popup, &XdgPopup::Private::kListener, this);
 }
 
 void XdgPopup::Destroy() {
@@ -45,6 +43,10 @@ void XdgPopup::Destroy() {
     zxdg_popup_v6_destroy(p_->zxdg_popup);
     p_->zxdg_popup = nullptr;
   }
+}
+
+void XdgPopup::AddListener(const struct zxdg_popup_v6_listener *listener, void *user_data) {
+  zxdg_popup_v6_add_listener(p_->zxdg_popup, listener, user_data);
 }
 
 void XdgPopup::SetUserData(void *user_data) {

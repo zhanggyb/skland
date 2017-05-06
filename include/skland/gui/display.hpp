@@ -52,6 +52,7 @@ class Display {
   friend class Application;
   friend class Output;
   friend class Input;
+  friend class Callback;
 
  public:
 

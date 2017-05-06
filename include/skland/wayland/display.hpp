@@ -17,8 +17,6 @@
 #ifndef SKLAND_WAYLAND_DISPLAY_HPP_
 #define SKLAND_WAYLAND_DISPLAY_HPP_
 
-#include "../core/delegate.hpp"
-
 #include <wayland-client.h>
 
 namespace skland {

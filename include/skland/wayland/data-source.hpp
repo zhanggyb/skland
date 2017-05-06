@@ -38,9 +38,7 @@ class DataSource {
 
   void Setup(const DataDeviceManager &data_device_manager) {
     Destroy();
-
     wl_data_source_ = wl_data_device_manager_create_data_source(data_device_manager.wl_data_device_manager_);
-    wl_data_source_add_listener(wl_data_source_, &kListener, this);
   }
 
   void Destroy() {
@@ -50,63 +48,14 @@ class DataSource {
     }
   }
 
-  DelegateRef<void(const char *)> target() {
-    return target_;
-  }
-
-  DelegateRef<void(const char *, int32_t)> send() {
-    return send_;
-  }
-
-  DelegateRef<void()> cancelled() {
-    return cancelled_;
-  }
-
-  DelegateRef<void()> dnd_drop_performed() {
-    return dnd_drop_performed_;
-  }
-
-  DelegateRef<void()> dnd_finished() {
-    return dnd_finished_;
-  }
-
-  DelegateRef<void(uint32_t)> action() {
-    return action_;
+  void AddListener(const struct wl_data_source_listener *listener, void *user_data) {
+    wl_data_source_add_listener(wl_data_source_, listener, user_data);
   }
 
  private:
 
-  static const struct wl_data_source_listener kListener;
-
-  static void OnTarget(void *data,
-                       struct wl_data_source *wl_data_source,
-                       const char *mime_type);
-
-  static void OnSend(void *data,
-                     struct wl_data_source *wl_data_source,
-                     const char *mime_type,
-                     int32_t fd);
-
-  static void OnCancelled(void *data,
-                          struct wl_data_source *wl_data_source);
-
-  static void OnDndDropPerformed(void *data,
-                                 struct wl_data_source *wl_data_source);
-  static void OnDndFinished(void *data,
-                            struct wl_data_source *wl_data_source);
-
-  static void OnAction(void *data,
-                       struct wl_data_source *wl_data_source,
-                       uint32_t dnd_action);
-
   struct wl_data_source *wl_data_source_;
 
-  Delegate<void(const char *)> target_;
-  Delegate<void(const char *, int32_t)> send_;
-  Delegate<void()> cancelled_;
-  Delegate<void()> dnd_drop_performed_;
-  Delegate<void()> dnd_finished_;
-  Delegate<void(uint32_t)> action_;
 };
 
 }
