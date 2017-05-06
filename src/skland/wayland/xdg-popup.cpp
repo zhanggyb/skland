@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include "internal/xdg-popup-private.hpp"
+#include "internal/xdg-popup_private.hpp"
 
-#include "internal/xdg-surface-private.hpp"
-#include "internal/xdg-positioner-private.hpp"
+#include "internal/xdg-surface_private.hpp"
+#include "internal/xdg-positioner_private.hpp"
 
 namespace skland {
 namespace wayland {

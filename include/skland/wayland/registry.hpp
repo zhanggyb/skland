@@ -42,9 +42,7 @@ class Registry {
 
   void Setup(const Display &display) {
     Destroy();
-
     wl_registry_ = wl_display_get_registry(display.wl_display_);
-    wl_registry_add_listener(wl_registry_, &kListener, this);
   }
 
   void Destroy() {
@@ -52,6 +50,10 @@ class Registry {
       wl_registry_destroy(wl_registry_);
       wl_registry_ = nullptr;
     }
+  }
+
+  void AddListener(const struct wl_registry_listener *listener, void *user_data) {
+    wl_registry_add_listener(wl_registry_, listener, user_data);
   }
 
   void *Bind(uint32_t name, const struct wl_interface *interface, uint32_t version) const {
@@ -78,32 +80,10 @@ class Registry {
     return wl_registry_ == object;
   }
 
-  DelegateRef<void(uint32_t, const char *, uint32_t)> global() {
-    return global_;
-  }
-
-  DelegateRef<void(uint32_t)> global_remove() {
-    return global_remove_;
-  }
-
  private:
-
-  static void OnGlobal(void *data,
-                       struct wl_registry *registry,
-                       uint32_t id,
-                       const char *interface,
-                       uint32_t version);
-
-  static void OnGlobalRemove(void *data,
-                             struct wl_registry *registry,
-                             uint32_t name);
-
-  static const struct wl_registry_listener kListener;
 
   struct wl_registry *wl_registry_;
 
-  Delegate<void(uint32_t, const char *, uint32_t)> global_;
-  Delegate<void(uint32_t)> global_remove_;
 };
 
 }

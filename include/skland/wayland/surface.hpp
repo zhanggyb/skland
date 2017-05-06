@@ -62,9 +62,7 @@ class Surface {
 
   void Setup(const Compositor &compositor) {
     Destroy();
-
     wl_surface_ = wl_compositor_create_surface(compositor.wl_compositor_);
-    wl_surface_add_listener(wl_surface_, &kListener, this);
   }
 
   void Destroy() {
@@ -72,6 +70,10 @@ class Surface {
       wl_surface_destroy(wl_surface_);
       wl_surface_ = nullptr;
     }
+  }
+
+  void AddListener(const struct wl_surface_listener *listener, void *user_data) {
+    wl_surface_add_listener(wl_surface_, listener, user_data);
   }
 
   void Attach(struct wl_buffer *buffer, int32_t x, int32_t y) const {
@@ -114,37 +116,9 @@ class Surface {
     return nullptr != wl_surface_;
   }
 
-  DelegateRef<void(struct wl_output *)> enter() {
-    return enter_;
-  }
-
-  DelegateRef<void(struct wl_output *)> leave() {
-    return leave_;
-  }
-
  private:
 
-  static void OnEnter(void *data, struct wl_surface *wl_surface,
-                      struct wl_output *wl_output);
-
-  static void OnLeave(void *data, struct wl_surface *wl_surface,
-                      struct wl_output *wl_output);
-
-  static const struct wl_surface_listener kListener;
-
-  const int a1_ = 0;
-  const int b1_ = 0;
-  const int c1_ = 0;
-  const int d1_ = 0;
-
-  Delegate<void(struct wl_output *)> enter_;
-  Delegate<void(struct wl_output *)> leave_;
   struct wl_surface *wl_surface_;
-
-  const int a2_ = 0;
-  const int b2_ = 0;
-  const int c2_ = 0;
-  const int d2_ = 0;
 
 };
 

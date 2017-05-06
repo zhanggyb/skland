@@ -19,6 +19,9 @@
 
 #include "xdg-surface.hpp"
 
+// Forward declaration
+struct zxdg_toplevel_v6_listener;
+
 namespace skland {
 namespace wayland {
 
@@ -32,25 +35,6 @@ class XdgToplevel {
 
  public:
 
-  enum StatesMask {
-    /**
-     * the surface is maximized
-     */
-        kStateMaskMaximized = 0x1, /* 1 */
-    /**
-     * the surface is fullscreen
-     */
-        kStateMaskFullscreen = 0x1 << 1,  /* 2 */
-    /**
-     * the surface is being resized
-     */
-        kStateMaskResizing = 0x1 << 2, /* 4 */
-    /**
-     * the surface is now activated
-     */
-        kStateMaskActivated = 0x1 << 3, /* 8 */
-  };
-
   XdgToplevel();
 
   ~XdgToplevel();
@@ -58,6 +42,8 @@ class XdgToplevel {
   void Setup(const XdgSurface &xdg_surface);
 
   void Destroy();
+
+  void AddListener(const struct zxdg_toplevel_v6_listener *listener, void *user_data);
 
   void SetParent(const XdgToplevel &parent) const;
 
@@ -93,18 +79,11 @@ class XdgToplevel {
 
   bool IsValid() const;
 
-  DelegateRef<void(int, int, int)> configure() { return configure_; }
-
-  DelegateRef<void()> close() { return close_; }
-
  private:
 
   struct Private;
 
   std::unique_ptr<Private> p_;
-
-  Delegate<void(int, int, int)> configure_;
-  Delegate<void()> close_;
 
 };
 

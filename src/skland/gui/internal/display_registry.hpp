@@ -18,7 +18,7 @@
 #define SKLAND_GUI_INTERNAL_DISPLAY_REGISTRY_HPP_
 
 #include <skland/gui/display.hpp>
-#include "display-private.hpp"
+#include "display_private.hpp"
 
 namespace skland {
 

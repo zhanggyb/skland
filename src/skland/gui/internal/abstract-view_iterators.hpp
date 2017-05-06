@@ -18,7 +18,7 @@
 #define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ITERATOR_HPP_
 
 #include <skland/gui/abstract-view.hpp>
-#include "abstract-view-private.hpp"
+#include "abstract-view_private.hpp"
 
 namespace skland {
 

@@ -14,30 +14,21 @@
  * limitations under the License.
  */
 
-#include <stdexcept>
-#include "keyboard-state.hpp"
-#include "keymap.hpp"
+#include "abstract-shell-view_redraw-task.hpp"
+
+#include "abstract-shell-view_private.hpp"
 
 namespace skland {
 
-KeyboardState::~KeyboardState() {
-  if (xkb_state_) xkb_state_unref(xkb_state_);
-}
+void AbstractShellView::RedrawTask::Run() const {
+  shell_view->OnDraw(&context);
 
-void KeyboardState::Setup(const Keymap &keymap) {
-  Destroy();
-
-  xkb_state_ = xkb_state_new(keymap.xkb_keymap_);
-  if (nullptr == xkb_state_) {
-    xkb_keymap_unref(keymap.xkb_keymap_);
-    throw std::runtime_error("FATAL! Cannot create keyboard state!");
-  }
-}
-
-void KeyboardState::Destroy() {
-  if (xkb_state_) {
-    xkb_state_unref(xkb_state_);
-    xkb_state_ = nullptr;
+  if (shell_view->p_->is_damaged) {
+    context.surface()->Damage(shell_view->p_->damaged_region.x(),
+                              shell_view->p_->damaged_region.y(),
+                              shell_view->p_->damaged_region.width(),
+                              shell_view->p_->damaged_region.height());
+    shell_view->p_->is_damaged = false;
   }
 }
 

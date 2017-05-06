@@ -21,6 +21,8 @@
 #include "../core/size.hpp"
 #include "../core/delegate.hpp"
 
+#include <wayland-client.h>
+
 #include <cstdint>
 #include <memory>
 
@@ -72,13 +74,21 @@ class Buffer {
 
   const Size &GetSize() const;
 
-  DelegateRef<void()> release();
+  DelegateRef<void()> release() {
+    return release_;
+  }
 
  private:
 
   struct Private;
 
   std::unique_ptr<Private> p_;
+
+  static void OnRelease(void *data, struct wl_buffer *buffer);
+
+  static const struct wl_buffer_listener kListener;
+
+  Delegate<void()> release_;
 
 };
 

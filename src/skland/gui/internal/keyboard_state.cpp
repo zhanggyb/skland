@@ -14,22 +14,31 @@
  * limitations under the License.
  */
 
-#include "skland/wayland/shm.hpp"
-#include "skland/wayland/registry.hpp"
+#include <stdexcept>
+#include "keyboard_state.hpp"
+#include "keymap.hpp"
 
 namespace skland {
-namespace wayland {
 
-const struct wl_shm_listener Shm::kListener = {
-    OnFormat
-};
+KeyboardState::~KeyboardState() {
+  if (xkb_state_) xkb_state_unref(xkb_state_);
+}
 
-void Shm::OnFormat(void *data, struct wl_shm *shm, uint32_t format) {
-  Shm *_this = static_cast<Shm *>(data);
-  if (_this->format_) {
-    _this->format_.Invoke(format);
+void KeyboardState::Setup(const Keymap &keymap) {
+  Destroy();
+
+  xkb_state_ = xkb_state_new(keymap.xkb_keymap_);
+  if (nullptr == xkb_state_) {
+    xkb_keymap_unref(keymap.xkb_keymap_);
+    throw std::runtime_error("FATAL! Cannot create keyboard state!");
   }
 }
 
+void KeyboardState::Destroy() {
+  if (xkb_state_) {
+    xkb_state_unref(xkb_state_);
+    xkb_state_ = nullptr;
+  }
 }
+
 }

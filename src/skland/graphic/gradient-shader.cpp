@@ -17,7 +17,7 @@
 #include <skland/graphic/gradient-shader.hpp>
 #include <skland/graphic/matrix.hpp>
 
-#include "internal/shader-private.hpp"
+#include "internal/shader_private.hpp"
 
 #include "SkGradientShader.h"
 

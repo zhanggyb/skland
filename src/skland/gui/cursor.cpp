@@ -16,7 +16,7 @@
 
 #include <skland/gui/cursor.hpp>
 
-#include "internal/display-registry.hpp"
+#include "internal/display_registry.hpp"
 
 namespace skland {
 

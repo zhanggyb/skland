@@ -25,10 +25,10 @@
 #include <skland/gui/shared-memory-pool.hpp>
 #include <skland/gui/buffer.hpp>
 
-#include "internal/display-registry.hpp"
-#include "internal/abstract-shell-view-iterators.hpp"
-#include "internal/abstract-view-iterators.hpp"
-#include "internal/abstract-event-handler-mouse-task-iterator.hpp"
+#include "internal/display_registry.hpp"
+#include "internal/abstract-shell-view_iterators.hpp"
+#include "internal/abstract-view_iterators.hpp"
+#include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>

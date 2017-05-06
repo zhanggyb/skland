@@ -14,19 +14,33 @@
  * limitations under the License.
  */
 
-#include <skland/wayland/buffer.hpp>
+#ifndef SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_
+#define SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_
+
+#include <skland/wayland/xdg-toplevel.hpp>
+
+#include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 namespace wayland {
 
-const struct wl_buffer_listener Buffer::kListener = {
-    OnRelease
+struct XdgToplevel::Private {
+
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : zxdg_toplevel(nullptr) {}
+
+  ~Private() {
+    if (zxdg_toplevel) zxdg_toplevel_v6_destroy(zxdg_toplevel);
+  }
+
+  struct zxdg_toplevel_v6 *zxdg_toplevel;
+
 };
 
-void Buffer::OnRelease(void *data, struct wl_buffer *buffer) {
-  Buffer *_this = static_cast<Buffer *>(data);
-  if (_this->release_) _this->release_();
+}
 }
 
-}
-}
+#endif // SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_

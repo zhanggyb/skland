@@ -25,10 +25,10 @@
 #include <skland/wayland/keyboard.hpp>
 #include <skland/wayland/touch.hpp>
 
-#include "internal/display-registry.hpp"
+#include "internal/display_registry.hpp"
 #include "internal/keymap.hpp"
-#include "internal/keyboard-state.hpp"
-#include "internal/mouse-event-private.hpp"
+#include "internal/keyboard_state.hpp"
+#include "internal/mouse-event_private.hpp"
 
 #include <unistd.h>
 #include <sys/mman.h>

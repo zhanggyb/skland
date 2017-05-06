@@ -14,31 +14,16 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_
+#ifndef SKLAND_SURFACE_SHELL_TOPLEVEL_PRIVATE_HPP
+#define SKLAND_SURFACE_SHELL_TOPLEVEL_PRIVATE_HPP
 
-#include <skland/wayland/xdg-toplevel.hpp>
+#include <skland/gui/surface.hpp>
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
-namespace wayland {
 
-struct XdgToplevel::Private {
-
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
-
-  Private()
-      : zxdg_toplevel(nullptr) {}
-
-  ~Private() {
-    if (zxdg_toplevel) zxdg_toplevel_v6_destroy(zxdg_toplevel);
-  }
-
-  struct zxdg_toplevel_v6 *zxdg_toplevel;
-
-  static const struct zxdg_toplevel_v6_listener kListener;
+struct Surface::Shell::Toplevel::Private {
 
   static void OnConfigure(void *data,
                           struct zxdg_toplevel_v6 *zxdg_toplevel_v6,
@@ -49,9 +34,10 @@ struct XdgToplevel::Private {
   static void OnClose(void *data,
                       struct zxdg_toplevel_v6 *zxdg_toplevel_v6);
 
+  static const struct zxdg_toplevel_v6_listener kListener;
+
 };
 
 }
-}
 
-#endif // SKLAND_WAYLAND_INTERNAL_XDG_TOPLEVEL_PRIVATE_HPP_
+#endif //SKLAND_SURFACE_SHELL_TOPLEVEL_PRIVATE_HPP

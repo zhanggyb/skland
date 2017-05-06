@@ -65,9 +65,7 @@ class Display {
 
   void Connect(const char *name = NULL) {
     Disconnect();
-
     wl_display_ = wl_display_connect(name);
-    if (wl_display_ != NULL) wl_display_add_listener(wl_display_, &kListener, this);
   }
 
   void Disconnect() {
@@ -75,6 +73,10 @@ class Display {
       wl_display_disconnect(wl_display_);
       wl_display_ = nullptr;
     }
+  }
+
+  void AddListener(const struct wl_display_listener *listener, void *user_data) {
+    wl_display_add_listener(wl_display_, listener, user_data);
   }
 
   int Dispatch() const {
@@ -121,32 +123,9 @@ class Display {
     return wl_display_ == object;
   }
 
-  DelegateRef<void(void *, uint32_t, const char *)> error() {
-    return error_;
-  }
-
-  DelegateRef<void(uint32_t)> delete_id() {
-    return delete_id_;
-  }
-
  private:
 
-  static void OnError(void *data,
-                      struct wl_display *wl_display,
-                      void *object_id,
-                      uint32_t code,
-                      const char *message);
-
-  static void OnDeleteId(void *data,
-                         struct wl_display *wl_display,
-                         uint32_t id);
-
-  static const struct wl_display_listener kListener;
-
   struct wl_display *wl_display_;
-
-  Delegate<void(void *, uint32_t, const char *)> error_;
-  Delegate<void(uint32_t)> delete_id_;
 
 };
 

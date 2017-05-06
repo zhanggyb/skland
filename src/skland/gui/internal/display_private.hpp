@@ -19,6 +19,8 @@
 
 #include <skland/gui/display.hpp>
 
+#include <skland/gui/task.hpp>
+
 #include <skland/wayland/display.hpp>
 #include <skland/wayland/registry.hpp>
 #include <skland/wayland/compositor.hpp>
@@ -31,6 +33,8 @@
 
 #include <skland/egl/display.hpp>
 
+#include "xdg-shell-unstable-v6-client-protocol.h"
+
 namespace skland {
 
 /**
@@ -38,6 +42,9 @@ namespace skland {
  * @brief The private data structure in Display
  */
 struct Display::Private {
+
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
 
   Private() {}
   ~Private() {}
@@ -55,6 +62,56 @@ struct Display::Private {
   egl::Display egl_display;
 
   struct xkb_context *xkb_context;
+
+  static void OnFormat(void *data, struct wl_shm *shm, uint32_t format);
+
+  static void OnError(void *data,
+                      struct wl_display *wl_display,
+                      void *object_id,
+                      uint32_t code,
+                      const char *message);
+
+  static void OnDeleteId(void *data,
+                         struct wl_display *wl_display,
+                         uint32_t id);
+
+  static void OnGlobal(void *data,
+                       struct wl_registry *registry,
+                       uint32_t id,
+                       const char *interface,
+                       uint32_t version);
+
+  static void OnGlobalRemove(void *data,
+                             struct wl_registry *registry,
+                             uint32_t name);
+
+  static void OnPing(void *data,
+                     struct zxdg_shell_v6 *zxdg_shell_v6,
+                     uint32_t serial);
+
+  static const struct wl_display_listener kDisplayListener;
+
+  static const struct wl_registry_listener kRegistryListener;
+
+  static const struct wl_shm_listener kShmListener;
+
+  static const struct zxdg_shell_v6_listener kXdgShellListener;
+
+};
+
+class Display::EpollTask : public AbstractEpollTask {
+
+ public:
+
+  EpollTask(Display *display)
+      : AbstractEpollTask(), display_(display) {}
+
+  virtual ~EpollTask() {}
+
+  virtual void Run(uint32_t events) override;
+ private:
+
+  Display *display_;
 
 };
 

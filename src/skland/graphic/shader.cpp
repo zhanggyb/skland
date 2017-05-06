@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "internal/shader-private.hpp"
+#include "internal/shader_private.hpp"
 
 #include <skland/core/assert.hpp>
 

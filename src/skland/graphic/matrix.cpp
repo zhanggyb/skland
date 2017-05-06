@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "internal/matrix-private.hpp"
+#include "internal/matrix_private.hpp"
 
 namespace skland {
 

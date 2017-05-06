@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "internal/mouse-event-private.hpp"
+#include "internal/mouse-event_private.hpp"
 
 #include <skland/gui/surface.hpp>
 

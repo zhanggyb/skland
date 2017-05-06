@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-#include "abstract-shell-view-redraw-task.hpp"
+#include "surface_shell_private.hpp"
 
-#include "abstract-shell-view-private.hpp"
+#include <skland/gui/abstract-shell-view.hpp>
 
 namespace skland {
 
-void AbstractShellView::RedrawTask::Run() const {
-  shell_view->OnDraw(&context);
+const struct zxdg_surface_v6_listener Surface::Shell::Private::kListener = {
+    OnConfigure
+};
 
-  if (shell_view->p_->is_damaged) {
-    context.surface()->Damage(shell_view->p_->damaged_region.x(),
-                              shell_view->p_->damaged_region.y(),
-                              shell_view->p_->damaged_region.width(),
-                              shell_view->p_->damaged_region.height());
-    shell_view->p_->is_damaged = false;
-  }
+void Surface::Shell::Private::OnConfigure(void *data,
+                                          struct zxdg_surface_v6 *zxdg_surface_v6,
+                                          uint32_t serial) {
+  Shell *_this = static_cast<Shell *>(data);
+  AbstractShellView *shell_view = dynamic_cast<AbstractShellView *>(_this->surface_->event_handler_);
+  if (shell_view)
+    shell_view->OnXdgSurfaceConfigure(serial);
 }
 
 }

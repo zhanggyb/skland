@@ -20,6 +20,9 @@
 #include "registry.hpp"
 #include <memory>
 
+// Forward declaration
+struct zxdg_shell_v6_listener;
+
 namespace skland {
 namespace wayland {
 
@@ -44,6 +47,8 @@ class XdgShell {
 
   void Setup(const Registry &registry, uint32_t id, uint32_t version);
 
+  void AddListener(const struct zxdg_shell_v6_listener *listener, void *user_data);
+
   void Destroy();
 
   void Pong(uint32_t serial) const;
@@ -58,19 +63,11 @@ class XdgShell {
 
   bool Equal(const void *object) const;
 
-  /**
-   * @brief A ping callback sent from compositor
-   * @return Reference to the ping delegate
-   */
-  DelegateRef<void(uint32_t)> ping() { return ping_; }
-
  private:
 
   struct Private;
 
   std::unique_ptr<Private> p_;
-
-  Delegate<void(uint32_t)> ping_;
 
 };
 

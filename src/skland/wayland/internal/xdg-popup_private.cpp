@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "xdg-popup-private.hpp"
+#include "xdg-popup_private.hpp"
 
 namespace skland {
 namespace wayland {

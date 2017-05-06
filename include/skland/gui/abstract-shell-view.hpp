@@ -36,7 +36,7 @@ class Context;
 SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   friend class AbstractView;
-  friend class AbstractShellFrame;
+  friend class Surface;
 
   AbstractShellView() = delete;
   AbstractShellView(const AbstractShellView &) = delete;

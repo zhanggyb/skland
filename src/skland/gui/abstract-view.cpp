@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "internal/abstract-view-private.hpp"
+#include "internal/abstract-view_private.hpp"
 
 #include <skland/core/numeric.hpp>
 #include <skland/core/assert.hpp>
@@ -24,7 +24,7 @@
 #include <skland/gui/abstract-layout.hpp>
 #include <skland/gui/mouse-event.hpp>
 
-#include "internal/abstract-view-iterators.hpp"
+#include "internal/abstract-view_iterators.hpp"
 
 namespace skland {
 

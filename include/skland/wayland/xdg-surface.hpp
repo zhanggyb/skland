@@ -19,6 +19,9 @@
 
 #include "xdg-shell.hpp"
 
+// Forward declaration
+struct zxdg_surface_v6_listener;
+
 namespace skland {
 namespace wayland {
 
@@ -44,6 +47,8 @@ class XdgSurface {
 
   void Destroy();
 
+  void AddListener(const struct zxdg_surface_v6_listener *listener, void *user_data);
+
   void SetWindowGeometry(int x, int y, int width, int height) const;
 
   void AckConfigure(uint32_t serial) const;
@@ -56,15 +61,11 @@ class XdgSurface {
 
   bool IsValid() const;
 
-  DelegateRef<void(uint32_t)> configure() { return configure_; }
-
  private:
 
   struct Private;
 
   std::unique_ptr<Private> p_;
-
-  Delegate<void(uint32_t)> configure_;
 
 };
 

@@ -16,7 +16,7 @@
 
 #include <skland/gui/relative-layout.hpp>
 
-#include "internal/abstract-view-iterators.hpp"
+#include "internal/abstract-view_iterators.hpp"
 
 namespace skland {
 

@@ -45,9 +45,7 @@ class Shm {
 
   void Setup(const Registry &registry, uint32_t id, uint32_t version) {
     Destroy();
-
     wl_shm_ = static_cast<struct wl_shm *>(registry.Bind(id, &wl_shm_interface, version));
-    wl_shm_add_listener(wl_shm_, &kListener, this);
   }
 
   void Destroy() {
@@ -55,6 +53,10 @@ class Shm {
       wl_shm_destroy(wl_shm_);
       wl_shm_ = nullptr;
     }
+  }
+
+  void AddListener(const struct wl_shm_listener *listener, void *user_data) {
+    wl_shm_add_listener(wl_shm_, listener, user_data);
   }
 
   void SetUserData(void *user_data) {
@@ -77,19 +79,10 @@ class Shm {
     return wl_shm_ == object;
   }
 
-  DelegateRef<void(uint32_t)> format() {
-    return format_;
-  }
-
  private:
-
-  static void OnFormat(void *data, struct wl_shm *shm, uint32_t format);
-
-  static const struct wl_shm_listener kListener;
 
   struct wl_shm *wl_shm_;
 
-  Delegate<void(uint32_t)> format_;
 };
 
 }

@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-#include "xdg-shell-private.hpp"
-#include <skland/wayland/xdg-shell.hpp>
+#include "surface-commit_task.hpp"
 
 namespace skland {
-namespace wayland {
 
-const struct zxdg_shell_v6_listener XdgShell::Private::kListener = {
-    OnPing
-};
-
-void XdgShell::Private::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, uint32_t serial) {
-  XdgShell *_this = static_cast<XdgShell *>(data);
-  if (_this->ping_) {
-    _this->ping_(serial);
-  }
+void Surface::CommitTask::Run() const {
+  surface->wl_surface_.Commit();
 }
 
-}
 }

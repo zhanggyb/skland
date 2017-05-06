@@ -19,8 +19,8 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
-#include "internal/abstract-shell-view-redraw-task.hpp"
-#include "internal/abstract-view-iterators.hpp"
+#include "internal/abstract-shell-view_redraw-task.hpp"
+#include "internal/abstract-view_iterators.hpp"
 
 #include <GLES2/gl2.h>
 

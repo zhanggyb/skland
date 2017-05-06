@@ -22,8 +22,10 @@
 #include <skland/gui/output.hpp>
 #include <skland/core/assert.hpp>
 
-#include "internal/display-registry.hpp"
-#include "internal/surface-commit-task.hpp"
+#include "internal/display_registry.hpp"
+#include "internal/surface-commit_task.hpp"
+#include "internal/surface_shell_private.hpp"
+#include "internal/surface_shell_toplevel_private.hpp"
 
 namespace skland {
 
@@ -51,6 +53,7 @@ Surface::Shell::Shell(Surface *surface)
   _ASSERT(surface_);
   role_.placeholder = nullptr;
   xdg_surface_.Setup(Display::Registry().xdg_shell(), surface_->wl_surface_);
+  xdg_surface_.AddListener(&Private::kListener, this);
 
   Push();
 }
@@ -166,6 +169,7 @@ Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
   _ASSERT(shell_surface);
   shell_ = shell_surface;
   xdg_toplevel_.Setup(shell_->xdg_surface_);
+  xdg_toplevel_.AddListener(&Private::kListener, this);
 }
 
 Surface::Shell::Toplevel::~Toplevel() {
@@ -447,6 +451,23 @@ int Surface::kShellSurfaceCount = 0;
 Task Surface::kCommitTaskHead;
 Task Surface::kCommitTaskTail;
 
+const struct wl_surface_listener Surface::kListener = {
+    OnEnter,
+    OnLeave
+};
+
+void Surface::OnEnter(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
+  const Surface *_this = static_cast<const Surface *>(data);
+  Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
+  _this->event_handler_->OnEnterOutput(output);
+}
+
+void Surface::OnLeave(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
+  const Surface *_this = static_cast<const Surface *>(data);
+  Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
+  _this->event_handler_->OnEnterOutput(output);
+}
+
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)
     : mode_(kSynchronized),
       parent_(nullptr),
@@ -463,9 +484,8 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)
   _ASSERT(nullptr != event_handler_);
   role_.placeholder = nullptr;
 
-  wl_surface_.enter().Set(this, &Surface::OnEnter);
-  wl_surface_.leave().Set(this, &Surface::OnLeave);
   wl_surface_.Setup(Display::Registry().wl_compositor());
+  wl_surface_.AddListener(&kListener, this);
 
   commit_task_.reset(new CommitTask(this));
 }
@@ -546,23 +566,6 @@ Point Surface::GetWindowPosition() const {
   }
 
   return position - Point(shell_surface->margin().l, shell_surface->margin().t);
-}
-
-void Surface::OnEnter(struct wl_output *wl_output) {
-  fprintf(stderr, "enter\n");
-  if (!is_user_data_set_) {
-    wl_surface_.SetUserData(this);
-    is_user_data_set_ = true;
-  }
-
-  Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
-  event_handler_->OnEnterOutput(output);
-}
-
-void Surface::OnLeave(struct wl_output *wl_output) {
-  fprintf(stderr, "leave\n");
-  Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
-  event_handler_->OnEnterOutput(output);
 }
 
 void Surface::Clear() {

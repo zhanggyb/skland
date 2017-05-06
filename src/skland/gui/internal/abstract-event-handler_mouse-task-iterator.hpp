@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_MOUSE_TASK_PROXY_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_MOUSE_TASK_PROXY_HPP_
 
-#include "abstract-event-handler-private.hpp"
+#include "abstract-event-handler_private.hpp"
 
 namespace skland {
 
