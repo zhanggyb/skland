@@ -64,21 +64,6 @@ SKLAND_EXPORT class Task {
 
 };
 
-class AbstractEpollTask: public Task {
-
- public:
-
-  AbstractEpollTask()
-      : Task() {
-
-  }
-
-  virtual ~AbstractEpollTask() {}
-
-  virtual void Run(uint32_t events) = 0;
-
-};
-
 } // namespace skland
 
 #endif // SKLAND_GUI_TASK_HPP_

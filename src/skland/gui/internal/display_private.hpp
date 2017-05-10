@@ -20,6 +20,7 @@
 #include <skland/gui/display.hpp>
 
 #include <skland/gui/task.hpp>
+#include <skland/gui/abstract-epoll-task.hpp>
 
 #include <skland/wayland/display.hpp>
 #include <skland/wayland/registry.hpp>
@@ -109,6 +110,7 @@ class Display::EpollTask : public AbstractEpollTask {
   virtual ~EpollTask() {}
 
   virtual void Run(uint32_t events) override;
+
  private:
 
   Display *display_;

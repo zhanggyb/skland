@@ -17,6 +17,7 @@
 #include <skland/gui/shared-memory-pool.hpp>
 
 #include <skland/core/debug.hpp>
+#include <skland/core/assert.hpp>
 
 #include <sys/mman.h>
 
@@ -30,7 +31,6 @@
 #ifdef HAVE_POSIX_FALLOCATE
 #include <fcntl.h>
 #include <new>
-#include <skland/core/assert.hpp>
 #endif
 
 #include "internal/display_registry.hpp"

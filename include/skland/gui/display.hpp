@@ -60,7 +60,7 @@ class Display {
 
   static const Output *GetOutputAt(int index = 0);
 
-  static int outputs_count() {
+  static int GetOutputCount() {
     return kDisplay->output_deque_.count();
   }
 
@@ -80,8 +80,6 @@ class Display {
 
   struct Private;
   class EpollTask;
-
-  void OnXdgShellPing(uint32_t serial);
 
   Display();
 

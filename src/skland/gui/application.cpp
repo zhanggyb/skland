@@ -130,11 +130,11 @@ int Application::Run() {
       break;
     }
 
-    Display::EpollTask* epoll_task = nullptr;
+    AbstractEpollTask *epoll_task = nullptr;
     count = epoll_wait(Display::kDisplay->epoll_fd_, ep, kMaxEpollEvents, -1);
     for (int i = 0; i < count; i++) {
-      epoll_task = static_cast<Display::EpollTask*>(ep[i].data.ptr);
-      epoll_task->Run(ep[i].events);
+      epoll_task = static_cast<AbstractEpollTask *>(ep[i].data.ptr);
+      if (epoll_task) epoll_task->Run(ep[i].events);
     }
   }
 

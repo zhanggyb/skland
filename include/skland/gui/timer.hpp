@@ -17,8 +17,10 @@
 #ifndef SKLAND_GUI_TIMER_HPP_
 #define SKLAND_GUI_TIMER_HPP_
 
-#include <skland/core/sigcxx.hpp>
-#include <skland/core/posix-timer.hpp>
+#include "../core/sigcxx.hpp"
+#include "../core/posix-timer.hpp"
+
+#include <memory>
 
 namespace skland {
 
@@ -71,10 +73,14 @@ class Timer {
 
  private:
 
+  class EpollTask;
+
   void OnExpire();
 
   Signal<> timeout_;
   PosixTimer posix_timer_;
+
+  std::unique_ptr<EpollTask> epoll_task_;
 
   static uint64_t kSavedTime;
   static uint64_t kProgramTime;

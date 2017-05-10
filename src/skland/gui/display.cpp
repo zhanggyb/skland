@@ -37,12 +37,7 @@ using std::endl;
 
 namespace skland {
 
-static int kEpollTaskCount = 0;
-
 void Display::EpollTask::Run(uint32_t events) {
-  ++kEpollTaskCount;
-//  fprintf(stderr, "%s: %d\n", __PRETTY_FUNCTION__, kEpollTaskCount);
-
   display_->display_fd_events_ = events;
   if (events & EPOLLERR || events & EPOLLHUP) {
     Application::Exit();
@@ -179,10 +174,6 @@ void Display::DestroyOutput(uint32_t id) {
 
 void Display::AddInput(Input *input, int index) {
   input_deque_.Insert(input, index);
-}
-
-void Display::OnXdgShellPing(uint32_t serial) {
-  p_->xdg_shell.Pong(serial);
 }
 
 void Display::InitializeCursors() {

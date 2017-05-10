@@ -39,7 +39,7 @@ TEST_F(Test, application) {
 
   Display *display = app.display();
 
-  cout << "outputs count: " << display->outputs_count() << endl;
+  cout << "outputs count: " << display->GetOutputCount() << endl;
 //  cout << "pixel format: " << display->pixel_formats() << endl;
 
   app.Exit();

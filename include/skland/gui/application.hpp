@@ -23,6 +23,8 @@
 
 namespace skland {
 
+class AbstractEpollTask;
+
 /**
  * @ingroup gui
  * @brief Singleton application object
