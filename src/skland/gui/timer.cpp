@@ -17,10 +17,13 @@
 #include <skland/gui/timer.hpp>
 
 #include <skland/gui/abstract-epoll-task.hpp>
+#include <skland/gui/application.hpp>
 
+#include <sys/timerfd.h>
+#include <unistd.h>
 #include <sys/epoll.h>
-#include <sys/time.h>
-#include <iostream>
+
+#include <skland/core/debug.hpp>
 
 namespace skland {
 
@@ -41,88 +44,128 @@ class Timer::EpollTask : public AbstractEpollTask {
 
 };
 
+struct Timer::Private {
+
+  Private() = delete;
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private(Timer *timer)
+      : fd(-1), is_armed(false), interval(0), epoll_task(timer) {}
+
+  ~Private() {}
+
+  int fd;
+  bool is_armed;
+  unsigned int interval;  // interval in microseconds
+  EpollTask epoll_task;
+
+};
+
 void Timer::EpollTask::Run(uint32_t events) {
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  uint64_t exp;
+  ssize_t s;
+
+  s = read(timer_->p_->fd, &exp, sizeof(uint64_t));
+  if (s != sizeof(uint64_t)) {
+    _DEBUG("%s\n", "Fail to read timer fd!\n");
+    return;
+  }
+
+  timer_->timeout_.Emit();
 }
 
-uint64_t Timer::kSavedTime = 0;
-uint64_t Timer::kProgramTime = 0;
+Timer::Timer(unsigned int interval) {
+  p_.reset(new Private(this));
 
-Timer::Timer() {
-  posix_timer_.expire().Set(this, &Timer::OnExpire);
-  epoll_task_.reset(new EpollTask(this));
+  p_->fd = timerfd_create(CLOCK_REALTIME, 0);
+  if (p_->fd < 0) {
+    fprintf(stderr, "Error! Fail to create timerfd!\n");
+  }
+  p_->interval = interval;
 }
 
 Timer::~Timer() {
-
+  if (p_->fd >= 0) close(p_->fd);
 }
 
 void Timer::Start() {
-  posix_timer_.Start();
+  if (p_->is_armed) return;
+
+  Application::WatchFd(p_->fd, EPOLLIN, &p_->epoll_task);
+  SetTime();
+  p_->is_armed = true;
 }
 
 void Timer::Stop() {
-  posix_timer_.Stop();
+  if (!p_->is_armed) return;
+
+  struct timespec interval = {0, 0};
+  struct timespec value = {0, 0};
+  struct itimerspec its = {
+      interval,
+      value
+  };
+
+  int ret = timerfd_settime(p_->fd, 0, &its, NULL);
+  if (ret < 0) {
+    _DEBUG("%s\n", "Fail to stop timer!");
+  }
+
+  Application::UnwatchFd(p_->fd);
+
+  p_->is_armed = false;
 }
 
 void Timer::SetInterval(unsigned int interval) {
-  posix_timer_.SetInterval(interval);
+  if (p_->interval == interval) return;
+
+  p_->interval = interval;
+  if (p_->is_armed) {
+    SetTime();
+  }
 }
 
-void Timer::OnExpire() {
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-//  struct epoll_event ep[1];
-//  ep[0].events = EPOLLIN | EPOLLOUT;
-//  ep[0].data.ptr = epoll_task_.get();
-//  epoll_ctl(Display::GetEpollFd(), EPOLL_CTL_ADD, Display::GetFd(), &ep[0]);
+unsigned int Timer::GetInterval() const {
+  return p_->interval;
 }
 
-double Timer::GetIntervalInSeconds() {
-  uint64_t current = GetMicroSeconds();
-  return (current - kSavedTime) / (1000000.0);
+bool Timer::IsArmed() const {
+  return p_->is_armed;
 }
 
-double Timer::GetIntervalInMilliseconds() {
-  uint64_t current = GetMicroSeconds();
-  return (current - kSavedTime) / (1000.0);
-}
-
-double Timer::GetIntervalInMicroseconds() {
-  uint64_t current = GetMicroSeconds();
-  return (double) (current - kSavedTime);
-}
-
-double Timer::GetProgramTimeInSeconds() {
-  uint64_t current = GetMicroSeconds();
-  return (current - kProgramTime) / (1000000.0);
-}
-
-double Timer::GetProgramTimeInMilliseconds() {
-  uint64_t current = GetMicroSeconds();
-  return (current - kProgramTime) / (1000.0);
-}
-
-double Timer::GetProgramTimeInMicroseconds() {
-  uint64_t current = GetMicroSeconds();
-  return (double) (current - kProgramTime);
-}
-
-uint64_t Timer::GetMicroSeconds() {
+uint64_t Timer::GetClockTime() {
   uint64_t retval = 0;
-  struct timeval tv = {0, 0};
+  struct timespec now = {0, 0};
 
-  gettimeofday(&tv, NULL);
-  retval = (uint64_t) tv.tv_sec * 1000 * 1000 + tv.tv_usec;
+  if (clock_gettime(CLOCK_REALTIME, &now) < 0) {
+    _DEBUG("%s\n", "Error! Cannot get clock time!");
+    return retval;
+  }
 
+  retval = (uint64_t) now.tv_sec * 1000 * 1000 * 1000 + now.tv_nsec;
   return retval;
 }
 
-void Timer::SaveCurrentTime() {
-  kSavedTime = GetMicroSeconds();
-}
+bool Timer::SetTime() {
+  int ret = 0;
+  unsigned int sec = p_->interval / 1000000;
+  long nsec = (p_->interval % 1000000) * 1000;
 
-void Timer::SaveProgramTime() {
-  kProgramTime = GetMicroSeconds();
+  struct timespec interval_ts = {sec, nsec};
+  struct timespec value_ts = {sec, nsec};
+  struct itimerspec its = {
+      interval_ts,
+      value_ts
+  };
+
+  ret = timerfd_settime(p_->fd, 0, &its, NULL);
+  if (ret < 0) {
+    _DEBUG("%s\n", "Fail to set timer!");
+    return false;
+  }
+
+  return true;
 }
 
 } // namespace skland

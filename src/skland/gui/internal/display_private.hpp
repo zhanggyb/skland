@@ -100,23 +100,6 @@ struct Display::Private {
 
 };
 
-class Display::EpollTask : public AbstractEpollTask {
-
- public:
-
-  EpollTask(Display *display)
-      : AbstractEpollTask(), display_(display) {}
-
-  virtual ~EpollTask() {}
-
-  virtual void Run(uint32_t events) override;
-
- private:
-
-  Display *display_;
-
-};
-
 }
 
 #endif // SKLAND_GUI_INTERNAL_DISPLAY_PRIVATE_HPP_

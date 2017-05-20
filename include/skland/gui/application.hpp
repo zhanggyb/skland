@@ -49,11 +49,43 @@ SKLAND_EXPORT class Application {
     return Application::kInstance;
   }
 
+  static void WatchFd(int fd, uint32_t events, AbstractEpollTask *epoll_task);
+
+  static void UnwatchFd(int fd);
+
  private:
+
+  class EpollTask;
 
   static void HandleSignalInt(int);
 
+  /**
+* @brief Create an epoll file descriptor
+* @return a nonnegative file descriptor or -1
+*/
+  int CreateEpollFd();
+
+  /**
+   * @brief Set close-on-exec or close the epoll file descriptor
+   * @param fd The epoll file descriptor created in CreateEpollFd()
+   * @return a nonnegative file descriptor or -1
+   */
+  int SetCloexecOrClose(int fd);
+
+  /**
+   * @brief Set close-on-exec flag of the given file descripor
+   * @param fd The epoll file descriptor passed from CreateEpollFd()
+   * @return
+   *     0 - success
+   *    -1 - fail
+   */
+  int SetCloexec(int fd);
+
   bool running_;
+
+  int epoll_fd_;
+
+  EpollTask *epoll_task_;
 
   static Application *kInstance;
 

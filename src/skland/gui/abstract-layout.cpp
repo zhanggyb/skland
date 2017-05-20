@@ -124,7 +124,7 @@ void AbstractLayout::OnKeyUp(KeyEvent *event) {
 
 void AbstractLayout::OnDraw(const Context *context) {
 //#ifdef DEBUG
-  srand(Timer::GetMicroSeconds());
+  srand(Timer::GetClockTime());
   float r = rand() % 255 / 255.f;
   float g = rand() % 255 / 255.f;
   float b = rand() % 255 / 255.f;

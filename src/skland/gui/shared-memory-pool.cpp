@@ -89,7 +89,7 @@ int SharedMemoryPool::CreateAnonymousFile(off_t size) {
   strcpy(name, path);
   strcat(name, temp);
 
-  fd = CreateTmpfileCloexec(name);
+  fd = CreateTempFile(name);
 
   free(name);
 
@@ -114,7 +114,7 @@ int SharedMemoryPool::CreateAnonymousFile(off_t size) {
   return fd;
 }
 
-int SharedMemoryPool::CreateTmpfileCloexec(char *tmpname) {
+int SharedMemoryPool::CreateTempFile(char *tmpname) {
   int fd;
 
 #ifdef HAVE_MKOSTEMP

@@ -31,7 +31,11 @@ class Timer {
 
  public:
 
-  Timer();
+  /**
+   * @brief Default constructor
+   * @param interval Interval in microseconds
+   */
+  Timer(unsigned int interval = 5000000);
 
   ~Timer();
 
@@ -41,49 +45,28 @@ class Timer {
 
   void SetInterval(unsigned int interval);
 
-  SignalRef<> timeout() {
-    return timeout_;
-  }
+  unsigned int GetInterval() const;
 
-  static double GetIntervalInSeconds();
+  bool IsArmed() const;
 
-  static double GetIntervalInMilliseconds();
+  SignalRef<> timeout() { return timeout_; }
 
-  static double GetIntervalInMicroseconds();
-
-  static double GetProgramTimeInSeconds();
-
-  static double GetProgramTimeInMilliseconds();
-
-  static double GetProgramTimeInMicroseconds();
-
-  static uint64_t GetMicroSeconds();
-
-  static void SaveCurrentTime();
-
-  static void SaveProgramTime();
-
-  static inline uint64_t saved_time() {
-    return kSavedTime;
-  }
-
-  static inline uint64_t program_time() {
-    return kProgramTime;
-  }
+  /**
+   * @brief Get clock time in nanoseconds
+   * @return
+   */
+  static uint64_t GetClockTime();
 
  private:
 
+  bool SetTime();
+
+  struct Private;
   class EpollTask;
 
-  void OnExpire();
+  std::unique_ptr<Private> p_;
 
   Signal<> timeout_;
-  PosixTimer posix_timer_;
-
-  std::unique_ptr<EpollTask> epoll_task_;
-
-  static uint64_t kSavedTime;
-  static uint64_t kProgramTime;
 
 };
 

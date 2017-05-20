@@ -66,6 +66,11 @@ class Display {
     wl_display_ = wl_display_connect(name);
   }
 
+  void ConnectToFd(int fd) {
+    Disconnect();
+    wl_display_ = wl_display_connect_to_fd(fd);
+  }
+
   void Disconnect() {
     if (wl_display_) {
       wl_display_disconnect(wl_display_);

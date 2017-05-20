@@ -49,13 +49,60 @@ using std::endl;
 
 namespace skland {
 
+class Application::EpollTask : public AbstractEpollTask {
+
+ public:
+
+  EpollTask(Application *app)
+      : AbstractEpollTask(), app_(app) {}
+
+  virtual ~EpollTask() {}
+
+  virtual void Run(uint32_t events) override;
+
+ private:
+
+  Application *app_;
+
+};
+
+void Application::EpollTask::Run(uint32_t events) {
+//  display_->display_fd_events_ = events;
+  if (events & EPOLLERR || events & EPOLLHUP) {
+    Application::Exit();
+    return;
+  }
+  if (events & EPOLLIN) {
+    if (Display::kDisplay->p_->wl_display.Dispatch() == -1) {
+      Application::Exit();
+      return;
+    }
+  }
+  if (events & EPOLLOUT) {
+    struct epoll_event ep;
+    int ret = Display::kDisplay->p_->wl_display.Flush();
+    if (ret == 0) {
+      ep.events = EPOLLIN | EPOLLERR | EPOLLHUP;
+      ep.data.ptr = app_->epoll_task_;
+      epoll_ctl(app_->epoll_fd_, EPOLL_CTL_MOD,
+                Display::kDisplay->display_fd_, &ep);
+    } else if (ret == -1 && errno != EAGAIN) {
+      Application::Exit();
+      return;
+    }
+  }
+}
+
 Application *Application::kInstance = nullptr;
 
 Application::Application(int argc, char *argv[])
-    : running_(false) {
-
+    : running_(false), epoll_fd_(-1), epoll_task_(nullptr) {
   if (kInstance != nullptr)
     throw std::runtime_error("Error! There should be only one application instance!");
+
+  kInstance = this;
+
+  epoll_task_ = new EpollTask(this);
 
   // Set log handler to a lambda function
   wl_log_set_handler_client([](const char *format, va_list args) {
@@ -74,12 +121,13 @@ Application::Application(int argc, char *argv[])
   // Load theme
   Theme::Initialize();
 
-  kInstance = this;
-
-  Timer::SaveProgramTime();
+  epoll_fd_ = CreateEpollFd();
+  WatchFd(Display::kDisplay->display_fd_, EPOLLIN | EPOLLERR | EPOLLHUP, epoll_task_);
 }
 
 Application::~Application() {
+  delete epoll_task_;
+  close(epoll_fd_);
   Display::kDisplay->Disconnect();
 
   Theme::Release();
@@ -123,15 +171,15 @@ int Application::Run() {
     if (ret < 0 && errno == EAGAIN) {
       _DEBUG("%s\n", "Error when flush display");
       ep[0].events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
-      ep[0].data.ptr = Display::kDisplay->epoll_task_;
-      epoll_ctl(Display::kDisplay->epoll_fd_, EPOLL_CTL_MOD,
+      ep[0].data.ptr = kInstance->epoll_task_;
+      epoll_ctl(kInstance->epoll_fd_, EPOLL_CTL_MOD,
                 Display::kDisplay->display_fd_, &ep[0]);
     } else if (ret < 0) {
       break;
     }
 
     AbstractEpollTask *epoll_task = nullptr;
-    count = epoll_wait(Display::kDisplay->epoll_fd_, ep, kMaxEpollEvents, -1);
+    count = epoll_wait(kInstance->epoll_fd_, ep, kMaxEpollEvents, -1);
     for (int i = 0; i < count; i++) {
       epoll_task = static_cast<AbstractEpollTask *>(ep[i].data.ptr);
       if (epoll_task) epoll_task->Run(ep[i].events);
@@ -147,9 +195,59 @@ void Application::Exit() {
   // TODO: check if need to clean other resources
 }
 
+void Application::WatchFd(int fd, uint32_t events, AbstractEpollTask *epoll_task) {
+  struct epoll_event ep;
+  ep.events = events;
+  ep.data.ptr = epoll_task;
+  epoll_ctl(kInstance->epoll_fd_, EPOLL_CTL_ADD, fd, &ep);
+}
+
+void Application::UnwatchFd(int fd) {
+  epoll_ctl(kInstance->epoll_fd_, EPOLL_CTL_DEL, fd, NULL);
+}
+
 void Application::HandleSignalInt(int) {
   _DEBUG("%s\n", "Get SIGINT");
   Application::Get()->Exit();
+}
+
+int Application::CreateEpollFd() {
+  int fd = 0;
+
+#ifdef EPOLL_CLOEXEC
+  fd = epoll_create1(EPOLL_CLOEXEC);
+  if (fd >= 0)
+    return fd;
+  if (errno != EINVAL)
+    return -1;
+#endif
+
+  fd = epoll_create(1);
+  return SetCloexecOrClose(fd);
+}
+
+int Application::SetCloexecOrClose(int fd) {
+  if (SetCloexec(fd) != 0) {
+    close(fd);
+    return -1;
+  }
+  return fd;
+}
+
+int Application::SetCloexec(int fd) {
+  long flags;
+
+  if (fd == -1)
+    return -1;
+
+  flags = fcntl(fd, F_GETFD);
+  if (flags == -1)
+    return -1;
+
+  if (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1)
+    return -1;
+
+  return 0;
 }
 
 }

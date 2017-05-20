@@ -61,7 +61,7 @@ class SharedMemoryPool {
 
   static int CreateAnonymousFile(off_t size);
 
-  static int CreateTmpfileCloexec(char *tmpname);
+  static int CreateTempFile(char *tmpname);
 
   wayland::ShmPool wl_shm_pool_;
 

@@ -19,6 +19,30 @@
 
 using namespace skland;
 
+class TimerWatcher : public skland::Trackable {
+ public:
+
+  TimerWatcher(Timer *timer)
+      : timer_(timer), count_(0) {}
+
+  virtual ~TimerWatcher() {}
+
+  void OnTimeout(__SLOT__) {
+    fprintf(stdout, "%s\n", __PRETTY_FUNCTION__);
+    count_++;
+    if (count_ == 10) {
+      timer_->Stop();
+      Application::Exit();
+    }
+  }
+
+ private:
+
+  Timer *timer_;
+  int count_;
+
+};
+
 Test::Test()
     : testing::Test() {
 }
@@ -40,7 +64,10 @@ TEST_F(Test, timer_1) {
   Application app(argc, argv);
 
   Timer t;
-  t.SetInterval(1000);
+  TimerWatcher watcher(&t);
+
+  t.timeout().Connect(&watcher, &TimerWatcher::OnTimeout);
+  t.SetInterval(1000000);
   t.Start();
 
   int result = app.Run();
