@@ -17,6 +17,7 @@
 #include "display_private.hpp"
 
 #include <skland/core/debug.hpp>
+#include <skland/core/assert.hpp>
 
 #include <skland/gui/input.hpp>
 #include <skland/gui/output.hpp>
@@ -73,17 +74,17 @@ void Display::Private::OnError(void *data,
   Display *_this = static_cast<Display *>(data);
   const char *object_name = "Unknown object";
 
-  if (_this->p_->wl_display.Equal(object_id)) {
+  if (_this->p_->wl_display == object_id) {
     object_name = "wl_display";
   } else if (_this->p_->wl_compositor == object_id) {
     object_name = "wl_compositor";
-  } else if (_this->p_->wl_registry.Equal(object_id)) {
+  } else if (_this->p_->wl_registry == object_id) {
     object_name = "wl_registry";
   } else if (_this->p_->wl_subcompositor == object_id) {
     object_name = "wl_subcompositor";
   } else if (_this->p_->wl_shm == object_id) {
     object_name = "wl_shm";
-  } else if (_this->p_->wl_shell.Equal(object_id)) {
+  } else if (_this->p_->wl_shell == object_id) {
     object_name = "wl_shell";
   } else if (_this->p_->xdg_shell == object_id) {
     object_name = "xdg_shell";
@@ -111,42 +112,46 @@ void Display::Private::OnGlobal(void *data,
   _this->globals_.push_back(global);
 
   if (strcmp(interface, wl_compositor_interface.name) == 0) {
-    _this->p_->wl_compositor = static_cast<struct wl_compositor *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+    _this->p_->wl_compositor = static_cast<struct wl_compositor *>(wl_registry_bind(_this->p_->wl_registry,
                                                                                     id,
                                                                                     &wl_compositor_interface,
                                                                                     version));
   } else if (strcmp(interface, wl_subcompositor_interface.name) == 0) {
     _this->p_->wl_subcompositor =
-        static_cast<struct wl_subcompositor *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+        static_cast<struct wl_subcompositor *>(wl_registry_bind(_this->p_->wl_registry,
                                                                 id,
                                                                 &wl_subcompositor_interface,
                                                                 version));
   } else if (strcmp(interface, wl_shm_interface.name) == 0) {
     _this->p_->wl_shm =
-        static_cast<struct wl_shm *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+        static_cast<struct wl_shm *>(wl_registry_bind(_this->p_->wl_registry,
                                                       id,
                                                       &wl_shm_interface,
                                                       version));
     wl_shm_add_listener(_this->p_->wl_shm, &Private::kShmListener, _this);
-    _this->p_->wl_cursor_theme.Load(NULL, 24, _this->p_->wl_shm);
+
+    _ASSERT(nullptr == _this->p_->wl_cursor_theme);
+    _this->p_->wl_cursor_theme = wl_cursor_theme_load(NULL, 24, _this->p_->wl_shm);
+
     _this->InitializeCursors();
   } else if (strcmp(interface, wl_output_interface.name) == 0) {
     Output *output = new Output(id, version);
     _this->AddOutput(output);
   } else if (strcmp(interface, zxdg_shell_v6_interface.name) == 0) {
-    _this->p_->xdg_shell = static_cast<struct zxdg_shell_v6 *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+    _this->p_->xdg_shell = static_cast<struct zxdg_shell_v6 *>(wl_registry_bind(_this->p_->wl_registry,
                                                                                 id,
                                                                                 &zxdg_shell_v6_interface,
                                                                                 version));
     zxdg_shell_v6_add_listener(_this->p_->xdg_shell, &Private::kXdgShellListener, _this);
   } else if (strcmp(interface, wl_shell_interface.name) == 0) {
-    _this->p_->wl_shell.Setup(_this->p_->wl_registry, id, version);
+    _this->p_->wl_shell = static_cast<struct wl_shell *>(wl_registry_bind(_this->p_->wl_registry,
+                                                                          id, &wl_shell_interface, version));
   } else if (strcmp(interface, wl_seat_interface.name) == 0) {
     Input *input = new Input(id, version);
     _this->AddInput(input);
   } else if (strcmp(interface, wl_data_device_manager_interface.name) == 0) {
     _this->p_->wl_data_device_manager =
-        static_cast<struct wl_data_device_manager *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+        static_cast<struct wl_data_device_manager *>(wl_registry_bind(_this->p_->wl_registry,
                                                                       id,
                                                                       &wl_data_device_manager_interface,
                                                                       version));

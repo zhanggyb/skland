@@ -73,14 +73,14 @@ void Application::EpollTask::Run(uint32_t events) {
     return;
   }
   if (events & EPOLLIN) {
-    if (Display::kDisplay->p_->wl_display.Dispatch() == -1) {
+    if (wl_display_dispatch(Display::kDisplay->p_->wl_display) == -1) {
       Application::Exit();
       return;
     }
   }
   if (events & EPOLLOUT) {
     struct epoll_event ep;
-    int ret = Display::kDisplay->p_->wl_display.Flush();
+    int ret = wl_display_flush(Display::kDisplay->p_->wl_display);
     if (ret == 0) {
       ep.events = EPOLLIN | EPOLLERR | EPOLLHUP;
       ep.data.ptr = app_->epoll_task_;
@@ -163,11 +163,11 @@ int Application::Run() {
       task->Run();
     }
 
-    Display::kDisplay->p_->wl_display.DispatchPending();
+    wl_display_dispatch_pending(Display::kDisplay->p_->wl_display);
 
     if (!kInstance->running_) break;
 
-    ret = Display::kDisplay->p_->wl_display.Flush();
+    ret = wl_display_flush(Display::kDisplay->p_->wl_display);
     if (ret < 0 && errno == EAGAIN) {
       _DEBUG("%s\n", "Error when flush display");
       ep[0].events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;

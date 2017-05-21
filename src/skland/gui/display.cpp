@@ -50,15 +50,15 @@ Display::~Display() {
 }
 
 void Display::Connect(const char *name) {
-  if (p_->wl_display.IsValid()) return;
+  if (p_->wl_display) return;
 
-  p_->wl_display.Connect(name);
-  p_->wl_display.AddListener(&Private::kDisplayListener, this);
+  p_->wl_display = wl_display_connect(name);
+  wl_display_add_listener(p_->wl_display, &Private::kDisplayListener, this);
 
-  if (!p_->wl_display.IsValid()) {
+  if (nullptr == p_->wl_display) {
     throw std::runtime_error("FATAL! Cannot connect to Wayland compositor!");
   }
-  display_fd_ = p_->wl_display.GetFd();
+  display_fd_ = wl_display_get_fd(p_->wl_display);
 
   p_->xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
   if (p_->xkb_context == NULL) {
@@ -68,10 +68,10 @@ void Display::Connect(const char *name) {
   p_->egl_display.Setup(p_->wl_display);
   fprintf(stdout, "Use EGL version: %d.%d\n", p_->egl_display.major(), p_->egl_display.minor());
 
-  p_->wl_registry.Setup(p_->wl_display);
-  p_->wl_registry.AddListener(&Private::kRegistryListener, this);
+  p_->wl_registry = wl_display_get_registry(p_->wl_display);
+  wl_registry_add_listener(p_->wl_registry, &Private::kRegistryListener, this);
 
-  if (p_->wl_display.Roundtrip() < 0) {
+  if (wl_display_roundtrip(p_->wl_display) < 0) {
     Disconnect();
     throw CompositorError("Failed to process Wayland connection!");
   }
@@ -80,7 +80,7 @@ void Display::Connect(const char *name) {
 }
 
 void Display::Disconnect() noexcept {
-  if (!p_->wl_display.IsValid()) return;
+  if (nullptr == p_->wl_display) return;
 
   xkb_context_unref(p_->xkb_context);
 
@@ -95,11 +95,16 @@ void Display::Disconnect() noexcept {
     p_->wl_data_device_manager = nullptr;
   }
 
-  if (p_->wl_cursor_theme.IsValid()) {
+  if (p_->wl_cursor_theme) {
     ReleaseCursors();
-    p_->wl_cursor_theme.Destroy();
+    wl_cursor_theme_destroy(p_->wl_cursor_theme);
+    p_->wl_cursor_theme = nullptr;
   }
-  p_->wl_shell.Destroy();
+
+  if (p_->wl_shell) {
+    wl_shell_destroy(p_->wl_shell);
+    p_->wl_shell = nullptr;
+  }
 
   if (p_->xdg_shell) {
     zxdg_shell_v6_destroy(p_->xdg_shell);
@@ -121,11 +126,14 @@ void Display::Disconnect() noexcept {
     p_->wl_compositor = nullptr;
   }
 
-  p_->wl_registry.Destroy();
+  if (p_->wl_registry) {
+    wl_registry_destroy(p_->wl_registry);
+    p_->wl_registry = nullptr;
+  }
 
   p_->egl_display.Destroy();
 
-  p_->wl_display.Disconnect();
+  wl_display_disconnect(p_->wl_display);
 }
 
 const Output *Display::GetOutputAt(int index) {
@@ -152,22 +160,22 @@ void Display::AddInput(Input *input, int index) {
 }
 
 void Display::InitializeCursors() {
-  cursors_[kCursorBottomLeft] = Cursor::Create(p_->wl_cursor_theme.GetCursor("bottom_left_corner"));
-  cursors_[kCursorBottomRight] = Cursor::Create(p_->wl_cursor_theme.GetCursor("bottom_right_corner"));
-  cursors_[kCursorBottom] = Cursor::Create(p_->wl_cursor_theme.GetCursor("bottom_side"));
-  cursors_[kCursorDragging] = Cursor::Create(p_->wl_cursor_theme.GetCursor("grabbing"));
-  cursors_[kCursorLeftPtr] = Cursor::Create(p_->wl_cursor_theme.GetCursor("left_ptr"));
-  cursors_[kCursorLeft] = Cursor::Create(p_->wl_cursor_theme.GetCursor("left_side"));
-  cursors_[kCursorRight] = Cursor::Create(p_->wl_cursor_theme.GetCursor("right_side"));
-  cursors_[kCursorTopLeft] = Cursor::Create(p_->wl_cursor_theme.GetCursor("top_left_corner"));
-  cursors_[kCursorTopRight] = Cursor::Create(p_->wl_cursor_theme.GetCursor("top_right_corner"));
-  cursors_[kCursorTop] = Cursor::Create(p_->wl_cursor_theme.GetCursor("top_side"));
-  cursors_[kCursorIbeam] = Cursor::Create(p_->wl_cursor_theme.GetCursor("xterm"));
-  cursors_[kCursorHand1] = Cursor::Create(p_->wl_cursor_theme.GetCursor("hand1"));
-  cursors_[kCursorWatch] = Cursor::Create(p_->wl_cursor_theme.GetCursor("watch"));
-  cursors_[kCursorDndMove] = Cursor::Create(p_->wl_cursor_theme.GetCursor("left_ptr"));
-  cursors_[kCursorDndCopy] = Cursor::Create(p_->wl_cursor_theme.GetCursor("left_ptr"));
-  cursors_[kCursorDndForbidden] = Cursor::Create(p_->wl_cursor_theme.GetCursor("left_ptr"));
+  cursors_[kCursorBottomLeft] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "bottom_left_corner"));
+  cursors_[kCursorBottomRight] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "bottom_right_corner"));
+  cursors_[kCursorBottom] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "bottom_side"));
+  cursors_[kCursorDragging] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "grabbing"));
+  cursors_[kCursorLeftPtr] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
+  cursors_[kCursorLeft] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_side"));
+  cursors_[kCursorRight] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "right_side"));
+  cursors_[kCursorTopLeft] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "top_left_corner"));
+  cursors_[kCursorTopRight] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "top_right_corner"));
+  cursors_[kCursorTop] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "top_side"));
+  cursors_[kCursorIbeam] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "xterm"));
+  cursors_[kCursorHand1] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "hand1"));
+  cursors_[kCursorWatch] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "watch"));
+  cursors_[kCursorDndMove] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
+  cursors_[kCursorDndCopy] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
+  cursors_[kCursorDndForbidden] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
 }
 
 void Display::ReleaseCursors() {

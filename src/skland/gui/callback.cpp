@@ -29,16 +29,16 @@ struct Callback::Private {
   Private &operator=(const Private &) = delete;
 
   Private()
-      : native(nullptr) {}
+      : wl_callback(nullptr) {}
 
   ~Private() {
-    if (native) wl_callback_destroy(native);
+    if (wl_callback) wl_callback_destroy(wl_callback);
   }
 
   void Destroy() {
-    if (native) {
-      wl_callback_destroy(native);
-      native = nullptr;
+    if (wl_callback) {
+      wl_callback_destroy(wl_callback);
+      wl_callback = nullptr;
     }
   }
 
@@ -48,7 +48,7 @@ struct Callback::Private {
 
   static const struct wl_callback_listener kListener;
 
-  struct wl_callback *native;
+  struct wl_callback *wl_callback;
 
 };
 
@@ -83,14 +83,14 @@ Callback::~Callback() {
 
 void Callback::Setup(const Display &display) {
   p_->Destroy();
-//  p_->native = wl_display_sync(display.p_->wl_display.wl_display_);
-  wl_callback_add_listener(p_->native, &Private::kListener, this);
+  p_->wl_callback = wl_display_sync(display.p_->wl_display);
+  wl_callback_add_listener(p_->wl_callback, &Private::kListener, this);
 }
 
 void Callback::Setup(const Surface &surface) {
   p_->Destroy();
-//  p_->native = wl_surface_frame(surface.wl_surface_.wl_surface_);
-  wl_callback_add_listener(p_->native, &Private::kListener, this);
+  p_->wl_callback = wl_surface_frame(surface.wl_surface_);
+  wl_callback_add_listener(p_->wl_callback, &Private::kListener, this);
 }
 
 }

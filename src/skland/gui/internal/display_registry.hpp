@@ -40,16 +40,12 @@ SKLAND_NO_EXPORT class Display::Registry {
 
   ~Registry() {}
 
-  const wayland::Display &wl_display() const {
+  struct wl_display *wl_display() const {
     return display_->p_->wl_display;
   }
 
-  const wayland::Registry &wl_registry() const {
+  struct wl_registry *wl_registry() const {
     return display_->p_->wl_registry;
-  }
-
-  struct wl_registry *native() const {
-    return display_->p_->wl_registry.wl_registry_;
   }
 
   struct wl_compositor *wl_compositor() const {
@@ -68,7 +64,7 @@ SKLAND_NO_EXPORT class Display::Registry {
     return display_->p_->xdg_shell;
   }
 
-  const wayland::Shell &wl_shell() const {
+  struct wl_shell *wl_shell() const {
     return display_->p_->wl_shell;
   }
 

@@ -6,13 +6,6 @@
  */
 
 /**
- * @defgroup wayland Wayland
- * @brief C++ wrappers to wayland client APIs.
- *
- * C++ wrapper to wayland client APIs.
- */
-
-/**
  * @defgroup egl EGL
  * @brief C++ wrappers to EGL APIs
  *

@@ -86,7 +86,10 @@ Output::Output(uint32_t id, uint32_t version)
   p_->version = version;
 
   p_->wl_output =
-      static_cast<struct wl_output *>(wl_registry_bind(Display::Registry().native(), id, &wl_output_interface, version));
+      static_cast<struct wl_output *>(wl_registry_bind(Display::Registry().wl_registry(),
+                                                       id,
+                                                       &wl_output_interface,
+                                                       version));
   wl_output_add_listener(p_->wl_output, &kListener, this);
 }
 

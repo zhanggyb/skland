@@ -22,11 +22,6 @@
 #include <skland/gui/task.hpp>
 #include <skland/gui/abstract-epoll-task.hpp>
 
-#include <skland/wayland/display.hpp>
-#include <skland/wayland/registry.hpp>
-#include <skland/wayland/shell.hpp>
-#include <skland/wayland/cursor-theme.hpp>
-
 #include <skland/egl/display.hpp>
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
@@ -43,22 +38,26 @@ struct Display::Private {
   Private &operator=(const Private &) = delete;
 
   Private()
-      : wl_compositor(nullptr),
+      : wl_display(nullptr),
+        wl_registry(nullptr),
+        wl_compositor(nullptr),
         wl_subcompositor(nullptr),
         wl_shm(nullptr),
+        wl_shell(nullptr),
         xdg_shell(nullptr),
+        wl_cursor_theme(nullptr),
         wl_data_device_manager(nullptr) {}
 
   ~Private() {}
 
-  wayland::Display wl_display;
-  wayland::Registry wl_registry;
+  struct wl_display *wl_display;
+  struct wl_registry *wl_registry;
   struct wl_compositor *wl_compositor;
   struct wl_subcompositor *wl_subcompositor;
-  struct wl_shm* wl_shm;
-  wayland::Shell wl_shell;
+  struct wl_shm *wl_shm;
+  struct wl_shell *wl_shell;
   struct zxdg_shell_v6 *xdg_shell;
-  wayland::CursorTheme wl_cursor_theme;
+  struct wl_cursor_theme *wl_cursor_theme;
   struct wl_data_device_manager *wl_data_device_manager;
 
   egl::Display egl_display;

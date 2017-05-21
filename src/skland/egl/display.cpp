@@ -18,8 +18,6 @@
 
 #include <EGL/eglext.h>
 
-#include <skland/wayland/display.hpp>
-
 #include <skland/core/assert.hpp>
 #include <malloc.h>
 #include <cstring>
@@ -60,7 +58,7 @@ weston_check_egl_extension(const char *extensions, const char *extension) {
   return false;
 }
 
-void Display::Setup(const wayland::Display &wl_display) {
+void Display::Setup(struct wl_display *wl_display) {
   Destroy();
 
   EGLint count, n, size;
@@ -81,7 +79,7 @@ void Display::Setup(const wayland::Display &wl_display) {
   };
 
   egl_display_ = GetEGLDisplay(EGL_PLATFORM_WAYLAND_KHR,
-                               wl_display.wl_display_, NULL);
+                               wl_display, NULL);
   _ASSERT(egl_display_);
 
   ret = eglInitialize(egl_display_, &major_, &minor_);

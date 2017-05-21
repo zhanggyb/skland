@@ -58,7 +58,7 @@ class Display {
     }
   }
 
-  void Setup(const wayland::Display &wl_display);
+  void Setup(struct wl_display *wl_display);
 
   void Destroy();
 

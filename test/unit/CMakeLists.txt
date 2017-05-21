@@ -38,14 +38,9 @@ if (LINUX)
     add_subdirectory(graphic-paint)
     add_subdirectory(graphic-canvas)
 
-    # wayland wrapper
-    add_subdirectory(wayland-client-display)
-    add_subdirectory(wayland-client-registry)
-
     # gui
     add_subdirectory(gui-idle-task)
     add_subdirectory(gui-display)
-    add_subdirectory(gui-output)
     add_subdirectory(gui-application)
     add_subdirectory(gui-abstract-window)
     add_subdirectory(gui-window)

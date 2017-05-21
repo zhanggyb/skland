@@ -27,7 +27,10 @@ Input::Input(uint32_t id, uint32_t version)
   p_->version = version;
 
   p_->wl_seat =
-      static_cast<struct wl_seat *>(wl_registry_bind(Display::Registry().native(), id, &wl_seat_interface, version));
+      static_cast<struct wl_seat *>(wl_registry_bind(Display::Registry().wl_registry(),
+                                                     id,
+                                                     &wl_seat_interface,
+                                                     version));
   wl_seat_add_listener(p_->wl_seat, &Private::kSeatListener, this);
 }
 
