@@ -51,13 +51,14 @@ void SharedMemoryPool::Setup(int32_t size) {
     throw std::runtime_error("Cannot map shared memory");
   }
 
-  wl_shm_pool_.Setup(Display::Registry().wl_shm(), fd, size);
+  wl_shm_pool_ = wl_shm_create_pool(Display::Registry().wl_shm(), fd, size);
+
   size_ = size;
   close(fd);
 }
 
 void SharedMemoryPool::Destroy() {
-  if (wl_shm_pool_.IsValid()) {
+  if (wl_shm_pool_) {
     _ASSERT(data_);
 
     if (munmap(data_, (size_t) size_))
@@ -65,7 +66,9 @@ void SharedMemoryPool::Destroy() {
 
     data_ = nullptr;
     size_ = 0;
-    wl_shm_pool_.Destroy();
+
+    wl_shm_pool_destroy(wl_shm_pool_);
+    wl_shm_pool_ = nullptr;
   }
 }
 

@@ -75,13 +75,13 @@ void Display::Private::OnError(void *data,
 
   if (_this->p_->wl_display.Equal(object_id)) {
     object_name = "wl_display";
-  } else if (_this->p_->wl_compositor.Equal(object_id)) {
+  } else if (_this->p_->wl_compositor == object_id) {
     object_name = "wl_compositor";
   } else if (_this->p_->wl_registry.Equal(object_id)) {
     object_name = "wl_registry";
   } else if (_this->p_->wl_subcompositor == object_id) {
     object_name = "wl_subcompositor";
-  } else if (_this->p_->wl_shm.Equal(object_id)) {
+  } else if (_this->p_->wl_shm == object_id) {
     object_name = "wl_shm";
   } else if (_this->p_->wl_shell.Equal(object_id)) {
     object_name = "wl_shell";
@@ -111,7 +111,10 @@ void Display::Private::OnGlobal(void *data,
   _this->globals_.push_back(global);
 
   if (strcmp(interface, wl_compositor_interface.name) == 0) {
-    _this->p_->wl_compositor.Setup(_this->p_->wl_registry, id, version);
+    _this->p_->wl_compositor = static_cast<struct wl_compositor *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+                                                                                    id,
+                                                                                    &wl_compositor_interface,
+                                                                                    version));
   } else if (strcmp(interface, wl_subcompositor_interface.name) == 0) {
     _this->p_->wl_subcompositor =
         static_cast<struct wl_subcompositor *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
@@ -119,8 +122,12 @@ void Display::Private::OnGlobal(void *data,
                                                                 &wl_subcompositor_interface,
                                                                 version));
   } else if (strcmp(interface, wl_shm_interface.name) == 0) {
-    _this->p_->wl_shm.Setup(_this->p_->wl_registry, id, version);
-    _this->p_->wl_shm.AddListener(&Private::kShmListener, _this);
+    _this->p_->wl_shm =
+        static_cast<struct wl_shm *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+                                                      id,
+                                                      &wl_shm_interface,
+                                                      version));
+    wl_shm_add_listener(_this->p_->wl_shm, &Private::kShmListener, _this);
     _this->p_->wl_cursor_theme.Load(NULL, 24, _this->p_->wl_shm);
     _this->InitializeCursors();
   } else if (strcmp(interface, wl_output_interface.name) == 0) {

@@ -18,12 +18,13 @@
 #define SKLAND_GUI_CURSOR_HPP_
 
 #include <wayland-cursor.h>
-
-#include "../wayland/surface.hpp"
+#include <wayland-client.h>
 
 namespace skland {
 
 class Cursor {
+
+  friend class Input;
 
   Cursor(const Cursor &) = delete;
   Cursor &operator=(const Cursor &) = delete;
@@ -35,11 +36,7 @@ class Cursor {
   ~Cursor();
 
   void Commit() const {
-    wl_surface_.Commit();
-  }
-
-  const wayland::Surface &wl_surface() const {
-    return wl_surface_;
+    wl_surface_commit(wl_surface_);
   }
 
   int32_t hotspot_x() const {
@@ -52,9 +49,9 @@ class Cursor {
 
  private:
 
-  Cursor() : wl_cursor_(nullptr) {}
+  Cursor() : wl_surface_(nullptr), wl_cursor_(nullptr) {}
 
-  wayland::Surface wl_surface_;
+  struct wl_surface* wl_surface_;
 
   struct wl_cursor *wl_cursor_;
 

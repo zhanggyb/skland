@@ -21,6 +21,7 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
+#include <skland/gui/region.hpp>
 
 #include <skland/graphic/canvas.hpp>
 
@@ -67,8 +68,7 @@ AbstractShellView::AbstractShellView(int width,
   width += kResizingMargin.lr();
   height += kResizingMargin.tb();
 
-  wayland::Region input_region;
-  input_region.Setup(Display::Registry().wl_compositor());
+  Region input_region;
   input_region.Add(x, y, width, height);
   p_->shell_surface->SetInputRegion(input_region);
 }

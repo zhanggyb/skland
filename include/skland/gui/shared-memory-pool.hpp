@@ -17,9 +17,8 @@
 #ifndef SKLAND_GUI_SHARED_MEMORY_POOL_HPP_
 #define SKLAND_GUI_SHARED_MEMORY_POOL_HPP_
 
+#include <wayland-client.h>
 #include <sys/types.h>
-
-#include <skland/wayland/shm-pool.hpp>
 
 namespace skland {
 
@@ -28,20 +27,25 @@ namespace skland {
  */
 class SharedMemoryPool {
 
+  friend class Buffer;
+
   SharedMemoryPool &operator=(const SharedMemoryPool &) = delete;
   SharedMemoryPool(const SharedMemoryPool &) = delete;
 
  public:
 
   SharedMemoryPool()
-      : size_(0), data_(nullptr) {}
+      : wl_shm_pool_(nullptr), size_(0), data_(nullptr) {}
 
   /**
    * @brief Destructor
    *
    * Destroy the pool, this does not unmap the memory though.
    */
-  inline ~SharedMemoryPool() {}
+  ~SharedMemoryPool() {
+    if (wl_shm_pool_)
+      wl_shm_pool_destroy(wl_shm_pool_);
+  }
 
   void Setup(int32_t size);
 
@@ -49,10 +53,6 @@ class SharedMemoryPool {
 
   int32_t size() const {
     return size_;
-  }
-
-  const wayland::ShmPool &wl_shm_pool() const {
-    return wl_shm_pool_;
   }
 
   void *data() const { return data_; };
@@ -63,7 +63,7 @@ class SharedMemoryPool {
 
   static int CreateTempFile(char *tmpname);
 
-  wayland::ShmPool wl_shm_pool_;
+  struct wl_shm_pool* wl_shm_pool_;
 
   int32_t size_;
 

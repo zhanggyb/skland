@@ -25,6 +25,7 @@
 
 #include <skland/gui/shared-memory-pool.hpp>
 #include <skland/gui/buffer.hpp>
+#include <skland/gui/region.hpp>
 
 #include "internal/display_registry.hpp"
 #include "internal/abstract-shell-view_iterators.hpp"
@@ -86,8 +87,7 @@ EGLWindow::EGLWindow(int width, int height, const char *title)
   _ASSERT(p_->sub_surface->parent() == parent);
   _ASSERT(p_->sub_surface->below() == parent);
 
-  wayland::Region empty_region;
-  empty_region.Setup(Display::Registry().wl_compositor());
+  Region empty_region;
   p_->sub_surface->SetInputRegion(empty_region);
 
   Surface::Sub::Get(p_->sub_surface)->SetWindowPosition(0, 0);
@@ -167,8 +167,7 @@ void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
   input_rect.Resize(width + kResizingMargin.lr(),
                     height + kResizingMargin.tb());
 
-  wayland::Region input_region;
-  input_region.Setup(Display::Registry().wl_compositor());
+  Region input_region;
   input_region.Add(input_rect.x(), input_rect.y(),
                    input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);

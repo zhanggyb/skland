@@ -41,7 +41,6 @@ if (LINUX)
     # wayland wrapper
     add_subdirectory(wayland-client-display)
     add_subdirectory(wayland-client-registry)
-    add_subdirectory(wayland-client-output)
 
     # gui
     add_subdirectory(gui-idle-task)

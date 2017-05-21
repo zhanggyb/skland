@@ -16,7 +16,6 @@
 
 #include <skland/egl/surface.hpp>
 #include <skland/core/assert.hpp>
-#include <skland/wayland/surface.hpp>
 #include <skland/egl/display.hpp>
 
 #include <stdlib.h>
@@ -38,12 +37,12 @@ Surface::~Surface() {
 }
 
 void Surface::Setup(const egl::Display &egl_display,
-                    const wayland::Surface &wl_surface,
+                    struct wl_surface *wl_surface,
                     int width, int height) {
   Destroy();
 
   wl_egl_window_ =
-      wl_egl_window_create(wl_surface.wl_surface_, width, height);
+      wl_egl_window_create(wl_surface, width, height);
   egl_surface_ =
       eglCreatePlatformWindowSurface(egl_display.egl_display_,
                                      egl_display.egl_config_,

@@ -49,7 +49,7 @@ class Surface {
   ~Surface();
 
   void Setup(const egl::Display &egl_display,
-             const wayland::Surface &wl_surface,
+             struct wl_surface* wl_surface,
              int width, int height);
 
   void Destroy();

@@ -28,10 +28,6 @@
 
 namespace skland {
 
-namespace wayland {
-class Buffer;
-}
-
 class SharedMemoryPool;
 
 /**
@@ -41,6 +37,8 @@ class SharedMemoryPool;
  * allocate this buffer and should allocate again if the shm pool is reset.
  */
 class Buffer {
+
+  friend class Surface;
 
   Buffer(const Buffer &) = delete;
   Buffer &operator=(const Buffer &) = delete;
@@ -61,8 +59,6 @@ class Buffer {
   void Destroy();
 
   void SetPosition(int x, int y);
-
-  const wayland::Buffer &wl_buffer() const;
 
   const void *GetData() const;
 

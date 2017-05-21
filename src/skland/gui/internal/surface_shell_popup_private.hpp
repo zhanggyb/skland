@@ -14,33 +14,37 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
-
-#include <skland/wayland/xdg-surface.hpp>
+#ifndef SKLAND_GUI_INTERNAL_SURFACE_SHELL_POPUP_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_SURFACE_SHELL_POPUP_PRIVATE_HPP_
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
-namespace wayland {
 
-struct XdgSurface::Private {
+struct Surface::Shell::Popup::Private {
 
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
   Private()
-      : zxdg_surface(nullptr) {}
+      : zxdg_popup(nullptr),
+        zxdg_positioner(nullptr) {}
 
   ~Private() {
-    if (zxdg_surface) zxdg_surface_v6_destroy(zxdg_surface);
+    if (zxdg_positioner) {
+      zxdg_positioner_v6_destroy(zxdg_positioner);
+    }
+
+    if (zxdg_popup) {
+      zxdg_popup_v6_destroy(zxdg_popup);
+    }
   }
 
-  struct zxdg_surface_v6 *zxdg_surface;
+  struct zxdg_popup_v6 *zxdg_popup;
+  struct zxdg_positioner_v6 *zxdg_positioner;
 
 };
 
 }
-}
 
-#endif // SKLAND_WAYLAND_INTERNAL_XDG_SURFACE_PRIVATE_HPP_
+#endif // SKLAND_GUI_INTERNAL_SURFACE_SHELL_POPUP_PRIVATE_HPP_

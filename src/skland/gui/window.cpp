@@ -27,6 +27,7 @@
 
 #include <skland/gui/shared-memory-pool.hpp>
 #include <skland/gui/buffer.hpp>
+#include <skland/gui/region.hpp>
 
 #include <skland/stock/theme.hpp>
 
@@ -88,8 +89,7 @@ Window::Window(int width, int height, const char *title, int flags)
     p_->main_surface = Surface::Sub::Create(parent, this, Theme::GetShadowMargin());
     _ASSERT(p_->main_surface->parent() == parent);
     _ASSERT(p_->main_surface->below() == parent);
-    wayland::Region empty_region;
-    empty_region.Setup(Display::Registry().wl_compositor());
+    Region empty_region;
     p_->main_surface->SetInputRegion(empty_region);
 
     // Create the default title bar:
@@ -245,8 +245,7 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   input_rect.Resize(width + kResizingMargin.lr(),
                     height + kResizingMargin.tb());
 
-  wayland::Region input_region;
-  input_region.Setup(Display::Registry().wl_compositor());
+  Region input_region;
   input_region.Add(input_rect.x(), input_rect.y(),
                    input_rect.width(), input_rect.height());
   shell_surface->SetInputRegion(input_region);

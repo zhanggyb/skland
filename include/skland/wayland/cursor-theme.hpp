@@ -17,7 +17,7 @@
 #ifndef SKLAND_WAYLAND_CURSOR_THEME_HPP_
 #define SKLAND_WAYLAND_CURSOR_THEME_HPP_
 
-#include "shm.hpp"
+#include <wayland-client.h>
 
 namespace skland {
 namespace wayland {
@@ -36,10 +36,10 @@ class CursorTheme {
     if (wl_cursor_theme_) wl_cursor_theme_destroy(wl_cursor_theme_);
   }
 
-  void Load(const char *name, int size, const Shm &shm) {
+  void Load(const char *name, int size, struct wl_shm *shm) {
     Destroy();
 
-    wl_cursor_theme_ = wl_cursor_theme_load(name, size, shm.wl_shm_);
+    wl_cursor_theme_ = wl_cursor_theme_load(name, size, shm);
   }
 
   void Destroy() {

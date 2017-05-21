@@ -106,14 +106,21 @@ void Display::Disconnect() noexcept {
     p_->xdg_shell = nullptr;
   }
 
-  p_->wl_shm.Destroy();
+  if (p_->wl_shm) {
+    wl_shm_destroy(p_->wl_shm);
+    p_->wl_shm = nullptr;
+  }
 
   if (p_->wl_subcompositor) {
     wl_subcompositor_destroy(p_->wl_subcompositor);
     p_->wl_subcompositor = nullptr;
   }
 
-  p_->wl_compositor.Destroy();
+  if (p_->wl_compositor) {
+    wl_compositor_destroy(p_->wl_compositor);
+    p_->wl_compositor = nullptr;
+  }
+
   p_->wl_registry.Destroy();
 
   p_->egl_display.Destroy();

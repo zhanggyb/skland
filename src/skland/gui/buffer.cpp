@@ -14,44 +14,11 @@
  * limitations under the License.
  */
 
-#include <skland/gui/buffer.hpp>
+#include "internal/buffer_private.hpp"
+
 #include <skland/gui/shared-memory-pool.hpp>
 
-#include <skland/wayland/buffer.hpp>
-
 namespace skland {
-
-struct Buffer::Private {
-
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
-
-  Private()
-      : stride(0),
-        format(0),
-        offset(0),
-        data(nullptr) {}
-
-  ~Private() {}
-
-  wayland::Buffer wl_buffer;
-
-  /**
-   * @brief Position on surface
-   */
-  Point position;
-
-  Size size;
-
-  int32_t stride;
-
-  uint32_t format;
-
-  int offset;
-
-  void *data;
-
-};
 
 const struct wl_buffer_listener Buffer::kListener = {
     OnRelease
@@ -78,9 +45,13 @@ void Buffer::Setup(const SharedMemoryPool &pool,
     throw std::runtime_error("Error! Trying to allocate buffer on small SHM pool.");
   }
 
-  p_->wl_buffer.Setup(pool.wl_shm_pool(), offset, width,
-                      height, stride, format);
-  p_->wl_buffer.AddListener(&kListener, this);
+  p_->wl_buffer = wl_shm_pool_create_buffer(pool.wl_shm_pool_,
+                                            offset,
+                                            width,
+                                            height,
+                                            stride,
+                                            format);
+  wl_buffer_add_listener(p_->wl_buffer, &kListener, this);
   p_->size.width = width;
   p_->size.height = height;
   p_->stride = stride;
@@ -90,24 +61,21 @@ void Buffer::Setup(const SharedMemoryPool &pool,
 }
 
 void Buffer::Destroy() {
-  if (p_->wl_buffer.IsValid()) {
+  if (p_->wl_buffer) {
     p_->data = nullptr;
     p_->offset = 0;
     p_->format = 0;
     p_->stride = 0;
     p_->size.width = 0;
     p_->size.height = 0;
-    p_->wl_buffer.Destroy();
+    wl_buffer_destroy(p_->wl_buffer);
+    p_->wl_buffer = nullptr;
   }
 }
 
 void Buffer::SetPosition(int x, int y) {
   p_->position.x = x;
   p_->position.y = y;
-}
-
-const wayland::Buffer &Buffer::wl_buffer() const {
-  return p_->wl_buffer;
 }
 
 const void *Buffer::GetData() const {

@@ -14,33 +14,20 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_POSITIONER_PRIVATE_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_POSITIONER_PRIVATE_HPP_
+#include <skland/gui/region.hpp>
 
-#include <skland/wayland/xdg-positioner.hpp>
-
-#include "xdg-shell-unstable-v6-client-protocol.h"
+#include "internal/display_registry.hpp"
 
 namespace skland {
-namespace wayland {
 
-struct XdgPositioner::Private {
-
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
-
-  Private()
-      : zxdg_positioner(nullptr) {}
-
-  ~Private() {
-    if (zxdg_positioner) zxdg_positioner_v6_destroy(zxdg_positioner);
-  }
-
-  struct zxdg_positioner_v6 *zxdg_positioner;
-
-};
-
-}
+Region::Region()
+    : wl_region_(nullptr) {
+  wl_region_ = wl_compositor_create_region(Display::Registry().wl_compositor());
 }
 
-#endif // SKLAND_WAYLAND_INTERNAL_XDG_POSITIONER_PRIVATE_HPP_
+Region::~Region() {
+  if (wl_region_)
+    wl_region_destroy(wl_region_);
+}
+
+}

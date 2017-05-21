@@ -37,7 +37,7 @@ Input::~Input() {
 
 void Input::SetCursor(const Cursor *cursor) const {
   wl_pointer_set_cursor(p_->wl_pointer, p_->mouse_event->GetSerial(),
-                        cursor->wl_surface().wl_surface_,
+                        cursor->wl_surface_,
                         cursor->hotspot_x(), cursor->hotspot_y());
   cursor->Commit();
 }

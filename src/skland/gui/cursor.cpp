@@ -23,14 +23,14 @@ namespace skland {
 Cursor *Cursor::Create(struct wl_cursor *wl_cursor) {
   Cursor *cursor = new Cursor;
 
-  cursor->wl_surface_.Setup(Display::Registry().wl_compositor());
+  cursor->wl_surface_ = wl_compositor_create_surface(Display::Registry().wl_compositor());
   cursor->wl_cursor_ = wl_cursor;
 
   struct wl_cursor_image *image = wl_cursor->images[0];
   struct wl_buffer *buffer = wl_cursor_image_get_buffer(image);
 
   // TODO: attach buffer to surface
-  cursor->wl_surface_.Attach(buffer, 0, 0);
+  wl_surface_attach(cursor->wl_surface_, buffer, 0, 0);
 
   return cursor;
 }

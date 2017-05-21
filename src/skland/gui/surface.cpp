@@ -21,15 +21,16 @@
 
 #include <skland/core/assert.hpp>
 #include <skland/gui/input-event.hpp>
+#include <skland/gui/region.hpp>
 
+#include "internal/input_private.hpp"
+#include "internal/output_private.hpp"
 #include "internal/display_registry.hpp"
 #include "internal/surface-commit_task.hpp"
 #include "internal/surface_shell_private.hpp"
 #include "internal/surface_shell_toplevel_private.hpp"
-#include "internal/input_private.hpp"
-#include "internal/output_private.hpp"
-
-#include "xdg-shell-unstable-v6-client-protocol.h"
+#include "internal/surface_shell_popup_private.hpp"
+#include "internal/buffer_private.hpp"
 
 namespace skland {
 
@@ -61,7 +62,7 @@ Surface::Shell::Shell(Surface *surface)
   _ASSERT(surface_);
   role_.placeholder = nullptr;
 
-  p_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(Display::Registry().xdg_shell(), surface_->wl_surface_.wl_surface_);
+  p_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(Display::Registry().xdg_shell(), surface_->wl_surface_);
   zxdg_surface_v6_add_listener(p_->zxdg_surface, &Private::kListener, this);
 
   Push();
@@ -200,11 +201,11 @@ Surface *Surface::Shell::Popup::Create(Shell *parent, AbstractEventHandler *view
 
 Surface::Shell::Popup::Popup(Shell *shell)
     : shell_(shell) {
+  p_.reset(new Private);
   // TODO: initialize xdg_popup_
 }
 
 Surface::Shell::Popup::~Popup() {
-  xdg_popup_.Destroy();
 
   _ASSERT(shell_->parent_);
   _ASSERT(shell_->role_.popup == this);
@@ -234,8 +235,8 @@ Surface::Sub::Sub(Surface *surface, Surface *parent)
   _ASSERT(parent);
 
   wl_sub_surface_ = wl_subcompositor_get_subsurface(Display::Registry().wl_subcompositor(),
-                                                    surface_->wl_surface_.wl_surface_,
-                                                    parent->wl_surface_.wl_surface_);
+                                                    surface_->wl_surface_,
+                                                    parent->wl_surface_);
   SetParent(parent);
 }
 
@@ -276,7 +277,7 @@ void Surface::Sub::PlaceAbove(Surface *sibling) {
   if (surface_->parent() == sibling->parent() ||
       surface_ == sibling->parent() ||
       surface_->parent() == sibling) {
-    wl_subsurface_place_above(wl_sub_surface_, sibling->wl_surface_.wl_surface_);
+    wl_subsurface_place_above(wl_sub_surface_, sibling->wl_surface_);
     MoveAbove(sibling);
   }
 }
@@ -287,7 +288,7 @@ void Surface::Sub::PlaceBelow(Surface *sibling) {
   if (surface_->parent() == sibling->parent() ||
       surface_ == sibling->parent() ||
       surface_->parent() == sibling) {
-    wl_subsurface_place_below(wl_sub_surface_, sibling->wl_surface_.wl_surface_);
+    wl_subsurface_place_below(wl_sub_surface_, sibling->wl_surface_);
     MoveBelow(sibling);
   }
 }
@@ -486,6 +487,7 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)
       below_(nullptr),
       up_(nullptr),
       down_(nullptr),
+      wl_surface_(nullptr),
       event_handler_(event_handler),
       margin_(margin),
       buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
@@ -495,8 +497,8 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)
   _ASSERT(nullptr != event_handler_);
   role_.placeholder = nullptr;
 
-  wl_surface_.Setup(Display::Registry().wl_compositor());
-  wl_surface_.AddListener(&kListener, this);
+  wl_surface_ = wl_compositor_create_surface(Display::Registry().wl_compositor());
+  wl_surface_add_listener(wl_surface_, &kListener, this);
 
   commit_task_.reset(new CommitTask(this));
 }
@@ -509,16 +511,19 @@ Surface::~Surface() {
     delete role_.shell; // deleting a shell surface will break the links to up_ and down_
   else
     delete role_.sub; // deleting all sub surfaces and break the links to above_ and below_
+
+  if (wl_surface_)
+    wl_surface_destroy(wl_surface_);
 }
 
 void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
   if (nullptr != egl_) return;
 
   if (nullptr == buffer) {
-    wl_surface_.Attach(NULL, x, y);
+    wl_surface_attach(wl_surface_, NULL, x, y);
   } else {
     buffer->SetPosition(x, y);
-    wl_surface_.Attach(buffer->wl_buffer(), x, y);
+    wl_surface_attach(wl_surface_, buffer->p_->wl_buffer, x, y);
   }
 }
 
@@ -550,6 +555,18 @@ void Surface::Commit() {
   } else {
     kCommitTaskTail.PushFront(commit_task_.get());
   }
+}
+
+void Surface::Damage(int surface_x, int surface_y, int width, int height) const {
+  wl_surface_damage(wl_surface_, surface_x, surface_y, width, height);
+}
+
+void Surface::SetInputRegion(const Region &region) {
+  wl_surface_set_input_region(wl_surface_, region.wl_region_);
+}
+
+void Surface::SetOpaqueRegion(const Region &region) {
+  wl_surface_set_opaque_region(wl_surface_, region.wl_region_);
 }
 
 Surface *Surface::GetShellSurface() {

@@ -52,7 +52,7 @@ SKLAND_NO_EXPORT class Display::Registry {
     return display_->p_->wl_registry.wl_registry_;
   }
 
-  const wayland::Compositor &wl_compositor() const {
+  struct wl_compositor *wl_compositor() const {
     return display_->p_->wl_compositor;
   }
 
@@ -60,7 +60,7 @@ SKLAND_NO_EXPORT class Display::Registry {
     return display_->p_->wl_subcompositor;
   }
 
-  const wayland::Shm &wl_shm() const {
+  struct wl_shm *wl_shm() const {
     return display_->p_->wl_shm;
   }
 

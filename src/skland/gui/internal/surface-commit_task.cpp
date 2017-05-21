@@ -19,7 +19,7 @@
 namespace skland {
 
 void Surface::CommitTask::Run() const {
-  surface->wl_surface_.Commit();
+  wl_surface_commit(surface->wl_surface_);
 }
 
 }

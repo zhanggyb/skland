@@ -18,6 +18,7 @@
 
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
+#include <skland/gui/region.hpp>
 
 #include "internal/abstract-shell-view_redraw-task.hpp"
 #include "internal/abstract-view_iterators.hpp"
@@ -57,7 +58,7 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 
     sub_surface_ = Surface::Sub::Create(parent_surface, this);
     egl_surface_ = Surface::EGL::Get(sub_surface_);
-    wayland::Region region;
+    Region region;
     sub_surface_->SetInputRegion(region);
 //    egl_surface_->Resize(GetWidth(), GetHeight());
 //    surface_->SetDesync();

@@ -14,33 +14,49 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_WAYLAND_INTERNAL_XDG_POPUP_PRIVATE_HPP_
-#define SKLAND_WAYLAND_INTERNAL_XDG_POPUP_PRIVATE_HPP_
+#ifndef SKLAND_BUFFER_PRIVATE_HPP
+#define SKLAND_BUFFER_PRIVATE_HPP
 
-#include <skland/wayland/xdg-popup.hpp>
-
-#include "xdg-shell-unstable-v6-client-protocol.h"
+#include <skland/gui/buffer.hpp>
 
 namespace skland {
-namespace wayland {
 
-struct XdgPopup::Private {
+struct Buffer::Private {
 
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
   Private()
-      : zxdg_popup(nullptr) {}
+      : wl_buffer(nullptr),
+        stride(0),
+        format(0),
+        offset(0),
+        data(nullptr) {}
 
   ~Private() {
-    if (zxdg_popup) zxdg_popup_v6_destroy(zxdg_popup);
+    if (wl_buffer)
+      wl_buffer_destroy(wl_buffer);
   }
 
-  struct zxdg_popup_v6 *zxdg_popup;
+  struct wl_buffer *wl_buffer;
+
+  /**
+   * @brief Position on surface
+   */
+  Point position;
+
+  Size size;
+
+  int32_t stride;
+
+  uint32_t format;
+
+  int offset;
+
+  void *data;
 
 };
 
 }
-}
 
-#endif // SKLAND_WAYLAND_INTERNAL_XDG_POPUP_PRIVATE_HPP_
+#endif //SKLAND_BUFFER_PRIVATE_HPP

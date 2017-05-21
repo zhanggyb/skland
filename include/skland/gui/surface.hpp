@@ -21,13 +21,6 @@
 #include "../core/margin.hpp"
 #include "../core/point.hpp"
 
-#include "../wayland/surface.hpp"
-#include "../wayland/region.hpp"
-#include "../wayland/xdg-surface.hpp"
-#include "../wayland/xdg-toplevel.hpp"
-#include "../wayland/xdg-popup.hpp"
-#include "../wayland/xdg-positioner.hpp"
-
 #include "../egl/surface.hpp"
 
 #include "task.hpp"
@@ -42,6 +35,7 @@ class AbstractEventHandler;
 class Buffer;
 class Output;
 class InputEvent;
+class Region;
 
 /**
  * @ingroup gui
@@ -196,14 +190,15 @@ class Surface {
 
      private:
 
+      struct Private;
+
       Popup(Shell *shell);
 
       ~Popup();
 
-      Shell *shell_;
+      std::unique_ptr<Private> p_;
 
-      wayland::XdgPopup xdg_popup_;
-      wayland::XdgPositioner xdg_positioner_;
+      Shell *shell_;
 
     };
 
@@ -380,17 +375,11 @@ class Surface {
   /**
    * @brief Mark the damaged region of the surface
    */
-  void Damage(int surface_x, int surface_y, int width, int height) const {
-    wl_surface_.Damage(surface_x, surface_y, width, height);
-  }
+  void Damage(int surface_x, int surface_y, int width, int height) const;
 
-  void SetInputRegion(const wayland::Region &region) {
-    wl_surface_.SetInputRegion(region);
-  }
+  void SetInputRegion(const Region &region);
 
-  void SetOpaqueRegion(const wayland::Region &region) {
-    wl_surface_.SetOpaqueRegion(region);
-  }
+  void SetOpaqueRegion(const Region &region);
 
   Surface *GetShellSurface();
 
@@ -469,7 +458,7 @@ class Surface {
    */
   Surface *down_;
 
-  wayland::Surface wl_surface_;
+  struct wl_surface *wl_surface_;
 
   AbstractEventHandler *event_handler_;
 
