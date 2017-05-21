@@ -316,11 +316,11 @@ void AbstractShellView::OnViewDetached(AbstractView *view) {
 }
 
 void AbstractShellView::MoveWithMouse(MouseEvent *event) const {
-  Surface::Shell::Toplevel::Get(p_->shell_surface)->Move(event->GetSeat(), event->GetSerial());
+  Surface::Shell::Toplevel::Get(p_->shell_surface)->Move(*event, event->GetSerial());
 }
 
 void AbstractShellView::ResizeWithMouse(MouseEvent *event, uint32_t edges) const {
-  Surface::Shell::Toplevel::Get(p_->shell_surface)->Resize(event->GetSeat(), event->GetSerial(), edges);
+  Surface::Shell::Toplevel::Get(p_->shell_surface)->Resize(*event, event->GetSerial(), edges);
 }
 
 Surface *AbstractShellView::GetShellSurface() const {

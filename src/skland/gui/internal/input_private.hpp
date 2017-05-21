@@ -19,11 +19,6 @@
 
 #include <skland/gui/input.hpp>
 
-#include <skland/wayland/seat.hpp>
-#include <skland/wayland/pointer.hpp>
-#include <skland/wayland/keyboard.hpp>
-#include <skland/wayland/touch.hpp>
-
 #include <skland/gui/surface.hpp>
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/touch-event.hpp>
@@ -40,7 +35,11 @@ struct Input::Private {
   Private &operator=(const Private &) = delete;
 
   Private()
-      : key_event(nullptr),
+      : wl_seat(nullptr),
+        wl_keyboard(nullptr),
+        wl_pointer(nullptr),
+        wl_touch(nullptr),
+        key_event(nullptr),
         mouse_event(nullptr),
         touch_event(nullptr),
         id(0), version(0) {}
@@ -53,16 +52,23 @@ struct Input::Private {
     delete mouse_event;
     delete key_event;
 
-    wl_touch.Destroy();
-    wl_pointer.Destroy();
-    wl_keyboard.Destroy();
-    wl_seat.Destroy();
+    if (wl_touch)
+      wl_touch_destroy(wl_touch);
+
+    if (wl_pointer)
+      wl_pointer_destroy(wl_pointer);
+
+    if (wl_keyboard)
+      wl_keyboard_destroy(wl_keyboard);
+
+    if (wl_seat)
+      wl_seat_destroy(wl_seat);
   }
 
-  wayland::Seat wl_seat;
-  wayland::Keyboard wl_keyboard;
-  wayland::Pointer wl_pointer;
-  wayland::Touch wl_touch;
+  struct wl_seat *wl_seat;
+  struct wl_keyboard *wl_keyboard;
+  struct wl_pointer *wl_pointer;
+  struct wl_touch *wl_touch;
 
   KeyEvent *key_event;
   MouseEvent *mouse_event;

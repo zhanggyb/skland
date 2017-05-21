@@ -79,13 +79,13 @@ void Display::Private::OnError(void *data,
     object_name = "wl_compositor";
   } else if (_this->p_->wl_registry.Equal(object_id)) {
     object_name = "wl_registry";
-  } else if (_this->p_->wl_subcompositor.Equal(object_id)) {
+  } else if (_this->p_->wl_subcompositor == object_id) {
     object_name = "wl_subcompositor";
   } else if (_this->p_->wl_shm.Equal(object_id)) {
     object_name = "wl_shm";
   } else if (_this->p_->wl_shell.Equal(object_id)) {
     object_name = "wl_shell";
-  } else if (_this->p_->xdg_shell.Equal(object_id)) {
+  } else if (_this->p_->xdg_shell == object_id) {
     object_name = "xdg_shell";
   }
 
@@ -102,8 +102,6 @@ void Display::Private::OnGlobal(void *data,
                                 uint32_t id,
                                 const char *interface,
                                 uint32_t version) {
-  using wayland::XdgShell;
-
   Display *_this = static_cast<Display *>(data);
 
   struct Global *global = new Global;
@@ -115,7 +113,11 @@ void Display::Private::OnGlobal(void *data,
   if (strcmp(interface, wl_compositor_interface.name) == 0) {
     _this->p_->wl_compositor.Setup(_this->p_->wl_registry, id, version);
   } else if (strcmp(interface, wl_subcompositor_interface.name) == 0) {
-    _this->p_->wl_subcompositor.Setup(_this->p_->wl_registry, id, version);
+    _this->p_->wl_subcompositor =
+        static_cast<struct wl_subcompositor *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+                                                                id,
+                                                                &wl_subcompositor_interface,
+                                                                version));
   } else if (strcmp(interface, wl_shm_interface.name) == 0) {
     _this->p_->wl_shm.Setup(_this->p_->wl_registry, id, version);
     _this->p_->wl_shm.AddListener(&Private::kShmListener, _this);
@@ -124,16 +126,23 @@ void Display::Private::OnGlobal(void *data,
   } else if (strcmp(interface, wl_output_interface.name) == 0) {
     Output *output = new Output(id, version);
     _this->AddOutput(output);
-  } else if (strcmp(interface, XdgShell::GetInterface()->name) == 0) {
-    _this->p_->xdg_shell.Setup(_this->p_->wl_registry, id, version);
-    _this->p_->xdg_shell.AddListener(&Private::kXdgShellListener, _this);
+  } else if (strcmp(interface, zxdg_shell_v6_interface.name) == 0) {
+    _this->p_->xdg_shell = static_cast<struct zxdg_shell_v6 *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+                                                                                id,
+                                                                                &zxdg_shell_v6_interface,
+                                                                                version));
+    zxdg_shell_v6_add_listener(_this->p_->xdg_shell, &Private::kXdgShellListener, _this);
   } else if (strcmp(interface, wl_shell_interface.name) == 0) {
     _this->p_->wl_shell.Setup(_this->p_->wl_registry, id, version);
   } else if (strcmp(interface, wl_seat_interface.name) == 0) {
     Input *input = new Input(id, version);
     _this->AddInput(input);
   } else if (strcmp(interface, wl_data_device_manager_interface.name) == 0) {
-    _this->p_->wl_data_device_manager.Setup(_this->p_->wl_registry, id, version);
+    _this->p_->wl_data_device_manager =
+        static_cast<struct wl_data_device_manager *>(wl_registry_bind(_this->p_->wl_registry.wl_registry_,
+                                                                      id,
+                                                                      &wl_data_device_manager_interface,
+                                                                      version));
   }
 }
 
@@ -161,7 +170,7 @@ void Display::Private::OnGlobalRemove(void *data,
 
 void Display::Private::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, uint32_t serial) {
   Display *_this = static_cast<Display *>(data);
-  _this->p_->xdg_shell.Pong(serial);
+  zxdg_shell_v6_pong(_this->p_->xdg_shell, serial);
 }
 
 }

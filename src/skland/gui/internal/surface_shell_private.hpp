@@ -25,6 +25,18 @@ namespace skland {
 
 struct Surface::Shell::Private {
 
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : zxdg_surface(nullptr) {}
+
+  ~Private() {
+    if (zxdg_surface) zxdg_surface_v6_destroy(zxdg_surface);
+  }
+
+  struct zxdg_surface_v6 *zxdg_surface;
+
   static void OnConfigure(void *data,
                           struct zxdg_surface_v6 *zxdg_surface_v6,
                           uint32_t serial);

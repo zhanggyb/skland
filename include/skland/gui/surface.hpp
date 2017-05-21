@@ -23,7 +23,6 @@
 
 #include "../wayland/surface.hpp"
 #include "../wayland/region.hpp"
-#include "../wayland/subsurface.hpp"
 #include "../wayland/xdg-surface.hpp"
 #include "../wayland/xdg-toplevel.hpp"
 #include "../wayland/xdg-popup.hpp"
@@ -42,6 +41,7 @@ class Display;
 class AbstractEventHandler;
 class Buffer;
 class Output;
+class InputEvent;
 
 /**
  * @ingroup gui
@@ -146,9 +146,9 @@ class Surface {
 
       void SetAppId(const char *id) const;
 
-      void Move(const wayland::Seat &seat, uint32_t serial) const;
+      void Move(const InputEvent &input_event, uint32_t serial) const;
 
-      void Resize(const wayland::Seat &seat, uint32_t serial, uint32_t edges) const;
+      void Resize(const InputEvent &input_event, uint32_t serial, uint32_t edges) const;
 
       void SetMaximized() const;
 
@@ -168,8 +168,9 @@ class Surface {
 
       ~Toplevel();
 
+      std::unique_ptr<Private> p_;
+
       Shell *shell_;
-      wayland::XdgToplevel xdg_toplevel_;
 
     };
 
@@ -210,9 +211,7 @@ class Surface {
 
     void ResizeWindow(int width, int height) const;
 
-    void AckConfigure(uint32_t serial) const {
-      xdg_surface_.AckConfigure(serial);
-    }
+    void AckConfigure(uint32_t serial) const;
 
     Surface *surface() const { return surface_; }
 
@@ -231,9 +230,9 @@ class Surface {
 
     void Remove();
 
-    Surface *surface_;
+    std::unique_ptr<Private> p_;
 
-    wayland::XdgSurface xdg_surface_;
+    Surface *surface_;
 
     Shell *parent_;
 
@@ -299,7 +298,7 @@ class Surface {
 
     Surface *surface_;
 
-    wayland::SubSurface wl_sub_surface_;
+    struct wl_subsurface *wl_sub_surface_;
 
   };
 

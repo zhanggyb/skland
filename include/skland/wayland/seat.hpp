@@ -84,8 +84,6 @@ class Seat {
     return wl_seat_ == object;
   }
 
- private:
-
   struct wl_seat *wl_seat_;
 
 };

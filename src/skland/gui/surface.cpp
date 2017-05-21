@@ -19,13 +19,17 @@
 #include <skland/gui/abstract-event-handler.hpp>
 #include <skland/gui/buffer.hpp>
 
-#include <skland/gui/output.hpp>
 #include <skland/core/assert.hpp>
+#include <skland/gui/input-event.hpp>
 
 #include "internal/display_registry.hpp"
 #include "internal/surface-commit_task.hpp"
 #include "internal/surface_shell_private.hpp"
 #include "internal/surface_shell_toplevel_private.hpp"
+#include "internal/input_private.hpp"
+#include "internal/output_private.hpp"
+
+#include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
 
@@ -43,17 +47,22 @@ Surface::Shell *Surface::Shell::Get(const Surface *surface) {
 }
 
 void Surface::Shell::ResizeWindow(int width, int height) const {
-  xdg_surface_.SetWindowGeometry(surface_->margin_.l,
-                                 surface_->margin_.t,
-                                 width, height);
+  zxdg_surface_v6_set_window_geometry(p_->zxdg_surface, surface_->margin_.l, surface_->margin_.t, width, height);
+}
+
+void Surface::Shell::AckConfigure(uint32_t serial) const {
+  zxdg_surface_v6_ack_configure(p_->zxdg_surface, serial);
 }
 
 Surface::Shell::Shell(Surface *surface)
     : surface_(surface), parent_(nullptr) {
+  p_.reset(new Private);
+
   _ASSERT(surface_);
   role_.placeholder = nullptr;
-  xdg_surface_.Setup(Display::Registry().xdg_shell(), surface_->wl_surface_);
-  xdg_surface_.AddListener(&Private::kListener, this);
+
+  p_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(Display::Registry().xdg_shell(), surface_->wl_surface_.wl_surface_);
+  zxdg_surface_v6_add_listener(p_->zxdg_surface, &Private::kListener, this);
 
   Push();
 }
@@ -63,8 +72,6 @@ Surface::Shell::~Shell() {
 
   if (nullptr == parent_) delete role_.toplevel;
   else delete role_.popup;
-
-  xdg_surface_.Destroy();
 
   _ASSERT(surface_->role_.shell == this);
   surface_->role_.shell = nullptr;
@@ -130,51 +137,52 @@ Surface::Shell::Toplevel *Surface::Shell::Toplevel::Get(const Surface *surface) 
 }
 
 void Surface::Shell::Toplevel::SetTitle(const char *title) const {
-  xdg_toplevel_.SetTitle(title);
+  zxdg_toplevel_v6_set_title(p_->zxdg_toplevel, title);
 }
 
 void Surface::Shell::Toplevel::SetAppId(const char *id) const {
-  xdg_toplevel_.SetAppId(id);
+  zxdg_toplevel_v6_set_app_id(p_->zxdg_toplevel, id);
 }
 
-void Surface::Shell::Toplevel::Move(const wayland::Seat &seat, uint32_t serial) const {
-  xdg_toplevel_.Move(seat, serial);
+void Surface::Shell::Toplevel::Move(const InputEvent &input_event, uint32_t serial) const {
+  zxdg_toplevel_v6_move(p_->zxdg_toplevel, input_event.input_->p_->wl_seat, serial);
 }
 
-void Surface::Shell::Toplevel::Resize(const wayland::Seat &seat, uint32_t serial, uint32_t edges) const {
-  xdg_toplevel_.Resize(seat, serial, edges);
+void Surface::Shell::Toplevel::Resize(const InputEvent &input_event, uint32_t serial, uint32_t edges) const {
+  zxdg_toplevel_v6_resize(p_->zxdg_toplevel, input_event.input_->p_->wl_seat, serial, edges);
 }
 
 void Surface::Shell::Toplevel::SetMaximized() const {
-  xdg_toplevel_.SetMaximized();
+  zxdg_toplevel_v6_set_maximized(p_->zxdg_toplevel);
 }
 
 void Surface::Shell::Toplevel::UnsetMaximized() const {
-  xdg_toplevel_.UnsetMaximized();
+  zxdg_toplevel_v6_unset_maximized(p_->zxdg_toplevel);
 }
 
 void Surface::Shell::Toplevel::SetFullscreen(const Output &output) const {
-  xdg_toplevel_.SetFullscreen(output.GetOutput());
+  zxdg_toplevel_v6_set_fullscreen(p_->zxdg_toplevel, output.p_->wl_output);
 }
 
 void Surface::Shell::Toplevel::UnsetFullscreen(const Output &output) const {
-  xdg_toplevel_.UnsetFullscreen(output.GetOutput());
+  zxdg_toplevel_v6_unset_fullscreen(p_->zxdg_toplevel);
 }
 
 void Surface::Shell::Toplevel::SetMinimized() const {
-  xdg_toplevel_.SetMinimized();
+  zxdg_toplevel_v6_set_minimized(p_->zxdg_toplevel);
 }
 
 Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
+  p_.reset(new Private);
+
   _ASSERT(shell_surface);
   shell_ = shell_surface;
-  xdg_toplevel_.Setup(shell_->xdg_surface_);
-  xdg_toplevel_.AddListener(&Private::kListener, this);
+
+  p_->zxdg_toplevel = zxdg_surface_v6_get_toplevel(shell_surface->p_->zxdg_surface);
+  zxdg_toplevel_v6_add_listener(p_->zxdg_toplevel, &Private::kListener, this);
 }
 
 Surface::Shell::Toplevel::~Toplevel() {
-  xdg_toplevel_.Destroy();
-
   _ASSERT(shell_->role_.toplevel == this);
   _ASSERT(nullptr == shell_->parent_);
   shell_->role_.toplevel = nullptr;
@@ -221,12 +229,13 @@ Surface::Sub *Surface::Sub::Get(const Surface *surface) {
 }
 
 Surface::Sub::Sub(Surface *surface, Surface *parent)
-    : surface_(surface) {
+    : surface_(surface), wl_sub_surface_(nullptr) {
   _ASSERT(surface_);
   _ASSERT(parent);
-  wl_sub_surface_.Setup(Display::Registry().wl_subcompositor(),
-                        surface_->wl_surface_,
-                        parent->wl_surface_);
+
+  wl_sub_surface_ = wl_subcompositor_get_subsurface(Display::Registry().wl_subcompositor(),
+                                                    surface_->wl_surface_.wl_surface_,
+                                                    parent->wl_surface_.wl_surface_);
   SetParent(parent);
 }
 
@@ -255,7 +264,9 @@ Surface::Sub::~Sub() {
   if (surface_->above_) surface_->above_->below_ = surface_->below_;
   if (surface_->below_) surface_->below_->above_ = surface_->above_;
 
-  wl_sub_surface_.Destroy();
+  if (wl_sub_surface_)
+    wl_subsurface_destroy(wl_sub_surface_);
+
   surface_->role_.sub = nullptr;
 }
 
@@ -265,7 +276,7 @@ void Surface::Sub::PlaceAbove(Surface *sibling) {
   if (surface_->parent() == sibling->parent() ||
       surface_ == sibling->parent() ||
       surface_->parent() == sibling) {
-    wl_sub_surface_.PlaceAbove(sibling->wl_surface_);
+    wl_subsurface_place_above(wl_sub_surface_, sibling->wl_surface_.wl_surface_);
     MoveAbove(sibling);
   }
 }
@@ -276,13 +287,13 @@ void Surface::Sub::PlaceBelow(Surface *sibling) {
   if (surface_->parent() == sibling->parent() ||
       surface_ == sibling->parent() ||
       surface_->parent() == sibling) {
-    wl_sub_surface_.PlaceBelow(sibling->wl_surface_);
+    wl_subsurface_place_below(wl_sub_surface_, sibling->wl_surface_.wl_surface_);
     MoveBelow(sibling);
   }
 }
 
 void Surface::Sub::SetRelativePosition(int x, int y) {
-  wl_sub_surface_.SetPosition(x, y);
+  wl_subsurface_set_position(wl_sub_surface_, x, y);
   surface_->relative_position_.x = x;
   surface_->relative_position_.y = y;
 }
@@ -291,7 +302,7 @@ void Surface::Sub::SetWindowPosition(int x, int y) {
   Point parent_global_position = surface_->parent()->GetWindowPosition();
   int local_x = x - parent_global_position.x;
   int local_y = y - parent_global_position.y;
-  wl_sub_surface_.SetPosition(local_x, local_y);
+  wl_subsurface_set_position(wl_sub_surface_, local_x, local_y);
   surface_->relative_position_.x = x;
   surface_->relative_position_.y = y;
 }

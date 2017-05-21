@@ -14,57 +14,13 @@
  * limitations under the License.
  */
 
-#include <skland/gui/output.hpp>
-#include <skland/gui/display.hpp>
+#include "internal/output_private.hpp"
 
-#include <skland/wayland/output.hpp>
+#include <skland/gui/display.hpp>
 
 #include "internal/display_registry.hpp"
 
 namespace skland {
-
-struct Output::Private {
-
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
-
-  Private()
-      : current_refresh_rate(0),
-        preferred_refresh_rate(0),
-        subpixel(0),
-        transform(WL_OUTPUT_TRANSFORM_NORMAL),
-        scale(1),
-        id(0),
-        version(0) {}
-
-  ~Private() {}
-
-  wayland::Output wl_output;
-
-  /** position within the global compositor space */
-  Point position_;
-
-  /** physical_width width in millimeters of the output */
-  Size physical_size_;
-
-  /** The size of a mode, given in physical hardware units of the output device */
-  Size current_mode_size_;
-  Size preferred_mode_size_;
-  int32_t current_refresh_rate;
-  int32_t preferred_refresh_rate;
-
-  int subpixel;  /**< enum value of wl_output_subpixel */
-  int transform; /**< enum value of wl_output_transform */
-  int scale;
-
-  /* vertical refresh rate in mHz */
-
-  std::string make_;
-  std::string model_;
-
-  uint32_t id;
-  uint32_t version;
-};
 
 const struct wl_output_listener Output::kListener = {
     OnGeometry,
@@ -129,13 +85,13 @@ Output::Output(uint32_t id, uint32_t version)
   p_->id = id;
   p_->version = version;
 
-  p_->wl_output.Setup(Display::Registry().wl_registry(), p_->id, p_->version);
-  p_->wl_output.AddListener(&kListener, this);
+  p_->wl_output =
+      static_cast<struct wl_output *>(wl_registry_bind(Display::Registry().native(), id, &wl_output_interface, version));
+  wl_output_add_listener(p_->wl_output, &kListener, this);
 }
 
 Output::~Output() {
   destroyed_.Emit(this);
-  p_->wl_output.Destroy();
 }
 
 const std::string &Output::GetMake() const {
@@ -144,10 +100,6 @@ const std::string &Output::GetMake() const {
 
 const std::string &Output::GetModel() const {
   return p_->model_;
-}
-
-const wayland::Output &Output::GetOutput() const {
-  return p_->wl_output;
 }
 
 uint32_t Output::GetID() const {

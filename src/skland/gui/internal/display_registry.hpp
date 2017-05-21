@@ -48,11 +48,15 @@ SKLAND_NO_EXPORT class Display::Registry {
     return display_->p_->wl_registry;
   }
 
+  struct wl_registry *native() const {
+    return display_->p_->wl_registry.wl_registry_;
+  }
+
   const wayland::Compositor &wl_compositor() const {
     return display_->p_->wl_compositor;
   }
 
-  const wayland::SubCompositor &wl_subcompositor() const {
+  struct wl_subcompositor *wl_subcompositor() const {
     return display_->p_->wl_subcompositor;
   }
 
@@ -60,7 +64,7 @@ SKLAND_NO_EXPORT class Display::Registry {
     return display_->p_->wl_shm;
   }
 
-  const wayland::XdgShell &xdg_shell() const {
+  struct zxdg_shell_v6 *xdg_shell() const {
     return display_->p_->xdg_shell;
   }
 
@@ -68,7 +72,7 @@ SKLAND_NO_EXPORT class Display::Registry {
     return display_->p_->wl_shell;
   }
 
-  const wayland::DataDeviceManager &wl_data_device_manager() const {
+  struct wl_data_device_manager *wl_data_device_manager() const {
     return display_->p_->wl_data_device_manager;
   }
 

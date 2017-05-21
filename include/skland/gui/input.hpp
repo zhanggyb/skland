@@ -42,6 +42,8 @@ class Seat;
  */
 SKLAND_EXPORT class Input : public Deque::Element {
 
+  friend class Surface;
+
   Input() = delete;
   Input(const Input &) = delete;
   Input &operator=(const Input &) = delete;
@@ -53,8 +55,6 @@ SKLAND_EXPORT class Input : public Deque::Element {
   virtual ~Input();
 
   void SetCursor(const Cursor *cursor) const;
-
-  const wayland::Seat &GetSeat() const;
 
   uint32_t GetID() const;
 

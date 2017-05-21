@@ -25,6 +25,18 @@ namespace skland {
 
 struct Surface::Shell::Toplevel::Private {
 
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : zxdg_toplevel(nullptr) {}
+
+  ~Private() {
+    if (zxdg_toplevel) zxdg_toplevel_v6_destroy(zxdg_toplevel);
+  }
+
+  struct zxdg_toplevel_v6 *zxdg_toplevel;
+
   static void OnConfigure(void *data,
                           struct zxdg_toplevel_v6 *zxdg_toplevel_v6,
                           int32_t width,

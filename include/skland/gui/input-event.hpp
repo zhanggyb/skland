@@ -31,6 +31,7 @@ class Seat;
 SKLAND_EXPORT class InputEvent {
 
   friend class Input;
+  friend class Surface;
 
  public:
 
@@ -65,8 +66,6 @@ SKLAND_EXPORT class InputEvent {
   virtual ~InputEvent() {}
 
   void SetCursor(const Cursor *cursor) const;
-
-  const wayland::Seat &GetSeat() const;
 
   void Accept() { response_ = kAccept; }
 

@@ -18,7 +18,6 @@
 #define SKLAND_GUI_TIMER_HPP_
 
 #include "../core/sigcxx.hpp"
-#include "../core/posix-timer.hpp"
 
 #include <memory>
 
@@ -59,10 +58,10 @@ class Timer {
 
  private:
 
-  bool SetTime();
-
   struct Private;
   class EpollTask;
+
+  bool SetTime();
 
   std::unique_ptr<Private> p_;
 

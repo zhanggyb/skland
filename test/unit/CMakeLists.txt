@@ -42,7 +42,6 @@ if (LINUX)
     add_subdirectory(wayland-client-display)
     add_subdirectory(wayland-client-registry)
     add_subdirectory(wayland-client-output)
-    add_subdirectory(wayland-client-seat)
 
     # gui
     add_subdirectory(gui-idle-task)

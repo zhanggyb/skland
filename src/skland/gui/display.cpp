@@ -88,18 +88,31 @@ void Display::Disconnect() noexcept {
 
   output_deque_.Clear();
   input_deque_.Clear();
-//  ClearManagedObject(this, &first_window_, &last_window_, windows_count_);
   Surface::Clear();
 
-  p_->wl_data_device_manager.Destroy();
+  if (p_->wl_data_device_manager) {
+    wl_data_device_manager_destroy(p_->wl_data_device_manager);
+    p_->wl_data_device_manager = nullptr;
+  }
+
   if (p_->wl_cursor_theme.IsValid()) {
     ReleaseCursors();
     p_->wl_cursor_theme.Destroy();
   }
   p_->wl_shell.Destroy();
-  p_->xdg_shell.Destroy();
+
+  if (p_->xdg_shell) {
+    zxdg_shell_v6_destroy(p_->xdg_shell);
+    p_->xdg_shell = nullptr;
+  }
+
   p_->wl_shm.Destroy();
-  p_->wl_subcompositor.Destroy();
+
+  if (p_->wl_subcompositor) {
+    wl_subcompositor_destroy(p_->wl_subcompositor);
+    p_->wl_subcompositor = nullptr;
+  }
+
   p_->wl_compositor.Destroy();
   p_->wl_registry.Destroy();
 

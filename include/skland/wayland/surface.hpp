@@ -116,8 +116,6 @@ class Surface {
     return nullptr != wl_surface_;
   }
 
- private:
-
   struct wl_surface *wl_surface_;
 
 };

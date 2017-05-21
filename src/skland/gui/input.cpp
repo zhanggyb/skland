@@ -26,8 +26,9 @@ Input::Input(uint32_t id, uint32_t version)
   p_->id = id;
   p_->version = version;
 
-  p_->wl_seat.Setup(Display::Registry().wl_registry(), p_->id, p_->version);
-  p_->wl_seat.AddListener(&Private::kSeatListener, this);
+  p_->wl_seat =
+      static_cast<struct wl_seat *>(wl_registry_bind(Display::Registry().native(), id, &wl_seat_interface, version));
+  wl_seat_add_listener(p_->wl_seat, &Private::kSeatListener, this);
 }
 
 Input::~Input() {
@@ -35,14 +36,10 @@ Input::~Input() {
 }
 
 void Input::SetCursor(const Cursor *cursor) const {
-  p_->wl_pointer.SetCursor(p_->mouse_event->GetSerial(),
-                           cursor->wl_surface(),
-                           cursor->hotspot_x(), cursor->hotspot_y());
+  wl_pointer_set_cursor(p_->wl_pointer, p_->mouse_event->GetSerial(),
+                        cursor->wl_surface().wl_surface_,
+                        cursor->hotspot_x(), cursor->hotspot_y());
   cursor->Commit();
-}
-
-const wayland::Seat &Input::GetSeat() const {
-  return p_->wl_seat;
 }
 
 uint32_t Input::GetID() const {

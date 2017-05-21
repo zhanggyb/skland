@@ -63,26 +63,26 @@ void Input::Private::OnSeatCapabilities(void *data, struct wl_seat *wl_seat, uin
   Input *_this = static_cast<Input *>(data);
 
   if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD) {
-    _ASSERT(!_this->p_->wl_keyboard.IsValid());
-    _this->p_->wl_keyboard.Setup(_this->p_->wl_seat);
-    _this->p_->wl_keyboard.AddListener(&kKeyboardListener, _this);
+    _ASSERT(nullptr == _this->p_->wl_keyboard);
 
-    _ASSERT(_this->p_->key_event == nullptr);
+    _this->p_->wl_keyboard = wl_seat_get_keyboard(wl_seat);
+    wl_keyboard_add_listener(_this->p_->wl_keyboard, &kKeyboardListener, _this);
+
+    _ASSERT(nullptr == _this->p_->key_event);
     _this->p_->key_event = new KeyEvent(_this);
   }
   if (capabilities & WL_SEAT_CAPABILITY_POINTER) {
-    _ASSERT(!_this->p_->wl_pointer.IsValid());
-    _this->p_->wl_pointer.Setup(_this->p_->wl_seat);
-    _this->p_->wl_pointer.AddListener(&kPointerListener, _this);
+    _ASSERT(nullptr == _this->p_->wl_pointer);
+    _this->p_->wl_pointer = wl_seat_get_pointer(wl_seat);
+    wl_pointer_add_listener(_this->p_->wl_pointer, &kPointerListener, _this);
 
-    _ASSERT(_this->p_->mouse_event == nullptr);
+    _ASSERT(nullptr == _this->p_->mouse_event);
     _this->p_->mouse_event = new MouseEvent(_this);
   }
   if (capabilities & WL_SEAT_CAPABILITY_TOUCH) {
-    _ASSERT(!_this->p_->wl_touch.IsValid());
-    _this->p_->wl_touch.Setup(_this->p_->wl_seat);
-    _this->p_->wl_touch.AddListener(&kTouchListener, _this);
-
+    _ASSERT(_this->p_->wl_touch == nullptr);
+    _this->p_->wl_touch = wl_seat_get_touch(wl_seat);
+    wl_touch_add_listener(_this->p_->wl_touch, &kTouchListener, _this);
     _ASSERT(_this->p_->touch_event == nullptr);
     _this->p_->touch_event = new TouchEvent(_this);
   }

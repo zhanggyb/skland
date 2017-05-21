@@ -15,9 +15,9 @@
  */
 
 #include <skland/gui/callback.hpp>
-
-#include <skland/wayland/callback.hpp>
 #include <skland/gui/surface.hpp>
+
+#include <wayland-client.h>
 
 #include "internal/display_private.hpp"
 
@@ -25,16 +25,30 @@ namespace skland {
 
 struct Callback::Private {
 
-  Private() {}
-  ~Private() {}
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
 
-  wayland::Callback wl_callback;
+  Private()
+      : native(nullptr) {}
+
+  ~Private() {
+    if (native) wl_callback_destroy(native);
+  }
+
+  void Destroy() {
+    if (native) {
+      wl_callback_destroy(native);
+      native = nullptr;
+    }
+  }
 
   static void OnDone(void *data,
                      struct wl_callback *wl_callback,
                      uint32_t callback_data);
 
   static const struct wl_callback_listener kListener;
+
+  struct wl_callback *native;
 
 };
 
@@ -46,6 +60,8 @@ void Callback::Private::OnDone(void *data, struct wl_callback */*wl_callback*/, 
   Callback *_this = static_cast<Callback *>(data);
   if (_this->done_) _this->done_(callback_data);
 }
+
+// -----
 
 Callback::Callback() {
   p_.reset(new Private);
@@ -66,13 +82,15 @@ Callback::~Callback() {
 }
 
 void Callback::Setup(const Display &display) {
-  p_->wl_callback.Setup(display.p_->wl_display);
-  p_->wl_callback.AddListener(&Private::kListener, this);
+  p_->Destroy();
+//  p_->native = wl_display_sync(display.p_->wl_display.wl_display_);
+  wl_callback_add_listener(p_->native, &Private::kListener, this);
 }
 
 void Callback::Setup(const Surface &surface) {
-  p_->wl_callback.Setup(surface.wl_surface_);
-  p_->wl_callback.AddListener(&Private::kListener, this);
+  p_->Destroy();
+//  p_->native = wl_surface_frame(surface.wl_surface_.wl_surface_);
+  wl_callback_add_listener(p_->native, &Private::kListener, this);
 }
 
 }

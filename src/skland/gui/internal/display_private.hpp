@@ -25,12 +25,9 @@
 #include <skland/wayland/display.hpp>
 #include <skland/wayland/registry.hpp>
 #include <skland/wayland/compositor.hpp>
-#include <skland/wayland/subcompositor.hpp>
 #include <skland/wayland/shm.hpp>
 #include <skland/wayland/shell.hpp>
-#include <skland/wayland/xdg-shell.hpp>
 #include <skland/wayland/cursor-theme.hpp>
-#include <skland/wayland/data-device-manager.hpp>
 
 #include <skland/egl/display.hpp>
 
@@ -47,18 +44,22 @@ struct Display::Private {
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  Private() {}
+  Private()
+      : wl_subcompositor(nullptr),
+        xdg_shell(nullptr),
+        wl_data_device_manager(nullptr) {}
+
   ~Private() {}
 
   wayland::Display wl_display;
   wayland::Registry wl_registry;
   wayland::Compositor wl_compositor;
-  wayland::SubCompositor wl_subcompositor;
+  struct wl_subcompositor *wl_subcompositor;
   wayland::Shm wl_shm;
   wayland::Shell wl_shell;
-  wayland::XdgShell xdg_shell;
+  struct zxdg_shell_v6 *xdg_shell;
   wayland::CursorTheme wl_cursor_theme;
-  wayland::DataDeviceManager wl_data_device_manager;
+  struct wl_data_device_manager *wl_data_device_manager;
 
   egl::Display egl_display;
 

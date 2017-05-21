@@ -35,6 +35,8 @@ class Output;
 
 class Output : public Deque::Element {
 
+  friend class Surface;
+
   Output() = delete;
   Output(const Output &) = delete;
   Output &operator=(const Output &) = delete;
@@ -52,8 +54,6 @@ class Output : public Deque::Element {
   const std::string &GetMake() const;
 
   const std::string &GetModel() const;
-
-  const wayland::Output &GetOutput() const;
 
   uint32_t GetID() const;
 

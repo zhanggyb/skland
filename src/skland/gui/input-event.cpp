@@ -24,8 +24,4 @@ void InputEvent::SetCursor(const Cursor *cursor) const {
   input_->SetCursor(cursor);
 }
 
-const wayland::Seat &InputEvent::GetSeat() const {
-  return input_->GetSeat();
-}
-
 }

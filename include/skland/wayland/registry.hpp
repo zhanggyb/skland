@@ -80,8 +80,6 @@ class Registry {
     return wl_registry_ == object;
   }
 
- private:
-
   struct wl_registry *wl_registry_;
 
 };
