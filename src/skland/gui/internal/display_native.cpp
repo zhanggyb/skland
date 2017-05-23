@@ -14,38 +14,10 @@
  * limitations under the License.
  */
 
-#include "test.hpp"
+#include "display_native.hpp"
 
-#include <skland/gui/application.hpp>
-#include <skland/gui/window.hpp>
+namespace skland {
 
-Test::Test()
-    : testing::Test() {
-}
+PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC Display::Native::kSwapBuffersWithDamageAPI = NULL;
 
-Test::~Test() {
-
-}
-
-/**
- * @brief Show a default empty window
- *
- * Expected result: display and resize a default window
- */
-TEST_F(Test, show) {
-  using skland::Application;
-  using skland::Window;
-
-  int argc = 1;
-  char argv1[] = "show";  // to avoid compile warning
-  char *argv[] = {argv1};
-
-  Application app(argc, argv);
-
-  Window win(400, 300, "Test Window");
-  win.Show();
-
-  int result = app.Run();
-
-  ASSERT_TRUE(result == 0);
 }

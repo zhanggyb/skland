@@ -31,7 +31,7 @@
 
 #include <skland/stock/theme.hpp>
 
-#include "internal/display_registry.hpp"
+#include "internal/display_native.hpp"
 #include "internal/abstract-shell-view_iterators.hpp"
 #include "internal/abstract-view_iterators.hpp"
 #include "internal/abstract-event-handler_mouse-task-iterator.hpp"

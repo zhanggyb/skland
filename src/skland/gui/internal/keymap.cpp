@@ -16,7 +16,7 @@
 
 #include "keymap.hpp"
 
-#include "display_registry.hpp"
+#include "display_native.hpp"
 
 namespace skland {
 
@@ -28,7 +28,7 @@ Keymap::~Keymap() {
 void Keymap::Setup(const char *string, enum xkb_keymap_format format, enum xkb_keymap_compile_flags flags) {
   Destroy();
 
-  xkb_keymap_ = xkb_keymap_new_from_string(Display::Registry().xkb_context(), string, format, flags);
+  xkb_keymap_ = xkb_keymap_new_from_string(Display::Native().xkb_context(), string, format, flags);
   if (nullptr == xkb_keymap_)
     throw std::runtime_error("FATAL! Cannot create XKB keymap!");
 }

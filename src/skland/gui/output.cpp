@@ -18,7 +18,7 @@
 
 #include <skland/gui/display.hpp>
 
-#include "internal/display_registry.hpp"
+#include "internal/display_native.hpp"
 
 namespace skland {
 
@@ -86,7 +86,7 @@ Output::Output(uint32_t id, uint32_t version)
   p_->version = version;
 
   p_->wl_output =
-      static_cast<struct wl_output *>(wl_registry_bind(Display::Registry().wl_registry(),
+      static_cast<struct wl_output *>(wl_registry_bind(Display::Native().wl_registry(),
                                                        id,
                                                        &wl_output_interface,
                                                        version));

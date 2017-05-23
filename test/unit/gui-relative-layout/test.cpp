@@ -50,7 +50,7 @@ TEST_F(Test, regular_1) {
 
   Application app(argc, argv);
 
-  Window win(400, 300, "Test Window");
+  skland::Window win(400, 300, "Test Window");
 
   RelativeLayout* layout = new RelativeLayout;
   PushButton * button = new PushButton("Test");
@@ -78,7 +78,7 @@ TEST_F(Test, regular_2) {
 
   Application app(argc, argv);
 
-  Window win(400, 300, "Test Window");
+  skland::Window win(400, 300, "Test Window");
 
   RelativeLayout* layout = new RelativeLayout;
   PushButton * button = new PushButton("Test");

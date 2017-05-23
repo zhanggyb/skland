@@ -22,9 +22,9 @@
 #include <skland/gui/task.hpp>
 #include <skland/gui/abstract-epoll-task.hpp>
 
-#include <skland/egl/display.hpp>
-
 #include "xdg-shell-unstable-v6-client-protocol.h"
+
+#include <EGL/eglext.h>
 
 namespace skland {
 
@@ -46,7 +46,12 @@ struct Display::Private {
         wl_shell(nullptr),
         xdg_shell(nullptr),
         wl_cursor_theme(nullptr),
-        wl_data_device_manager(nullptr) {}
+        wl_data_device_manager(nullptr),
+        egl_display_(nullptr),
+        egl_context_(nullptr),
+        egl_config_(nullptr),
+        major_(0),
+        minor_(0) {}
 
   ~Private() {}
 
@@ -60,7 +65,12 @@ struct Display::Private {
   struct wl_cursor_theme *wl_cursor_theme;
   struct wl_data_device_manager *wl_data_device_manager;
 
-  egl::Display egl_display;
+  EGLDisplay egl_display_;
+  EGLContext egl_context_;
+  EGLConfig egl_config_;
+
+  EGLint major_;  /**< The major version */
+  EGLint minor_;  /**< The minor version */
 
   struct xkb_context *xkb_context;
 

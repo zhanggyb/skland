@@ -23,6 +23,7 @@
 
 #include "cursor.hpp"
 
+#include <EGL/egl.h>
 #include <xkbcommon/xkbcommon.h>
 
 #include <list>
@@ -56,7 +57,7 @@ class Display {
 
  public:
 
-  class Registry;
+  class Native;
 
   static const Output *GetOutputAt(int index = 0);
 
@@ -97,6 +98,18 @@ class Display {
   void InitializeCursors();
 
   void ReleaseCursors();
+
+  void InitializeEGLDisplay();
+
+  void ReleaseEGLDisplay();
+
+  void MakeSwapBufferNonBlock() const;
+
+  static EGLDisplay GetEGLDisplay(EGLenum platform, void *native_display, const EGLint *attrib_list);
+
+  static void *GetEGLProcAddress(const char *address);
+
+  static bool CheckEGLExtension(const char *extensions, const char *extension);
 
   std::unique_ptr<Private> p_;
 

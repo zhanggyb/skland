@@ -16,7 +16,7 @@
 
 #include "internal/input_private.hpp"
 
-#include "internal/display_registry.hpp"
+#include "internal/display_native.hpp"
 
 namespace skland {
 
@@ -27,7 +27,7 @@ Input::Input(uint32_t id, uint32_t version)
   p_->version = version;
 
   p_->wl_seat =
-      static_cast<struct wl_seat *>(wl_registry_bind(Display::Registry().wl_registry(),
+      static_cast<struct wl_seat *>(wl_registry_bind(Display::Native().wl_registry(),
                                                      id,
                                                      &wl_seat_interface,
                                                      version));

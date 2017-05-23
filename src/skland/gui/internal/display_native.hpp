@@ -26,19 +26,19 @@ namespace skland {
  * @ingroup gui_intern
  * @brief An internal class to get wayland registry from a Display
  */
-SKLAND_NO_EXPORT class Display::Registry {
+SKLAND_NO_EXPORT class Display::Native {
 
-  Registry(const Registry &) = delete;
-  Registry &operator=(const Registry &) = delete;
+  Native(const Native &) = delete;
+  Native &operator=(const Native &) = delete;
 
  public:
 
-  Registry()
+  Native()
       : display_(nullptr) {
     display_ = Display::kDisplay;
   }
 
-  ~Registry() {}
+  ~Native() {}
 
   struct wl_display *wl_display() const {
     return display_->p_->wl_display;
@@ -72,13 +72,23 @@ SKLAND_NO_EXPORT class Display::Registry {
     return display_->p_->wl_data_device_manager;
   }
 
-  const egl::Display &egl_display() const {
-    return display_->p_->egl_display;
+  EGLDisplay egl_display() const {
+    return display_->p_->egl_display_;
+  }
+
+  EGLConfig egl_config() const {
+    return display_->p_->egl_config_;
+  }
+
+  EGLContext egl_context() const {
+    return display_->p_->egl_context_;
   }
 
   struct xkb_context *xkb_context() const {
     return display_->p_->xkb_context;
   }
+
+  static PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC kSwapBuffersWithDamageAPI;
 
  private:
 

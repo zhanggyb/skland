@@ -28,7 +28,7 @@
 #include <skland/stock/theme.hpp>
 
 #include "internal/abstract-view_private.hpp"
-#include "internal/display_registry.hpp"
+#include "internal/display_native.hpp"
 #include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include "SkCanvas.h"

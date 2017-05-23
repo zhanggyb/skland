@@ -22,7 +22,6 @@
 namespace skland {
 
 class Surface;
-class EGLSurface;
 class Canvas;
 
 /**

@@ -6,13 +6,6 @@
  */
 
 /**
- * @defgroup egl EGL
- * @brief C++ wrappers to EGL APIs
- *
- * C++ wrapper to egl APIs
- */
-
-/**
  * @defgroup graphic Graphic
  * @brief Graphic classes based on Google Skia
  *

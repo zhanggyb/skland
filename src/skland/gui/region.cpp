@@ -16,13 +16,13 @@
 
 #include <skland/gui/region.hpp>
 
-#include "internal/display_registry.hpp"
+#include "internal/display_native.hpp"
 
 namespace skland {
 
 Region::Region()
     : wl_region_(nullptr) {
-  wl_region_ = wl_compositor_create_region(Display::Registry().wl_compositor());
+  wl_region_ = wl_compositor_create_region(Display::Native().wl_compositor());
 }
 
 Region::~Region() {

@@ -20,10 +20,6 @@
 #include <skland/gui/window.hpp>
 #include <skland/gui/linear-layout.hpp>
 
-using skland::Application;
-using skland::Window;
-using skland::LinearLayout;
-
 Test::Test()
     : testing::Test() {
 }
@@ -38,6 +34,10 @@ Test::~Test() {
  * Expected result: display and resize a default window
  */
 TEST_F(Test, regular) {
+  using skland::Application;
+  using skland::Window;
+  using skland::LinearLayout;
+
   int argc = 1;
   char argv1[] = "show";  // to avoid compile warning
   char *argv[] = {argv1};

@@ -21,10 +21,11 @@
 #include "../core/margin.hpp"
 #include "../core/point.hpp"
 
-#include "../egl/surface.hpp"
-
 #include "task.hpp"
 
+#include <wayland-egl.h>
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
 #include <memory>
 
 namespace skland {
@@ -328,7 +329,7 @@ class Surface {
     bool SwapInterval(EGLint interval = 0);
 
     void Resize(int width, int height, int dx = 0, int dy = 0) {
-      egl_surface_.Resize(width, height, dx, dy);
+      wl_egl_window_resize(wl_egl_window_, width, height, dx, dy);
     }
 
     Surface *surface() const { return surface_; }
@@ -339,7 +340,8 @@ class Surface {
 
     Surface *surface_;
 
-    egl::Surface egl_surface_;
+    EGLSurface egl_surface_;
+    struct wl_egl_window *wl_egl_window_;
 
   };
 
