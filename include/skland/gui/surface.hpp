@@ -24,8 +24,6 @@
 #include "task.hpp"
 
 #include <wayland-egl.h>
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
 #include <memory>
 
 namespace skland {
@@ -326,22 +324,21 @@ class Surface {
 
     bool SwapBuffersWithDamage(int x, int y, int width, int height);
 
-    bool SwapInterval(EGLint interval = 0);
+    bool SwapInterval(int interval = 0);
 
-    void Resize(int width, int height, int dx = 0, int dy = 0) {
-      wl_egl_window_resize(wl_egl_window_, width, height, dx, dy);
-    }
+    void Resize(int width, int height, int dx = 0, int dy = 0);
 
     Surface *surface() const { return surface_; }
 
    private:
 
+    struct Private;
+
     EGL(Surface *surface);
 
     Surface *surface_;
 
-    EGLSurface egl_surface_;
-    struct wl_egl_window *wl_egl_window_;
+    std::unique_ptr<Private> p_;
 
   };
 

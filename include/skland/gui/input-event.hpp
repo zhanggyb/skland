@@ -24,10 +24,6 @@ namespace skland {
 class Input;
 class Cursor;
 
-namespace wayland {
-class Seat;
-}
-
 SKLAND_EXPORT class InputEvent {
 
   friend class Input;

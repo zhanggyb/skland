@@ -24,6 +24,7 @@
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
+#include <EGL/egl.h>
 #include <EGL/eglext.h>
 
 namespace skland {
@@ -99,6 +100,12 @@ struct Display::Private {
   static void OnPing(void *data,
                      struct zxdg_shell_v6 *zxdg_shell_v6,
                      uint32_t serial);
+
+  static EGLDisplay GetEGLDisplay(EGLenum platform, void *native_display, const EGLint *attrib_list);
+
+  static void *GetEGLProcAddress(const char *address);
+
+  static bool CheckEGLExtension(const char *extensions, const char *extension);
 
   static const struct wl_display_listener kDisplayListener;
 

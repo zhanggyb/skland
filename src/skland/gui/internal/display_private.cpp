@@ -185,4 +185,57 @@ void Display::Private::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, u
   zxdg_shell_v6_pong(_this->p_->xdg_shell, serial);
 }
 
+EGLDisplay Display::Private::GetEGLDisplay(EGLenum platform, void *native_display, const EGLint *attrib_list) {
+  static PFNEGLGETPLATFORMDISPLAYEXTPROC get_platform_display = NULL;
+
+  if (!get_platform_display) {
+    get_platform_display = (PFNEGLGETPLATFORMDISPLAYEXTPROC)
+        GetEGLProcAddress("eglGetPlatformDisplayEXT");
+  }
+
+  if (get_platform_display)
+    return get_platform_display(platform,
+                                native_display, attrib_list);
+
+  return eglGetDisplay((EGLNativeDisplayType) native_display);
+}
+
+void *Display::Private::GetEGLProcAddress(const char *address) {
+  const char *extensions = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+
+  if (extensions &&
+      (CheckEGLExtension(extensions, "EGL_EXT_platform_wayland") ||
+          CheckEGLExtension(extensions, "EGL_KHR_platform_wayland"))) {
+    return (void *) eglGetProcAddress(address);
+  }
+
+  return NULL;
+}
+
+bool Display::Private::CheckEGLExtension(const char *extensions, const char *extension) {
+  size_t extlen = strlen(extension);
+  const char *end = extensions + strlen(extensions);
+
+  while (extensions < end) {
+    size_t n = 0;
+
+    /* Skip whitespaces, if any */
+    if (*extensions == ' ') {
+      extensions++;
+      continue;
+    }
+
+    n = strcspn(extensions, " ");
+
+    /* Compare strings */
+    if (n == extlen && strncmp(extension, extensions, n) == 0)
+      return true; /* Found */
+
+    extensions += n;
+  }
+
+  /* Not found */
+  return false;
+}
+
 }

@@ -32,10 +32,6 @@ class TouchEvent;
 class AbstractView;
 struct ViewTask;
 
-namespace wayland {
-class Seat;
-}
-
 /**
  * @ingroup gui
  * @brief Input manager

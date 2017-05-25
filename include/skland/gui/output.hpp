@@ -29,10 +29,6 @@
 
 namespace skland {
 
-namespace wayland {
-class Output;
-}
-
 class Output : public Deque::Element {
 
   friend class Surface;

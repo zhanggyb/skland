@@ -234,8 +234,8 @@ void Display::InitializeEGLDisplay() {
       EGL_NONE
   };
 
-  p_->egl_display_ = GetEGLDisplay(EGL_PLATFORM_WAYLAND_KHR,
-                                   p_->wl_display, NULL);
+  p_->egl_display_ = Private::GetEGLDisplay(EGL_PLATFORM_WAYLAND_KHR,
+                                            p_->wl_display, NULL);
   _ASSERT(p_->egl_display_);
 
   ret = eglInitialize(p_->egl_display_, &p_->major_, &p_->minor_);
@@ -330,61 +330,6 @@ void Display::MakeSwapBufferNonBlock() const {
   if (!eglSwapInterval(p_->egl_display_, 0)) {
     fprintf(stderr, "error: eglSwapInterval() failed.\n");
   }
-}
-
-
-EGLDisplay Display::GetEGLDisplay(EGLenum platform, void *native_display, const EGLint *attrib_list) {
-  static PFNEGLGETPLATFORMDISPLAYEXTPROC get_platform_display = NULL;
-
-  if (!get_platform_display) {
-    get_platform_display = (PFNEGLGETPLATFORMDISPLAYEXTPROC)
-        GetEGLProcAddress("eglGetPlatformDisplayEXT");
-  }
-
-  if (get_platform_display)
-    return get_platform_display(platform,
-                                native_display, attrib_list);
-
-  return eglGetDisplay((EGLNativeDisplayType) native_display);
-}
-
-void *Display::GetEGLProcAddress(const char *address) {
-  const char *extensions = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-
-  if (extensions &&
-      (CheckEGLExtension(extensions, "EGL_EXT_platform_wayland") ||
-          CheckEGLExtension(extensions, "EGL_KHR_platform_wayland"))) {
-    return (void *) eglGetProcAddress(address);
-  }
-
-  return NULL;
-}
-
-
-bool Display::CheckEGLExtension(const char *extensions, const char *extension) {
-  size_t extlen = strlen(extension);
-  const char *end = extensions + strlen(extensions);
-
-  while (extensions < end) {
-    size_t n = 0;
-
-    /* Skip whitespaces, if any */
-    if (*extensions == ' ') {
-      extensions++;
-      continue;
-    }
-
-    n = strcspn(extensions, " ");
-
-    /* Compare strings */
-    if (n == extlen && strncmp(extension, extensions, n) == 0)
-      return true; /* Found */
-
-    extensions += n;
-  }
-
-  /* Not found */
-  return false;
 }
 
 }

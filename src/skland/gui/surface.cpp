@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-#include <skland/gui/surface.hpp>
+#include "internal/surface_shell_private.hpp"
+#include "internal/surface_shell_toplevel_private.hpp"
+#include "internal/surface_shell_popup_private.hpp"
+#include "internal/surface_egl_private.hpp"
+#include "internal/surface-commit_task.hpp"
 
 #include <skland/gui/abstract-event-handler.hpp>
 #include <skland/gui/buffer.hpp>
@@ -26,10 +30,6 @@
 #include "internal/input_private.hpp"
 #include "internal/output_private.hpp"
 #include "internal/display_native.hpp"
-#include "internal/surface-commit_task.hpp"
-#include "internal/surface_shell_private.hpp"
-#include "internal/surface_shell_toplevel_private.hpp"
-#include "internal/surface_shell_popup_private.hpp"
 #include "internal/buffer_private.hpp"
 
 namespace skland {
@@ -48,7 +48,9 @@ Surface::Shell *Surface::Shell::Get(const Surface *surface) {
 }
 
 void Surface::Shell::ResizeWindow(int width, int height) const {
-  zxdg_surface_v6_set_window_geometry(p_->zxdg_surface, surface_->margin_.l, surface_->margin_.t, width, height);
+  zxdg_surface_v6_set_window_geometry(p_->zxdg_surface,
+                                      surface_->margin_.l, surface_->margin_.t,
+                                      width, height);
 }
 
 void Surface::Shell::AckConfigure(uint32_t serial) const {
@@ -427,46 +429,54 @@ Surface::EGL *Surface::EGL::Get(Surface *surface) {
 }
 
 Surface::EGL::EGL(Surface *surface)
-    : surface_(surface),
-      egl_surface_(nullptr), wl_egl_window_(nullptr) {
-  wl_egl_window_ =
+    : surface_(surface) {
+  p_.reset(new Private);
+
+  p_->wl_egl_window_ =
       wl_egl_window_create(surface_->wl_surface_, 400, 400);
-  egl_surface_ =
+  p_->egl_surface_ =
       eglCreatePlatformWindowSurface(Display::Native().egl_display(),
                                      Display::Native().egl_config(),
-                                     wl_egl_window_,
+                                     p_->wl_egl_window_,
                                      NULL);
 }
 
 Surface::EGL::~EGL() {
-  if (egl_surface_) {
-    _ASSERT(wl_egl_window_);
-    wl_egl_window_destroy(wl_egl_window_);
+  if (p_->egl_surface_) {
+    _ASSERT(p_->wl_egl_window_);
+    wl_egl_window_destroy(p_->wl_egl_window_);
   }
   surface_->egl_ = nullptr;
 }
 
 bool Surface::EGL::MakeCurrent() {
   return EGL_TRUE ==
-      eglMakeCurrent(Display::Native().egl_display(), egl_surface_, egl_surface_, Display::Native().egl_context());
+      eglMakeCurrent(Display::Native().egl_display(),
+                     p_->egl_surface_,
+                     p_->egl_surface_,
+                     Display::Native().egl_context());
 }
 
 bool Surface::EGL::SwapBuffers() {
   return EGL_TRUE ==
-      eglSwapBuffers(Display::Native().egl_display(), egl_surface_);
+      eglSwapBuffers(Display::Native().egl_display(), p_->egl_surface_);
 }
 
 bool Surface::EGL::SwapBuffersWithDamage(int x, int y, int width, int height) {
   EGLint rect[4] = {x, y, width, height};
   return EGL_TRUE
       == Display::Native::kSwapBuffersWithDamageAPI(Display::Native().egl_display(),
-                                                    egl_surface_,
+                                                    p_->egl_surface_,
                                                     rect,
                                                     4 * sizeof(EGLint));
 }
 
 bool Surface::EGL::SwapInterval(EGLint interval) {
   return EGL_TRUE == eglSwapInterval(Display::Native().egl_display(), interval);
+}
+
+void Surface::EGL::Resize(int width, int height, int dx, int dy) {
+  wl_egl_window_resize(p_->wl_egl_window_, width, height, dx, dy);
 }
 
 // ------
