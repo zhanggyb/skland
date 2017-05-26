@@ -7,7 +7,7 @@ Build the source code
 $ git clone --recursive https://github.com/zhanggyb/skland.git
 ```
 
-## Build on Fedora 25
+## Build in Fedora 25
 
 ### Install prerequisites
 
@@ -46,7 +46,11 @@ $ make doc
 This will generate html document through doxygen in `html/`, open the
  `html/index.html` with your favorite web browser.
 
-## Build on ArchLinux
+## Build in ArchLinux
+
+### Install prerequisites
+
+## Build in Ubuntu
 
 ### Install prerequisites
 

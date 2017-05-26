@@ -87,6 +87,8 @@ endif ()
 find_library(DL_LIBRARY "dl")
 set(LIBS ${LIBS} ${DL_LIBRARY})
 
+# TODO: check fontconfig, gles-mesa, gl-mesa packages
+
 # ----------------------------------------------------------------------------
 # Document build option
 # ----------------------------------------------------------------------------
