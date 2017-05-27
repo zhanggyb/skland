@@ -1,6 +1,7 @@
 # travis-ci.org
 #
 language: cpp
+sudo: required
 dist: trusty
 compiler:
         - clang
@@ -10,13 +11,14 @@ os:
 before_install:
         - echo $LANG
         - echo $LC_ALL
+        - echo $PWD
         - ./scripts/install-dependencies.sh
 before_script:
         - mkdir build
         - cd build
         - cmake ../
 script:
-        - cd build
+        - echo $PWD
         - make
 branches:
         - master
