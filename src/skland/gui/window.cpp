@@ -16,6 +16,10 @@
 
 #include <skland/gui/window.hpp>
 
+#include "internal/abstract-shell-view_iterators.hpp"
+#include "internal/abstract-view_iterators.hpp"
+#include "internal/abstract-event-handler_mouse-task-iterator.hpp"
+
 #include <skland/core/assert.hpp>
 
 #include <skland/gui/application.hpp>
@@ -28,13 +32,9 @@
 #include <skland/gui/shared-memory-pool.hpp>
 #include <skland/gui/buffer.hpp>
 #include <skland/gui/region.hpp>
+#include <skland/gui/output.hpp>
 
 #include <skland/stock/theme.hpp>
-
-#include "internal/display_native.hpp"
-#include "internal/abstract-shell-view_iterators.hpp"
-#include "internal/abstract-view_iterators.hpp"
-#include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
@@ -52,6 +52,7 @@ struct Window::Private {
       : main_surface(nullptr),
         title_bar(nullptr),
         content_view(nullptr),
+        output(nullptr),
         flags(0) {}
 
   ~Private() {}
@@ -70,6 +71,8 @@ struct Window::Private {
 
   TitleBar *title_bar;
   AbstractView *content_view;
+
+  const Output *output;
 
   int flags;
 };
@@ -561,6 +564,16 @@ void Window::OnViewDetached(AbstractView *view) {
     p_->content_view = nullptr;
     return;
   }
+}
+
+void Window::OnEnterOutput(const Output *output) {
+  fprintf(stdout, "%s\n", __func__);
+  p_->output = output;
+}
+
+void Window::OnLeaveOutput(const Output *output) {
+  fprintf(stdout, "%s\n", __func__);
+  p_->output = nullptr;
 }
 
 int Window::GetMouseLocation(const MouseEvent *event) const {

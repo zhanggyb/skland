@@ -267,7 +267,7 @@ endif ()
 if (WIN32)
     list(APPEND libs FontSub.lib Usp10.lib)
 else ()
-    list(APPEND libs pthread)
+    list(APPEND libs pthread dl)
 endif ()
 
 find_package(OpenGL REQUIRED)

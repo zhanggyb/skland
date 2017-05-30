@@ -501,7 +501,7 @@ void Surface::OnEnter(void *data, struct wl_surface *wl_surface, struct wl_outpu
 void Surface::OnLeave(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
   const Surface *_this = static_cast<const Surface *>(data);
   Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
-  _this->event_handler_->OnEnterOutput(output);
+  _this->event_handler_->OnLeaveOutput(output);
 }
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)

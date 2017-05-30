@@ -85,6 +85,10 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnViewDetached(AbstractView *view) final;
 
+  virtual void OnEnterOutput(const Output *output) override;
+
+  virtual void OnLeaveOutput(const Output *output) override;
+
   int GetMouseLocation(const MouseEvent *event) const;
 
   Rect GetContentGeometry() const;

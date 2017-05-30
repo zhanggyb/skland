@@ -23,6 +23,7 @@
 #include "SkBlurMaskFilter.h"
 #include "SkPath.h"
 #include "SkCanvas.h"
+#include "SkPixmap.h"
 
 #include "internal/theme-light.hpp"
 #include "internal/theme-dark.hpp"

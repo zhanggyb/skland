@@ -16,9 +16,9 @@ before_install:
 before_script:
         - mkdir build
         - cd build
-        - cmake ../
 script:
         - echo $PWD
+        - cmake ../
         - make
 branches:
         - master

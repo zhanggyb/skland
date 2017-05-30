@@ -32,6 +32,7 @@
 #include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include "SkCanvas.h"
+#include "SkImage.h"
 
 namespace skland {
 
