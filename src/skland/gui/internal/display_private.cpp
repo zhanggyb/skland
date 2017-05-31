@@ -15,6 +15,7 @@
  */
 
 #include "display_private.hpp"
+#include "display_native.hpp"
 
 #include <skland/core/debug.hpp>
 #include <skland/core/assert.hpp>
@@ -42,11 +43,156 @@ const struct zxdg_shell_v6_listener Display::Private::kXdgShellListener = {
     OnPing
 };
 
+static bool
+weston_check_egl_extension(const char *extensions, const char *extension) {
+  size_t extlen = strlen(extension);
+  const char *end = extensions + strlen(extensions);
+
+  while (extensions < end) {
+    size_t n = 0;
+
+    /* Skip whitespaces, if any */
+    if (*extensions == ' ') {
+      extensions++;
+      continue;
+    }
+
+    n = strcspn(extensions, " ");
+
+    /* Compare strings */
+    if (n == extlen && strncmp(extension, extensions, n) == 0)
+      return true; /* Found */
+
+    extensions += n;
+  }
+
+  /* Not found */
+  return false;
+}
+
+void Display::Private::InitializeEGLDisplay() {
+  ReleaseEGLDisplay();
+
+  EGLint count, n, size;
+  EGLBoolean ret;
+
+  EGLint config_attribs[] = {
+      EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+      EGL_RED_SIZE, 8,
+      EGL_GREEN_SIZE, 8,
+      EGL_BLUE_SIZE, 8,
+      EGL_ALPHA_SIZE, 8,
+      EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+      EGL_NONE
+  };
+  static const EGLint context_attribs[] = {
+      EGL_CONTEXT_CLIENT_VERSION, 2,
+      EGL_NONE
+  };
+
+  egl_display = Private::GetEGLDisplay(EGL_PLATFORM_WAYLAND_KHR,
+                                       wl_display, NULL);
+  _ASSERT(egl_display);
+
+  ret = eglInitialize(egl_display, &egl_version_major, &egl_version_minor);
+  _ASSERT(ret == EGL_TRUE);
+
+  ret = eglBindAPI(EGL_OPENGL_ES_API);
+  _ASSERT(ret == EGL_TRUE);
+
+  eglGetConfigs(egl_display, NULL, 0, &count);
+
+  EGLConfig *configs = (EGLConfig *) calloc((size_t) count, sizeof(EGLConfig));
+  eglChooseConfig(egl_display, config_attribs, configs, count, &n);
+  for (int i = 0; i < n; i++) {
+    eglGetConfigAttrib(egl_display, configs[i], EGL_BUFFER_SIZE, &size);
+    if (32 == size) {
+      // TODO: config buffer size
+      egl_config = configs[i];
+      break;
+    }
+  }
+  free(configs);
+  _ASSERT(egl_config);
+
+  egl_context = eglCreateContext(egl_display, egl_config, EGL_NO_CONTEXT, context_attribs);
+  _ASSERT(egl_context);
+
+  static const struct {
+    const char *extension, *entrypoint;
+  } swap_damage_ext_to_entrypoint[] = {
+      {
+          .extension = "EGL_EXT_swap_buffers_with_damage",
+          .entrypoint = "eglSwapBuffersWithDamageEXT",
+      },
+      {
+          .extension = "EGL_KHR_swap_buffers_with_damage",
+          .entrypoint = "eglSwapBuffersWithDamageKHR",
+      },
+  };
+  const char *extensions;
+
+  extensions = eglQueryString(egl_display, EGL_EXTENSIONS);
+  if (extensions &&
+      weston_check_egl_extension(extensions, "EGL_EXT_buffer_age")) {
+//    int len = (int) ARRAY_LENGTH(swap_damage_ext_to_entrypoint);
+    int i = 0;
+    for (i = 0; i < 2; i++) {
+      if (weston_check_egl_extension(extensions,
+                                     swap_damage_ext_to_entrypoint[i].extension)) {
+        /* The EXTPROC is identical to the KHR one */
+        Native::kSwapBuffersWithDamageAPI =
+            (PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC)
+                eglGetProcAddress(swap_damage_ext_to_entrypoint[i].entrypoint);
+        break;
+      }
+    }
+    if (Native::kSwapBuffersWithDamageAPI)
+      printf("has EGL_EXT_buffer_age and %s\n", swap_damage_ext_to_entrypoint[i].extension);
+  }
+}
+
+void Display::Private::ReleaseEGLDisplay() {
+  if (egl_display) {
+    eglMakeCurrent(egl_display, (::EGLSurface) 0, (::EGLSurface) 0, (::EGLContext) 0);
+    eglTerminate(egl_display);
+    eglReleaseThread();
+
+    egl_display = nullptr;
+    egl_context = nullptr;
+    egl_config = nullptr;
+    egl_version_major = 0;
+    egl_version_minor = 0;
+  }
+}
+
+void Display::Private::MakeSwapBufferNonBlock() const {
+  EGLint a = EGL_MIN_SWAP_INTERVAL;
+  EGLint b = EGL_MAX_SWAP_INTERVAL;
+
+  if (!eglGetConfigAttrib(egl_display, egl_config, a, &a) ||
+      !eglGetConfigAttrib(egl_display, egl_config, b, &b)) {
+    fprintf(stderr, "warning: swap interval range unknown\n");
+  } else if (a > 0) {
+    fprintf(stderr, "warning: minimum swap interval is %d, "
+        "while 0 is required to not deadlock on resize.\n", a);
+  }
+
+  /*
+   * We rely on the Wayland compositor to sync to vblank anyway.
+   * We just need to be able to call eglSwapBuffers() without the
+   * risk of waiting for a frame callback in it.
+   */
+  if (!eglSwapInterval(egl_display, 0)) {
+    fprintf(stderr, "error: eglSwapInterval() failed.\n");
+  }
+}
+
 void Display::Private::OnFormat(void *data, struct wl_shm *shm, uint32_t format) {
   Display *_this = static_cast<Display *>(data);
   const char *text = nullptr;
 
-  _this->pixel_formats_.insert(format);
+  _this->p_->pixel_formats.insert(format);
 
   switch (format) {
     case WL_SHM_FORMAT_ARGB8888: {
@@ -109,7 +255,7 @@ void Display::Private::OnGlobal(void *data,
   global->id = id;
   global->interface = interface;
   global->version = version;
-  _this->globals_.push_back(global);
+  _this->p_->globals.push_back(global);
 
   if (strcmp(interface, wl_compositor_interface.name) == 0) {
     _this->p_->wl_compositor = static_cast<struct wl_compositor *>(wl_registry_bind(_this->p_->wl_registry,
@@ -163,7 +309,7 @@ void Display::Private::OnGlobalRemove(void *data,
                                       uint32_t name) {
   Display *_this = static_cast<Display *>(data);
 
-  for (std::list<Global *>::iterator it = _this->globals_.begin(); it != _this->globals_.end();) {
+  for (std::list<Global *>::iterator it = _this->p_->globals.begin(); it != _this->p_->globals.end();) {
     if ((*it)->id != name) {
       it++;
       continue;
@@ -176,7 +322,7 @@ void Display::Private::OnGlobalRemove(void *data,
     _this->unregister_.Emit(**it);
 
     delete (*it);
-    it = _this->globals_.erase(it);
+    it = _this->p_->globals.erase(it);
   }
 }
 

@@ -127,9 +127,9 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
    */
   virtual Surface *GetSurface(const AbstractView *view) const = 0;
 
-  virtual void OnEnterOutput(const Output *output) = 0;
+  virtual void OnEnterOutput(const Surface *surface, const Output *output) = 0;
 
-  virtual void OnLeaveOutput(const Output *output) = 0;
+  virtual void OnLeaveOutput(const Surface *surface, const Output *output) = 0;
 
   /**
    * @brief Disable this virtual method

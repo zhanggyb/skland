@@ -120,7 +120,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void ToggleMaximize(__SLOT__);
 
-  void ToggleFullscreen(__SLOT__);
+  void ToggleFullscreen(const Output *output, __SLOT__);
 
   const std::string &GetTitle() const;
 
@@ -184,9 +184,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual Surface *GetSurface(const AbstractView *view) const override;
 
-  virtual void OnEnterOutput(const Output *output) override;
+  virtual void OnEnterOutput(const Surface *surface, const Output *output) override;
 
-  virtual void OnLeaveOutput(const Output *output) override;
+  virtual void OnLeaveOutput(const Surface *surface, const Output *output) override;
 
   virtual void OnDraw(const Context *context);
 

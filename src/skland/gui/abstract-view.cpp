@@ -252,7 +252,7 @@ void AbstractView::SetLeft(int left) {
   else
     Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyWidthMask);
 
-  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry) ;
+  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetTop() const {
@@ -529,11 +529,11 @@ Surface *AbstractView::GetSurface(const AbstractView *view) const {
   return nullptr;
 }
 
-void AbstractView::OnEnterOutput(const Output *output) {
+void AbstractView::OnEnterOutput(const Surface *surface, const Output *output) {
 
 }
 
-void AbstractView::OnLeaveOutput(const Output *output) {
+void AbstractView::OnLeaveOutput(const Surface *surface, const Output *output) {
 
 }
 

@@ -17,13 +17,10 @@
 #include "internal/display_private.hpp"
 
 #include <skland/core/exceptions.hpp>
-#include <skland/core/assert.hpp>
 
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
 #include <skland/gui/surface.hpp>
-
-#include "internal/display_native.hpp"
 
 #include <iostream>
 
@@ -35,12 +32,10 @@ namespace skland {
 
 Display *Display::kDisplay = nullptr;
 
-Display::Display()
-    : display_fd_(0),
-      display_fd_events_(0) {
+Display::Display() {
   p_.reset(new Private);
 
-  cursors_.resize(kCursorBlank, nullptr);
+  p_->cursors.resize(kCursorBlank, nullptr);
   AbstractEventHandler::InitializeIdleTaskList();
   Surface::InitializeCommitTaskList();
 }
@@ -59,16 +54,14 @@ void Display::Connect(const char *name) {
   if (nullptr == p_->wl_display) {
     throw std::runtime_error("FATAL! Cannot connect to Wayland compositor!");
   }
-  display_fd_ = wl_display_get_fd(p_->wl_display);
+  p_->fd = wl_display_get_fd(p_->wl_display);
 
   p_->xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
   if (p_->xkb_context == NULL) {
     throw std::runtime_error("FATAL! Cannot create xkb_context!");
   }
 
-  InitializeEGLDisplay();
-
-  fprintf(stdout, "Use EGL version: %d.%d\n", p_->major_, p_->minor_);
+  p_->InitializeEGLDisplay();
 
   p_->wl_registry = wl_display_get_registry(p_->wl_display);
   wl_registry_add_listener(p_->wl_registry, &Private::kRegistryListener, this);
@@ -88,8 +81,8 @@ void Display::Disconnect() noexcept {
 
   // TODO: other operations
 
-  output_deque_.Clear();
-  input_deque_.Clear();
+  p_->outputs.Clear();
+  p_->inputs.Clear();
   Surface::Clear();
 
   if (p_->wl_data_device_manager) {
@@ -133,22 +126,34 @@ void Display::Disconnect() noexcept {
     p_->wl_registry = nullptr;
   }
 
-  ReleaseEGLDisplay();
+  p_->ReleaseEGLDisplay();
 
   wl_display_disconnect(p_->wl_display);
 }
 
-const Output *Display::GetOutputAt(int index) {
-  return static_cast<Output *>(kDisplay->output_deque_[index]);
+const Deque &Display::GetOutputs() {
+  return kDisplay->p_->outputs;
+}
+
+const Deque &Display::GetInputs() {
+  return kDisplay->p_->inputs;
+}
+
+const std::set<uint32_t> &Display::GetPixelFormats() {
+  return kDisplay->p_->pixel_formats;
+}
+
+const Cursor *Display::GetCursor(CursorType cursor_type) {
+  return kDisplay->p_->cursors[cursor_type];
 }
 
 void Display::AddOutput(Output *output, int index) {
-  output_deque_.Insert(output, index);
+  p_->outputs.Insert(output, index);
 }
 
 void Display::DestroyOutput(uint32_t id) {
   Output *output = nullptr;
-  for (Deque::Iterator it = output_deque_.begin(); it != output_deque_.end(); ++it) {
+  for (Deque::Iterator it = p_->outputs.begin(); it != p_->outputs.end(); ++it) {
     output = it.cast<Output>();
     if (output->GetID() == id) {
       delete output;
@@ -158,177 +163,48 @@ void Display::DestroyOutput(uint32_t id) {
 }
 
 void Display::AddInput(Input *input, int index) {
-  input_deque_.Insert(input, index);
+  p_->inputs.Insert(input, index);
 }
 
 void Display::InitializeCursors() {
-  cursors_[kCursorBottomLeft] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "bottom_left_corner"));
-  cursors_[kCursorBottomRight] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "bottom_right_corner"));
-  cursors_[kCursorBottom] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "bottom_side"));
-  cursors_[kCursorDragging] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "grabbing"));
-  cursors_[kCursorLeftPtr] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
-  cursors_[kCursorLeft] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_side"));
-  cursors_[kCursorRight] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "right_side"));
-  cursors_[kCursorTopLeft] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "top_left_corner"));
-  cursors_[kCursorTopRight] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "top_right_corner"));
-  cursors_[kCursorTop] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "top_side"));
-  cursors_[kCursorIbeam] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "xterm"));
-  cursors_[kCursorHand1] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "hand1"));
-  cursors_[kCursorWatch] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "watch"));
-  cursors_[kCursorDndMove] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
-  cursors_[kCursorDndCopy] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
-  cursors_[kCursorDndForbidden] = Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
+  p_->cursors[kCursorBottomLeft] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "bottom_left_corner"));
+  p_->cursors[kCursorBottomRight] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "bottom_right_corner"));
+  p_->cursors[kCursorBottom] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "bottom_side"));
+  p_->cursors[kCursorDragging] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "grabbing"));
+  p_->cursors[kCursorLeftPtr] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
+  p_->cursors[kCursorLeft] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_side"));
+  p_->cursors[kCursorRight] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "right_side"));
+  p_->cursors[kCursorTopLeft] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "top_left_corner"));
+  p_->cursors[kCursorTopRight] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "top_right_corner"));
+  p_->cursors[kCursorTop] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "top_side"));
+  p_->cursors[kCursorIbeam] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "xterm"));
+  p_->cursors[kCursorHand1] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "hand1"));
+  p_->cursors[kCursorWatch] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "watch"));
+  p_->cursors[kCursorDndMove] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
+  p_->cursors[kCursorDndCopy] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
+  p_->cursors[kCursorDndForbidden] =
+      Cursor::Create(wl_cursor_theme_get_cursor(p_->wl_cursor_theme, "left_ptr"));
 }
 
 void Display::ReleaseCursors() {
-  for (size_t i = 0; i < cursors_.size(); i++) {
-    delete cursors_[i];
-    cursors_[i] = nullptr;
-  }
-}
-
-static bool
-weston_check_egl_extension(const char *extensions, const char *extension) {
-  size_t extlen = strlen(extension);
-  const char *end = extensions + strlen(extensions);
-
-  while (extensions < end) {
-    size_t n = 0;
-
-    /* Skip whitespaces, if any */
-    if (*extensions == ' ') {
-      extensions++;
-      continue;
-    }
-
-    n = strcspn(extensions, " ");
-
-    /* Compare strings */
-    if (n == extlen && strncmp(extension, extensions, n) == 0)
-      return true; /* Found */
-
-    extensions += n;
-  }
-
-  /* Not found */
-  return false;
-}
-
-void Display::InitializeEGLDisplay() {
-  ReleaseEGLDisplay();
-
-  EGLint count, n, size;
-  EGLBoolean ret;
-
-  EGLint config_attribs[] = {
-      EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-      EGL_RED_SIZE, 8,
-      EGL_GREEN_SIZE, 8,
-      EGL_BLUE_SIZE, 8,
-      EGL_ALPHA_SIZE, 8,
-      EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-      EGL_NONE
-  };
-  static const EGLint context_attribs[] = {
-      EGL_CONTEXT_CLIENT_VERSION, 2,
-      EGL_NONE
-  };
-
-  p_->egl_display_ = Private::GetEGLDisplay(EGL_PLATFORM_WAYLAND_KHR,
-                                            p_->wl_display, NULL);
-  _ASSERT(p_->egl_display_);
-
-  ret = eglInitialize(p_->egl_display_, &p_->major_, &p_->minor_);
-  _ASSERT(ret == EGL_TRUE);
-
-  ret = eglBindAPI(EGL_OPENGL_ES_API);
-  _ASSERT(ret == EGL_TRUE);
-
-  eglGetConfigs(p_->egl_display_, NULL, 0, &count);
-
-  EGLConfig *configs = (EGLConfig *) calloc((size_t) count, sizeof(EGLConfig));
-  eglChooseConfig(p_->egl_display_, config_attribs, configs, count, &n);
-  for (int i = 0; i < n; i++) {
-    eglGetConfigAttrib(p_->egl_display_, configs[i], EGL_BUFFER_SIZE, &size);
-    if (32 == size) {
-      // TODO: config buffer size
-      p_->egl_config_ = configs[i];
-      break;
-    }
-  }
-  free(configs);
-  _ASSERT(p_->egl_config_);
-
-  p_->egl_context_ = eglCreateContext(p_->egl_display_, p_->egl_config_, EGL_NO_CONTEXT, context_attribs);
-  _ASSERT(p_->egl_context_);
-
-  static const struct {
-    const char *extension, *entrypoint;
-  } swap_damage_ext_to_entrypoint[] = {
-      {
-          .extension = "EGL_EXT_swap_buffers_with_damage",
-          .entrypoint = "eglSwapBuffersWithDamageEXT",
-      },
-      {
-          .extension = "EGL_KHR_swap_buffers_with_damage",
-          .entrypoint = "eglSwapBuffersWithDamageKHR",
-      },
-  };
-  const char *extensions;
-
-  extensions = eglQueryString(p_->egl_display_, EGL_EXTENSIONS);
-  if (extensions &&
-      weston_check_egl_extension(extensions, "EGL_EXT_buffer_age")) {
-//    int len = (int) ARRAY_LENGTH(swap_damage_ext_to_entrypoint);
-    int i = 0;
-    for (i = 0; i < 2; i++) {
-      if (weston_check_egl_extension(extensions,
-                                     swap_damage_ext_to_entrypoint[i].extension)) {
-        /* The EXTPROC is identical to the KHR one */
-        Native::kSwapBuffersWithDamageAPI =
-            (PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC)
-                eglGetProcAddress(swap_damage_ext_to_entrypoint[i].entrypoint);
-        break;
-      }
-    }
-    if (Native::kSwapBuffersWithDamageAPI)
-      printf("has EGL_EXT_buffer_age and %s\n", swap_damage_ext_to_entrypoint[i].extension);
-  }
-}
-
-void Display::ReleaseEGLDisplay() {
-  if (p_->egl_display_) {
-    eglMakeCurrent(p_->egl_display_, (::EGLSurface) 0, (::EGLSurface) 0, (::EGLContext) 0);
-    eglTerminate(p_->egl_display_);
-    eglReleaseThread();
-
-    p_->egl_display_ = nullptr;
-    p_->egl_context_ = nullptr;
-    p_->egl_config_ = nullptr;
-    p_->major_ = 0;
-    p_->minor_ = 0;
-  }
-}
-
-void Display::MakeSwapBufferNonBlock() const {
-  EGLint a = EGL_MIN_SWAP_INTERVAL;
-  EGLint b = EGL_MAX_SWAP_INTERVAL;
-
-  if (!eglGetConfigAttrib(p_->egl_display_, p_->egl_config_, a, &a) ||
-      !eglGetConfigAttrib(p_->egl_display_, p_->egl_config_, b, &b)) {
-    fprintf(stderr, "warning: swap interval range unknown\n");
-  } else if (a > 0) {
-    fprintf(stderr, "warning: minimum swap interval is %d, "
-        "while 0 is required to not deadlock on resize.\n", a);
-  }
-
-  /*
-   * We rely on the Wayland compositor to sync to vblank anyway.
-   * We just need to be able to call eglSwapBuffers() without the
-   * risk of waiting for a frame callback in it.
-   */
-  if (!eglSwapInterval(p_->egl_display_, 0)) {
-    fprintf(stderr, "error: eglSwapInterval() failed.\n");
+  for (size_t i = 0; i < p_->cursors.size(); i++) {
+    delete p_->cursors[i];
+    p_->cursors[i] = nullptr;
   }
 }
 

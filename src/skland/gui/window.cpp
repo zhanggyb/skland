@@ -23,10 +23,8 @@
 #include <skland/core/assert.hpp>
 
 #include <skland/gui/application.hpp>
-#include <skland/gui/abstract-view.hpp>
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
-#include <skland/gui/context.hpp>
 #include <skland/gui/title-bar.hpp>
 
 #include <skland/gui/shared-memory-pool.hpp>
@@ -52,8 +50,8 @@ struct Window::Private {
       : main_surface(nullptr),
         title_bar(nullptr),
         content_view(nullptr),
-        output(nullptr),
-        flags(0) {}
+        flags(0),
+        output(nullptr) {}
 
   ~Private() {}
 
@@ -72,9 +70,9 @@ struct Window::Private {
   TitleBar *title_bar;
   AbstractView *content_view;
 
-  const Output *output;
-
   int flags;
+
+  const Output *output;
 };
 
 Window::Window(const char *title, int flags)
@@ -86,12 +84,13 @@ Window::Window(int width, int height, const char *title, int flags)
   p_.reset(new Private);
   p_->flags = flags;
 
+  Surface *shell_surface = GetShellSurface();
+
   // Create a sub surface for views:
   if (!(flags & kFlagMaskFrameless)) {
-    Surface *parent = GetShellSurface();
-    p_->main_surface = Surface::Sub::Create(parent, this, Theme::GetShadowMargin());
-    _ASSERT(p_->main_surface->parent() == parent);
-    _ASSERT(p_->main_surface->below() == parent);
+    p_->main_surface = Surface::Sub::Create(shell_surface, this, Theme::GetShadowMargin());
+    _ASSERT(p_->main_surface->parent() == shell_surface);
+    _ASSERT(p_->main_surface->below() == shell_surface);
     Region empty_region;
     p_->main_surface->SetInputRegion(empty_region);
 
@@ -113,7 +112,8 @@ Window::Window(int width, int height, const char *title, int flags)
     button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Minimize));
 
     button = titlebar->GetButton(TitleBar::kButtonFullscreen);
-    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::ToggleFullscreen));
+    //button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::SetFullscreen));
+    button->clicked().Connect(this, &Window::OnFullscreenButtonClicked);
   }
 }
 
@@ -154,8 +154,8 @@ void Window::OnShown() {
   // Create buffer:
   int width = GetWidth();
   int height = GetHeight();
-  width += shell_surface->margin().lr();
-  height += shell_surface->margin().tb();
+  width += (shell_surface->margin().lr());
+  height += (shell_surface->margin().tb());
 
   int32_t pool_size = width * 4 * height;
   if (p_->main_surface) pool_size *= 2; // double buffer for 2 surfaces
@@ -196,6 +196,8 @@ void Window::OnUpdate(AbstractView *view) {
   Surface *surface = nullptr;
 
   if (nullptr == view) {
+    int width = GetWidth();
+    int height = GetHeight();
     surface = this->GetShellSurface();
     Iterator it(this);
     PushToTail(&it.redraw_task());
@@ -203,8 +205,8 @@ void Window::OnUpdate(AbstractView *view) {
     _ASSERT(p_->frame_canvas);
     Damage(this,
            0, 0,
-           GetWidth() + surface->margin().lr(),
-           GetHeight() + surface->margin().tb());
+           width + surface->margin().lr(),
+           height + surface->margin().tb());
     surface->Commit();
   } else {
     std::shared_ptr<Canvas> canvas;
@@ -265,8 +267,7 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   p_->frame_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
   p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer.GetData(),
-                                    p_->frame_buffer.GetSize().width,
-                                    p_->frame_buffer.GetSize().height));
+                                    width, height));
   p_->frame_canvas->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
   p_->frame_canvas->Clear();
 
@@ -274,8 +275,8 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
     p_->main_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
     p_->main_canvas.reset(new Canvas((unsigned char *) p_->main_buffer.GetData(),
-                                     p_->main_buffer.GetSize().width,
-                                     p_->main_buffer.GetSize().height));
+                                     width,
+                                     height));
     p_->main_canvas->SetOrigin(p_->main_surface->margin().left,
                                p_->main_surface->margin().top);
     p_->main_canvas->Clear();
@@ -301,35 +302,35 @@ void Window::OnMouseEnter(MouseEvent *event) {
   int location = GetMouseLocation(event);
   switch (location) {
     case kResizeTop: {
-      event->SetCursor(Display::cursor(kCursorTop));
+      event->SetCursor(Display::GetCursor(kCursorTop));
       break;
     }
     case kResizeBottom: {
-      event->SetCursor(Display::cursor(kCursorBottom));
+      event->SetCursor(Display::GetCursor(kCursorBottom));
       break;
     }
     case kResizeLeft: {
-      event->SetCursor(Display::cursor(kCursorLeft));
+      event->SetCursor(Display::GetCursor(kCursorLeft));
       break;
     }
     case kResizeRight: {
-      event->SetCursor(Display::cursor(kCursorRight));
+      event->SetCursor(Display::GetCursor(kCursorRight));
       break;
     }
     case kResizeTopLeft: {
-      event->SetCursor(Display::cursor(kCursorTopLeft));
+      event->SetCursor(Display::GetCursor(kCursorTopLeft));
       break;
     }
     case kResizeTopRight: {
-      event->SetCursor(Display::cursor(kCursorTopRight));
+      event->SetCursor(Display::GetCursor(kCursorTopRight));
       break;
     }
     case kResizeBottomLeft: {
-      event->SetCursor(Display::cursor(kCursorBottomLeft));
+      event->SetCursor(Display::GetCursor(kCursorBottomLeft));
       break;
     }
     case kResizeBottomRight: {
-      event->SetCursor(Display::cursor(kCursorBottomRight));
+      event->SetCursor(Display::GetCursor(kCursorBottomRight));
       break;
     }
     case kTitleBar: {
@@ -341,7 +342,7 @@ void Window::OnMouseEnter(MouseEvent *event) {
       break;
     }
     default: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      event->SetCursor(Display::GetCursor(kCursorLeftPtr));
       break;
     }
   }
@@ -358,56 +359,56 @@ void Window::OnMouseMove(MouseEvent *event) {
   switch (GetMouseLocation(event)) {
     case kResizeTop: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorTop));
+      event->SetCursor(Display::GetCursor(kCursorTop));
       break;
     }
     case kResizeBottom: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorBottom));
+      event->SetCursor(Display::GetCursor(kCursorBottom));
       break;
     }
     case kResizeLeft: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorLeft));
+      event->SetCursor(Display::GetCursor(kCursorLeft));
       break;
     }
     case kResizeRight: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorRight));
+      event->SetCursor(Display::GetCursor(kCursorRight));
       break;
     }
     case kResizeTopLeft: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorTopLeft));
+      event->SetCursor(Display::GetCursor(kCursorTopLeft));
       break;
     }
     case kResizeTopRight: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorTopRight));
+      event->SetCursor(Display::GetCursor(kCursorTopRight));
       break;
     }
     case kResizeBottomLeft: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorBottomLeft));
+      event->SetCursor(Display::GetCursor(kCursorBottomLeft));
       break;
     }
     case kResizeBottomRight: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorBottomRight));
+      event->SetCursor(Display::GetCursor(kCursorBottomRight));
       break;
     }
     case kTitleBar: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      event->SetCursor(Display::GetCursor(kCursorLeftPtr));
       view = p_->title_bar;
       break;
     }
     case kClientArea: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      event->SetCursor(Display::GetCursor(kCursorLeftPtr));
       view = p_->content_view;
       break;
     }
     default: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      event->SetCursor(Display::GetCursor(kCursorLeftPtr));
       break;
     }
   }
@@ -566,14 +567,14 @@ void Window::OnViewDetached(AbstractView *view) {
   }
 }
 
-void Window::OnEnterOutput(const Output *output) {
-  fprintf(stdout, "%s\n", __func__);
-  p_->output = output;
+void Window::OnEnterOutput(const Surface *surface, const Output *output) {
+  if (surface == GetShellSurface())
+    p_->output = output;
 }
 
-void Window::OnLeaveOutput(const Output *output) {
-  fprintf(stdout, "%s\n", __func__);
-  p_->output = nullptr;
+void Window::OnLeaveOutput(const Surface *surface, const Output *output) {
+  if (surface == GetShellSurface())
+    p_->output = nullptr;
 }
 
 int Window::GetMouseLocation(const MouseEvent *event) const {
@@ -581,7 +582,7 @@ int Window::GetMouseLocation(const MouseEvent *event) const {
   int x = static_cast<int>(event->GetSurfaceXY().x),
       y = static_cast<int>(event->GetSurfaceXY().y);
 
-  // TODO: maximized or frameless
+  // TODO: maximized or fullscreen
 
   if (x < (Theme::GetShadowMargin().left - kResizingMargin.left))
     hlocation = AbstractShellView::kExterior;
@@ -628,6 +629,22 @@ Rect Window::GetContentGeometry() const {
     h -= p_->title_bar->GetHeight();
   }
   return Rect::FromXYWH(x, y, w, h);
+}
+
+void Window::OnFullscreenButtonClicked(SLOT slot) {
+  if (IsFullscreen()) {
+    ToggleFullscreen(nullptr);
+  } else {
+    if (p_->output)
+      ToggleFullscreen(p_->output);
+    else {
+      const Deque &outputs = Display::GetOutputs();
+      if (outputs.count()) {
+        p_->output = static_cast<const Output *>(outputs[0]);
+        ToggleFullscreen(p_->output);
+      }
+    }
+  }
 }
 
 }

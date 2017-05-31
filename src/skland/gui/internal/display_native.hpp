@@ -73,15 +73,15 @@ SKLAND_NO_EXPORT class Display::Native {
   }
 
   EGLDisplay egl_display() const {
-    return display_->p_->egl_display_;
+    return display_->p_->egl_display;
   }
 
   EGLConfig egl_config() const {
-    return display_->p_->egl_config_;
+    return display_->p_->egl_config;
   }
 
   EGLContext egl_context() const {
-    return display_->p_->egl_context_;
+    return display_->p_->egl_context;
   }
 
   struct xkb_context *xkb_context() const {

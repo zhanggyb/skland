@@ -198,56 +198,56 @@ void EGLWindow::OnMouseMove(MouseEvent *event) {
   switch (GetMouseLocation(event)) {
     case kResizeTop: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorTop));
+      event->SetCursor(Display::GetCursor(kCursorTop));
       break;
     }
     case kResizeBottom: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorBottom));
+      event->SetCursor(Display::GetCursor(kCursorBottom));
       break;
     }
     case kResizeLeft: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorLeft));
+      event->SetCursor(Display::GetCursor(kCursorLeft));
       break;
     }
     case kResizeRight: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorRight));
+      event->SetCursor(Display::GetCursor(kCursorRight));
       break;
     }
     case kResizeTopLeft: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorTopLeft));
+      event->SetCursor(Display::GetCursor(kCursorTopLeft));
       break;
     }
     case kResizeTopRight: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorTopRight));
+      event->SetCursor(Display::GetCursor(kCursorTopRight));
       break;
     }
     case kResizeBottomLeft: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorBottomLeft));
+      event->SetCursor(Display::GetCursor(kCursorBottomLeft));
       break;
     }
     case kResizeBottomRight: {
       DispatchMouseLeaveEvent();
-      event->SetCursor(Display::cursor(kCursorBottomRight));
+      event->SetCursor(Display::GetCursor(kCursorBottomRight));
       break;
     }
     case kTitleBar: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      event->SetCursor(Display::GetCursor(kCursorLeftPtr));
 //      view = p_->title_bar;
       break;
     }
     case kClientArea: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      event->SetCursor(Display::GetCursor(kCursorLeftPtr));
 //      view = p_->content_view;
       break;
     }
     default: {
-      event->SetCursor(Display::cursor(kCursorLeftPtr));
+      event->SetCursor(Display::GetCursor(kCursorLeftPtr));
       break;
     }
   }

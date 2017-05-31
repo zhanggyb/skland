@@ -85,9 +85,9 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnViewDetached(AbstractView *view) final;
 
-  virtual void OnEnterOutput(const Output *output) override;
+  virtual void OnEnterOutput(const Surface *surface, const Output *output) final;
 
-  virtual void OnLeaveOutput(const Output *output) override;
+  virtual void OnLeaveOutput(const Surface *surface, const Output *output) final;
 
   int GetMouseLocation(const MouseEvent *event) const;
 
@@ -96,6 +96,8 @@ SKLAND_EXPORT class Window : public AbstractShellView {
  private:
 
   struct Private;
+
+  void OnFullscreenButtonClicked(__SLOT__);
 
   std::unique_ptr<Private> p_;
 

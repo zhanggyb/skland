@@ -67,7 +67,7 @@ class Application::EpollTask : public AbstractEpollTask {
 };
 
 void Application::EpollTask::Run(uint32_t events) {
-//  display_->display_fd_events_ = events;
+  Display::kDisplay->p_->epoll_events = events;
   if (events & EPOLLERR || events & EPOLLHUP) {
     Application::Exit();
     return;
@@ -85,7 +85,7 @@ void Application::EpollTask::Run(uint32_t events) {
       ep.events = EPOLLIN | EPOLLERR | EPOLLHUP;
       ep.data.ptr = app_->epoll_task_;
       epoll_ctl(app_->epoll_fd_, EPOLL_CTL_MOD,
-                Display::kDisplay->display_fd_, &ep);
+                Display::kDisplay->p_->fd, &ep);
     } else if (ret == -1 && errno != EAGAIN) {
       Application::Exit();
       return;
@@ -122,7 +122,7 @@ Application::Application(int argc, char *argv[])
   Theme::Initialize();
 
   epoll_fd_ = CreateEpollFd();
-  WatchFd(Display::kDisplay->display_fd_, EPOLLIN | EPOLLERR | EPOLLHUP, epoll_task_);
+  WatchFd(Display::kDisplay->p_->fd, EPOLLIN | EPOLLERR | EPOLLHUP, epoll_task_);
 }
 
 Application::~Application() {
@@ -173,7 +173,7 @@ int Application::Run() {
       ep[0].events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
       ep[0].data.ptr = kInstance->epoll_task_;
       epoll_ctl(kInstance->epoll_fd_, EPOLL_CTL_MOD,
-                Display::kDisplay->display_fd_, &ep[0]);
+                Display::kDisplay->p_->fd, &ep[0]);
     } else if (ret < 0) {
       break;
     }

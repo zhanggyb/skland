@@ -48,13 +48,21 @@ struct Display::Private {
         xdg_shell(nullptr),
         wl_cursor_theme(nullptr),
         wl_data_device_manager(nullptr),
-        egl_display_(nullptr),
-        egl_context_(nullptr),
-        egl_config_(nullptr),
-        major_(0),
-        minor_(0) {}
+        egl_display(nullptr),
+        egl_context(nullptr),
+        egl_config(nullptr),
+        egl_version_major(0),
+        egl_version_minor(0),
+        fd(0),
+        epoll_events(0) {}
 
   ~Private() {}
+
+  void InitializeEGLDisplay();
+
+  void ReleaseEGLDisplay();
+
+  void MakeSwapBufferNonBlock() const;
 
   struct wl_display *wl_display;
   struct wl_registry *wl_registry;
@@ -66,14 +74,25 @@ struct Display::Private {
   struct wl_cursor_theme *wl_cursor_theme;
   struct wl_data_device_manager *wl_data_device_manager;
 
-  EGLDisplay egl_display_;
-  EGLContext egl_context_;
-  EGLConfig egl_config_;
+  EGLDisplay egl_display;
+  EGLContext egl_context;
+  EGLConfig egl_config;
 
-  EGLint major_;  /**< The major version */
-  EGLint minor_;  /**< The minor version */
+  EGLint egl_version_major;  /**< The major version */
+  EGLint egl_version_minor;  /**< The minor version */
 
   struct xkb_context *xkb_context;
+
+  int fd;
+  uint32_t epoll_events;
+
+  Deque outputs;
+  Deque inputs;
+
+  std::list<Global *> globals;
+  std::set<uint32_t> pixel_formats;
+
+  std::vector<Cursor *> cursors;
 
   static void OnFormat(void *data, struct wl_shm *shm, uint32_t format);
 

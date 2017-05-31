@@ -37,12 +37,6 @@ namespace skland {
 class Output;
 class Input;
 
-struct Global {
-  uint32_t id;
-  std::string interface;
-  uint32_t version;
-};
-
 /**
  * @ingroup gui
  * @brief The global display
@@ -56,25 +50,40 @@ class Display {
 
  public:
 
+  struct Global {
+    uint32_t id;
+    std::string interface;
+    uint32_t version;
+  };
+
   class Native;
 
-  static const Output *GetOutputAt(int index = 0);
+  /**
+   * @brief Get a deque of outputs
+   * @return
+   */
+  static const Deque &GetOutputs();
 
-  static int GetOutputCount() {
-    return kDisplay->output_deque_.count();
-  }
+  /**
+   * @brief Get a deque of inputs
+   * @return
+   */
+  static const Deque &GetInputs();
 
-  static bool has_pixel_format(uint32_t format) {
-    return kDisplay->pixel_formats_.count(format) != 0;
-  }
+  /**
+   * @brief Get a set of supported pixel formats
+   * @return
+   */
+  static const std::set<uint32_t> &GetPixelFormats();
 
-  static SignalRef<const Global &> unregister() {
-    return kDisplay->unregister_;
-  }
+  static SignalRef<const Global &> unregister() { return kDisplay->unregister_; }
 
-  static Cursor *cursor(CursorType cursor_type) {
-    return kDisplay->cursors_[cursor_type];
-  }
+  /**
+   * @brief Get a predefined cursor
+   * @param cursor_type An enumeration of cursor type
+   * @return
+   */
+  static const Cursor *GetCursor(CursorType cursor_type);
 
  private:
 
@@ -98,26 +107,9 @@ class Display {
 
   void ReleaseCursors();
 
-  void InitializeEGLDisplay();
-
-  void ReleaseEGLDisplay();
-
-  void MakeSwapBufferNonBlock() const;
-
   std::unique_ptr<Private> p_;
 
-  int display_fd_;
-  uint32_t display_fd_events_;
-
-  Deque output_deque_;
-  Deque input_deque_;
-
-  std::list<Global *> globals_;
-  std::set<uint32_t> pixel_formats_;
-
   Signal<const Global &> unregister_;
-
-  std::vector<Cursor *> cursors_;
 
   static Display *kDisplay;
 

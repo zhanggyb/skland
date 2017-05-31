@@ -54,40 +54,58 @@ if (TRACE)
     add_definitions(-DTRACE)
 endif ()
 
-if (LINUX)
-    find_package(EGL)
-    if (EGL_FOUND)
-        # set(HAVE_EGL 1)
-        include_directories(${EGL_INCLUDE_DIRS})
-        set(LIBS ${LIBS} ${EGL_LIBRARIES})
-    endif ()
+# ----------------------------------------------------------------------------
+# Find prerequisites
+# ----------------------------------------------------------------------------
 
-    find_package(Wayland REQUIRED)
-    if (WAYLAND_FOUND)
-        include_directories(${WAYLAND_CLIENT_INCLUDE_DIR} ${WAYLAND_EGL_INCLUDE_DIR})
-        set(LIBS ${LIBS} ${WAYLAND_CLIENT_LIBRARIES} ${WAYLAND_EGL_LIBRARIES})
-    endif ()
-    #add_definitions(-D__UNIX__)
+find_package(EGL)
+if (EGL_FOUND)
+    # set(HAVE_EGL 1)
+    include_directories(${EGL_INCLUDE_DIRS})
+    set(LIBS ${LIBS} ${EGL_LIBRARIES})
+endif ()
 
-    find_package(XKBCommon REQUIRED)
-    if (XKBCommon_FOUND)
-        include_directories(${XKBCOMMON_INCLUDE_DIRS})
-        add_definitions(${XKBCOMMON_DEFINITIONS})
-        set(LIBS ${LIBS} ${XKBCOMMON_LIBRARIES})
-    endif ()
+find_package(FontConfig REQUIRED)
+if (FONTCONFIG_FOUND)
+    include_directories(${FONTCONFIG_INCLUDE_DIR})
+    set(LIBS ${LIBS} ${FONTCONFIG_LIBRARY})
+endif ()
 
-    find_package(LibInput REQUIRED)
-    if (LIBINPUT_FOUND)
-        include_directories(${LIBINPUT_INCLUDE_DIRS})
-        add_definitions(${LIBINPUT_DEFINITIONS})
-        set(LIBS ${LIBS} ${LIBINPUT_LIBRARIES})
-    endif ()
+find_package(OpenGL REQUIRED)
+if (OPENGL_FOUND)
+    include_directories(${OPENGL_INCLUDE_DIR})
+    set(LIBS ${LIBS} ${OPENGL_LIBRARIES})
+endif ()
+
+find_package(GLES2 REQUIRED)
+if (GLES2_FOUND)
+    include_directories(${GLES2_INCLUDE_DIRS})
+    set(LIBS ${LIBS} ${GLES2_LIBRARIES})
+endif ()
+
+find_package(Wayland REQUIRED)
+if (WAYLAND_FOUND)
+    include_directories(${WAYLAND_CLIENT_INCLUDE_DIR} ${WAYLAND_EGL_INCLUDE_DIR})
+    set(LIBS ${LIBS} ${WAYLAND_CLIENT_LIBRARIES} ${WAYLAND_EGL_LIBRARIES})
+endif ()
+#add_definitions(-D__UNIX__)
+
+find_package(XKBCommon REQUIRED)
+if (XKBCommon_FOUND)
+    include_directories(${XKBCOMMON_INCLUDE_DIRS})
+    add_definitions(${XKBCOMMON_DEFINITIONS})
+    set(LIBS ${LIBS} ${XKBCOMMON_LIBRARIES})
+endif ()
+
+find_package(LibInput REQUIRED)
+if (LIBINPUT_FOUND)
+    include_directories(${LIBINPUT_INCLUDE_DIRS})
+    add_definitions(${LIBINPUT_DEFINITIONS})
+    set(LIBS ${LIBS} ${LIBINPUT_LIBRARIES})
 endif ()
 
 find_library(DL_LIBRARY "dl")
 set(LIBS ${LIBS} ${DL_LIBRARY})
-
-# TODO: check fontconfig, gles-mesa, gl-mesa packages
 
 # ----------------------------------------------------------------------------
 # Document build option

@@ -163,11 +163,11 @@ void Surface::Shell::Toplevel::UnsetMaximized() const {
   zxdg_toplevel_v6_unset_maximized(p_->zxdg_toplevel);
 }
 
-void Surface::Shell::Toplevel::SetFullscreen(const Output &output) const {
-  zxdg_toplevel_v6_set_fullscreen(p_->zxdg_toplevel, output.p_->wl_output);
+void Surface::Shell::Toplevel::SetFullscreen(const Output *output) const {
+  zxdg_toplevel_v6_set_fullscreen(p_->zxdg_toplevel, output->p_->wl_output);
 }
 
-void Surface::Shell::Toplevel::UnsetFullscreen(const Output &output) const {
+void Surface::Shell::Toplevel::UnsetFullscreen() const {
   zxdg_toplevel_v6_unset_fullscreen(p_->zxdg_toplevel);
 }
 
@@ -494,14 +494,14 @@ const struct wl_surface_listener Surface::kListener = {
 
 void Surface::OnEnter(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
   const Surface *_this = static_cast<const Surface *>(data);
-  Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
-  _this->event_handler_->OnEnterOutput(output);
+  const Output *output = static_cast<const Output *>(wl_output_get_user_data(wl_output));
+  _this->event_handler_->OnEnterOutput(_this, output);
 }
 
 void Surface::OnLeave(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
   const Surface *_this = static_cast<const Surface *>(data);
-  Output *output = static_cast<Output *>(wl_output_get_user_data(wl_output));
-  _this->event_handler_->OnLeaveOutput(output);
+  const Output *output = static_cast<const Output *>(wl_output_get_user_data(wl_output));
+  _this->event_handler_->OnLeaveOutput(_this, output);
 }
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)
@@ -591,6 +591,18 @@ void Surface::SetInputRegion(const Region &region) {
 
 void Surface::SetOpaqueRegion(const Region &region) {
   wl_surface_set_opaque_region(wl_surface_, region.wl_region_);
+}
+
+void Surface::SetBufferTransform(int32_t transform) {
+  wl_surface_set_buffer_transform(wl_surface_, transform);
+}
+
+void Surface::SetBufferScale(int32_t scale) {
+  wl_surface_set_buffer_scale(wl_surface_, scale);
+}
+
+void Surface::DamageBuffer(int32_t x, int32_t y, int32_t width, int32_t height) {
+  wl_surface_damage_buffer(wl_surface_, x, y, width, height);
 }
 
 Surface *Surface::GetShellSurface() {

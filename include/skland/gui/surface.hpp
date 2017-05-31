@@ -147,9 +147,9 @@ class Surface {
 
       void UnsetMaximized() const;
 
-      void SetFullscreen(const Output &output) const;
+      void SetFullscreen(const Output *output) const;
 
-      void UnsetFullscreen(const Output &output) const;
+      void UnsetFullscreen() const;
 
       void SetMinimized() const;
 
@@ -379,6 +379,12 @@ class Surface {
   void SetInputRegion(const Region &region);
 
   void SetOpaqueRegion(const Region &region);
+
+  void SetBufferTransform(int32_t transform);
+
+  void SetBufferScale(int32_t scale);
+
+  void DamageBuffer(int32_t x, int32_t y, int32_t width, int32_t height);
 
   Surface *GetShellSurface();
 

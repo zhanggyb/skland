@@ -132,15 +132,14 @@ void AbstractShellView::ToggleMaximize(SLOT) {
   }
 }
 
-void AbstractShellView::ToggleFullscreen(SLOT slot) {
+void AbstractShellView::ToggleFullscreen(const Output *output, SLOT) {
   Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
-  if (p_->output) {
-    if (IsFullscreen())
-      toplevel->UnsetFullscreen(*p_->output);
-    else
-      toplevel->SetFullscreen(*p_->output);
+  if (output) {
+    toplevel->SetFullscreen(output);
+  } else {
+    toplevel->UnsetFullscreen();
   }
 }
 
@@ -280,16 +279,10 @@ Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
   return p_->shell_surface;
 }
 
-void AbstractShellView::OnEnterOutput(const Output *output) {
-  p_->output = output;
+void AbstractShellView::OnEnterOutput(const Surface *surface, const Output *output) {
 }
 
-void AbstractShellView::OnLeaveOutput(const Output *output) {
-  if (p_->output != output) {
-    fprintf(stderr, "Warning! Registered output object does not match!\n");
-  }
-
-  p_->output = nullptr;
+void AbstractShellView::OnLeaveOutput(const Surface *surface, const Output *output) {
 }
 
 void AbstractShellView::OnDraw(const Context *context) {
