@@ -109,7 +109,7 @@ void Input::Private::OnPointerEnter(void *data,
       static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
 
   _this->p_->mouse_event->response_ = InputEvent::kUnknown;
-  _this->p_->mouse_event->p_->surface->event_handler()->OnMouseEnter(_this->p_->mouse_event);
+  _this->p_->mouse_event->p_->surface->GetEventHandler()->OnMouseEnter(_this->p_->mouse_event);
 }
 
 void Input::Private::OnPointerLeave(void *data,
@@ -122,7 +122,7 @@ void Input::Private::OnPointerLeave(void *data,
   _this->p_->mouse_event->p_->surface = static_cast<Surface *>(wl_surface_get_user_data(wl_surface));
 
   _this->p_->mouse_event->response_ = InputEvent::kUnknown;
-  _this->p_->mouse_event->p_->surface->event_handler()->OnMouseLeave();
+  _this->p_->mouse_event->p_->surface->GetEventHandler()->OnMouseLeave();
 }
 
 void Input::Private::OnPointerMotion(void *data,
@@ -139,7 +139,7 @@ void Input::Private::OnPointerMotion(void *data,
   if (nullptr == _this->p_->mouse_event->p_->surface) return;
 
   _this->p_->mouse_event->response_ = InputEvent::kUnknown;
-  _this->p_->mouse_event->p_->surface->event_handler()->OnMouseMove(_this->p_->mouse_event);
+  _this->p_->mouse_event->p_->surface->GetEventHandler()->OnMouseMove(_this->p_->mouse_event);
 }
 
 void Input::Private::OnPointerButton(void *data,
@@ -161,9 +161,9 @@ void Input::Private::OnPointerButton(void *data,
   _this->p_->mouse_event->response_ = InputEvent::kUnknown;
 
   if (state == WL_POINTER_BUTTON_STATE_PRESSED) {
-    _this->p_->mouse_event->p_->surface->event_handler()->OnMouseDown(_this->p_->mouse_event);
+    _this->p_->mouse_event->p_->surface->GetEventHandler()->OnMouseDown(_this->p_->mouse_event);
   } else if (state == WL_POINTER_BUTTON_STATE_RELEASED) {
-    _this->p_->mouse_event->p_->surface->event_handler()->OnMouseUp(_this->p_->mouse_event);
+    _this->p_->mouse_event->p_->surface->GetEventHandler()->OnMouseUp(_this->p_->mouse_event);
   }
 }
 

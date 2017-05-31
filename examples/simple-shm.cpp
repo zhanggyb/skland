@@ -133,8 +133,8 @@ class ShmWidget : public AbstractView {
 
     context_->SetupCallback(frame_callback_);
     Animate();
-    context_->Damage(context_->margin().l + GetX(),
-                     context_->margin().t + GetY(),
+    context_->Damage(context_->GetMargin().l + GetX(),
+                     context_->GetMargin().t + GetY(),
                      GetWidth(),
                      GetHeight());
     context_->Commit();

@@ -53,8 +53,8 @@ class Context {
     callback.Setup(*surface_);
   }
 
-  const Margin &margin() const {
-    return surface_->margin();
+  const Margin &GetMargin() const {
+    return surface_->GetMargin();
   }
 
   void Damage(int surface_x, int surface_y, int width, int height) const {

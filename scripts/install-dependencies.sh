@@ -22,6 +22,14 @@ if [ "$OS" = "Ubuntu" ]; then
 		libwebp-dev \
 		liblua5.3-dev \
 		libinput-dev \
+		libavcodec-dev \
+		libavformat-dev \
+		libavdevice-dev \
+		libavutil-dev \
+		libavfilter-dev \
+		libswscale-dev \
+		libpostproc-dev \
+		libswresample-dev \
 		doxygen \
 		graphviz"
 	sudo apt install ${PACKAGES}

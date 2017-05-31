@@ -15,7 +15,7 @@
  */
 
 #include "surface_shell_toplevel_private.hpp"
-
+#include "surface_private.hpp"
 #include <skland/core/numeric.hpp>
 #include <skland/gui/abstract-shell-view.hpp>
 
@@ -61,14 +61,14 @@ void Surface::Shell::Toplevel::Private::OnConfigure(void *data,
     }
   }
 
-  AbstractShellView *shell_view = dynamic_cast<AbstractShellView *>(_this->shell_->surface_->event_handler_);
+  AbstractShellView *shell_view = dynamic_cast<AbstractShellView *>(_this->shell_->surface_->p_->event_handler_);
   if (shell_view)
     shell_view->OnXdgToplevelConfigure(width, height, value);
 }
 
 void Surface::Shell::Toplevel::Private::OnClose(void *data, struct zxdg_toplevel_v6 * /* zxdg_toplevel_v6 */) {
   Toplevel *_this = static_cast<Toplevel *>(data);
-  AbstractShellView *shell_view = dynamic_cast<AbstractShellView *>(_this->shell_->surface_->event_handler_);
+  AbstractShellView *shell_view = dynamic_cast<AbstractShellView *>(_this->shell_->surface_->p_->event_handler_);
   if (shell_view)
     shell_view->OnXdgToplevelClose();
 }

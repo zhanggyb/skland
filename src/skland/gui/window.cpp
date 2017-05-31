@@ -154,8 +154,9 @@ void Window::OnShown() {
   // Create buffer:
   int width = GetWidth();
   int height = GetHeight();
-  width += (shell_surface->margin().lr());
-  height += (shell_surface->margin().tb());
+  const Margin &margin = shell_surface->GetMargin();
+  width += margin.lr();
+  height += margin.tb();
 
   int32_t pool_size = width * 4 * height;
   if (p_->main_surface) pool_size *= 2; // double buffer for 2 surfaces
@@ -166,10 +167,8 @@ void Window::OnShown() {
                          width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
   p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer.GetData(),
-                                    p_->frame_buffer.GetSize().width,
-                                    p_->frame_buffer.GetSize().height));
-  p_->frame_canvas->SetOrigin((float) shell_surface->margin().left,
-                              (float) shell_surface->margin().top);
+                                    width, height));
+  p_->frame_canvas->SetOrigin((float) margin.left, (float) margin.top);
   p_->frame_canvas->Clear();
 
   if (p_->main_surface) {
@@ -178,10 +177,9 @@ void Window::OnShown() {
                           width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
     p_->main_canvas.reset(new Canvas((unsigned char *) p_->main_buffer.GetData(),
-                                     p_->main_buffer.GetSize().width,
-                                     p_->main_buffer.GetSize().height));
-    p_->main_canvas->SetOrigin((float) p_->main_surface->margin().left,
-                               (float) p_->main_surface->margin().top);
+                                     width, height));
+    p_->main_canvas->SetOrigin((float) margin.left,
+                               (float) margin.top);
     p_->main_canvas->Clear();
   }
 
@@ -205,8 +203,8 @@ void Window::OnUpdate(AbstractView *view) {
     _ASSERT(p_->frame_canvas);
     Damage(this,
            0, 0,
-           width + surface->margin().lr(),
-           height + surface->margin().tb());
+           width + surface->GetMargin().lr(),
+           height + surface->GetMargin().tb());
     surface->Commit();
   } else {
     std::shared_ptr<Canvas> canvas;
@@ -223,8 +221,8 @@ void Window::OnUpdate(AbstractView *view) {
     it.redraw_task().context = Context(surface, canvas);
     _ASSERT(canvas);
     Damage(view,
-           view->GetX() + surface->margin().left,
-           view->GetY() + surface->margin().top,
+           view->GetX() + surface->GetMargin().left,
+           view->GetY() + surface->GetMargin().top,
            view->GetWidth(),
            view->GetHeight());
     surface->Commit();
@@ -245,8 +243,8 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   RectI input_rect(width, height);
   Surface *shell_surface = this->GetShellSurface();
 
-  input_rect.left = shell_surface->margin().left - kResizingMargin.left;
-  input_rect.top = shell_surface->margin().top - kResizingMargin.top;
+  input_rect.left = shell_surface->GetMargin().left - kResizingMargin.left;
+  input_rect.top = shell_surface->GetMargin().top - kResizingMargin.top;
   input_rect.Resize(width + kResizingMargin.lr(),
                     height + kResizingMargin.tb());
 
@@ -256,8 +254,8 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   shell_surface->SetInputRegion(input_region);
 
   // Reset buffer:
-  width += shell_surface->margin().lr();
-  height += shell_surface->margin().tb();
+  width += shell_surface->GetMargin().lr();
+  height += shell_surface->GetMargin().tb();
 
   int pool_size = width * 4 * height;
   if (p_->main_surface) pool_size *= 2;
@@ -268,7 +266,7 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   shell_surface->Attach(&p_->frame_buffer);
   p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer.GetData(),
                                     width, height));
-  p_->frame_canvas->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
+  p_->frame_canvas->SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
   p_->frame_canvas->Clear();
 
   if (p_->main_surface) {
@@ -277,8 +275,8 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
     p_->main_canvas.reset(new Canvas((unsigned char *) p_->main_buffer.GetData(),
                                      width,
                                      height));
-    p_->main_canvas->SetOrigin(p_->main_surface->margin().left,
-                               p_->main_surface->margin().top);
+    p_->main_canvas->SetOrigin(p_->main_surface->GetMargin().left,
+                               p_->main_surface->GetMargin().top);
     p_->main_canvas->Clear();
   }
 
@@ -568,13 +566,15 @@ void Window::OnViewDetached(AbstractView *view) {
 }
 
 void Window::OnEnterOutput(const Surface *surface, const Output *output) {
-  if (surface == GetShellSurface())
+  if (surface == GetShellSurface()) {
     p_->output = output;
+  }
 }
 
 void Window::OnLeaveOutput(const Surface *surface, const Output *output) {
-  if (surface == GetShellSurface())
+  if (surface == GetShellSurface()) {
     p_->output = nullptr;
+  }
 }
 
 int Window::GetMouseLocation(const MouseEvent *event) const {

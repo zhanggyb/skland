@@ -15,11 +15,12 @@
  */
 
 #include "surface-commit_task.hpp"
+#include "surface_private.hpp"
 
 namespace skland {
 
 void Surface::CommitTask::Run() const {
-  wl_surface_commit(surface->wl_surface_);
+  wl_surface_commit(surface->p_->wl_surface);
 }
 
 }

@@ -342,7 +342,16 @@ class Surface {
 
   };
 
-  virtual ~Surface();
+  enum Transform {
+    kTransformNormal = 0, // WL_OUTPUT_TRANSFORM_NORMAL
+    kTransform90 = 1, // WL_OUTPUT_TRANSFORM_90
+    kTransform180 = 2,  // WL_OUTPUT_TRANSFORM_180
+    kTransform270 = 3,  // WL_OUTPUT_TRANSFORM_270
+    kTransformFlipped = 4,  // WL_OUTPUT_TRANSFORM_FLIPPED
+    kTransformFlipped90 = 5,  // WL_OUTPUT_TRANSFORM_FLIPPED_90
+    kTransformFlipped180 = 6, // WL_OUTPUT_TRANSFORM_FLIPPED_180
+    kTransformFlipped270 = 7  // WL_OUTPUT_TRANSFORM_FLIPPED_270
+  };
 
   /**
     * @brief Commit behaviour of the sub-surface
@@ -351,6 +360,8 @@ class Surface {
     kSynchronized,
     kDesynchronized
   };
+
+  virtual ~Surface();
 
   static int GetShellSurfaceCount() { return kShellSurfaceCount; }
 
@@ -374,15 +385,19 @@ class Surface {
   /**
    * @brief Mark the damaged region of the surface
    */
-  void Damage(int surface_x, int surface_y, int width, int height) const;
+  void Damage(int surface_x, int surface_y, int width, int height);
 
   void SetInputRegion(const Region &region);
 
   void SetOpaqueRegion(const Region &region);
 
-  void SetBufferTransform(int32_t transform);
+  void SetTransform(Transform transform);
 
-  void SetBufferScale(int32_t scale);
+  Transform GetTransform() const;
+
+  void SetScale(int32_t scale);
+
+  int32_t GetScale() const;
 
   void DamageBuffer(int32_t x, int32_t y, int32_t width, int32_t height);
 
@@ -424,19 +439,20 @@ class Surface {
    */
   Surface *down() const { return down_; }
 
-  AbstractEventHandler *event_handler() const { return event_handler_; }
+  AbstractEventHandler *GetEventHandler() const;
 
-  const Margin &margin() const { return margin_; }
+  const Margin &GetMargin() const;
 
-  const Point &relative_position() const { return relative_position_; }
+  const Point &GetRelativePosition() const;
 
  private:
 
+  struct Private;
   struct CommitTask;
 
   Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
 
-  CommitMode mode_;
+  std::unique_ptr<Private> p_;
 
   /**
    * @brief The parent surface
@@ -462,25 +478,6 @@ class Surface {
    * @brief The shell surface shows back
    */
   Surface *down_;
-
-  struct wl_surface *wl_surface_;
-
-  AbstractEventHandler *event_handler_;
-
-  Margin margin_;
-
-  /**
-   * Position in parent surface
-   *
-   * For root surface, this should always be (0, 0)
-   */
-  Point relative_position_;
-
-  enum wl_output_transform buffer_transform_;
-
-  int32_t buffer_scale_;
-
-  bool is_user_data_set_;
 
   std::unique_ptr<CommitTask> commit_task_;
 
@@ -523,14 +520,6 @@ class Surface {
    * @brief The count of shell surface
    */
   static int kShellSurfaceCount;
-
-  static void OnEnter(void *data, struct wl_surface *wl_surface,
-                      struct wl_output *wl_output);
-
-  static void OnLeave(void *data, struct wl_surface *wl_surface,
-                      struct wl_output *wl_output);
-
-  static const struct wl_surface_listener kListener;
 
   static Task kCommitTaskHead;
   static Task kCommitTaskTail;

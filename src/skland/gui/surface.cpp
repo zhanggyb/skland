@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include "internal/surface_private.hpp"
 #include "internal/surface_shell_private.hpp"
 #include "internal/surface_shell_toplevel_private.hpp"
 #include "internal/surface_shell_popup_private.hpp"
@@ -49,7 +50,8 @@ Surface::Shell *Surface::Shell::Get(const Surface *surface) {
 
 void Surface::Shell::ResizeWindow(int width, int height) const {
   zxdg_surface_v6_set_window_geometry(p_->zxdg_surface,
-                                      surface_->margin_.l, surface_->margin_.t,
+                                      surface_->p_->margin.l,
+                                      surface_->p_->margin.t,
                                       width, height);
 }
 
@@ -64,7 +66,7 @@ Surface::Shell::Shell(Surface *surface)
   _ASSERT(surface_);
   role_.placeholder = nullptr;
 
-  p_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(Display::Native().xdg_shell(), surface_->wl_surface_);
+  p_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(Display::Native().xdg_shell(), surface_->p_->wl_surface);
   zxdg_surface_v6_add_listener(p_->zxdg_surface, &Private::kListener, this);
 
   Push();
@@ -237,8 +239,8 @@ Surface::Sub::Sub(Surface *surface, Surface *parent)
   _ASSERT(parent);
 
   wl_sub_surface_ = wl_subcompositor_get_subsurface(Display::Native().wl_subcompositor(),
-                                                    surface_->wl_surface_,
-                                                    parent->wl_surface_);
+                                                    surface_->p_->wl_surface,
+                                                    parent->p_->wl_surface);
   SetParent(parent);
 }
 
@@ -279,7 +281,7 @@ void Surface::Sub::PlaceAbove(Surface *sibling) {
   if (surface_->parent() == sibling->parent() ||
       surface_ == sibling->parent() ||
       surface_->parent() == sibling) {
-    wl_subsurface_place_above(wl_sub_surface_, sibling->wl_surface_);
+    wl_subsurface_place_above(wl_sub_surface_, sibling->p_->wl_surface);
     MoveAbove(sibling);
   }
 }
@@ -290,15 +292,15 @@ void Surface::Sub::PlaceBelow(Surface *sibling) {
   if (surface_->parent() == sibling->parent() ||
       surface_ == sibling->parent() ||
       surface_->parent() == sibling) {
-    wl_subsurface_place_below(wl_sub_surface_, sibling->wl_surface_);
+    wl_subsurface_place_below(wl_sub_surface_, sibling->p_->wl_surface);
     MoveBelow(sibling);
   }
 }
 
 void Surface::Sub::SetRelativePosition(int x, int y) {
   wl_subsurface_set_position(wl_sub_surface_, x, y);
-  surface_->relative_position_.x = x;
-  surface_->relative_position_.y = y;
+  surface_->p_->relative_position.x = x;
+  surface_->p_->relative_position.y = y;
 }
 
 void Surface::Sub::SetWindowPosition(int x, int y) {
@@ -306,8 +308,8 @@ void Surface::Sub::SetWindowPosition(int x, int y) {
   int local_x = x - parent_global_position.x;
   int local_y = y - parent_global_position.y;
   wl_subsurface_set_position(wl_sub_surface_, local_x, local_y);
-  surface_->relative_position_.x = x;
-  surface_->relative_position_.y = y;
+  surface_->p_->relative_position.x = x;
+  surface_->p_->relative_position.y = y;
 }
 
 void Surface::Sub::SetParent(Surface *parent) {
@@ -433,7 +435,7 @@ Surface::EGL::EGL(Surface *surface)
   p_.reset(new Private);
 
   p_->wl_egl_window_ =
-      wl_egl_window_create(surface_->wl_surface_, 400, 400);
+      wl_egl_window_create(surface_->p_->wl_surface, 400, 400);
   p_->egl_surface_ =
       eglCreatePlatformWindowSurface(Display::Native().egl_display(),
                                      Display::Native().egl_config(),
@@ -487,42 +489,20 @@ int Surface::kShellSurfaceCount = 0;
 Task Surface::kCommitTaskHead;
 Task Surface::kCommitTaskTail;
 
-const struct wl_surface_listener Surface::kListener = {
-    OnEnter,
-    OnLeave
-};
-
-void Surface::OnEnter(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
-  const Surface *_this = static_cast<const Surface *>(data);
-  const Output *output = static_cast<const Output *>(wl_output_get_user_data(wl_output));
-  _this->event_handler_->OnEnterOutput(_this, output);
-}
-
-void Surface::OnLeave(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
-  const Surface *_this = static_cast<const Surface *>(data);
-  const Output *output = static_cast<const Output *>(wl_output_get_user_data(wl_output));
-  _this->event_handler_->OnLeaveOutput(_this, output);
-}
-
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin)
-    : mode_(kSynchronized),
-      parent_(nullptr),
+    : parent_(nullptr),
       above_(nullptr),
       below_(nullptr),
       up_(nullptr),
       down_(nullptr),
-      wl_surface_(nullptr),
-      event_handler_(event_handler),
-      margin_(margin),
-      buffer_transform_(WL_OUTPUT_TRANSFORM_NORMAL),
-      buffer_scale_(1),
-      is_user_data_set_(false),
       egl_(nullptr) {
+  p_.reset(new Private(event_handler, margin));
+
   _ASSERT(nullptr != event_handler_);
   role_.placeholder = nullptr;
 
-  wl_surface_ = wl_compositor_create_surface(Display::Native().wl_compositor());
-  wl_surface_add_listener(wl_surface_, &kListener, this);
+  p_->wl_surface = wl_compositor_create_surface(Display::Native().wl_compositor());
+  wl_surface_add_listener(p_->wl_surface, &Private::kListener, this);
 
   commit_task_.reset(new CommitTask(this));
 }
@@ -536,25 +516,25 @@ Surface::~Surface() {
   else
     delete role_.sub; // deleting all sub surfaces and break the links to above_ and below_
 
-  if (wl_surface_)
-    wl_surface_destroy(wl_surface_);
+  if (p_->wl_surface)
+    wl_surface_destroy(p_->wl_surface);
 }
 
 void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
   if (nullptr != egl_) return;
 
   if (nullptr == buffer) {
-    wl_surface_attach(wl_surface_, NULL, x, y);
+    wl_surface_attach(p_->wl_surface, NULL, x, y);
   } else {
     buffer->SetPosition(x, y);
-    wl_surface_attach(wl_surface_, buffer->p_->wl_buffer, x, y);
+    wl_surface_attach(p_->wl_surface, buffer->p_->wl_buffer, x, y);
   }
 }
 
 void Surface::Commit() {
   if (nullptr != egl_) {
     // EGL surface does not use commit
-    if (mode_ == kSynchronized) {
+    if (p_->commit_mode == kSynchronized) {
       // Synchronized mode need to commit the main surface
       Surface *main_surface = GetShellSurface();
       main_surface->Commit();
@@ -571,7 +551,7 @@ void Surface::Commit() {
     return;
   }
 
-  if (mode_ == kSynchronized) {
+  if (p_->commit_mode == kSynchronized) {
     // Synchronized mode need to commit the main surface too
     Surface *main_surface = GetShellSurface();
     main_surface->Commit();
@@ -581,28 +561,38 @@ void Surface::Commit() {
   }
 }
 
-void Surface::Damage(int surface_x, int surface_y, int width, int height) const {
-  wl_surface_damage(wl_surface_, surface_x, surface_y, width, height);
+void Surface::Damage(int surface_x, int surface_y, int width, int height) {
+  wl_surface_damage(p_->wl_surface, surface_x, surface_y, width, height);
 }
 
 void Surface::SetInputRegion(const Region &region) {
-  wl_surface_set_input_region(wl_surface_, region.wl_region_);
+  wl_surface_set_input_region(p_->wl_surface, region.wl_region_);
 }
 
 void Surface::SetOpaqueRegion(const Region &region) {
-  wl_surface_set_opaque_region(wl_surface_, region.wl_region_);
+  wl_surface_set_opaque_region(p_->wl_surface, region.wl_region_);
 }
 
-void Surface::SetBufferTransform(int32_t transform) {
-  wl_surface_set_buffer_transform(wl_surface_, transform);
+void Surface::SetTransform(Transform transform) {
+  if (p_->transform != transform)
+    wl_surface_set_buffer_transform(p_->wl_surface, transform);
 }
 
-void Surface::SetBufferScale(int32_t scale) {
-  wl_surface_set_buffer_scale(wl_surface_, scale);
+Surface::Transform Surface::GetTransform() const {
+  return p_->transform;
+}
+
+void Surface::SetScale(int32_t scale) {
+  if (p_->scale != scale)
+    wl_surface_set_buffer_scale(p_->wl_surface, scale);
+}
+
+int32_t Surface::GetScale() const {
+  return p_->scale;
 }
 
 void Surface::DamageBuffer(int32_t x, int32_t y, int32_t width, int32_t height) {
-  wl_surface_damage_buffer(wl_surface_, x, y, width, height);
+  wl_surface_damage_buffer(p_->wl_surface, x, y, width, height);
 }
 
 Surface *Surface::GetShellSurface() {
@@ -618,23 +608,35 @@ Surface *Surface::GetShellSurface() {
 }
 
 Point Surface::GetWindowPosition() const {
-  Point position = relative_position_;
+  Point position = p_->relative_position;
 
   const Surface *parent = parent_;
   const Surface *shell_surface = this;
 
   while (parent) {
-    position += parent->relative_position();
+    position += parent->GetRelativePosition();
     if (nullptr == parent->parent_) shell_surface = parent;
     parent = parent->parent();
   }
 
-  return position - Point(shell_surface->margin().l, shell_surface->margin().t);
+  return position - Point(shell_surface->GetMargin().l, shell_surface->GetMargin().t);
+}
+
+AbstractEventHandler *Surface::GetEventHandler() const {
+  return p_->event_handler_;
+}
+
+const Margin &Surface::GetMargin() const {
+  return p_->margin;
+}
+
+const Point &Surface::GetRelativePosition() const {
+  return p_->relative_position;
 }
 
 void Surface::Clear() {
   while (kShellSurfaceCount > 0) {
-    AbstractEventHandler *event_handler = kTop->event_handler();
+    AbstractEventHandler *event_handler = kTop->GetEventHandler();
     delete event_handler;
   }
 }

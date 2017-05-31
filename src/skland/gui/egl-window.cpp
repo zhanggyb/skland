@@ -109,8 +109,8 @@ void EGLWindow::OnShown() {
   // Create buffer:
   int width = GetWidth();
   int height = GetHeight();
-  width += shell_surface->margin().lr();
-  height += shell_surface->margin().tb();
+  width += shell_surface->GetMargin().lr();
+  height += shell_surface->GetMargin().tb();
 
   int32_t pool_size = width * 4 * height;
 
@@ -122,8 +122,8 @@ void EGLWindow::OnShown() {
   p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer_.GetData(),
                                     p_->frame_buffer_.GetSize().width,
                                     p_->frame_buffer_.GetSize().height));
-  p_->frame_canvas->SetOrigin((float) shell_surface->margin().left,
-                              (float) shell_surface->margin().top);
+  p_->frame_canvas->SetOrigin((float) shell_surface->GetMargin().left,
+                              (float) shell_surface->GetMargin().top);
   p_->frame_canvas->Clear();
 
   OnUpdate(nullptr);
@@ -142,8 +142,8 @@ void EGLWindow::OnUpdate(AbstractView *view) {
     _ASSERT(p_->frame_canvas);
     Damage(this,
            0, 0,
-           GetWidth() + surface->margin().lr(),
-           GetHeight() + surface->margin().tb());
+           GetWidth() + surface->GetMargin().lr(),
+           GetHeight() + surface->GetMargin().tb());
     surface->Commit();
   }
 }
@@ -162,8 +162,8 @@ void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
   RectI input_rect(width, height);
   Surface *shell_surface = this->GetShellSurface();
 
-  input_rect.left = shell_surface->margin().left - kResizingMargin.left;
-  input_rect.top = shell_surface->margin().top - kResizingMargin.top;
+  input_rect.left = shell_surface->GetMargin().left - kResizingMargin.left;
+  input_rect.top = shell_surface->GetMargin().top - kResizingMargin.top;
   input_rect.Resize(width + kResizingMargin.lr(),
                     height + kResizingMargin.tb());
 
@@ -173,8 +173,8 @@ void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
   shell_surface->SetInputRegion(input_region);
 
   // Reset buffer:
-  width += shell_surface->margin().lr();
-  height += shell_surface->margin().tb();
+  width += shell_surface->GetMargin().lr();
+  height += shell_surface->GetMargin().tb();
 
   int pool_size = width * 4 * height;
   p_->pool.Setup(pool_size);
@@ -184,7 +184,7 @@ void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
   p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer_.GetData(),
                                     p_->frame_buffer_.GetSize().width,
                                     p_->frame_buffer_.GetSize().height));
-  p_->frame_canvas->SetOrigin(shell_surface->margin().left, shell_surface->margin().top);
+  p_->frame_canvas->SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
   p_->frame_canvas->Clear();
 
   p_->egl_surface->Resize(new_size.width, new_size.height);

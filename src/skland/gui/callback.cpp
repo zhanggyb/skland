@@ -15,11 +15,9 @@
  */
 
 #include <skland/gui/callback.hpp>
-#include <skland/gui/surface.hpp>
-
-#include <wayland-client.h>
 
 #include "internal/display_private.hpp"
+#include "internal/surface_private.hpp"
 
 namespace skland {
 
@@ -89,7 +87,7 @@ void Callback::Setup(const Display &display) {
 
 void Callback::Setup(const Surface &surface) {
   p_->Destroy();
-  p_->wl_callback = wl_surface_frame(surface.wl_surface_);
+  p_->wl_callback = wl_surface_frame(surface.p_->wl_surface);
   wl_callback_add_listener(p_->wl_callback, &Private::kListener, this);
 }
 
