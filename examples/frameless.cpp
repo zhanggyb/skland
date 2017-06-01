@@ -113,8 +113,15 @@ class MainWidget : public AbstractView {
   virtual void OnDraw(const Context *context) override {
     Paint paint;
     paint.SetColor(Color(0.855f, 0.855f, 0.165f, .9f));
+    const Rect& rect = GetGeometry();
+    int scale = 2;
 
-    context->canvas()->DrawRect(GetGeometry(), paint);
+    int x = rect.l;
+    int y = rect.t;
+    int w = x + rect.width() * scale;
+    int h = y + rect.height() * scale;
+
+    context->canvas()->DrawRect(Rect::FromXYWH(x, y, w, h), paint);
   }
 
 };

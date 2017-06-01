@@ -57,11 +57,24 @@ struct Rect {
   inline Rect(const Rect &other)
       : left(other.left), top(other.top), right(other.right), bottom(other.bottom) {}
 
+  template<typename R>
+  inline Rect(const Rect<R> &other)
+      : left(T(other.left)), top(T(other.top)), right(T(other.right)), bottom(T(other.bottom)) {}
+
   inline Rect &operator=(const Rect &other) {
     left = other.left;
     top = other.top;
     right = other.right;
     bottom = other.bottom;
+    return *this;
+  }
+
+  template<typename R>
+  inline Rect &operator=(const Rect<R> &other) {
+    left = T(other.left);
+    top = T(other.top);
+    right = T(other.right);
+    bottom = T(other.bottom);
     return *this;
   }
 
@@ -114,6 +127,11 @@ struct Rect {
   union { T b, bottom; };
 
 };
+
+template<typename T>
+inline Rect<T> operator*(const Rect<T> &src, int factor) {
+  return Rect<T>(src.left * factor, src.top * factor, src.right * factor, src.bottom * factor);
+}
 
 } // namespace core
 

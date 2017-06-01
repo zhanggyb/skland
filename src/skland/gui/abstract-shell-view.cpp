@@ -355,27 +355,27 @@ void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {
 }
 
 void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states) {
+  if (width == 0 || height == 0) return;
+
+  bool do_resize = true;
+
+  Size min = this->GetMinimalSize();
+  Size max = this->GetMaximalSize();
+  _ASSERT(min.width < max.width && min.height < max.height);
+
+  width = clamp(width, min.width, max.width);
+  height = clamp(height, min.height, max.height);
+  if (width == p_->size.width && height == p_->size.height) {
+    do_resize = false;
+  } else {
+    p_->size.width = width;
+    p_->size.height = height;
+  }
+
   bool maximized = (0 != (states & Surface::Shell::Toplevel::kStateMaskMaximized));
   bool fullscreen = (0 != (states & Surface::Shell::Toplevel::kStateMaskFullscreen));
   bool resizing = (0 != (states & Surface::Shell::Toplevel::kStateMaskResizing));
   bool focus = (0 != (states & Surface::Shell::Toplevel::kStateMaskActivated));
-
-  bool do_resize = true;
-
-  if (width > 0 && height > 0) {
-    Size min = this->GetMinimalSize();
-    Size max = this->GetMaximalSize();
-    _ASSERT(min.width < max.width && min.height < max.height);
-
-    width = clamp(width, min.width, max.width);
-    height = clamp(height, min.height, max.height);
-    if (width == p_->size.width && height == p_->size.height) {
-      do_resize = false;
-    } else {
-      p_->size.width = width;
-      p_->size.height = height;
-    }
-  }
 
   if (maximized != IsMaximized()) {
     Bit::Inverse<int>(p_->flags, Private::kFlagMaskMaximized);
@@ -511,9 +511,13 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent
 }
 
 void AbstractShellView::DropShadow(const Context *context) {
-  float rad = Theme::GetShadowRadius() - 1.f; // The spread radius
+  int scale = context->surface()->GetScale();
+  float rad = (Theme::GetShadowRadius() - 1.f); // The spread radius
   float offset_x = Theme::GetShadowOffsetX();
   float offset_y = Theme::GetShadowOffsetY();
+
+  int width = GetWidth();
+  int height = GetHeight();
 
   if (!IsFocused()) {
     rad = (int) rad / 3;
@@ -523,6 +527,8 @@ void AbstractShellView::DropShadow(const Context *context) {
 
   // shadow map
   SkCanvas *c = context->canvas()->GetSkCanvas();
+  c->save();
+  c->scale(scale, scale);
   sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::GetShadowPixmap(), nullptr, nullptr);
 
   // top-left
@@ -538,14 +544,14 @@ void AbstractShellView::DropShadow(const Context *context) {
                    SkRect::MakeLTRB(2 * Theme::GetShadowRadius(), 0,
                                     250 - 2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius()),
                    SkRect::MakeXYWH(rad + offset_x, -rad + offset_y,
-                                    GetWidth() - 2 * rad, 2 * rad),
+                                    width - 2 * rad, 2 * rad),
                    nullptr);
 
   // top-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 0,
                                     250, 2 * Theme::GetShadowRadius()),
-                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, -rad + offset_y,
+                   SkRect::MakeXYWH(width - rad + offset_x, -rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -554,14 +560,14 @@ void AbstractShellView::DropShadow(const Context *context) {
                    SkRect::MakeLTRB(0, 2 * Theme::GetShadowRadius(),
                                     2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius()),
                    SkRect::MakeXYWH(-rad + offset_x, rad + offset_y,
-                                    2 * rad, GetHeight() - 2 * rad),
+                                    2 * rad, height - 2 * rad),
                    nullptr);
 
   // bottom-left
   c->drawImageRect(image,
                    SkRect::MakeLTRB(0, 250 - 2 * Theme::GetShadowRadius(),
                                     2 * Theme::GetShadowRadius(), 250),
-                   SkRect::MakeXYWH(-rad + offset_x, GetHeight() - rad + offset_y,
+                   SkRect::MakeXYWH(-rad + offset_x, height - rad + offset_y,
                                     2 * rad, 2 * rad),
                    nullptr);
 
@@ -569,16 +575,16 @@ void AbstractShellView::DropShadow(const Context *context) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius(),
                                     250 - 2 * Theme::GetShadowRadius(), 250),
-                   SkRect::MakeXYWH(rad + offset_x, GetHeight() - rad + offset_y,
-                                    GetWidth() - 2 * rad, 2 * rad),
+                   SkRect::MakeXYWH(rad + offset_x, height - rad + offset_y,
+                                    width - 2 * rad, 2 * rad),
                    nullptr);
 
   // bottom-right
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 250 - 2 * Theme::GetShadowRadius(),
                                     250, 250),
-                   SkRect::MakeXYWH(GetWidth() - rad + offset_x,
-                                    GetHeight() - rad + offset_y,
+                   SkRect::MakeXYWH(width - rad + offset_x,
+                                    height - rad + offset_y,
                                     2 * rad,
                                     2 * rad),
                    nullptr);
@@ -587,9 +593,10 @@ void AbstractShellView::DropShadow(const Context *context) {
   c->drawImageRect(image,
                    SkRect::MakeLTRB(250 - 2 * Theme::GetShadowRadius(), 2 * Theme::GetShadowRadius(),
                                     250, 250 - 2 * Theme::GetShadowRadius()),
-                   SkRect::MakeXYWH(GetWidth() - rad + offset_x, rad + offset_y,
-                                    2 * rad, GetHeight() - 2 * rad),
+                   SkRect::MakeXYWH(width - rad + offset_x, rad + offset_y,
+                                    2 * rad, height - 2 * rad),
                    nullptr);
+  c->restore();
 }
 
 }

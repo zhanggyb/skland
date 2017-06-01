@@ -67,7 +67,7 @@ class Context {
 
   Surface *surface() const { return surface_; }
 
-  Canvas* canvas() const { return canvas_.get(); }
+  Canvas *canvas() const { return canvas_.get(); }
 
  private:
 

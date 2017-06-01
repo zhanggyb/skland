@@ -97,7 +97,10 @@ class ShmWidget : public AbstractView {
 
   void Animate() {
     static int padding = 0;
-    Canvas* canvas = context_->canvas();
+    Canvas *canvas = context_->canvas();
+    canvas->Save();
+    int scale = context_->surface()->GetScale();
+    canvas->Scale(scale, scale);
 
     const Rect &rect = GetGeometry();
     float radius_ = clamp(std::min(rect.width(), rect.height()) / 2.f - 50.f,
@@ -123,6 +126,7 @@ class ShmWidget : public AbstractView {
                          rect.center_x() + radius_,
                          rect.center_y() + radius_),
                     angle_, 300.f, false, paint);
+    canvas->Restore();
   }
 
   void OnFrame(uint32_t serial) {

@@ -105,6 +105,11 @@ inline Size<T> operator-(const Size<T> &size1, const Size<T> &size2) {
   return Size<T>(size1.width - size2.width, size1.height - size2.height);
 }
 
+template<typename T>
+inline Size<T> operator*(const Size<T> &src, int factor) {
+  return Size<T>(src.width * factor, src.height * factor);
+}
+
 }  // namespace core
 
 /**

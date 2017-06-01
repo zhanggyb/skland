@@ -73,12 +73,14 @@ class TitleBar::CloseButton : public TitleBar::Button {
 };
 
 void TitleBar::CloseButton::OnDraw(const Context *context) {
-  Canvas* canvas = context->canvas();
-  const Rect &rect = GetGeometry();
+  Canvas *canvas = context->canvas();
+  int scale = context->surface()->GetScale();
+  const Rect& rect = GetGeometry();
 
-  Canvas::ClipGuard guard(canvas, rect);
+  Canvas::ClipGuard guard(canvas, rect * scale);
 
   canvas->Clear();
+  canvas->Scale(scale, scale);
 
   Paint paint;
   paint.SetAntiAlias(true);
@@ -121,12 +123,14 @@ class TitleBar::MaximizeButton : public TitleBar::Button {
 };
 
 void TitleBar::MaximizeButton::OnDraw(const Context *context) {
-  Canvas* canvas = context->canvas();
-  const Rect &rect = GetGeometry();
+  Canvas *canvas = context->canvas();
+  int scale = context->surface()->GetScale();
+  const Rect& rect = GetGeometry();
 
-  Canvas::ClipGuard guard(canvas, rect);
+  Canvas::ClipGuard guard(canvas, rect * 2);
 
   canvas->Clear();
+  canvas->Scale(scale, scale);
 
   Paint paint;
   paint.SetAntiAlias(true);
@@ -169,12 +173,14 @@ class TitleBar::MinimizeButton : public TitleBar::Button {
 };
 
 void TitleBar::MinimizeButton::OnDraw(const Context *context) {
-  Canvas* canvas = context->canvas();
-  const Rect &rect = GetGeometry();
+  Canvas *canvas = context->canvas();
+  int scale = context->surface()->GetScale();
+  const Rect& rect = GetGeometry();
 
-  Canvas::ClipGuard guard(canvas, rect);
+  Canvas::ClipGuard guard(canvas, rect * 2);
 
   canvas->Clear();
+  canvas->Scale(scale, scale);
 
   Paint paint;
   paint.SetAntiAlias(true);
@@ -214,12 +220,14 @@ class TitleBar::FullscreenButton : public TitleBar::Button {
 };
 
 void TitleBar::FullscreenButton::OnDraw(const Context *context) {
-  Canvas* canvas = context->canvas();
-  const Rect &rect = GetGeometry();
+  Canvas *canvas = context->canvas();
+  int scale = context->surface()->GetScale();
+  const Rect& rect = GetGeometry();
 
-  Canvas::ClipGuard guard(canvas, rect);
+  Canvas::ClipGuard guard(canvas, rect * 2);
 
   canvas->Clear();
+  canvas->Scale(scale, scale);
 
   Paint paint;
   paint.SetAntiAlias(true);

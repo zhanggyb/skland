@@ -574,8 +574,10 @@ void Surface::SetOpaqueRegion(const Region &region) {
 }
 
 void Surface::SetTransform(Transform transform) {
-  if (p_->transform != transform)
+  if (p_->transform != transform) {
     wl_surface_set_buffer_transform(p_->wl_surface, transform);
+    p_->transform = transform;
+  }
 }
 
 Surface::Transform Surface::GetTransform() const {
@@ -583,8 +585,10 @@ Surface::Transform Surface::GetTransform() const {
 }
 
 void Surface::SetScale(int32_t scale) {
-  if (p_->scale != scale)
+  if (p_->scale != scale) {
     wl_surface_set_buffer_scale(p_->wl_surface, scale);
+    p_->scale = scale;
+  }
 }
 
 int32_t Surface::GetScale() const {
