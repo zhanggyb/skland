@@ -17,16 +17,31 @@
 #include <skland/gui/application.hpp>
 #include <skland/av/format.hpp>
 
-int main(int argc, char* argv[]) {
+#include <iostream>
+
+int main(int argc, char *argv[]) {
   using namespace skland;
 
   Application app(argc, argv);
   av::Format::RegisterAll();
 
-  av::InputFormat fmt = av::InputFormat(nullptr);
-  while(fmt) {
-    fprintf(stdout, "name: %s, long name: %s\n", fmt.name(), fmt.long_name());
-    fmt = fmt.next();
+  std::string url = "file:";
+  if (argc > 1) {
+    url += argv[1];
+  } else {
+    url += "in.mp3";
+  }
+
+  av::FormatContext context;
+
+  try {
+    context.Open(url.c_str(), nullptr, nullptr);
+    av::InputFormat f = context.iformat();
+    std::cout << f.name() << std::endl;
+    std::cout << f.long_name() << std::endl;
+  } catch (const std::runtime_error &e) {
+    std::cerr << e.what() << std::endl;
+    app.Exit();
   }
 
   return app.Run();

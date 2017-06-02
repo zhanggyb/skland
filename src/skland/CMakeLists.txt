@@ -17,14 +17,14 @@ file(GLOB core_internal_headers "${PROJECT_SOURCE_DIR}/include/skland/core/inter
 file(GLOB core_sources "core/*.cpp")
 
 if (APPLE)
-  list(REMOVE_ITEM core_headers "${PROJECT_SOURCE_DIR}/include/skland/core/posix-timer.hpp")
-  list(REMOVE_ITEM core_sources "${PROJECT_SOURCE_DIR}/src/skland/core/posix-timer.cpp")
+    list(REMOVE_ITEM core_headers "${PROJECT_SOURCE_DIR}/include/skland/core/posix-timer.hpp")
+    list(REMOVE_ITEM core_sources "${PROJECT_SOURCE_DIR}/src/skland/core/posix-timer.cpp")
 endif ()
 
 list(APPEND all_source_files
-  ${core_headers}
-  ${core_internal_headers}
-  ${core_sources})
+        ${core_headers}
+        ${core_internal_headers}
+        ${core_sources})
 
 file(GLOB graphic_headers "${PROJECT_SOURCE_DIR}/include/skland/graphic/*.hpp")
 file(GLOB graphic_sources "graphic/*.cpp")
@@ -32,10 +32,10 @@ file(GLOB graphic_internal_headers "graphic/internal/*.hpp")
 file(GLOB graphic_internal_sources "graphic/internal/*.cpp")
 
 list(APPEND all_source_files
-  ${graphic_headers}
-  ${graphic_sources}
-  ${graphic_internal_headers}
-  ${graphic_internal_sources})
+        ${graphic_headers}
+        ${graphic_sources}
+        ${graphic_internal_headers}
+        ${graphic_internal_sources})
 
 file(GLOB av_headers "${PROJECT_SOURCE_DIR}/include/skland/av/*.hpp")
 file(GLOB av_sources "av/*.cpp")
@@ -43,37 +43,37 @@ file(GLOB av_internal_headers "av/internal/*.hpp")
 file(GLOB av_internal_sources "av/internal/*.cpp")
 
 list(APPEND all_source_files
-  ${av_headers}
-  ${av_sources}
-  ${av_internal_headers}
-  ${av_internal_sources})
+        ${av_headers}
+        ${av_sources}
+        ${av_internal_headers}
+        ${av_internal_sources})
 
 if (LINUX)
 
-  file(GLOB egl_headers "${PROJECT_SOURCE_DIR}/include/skland/egl/*.hpp")
-  file(GLOB egl_sources "egl/*.cpp")
+    file(GLOB egl_headers "${PROJECT_SOURCE_DIR}/include/skland/egl/*.hpp")
+    file(GLOB egl_sources "egl/*.cpp")
 
-  file(GLOB gui_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/*.hpp")
-  file(GLOB gui_sources "gui/*.cpp")
-  file(GLOB gui_internal_headers "gui/internal/*.hpp")
-  file(GLOB gui_internal_sources "gui/internal/*.cpp")
+    file(GLOB gui_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/*.hpp")
+    file(GLOB gui_sources "gui/*.cpp")
+    file(GLOB gui_internal_headers "gui/internal/*.hpp")
+    file(GLOB gui_internal_sources "gui/internal/*.cpp")
 
-  file(GLOB stock_headers "${PROJECT_SOURCE_DIR}/include/skland/stock/*.hpp")
-  file(GLOB stock_sources "stock/*.cpp")
-  file(GLOB stock_internal_headers "stock/internal/*.hpp")
-  file(GLOB stock_internal_sources "stock/internal/*.cpp")
+    file(GLOB stock_headers "${PROJECT_SOURCE_DIR}/include/skland/stock/*.hpp")
+    file(GLOB stock_sources "stock/*.cpp")
+    file(GLOB stock_internal_headers "stock/internal/*.hpp")
+    file(GLOB stock_internal_sources "stock/internal/*.cpp")
 
-  list(APPEND all_source_files
-    ${egl_headers}
-    ${egl_sources}
-    ${gui_headers}
-    ${gui_sources}
-    ${gui_internal_headers}
-    ${gui_internal_sources}
-    ${stock_headers}
-    ${stock_sources}
-    ${stock_internal_headers}
-    ${stock_internal_sources})
+    list(APPEND all_source_files
+            ${egl_headers}
+            ${egl_sources}
+            ${gui_headers}
+            ${gui_sources}
+            ${gui_internal_headers}
+            ${gui_internal_sources}
+            ${stock_headers}
+            ${stock_sources}
+            ${stock_internal_headers}
+            ${stock_internal_sources})
 
 endif ()
 
@@ -82,20 +82,21 @@ set(global_header "${PROJECT_SOURCE_DIR}/include/skland/skland.hpp")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 if (BUILD_SHARED_LIBRARY)
-  add_library(skland SHARED ${global_header} ${all_source_files})
-  set_target_properties(skland PROPERTIES VERSION 1 SOVERSION 1)
+    add_library(skland SHARED ${global_header} ${all_source_files})
+    set_target_properties(skland PROPERTIES VERSION 1 SOVERSION 1)
 else ()
-  add_library(skland ${global_header} ${all_source_files})
+    add_library(skland ${global_header} ${all_source_files})
 endif ()
 
 target_include_directories(skland
-  PRIVATE "${SKIA_PUBLIC_INCLUDES}"
-  PRIVATE "${PROJECT_BINARY_DIR}/deps/wayland-protocols/unstable/xdg-shell")
+        PRIVATE "${SKIA_PUBLIC_INCLUDES}"
+        PRIVATE "${PROJECT_BINARY_DIR}/deps/wayland-protocols/unstable/xdg-shell"
+        PRIVATE "${PROJECT_SOURCE_DIR}/include/skland")
 
 if (LINUX)
-  target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client)
+    target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client)
 else ()
-  target_link_libraries(skland ${LIBS} skia)
+    target_link_libraries(skland ${LIBS} skia)
 endif ()
 
 install(TARGETS skland DESTINATION lib)

@@ -44,10 +44,10 @@ Theme *Theme::kTheme = nullptr;
 
 Theme::Data::Data()
     : title_bar_font("Noto Sans CJK SC",
-                     FontStyle(FontStyle::kWeightBold, FontStyle::kWidthNormal, FontStyle::kSlantUpright),
+                     FontStyle(FontStyle::kWeightBold),
                      12.f),
       default_font("Noto Sans CJK SC",
-                   FontStyle(FontStyle::kWeightNormal, FontStyle::kWidthNormal, FontStyle::kSlantUpright),
+                   FontStyle(),
                    12.f) {
 
 }

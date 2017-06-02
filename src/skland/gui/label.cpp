@@ -14,28 +14,50 @@
  * limitations under the License.
  */
 
-#include <skland/gui/label.hpp>
+#include "gui/label.hpp"
 
-#include <skland/graphic/canvas.hpp>
-#include <skland/graphic/paint.hpp>
-#include <skland/graphic/text-box.hpp>
+#include "core/color.hpp"
 
-#include <skland/gui/context.hpp>
-#include <skland/gui/key-event.hpp>
-#include <skland/gui/mouse-event.hpp>
+#include "graphic/font.hpp"
+#include "graphic/canvas.hpp"
+#include "graphic/paint.hpp"
+#include "graphic/text-box.hpp"
+
+#include "gui/context.hpp"
+#include "gui/key-event.hpp"
+#include "gui/mouse-event.hpp"
+
+#include "stock/theme.hpp"
 
 namespace skland {
 
-Label::Label(const std::string &text, const Font &font)
-    : Label(text, 200, 24, font) {
+struct Label::Private {
+
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private(const std::string &text)
+      : text(text),
+        foreground(0.2f, 0.2f, 0.2f),
+        background(0.f, 0.f, 0.f, 0.f),
+        font(Theme::GetData().default_font) {}
+
+  ~Private() {}
+
+  std::string text;
+  Color foreground;
+  Color background;
+  Font font;
+
+};
+
+Label::Label(const std::string &text)
+    : Label(200, 24, text) {
 }
 
-Label::Label(const std::string &text, int width, int height, const Font &font)
-    : AbstractView(width, height),
-      text_(text),
-      foreground_(0.2f, 0.2f, 0.2f),
-      background_(0.f, 0.f, 0.f, 0.f),
-      font_(font) {
+Label::Label(int width, int height, const std::string &text)
+    : AbstractView(width, height) {
+  p_.reset(new Private(text));
 }
 
 Label::~Label() {
@@ -43,21 +65,21 @@ Label::~Label() {
 }
 
 void Label::SetForeground(const Color &color) {
-  if (foreground_ != color) {
-    foreground_ = color;
+  if (p_->foreground != color) {
+    p_->foreground = color;
     Update();
   }
 }
 
 void Label::SetBackground(const Color &color) {
-  if (background_ != color) {
-    background_ = color;
+  if (p_->background != color) {
+    p_->background = color;
     Update();
   }
 }
 
 void Label::SetFont(const Font &font) {
-  font_ = font;
+  p_->font = font;
   Update();
 }
 
@@ -111,16 +133,16 @@ void Label::OnDraw(const Context *context) {
   Canvas::ClipGuard guard(context->canvas(), rect);
 
   Paint paint;
-  paint.SetColor(background_);
+  paint.SetColor(p_->background);
   context->canvas()->DrawRect(rect, paint);
 
-  paint.SetColor(foreground_);
+  paint.SetColor(p_->foreground);
   paint.SetAntiAlias(true);
   paint.SetStyle(Paint::kStyleFill);
-  paint.SetFont(font_);
-  paint.SetTextSize(font_.GetSize() * scale);
+  paint.SetFont(p_->font);
+  paint.SetTextSize(p_->font.GetSize() * scale);
 
-  float text_width = paint.MeasureText(text_.c_str(), text_.length());
+  float text_width = paint.MeasureText(p_->text.c_str(), p_->text.length());
 
   TextBox text_box;
   // Put the text at the center
@@ -129,7 +151,7 @@ void Label::OnDraw(const Context *context) {
                   rect.r - (rect.width() - text_width) / 2.f,
                   rect.b);
   text_box.SetSpacingAlign(TextBox::kSpacingAlignCenter);
-  text_box.SetText(text_.c_str(), text_.length(), paint);
+  text_box.SetText(p_->text.c_str(), p_->text.length(), paint);
   text_box.Draw(*context->canvas());
 }
 

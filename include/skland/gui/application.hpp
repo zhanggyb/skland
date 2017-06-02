@@ -27,69 +27,78 @@ class AbstractEpollTask;
 
 /**
  * @ingroup gui
- * @brief Singleton application object
+ * @brief Single object manages an application's main event loop and global resources
  */
 SKLAND_EXPORT class Application {
 
+  Application() = delete;
+  Application(const Application &) = delete;
+  Application &operator=(const Application &) = delete;
+
  public:
 
+  /**
+   * @brief Construct a single application instance
+   * @param argc The argc parameter passed from main()
+   * @param argv The argv parameter passed from main()
+   *
+   * @warning An application instance should be constructed only once in the main function.
+   */
   Application(int argc, char *argv[]);
 
+  /**
+   * @brief Destructor
+   */
   ~Application();
 
-  Display *display() const {
-    return Display::kDisplay;
-  }
-
+  /**
+   * @brief Run the main event loop
+   * @return
+   *
+   * Internally this object uses epoll to implement the main event loop.
+   */
   static int Run();
 
+  /**
+   * @brief Exit the main event loop
+   */
   static void Exit();
 
-  static inline Application *Get() {
-    return Application::kInstance;
-  }
-
+  /**
+   * @brief Watch a given file descriptor in the main epoll event loop
+   * @param fd
+   * @param events Epoll events flags
+   * @param epoll_task An AbstractEpollTask object, the virtual Run() method will be called
+   *                   when there's event arrived on the fd
+   */
   static void WatchFd(int fd, uint32_t events, AbstractEpollTask *epoll_task);
 
+  /**
+   * @brief Unwatch the given file descriptor
+   * @param fd
+   */
   static void UnwatchFd(int fd);
+
+  /**
+   * @brief Get the argc parameter
+   * @return
+   */
+  static int GetArgc();
+
+  /**
+   * @brief Get the argv parameter
+   * @return
+   */
+  static char **GetArgv();
 
  private:
 
   class EpollTask;
+  struct Private;
 
-  static void HandleSignalInt(int);
-
-  /**
-* @brief Create an epoll file descriptor
-* @return a nonnegative file descriptor or -1
-*/
-  int CreateEpollFd();
-
-  /**
-   * @brief Set close-on-exec or close the epoll file descriptor
-   * @param fd The epoll file descriptor created in CreateEpollFd()
-   * @return a nonnegative file descriptor or -1
-   */
-  int SetCloexecOrClose(int fd);
-
-  /**
-   * @brief Set close-on-exec flag of the given file descripor
-   * @param fd The epoll file descriptor passed from CreateEpollFd()
-   * @return
-   *     0 - success
-   *    -1 - fail
-   */
-  int SetCloexec(int fd);
-
-  bool running_;
-
-  int epoll_fd_;
-
-  EpollTask *epoll_task_;
+  std::unique_ptr<Private> p_;
 
   static Application *kInstance;
-
-  static const int kMaxEpollEvents = 16;
 
 };
 

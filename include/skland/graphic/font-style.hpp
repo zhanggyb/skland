@@ -67,9 +67,7 @@ SKLAND_EXPORT class FontStyle {
     kSlantOblique
   };
 
-  FontStyle();
-
-  FontStyle(int weight, int width, Slant slant);
+  FontStyle(int weight = kWeightNormal, int width = kWidthNormal, Slant slant = kSlantUpright);
 
   FontStyle(const FontStyle &other);
 

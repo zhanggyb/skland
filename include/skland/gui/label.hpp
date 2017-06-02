@@ -19,11 +19,12 @@
 
 #include "abstract-view.hpp"
 
-#include "../core/color.hpp"
-#include "../graphic/font.hpp"
-#include "../stock/theme.hpp"
+#include <skland/core/color.hpp>
 
 namespace skland {
+
+// Forward declarations
+class Font;
 
 /**
  * @ingroup gui
@@ -33,9 +34,9 @@ SKLAND_EXPORT class Label : public AbstractView {
 
  public:
 
-  Label(const std::string &text, const Font &font = Theme::GetData().default_font);
+  Label(const std::string &text);
 
-  Label(const std::string &text, int width, int height, const Font &font = Theme::GetData().default_font);
+  Label(int width, int height, const std::string &text);
 
   void SetForeground(const Color &color);
 
@@ -71,13 +72,9 @@ SKLAND_EXPORT class Label : public AbstractView {
 
  private:
 
-  std::string text_;
+  struct Private;
 
-  Color foreground_;
-
-  Color background_;
-
-  Font font_;
+  std::unique_ptr<Private> p_;
 
 };
 

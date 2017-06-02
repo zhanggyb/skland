@@ -24,10 +24,10 @@ TEST_F(Test, application) {
   char argv1[] = "application";  // to avoid compile warning
   char *argv[] = {argv1};
 
-  bool result1 = (Application::Get() == nullptr);
-
   Application app(argc, argv);
-  bool result2 = (Application::Get() != nullptr);
+
+  bool result1 = (app.GetArgc() == argc);
+  bool result2 = (strcmp(app.GetArgv()[0], argv1) == 0);
 
   app.Exit();
 

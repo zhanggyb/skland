@@ -53,6 +53,10 @@ class InputFormat {
 
  public:
 
+  static InputFormat Find(const char *short_name) {
+    return InputFormat(av_find_input_format(short_name));
+  }
+
   /**
    * @brief Default constructor
    *
@@ -115,6 +119,9 @@ class InputFormat {
  */
 class FormatContext {
 
+  FormatContext(const FormatContext &) = delete;
+  FormatContext &operator=(const FormatContext &) = delete;
+
  public:
 
   FormatContext();
@@ -133,6 +140,32 @@ class FormatContext {
    * This method will throw a runtime_error if fails.
    */
   void Open(const char *url, const InputFormat *fmt, Dictionary *dict);
+
+  /**
+   * @brief The input container format
+   * @return
+   *
+   * Demuxing only, set by Open().
+   */
+  InputFormat iformat() const {
+    return InputFormat(native_->iformat);
+  }
+
+  int64_t start_time() const {
+    return native_->start_time;
+  }
+
+  int64_t duration() const {
+    return native_->duration;
+  }
+
+  unsigned int packet_size() const {
+    return native_->packet_size;
+  }
+
+  int64_t bit_rate() const {
+    return native_->bit_rate;
+  }
 
   operator bool() const {
     return nullptr != native_;

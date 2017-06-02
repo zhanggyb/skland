@@ -21,13 +21,6 @@
 
 namespace skland {
 
-FontStyle::FontStyle() {
-  data_.value = 0;
-  data_.styles.weight = kWeightNormal;
-  data_.styles.width = kWidthNormal;
-  data_.styles.slant = kSlantUpright;
-}
-
 FontStyle::FontStyle(int weight, int width, Slant slant) {
   data_.value = 0;
   data_.styles.weight = (uint16_t) clamp<int>(weight, kWeightInvisible, kWeightExtraBlack);
@@ -46,7 +39,7 @@ FontStyle::FontStyle(const SkFontStyle &sk_font_style) {
   data_.styles.slant = (uint8_t) sk_font_style.slant();
 }
 
-FontStyle& FontStyle::operator=(const FontStyle &other) {
+FontStyle &FontStyle::operator=(const FontStyle &other) {
   data_.value = other.data_.value;
   return *this;
 }

@@ -17,10 +17,10 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
 #include <skland/gui/label.hpp>
+#include <skland/graphic/font.hpp>
 
 int main(int argc, char *argv[]) {
   using namespace skland;
-  using skland::Window;
 
   Application app(argc, argv);
 
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   Label *label = new Label("Hello Wayland!");
   label->SetForeground(0xFF444444);
   label->SetFont(skland::Font("Noto Sans CJK SC",
-                              FontStyle(FontStyle::kWeightBold, FontStyle::kWidthNormal, FontStyle::kSlantUpright),
+                              FontStyle(FontStyle::kWeightBold),
                               24.f));
   win.SetContentView(label);
 
