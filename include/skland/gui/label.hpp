@@ -21,6 +21,7 @@
 
 #include "../core/color.hpp"
 #include "../graphic/font.hpp"
+#include "../stock/theme.hpp"
 
 namespace skland {
 
@@ -32,9 +33,9 @@ SKLAND_EXPORT class Label : public AbstractView {
 
  public:
 
-  Label(const std::string &text, const Font &font = Font());
+  Label(const std::string &text, const Font &font = Theme::GetData().default_font);
 
-  Label(const std::string &text, int width, int height, const Font &font = Font());
+  Label(const std::string &text, int width, int height, const Font &font = Theme::GetData().default_font);
 
   void SetForeground(const Color &color);
 

@@ -269,7 +269,7 @@ TitleBar::TitleBar()
       maximize_button_(nullptr),
       minimize_button_(nullptr),
       fullscreen_button_(nullptr),
-      font_(Typeface::kBold) {
+      font_(Theme::GetData().title_bar_font) {
   close_button_ = new CloseButton;
   maximize_button_ = new MaximizeButton;
   minimize_button_ = new MinimizeButton;
@@ -314,7 +314,7 @@ void TitleBar::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, co
   new_x = GetWidth() - kButtonSpace - fullscreen_button_->GetWidth();
   fullscreen_button_->MoveTo(new_x, new_y);
 
-  RecursiveUpdate();
+  DispatchUpdate();
 }
 
 void TitleBar::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
@@ -354,18 +354,18 @@ void TitleBar::OnKeyUp(KeyEvent *event) {
 }
 
 void TitleBar::OnDraw(const Context *context) {
+  int scale = context->surface()->GetScale();
   Paint paint;
-
   paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
   paint.SetAntiAlias(true);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font_);
-  paint.SetTextSize(font_.GetSize());
+  paint.SetTextSize(font_.GetSize() * scale);
 
   float text_width = paint.MeasureText(title_.c_str(), title_.length());
 
   SkTextBox text_box;
-  const Rect &rect = GetGeometry();
+  const Rect rect = GetGeometry() * scale;
   // Put the foreground at the center
   text_box.setBox(rect.l + (rect.width() - text_width) / 2.f,
                   rect.t + 1.f, // move down a little for better look

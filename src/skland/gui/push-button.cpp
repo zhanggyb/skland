@@ -38,13 +38,16 @@ PushButton::~PushButton() {
 }
 
 void PushButton::OnDraw(const Context *context) {
-  Canvas* canvas = context->canvas();
-  Canvas::ClipGuard guard(canvas, GetGeometry());
+  Canvas *canvas = context->canvas();
+
+  const Rect &geometry = GetGeometry();
+  int scale = context->surface()->GetScale();
+  Canvas::ClipGuard guard(canvas, geometry * 2);
 
   canvas->Clear();
+  canvas->Scale(scale, scale);
 
   Path path;
-  const Rect &geometry = GetGeometry();
   Rect inner_rect = geometry.Shrink(0.5f);
   const Theme::Schema &schema = Theme::GetData().button;
   Shader shader;

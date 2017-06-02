@@ -15,26 +15,19 @@
  */
 
 #include <skland/gui/application.hpp>
-#include <skland/gui/window.hpp>
-#include <skland/gui/label.hpp>
+#include <skland/av/format.hpp>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   using namespace skland;
-  using skland::Window;
 
   Application app(argc, argv);
+  av::Format::RegisterAll();
 
-  Window win(320, 240, "Hello");
-  win.SetAppId("Hello");
-
-  Label *label = new Label("Hello Wayland!");
-  label->SetForeground(0xFF444444);
-  label->SetFont(skland::Font("Noto Sans CJK SC",
-                              FontStyle(FontStyle::kWeightBold, FontStyle::kWidthNormal, FontStyle::kSlantUpright),
-                              24.f));
-  win.SetContentView(label);
-
-  win.Show();
+  av::InputFormat fmt = av::InputFormat(nullptr);
+  while(fmt) {
+    fprintf(stdout, "name: %s, long name: %s\n", fmt.name(), fmt.long_name());
+    fmt = fmt.next();
+  }
 
   return app.Run();
 }

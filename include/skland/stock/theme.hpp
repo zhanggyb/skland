@@ -22,6 +22,7 @@
 #include "../core/point.hpp"
 
 #include "../graphic/shader.hpp"
+#include "../graphic/font.hpp"
 
 #include <vector>
 #include <string>
@@ -128,13 +129,19 @@ class Theme {
 
   struct Data {
 
+    Data();
+
     std::string name;
 
     Schema window;
 
     Schema title_bar;
 
+    Font title_bar_font;
+
     Schema button;
+
+    Font default_font;
 
   };
 

@@ -340,7 +340,8 @@ void AbstractShellView::Damage(AbstractView *view,
 }
 
 void AbstractShellView::RecursiveUpdate(AbstractView *view) {
-  view->RecursiveUpdate();
+  view->Update();
+  view->DispatchUpdate();
 }
 
 void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {

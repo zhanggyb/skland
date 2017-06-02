@@ -49,22 +49,6 @@ class Context {
     return *this;
   }
 
-  void SetupCallback(Callback &callback) const {
-    callback.Setup(*surface_);
-  }
-
-  const Margin &GetMargin() const {
-    return surface_->GetMargin();
-  }
-
-  void Damage(int surface_x, int surface_y, int width, int height) const {
-    surface_->Damage(surface_x, surface_y, width, height);
-  }
-
-  void Commit() const {
-    surface_->Commit();
-  }
-
   Surface *surface() const { return surface_; }
 
   Canvas *canvas() const { return canvas_.get(); }

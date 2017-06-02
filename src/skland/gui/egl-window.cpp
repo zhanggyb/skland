@@ -84,8 +84,8 @@ EGLWindow::EGLWindow(int width, int height, const char *title)
   Surface *parent = GetShellSurface();
 
   p_->sub_surface = Surface::Sub::Create(parent, this);
-  _ASSERT(p_->sub_surface->parent() == parent);
-  _ASSERT(p_->sub_surface->below() == parent);
+  _ASSERT(p_->sub_surface->GetParent() == parent);
+  _ASSERT(p_->sub_surface->GetSiblingBelow() == parent);
 
   Region empty_region;
   p_->sub_surface->SetInputRegion(empty_region);

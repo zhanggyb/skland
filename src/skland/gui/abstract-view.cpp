@@ -487,10 +487,10 @@ void AbstractView::OnDetachedFromShellView(AbstractShellView */*shell_view*/) {
 
 }
 
-void AbstractView::RecursiveUpdate() {
-  OnUpdate(this);
+void AbstractView::DispatchUpdate() {
   for (AbstractView *sub = p_->last_child; sub; sub = sub->p_->previous) {
-    sub->RecursiveUpdate();
+    sub->Update();
+    sub->DispatchUpdate();
   }
 }
 

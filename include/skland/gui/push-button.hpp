@@ -29,7 +29,7 @@ class PushButton : public AbstractButton {
 
  public:
 
-  PushButton(const std::string& text);
+  PushButton(const std::string &text);
 
  protected:
 

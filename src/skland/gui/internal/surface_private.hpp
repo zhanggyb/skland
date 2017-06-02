@@ -33,7 +33,13 @@ struct Surface::Private {
         transform(kTransformNormal),
         scale(1),
         event_handler_(event_handler),
-        margin(margin) {}
+        margin(margin),
+        parent_(nullptr),
+        above(nullptr),
+        below(nullptr),
+        upper(nullptr),
+        lower(nullptr),
+        egl(nullptr) {}
 
   ~Private() {}
 
@@ -53,6 +59,39 @@ struct Surface::Private {
    * For root surface, this should always be (0, 0)
    */
   Point relative_position;
+
+  /**
+    * @brief The parent surface
+    */
+  Surface *parent_;
+
+  /**
+    * @brief The sibling surface placed up
+    */
+  Surface *above;
+
+  /**
+    * @brief The sibling surface placed down
+    */
+  Surface *below;
+
+  /**
+   * @brief The shell surface shows front
+   */
+  Surface *upper;
+
+  /**
+   * @brief The shell surface shows back
+   */
+  Surface *lower;
+
+  EGL *egl;
+
+  union {
+    void *placeholder;
+    Shell *shell;
+    Sub *sub;
+  } role;
 
   static void OnEnter(void *data, struct wl_surface *wl_surface,
                       struct wl_output *wl_output);

@@ -106,7 +106,8 @@ void Label::OnKeyUp(KeyEvent *event) {
 }
 
 void Label::OnDraw(const Context *context) {
-  const Rect &rect = GetGeometry();
+  int scale = context->surface()->GetScale();
+  const Rect rect = GetGeometry() * scale;
   Canvas::ClipGuard guard(context->canvas(), rect);
 
   Paint paint;
@@ -117,7 +118,7 @@ void Label::OnDraw(const Context *context) {
   paint.SetAntiAlias(true);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font_);
-  paint.SetTextSize(font_.GetSize());
+  paint.SetTextSize(font_.GetSize() * scale);
 
   float text_width = paint.MeasureText(text_.c_str(), text_.length());
 

@@ -413,31 +413,31 @@ class Surface {
    * @brief Get the parent surface
    * @return
    */
-  Surface *parent() const { return parent_; }
+  Surface *GetParent() const;
 
   /**
    * @brief The sibling surface above this one
    * @return
    */
-  Surface *above() const { return above_; }
+  Surface *GetSiblingAbove() const;
 
   /**
    * @brief The sibling surface below this one
    * @return
    */
-  Surface *below() const { return below_; }
+  Surface *GetSiblingBelow() const;
 
   /**
    * @brief The shell surface shows over this one
    * @return
    */
-  Surface *up() const { return up_; }
+  Surface *GetUpperShell() const;
 
   /**
    * @brief The shell surface shows under this one
    * @return
    */
-  Surface *down() const { return down_; }
+  Surface *GetLowerShell() const;
 
   AbstractEventHandler *GetEventHandler() const;
 
@@ -454,40 +454,7 @@ class Surface {
 
   std::unique_ptr<Private> p_;
 
-  /**
-   * @brief The parent surface
-   */
-  Surface *parent_;
-
-  /**
-   * @brief The sibling surface placed up
-   */
-  Surface *above_;
-
-  /**
-   * @brief The sibling surface placed down
-   */
-  Surface *below_;
-
-  /**
-   * @brief The shell surface shows front
-   */
-  Surface *up_;
-
-  /**
-   * @brief The shell surface shows back
-   */
-  Surface *down_;
-
   std::unique_ptr<CommitTask> commit_task_;
-
-  EGL *egl_;
-
-  union {
-    void *placeholder;
-    Shell *shell;
-    Sub *sub;
-  } role_;
 
   // global surface stack:
 

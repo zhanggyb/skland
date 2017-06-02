@@ -90,8 +90,8 @@ Window::Window(int width, int height, const char *title, int flags)
   // Create a sub surface for views:
   if (!(flags & kFlagMaskFrameless)) {
     p_->main_surface = Surface::Sub::Create(shell_surface, this, Theme::GetShadowMargin());
-    _ASSERT(p_->main_surface->parent() == shell_surface);
-    _ASSERT(p_->main_surface->below() == shell_surface);
+    _ASSERT(p_->main_surface->GetParent() == shell_surface);
+    _ASSERT(p_->main_surface->GetSiblingBelow() == shell_surface);
     Region empty_region;
     p_->main_surface->SetInputRegion(empty_region);
 

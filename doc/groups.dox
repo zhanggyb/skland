@@ -6,6 +6,13 @@
  */
 
 /**
+ * @defgroup av Audio/Video
+ * @brief Audio/Video process based on FFMPEG
+ *
+ * ...
+ */
+
+/**
  * @defgroup graphic Graphic
  * @brief Graphic classes based on Google Skia
  *

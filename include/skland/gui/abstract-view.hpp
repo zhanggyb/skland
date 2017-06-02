@@ -440,7 +440,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * sub views.  Sub class can override this method to select part of sub views
    * to update.
    */
-  virtual void RecursiveUpdate();
+  virtual void DispatchUpdate();
 
   /**
    * @brief A view request an update

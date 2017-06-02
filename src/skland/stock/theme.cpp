@@ -42,6 +42,16 @@ SkPixmap *Theme::kShadowPixmap = nullptr;
 
 Theme *Theme::kTheme = nullptr;
 
+Theme::Data::Data()
+    : title_bar_font("Noto Sans CJK SC",
+                     FontStyle(FontStyle::kWeightBold, FontStyle::kWidthNormal, FontStyle::kSlantUpright),
+                     12.f),
+      default_font("Noto Sans CJK SC",
+                   FontStyle(FontStyle::kWeightNormal, FontStyle::kWidthNormal, FontStyle::kSlantUpright),
+                   12.f) {
+
+}
+
 Shader Theme::Helper::GradientShader::MakeLinear(const Point2F *points, const Schema::ShadedColor &color) {
   return skland::GradientShader::MakeLinear(points,
                                             color.shaded_colors.data(),

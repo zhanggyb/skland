@@ -135,13 +135,13 @@ class ShmWidget : public AbstractView {
     angle_ += 5.f;
     if (angle_ > 360.f) angle_ = 0.f;
 
-    context_->SetupCallback(frame_callback_);
+    frame_callback_.Setup(*context_->surface());
     Animate();
-    context_->Damage(context_->GetMargin().l + GetX(),
-                     context_->GetMargin().t + GetY(),
-                     GetWidth(),
-                     GetHeight());
-    context_->Commit();
+    context_->surface()->Damage(context_->surface()->GetMargin().l + GetX(),
+                                context_->surface()->GetMargin().t + GetY(),
+                                GetWidth(),
+                                GetHeight());
+    context_->surface()->Commit();
   }
 
   Callback frame_callback_;
@@ -152,8 +152,6 @@ class ShmWidget : public AbstractView {
 };
 
 int main(int argc, char *argv[]) {
-  using skland::Window;
-
   Application app(argc, argv);
 
   Window *win = new Window(320, 280, "Simple Shm");
