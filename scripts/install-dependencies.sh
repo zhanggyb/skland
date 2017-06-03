@@ -34,23 +34,28 @@ if [ "$OS" = "Ubuntu" ]; then
 		graphviz"
 	sudo apt install ${PACKAGES}
 elif [ "$OS" = "Fedora" ]; then
-    PACKAGES="gcc-c++ \
-        cmake \
-        wayland-devel \
-        mesa-libwayland-egl-devel \
-        libwebp-devel \
-        libjpeg-turbo-devel \
-        expat-devel \
-        lua-devel \
-        zlib-devel \
-        freetype-devel \
-        giflib-devel \
-        mesa-libGL-devel \
-        mesa-libEGL-devel \
-        fontconfig-devel \
-        doxygen \
-        graphviz"
-    sudo dnf install ${PACKAGES}
+	PACKAGES="gcc-c++ \
+		cmake \
+		wayland-devel \
+		libxkbcommon-devel \
+		mesa-libwayland-egl-devel \
+		mesa-libGLES-devel \
+		mesa-libGL-devel \
+		vulkan-devel \
+		libwebp-devel \
+		libjpeg-turbo-devel \
+		giflib-devel \
+		expat-devel \
+		zlib-devel \
+		lua-devel \
+		libinput-devel \
+		freetype-devel \
+		fontconfig-devel \
+		ffmpeg-devel \
+		doxygen \
+		graphviz"
+	sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+	sudo dnf install ${PACKAGES}
 else
 	echo "Unsupported Linux distribution!"
 fi

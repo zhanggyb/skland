@@ -32,9 +32,9 @@ struct Surface::Private {
         commit_mode(kSynchronized),
         transform(kTransformNormal),
         scale(1),
-        event_handler_(event_handler),
+        event_handler(event_handler),
         margin(margin),
-        parent_(nullptr),
+        parent(nullptr),
         above(nullptr),
         below(nullptr),
         upper(nullptr),
@@ -49,7 +49,7 @@ struct Surface::Private {
   Transform transform;
   int32_t scale;
 
-  AbstractEventHandler *event_handler_;
+  AbstractEventHandler *event_handler;
 
   Margin margin;
 
@@ -63,7 +63,7 @@ struct Surface::Private {
   /**
     * @brief The parent surface
     */
-  Surface *parent_;
+  Surface *parent;
 
   /**
     * @brief The sibling surface placed up

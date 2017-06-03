@@ -42,7 +42,7 @@ void PushButton::OnDraw(const Context *context) {
 
   const Rect &geometry = GetGeometry();
   int scale = context->surface()->GetScale();
-  Canvas::ClipGuard guard(canvas, geometry * 2);
+  Canvas::ClipGuard guard(canvas, geometry * scale);
 
   canvas->Clear();
   canvas->Scale(scale, scale);

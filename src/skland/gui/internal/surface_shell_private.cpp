@@ -29,7 +29,7 @@ void Surface::Shell::Private::OnConfigure(void *data,
                                           struct zxdg_surface_v6 *zxdg_surface_v6,
                                           uint32_t serial) {
   Shell *_this = static_cast<Shell *>(data);
-  AbstractShellView *shell_view = dynamic_cast<AbstractShellView *>(_this->surface_->p_->event_handler_);
+  AbstractShellView *shell_view = dynamic_cast<AbstractShellView *>(_this->surface_->p_->event_handler);
   if (shell_view)
     shell_view->OnXdgSurfaceConfigure(serial);
 }

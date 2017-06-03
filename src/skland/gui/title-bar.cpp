@@ -127,7 +127,7 @@ void TitleBar::MaximizeButton::OnDraw(const Context *context) {
   int scale = context->surface()->GetScale();
   const Rect& rect = GetGeometry();
 
-  Canvas::ClipGuard guard(canvas, rect * 2);
+  Canvas::ClipGuard guard(canvas, rect * scale);
 
   canvas->Clear();
   canvas->Scale(scale, scale);
@@ -177,7 +177,7 @@ void TitleBar::MinimizeButton::OnDraw(const Context *context) {
   int scale = context->surface()->GetScale();
   const Rect& rect = GetGeometry();
 
-  Canvas::ClipGuard guard(canvas, rect * 2);
+  Canvas::ClipGuard guard(canvas, rect * scale);
 
   canvas->Clear();
   canvas->Scale(scale, scale);
@@ -224,7 +224,7 @@ void TitleBar::FullscreenButton::OnDraw(const Context *context) {
   int scale = context->surface()->GetScale();
   const Rect& rect = GetGeometry();
 
-  Canvas::ClipGuard guard(canvas, rect * 2);
+  Canvas::ClipGuard guard(canvas, rect * scale);
 
   canvas->Clear();
   canvas->Scale(scale, scale);

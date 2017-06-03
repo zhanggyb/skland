@@ -42,7 +42,7 @@ Surface *Surface::Shell::Create(AbstractEventHandler *event_handler, const Margi
 }
 
 Surface::Shell *Surface::Shell::Get(const Surface *surface) {
-  if (nullptr == surface->p_->parent_)
+  if (nullptr == surface->p_->parent)
     return surface->p_->role.shell;
 
   return nullptr;
@@ -78,12 +78,12 @@ Surface::Shell::~Shell() {
   if (nullptr == parent_) delete role_.toplevel;
   else delete role_.popup;
 
-  _ASSERT(surface_->role_.shell == this);
+  _ASSERT(surface_->p_->role.shell == this);
   surface_->p_->role.shell = nullptr;
 }
 
 void Surface::Shell::Push() {
-  _ASSERT(nullptr == surface_->parent_);
+  _ASSERT(nullptr == surface_->p_->parent);
   _ASSERT(nullptr == surface_->p_->upper);
   _ASSERT(nullptr == surface_->p_->lower);
 
@@ -104,7 +104,7 @@ void Surface::Shell::Push() {
 }
 
 void Surface::Shell::Remove() {
-  _ASSERT(nullptr == surface_->parent_);
+  _ASSERT(nullptr == surface_->p_->parent);
 
   if (surface_->p_->upper) {
     surface_->p_->upper->p_->lower = surface_->p_->lower;
@@ -227,7 +227,7 @@ Surface *Surface::Sub::Create(Surface *parent, AbstractEventHandler *event_handl
 }
 
 Surface::Sub *Surface::Sub::Get(const Surface *surface) {
-  if (nullptr == surface->p_->parent_)
+  if (nullptr == surface->p_->parent)
     return nullptr;
 
   return surface->p_->role.sub;
@@ -245,21 +245,21 @@ Surface::Sub::Sub(Surface *surface, Surface *parent)
 }
 
 Surface::Sub::~Sub() {
-  _ASSERT(surface_->role_.sub == this);
+  _ASSERT(surface_->p_->role.sub == this);
 
   // Delete all sub surfaces of this one:
   Surface *p = nullptr;
   Surface *tmp = nullptr;
 
   p = surface_->p_->above;
-  while (p && p->p_->parent_ == surface_) {
+  while (p && p->p_->parent == surface_) {
     tmp = p->p_->above;
     delete p;
     p = tmp;
   }
 
   p = surface_->p_->below;
-  while (p && p->p_->parent_ == surface_) {
+  while (p && p->p_->parent == surface_) {
     tmp = p->p_->below;
     delete p;
     p = tmp;
@@ -313,18 +313,18 @@ void Surface::Sub::SetWindowPosition(int x, int y) {
 }
 
 void Surface::Sub::SetParent(Surface *parent) {
-  _ASSERT(surface_->parent_ == nullptr &&
+  _ASSERT(nullptr == surface_->p_->parent &&
       surface_->p_->upper == nullptr &&
       surface_->p_->lower == nullptr);
 
-  surface_->p_->parent_ = parent;
+  surface_->p_->parent = parent;
 
   Surface *tmp = parent;
   Surface *sibling = nullptr;
   do {
     sibling = tmp;
     tmp = tmp->p_->above;
-    if (nullptr == tmp || tmp->p_->parent_ != parent) break;
+    if (nullptr == tmp || tmp->p_->parent != parent) break;
   } while (true);
   InsertAbove(sibling);
 }
@@ -335,13 +335,13 @@ void Surface::Sub::MoveAbove(Surface *dst) {
   Surface *tmp = nullptr;
 
   tmp = surface_;
-  while (tmp->p_->above && (tmp->p_->above->p_->parent_ != surface_->p_->parent_)) {
+  while (tmp->p_->above && (tmp->p_->above->p_->parent != surface_->p_->parent)) {
     top = tmp;
     tmp = tmp->p_->above;
   }
 
   tmp = surface_;
-  while (tmp->p_->below && (tmp->p_->below->p_->parent_ != surface_->p_->parent_)) {
+  while (tmp->p_->below && (tmp->p_->below->p_->parent != surface_->p_->parent)) {
     bottom = tmp;
     tmp = tmp->p_->below;
   }
@@ -371,13 +371,13 @@ void Surface::Sub::MoveBelow(Surface *dst) {
   Surface *tmp = nullptr;
 
   tmp = surface_;
-  while (tmp->p_->above && (tmp->p_->above->p_->parent_ != surface_->p_->parent_)) {
+  while (tmp->p_->above && (tmp->p_->above->p_->parent != surface_->p_->parent)) {
     top = tmp;
     tmp = tmp->p_->above;
   }
 
   tmp = surface_;
-  while (tmp->p_->below && (tmp->p_->below->p_->parent_ != surface_->p_->parent_)) {
+  while (tmp->p_->below && (tmp->p_->below->p_->parent != surface_->p_->parent)) {
     bottom = tmp;
     tmp = tmp->p_->below;
   }
@@ -402,9 +402,9 @@ void Surface::Sub::MoveBelow(Surface *dst) {
 }
 
 void Surface::Sub::InsertAbove(Surface *sibling) {
-  _ASSERT(surface_->parent_ == sibling->parent_ ||
-      surface_ == sibling->parent_ ||
-      surface_->parent_ == sibling);
+  _ASSERT(surface_->p_->parent == sibling->p_->parent ||
+      surface_ == sibling->p_->parent ||
+      surface_->p_->parent == sibling);
   if (sibling->p_->above) sibling->p_->above->p_->below = surface_;
   surface_->p_->above = sibling->p_->above;
   sibling->p_->above = surface_;
@@ -412,9 +412,9 @@ void Surface::Sub::InsertAbove(Surface *sibling) {
 }
 
 void Surface::Sub::InsertBelow(Surface *sibling) {
-  _ASSERT(surface_->parent_ == sibling->parent_ ||
-      surface_ == sibling->parent_ ||
-      surface_->parent_ == sibling);
+  _ASSERT(surface_->p_->parent == sibling->p_->parent ||
+      surface_ == sibling->p_->parent ||
+      surface_->p_->parent == sibling);
   if (sibling->p_->below) sibling->p_->below->p_->above = surface_;
   surface_->p_->below = sibling->p_->below;
   sibling->p_->below = surface_;
@@ -490,7 +490,7 @@ Task Surface::kCommitTaskHead;
 Task Surface::kCommitTaskTail;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
-  _ASSERT(nullptr != event_handler_);
+  _ASSERT(nullptr != p_->event_handler);
   p_.reset(new Private(event_handler, margin));
   p_->role.placeholder = nullptr;
 
@@ -504,7 +504,7 @@ Surface::~Surface() {
   if (p_->egl)
     delete p_->egl;
 
-  if (nullptr == p_->parent_)
+  if (nullptr == p_->parent)
     delete p_->role.shell; // deleting a shell surface will break the links to up_ and down_
   else
     delete p_->role.sub; // deleting all sub surfaces and break the links to above_ and below_
@@ -539,7 +539,7 @@ void Surface::Commit() {
   if (commit_task_->IsLinked())
     return;
 
-  if (nullptr == p_->parent_) {
+  if (nullptr == p_->parent) {
     kCommitTaskTail.PushFront(commit_task_.get());
     return;
   }
@@ -594,11 +594,11 @@ void Surface::DamageBuffer(int32_t x, int32_t y, int32_t width, int32_t height) 
 
 Surface *Surface::GetShellSurface() {
   Surface *shell_surface = this;
-  Surface *parent = p_->parent_;
+  Surface *parent = p_->parent;
 
   while (parent) {
     shell_surface = parent;
-    parent = parent->p_->parent_;
+    parent = parent->p_->parent;
   }
 
   return shell_surface;
@@ -607,12 +607,12 @@ Surface *Surface::GetShellSurface() {
 Point Surface::GetWindowPosition() const {
   Point position = p_->relative_position;
 
-  const Surface *parent = p_->parent_;
+  const Surface *parent = p_->parent;
   const Surface *shell_surface = this;
 
   while (parent) {
     position += parent->GetRelativePosition();
-    if (nullptr == parent->p_->parent_) shell_surface = parent;
+    if (nullptr == parent->p_->parent) shell_surface = parent;
     parent = parent->GetParent();
   }
 
@@ -620,7 +620,7 @@ Point Surface::GetWindowPosition() const {
 }
 
 Surface *Surface::GetParent() const {
-  return p_->parent_;
+  return p_->parent;
 }
 
 Surface *Surface::GetSiblingAbove() const {
@@ -640,7 +640,7 @@ Surface *Surface::GetLowerShell() const {
 }
 
 AbstractEventHandler *Surface::GetEventHandler() const {
-  return p_->event_handler_;
+  return p_->event_handler;
 }
 
 const Margin &Surface::GetMargin() const {

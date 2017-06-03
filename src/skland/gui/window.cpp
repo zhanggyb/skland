@@ -261,8 +261,15 @@ Surface *Window::GetSurface(const AbstractView *view) const {
 }
 
 void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
-  int scale = 2;
   Surface *shell_surface = this->GetShellSurface();
+
+  int scale = 1;
+  const Deque &outputs = Display::GetOutputs();
+  if (outputs.count()) {
+    p_->output = static_cast<const Output *>(outputs[0]);
+    scale = p_->output->GetScale();
+  }
+  shell_surface->SetScale(scale);
 
   int width = new_size.width;
   int height = new_size.height;

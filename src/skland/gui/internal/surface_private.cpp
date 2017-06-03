@@ -28,13 +28,13 @@ const struct wl_surface_listener Surface::Private::kListener = {
 void Surface::Private::OnEnter(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
   const Surface *_this = static_cast<const Surface *>(data);
   const Output *output = static_cast<const Output *>(wl_output_get_user_data(wl_output));
-  _this->p_->event_handler_->OnEnterOutput(_this, output);
+  _this->p_->event_handler->OnEnterOutput(_this, output);
 }
 
 void Surface::Private::OnLeave(void *data, struct wl_surface *wl_surface, struct wl_output *wl_output) {
   const Surface *_this = static_cast<const Surface *>(data);
   const Output *output = static_cast<const Output *>(wl_output_get_user_data(wl_output));
-  _this->p_->event_handler_->OnLeaveOutput(_this, output);
+  _this->p_->event_handler->OnLeaveOutput(_this, output);
 }
 
 }
