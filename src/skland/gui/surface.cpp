@@ -490,7 +490,7 @@ Task Surface::kCommitTaskHead;
 Task Surface::kCommitTaskTail;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
-  _ASSERT(nullptr != p_->event_handler);
+  _ASSERT(nullptr != event_handler);
   p_.reset(new Private(event_handler, margin));
   p_->role.placeholder = nullptr;
 
