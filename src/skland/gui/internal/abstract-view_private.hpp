@@ -17,9 +17,9 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
 
-#include "abstract-view_redraw-task.hpp"
+#include "skland/gui/abstract-view.hpp"
 
-#include <skland/core/padding.hpp>
+#include "skland/core/padding.hpp"
 #include "skland/gui/anchor.hpp"
 #include "skland/gui/anchor-group.hpp"
 

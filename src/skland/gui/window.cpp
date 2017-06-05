@@ -16,10 +16,6 @@
 
 #include <skland/gui/window.hpp>
 
-#include "internal/abstract-shell-view_redraw-task.hpp"
-#include "internal/abstract-view_redraw-task.hpp"
-#include "internal/abstract-event-handler_mouse-task-iterator.hpp"
-
 #include <skland/core/assert.hpp>
 
 #include <skland/gui/application.hpp>
@@ -223,7 +219,7 @@ void Window::OnUpdate(AbstractView *view) {
     int height = GetHeight();
     const Margin &margin = surface->GetMargin();
 
-    RedrawTask *redraw_task = RedrawTask::Get(this);
+    AbstractShellView::RedrawTask *redraw_task = RedrawTask::Get(this);
     redraw_task->context = Context(surface, p_->frame_canvas);
     PushToTail(redraw_task);
     _ASSERT(p_->frame_canvas);
@@ -464,7 +460,7 @@ void Window::OnMouseDown(MouseEvent *event) {
 
     int location = GetMouseLocation(event);
 
-    if (location == kTitleBar && (nullptr == MouseTaskIterator(this).next())) {
+    if (location == kTitleBar && (nullptr == EventTask::GetMouseTask(this)->next())) {
       MoveWithMouse(event);
       event->Ignore();
       return;

@@ -61,9 +61,42 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
  public:
 
-  struct EventTask;
+  class EventTask : public Task {
 
-  class MouseTaskIterator;
+    EventTask() = delete;
+    EventTask(const EventTask &) = delete;
+    EventTask &operator=(const EventTask &) = delete;
+
+   public:
+
+    /**
+     * @brief Constructor
+     * @param event_handler An AbstractEventHandler object
+     *
+     * @note The parameter cannot be nullptr.
+     */
+    EventTask(AbstractEventHandler *event_handler)
+        : Task(), event_handler_(event_handler) {}
+
+    /**
+     * @brief Destructor
+     */
+    virtual ~EventTask() {}
+
+    AbstractEventHandler *event_handler() const { return event_handler_; }
+
+    static EventTask *GetMouseTask(const AbstractEventHandler *event_hander);
+
+    static EventTask *GetMouseMotionTask(const AbstractEventHandler *event_handler);
+
+   private:
+
+    /**
+     * @brief A pointer to an AbstractEventHandler object
+     */
+    AbstractEventHandler *event_handler_;
+
+  };
 
   /**
    * @brief Default constructor

@@ -49,4 +49,14 @@ void AbstractEventHandler::ClearIdleTaskList() {
   }
 }
 
+// --------------------
+
+AbstractEventHandler::EventTask *AbstractEventHandler::EventTask::GetMouseTask(const AbstractEventHandler *event_hander) {
+  return &event_hander->p_->mouse_task;
+}
+
+AbstractEventHandler::EventTask *AbstractEventHandler::EventTask::GetMouseMotionTask(const AbstractEventHandler *event_handler) {
+  return &event_handler->p_->mouse_motion_task;
+}
+
 }

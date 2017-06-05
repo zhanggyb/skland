@@ -18,6 +18,7 @@
 #define SKLAND_GUI_APPLICATION_HPP_
 
 #include <cstdint>
+#include <thread>
 
 #include "display.hpp"
 
@@ -90,6 +91,12 @@ SKLAND_EXPORT class Application {
    * @return
    */
   static char **GetArgv();
+
+  /**
+   * @brief Get the main thread id
+   * @return A const reference to the main thread id
+   */
+  static const std::thread::id &GetThreadID();
 
  private:
 

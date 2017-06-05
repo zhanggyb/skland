@@ -18,10 +18,6 @@
 #define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_
 
 #include <skland/gui/abstract-event-handler.hpp>
-#include <skland/core/rect.hpp>
-
-#include "abstract-event-handler_event-task.hpp"
-#include "abstract-shell-view_redraw-task.hpp"
 
 namespace skland {
 

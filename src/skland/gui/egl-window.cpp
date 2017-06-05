@@ -29,7 +29,6 @@
 
 #include "internal/display_native.hpp"
 #include "internal/abstract-view_iterators.hpp"
-#include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
@@ -260,7 +259,7 @@ void EGLWindow::OnMouseDown(MouseEvent *event) {
 
     int location = GetMouseLocation(event);
 
-    if (location == kClientArea && (nullptr == MouseTaskIterator(this).next())) {
+    if (location == kClientArea && (nullptr == EventTask::GetMouseTask(this)->next())) {
       MoveWithMouse(event);
       event->Ignore();
       return;

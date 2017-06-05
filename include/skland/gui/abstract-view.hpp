@@ -24,6 +24,7 @@
 #include "../core/rect.hpp"
 #include "../core/padding.hpp"
 
+#include "context.hpp"
 #include "anchor-group.hpp"
 
 #include <memory>
@@ -32,7 +33,6 @@ namespace skland {
 
 class AbstractShellView;
 class AbstractLayout;
-class Context;
 
 /**
  * @ingroup gui
@@ -99,7 +99,30 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   class Iterator;
   class ConstIterator;
 
-  struct RedrawTask;
+  class RedrawTask: public Task {
+
+    RedrawTask() = delete;
+    RedrawTask(const RedrawTask &) = delete;
+    RedrawTask &operator=(const RedrawTask &) = delete;
+
+   public:
+
+    RedrawTask(AbstractView *view)
+        : Task(), view_(view) {}
+
+    virtual ~RedrawTask() {}
+
+    virtual void Run() const final;
+
+    static RedrawTask *Get(const AbstractView *view);
+
+    Context context;
+
+   private:
+
+    AbstractView *view_;
+
+  };
 
   /**
    * @brief Default constructor

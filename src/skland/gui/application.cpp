@@ -77,6 +77,8 @@ struct Application::Private {
   int argc;
   char **argv;
 
+  std::thread::id thread_id;
+
   /**
 * @brief Create an epoll file descriptor
 * @return a nonnegative file descriptor or -1
@@ -184,6 +186,7 @@ Application::Application(int argc, char *argv[]) {
   p_.reset(new Private(this));
   p_->argc = argc;
   p_->argv = argv;
+  p_->thread_id = std::this_thread::get_id();
 
   if (kInstance != nullptr)
     throw std::runtime_error("Error! There should be only one application instance!");
@@ -295,6 +298,10 @@ int Application::GetArgc() {
 
 char** Application::GetArgv() {
   return kInstance->p_->argv;
+}
+
+const std::thread::id& Application::GetThreadID() {
+  return kInstance->p_->thread_id;
 }
 
 }

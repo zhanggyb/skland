@@ -28,7 +28,6 @@
 #include <skland/stock/theme.hpp>
 
 #include "internal/abstract-view_private.hpp"
-#include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include "SkCanvas.h"
 #include "SkImage.h"
@@ -210,7 +209,7 @@ int AbstractShellView::GetHeight() const {
   return p_->size.height;
 }
 
-AbstractShellView* AbstractShellView::GetParent() const {
+AbstractShellView *AbstractShellView::GetParent() const {
   return p_->parent;
 }
 
@@ -420,92 +419,83 @@ void AbstractShellView::OnXdgToplevelClose() {
 
 void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event) {
   Point cursor = event->GetWindowXY();
-  MouseTaskIterator it(this);
+  EventTask *mouse_task = EventTask::GetMouseTask(this);
 
-  if (nullptr == it.next()) {
-    _ASSERT(it.mouse_task()->event_handler == this);
-    _ASSERT(nullptr == it.previous());
+  if (nullptr == mouse_task->next()) {
+    _ASSERT(mouse_task->event_handler() == this);
+    _ASSERT(nullptr == mouse_task->previous());
     if (view->Contain(cursor.x, cursor.y)) {
       view->OnMouseEnter(event);
       if (event->IsAccepted()) {
-        it.PushBack(view);
-        ++it;
-        DispatchMouseEnterEvent(view, event, it);
+        mouse_task->PushBack(EventTask::GetMouseTask(view));
+        mouse_task = static_cast<EventTask *>(mouse_task->next());
+        DispatchMouseEnterEvent(view, event, mouse_task);
       } else if (event->IsIgnored()) {
-        DispatchMouseEnterEvent(view, event, it);
+        DispatchMouseEnterEvent(view, event, mouse_task);
       }
     }
   } else {
-    while (it.next()) ++it; // move to tail
+    while (mouse_task->next()) mouse_task = static_cast<EventTask *>(mouse_task->next()); // move to tail
     AbstractView *last = nullptr;
     EventTask *tail = nullptr;
-    while (it.previous()) {
-      tail = it.mouse_task();
-      last = static_cast<AbstractView *>(tail->event_handler);
+    while (mouse_task->previous()) {
+      tail = mouse_task;
+      last = static_cast<AbstractView *>(tail->event_handler());
       if (last->Contain(cursor.x, cursor.y)) {
         break;
       }
-      --it;
+      mouse_task = static_cast<EventTask *>(mouse_task->previous());
       tail->Unlink();
       last->OnMouseLeave();
-      if (nullptr == it.previous()) break;
+      if (nullptr == mouse_task->previous()) break;
     }
 
-    DispatchMouseEnterEvent(last, event, it);
+    DispatchMouseEnterEvent(last, event, mouse_task);
   }
 }
 
 void AbstractShellView::DispatchMouseLeaveEvent() {
-  MouseTaskIterator it(this);
-  EventTask *task = nullptr;
-  ++it;
+  Task *it = EventTask::GetMouseTask(this)->next();
 
+  Task *tmp = nullptr;
   while (it) {
-    task = it.mouse_task();
-    ++it;
-    task->Unlink();
-    static_cast<AbstractView *>(task->event_handler)->OnMouseLeave();
+    tmp = it;
+    it = it->next();
+    tmp->Unlink();
+    static_cast<EventTask *>(tmp)->event_handler()->OnMouseLeave();
   }
 }
 
 void AbstractShellView::DispatchMouseDownEvent(MouseEvent *event) {
   _ASSERT(event->GetState() == kMouseButtonPressed);
 
-  MouseTaskIterator it(this);
-  ++it;
-
-  AbstractView *view = nullptr;
+  Task *it = EventTask::GetMouseTask(this)->next();
   while (it) {
-    view = static_cast<AbstractView *>(it.mouse_task()->event_handler);
-    view->OnMouseDown(event);
+    static_cast<EventTask *>(it)->event_handler()->OnMouseDown(event);
     if (event->IsRejected()) break;
-    ++it;
+    it = it->next();
   }
 }
 
 void AbstractShellView::DispatchMouseUpEvent(MouseEvent *event) {
   _ASSERT(event->GetState() == kMouseButtonReleased);
 
-  MouseTaskIterator it(this);
-  ++it;
-
-  AbstractView *view = nullptr;
+  Task *it = EventTask::GetMouseTask(this)->next();
   while (it) {
-    view = static_cast<AbstractView *>(it.mouse_task()->event_handler);
-    view->OnMouseUp(event);
+    static_cast<EventTask *>(it)->event_handler()->OnMouseUp(event);
     if (event->IsRejected()) break;
-    ++it;
+    it = it->next();
   }
 }
 
-void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, MouseTaskIterator &tail) {
+void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, EventTask *tail) {
   AbstractView *sub = parent->DispatchMouseEnterEvent(event);
   while (sub) {
     _ASSERT(sub != parent);
     sub->OnMouseEnter(event);
     if (event->IsAccepted()) {
-      tail.PushBack(sub);
-      ++tail;
+      tail->PushBack(EventTask::GetMouseTask(sub));
+      tail = static_cast<EventTask *>(tail->next());
       parent = sub;
       sub = parent->DispatchMouseEnterEvent(event);
     } else if (event->IsIgnored()) {
@@ -604,6 +594,24 @@ void AbstractShellView::DropShadow(const Context *context) {
                                     2 * rad, height - 2 * rad),
                    nullptr);
   c->restore();
+}
+
+// ---------
+
+void AbstractShellView::RedrawTask::Run() const {
+  shell_view_->OnDraw(&context);
+
+  if (shell_view_->p_->is_damaged) {
+    context.surface()->Damage(shell_view_->p_->damaged_region.x(),
+                              shell_view_->p_->damaged_region.y(),
+                              shell_view_->p_->damaged_region.width(),
+                              shell_view_->p_->damaged_region.height());
+    shell_view_->p_->is_damaged = false;
+  }
+}
+
+AbstractShellView::RedrawTask *AbstractShellView::RedrawTask::Get(const AbstractShellView *shell_view) {
+  return &shell_view->p_->redraw_task;
 }
 
 }

@@ -20,7 +20,6 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/region.hpp>
 
-#include "internal/abstract-shell-view_redraw-task.hpp"
 #include "internal/abstract-view_iterators.hpp"
 
 #include <GLES2/gl2.h>

@@ -19,6 +19,7 @@
 
 #include "abstract-event-handler.hpp"
 
+#include "context.hpp"
 #include "../core/rect.hpp"
 #include "../core/margin.hpp"
 
@@ -44,7 +45,33 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
  public:
 
-  struct RedrawTask;
+  /**
+   * @brief A task to process shell view rendering in event loop
+   */
+  class RedrawTask : public Task {
+
+    RedrawTask() = delete;
+    RedrawTask(const RedrawTask &) = delete;
+    RedrawTask &operator=(const RedrawTask &) = delete;
+
+   public:
+
+    RedrawTask(AbstractShellView *shell_view)
+        : Task(), shell_view_(shell_view) {}
+
+    virtual ~RedrawTask() {}
+
+    virtual void Run() const final;
+
+    static RedrawTask *Get(const AbstractShellView *shell_view);
+
+    Context context;
+
+   private:
+
+    AbstractShellView *shell_view_;
+
+  };
 
   /**
    * @brief Enumeration values to indicate where the mouse
@@ -256,7 +283,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void DispatchMouseEnterEvent(AbstractView *parent,
                                MouseEvent *event,
-                               MouseTaskIterator &tail);
+                               EventTask *tail);
 
   /**
    * @brief The private data

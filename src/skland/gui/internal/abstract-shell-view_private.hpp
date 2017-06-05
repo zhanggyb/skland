@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_
 
-#include "abstract-shell-view_redraw-task.hpp"
+#include "skland/gui/abstract-shell-view.hpp"
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
