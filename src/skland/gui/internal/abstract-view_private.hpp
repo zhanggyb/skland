@@ -17,16 +17,13 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_
 
-#include <skland/core/padding.hpp>
 #include "abstract-view_redraw-task.hpp"
 
+#include <skland/core/padding.hpp>
 #include "skland/gui/anchor.hpp"
 #include "skland/gui/anchor-group.hpp"
 
 namespace skland {
-
-class AbstractShellView;
-class AbstractLayout;
 
 /**
  * @ingroup gui_intern

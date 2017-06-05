@@ -16,8 +16,8 @@
 
 #include <skland/gui/window.hpp>
 
-#include "internal/abstract-shell-view_iterators.hpp"
-#include "internal/abstract-view_iterators.hpp"
+#include "internal/abstract-shell-view_redraw-task.hpp"
+#include "internal/abstract-view_redraw-task.hpp"
 #include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include <skland/core/assert.hpp>
@@ -41,7 +41,11 @@
 
 namespace skland {
 
-struct Window::Private {
+/**
+ * @ingroup gui_intern
+ * @brief The private structure for Window
+ */
+SKLAND_NO_EXPORT struct Window::Private {
 
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
@@ -55,19 +59,20 @@ struct Window::Private {
 
   ~Private() {}
 
+  /** The surface for rendering views in this window */
   Surface *main_surface;
 
-  /* Properties for frame surface, JUST experimental */
   SharedMemoryPool pool;
 
   Buffer frame_buffer;
   std::shared_ptr<Canvas> frame_canvas;
 
-  /* Properties for main surface, JUST experimental */
   Buffer main_buffer;
   std::shared_ptr<Canvas> main_canvas;
 
+  /** The default title bar */
   TitleBar *title_bar;
+
   AbstractView *content_view;
 
   int flags;
@@ -75,6 +80,8 @@ struct Window::Private {
   const Output *output;
 
 };
+
+// --------------
 
 Window::Window(const char *title, int flags)
     : Window(640, 480, title, flags) {
@@ -87,8 +94,8 @@ Window::Window(int width, int height, const char *title, int flags)
 
   Surface *shell_surface = GetShellSurface();
 
-  // Create a sub surface for views:
   if (!(flags & kFlagMaskFrameless)) {
+    // Create a sub surface for views in this window:
     p_->main_surface = Surface::Sub::Create(shell_surface, this, Theme::GetShadowMargin());
     _ASSERT(p_->main_surface->GetParent() == shell_surface);
     _ASSERT(p_->main_surface->GetSiblingBelow() == shell_surface);
@@ -143,23 +150,20 @@ void Window::SetContentView(AbstractView *view) {
   if (nullptr == p_->content_view) return;
 
   AttachView(p_->content_view);
-
-  RectI geometry = GetContentGeometry();
-  p_->content_view->MoveTo(geometry.x(), geometry.y());
-  p_->content_view->Resize(geometry.width(), geometry.height());
+  SetContentViewGeometry();
 }
 
 void Window::OnShown() {
-  _ASSERT(p_->output);
-
-  Surface *shell_surface = this->GetShellSurface();
+  Surface *shell_surface = GetShellSurface();
 
   int scale = 1;
-  const Deque &outputs = Display::GetOutputs();
-  if (outputs.count()) {
-    p_->output = static_cast<const Output *>(outputs[0]);
-    scale = p_->output->GetScale();
+  if (nullptr == p_->output) {
+    const Deque &outputs = Display::GetOutputs();
+    if (outputs.count()) {
+      p_->output = static_cast<const Output *>(outputs[0]);
+    }
   }
+  if (p_->output) scale = p_->output->GetScale();
   shell_surface->SetScale(scale);
 
   // Create buffer:
@@ -170,7 +174,7 @@ void Window::OnShown() {
   height += margin.tb() * scale;
 
   int32_t pool_size = width * 4 * height;
-  if (p_->main_surface) pool_size *= 2; // double buffer for 2 surfaces
+  if (p_->main_surface) pool_size *= 2; // double buffer for 2 surfaces, not frameless
 
   p_->pool.Setup(pool_size);
 
@@ -198,14 +202,12 @@ void Window::OnShown() {
 
   OnUpdate(nullptr);
   if (p_->title_bar) {
+    AbstractShellView::DispatchUpdate(p_->title_bar);
     p_->title_bar->Resize(GetWidth(), TitleBar::kHeight);
-    AbstractShellView::RecursiveUpdate(p_->title_bar);
   }
   if (p_->content_view) {
-    RectI geometry = GetContentGeometry();
-    p_->content_view->MoveTo(geometry.x(), geometry.y());
-    p_->content_view->Resize(geometry.width(), geometry.height());
-    AbstractShellView::RecursiveUpdate(p_->content_view);
+    AbstractShellView::DispatchUpdate(p_->content_view);
+    SetContentViewGeometry();
   }
 }
 
@@ -221,9 +223,9 @@ void Window::OnUpdate(AbstractView *view) {
     int height = GetHeight();
     const Margin &margin = surface->GetMargin();
 
-    Iterator it(this);
-    PushToTail(&it.redraw_task());
-    it.redraw_task().context = Context(surface, p_->frame_canvas);
+    RedrawTask *redraw_task = RedrawTask::Get(this);
+    redraw_task->context = Context(surface, p_->frame_canvas);
+    PushToTail(redraw_task);
     _ASSERT(p_->frame_canvas);
     Damage(this,
            0, 0,
@@ -240,9 +242,9 @@ void Window::OnUpdate(AbstractView *view) {
       canvas = p_->frame_canvas;
     }
 
-    AbstractView::Iterator it(view);
-    PushToTail(&it.redraw_task());
-    it.redraw_task().context = Context(surface, canvas);
+    AbstractView::RedrawTask *redraw_task = AbstractView::RedrawTask::Get(view);
+    PushToTail(redraw_task);
+    redraw_task->context = Context(surface, canvas);
     _ASSERT(canvas);
     Damage(view,
            view->GetX() + surface->GetMargin().left,
@@ -319,15 +321,13 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   OnUpdate(nullptr);
 
   if (p_->title_bar) {
+    AbstractShellView::DispatchUpdate(p_->title_bar);
     p_->title_bar->Resize(new_size.width, TitleBar::kHeight);
-    AbstractShellView::RecursiveUpdate(p_->title_bar);
   }
 
   if (p_->content_view) {
-    RectI geometry = GetContentGeometry();
-    p_->content_view->MoveTo(geometry.x(), geometry.y());
-    p_->content_view->Resize(geometry.width(), geometry.height());
-    AbstractShellView::RecursiveUpdate(p_->content_view);
+    AbstractShellView::DispatchUpdate(p_->content_view);
+    SetContentViewGeometry();
   }
 }
 
@@ -609,8 +609,9 @@ void Window::OnEnterOutput(const Surface *surface, const Output *output) {
   if (p_->output == output) return;
 
   p_->output = output;
-  if (surface == GetShellSurface()) {
-    GetShellSurface()->SetScale(output->GetScale());
+  Surface *shell_surface = GetShellSurface();
+  if (surface == shell_surface) {
+    shell_surface->SetScale(output->GetScale());
   } else if (surface == p_->main_surface) {
     p_->main_surface->SetScale(output->GetScale());
   }
@@ -618,6 +619,8 @@ void Window::OnEnterOutput(const Surface *surface, const Output *output) {
 
 void Window::OnLeaveOutput(const Surface *surface, const Output *output) {
   if (p_->output != output) return;
+
+  p_->output = nullptr;
 
   int scale = 1;
   const Deque &outputs = Display::GetOutputs();
@@ -672,7 +675,7 @@ int Window::GetMouseLocation(const MouseEvent *event) const {
   return location;
 }
 
-Rect Window::GetContentGeometry() const {
+RectI Window::GetContentGeometry() const {
   int x = 0;
   int y = 0;
   int w = GetWidth();
@@ -681,7 +684,7 @@ Rect Window::GetContentGeometry() const {
     y += p_->title_bar->GetHeight();
     h -= p_->title_bar->GetHeight();
   }
-  return Rect::FromXYWH(x, y, w, h);
+  return RectI::FromXYWH(x, y, w, h);
 }
 
 void Window::OnFullscreenButtonClicked(SLOT slot) {
@@ -698,6 +701,12 @@ void Window::OnFullscreenButtonClicked(SLOT slot) {
       }
     }
   }
+}
+
+void Window::SetContentViewGeometry() {
+  const RectI geometry = GetContentGeometry();
+  p_->content_view->MoveTo(geometry.x(), geometry.y());
+  p_->content_view->Resize(geometry.width(), geometry.height());
 }
 
 }

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ITERATOR_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ITERATOR_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ITERATORS_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ITERATORS_HPP_
 
 #include <skland/gui/abstract-view.hpp>
 #include "abstract-view_private.hpp"
@@ -88,8 +88,6 @@ SKLAND_NO_EXPORT class AbstractView::Iterator {
     return it;
   }
 
-  Surface *GetSurface() const { return view_->GetSurface(view_); }
-
   AbstractView *parent() const { return view_->p_->parent; }
 
   AbstractView *previous() const { return view_->p_->previous; }
@@ -100,11 +98,7 @@ SKLAND_NO_EXPORT class AbstractView::Iterator {
 
   AbstractView *last_child() const { return view_->p_->last_child; }
 
-  AbstractLayout *layout() const { return view_->p_->layout; }
-
   AbstractView *view() const { return view_; }
-
-  RedrawTask &redraw_task() const { return view_->p_->redraw_task; }
 
   operator bool() const { return nullptr != view_; }
 
@@ -176,8 +170,6 @@ class AbstractView::ConstIterator {
     return it;
   }
 
-  const Surface *GetSurface() const { return view_->GetSurface(view_); }
-
   const AbstractView *parent() const { return view_->p_->parent; }
 
   const AbstractView *previous() const { return view_->p_->previous; }
@@ -188,11 +180,7 @@ class AbstractView::ConstIterator {
 
   const AbstractView *last_child() const { return view_->p_->last_child; }
 
-  const AbstractLayout *layout() const { return view_->p_->layout; }
-
   const AbstractView *view() const { return view_; }
-
-  const RedrawTask &redraw_task() const { return view_->p_->redraw_task; }
 
   operator bool() const { return nullptr != view_; }
 
@@ -204,4 +192,4 @@ class AbstractView::ConstIterator {
 
 }
 
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ITERATOR_HPP_
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ITERATORS_HPP_

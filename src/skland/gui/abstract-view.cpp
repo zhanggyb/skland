@@ -463,6 +463,14 @@ void AbstractView::Destroy() {
   delete this;
 }
 
+AbstractView* AbstractView::GetParent() const {
+  return p_->parent;
+}
+
+AbstractLayout* AbstractView::GetLayout() const {
+  return p_->layout;
+}
+
 void AbstractView::OnChildAdded(AbstractView */*view*/) {
   // override in subclass
 }

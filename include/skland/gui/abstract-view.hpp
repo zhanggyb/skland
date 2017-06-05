@@ -31,6 +31,7 @@
 namespace skland {
 
 class AbstractShellView;
+class AbstractLayout;
 class Context;
 
 /**
@@ -380,6 +381,10 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   void Destroy();
 
+  AbstractView *GetParent() const;
+
+  AbstractLayout *GetLayout() const;
+
   SignalRef<AbstractView *> destroyed() { return destroyed_; }
 
  protected:
@@ -444,13 +449,13 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   /**
    * @brief A view request an update
-   * @param view This view or a sub view in hierachy
+   * @param view This view or a sub view in hierarchy
    */
   virtual void OnUpdate(AbstractView *view) override;
 
   /**
    * @brief Get surface for the given view
-   * @param view A view object, it is always this view or a sub view in hierachy
+   * @param view A view object, it is always this view or a sub view in hierarchy
    * @return A pointer to a surface or nullptr
    */
   virtual Surface *GetSurface(const AbstractView *view) const;

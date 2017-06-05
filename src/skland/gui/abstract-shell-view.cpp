@@ -28,7 +28,6 @@
 #include <skland/stock/theme.hpp>
 
 #include "internal/abstract-view_private.hpp"
-#include "internal/display_native.hpp"
 #include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
 #include "SkCanvas.h"
@@ -59,6 +58,9 @@ AbstractShellView::AbstractShellView(int width,
     p_->shell_surface = Surface::Shell::Toplevel::Create(this, Theme::GetShadowMargin());
     Surface::Shell::Toplevel *top_level_role = Surface::Shell::Toplevel::Get(p_->shell_surface);
     top_level_role->SetTitle(title);
+
+    // Set focus on, this will avoid draw the frame in Window twice when initially shows
+    Bit::Set<int>(p_->flags, Private::kFlagMaskFocused);
   } else {
     // TODO: create popup shell surface
   }
@@ -208,6 +210,10 @@ int AbstractShellView::GetHeight() const {
   return p_->size.height;
 }
 
+AbstractShellView* AbstractShellView::GetParent() const {
+  return p_->parent;
+}
+
 void AbstractShellView::AttachView(AbstractView *view) {
   if (view->p_->shell == this) {
     _ASSERT(nullptr == view->p_->parent);
@@ -339,7 +345,7 @@ void AbstractShellView::Damage(AbstractView *view,
   view->p_->damaged_region.Resize(width, height);
 }
 
-void AbstractShellView::RecursiveUpdate(AbstractView *view) {
+void AbstractShellView::DispatchUpdate(AbstractView *view) {
   view->Update();
   view->DispatchUpdate();
 }
@@ -378,6 +384,11 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
   bool resizing = (0 != (states & Surface::Shell::Toplevel::kStateMaskResizing));
   bool focus = (0 != (states & Surface::Shell::Toplevel::kStateMaskActivated));
 
+  if (resizing != IsResizing()) {
+    // TODO: no need to use this flag
+    Bit::Inverse<int>(p_->flags, Private::kFlagMaskResizing);
+  }
+
   if (maximized != IsMaximized()) {
     Bit::Inverse<int>(p_->flags, Private::kFlagMaskMaximized);
     OnMaximized(maximized);
@@ -388,6 +399,11 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
     OnFullscreen(fullscreen);
   }
 
+  if (focus != IsFocused()) {
+    Bit::Inverse<int>(p_->flags, Private::kFlagMaskFocused);
+    OnFocus(focus);
+  }
+
   if (do_resize) {
     Surface::Shell::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
     OnSizeChange(p_->last_size, p_->size);
@@ -395,16 +411,6 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
 
     // surface size is changed, reset the pointer position and enter/leave widgets
     DispatchMouseLeaveEvent();
-  }
-
-  if (focus != IsFocused()) {
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskFocused);
-    OnFocus(focus);
-  }
-
-  if (resizing != IsResizing()) {
-    // TODO: no need to use this flag
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskResizing);
   }
 }
 

@@ -52,9 +52,7 @@ class Callback {
   /**
    * @brief A delegate to the 'done' event
    */
-  DelegateRef<void(uint32_t)> done() {
-    return done_;
-  }
+  DelegateRef<void(uint32_t)> done() { return done_; }
 
  private:
 

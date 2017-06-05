@@ -44,9 +44,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
  public:
 
-  class Iterator;
-  class ConstIterator;
-
   struct RedrawTask;
 
   /**
@@ -146,22 +143,33 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   int GetHeight() const;
 
+  AbstractShellView *GetParent() const;
+
   static const Margin kResizingMargin;
 
  protected:
 
   /**
- * @brief Attach a given view to this shell view
- * @param view
- */
+   * @brief Attach a given view to this shell view
+   * @param view
+   *
+   * @note This method does not check if the given view is nullptr.
+   */
   void AttachView(AbstractView *view);
 
   /**
    * @brief Detach the view from this shell view
    * @param view
+   *
+   * @note This method does not check if the given view is nullptr.
    */
   void DetachView(AbstractView *view);
 
+  /**
+   * @brief A virtual method called when this shell view is first shown
+   *
+   * @note This is called only once.
+   */
   virtual void OnShown() = 0;
 
   virtual void OnSizeChange(const Size &old_size, const Size &new_size) = 0;
@@ -221,16 +229,20 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    *
    * 'Damange an area in the surface' is a wayland concept.
    */
-  static void Damage(AbstractShellView *shell_view, int surface_x, int surface_y, int width, int height);
+  static void Damage(AbstractShellView *shell_view,
+                     int surface_x, int surface_y,
+                     int width, int height);
 
   /**
    * @brief Mark damage area of the given object
    *
    * 'Damange an area in the surface' is a wayland concept.
    */
-  static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
+  static void Damage(AbstractView *view,
+                     int surface_x, int surface_y,
+                     int width, int height);
 
-  static void RecursiveUpdate(AbstractView *view);
+  static void DispatchUpdate(AbstractView *view);
 
  private:
 
@@ -242,7 +254,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void OnXdgToplevelClose();
 
-  void DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, MouseTaskIterator &tail);
+  void DispatchMouseEnterEvent(AbstractView *parent,
+                               MouseEvent *event,
+                               MouseTaskIterator &tail);
 
   /**
    * @brief The private data

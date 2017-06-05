@@ -24,8 +24,13 @@
 
 namespace skland {
 
+/**
+ * @ingroup gui_intern
+ * @brief A task structure to process shell view rendering in event loop
+ */
 SKLAND_NO_EXPORT struct AbstractShellView::RedrawTask : public Task {
 
+  RedrawTask() = delete;
   RedrawTask(const RedrawTask &) = delete;
   RedrawTask &operator=(const RedrawTask &) = delete;
 
@@ -38,6 +43,8 @@ SKLAND_NO_EXPORT struct AbstractShellView::RedrawTask : public Task {
 
   AbstractShellView *shell_view;
   Context context;
+
+  static RedrawTask *Get(const AbstractShellView *shell_view);
 
 };
 

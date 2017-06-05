@@ -32,4 +32,8 @@ void AbstractShellView::RedrawTask::Run() const {
   }
 }
 
+AbstractShellView::RedrawTask *AbstractShellView::RedrawTask::Get(const AbstractShellView *shell_view) {
+  return &shell_view->p_->redraw_task;
+}
+
 }

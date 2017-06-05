@@ -21,19 +21,15 @@
 
 namespace skland {
 
-class AbstractWidget;
-class Surface;
-class Canvas;
-class TitleBar;
-
 /**
  * @ingroup gui
- * @brief A simple window with client-side decorations
+ * @brief A default window with a client-side decorations
  *
  * @example hello.cpp
  */
 SKLAND_EXPORT class Window : public AbstractShellView {
 
+  Window() = delete;
   Window(const Window &) = delete;
   Window &operator=(const Window &) = delete;
 
@@ -49,10 +45,24 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual ~Window();
 
+  /**
+   * @brief Get the title bar view
+   * @return
+   *    - A title bar object
+   *    - nullptr if this is a frameless window
+   */
   AbstractView *GetTitleBar() const;
 
+  /**
+   * @brief Get the content view
+   * @return
+   */
   AbstractView *GetContentView() const;
 
+  /**
+   * @brief Set the content view
+   * @param view
+   */
   void SetContentView(AbstractView *view);
 
  protected:
@@ -91,13 +101,15 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   int GetMouseLocation(const MouseEvent *event) const;
 
-  Rect GetContentGeometry() const;
+  RectI GetContentGeometry() const;
 
  private:
 
   struct Private;
 
   void OnFullscreenButtonClicked(__SLOT__);
+
+  void SetContentViewGeometry();
 
   std::unique_ptr<Private> p_;
 

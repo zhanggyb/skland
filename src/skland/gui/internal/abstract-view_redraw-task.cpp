@@ -56,4 +56,8 @@ void AbstractView::RedrawTask::Run() const {
   view->p_->is_drawing = false;
 }
 
+AbstractView::RedrawTask *AbstractView::RedrawTask::Get(const AbstractView *view) {
+  return &view->p_->redraw_task;
+}
+
 }

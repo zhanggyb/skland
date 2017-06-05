@@ -22,8 +22,6 @@
 using namespace skland;
 
 int main(int argc, char *argv[]) {
-  using skland::Window;
-
   Application app(argc, argv);
 
   Window win(400, 300, "Event Demo");

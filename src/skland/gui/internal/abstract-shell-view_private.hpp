@@ -71,8 +71,6 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
 
   /**
    * @brief App ID string for the top level window
-   *
-   * TODO: support multi-language
    */
   std::string app_id;
 

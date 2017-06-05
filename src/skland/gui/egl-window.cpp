@@ -28,7 +28,6 @@
 #include <skland/gui/region.hpp>
 
 #include "internal/display_native.hpp"
-#include "internal/abstract-shell-view_iterators.hpp"
 #include "internal/abstract-view_iterators.hpp"
 #include "internal/abstract-event-handler_mouse-task-iterator.hpp"
 
@@ -136,9 +135,9 @@ void EGLWindow::OnUpdate(AbstractView *view) {
 
   if (nullptr == view) {
     surface = this->GetShellSurface();
-    Iterator it(this);
-    PushToTail(&it.redraw_task());
-    it.redraw_task().context = Context(surface, p_->frame_canvas);
+    RedrawTask *redraw_task = RedrawTask::Get(this);
+    redraw_task->context = Context(surface, p_->frame_canvas);
+    PushToTail(redraw_task);
     _ASSERT(p_->frame_canvas);
     Damage(this,
            0, 0,
@@ -286,7 +285,7 @@ void EGLWindow::OnKeyDown(KeyEvent *event) {
 }
 
 void EGLWindow::OnDraw(const Context *context) {
-  Canvas* canvas = context->canvas();
+  Canvas *canvas = context->canvas();
   canvas->Clear();
 
   Path path;
