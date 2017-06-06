@@ -185,7 +185,7 @@ void AbstractView::MoveTo(int x, int y) {
     Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyTopMask);
   }
 
-  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 const Padding &AbstractView::GetPadding() const {
@@ -219,7 +219,7 @@ void AbstractView::Resize(int width, int height) {
     Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyBottomMask);
   }
 
-  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetX() const {
@@ -252,7 +252,7 @@ void AbstractView::SetLeft(int left) {
   else
     Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyWidthMask);
 
-  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetTop() const {
@@ -277,7 +277,7 @@ void AbstractView::SetTop(int top) {
   else
     Bit::Set<int>(p_->dirty_flag, Private::kDirtyTopMask | Private::kDirtyHeightMask);
 
-  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetRight() const {
@@ -299,7 +299,7 @@ void AbstractView::SetRight(int right) {
   else
     Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyWidthMask);
 
-  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetBottom() const {
@@ -321,7 +321,7 @@ void AbstractView::SetBottom(int bottom) {
   else
     Bit::Set<int>(p_->dirty_flag, Private::kDirtyBottomMask | Private::kDirtyHeightMask);
 
-  OnGeometryWillChange(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetWidth() const {
@@ -422,6 +422,8 @@ const AnchorGroup &AbstractView::GetAnchorGroup(Alignment align) const {
 
 void AbstractView::Update() {
   if (p_->is_drawing) return;
+
+  if (p_->redraw_task.IsLinked()) return;
 
   OnUpdate(this);
 }

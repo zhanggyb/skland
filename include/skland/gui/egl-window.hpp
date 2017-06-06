@@ -52,6 +52,8 @@ class EGLWindow : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
+  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
+
   virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
 
   virtual void OnMouseMove(MouseEvent *event) override;
@@ -85,6 +87,10 @@ class EGLWindow : public AbstractShellView {
   void OnFrame(uint32_t serial);
 
   void OnRelease();
+
+  void RequestUpdate();
+
+  void CancelUpdate();
 
   std::unique_ptr<Private> p_;
 

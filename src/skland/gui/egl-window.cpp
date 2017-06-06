@@ -124,26 +124,11 @@ void EGLWindow::OnShown() {
                               (float) shell_surface->GetMargin().top);
   p_->frame_canvas->Clear();
 
-  OnUpdate(nullptr);
+  RequestUpdate();
 }
 
 void EGLWindow::OnUpdate(AbstractView *view) {
-  if (!IsShown()) return;
-
-  Surface *surface = nullptr;
-
-  if (nullptr == view) {
-    surface = this->GetShellSurface();
-    RedrawTask *redraw_task = RedrawTask::Get(this);
-    redraw_task->context = Context(surface, p_->frame_canvas);
-    PushToTail(redraw_task);
-    _ASSERT(p_->frame_canvas);
-    Damage(this,
-           0, 0,
-           GetWidth() + surface->GetMargin().lr(),
-           GetHeight() + surface->GetMargin().tb());
-    surface->Commit();
-  }
+  return;
 }
 
 Surface *EGLWindow::GetSurface(const AbstractView *view) const {
@@ -151,6 +136,34 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
     return GetShellSurface();
 
   return nullptr != p_->sub_surface ? p_->sub_surface : GetShellSurface();
+}
+
+bool EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
+  Size min = this->GetMinimalSize();
+  Size max = this->GetMaximalSize();
+  _ASSERT(min.width < max.width && min.height < max.height);
+
+  if (new_size.width < min.width || new_size.height < min.height) return false;
+  if (new_size.width > max.width || new_size.height > max.height) return false;
+
+  RedrawTask *redraw_task = RedrawTask::Get(this);
+
+  if (old_size == new_size) {
+    redraw_task->Unlink();
+    return false;
+  }
+
+  PushToTail(redraw_task);
+
+  Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
+  // surface size is changed, reset the pointer position and enter/leave widgets
+
+  p_->egl_surface->Resize(new_size.width, new_size.height);
+  OnResize(new_size.width, new_size.height);
+
+  DispatchMouseLeaveEvent();
+
+  return true;
 }
 
 void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
@@ -185,10 +198,16 @@ void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
   p_->frame_canvas->SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
   p_->frame_canvas->Clear();
 
-  p_->egl_surface->Resize(new_size.width, new_size.height);
-  OnResize(new_size.width, new_size.height);
-
-  OnUpdate(nullptr);
+  const Margin &margin = shell_surface->GetMargin();
+  RedrawTask *redraw_task = RedrawTask::Get(this);
+  redraw_task->context = Context(shell_surface, p_->frame_canvas);
+  PushToTail(redraw_task);
+  _ASSERT(p_->frame_canvas);
+  Damage(this,
+         0, 0,
+         GetWidth() + margin.lr(),
+         GetHeight() + margin.tb());
+  shell_surface->Commit();
 }
 
 void EGLWindow::OnMouseMove(MouseEvent *event) {
@@ -331,7 +350,7 @@ void EGLWindow::OnDraw(const Context *context) {
 }
 
 void EGLWindow::OnFocus(bool) {
-  OnUpdate(nullptr);
+  RequestUpdate();
 }
 
 void EGLWindow::OnInitialize() {
@@ -411,6 +430,26 @@ void EGLWindow::OnFrame(uint32_t serial) {
 
 void EGLWindow::OnRelease() {
 //  fprintf(stderr, "on release\n");
+}
+
+void EGLWindow::RequestUpdate() {
+  Surface *shell_surface = GetShellSurface();
+  const Margin &margin = shell_surface->GetMargin();
+
+  RedrawTask *redraw_task = RedrawTask::Get(this);
+  redraw_task->context = Context(shell_surface, p_->frame_canvas);
+  PushToTail(redraw_task);
+  _ASSERT(p_->frame_canvas);
+  Damage(this,
+         0, 0,
+         GetWidth() + margin.lr(),
+         GetHeight() + margin.tb());
+  shell_surface->Commit();
+}
+
+void EGLWindow::CancelUpdate() {
+  RedrawTask *redraw_task = RedrawTask::Get(this);
+  redraw_task->Unlink();
 }
 
 }

@@ -70,7 +70,7 @@ Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
   return sub_surface_;
 }
 
-void EGLWidget::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void EGLWidget::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   if (dirty_flag)
     Update();
   else

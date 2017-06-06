@@ -497,7 +497,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    *
    * The new size will never smaller than minimal size or larger than maximal size.
    */
-  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
+  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
 
   /**
    * @brief Callback when the geometry changes before draw this view

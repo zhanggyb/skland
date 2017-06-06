@@ -69,7 +69,7 @@ class MainWidget : public AbstractView {
 
  protected:
 
-  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
     if (dirty_flag) Update();
     else CancelUpdate();
   }

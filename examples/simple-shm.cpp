@@ -29,24 +29,24 @@
 
 using namespace skland;
 
-class ShmWidget : public AbstractView {
+class SpinningView : public AbstractView {
 
  public:
 
-  ShmWidget()
+  SpinningView()
       : AbstractView(),
         context_(nullptr),
         angle_(0.f),
         running_animation_(false) {
     color_ = 0xFF4FBF4F;
-    frame_callback_.done().Set(this, &ShmWidget::OnFrame);
+    frame_callback_.done().Set(this, &SpinningView::OnFrame);
   }
 
-  virtual ~ShmWidget() {}
+  virtual ~SpinningView() {}
 
  protected:
 
-  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
     if (!running_animation_)
       Update();
   }
@@ -96,7 +96,7 @@ class ShmWidget : public AbstractView {
  private:
 
   void Animate() {
-    static int padding = 0;
+    static const int padding = 0;
     Canvas *canvas = context_->canvas();
     canvas->Save();
     int scale = context_->surface()->GetScale();
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
   Window *win = new Window(320, 280, "Simple Shm");
   win->SetAppId("Simple-Shm");
 
-  ShmWidget *widget = new ShmWidget;
+  SpinningView *widget = new SpinningView;
   win->SetContentView(widget);
 
   win->Show();

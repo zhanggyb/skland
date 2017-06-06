@@ -47,7 +47,7 @@ class EGLWidget : public AbstractView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
 
   virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
 

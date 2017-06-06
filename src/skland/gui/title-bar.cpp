@@ -300,7 +300,7 @@ AbstractButton *TitleBar::GetButton(ButtonType button_type) const {
   }
 }
 
-void TitleBar::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void TitleBar::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   int new_y = (GetHeight() - close_button_->GetHeight()) / 2;
   int new_x = kButtonSpace;
   close_button_->MoveTo(new_x, new_y);

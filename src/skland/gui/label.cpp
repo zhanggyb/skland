@@ -83,7 +83,7 @@ void Label::SetFont(const Font &font) {
   Update();
 }
 
-void Label::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void Label::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   if (dirty_flag) {
     Update();
   } else {

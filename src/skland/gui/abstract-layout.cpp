@@ -71,7 +71,7 @@ void AbstractLayout::Layout() {
   Update();
 }
 
-void AbstractLayout::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void AbstractLayout::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   if (dirty_flag) {
     Layout();
   } else {

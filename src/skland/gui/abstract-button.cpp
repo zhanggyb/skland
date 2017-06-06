@@ -155,7 +155,7 @@ void AbstractButton::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void AbstractButton::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
   if (dirty_flag) {
     Update();
   } else {

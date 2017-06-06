@@ -52,7 +52,7 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual ~AbstractLayout();
 
-  virtual void OnGeometryWillChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
 
   virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
 

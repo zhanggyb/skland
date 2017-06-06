@@ -361,32 +361,10 @@ void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {
 }
 
 void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states) {
-  if (width == 0 || height == 0) return;
-
-  bool do_resize = true;
-
-  Size min = this->GetMinimalSize();
-  Size max = this->GetMaximalSize();
-  _ASSERT(min.width < max.width && min.height < max.height);
-
-  width = clamp(width, min.width, max.width);
-  height = clamp(height, min.height, max.height);
-  if (width == p_->size.width && height == p_->size.height) {
-    do_resize = false;
-  } else {
-    p_->size.width = width;
-    p_->size.height = height;
-  }
-
   bool maximized = (0 != (states & Surface::Shell::Toplevel::kStateMaskMaximized));
   bool fullscreen = (0 != (states & Surface::Shell::Toplevel::kStateMaskFullscreen));
   bool resizing = (0 != (states & Surface::Shell::Toplevel::kStateMaskResizing));
   bool focus = (0 != (states & Surface::Shell::Toplevel::kStateMaskActivated));
-
-  if (resizing != IsResizing()) {
-    // TODO: no need to use this flag
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskResizing);
-  }
 
   if (maximized != IsMaximized()) {
     Bit::Inverse<int>(p_->flags, Private::kFlagMaskMaximized);
@@ -398,18 +376,25 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
     OnFullscreen(fullscreen);
   }
 
+  if (resizing != IsResizing()) {
+    // TODO: no need to use this flag
+    Bit::Inverse<int>(p_->flags, Private::kFlagMaskResizing);
+  }
+
   if (focus != IsFocused()) {
     Bit::Inverse<int>(p_->flags, Private::kFlagMaskFocused);
     OnFocus(focus);
   }
 
-  if (do_resize) {
-    Surface::Shell::Get(p_->shell_surface)->ResizeWindow(width, height);  // Call xdg surface api
-    OnSizeChange(p_->last_size, p_->size);
-    p_->last_size = p_->size;
-
-    // surface size is changed, reset the pointer position and enter/leave widgets
-    DispatchMouseLeaveEvent();
+  if (width > 0 && height > 0) {
+    p_->dirty_flag = 1;
+    Size saved_size = p_->size;
+    p_->size.width = width;
+    p_->size.height = height;
+    if (!OnConfigureSize(p_->last_size, p_->size)) {
+      p_->size = saved_size;
+      p_->dirty_flag = 0;
+    }
   }
 }
 
@@ -599,6 +584,12 @@ void AbstractShellView::DropShadow(const Context *context) {
 // ---------
 
 void AbstractShellView::RedrawTask::Run() const {
+  if (shell_view_->p_->dirty_flag) {
+    shell_view_->OnSizeChange(shell_view_->p_->last_size, shell_view_->p_->size);
+    shell_view_->p_->last_size = shell_view_->p_->size;
+    shell_view_->p_->dirty_flag = 0;
+  }
+
   shell_view_->OnDraw(&context);
 
   if (shell_view_->p_->is_damaged) {

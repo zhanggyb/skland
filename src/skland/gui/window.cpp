@@ -51,7 +51,8 @@ SKLAND_NO_EXPORT struct Window::Private {
         title_bar(nullptr),
         content_view(nullptr),
         flags(0),
-        output(nullptr) {}
+        output(nullptr),
+        inhibit_redraw(true) {}
 
   ~Private() {}
 
@@ -74,6 +75,8 @@ SKLAND_NO_EXPORT struct Window::Private {
   int flags;
 
   const Output *output;
+
+  bool inhibit_redraw;
 
 };
 
@@ -196,7 +199,9 @@ void Window::OnShown() {
     p_->main_canvas->Clear();
   }
 
-  OnUpdate(nullptr);
+  p_->inhibit_redraw = false;
+
+  RequestUpdate();
   if (p_->title_bar) {
     AbstractShellView::DispatchUpdate(p_->title_bar);
     p_->title_bar->Resize(GetWidth(), TitleBar::kHeight);
@@ -208,47 +213,29 @@ void Window::OnShown() {
 }
 
 void Window::OnUpdate(AbstractView *view) {
-  if (!IsShown()) return;
+  if (p_->inhibit_redraw) return;
 
   Surface *surface = nullptr;
+  std::shared_ptr<Canvas> canvas;
 
-  if (nullptr == view) {
-    surface = this->GetShellSurface();
-
-    int width = GetWidth();
-    int height = GetHeight();
-    const Margin &margin = surface->GetMargin();
-
-    AbstractShellView::RedrawTask *redraw_task = RedrawTask::Get(this);
-    redraw_task->context = Context(surface, p_->frame_canvas);
-    PushToTail(redraw_task);
-    _ASSERT(p_->frame_canvas);
-    Damage(this,
-           0, 0,
-           width + margin.lr(),
-           height + margin.tb());
-    surface->Commit();
+  if (p_->main_surface) {
+    surface = p_->main_surface;
+    canvas = p_->main_canvas;
   } else {
-    std::shared_ptr<Canvas> canvas;
-    if (p_->main_surface) {
-      surface = p_->main_surface;
-      canvas = p_->main_canvas;
-    } else {
-      surface = this->GetShellSurface();
-      canvas = p_->frame_canvas;
-    }
-
-    AbstractView::RedrawTask *redraw_task = AbstractView::RedrawTask::Get(view);
-    PushToTail(redraw_task);
-    redraw_task->context = Context(surface, canvas);
-    _ASSERT(canvas);
-    Damage(view,
-           view->GetX() + surface->GetMargin().left,
-           view->GetY() + surface->GetMargin().top,
-           view->GetWidth(),
-           view->GetHeight());
-    surface->Commit();
+    surface = this->GetShellSurface();
+    canvas = p_->frame_canvas;
   }
+
+  AbstractView::RedrawTask *redraw_task = AbstractView::RedrawTask::Get(view);
+  redraw_task->context = Context(surface, canvas);
+  PushToTail(redraw_task);
+  _ASSERT(canvas);
+  Damage(view,
+         view->GetX() + surface->GetMargin().left,
+         view->GetY() + surface->GetMargin().top,
+         view->GetWidth(),
+         view->GetHeight());
+  surface->Commit();
 }
 
 Surface *Window::GetSurface(const AbstractView *view) const {
@@ -256,6 +243,31 @@ Surface *Window::GetSurface(const AbstractView *view) const {
     return GetShellSurface();
 
   return nullptr != p_->main_surface ? p_->main_surface : GetShellSurface();
+}
+
+bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
+  Size min = this->GetMinimalSize();
+  Size max = this->GetMaximalSize();
+  _ASSERT(min.width < max.width && min.height < max.height);
+
+  if (new_size.width < min.width || new_size.height < min.height) return false;
+  if (new_size.width > max.width || new_size.height > max.height) return false;
+
+  RedrawTask *redraw_task = RedrawTask::Get(this);
+
+  if (old_size == new_size) {
+    redraw_task->Unlink();
+    return false;
+  }
+
+  p_->inhibit_redraw = true;
+  PushToTail(redraw_task);
+
+  Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
+  // surface size is changed, reset the pointer position and enter/leave widgets
+  DispatchMouseLeaveEvent();
+
+  return true;
 }
 
 void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
@@ -314,15 +326,24 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
     p_->main_canvas->Clear();
   }
 
-  OnUpdate(nullptr);
+  RedrawTask *redraw_task = RedrawTask::Get(this);
+  redraw_task->context = Context(shell_surface, p_->frame_canvas);
+  PushToTail(redraw_task);
+  _ASSERT(p_->frame_canvas);
+  Damage(this,
+         0, 0,
+         GetWidth() + margin.lr(),
+         GetHeight() + margin.tb());
+  shell_surface->Commit();
+
+  p_->inhibit_redraw = false;
 
   if (p_->title_bar) {
-    AbstractShellView::DispatchUpdate(p_->title_bar);
+    DispatchUpdate(p_->title_bar);
     p_->title_bar->Resize(new_size.width, TitleBar::kHeight);
   }
-
   if (p_->content_view) {
-    AbstractShellView::DispatchUpdate(p_->content_view);
+    DispatchUpdate(p_->content_view);
     SetContentViewGeometry();
   }
 }
@@ -582,7 +603,7 @@ void Window::OnDraw(const Context *context) {
 }
 
 void Window::OnFocus(bool) {
-  OnUpdate(nullptr);
+  RequestUpdate();
 }
 
 void Window::OnViewAttached(AbstractView */*view*/) {
@@ -703,6 +724,26 @@ void Window::SetContentViewGeometry() {
   const RectI geometry = GetContentGeometry();
   p_->content_view->MoveTo(geometry.x(), geometry.y());
   p_->content_view->Resize(geometry.width(), geometry.height());
+}
+
+void Window::RequestUpdate() {
+  Surface *shell_surface = GetShellSurface();
+  const Margin &margin = shell_surface->GetMargin();
+
+  RedrawTask *redraw_task = RedrawTask::Get(this);
+  redraw_task->context = Context(shell_surface, p_->frame_canvas);
+  PushToTail(redraw_task);
+  _ASSERT(p_->frame_canvas);
+  Damage(this,
+         0, 0,
+         GetWidth() + margin.lr(),
+         GetHeight() + margin.tb());
+  shell_surface->Commit();
+}
+
+void Window::CancelUpdate() {
+  RedrawTask *redraw_task = RedrawTask::Get(this);
+  redraw_task->Unlink();
 }
 
 }

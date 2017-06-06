@@ -50,7 +50,8 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
         shell_surface(nullptr),
         parent(nullptr),
         redraw_task(shell_view),
-        is_damaged(false) {}
+        is_damaged(false),
+        dirty_flag(0) {}
 
   /**
    * @brief Destructor
@@ -115,6 +116,8 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
    * This member variable works with is_damaged.
    */
   RectI damaged_region;
+
+  int dirty_flag;
 
 };
 
