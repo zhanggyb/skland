@@ -29,11 +29,13 @@ struct Surface::Shell::Toplevel::Private {
   Private &operator=(const Private &) = delete;
 
   Private()
-      : zxdg_toplevel(nullptr) {}
+      : shell(nullptr), zxdg_toplevel(nullptr) {}
 
   ~Private() {
     if (zxdg_toplevel) zxdg_toplevel_v6_destroy(zxdg_toplevel);
   }
+
+  Shell *shell;
 
   struct zxdg_toplevel_v6 *zxdg_toplevel;
 

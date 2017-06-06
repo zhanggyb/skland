@@ -50,9 +50,12 @@ SKLAND_NO_EXPORT struct Window::Private {
       : main_surface(nullptr),
         title_bar(nullptr),
         content_view(nullptr),
+        minimal_size(160, 120),
+        preferred_size(640, 480),
+        maximal_size(65536, 65536),
         flags(0),
         output(nullptr),
-        inhibit_redraw(true) {}
+        inhibit_update(true) {}
 
   ~Private() {}
 
@@ -72,11 +75,17 @@ SKLAND_NO_EXPORT struct Window::Private {
 
   AbstractView *content_view;
 
+  Size minimal_size;
+
+  Size preferred_size;
+
+  Size maximal_size;
+
   int flags;
 
   const Output *output;
 
-  bool inhibit_redraw;
+  bool inhibit_update;
 
 };
 
@@ -152,6 +161,18 @@ void Window::SetContentView(AbstractView *view) {
   SetContentViewGeometry();
 }
 
+const Size &Window::GetMinimalSize() const {
+  return p_->minimal_size;
+}
+
+const Size &Window::GetPreferredSize() const {
+  return p_->preferred_size;
+}
+
+const Size &Window::GetMaximalSize() const {
+  return p_->maximal_size;
+}
+
 void Window::OnShown() {
   Surface *shell_surface = GetShellSurface();
 
@@ -199,7 +220,7 @@ void Window::OnShown() {
     p_->main_canvas->Clear();
   }
 
-  p_->inhibit_redraw = false;
+  p_->inhibit_update = false;
 
   RequestUpdate();
   if (p_->title_bar) {
@@ -213,7 +234,7 @@ void Window::OnShown() {
 }
 
 void Window::OnUpdate(AbstractView *view) {
-  if (p_->inhibit_redraw) return;
+  if (p_->inhibit_update) return;
 
   Surface *surface = nullptr;
   std::shared_ptr<Canvas> canvas;
@@ -246,12 +267,11 @@ Surface *Window::GetSurface(const AbstractView *view) const {
 }
 
 bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  Size min = this->GetMinimalSize();
-  Size max = this->GetMaximalSize();
-  _ASSERT(min.width < max.width && min.height < max.height);
+  _ASSERT(p_->minimal_size.width < p_->maximal_size.width &&
+      p_->minimal_size.height < p_->maximal_size.height);
 
-  if (new_size.width < min.width || new_size.height < min.height) return false;
-  if (new_size.width > max.width || new_size.height > max.height) return false;
+  if (new_size.width < p_->minimal_size.width || new_size.height < p_->minimal_size.height) return false;
+  if (new_size.width > p_->maximal_size.width || new_size.height > p_->maximal_size.height) return false;
 
   RedrawTask *redraw_task = RedrawTask::Get(this);
 
@@ -260,7 +280,7 @@ bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
     return false;
   }
 
-  p_->inhibit_redraw = true;
+  p_->inhibit_update = true;
   PushToTail(redraw_task);
 
   Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
@@ -326,18 +346,17 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
     p_->main_canvas->Clear();
   }
 
-  RedrawTask *redraw_task = RedrawTask::Get(this);
-  redraw_task->context = Context(shell_surface, p_->frame_canvas);
-  PushToTail(redraw_task);
-  _ASSERT(p_->frame_canvas);
+  // Set context before draw this window
+  RedrawTask::Get(this)->context = Context(shell_surface, p_->frame_canvas);
+
   Damage(this,
          0, 0,
          GetWidth() + margin.lr(),
          GetHeight() + margin.tb());
+
   shell_surface->Commit();
 
-  p_->inhibit_redraw = false;
-
+  p_->inhibit_update = false;
   if (p_->title_bar) {
     DispatchUpdate(p_->title_bar);
     p_->title_bar->Resize(new_size.width, TitleBar::kHeight);
@@ -509,6 +528,8 @@ void Window::OnKeyDown(KeyEvent *event) {
 }
 
 void Window::OnDraw(const Context *context) {
+  fprintf(stdout, "%s\n", __PRETTY_FUNCTION__);
+
   if (p_->flags & kFlagMaskFrameless) return;
 
   Canvas *canvas = context->canvas();
@@ -599,10 +620,10 @@ void Window::OnDraw(const Context *context) {
     paint.SetColor(window_schema.active.foreground.color);
   }
   canvas->DrawRect(GetContentGeometry() * scale, paint);
-//  canvas->Flush();
+  canvas->Flush();
 }
 
-void Window::OnFocus(bool) {
+void Window::OnFocus(bool focus) {
   RequestUpdate();
 }
 
@@ -727,10 +748,11 @@ void Window::SetContentViewGeometry() {
 }
 
 void Window::RequestUpdate() {
+  RedrawTask *redraw_task = RedrawTask::Get(this);
+
   Surface *shell_surface = GetShellSurface();
   const Margin &margin = shell_surface->GetMargin();
 
-  RedrawTask *redraw_task = RedrawTask::Get(this);
   redraw_task->context = Context(shell_surface, p_->frame_canvas);
   PushToTail(redraw_task);
   _ASSERT(p_->frame_canvas);

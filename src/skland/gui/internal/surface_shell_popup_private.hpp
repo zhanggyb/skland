@@ -27,24 +27,26 @@ struct Surface::Shell::Popup::Private {
   Private &operator=(const Private &) = delete;
 
   Private()
-      : zxdg_popup(nullptr),
+      : shell(nullptr),
+        zxdg_popup(nullptr),
         zxdg_positioner(nullptr) {}
 
   ~Private() {
     if (zxdg_positioner) {
       zxdg_positioner_v6_destroy(zxdg_positioner);
     }
-
     if (zxdg_popup) {
       zxdg_popup_v6_destroy(zxdg_popup);
     }
   }
+
+  Shell *shell;
 
   struct zxdg_popup_v6 *zxdg_popup;
   struct zxdg_positioner_v6 *zxdg_positioner;
 
 };
 
-}
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_SURFACE_SHELL_POPUP_PRIVATE_HPP_

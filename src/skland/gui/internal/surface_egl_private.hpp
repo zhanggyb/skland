@@ -30,14 +30,17 @@ struct Surface::EGL::Private {
   Private &operator=(const Private &) = delete;
 
   Private()
-      : egl_surface_(nullptr),
-        wl_egl_window_(nullptr) {}
+      : surface(nullptr),
+        egl_surface(nullptr),
+        wl_egl_window(nullptr) {}
 
   ~Private() {}
 
-  EGLSurface egl_surface_;
+  Surface *surface;
 
-  struct wl_egl_window *wl_egl_window_;
+  EGLSurface egl_surface;
+
+  struct wl_egl_window *wl_egl_window;
 
 };
 

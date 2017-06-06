@@ -139,8 +139,8 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
 }
 
 bool EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  Size min = this->GetMinimalSize();
-  Size max = this->GetMaximalSize();
+  Size min(160, 120);
+  Size max(65536, 65536);
   _ASSERT(min.width < max.width && min.height < max.height);
 
   if (new_size.width < min.width || new_size.height < min.height) return false;
@@ -344,7 +344,7 @@ void EGLWindow::OnDraw(const Context *context) {
 
   if (!p_->animating) {
     p_->animating = true;
-    p_->frame_callback.Setup(*p_->egl_surface->surface());
+    p_->frame_callback.Setup(*p_->egl_surface->GetSurface());
     OnInitialize();
   }
 }
@@ -423,9 +423,9 @@ int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
 }
 
 void EGLWindow::OnFrame(uint32_t serial) {
-  p_->frame_callback.Setup(*p_->egl_surface->surface());
+  p_->frame_callback.Setup(*p_->egl_surface->GetSurface());
   OnRender();
-  p_->egl_surface->surface()->Commit();
+  p_->egl_surface->GetSurface()->Commit();
 }
 
 void EGLWindow::OnRelease() {

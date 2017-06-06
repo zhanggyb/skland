@@ -112,19 +112,22 @@ class Surface {
         /**
          * the surface is maximized
          */
-            kStateMaskMaximized = 0x1, /* 1 */
+        kStateMaskMaximized = 0x1, /* 1 */
+
         /**
          * the surface is fullscreen
          */
-            kStateMaskFullscreen = 0x1 << 1,  /* 2 */
+        kStateMaskFullscreen = 0x1 << 1,  /* 2 */
+
         /**
          * the surface is being resized
          */
-            kStateMaskResizing = 0x1 << 2, /* 4 */
+        kStateMaskResizing = 0x1 << 2, /* 4 */
+
         /**
          * the surface is now activated
          */
-            kStateMaskActivated = 0x1 << 3, /* 8 */
+        kStateMaskActivated = 0x1 << 3, /* 8 */
       };
 
       /**
@@ -163,8 +166,6 @@ class Surface {
 
       std::unique_ptr<Private> p_;
 
-      Shell *shell_;
-
     };
 
     /**
@@ -196,8 +197,6 @@ class Surface {
       ~Popup();
 
       std::unique_ptr<Private> p_;
-
-      Shell *shell_;
 
     };
 
@@ -328,15 +327,13 @@ class Surface {
 
     void Resize(int width, int height, int dx = 0, int dy = 0);
 
-    Surface *surface() const { return surface_; }
+    Surface *GetSurface() const;
 
    private:
 
     struct Private;
 
     EGL(Surface *surface);
-
-    Surface *surface_;
 
     std::unique_ptr<Private> p_;
 

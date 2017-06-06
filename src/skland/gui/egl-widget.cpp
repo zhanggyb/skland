@@ -122,9 +122,9 @@ void EGLWidget::OnKeyUp(KeyEvent *event) {
 void EGLWidget::OnDraw(const Context *context) {
   if (!animating_) {
     animating_ = true;
-    frame_callback_.Setup(*egl_surface_->surface());
+    frame_callback_.Setup(*egl_surface_->GetSurface());
     OnInitialize();
-    egl_surface_->surface()->Commit();
+    egl_surface_->GetSurface()->Commit();
   }
 }
 
@@ -161,9 +161,9 @@ void EGLWidget::SwapBuffers() {
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-  frame_callback_.Setup(*egl_surface_->surface());
+  frame_callback_.Setup(*egl_surface_->GetSurface());
   OnRender();
-  egl_surface_->surface()->Commit();
+  egl_surface_->GetSurface()->Commit();
 }
 
 }

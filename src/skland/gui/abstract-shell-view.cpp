@@ -57,9 +57,6 @@ AbstractShellView::AbstractShellView(int width,
     p_->shell_surface = Surface::Shell::Toplevel::Create(this, Theme::GetShadowMargin());
     Surface::Shell::Toplevel *top_level_role = Surface::Shell::Toplevel::Get(p_->shell_surface);
     top_level_role->SetTitle(title);
-
-    // Set focus on, this will avoid draw the frame in Window twice when initially shows
-    Bit::Set<int>(p_->flags, Private::kFlagMaskFocused);
   } else {
     // TODO: create popup shell surface
   }
@@ -146,35 +143,6 @@ void AbstractShellView::ToggleFullscreen(const Output *output, SLOT) {
 
 const std::string &AbstractShellView::GetTitle() const {
   return p_->title;
-}
-
-Size AbstractShellView::GetMinimalSize() const {
-  int w = 160, h = 120;
-//  Rect client = GetClientGeometry();
-//  switch (window_frame_->title_bar_position()) {
-//    case AbstractWindowFrame::kTitleBarLeft:
-//    case AbstractWindowFrame::kTitleBarRight: {
-//      w = window_frame_->title_bar_size() + window_frame_->border();
-//      w += 120;
-//      break;
-//    }
-//    case AbstractWindowFrame::kTitleBarBottom:
-//    case AbstractWindowFrame::kTitleBarTop:
-//    default: {
-//      h = window_frame_->title_bar_size() + window_frame_->border();
-//      h += 90;
-//      break;
-//    }
-//  }
-  return Size(w, h);
-}
-
-Size AbstractShellView::GetPreferredSize() const {
-  return Size(640, 480);
-}
-
-Size AbstractShellView::GetMaximalSize() const {
-  return Size(65536, 65536);
 }
 
 bool AbstractShellView::IsFullscreen() const {
@@ -381,11 +349,6 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
     Bit::Inverse<int>(p_->flags, Private::kFlagMaskResizing);
   }
 
-  if (focus != IsFocused()) {
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskFocused);
-    OnFocus(focus);
-  }
-
   if (width > 0 && height > 0) {
     p_->dirty_flag = 1;
     Size saved_size = p_->size;
@@ -395,6 +358,11 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
       p_->size = saved_size;
       p_->dirty_flag = 0;
     }
+  }
+
+  if (focus != IsFocused()) {
+    Bit::Inverse<int>(p_->flags, Private::kFlagMaskFocused);
+    OnFocus(focus);
   }
 }
 

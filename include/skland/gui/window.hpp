@@ -65,6 +65,12 @@ SKLAND_EXPORT class Window : public AbstractShellView {
    */
   void SetContentView(AbstractView *view);
 
+  const Size &GetMinimalSize() const;
+
+  const Size &GetPreferredSize() const;
+
+  const Size &GetMaximalSize() const;
+
  protected:
 
   virtual void OnShown() final;

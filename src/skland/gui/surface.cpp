@@ -181,7 +181,7 @@ Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
   p_.reset(new Private);
 
   _ASSERT(shell_surface);
-  shell_ = shell_surface;
+  p_->shell = shell_surface;
 
   p_->zxdg_toplevel = zxdg_surface_v6_get_toplevel(shell_surface->p_->zxdg_surface);
   zxdg_toplevel_v6_add_listener(p_->zxdg_toplevel, &Private::kListener, this);
@@ -190,7 +190,7 @@ Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
 Surface::Shell::Toplevel::~Toplevel() {
   _ASSERT(shell_->role_.toplevel == this);
   _ASSERT(nullptr == shell_->parent_);
-  shell_->role_.toplevel = nullptr;
+  p_->shell->role_.toplevel = nullptr;
 }
 
 // ------
@@ -203,19 +203,19 @@ Surface *Surface::Shell::Popup::Create(Shell *parent, AbstractEventHandler *view
   return surface;
 }
 
-Surface::Shell::Popup::Popup(Shell *shell)
-    : shell_(shell) {
+Surface::Shell::Popup::Popup(Shell *shell) {
+  _ASSERT(shell);
   p_.reset(new Private);
+  p_->shell = shell;
   // TODO: initialize xdg_popup_
 }
 
 Surface::Shell::Popup::~Popup() {
-
   _ASSERT(shell_->parent_);
   _ASSERT(shell_->role_.popup == this);
 
-  shell_->parent_ = nullptr;
-  shell_->role_.popup = nullptr;
+  p_->shell->parent_ = nullptr;
+  p_->shell->role_.popup = nullptr;
 }
 
 // ------
@@ -430,45 +430,46 @@ Surface::EGL *Surface::EGL::Get(Surface *surface) {
   return surface->p_->egl;
 }
 
-Surface::EGL::EGL(Surface *surface)
-    : surface_(surface) {
+Surface::EGL::EGL(Surface *surface) {
+  _ASSERT(surface);
   p_.reset(new Private);
+  p_->surface = surface;
 
-  p_->wl_egl_window_ =
-      wl_egl_window_create(surface_->p_->wl_surface, 400, 400);
-  p_->egl_surface_ =
+  p_->wl_egl_window =
+      wl_egl_window_create(p_->surface->p_->wl_surface, 400, 400);
+  p_->egl_surface =
       eglCreatePlatformWindowSurface(Display::Native().egl_display(),
                                      Display::Native().egl_config(),
-                                     p_->wl_egl_window_,
+                                     p_->wl_egl_window,
                                      NULL);
 }
 
 Surface::EGL::~EGL() {
-  if (p_->egl_surface_) {
-    _ASSERT(p_->wl_egl_window_);
-    wl_egl_window_destroy(p_->wl_egl_window_);
+  if (p_->egl_surface) {
+    _ASSERT(p_->wl_egl_window);
+    wl_egl_window_destroy(p_->wl_egl_window);
   }
-  surface_->p_->egl = nullptr;
+  p_->surface->p_->egl = nullptr;
 }
 
 bool Surface::EGL::MakeCurrent() {
   return EGL_TRUE ==
       eglMakeCurrent(Display::Native().egl_display(),
-                     p_->egl_surface_,
-                     p_->egl_surface_,
+                     p_->egl_surface,
+                     p_->egl_surface,
                      Display::Native().egl_context());
 }
 
 bool Surface::EGL::SwapBuffers() {
   return EGL_TRUE ==
-      eglSwapBuffers(Display::Native().egl_display(), p_->egl_surface_);
+      eglSwapBuffers(Display::Native().egl_display(), p_->egl_surface);
 }
 
 bool Surface::EGL::SwapBuffersWithDamage(int x, int y, int width, int height) {
   EGLint rect[4] = {x, y, width, height};
   return EGL_TRUE
       == Display::Native::kSwapBuffersWithDamageAPI(Display::Native().egl_display(),
-                                                    p_->egl_surface_,
+                                                    p_->egl_surface,
                                                     rect,
                                                     4 * sizeof(EGLint));
 }
@@ -478,7 +479,11 @@ bool Surface::EGL::SwapInterval(EGLint interval) {
 }
 
 void Surface::EGL::Resize(int width, int height, int dx, int dy) {
-  wl_egl_window_resize(p_->wl_egl_window_, width, height, dx, dy);
+  wl_egl_window_resize(p_->wl_egl_window, width, height, dx, dy);
+}
+
+Surface *Surface::EGL::GetSurface() const {
+  return p_->surface;
 }
 
 // ------

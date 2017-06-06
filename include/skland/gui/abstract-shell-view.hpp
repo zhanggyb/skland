@@ -32,7 +32,10 @@ class Context;
 
 /**
  * @ingroup gui
- * @brief Abstract class to hold and manage a shell surface
+ * @brief Abstract class for shell views
+ *
+ * This is the base class for windows/menus/dialogs etc to show a shell surface
+ * and managed by compositor.
  */
 SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
@@ -147,12 +150,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   void ToggleFullscreen(const Output *output, __SLOT__);
 
   const std::string &GetTitle() const;
-
-  virtual Size GetMinimalSize() const;
-
-  virtual Size GetPreferredSize() const;
-
-  virtual Size GetMaximalSize() const;
 
   bool IsFullscreen() const;
 
