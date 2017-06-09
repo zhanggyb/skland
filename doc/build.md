@@ -7,23 +7,19 @@ Build the source code
 $ git clone --recursive https://github.com/zhanggyb/skland.git
 ```
 
-## Build in Fedora 25
+## Install dependencies
 
-### Install prerequisites
+Use the shell script to install prerequisites if you're using Ubuntu or Fedora:
 
 ```shell
-$ sudo dnf install gcc-c++ cmake wayland-devel mesa-libwayland-egl-devel libwebp-devel libjpeg-turbo-devel expat-devel lua-devel zlib-devel freetype-devel giflib-devel mesa-libGL-devel mesa-libEGL-devel fontconfig-devel
+$ cd <path to skland>
+$ ./scripts/install-dependencies.sh
 ```
 
-Optional (to build documents):
-```shell
-$ sudo dnf install doxygen graphviz
-```
-
-### Build the source code
+## Build the source code
 
 ```shell
-$ cd <the parent directory you checkout skland>/skland
+$ cd <path to skland>
 $ mkdir build
 $ cd build
 $ cmake ..
@@ -37,7 +33,7 @@ Available Cmake options:
 - `-DCMAKE_BUILD_TYPE=<value>`: value = 'Release' or 'Debug'
 - `-DBUILD_UNIT_TEST=<value>`: value = 'On', 'True', 'Off' or 'False'
 
-### Build the document
+## Build the document
 
 ```shell
 $ make doc
@@ -45,12 +41,3 @@ $ make doc
 
 This will generate html document through doxygen in `html/`, open the
  `html/index.html` with your favorite web browser.
-
-## Build in ArchLinux
-
-### Install prerequisites
-
-## Build in Ubuntu
-
-### Install prerequisites
-

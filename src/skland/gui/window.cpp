@@ -528,8 +528,6 @@ void Window::OnKeyDown(KeyEvent *event) {
 }
 
 void Window::OnDraw(const Context *context) {
-  fprintf(stdout, "%s\n", __PRETTY_FUNCTION__);
-
   if (p_->flags & kFlagMaskFrameless) return;
 
   Canvas *canvas = context->canvas();

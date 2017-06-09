@@ -77,7 +77,7 @@ if (LINUX)
 
 endif ()
 
-set(global_header "${PROJECT_SOURCE_DIR}/include/skland/skland.hpp")
+set(global_header "${PROJECT_SOURCE_DIR}/include/skland/config.hpp")
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 

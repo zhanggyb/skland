@@ -31,7 +31,7 @@ namespace skland {
 
 /**
  * @ingroup gui_intern
- * @brief The private data structure in Display
+ * @brief The private data structure used in Display
  */
 struct Display::Private {
 

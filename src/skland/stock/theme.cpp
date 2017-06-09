@@ -17,7 +17,6 @@
 #include <skland/stock/theme.hpp>
 #include <iostream>
 #include <skland/core/assert.hpp>
-#include <skland/skland.hpp>
 #include <skland/graphic/gradient-shader.hpp>
 
 #include "SkBlurMaskFilter.h"

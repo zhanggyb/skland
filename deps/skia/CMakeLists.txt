@@ -1,7 +1,11 @@
+#
+# CMakeLists to build static/shared skia library
+#
+
 enable_language(ASM)
 
 # To first approximation, the Skia library comprises all .cpp files under src/.
-file(GLOB_RECURSE srcs ${SKIA_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE SKIA_SOURCE_FILES ${SKIA_SOURCE_DIR}/src/*.cpp)
 
 function(find_include_dirs out)
     file(GLOB_RECURSE headers ${ARGN})
@@ -15,32 +19,32 @@ endfunction()
 
 # We need src/ directories and include/private on our path when building Skia.
 # Users should be able to use Skia with only include/ directories that are not include/private.
-find_include_dirs(private_includes ${SKIA_SOURCE_DIR}/src/*.h ${SKIA_SOURCE_DIR}/include/private/*.h)
-find_include_dirs(public_includes ${SKIA_SOURCE_DIR}/include/*.h)
-list(REMOVE_ITEM public_includes ${private_includes})  # Easiest way to exclude private.
+find_include_dirs(SKIA_PRIVATE_HEADER_FILES ${SKIA_SOURCE_DIR}/src/*.h ${SKIA_SOURCE_DIR}/include/private/*.h)
+find_include_dirs(SKIA_PUBLIC_HEADER_FILES ${SKIA_SOURCE_DIR}/include/*.h)
+list(REMOVE_ITEM SKIA_PUBLIC_HEADER_FILES ${SKIA_PRIVATE_HEADER_FILES})  # Easiest way to exclude private.
 file(GLOB default_include_config "${SKIA_SOURCE_DIR}/include/config")
-list(REMOVE_ITEM public_includes ${default_include_config})
+list(REMOVE_ITEM SKIA_PUBLIC_HEADER_FILES ${default_include_config})
 set(userconfig_directory ${CMAKE_BINARY_DIR}/include)
-list(APPEND public_includes ${userconfig_directory})
+list(APPEND SKIA_PUBLIC_HEADER_FILES ${userconfig_directory})
 
 # These guys are third_party but provided by a Skia checkout.
-list(APPEND srcs ${SKIA_SOURCE_DIR}/third_party/etc1/etc1.cpp)  # ${SKIA_SOURCE_DIR}/third_party/ktx/ktx.cpp)
-list(APPEND private_includes ${SKIA_SOURCE_DIR}/third_party/etc1)   # ${SKIA_SOURCE_DIR}/third_party/ktx)
+list(APPEND SKIA_SOURCE_FILES ${SKIA_SOURCE_DIR}/third_party/etc1/etc1.cpp)  # ${SKIA_SOURCE_DIR}/third_party/ktx/ktx.cpp)
+list(APPEND SKIA_PRIVATE_HEADER_FILES ${SKIA_SOURCE_DIR}/third_party/etc1)   # ${SKIA_SOURCE_DIR}/third_party/ktx)
 
-list(APPEND srcs ${SKIA_SOURCE_DIR}/third_party/gif/SkGifImageReader.cpp)
-list(APPEND private_includes ${SKIA_SOURCE_DIR}/third_party/gif)
+list(APPEND SKIA_SOURCE_FILES ${SKIA_SOURCE_DIR}/third_party/gif/SkGifImageReader.cpp)
+list(APPEND SKIA_PRIVATE_HEADER_FILES ${SKIA_SOURCE_DIR}/third_party/gif)
 
-list(APPEND private_includes ${SKIA_SOURCE_DIR}/third_party/libpng)
+list(APPEND SKIA_PRIVATE_HEADER_FILES ${SKIA_SOURCE_DIR}/third_party/libpng)
 file(GLOB libpng_srcs ${SKIA_SOURCE_DIR}/third_party/libpng/*.c)
 foreach (src ${libpng_srcs})
-    list(APPEND srcs ${src})
+    list(APPEND SKIA_SOURCE_FILES ${src})
 endforeach ()
 
 
 function(remove_srcs)
     file(GLOB_RECURSE to_remove ${ARGN})
-    list(REMOVE_ITEM srcs ${to_remove})
-    set(srcs ${srcs} PARENT_SCOPE)
+    list(REMOVE_ITEM SKIA_SOURCE_FILES ${to_remove})
+    set(SKIA_SOURCE_FILES ${SKIA_SOURCE_FILES} PARENT_SCOPE)
 endfunction()
 
 # This file is empty and is only used to trick GYP.
@@ -68,11 +72,11 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/svg/*
         ${SKIA_SOURCE_DIR}/src/xml/*)
 foreach (include svg views gpu/vk)
     file(GLOB globed_include ${SKIA_SOURCE_DIR}/include/${include})
-    list(REMOVE_ITEM public_includes ${globed_include})
+    list(REMOVE_ITEM SKIA_PUBLIC_HEADER_FILES ${globed_include})
 endforeach ()
 
 # Add assembly code in jumper module
-list(APPEND srcs ${SKIA_SOURCE_DIR}/src/jumper/SkJumper_generated.S)
+list(APPEND SKIA_SOURCE_FILES ${SKIA_SOURCE_DIR}/src/jumper/SkJumper_generated.S)
 
 # Remove OS-specific source files.
 if (NOT UNIX)
@@ -90,7 +94,12 @@ endif ()
 
 # Remove processor-specific source files.
 if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL ARM)
-    remove_srcs(${SKIA_SOURCE_DIR}/src/*arm* ${SKIA_SOURCE_DIR}/src/*ARM* ${SKIA_SOURCE_DIR}/src/*neon* ${SKIA_SOURCE_DIR}/src/*NEON*)
+    remove_srcs(
+            ${SKIA_SOURCE_DIR}/src/*arm*
+            ${SKIA_SOURCE_DIR}/src/*ARM*
+            ${SKIA_SOURCE_DIR}/src/*neon*
+            ${SKIA_SOURCE_DIR}/src/*NEON*
+    )
 endif ()
 #if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL MIPS)
 #    remove_srcs(${SKIA_SOURCE_DIR}/src/*mips* ${SKIA_SOURCE_DIR}/src/*MIPS*)
@@ -114,7 +123,8 @@ remove_srcs(
         ${SKIA_SOURCE_DIR}/src/ports/SkGlobalInitialization_chromium.cpp
         ${SKIA_SOURCE_DIR}/src/ports/SkImageEncoder_none.cpp
         ${SKIA_SOURCE_DIR}/src/ports/SkImageGenerator_none.cpp
-        ${SKIA_SOURCE_DIR}/src/ports/SkTLS_none.cpp)
+        ${SKIA_SOURCE_DIR}/src/ports/SkTLS_none.cpp
+)
 
 if (NOT APPLE)
     remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkImageGeneratorCG.cpp)
@@ -180,14 +190,14 @@ remove_srcs(${SKIA_SOURCE_DIR}/src/codec/*Raw*.cpp)
 # TODO: macro away this if (found) ... else() ... endif() stuff.
 
 if (EXPAT_FOUND)
-    list(APPEND private_includes ${EXPAT_INCLUDE_DIRS})
+    list(APPEND SKIA_PRIVATE_HEADER_FILES ${EXPAT_INCLUDE_DIRS})
     list(APPEND libs ${EXPAT_LIBRARIES})
 else ()
     remove_srcs(${SKIA_SOURCE_DIR}/src/ports/SkFontMgr_android_parser.cpp)
 endif ()
 
 if (GIF_FOUND)
-    list(APPEND private_includes ${GIF_INCLUDE_DIRS})
+    list(APPEND SKIA_PRIVATE_HEADER_FILES ${GIF_INCLUDE_DIRS})
     list(APPEND libs ${GIF_LIBRARIES})
     add_definitions(-DSK_HAS_GIF_LIBRARY)
 else ()
@@ -197,7 +207,7 @@ else ()
 endif ()
 
 if (JPEG_TURBO_FOUND)
-    list(APPEND private_includes ${JPEG_TURBO_INCLUDE_DIRS})
+    list(APPEND SKIA_PRIVATE_HEADER_FILES ${JPEG_TURBO_INCLUDE_DIRS})
     list(APPEND libs ${JPEG_TURBO_LIBRARIES})
     add_definitions(-DSK_HAS_JPEG_LIBRARY)
 else ()
@@ -206,7 +216,7 @@ else ()
 endif ()
 
 if (LUA_FOUND)
-    list(APPEND private_includes ${LUA_INCLUDE_DIR})
+    list(APPEND SKIA_PRIVATE_HEADER_FILES ${LUA_INCLUDE_DIR})
     list(APPEND libs ${LUA_LIBRARIES})
 else ()
     remove_srcs(${SKIA_SOURCE_DIR}/src/utils/*Lua*)
@@ -217,16 +227,16 @@ add_definitions(-DSK_HAS_PNG_LIBRARY)
 add_definitions(-DPNG_ARM_NEON_OPT=0)
 
 if (ZLIB_FOUND)
-    list(APPEND private_includes ${ZLIB_INCLUDE_DIRS})
+    list(APPEND SKIA_PRIVATE_HEADER_FILES ${ZLIB_INCLUDE_DIRS})
     list(APPEND libs ${ZLIB_LIBRARIES})
     remove_srcs(${SKIA_SOURCE_DIR}/src/pdf/SkDocument_PDF_None.cpp)
 else ()
     remove_srcs(${SKIA_SOURCE_DIR}/src/pdf/*.cpp)
-    set(srcs ${srcs} ${SKIA_SOURCE_DIR}/src/pdf/SkDocument_PDF_None.cpp)
+    set(SKIA_SOURCE_FILES ${SKIA_SOURCE_FILES} ${SKIA_SOURCE_DIR}/src/pdf/SkDocument_PDF_None.cpp)
 endif ()
 
 if (WEBP_INCLUDE_DIRS AND WEBP_LIBRARIES)
-    list(APPEND private_includes ${WEBP_INCLUDE_DIRS})
+    list(APPEND SKIA_PRIVATE_HEADER_FILES ${WEBP_INCLUDE_DIRS})
     list(APPEND libs ${WEBP_LIBRARIES})
     if (WEBPMUX_LIBRARY)
         list(APPEND libs ${WEBPMUX_LIBRARY})
@@ -241,12 +251,12 @@ else ()
 endif ()
 
 if (FREETYPE_FOUND)
-    list(APPEND private_includes ${FREETYPE_INCLUDE_DIRS})
+    list(APPEND SKIA_PRIVATE_HEADER_FILES ${FREETYPE_INCLUDE_DIRS})
     list(APPEND libs ${FREETYPE_LIBRARIES})
 endif ()
 
 if (FONTCONFIG_INCLUDE_DIRS AND FONTCONFIG_LIBRARIES)
-    list(APPEND private_includes ${FONTCONFIG_INCLUDE_DIRS})
+    list(APPEND SKIA_PRIVATE_HEADER_FILES ${FONTCONFIG_INCLUDE_DIRS})
     list(APPEND libs ${FONTCONFIG_LIBRARIES})
 endif ()
 
@@ -257,7 +267,7 @@ endif ()
 
 if (OSMESA_LIBRARIES AND OSMESA_INCLUDE_DIRS)
     list(APPEND libs ${OSMESA_LIBRARIES})
-    list(APPEND private_includes ${OSMESA_INCLUDE_DIRS})
+    list(APPEND SKIA_PRIVATE_HEADER_FILES ${OSMESA_INCLUDE_DIRS})
     list(APPEND public_defines "-DSK_MESA=1")
     set(SK_MESA 1)
 else ()
@@ -275,15 +285,15 @@ list(APPEND libs ${OPENGL_LIBRARIES})
 
 # This is our main output, libskia.{a,so,dll,dylib,etc...}
 # You can control whether this is static or shared with BUILD_SHARED_LIBS.
-add_library(skia ${srcs})
+add_library(skia ${SKIA_SOURCE_FILES} ${SKIA_PRIVATE_HEADER_FILES} ${SKIA_PUBLIC_HEADER_FILES})
 
 target_compile_definitions(skia
         PUBLIC ${public_defines}
         PRIVATE -DSKIA_DLL -DSKIA_IMPLEMENTATION=1)
 
 target_include_directories(skia
-        PUBLIC ${public_includes}
-        PRIVATE ${private_includes})
+        PUBLIC ${SKIA_PUBLIC_HEADER_FILES}
+        PRIVATE ${SKIA_PRIVATE_HEADER_FILES})
 
 target_link_libraries(skia
         PUBLIC
@@ -296,11 +306,68 @@ else ()
     set(cc_flags "-w -fno-rtti -fno-exceptions")
 endif ()
 
-# TODO: add macro to check SSE feature
+# -------------------------------
+# Check SIMD instructions support
+
+set(HAVE_AVX2 0)
+set(HAVE_AVX 0)
+set(HAVE_SSE42 0)
+set(HAVE_SSE41 0)
+set(HAVE_SSSE3 0)
+set(HAVE_SSE3 0)
+set(HAVE_SSE2 0)
+set(HAVE_SSE1 0)
+
+try_compile(
+        HAVE_AVX2 "${PROJECT_BINARY_DIR}/cmake/tests"
+        "${PROJECT_SOURCE_DIR}/cmake/tests/avx2.c"
+        COMPILE_DEFINITIONS "-mavx2"
+)
+try_compile(
+        HAVE_AVX "${PROJECT_BINARY_DIR}/cmake/tests"
+        "${PROJECT_SOURCE_DIR}/cmake/tests/avx.c"
+        COMPILE_DEFINITIONS "-mavx"
+)
+# TODO: add more commands to check SSE feature
+
 # See SK_CPU_SSE_LEVEL in ${SKIA_SOURCE_DIR}/include/core/SkPreConfig.h
-add_definitions(-DSK_CPU_SSE_LEVEL=42)
-set(cc_flags "${cc_flags} -msse4.2")
-#set(cc_flags "${cc_flags} -mfma -msse -msse2 -msse3 -msse4.1 -msse4.2 -mavx -mavx2")
+
+if (HAVE_AVX2)
+    message(STATUS "HAVE AVX2")
+    add_definitions(-D__AVX2__)
+    set(cc_flags "${cc_flags} -mfma -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -mavx2")
+elseif (HAVE_AVX)
+    message(STATUS "HAVE AVX")
+    add_definitions(-D__AVX__)
+    set(cc_flags "${cc_flags} -mfma -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx")
+elseif (HAVE_SSE42)
+    message(STATUS "HAVE SSE42")
+    add_definitions(-D__SSE4_2__)
+    set(cc_flags "${cc_flags} -mfma -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2")
+elseif (HAVE_SSE41)
+    message(STATUS "HAVE SSE41")
+    add_definitions(-D__SSE4_1__)
+    set(cc_flags "${cc_flags} -mfma -msse -msse2 -msse3 -mssse3 -msse4.1")
+elseif (HAVE_SSSE3)
+    message(STATUS "HAVE SSSE3")
+    add_definitions(-D__SSSE3__)
+    set(cc_flags "${cc_flags} -mfma -msse -msse2 -msse3 -mssse3")
+elseif (HAVE_SSE3)
+    message(STATUS "HAVE SSE3")
+    add_definitions(-D__SSE3__)
+    set(cc_flags "${cc_flags} -mfma -msse -msse2 -msse3")
+elseif (HAVE_SSE2)
+    message(STATUS "HAVE SSE2")
+    add_definitions(-D__SSE2__)
+    set(cc_flags "${cc_flags} -mfma -msse -msse2")
+elseif (HAVE_SSE)
+    message(STATUS "HAVE SSE")
+    add_definitions(-D__SSE__)
+    set(cc_flags "${cc_flags} -mfma -msse")
+else ()
+    message(STATUS "NO OPTS")
+    add_definitions(-DSK_BUILD_NO_OPTS)
+endif ()
 
 # Global definitions:
 add_definitions(-DSK_IGNORE_ETC1_SUPPORT)   # avoid 'ktx.h' error
@@ -352,7 +419,7 @@ endif ()
 # skia_compile_arguments.txt
 set(compile_arguments ${CMAKE_BINARY_DIR}/skia_compile_arguments.txt)
 file(WRITE ${compile_arguments} "--std=c++11\n")
-foreach (include ${public_includes})
+foreach (include ${SKIA_PUBLIC_HEADER_FILES})
     get_filename_component(abs_include ${include} ABSOLUTE)
     file(APPEND ${compile_arguments} "-I${abs_include}\n")
 endforeach ()
@@ -369,7 +436,7 @@ set(skia_h_path ${userconfig_directory}/skia.h)
 file(WRITE ${skia_h_path} "// skia.h generated by CMake.\n")
 file(APPEND ${skia_h_path} "#ifndef skia_DEFINED\n")
 file(APPEND ${skia_h_path} "#define skia_DEFINED\n")
-foreach (include ${public_includes})
+foreach (include ${SKIA_PUBLIC_HEADER_FILES})
     if (NOT include STREQUAL userconfig_directory)
         file(APPEND ${skia_h_path} "\n")
         file(GLOB all_public_headers ${include}/*.h)

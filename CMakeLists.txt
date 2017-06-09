@@ -83,6 +83,12 @@ if (GLES2_FOUND)
     set(LIBS ${LIBS} ${GLES2_LIBRARIES})
 endif ()
 
+find_package(Vulkan REQUIRED)
+if (Vulkan_FOUND)
+    include_directories(Vulkan_INCLUDE_DIRS)
+    set(LIBS ${LIBS} ${Vulkan_LIBRARIES})
+endif ()
+
 find_package(Wayland REQUIRED)
 if (WAYLAND_FOUND)
     include_directories(${WAYLAND_CLIENT_INCLUDE_DIR} ${WAYLAND_EGL_INCLUDE_DIR})

@@ -43,33 +43,6 @@ const struct zxdg_shell_v6_listener Display::Private::kXdgShellListener = {
     OnPing
 };
 
-static bool
-weston_check_egl_extension(const char *extensions, const char *extension) {
-  size_t extlen = strlen(extension);
-  const char *end = extensions + strlen(extensions);
-
-  while (extensions < end) {
-    size_t n = 0;
-
-    /* Skip whitespaces, if any */
-    if (*extensions == ' ') {
-      extensions++;
-      continue;
-    }
-
-    n = strcspn(extensions, " ");
-
-    /* Compare strings */
-    if (n == extlen && strncmp(extension, extensions, n) == 0)
-      return true; /* Found */
-
-    extensions += n;
-  }
-
-  /* Not found */
-  return false;
-}
-
 void Display::Private::InitializeEGLDisplay() {
   ReleaseEGLDisplay();
 
@@ -90,15 +63,23 @@ void Display::Private::InitializeEGLDisplay() {
       EGL_NONE
   };
 
-  egl_display = Private::GetEGLDisplay(EGL_PLATFORM_WAYLAND_KHR,
-                                       wl_display, NULL);
-  _ASSERT(egl_display);
+  egl_display = GetEGLDisplay(EGL_PLATFORM_WAYLAND_KHR, wl_display, NULL);
+  if (!egl_display) {
+    fprintf(stderr, "Cannot get EGL display!\n");
+    exit(1);
+  }
 
   ret = eglInitialize(egl_display, &egl_version_major, &egl_version_minor);
-  _ASSERT(ret == EGL_TRUE);
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "Cannot initialize EGL!\n");
+    exit(1);
+  }
 
   ret = eglBindAPI(EGL_OPENGL_ES_API);
-  _ASSERT(ret == EGL_TRUE);
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "Cannot bind EGL API!\n");
+    exit(1);
+  }
 
   eglGetConfigs(egl_display, NULL, 0, &count);
 
@@ -116,7 +97,10 @@ void Display::Private::InitializeEGLDisplay() {
   _ASSERT(egl_config);
 
   egl_context = eglCreateContext(egl_display, egl_config, EGL_NO_CONTEXT, context_attribs);
-  _ASSERT(egl_context);
+  if (!egl_context) {
+    fprintf(stderr, "Cannot create EGL context!\n");
+    exit(1);
+  }
 
   static const struct {
     const char *extension, *entrypoint;
@@ -134,12 +118,12 @@ void Display::Private::InitializeEGLDisplay() {
 
   extensions = eglQueryString(egl_display, EGL_EXTENSIONS);
   if (extensions &&
-      weston_check_egl_extension(extensions, "EGL_EXT_buffer_age")) {
+      CheckEGLExtension(extensions, "EGL_EXT_buffer_age")) {
 //    int len = (int) ARRAY_LENGTH(swap_damage_ext_to_entrypoint);
     int i = 0;
     for (i = 0; i < 2; i++) {
-      if (weston_check_egl_extension(extensions,
-                                     swap_damage_ext_to_entrypoint[i].extension)) {
+      if (CheckEGLExtension(extensions,
+                            swap_damage_ext_to_entrypoint[i].extension)) {
         /* The EXTPROC is identical to the KHR one */
         Native::kSwapBuffersWithDamageAPI =
             (PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC)
@@ -236,7 +220,7 @@ void Display::Private::OnError(void *data,
     object_name = "xdg_shell";
   }
 
-  _DEBUG("Error from %s: %s (%d)\n", object_name, message, code);
+  fprintf(stderr, "Error from %s: %s (%d)\n", object_name, message, code);
 }
 
 void Display::Private::OnDeleteId(void *data, struct wl_display *wl_display, uint32_t id) {
@@ -258,10 +242,11 @@ void Display::Private::OnGlobal(void *data,
   _this->p_->globals.push_back(global);
 
   if (strcmp(interface, wl_compositor_interface.name) == 0) {
-    _this->p_->wl_compositor = static_cast<struct wl_compositor *>(wl_registry_bind(_this->p_->wl_registry,
-                                                                                    id,
-                                                                                    &wl_compositor_interface,
-                                                                                    version));
+    _this->p_->wl_compositor =
+        static_cast<struct wl_compositor *>(wl_registry_bind(_this->p_->wl_registry,
+                                                             id,
+                                                             &wl_compositor_interface,
+                                                             version));
   } else if (strcmp(interface, wl_subcompositor_interface.name) == 0) {
     _this->p_->wl_subcompositor =
         static_cast<struct wl_subcompositor *>(wl_registry_bind(_this->p_->wl_registry,
@@ -275,7 +260,6 @@ void Display::Private::OnGlobal(void *data,
                                                       &wl_shm_interface,
                                                       version));
     wl_shm_add_listener(_this->p_->wl_shm, &Private::kShmListener, _this);
-
     _ASSERT(nullptr == _this->p_->wl_cursor_theme);
     _this->p_->wl_cursor_theme = wl_cursor_theme_load(NULL, 24, _this->p_->wl_shm);
 
@@ -284,14 +268,17 @@ void Display::Private::OnGlobal(void *data,
     Output *output = new Output(id, version);
     _this->AddOutput(output);
   } else if (strcmp(interface, zxdg_shell_v6_interface.name) == 0) {
-    _this->p_->xdg_shell = static_cast<struct zxdg_shell_v6 *>(wl_registry_bind(_this->p_->wl_registry,
-                                                                                id,
-                                                                                &zxdg_shell_v6_interface,
-                                                                                version));
+    _this->p_->xdg_shell =
+        static_cast<struct zxdg_shell_v6 *>(wl_registry_bind(_this->p_->wl_registry,
+                                                             id,
+                                                             &zxdg_shell_v6_interface,
+                                                             version));
     zxdg_shell_v6_add_listener(_this->p_->xdg_shell, &Private::kXdgShellListener, _this);
   } else if (strcmp(interface, wl_shell_interface.name) == 0) {
-    _this->p_->wl_shell = static_cast<struct wl_shell *>(wl_registry_bind(_this->p_->wl_registry,
-                                                                          id, &wl_shell_interface, version));
+    _this->p_->wl_shell =
+        static_cast<struct wl_shell *>(wl_registry_bind(_this->p_->wl_registry,
+                                                        id, &wl_shell_interface,
+                                                        version));
   } else if (strcmp(interface, wl_seat_interface.name) == 0) {
     Input *input = new Input(id, version);
     _this->AddInput(input);
@@ -332,16 +319,16 @@ void Display::Private::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, u
 }
 
 EGLDisplay Display::Private::GetEGLDisplay(EGLenum platform, void *native_display, const EGLint *attrib_list) {
-  static PFNEGLGETPLATFORMDISPLAYEXTPROC get_platform_display = NULL;
+  static PFNEGLGETPLATFORMDISPLAYEXTPROC kEGLGetPlatformDisplayHandle = NULL;
 
-  if (!get_platform_display) {
-    get_platform_display = (PFNEGLGETPLATFORMDISPLAYEXTPROC)
+  if (!kEGLGetPlatformDisplayHandle) {
+    kEGLGetPlatformDisplayHandle = (PFNEGLGETPLATFORMDISPLAYEXTPROC)
         GetEGLProcAddress("eglGetPlatformDisplayEXT");
   }
 
-  if (get_platform_display)
-    return get_platform_display(platform,
-                                native_display, attrib_list);
+  if (kEGLGetPlatformDisplayHandle)
+    return kEGLGetPlatformDisplayHandle(platform,
+                                        native_display, attrib_list);
 
   return eglGetDisplay((EGLNativeDisplayType) native_display);
 }

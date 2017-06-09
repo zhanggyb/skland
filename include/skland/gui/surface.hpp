@@ -308,12 +308,16 @@ class Surface {
 
     /**
      * @brief Get the EGL surface
+     * @param[in] surface The surface object
+     * @param[in] create
+     *            - true: create and turn the surface role to 3D surface
+     *            - false: just get the existing EGL surface, return null if not exists
      *
      * If the surface is not an EGL surface, this method will create one and
      * change the surface behavior. Delete the EGL object returned by this
      * method will turn this surface back to 2D.
      */
-    static EGL *Get(Surface *surface);
+    static EGL *Get(Surface *surface, bool create = true);
 
     virtual ~EGL();
 
