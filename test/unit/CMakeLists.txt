@@ -38,6 +38,9 @@ if (LINUX)
     add_subdirectory(graphic-paint)
     add_subdirectory(graphic-canvas)
 
+    # graphic
+    add_subdirectory(av-dict)
+
     # gui
     add_subdirectory(gui-idle-task)
     add_subdirectory(gui-display)

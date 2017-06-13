@@ -14,40 +14,29 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_DYNAMIC_LIBRARY_HPP_
-#define SKLAND_CORE_DYNAMIC_LIBRARY_HPP_
+#ifndef SKLAND_AV_UTIL_HPP_
+#define SKLAND_AV_UTIL_HPP_
 
-#include <dlfcn.h>
+extern "C" {
+#include <libavutil/avutil.h>
+};
 
 namespace skland {
+namespace av {
 
-/**
- * @ingroup core
- * @brief dlopen wrapper
- */
-class DynamicLibrary {
+enum MediaType {
 
- public:
-
-  DynamicLibrary()
-      : handle_(nullptr) {}
-
-  ~DynamicLibrary();
-
-  void Open(const char *filename, int flags);
-
-  void Close();
-
-  void *GetSymbol(const char *symbol);
-
-  operator bool() const { return nullptr != handle_; }
-
- private:
-
-  void *handle_;
+  kMediaTypeUnknown = AVMEDIA_TYPE_UNKNOWN,
+  kMediaTypeVideo = AVMEDIA_TYPE_VIDEO,
+  kMediaTypeAudio = AVMEDIA_TYPE_AUDIO,
+  kMediaTypeData = AVMEDIA_TYPE_DATA,
+  kMediaTypeSubtitle = AVMEDIA_TYPE_SUBTITLE,
+  kMediaTypeAttachment = AVMEDIA_TYPE_ATTACHMENT,
+  kMediaTypeNB = AVMEDIA_TYPE_NB
 
 };
 
 }
+}
 
-#endif // SKLAND_CORE_DYNAMIC_LIBRARY_HPP_
+#endif // SKLAND_AV_UTIL_HPP_

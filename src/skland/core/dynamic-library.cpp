@@ -16,10 +16,8 @@
 
 #include <skland/core/dynamic-library.hpp>
 
+#include <stdexcept>
 #include <iostream>
-
-using std::cerr;
-using std::endl;
 
 namespace skland {
 
@@ -32,7 +30,7 @@ void DynamicLibrary::Open(const char *filename, int flags) {
 
   handle_ = dlopen(filename, flags);
   if (nullptr == handle_) {
-    cerr << "Error! Cannot load library: " << dlerror() << endl;
+    throw std::runtime_error("Error! Cannot load library!");
   }
 }
 
@@ -44,10 +42,13 @@ void DynamicLibrary::Close() {
 }
 
 void *DynamicLibrary::GetSymbol(const char *symbol) {
-  void* addr = dlsym(handle_, symbol);
-  const char* error = dlerror();
+  void *addr = nullptr;
+
+  dlerror();  // Clear old error.
+  addr = dlsym(handle_, symbol);
+  const char *error = dlerror();
   if (error) {
-    cerr << "Error! Cannot load symbol: " << error << endl;
+    throw std::runtime_error("Error in loading symbol!");
   }
 
   return addr;

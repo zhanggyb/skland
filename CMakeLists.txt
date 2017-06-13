@@ -113,7 +113,7 @@ endif ()
 find_package(FFMPEG REQUIRED)
 if (FFMPEG_FOUND)
     include_directories(${FFMPEG_INCLUDE_DIRS})
-    add_definitions(${FFMPEG_DEFINITIONS})
+    add_definitions(${FFMPEG_DEFINITIONS} -D__STDC_CONSTANT_MACROS)
     set(LIBS ${LIBS} ${FFMPEG_LIBRARIES})
 endif ()
 

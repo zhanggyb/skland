@@ -192,8 +192,6 @@ void Display::Private::OnFormat(void *data, struct wl_shm *shm, uint32_t format)
       break;
     }
   }
-
-  fprintf(stderr, "Possible shmem format %s\n", text);
 }
 
 void Display::Private::OnError(void *data,

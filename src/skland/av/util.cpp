@@ -14,40 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_DYNAMIC_LIBRARY_HPP_
-#define SKLAND_CORE_DYNAMIC_LIBRARY_HPP_
-
-#include <dlfcn.h>
+#include "skland/av/util.hpp"
 
 namespace skland {
+namespace av {
 
-/**
- * @ingroup core
- * @brief dlopen wrapper
- */
-class DynamicLibrary {
 
- public:
-
-  DynamicLibrary()
-      : handle_(nullptr) {}
-
-  ~DynamicLibrary();
-
-  void Open(const char *filename, int flags);
-
-  void Close();
-
-  void *GetSymbol(const char *symbol);
-
-  operator bool() const { return nullptr != handle_; }
-
- private:
-
-  void *handle_;
-
-};
 
 }
-
-#endif // SKLAND_CORE_DYNAMIC_LIBRARY_HPP_
+}
