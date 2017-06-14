@@ -36,15 +36,9 @@ class Packet {
 
  public:
 
-  /**
-   * @brief Default constructor
-   *
-   * Allocate and initialize optional fields of a packet with default values.
-   *
-   * @note This only allocates the packet itself, not the data buffers. Those must be allocated through other means
-   * such as av_new_packet.
-   */
-  Packet();
+  static std::unique_ptr<Packet> Allocate();
+
+  static std::unique_ptr<Packet> Clone(const Packet &src);
 
   /**
    * @brief Destructor
@@ -60,14 +54,6 @@ class Packet {
    * @note This does not touch the data and size members, which have to be initialized separately.
    */
   void Initialize();
-
-  /**
-   * @brief Allocate the payload of a packet and initialize its fields with default values
-   * @param size
-   */
-  void Allocate(int size);
-
-  Packet *Clone();
 
   /**
    * @brief Reduce packet size, correctly zeroing padding.
@@ -98,18 +84,25 @@ class Packet {
    */
   void Unref();
 
-  operator bool() const {
-    return nullptr != native_;
-  }
-
   /**
    * @brief Copy packet, including contents
    * @param src
    * @param dst
    */
-  static void Copy(const Packet *src, Packet *dst);
+  static void Copy(const Packet &src, Packet &dst);
 
  private:
+
+  /**
+   * @brief Default constructor
+   *
+   * Allocate and initialize optional fields of a packet with default values.
+   *
+   * @note This only allocates the packet itself, not the data buffers. Those must be allocated through other means
+   * such as av_new_packet.
+   */
+  explicit Packet(AVPacket *packet)
+      : native_(packet) {}
 
   AVPacket *native_;
 

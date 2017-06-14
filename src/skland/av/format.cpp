@@ -26,6 +26,18 @@ namespace av {
 
 bool Format::kAllRegistered = false;
 
+unsigned int Format::Version() {
+  return avformat_version();
+}
+
+const char *Format::Configuration() {
+  return avformat_configuration();
+}
+
+const char *Format::License() {
+  return avformat_license();
+}
+
 void Format::RegisterAll() {
   if (kAllRegistered) return;
 

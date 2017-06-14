@@ -14,32 +14,49 @@
  * limitations under the License.
  */
 
-#include <stdexcept>
 #include "skland/av/codec.hpp"
+
+#include "skland/core/assert.hpp"
+#include <stdexcept>
 
 namespace skland {
 namespace av {
 
-Packet::Packet()
-    : native_(nullptr) {
-  native_ = av_packet_alloc();
-  if (!native_)
-    fprintf(stderr, "Error! Fail to allocate packet!");
+std::unique_ptr<Packet> Packet::Allocate() {
+  AVPacket *packet = av_packet_alloc();
+  if (!packet) {
+    throw std::runtime_error("Error! Fail to allocate packet!");
+  }
+
+  std::unique_ptr<Packet> ptr(new Packet(packet));
+  return std::move(ptr);
+}
+
+std::unique_ptr<Packet> Packet::Clone(const Packet &src) {
+  AVPacket *packet = av_packet_clone(src.native_);
+  if (!packet) {
+    throw std::runtime_error("Error! Fail to clone packet!");
+  }
+
+  std::unique_ptr<Packet> ptr(new Packet(packet));
+  return std::move(ptr);
 }
 
 Packet::~Packet() {
-  if (native_) av_packet_free(&native_);
+  _ASSERT(native_);
+  av_packet_free(&native_);
 }
 
 void Packet::Initialize() {
   av_init_packet(native_);
 }
 
-void Packet::Allocate(int size) {
-  int ret = av_new_packet(native_, size);
-  if (ret < 0) {
-    throw std::runtime_error("Error! Fail to allocate payload!");
-  }
+void Packet::Shrink(int size) {
+  av_shrink_packet(native_, size);
+}
+
+void Packet::Grow(int grow_by) {
+  av_grow_packet(native_, grow_by);
 }
 
 void Packet::Ref(const Packet *src) {
@@ -53,8 +70,8 @@ void Packet::Unref() {
   av_packet_unref(native_);
 }
 
-void Packet::Copy(const Packet *src, Packet *dst) {
-  int ret = av_copy_packet(dst->native_, src->native_);
+void Packet::Copy(const Packet &src, Packet &dst) {
+  int ret = av_copy_packet(dst.native_, src.native_);
   if (ret < 0) {
     throw std::runtime_error("Error! Fail to copy packet!");
   }

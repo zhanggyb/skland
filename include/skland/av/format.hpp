@@ -95,10 +95,6 @@ class InputFormat {
     return native_->extensions;
   }
 
-  operator bool() const {
-    return nullptr != native_;
-  }
-
  private:
 
   explicit InputFormat(AVInputFormat *input_format)
@@ -252,10 +248,6 @@ class FormatContext {
 
   int64_t bit_rate() const {
     return native_->bit_rate;
-  }
-
-  operator bool() const {
-    return nullptr != native_;
   }
 
  private:
