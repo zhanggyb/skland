@@ -34,6 +34,9 @@ namespace skland {
 class Paint;
 class Path;
 class Matrix;
+class Bitmap;
+class ImageInfo;
+class Layer;
 
 /**
  * @ingroup graphic
@@ -48,6 +51,11 @@ class Canvas {
 
   class ClipGuard;
 
+  static std::unique_ptr<Canvas> MakeRasterDirect(int width,
+                                                  int height,
+                                                  unsigned char *pixels,
+                                                  int format = kPixelFormatABGR8888);
+
   /**
    * @brief Create an empty canvas with no backing device/pixels, and zero dimentions
    */
@@ -56,9 +64,18 @@ class Canvas {
   Canvas(unsigned char *pixel, int width, int height,
          int format = kPixelFormatABGR8888);
 
+  Canvas(const Bitmap &bitmap);
+
   ~Canvas();
 
   void SetOrigin(float x, float y);
+
+  /**
+   * @brief Create a new layer matching the specified info
+   * @param info
+   * @return
+   */
+  Layer MakeLayer(const ImageInfo &info);
 
   void DrawLine(float x0, float y0, float x1, float y1, const Paint &paint);
 

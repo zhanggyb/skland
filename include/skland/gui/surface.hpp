@@ -82,266 +82,9 @@ class Surface {
 
  public:
 
-  /**
-   * @brief Shell surface role
-   */
-  class Shell {
-
-    friend class Surface;
-
-    Shell() = delete;
-    Shell(const Shell &) = delete;
-    Shell &operator=(const Shell &) = delete;
-
-   public:
-
-    /**
-     * @brief Toplevel shell surface role
-     */
-    class Toplevel {
-
-      friend class Shell;
-
-      Toplevel() = delete;
-      Toplevel(const Toplevel &) = delete;
-      Toplevel &operator=(const Toplevel &) = delete;
-
-     public:
-
-      enum StatesMask {
-        /**
-         * the surface is maximized
-         */
-        kStateMaskMaximized = 0x1, /* 1 */
-
-        /**
-         * the surface is fullscreen
-         */
-        kStateMaskFullscreen = 0x1 << 1,  /* 2 */
-
-        /**
-         * the surface is being resized
-         */
-        kStateMaskResizing = 0x1 << 2, /* 4 */
-
-        /**
-         * the surface is now activated
-         */
-        kStateMaskActivated = 0x1 << 3, /* 8 */
-      };
-
-      /**
-       * @brief Create a toplevel shell surface
-       */
-      static Surface *Create(AbstractEventHandler *event_handler,
-                             const Margin &margin = Margin());
-
-      static Toplevel *Get(const Surface *surface);
-
-      void SetTitle(const char *title) const;
-
-      void SetAppId(const char *id) const;
-
-      void Move(const InputEvent &input_event, uint32_t serial) const;
-
-      void Resize(const InputEvent &input_event, uint32_t serial, uint32_t edges) const;
-
-      void SetMaximized() const;
-
-      void UnsetMaximized() const;
-
-      void SetFullscreen(const Output *output) const;
-
-      void UnsetFullscreen() const;
-
-      void SetMinimized() const;
-
-     private:
-
-      struct Private;
-
-      Toplevel(Shell *shell_surface);
-
-      ~Toplevel();
-
-      std::unique_ptr<Private> p_;
-
-    };
-
-    /**
-     * @brief Popup shell surface role
-     */
-    class Popup {
-
-      friend class Shell;
-
-      Popup() = delete;
-      Popup(const Popup &) = delete;
-      Popup &operator=(const Popup &) = delete;
-
-     public:
-
-      /**
-       * @brief Create a popup shell surface
-       */
-      static Surface *Create(Shell *parent,
-                             AbstractEventHandler *view,
-                             const Margin &margin = Margin());
-
-     private:
-
-      struct Private;
-
-      Popup(Shell *shell);
-
-      ~Popup();
-
-      std::unique_ptr<Private> p_;
-
-    };
-
-    static Shell *Get(const Surface *surface);
-
-    void ResizeWindow(int width, int height) const;
-
-    void AckConfigure(uint32_t serial) const;
-
-    Surface *surface() const { return surface_; }
-
-   private:
-
-    struct Private;
-
-    static Surface *Create(AbstractEventHandler *event_handler,
-                           const Margin &margin = Margin());
-
-    Shell(Surface *surface);
-
-    ~Shell();
-
-    void Push();
-
-    void Remove();
-
-    std::unique_ptr<Private> p_;
-
-    Surface *surface_;
-
-    Shell *parent_;
-
-    union {
-      void *placeholder;
-      Toplevel *toplevel;
-      Popup *popup;
-    } role_;
-
-  };
-
-  /**
-   * @brief Sub surface role
-   */
-  class Sub {
-
-    friend class Surface;
-
-   public:
-
-    /**
-     * @brief Create a sub surface
-     */
-    static Surface *Create(Surface *parent,
-                           AbstractEventHandler *event_handler,
-                           const Margin &margin = Margin());
-
-    static Sub *Get(const Surface *surface);
-
-    void PlaceAbove(Surface *sibling);
-
-    void PlaceBelow(Surface *sibling);
-
-    void SetRelativePosition(int x, int y);
-
-    void SetWindowPosition(int x, int y);
-
-    Surface *surface() const { return surface_; }
-
-   private:
-
-    Sub(Surface *surface, Surface *parent);
-
-    ~Sub();
-
-    void SetParent(Surface *parent);
-
-    /**
-   * @brief Move the local surface list and insert above target dst surface
-   * @param dst
-   */
-    void MoveAbove(Surface *dst);
-
-    /**
-     * @brief Move the local surface list and insert below target dst surface
-     * @param dst
-     */
-    void MoveBelow(Surface *dst);
-
-    void InsertAbove(Surface *sibling);
-
-    void InsertBelow(Surface *sibling);
-
-    Surface *surface_;
-
-    struct wl_subsurface *wl_sub_surface_;
-
-  };
-
-  /**
-   * @brief EGL surface role
-   */
-  class EGL {
-
-    EGL() = delete;
-    EGL(const EGL &) = delete;
-    EGL &operator=(const EGL &) = delete;
-
-   public:
-
-    /**
-     * @brief Get the EGL surface
-     * @param[in] surface The surface object
-     * @param[in] create
-     *            - true: create and turn the surface role to 3D surface
-     *            - false: just get the existing EGL surface, return null if not exists
-     *
-     * If the surface is not an EGL surface, this method will create one and
-     * change the surface behavior. Delete the EGL object returned by this
-     * method will turn this surface back to 2D.
-     */
-    static EGL *Get(Surface *surface, bool create = true);
-
-    virtual ~EGL();
-
-    bool MakeCurrent();
-
-    bool SwapBuffers();
-
-    bool SwapBuffersWithDamage(int x, int y, int width, int height);
-
-    bool SwapInterval(int interval = 0);
-
-    void Resize(int width, int height, int dx = 0, int dy = 0);
-
-    Surface *GetSurface() const;
-
-   private:
-
-    struct Private;
-
-    EGL(Surface *surface);
-
-    std::unique_ptr<Private> p_;
-
-  };
+  class Shell;
+  class Sub;
+  class EGL;
 
   enum Transform {
     kTransformNormal = 0, // WL_OUTPUT_TRANSFORM_NORMAL
@@ -491,6 +234,280 @@ class Surface {
 
   static Task kCommitTaskHead;
   static Task kCommitTaskTail;
+
+};
+
+/**
+ * @brief Shell surface role
+ */
+class Surface::Shell {
+
+  friend class Surface;
+
+  Shell() = delete;
+  Shell(const Shell &) = delete;
+  Shell &operator=(const Shell &) = delete;
+
+ public:
+
+  class Toplevel;
+  class Popup;
+
+  static Shell *Get(const Surface *surface);
+
+  void ResizeWindow(int width, int height) const;
+
+  void AckConfigure(uint32_t serial) const;
+
+  Surface *surface() const { return surface_; }
+
+ private:
+
+  struct Private;
+
+  static Surface *Create(AbstractEventHandler *event_handler,
+                         const Margin &margin = Margin());
+
+  Shell(Surface *surface);
+
+  ~Shell();
+
+  void Push();
+
+  void Remove();
+
+  std::unique_ptr<Private> p_;
+
+  Surface *surface_;
+
+  Shell *parent_;
+
+  union {
+    void *placeholder;
+    Toplevel *toplevel;
+    Popup *popup;
+  } role_;
+
+};
+
+/**
+ * @brief Toplevel shell surface role
+ */
+class Surface::Shell::Toplevel {
+
+  friend class Shell;
+
+  Toplevel() = delete;
+  Toplevel(const Toplevel &) = delete;
+  Toplevel &operator=(const Toplevel &) = delete;
+
+ public:
+
+  enum StatesMask {
+    /**
+     * the surface is maximized
+     */
+        kStateMaskMaximized = 0x1, /* 1 */
+
+    /**
+     * the surface is fullscreen
+     */
+        kStateMaskFullscreen = 0x1 << 1,  /* 2 */
+
+    /**
+     * the surface is being resized
+     */
+        kStateMaskResizing = 0x1 << 2, /* 4 */
+
+    /**
+     * the surface is now activated
+     */
+        kStateMaskActivated = 0x1 << 3, /* 8 */
+  };
+
+  /**
+   * @brief Create a toplevel shell surface
+   */
+  static Surface *Create(AbstractEventHandler *event_handler,
+                         const Margin &margin = Margin());
+
+  static Toplevel *Get(const Surface *surface);
+
+  void SetTitle(const char *title) const;
+
+  void SetAppId(const char *id) const;
+
+  void Move(const InputEvent &input_event, uint32_t serial) const;
+
+  void Resize(const InputEvent &input_event, uint32_t serial, uint32_t edges) const;
+
+  void SetMaximized() const;
+
+  void UnsetMaximized() const;
+
+  void SetFullscreen(const Output *output) const;
+
+  void UnsetFullscreen() const;
+
+  void SetMinimized() const;
+
+ private:
+
+  struct Private;
+
+  Toplevel(Shell *shell_surface);
+
+  ~Toplevel();
+
+  std::unique_ptr<Private> p_;
+
+};
+
+/**
+ * @brief Popup shell surface role
+ */
+class Surface::Shell::Popup {
+
+  friend class Shell;
+
+  Popup() = delete;
+  Popup(const Popup &) = delete;
+  Popup &operator=(const Popup &) = delete;
+
+ public:
+
+  /**
+   * @brief Create a popup shell surface
+   */
+  static Surface *Create(Shell *parent,
+                         AbstractEventHandler *view,
+                         const Margin &margin = Margin());
+
+ private:
+
+  struct Private;
+
+  Popup(Shell *shell);
+
+  ~Popup();
+
+  std::unique_ptr<Private> p_;
+
+};
+
+/**
+ * @brief Sub surface role
+ */
+class Surface::Sub {
+
+  friend class Surface;
+
+ public:
+
+  /**
+   * @brief Create a sub surface
+   */
+  static Surface *Create(Surface *parent,
+                         AbstractEventHandler *event_handler,
+                         const Margin &margin = Margin());
+
+  static Sub *Get(const Surface *surface);
+
+  void PlaceAbove(Surface *sibling);
+
+  void PlaceBelow(Surface *sibling);
+
+  void SetRelativePosition(int x, int y);
+
+  void SetWindowPosition(int x, int y);
+
+  Surface *surface() const { return surface_; }
+
+ private:
+
+  Sub(Surface *surface, Surface *parent);
+
+  ~Sub();
+
+  void SetParent(Surface *parent);
+
+  /**
+ * @brief Move the local surface list and insert above target dst surface
+ * @param dst
+ */
+  void MoveAbove(Surface *dst);
+
+  /**
+   * @brief Move the local surface list and insert below target dst surface
+   * @param dst
+   */
+  void MoveBelow(Surface *dst);
+
+  void InsertAbove(Surface *sibling);
+
+  void InsertBelow(Surface *sibling);
+
+  Surface *surface_;
+
+  struct wl_subsurface *wl_sub_surface_;
+
+};
+
+/**
+ * @brief EGL surface role
+ */
+class Surface::EGL {
+
+  EGL() = delete;
+  EGL(const EGL &) = delete;
+  EGL &operator=(const EGL &) = delete;
+
+ public:
+
+  enum Profile {
+    kProfileOpenGLES2,  // OpenGL ES 2
+    kProfileOpenGLES3,  // OpenGL ES 3
+    kProfileOpenGL1_4,  // OpenGL 1.4
+    kProfileOpenGL2_1,  // OpenGL 2.1
+    kProfileOpenGL3_3,  // OpenGL 3.3
+    kProfileOpenGL4_4,  // OpenGL 4.4
+    kProfileVulkan      // Vulkan
+  };
+
+  /**
+   * @brief Get the EGL surface
+   * @param[in] surface The surface object
+   * @param[in] create
+   *            - true: create and turn the surface role to 3D surface
+   *            - false: just get the existing EGL surface, return null if not exists
+   *
+   * If the surface is not an EGL surface, this method will create one and
+   * change the surface behavior. Delete the EGL object returned by this
+   * method will turn this surface back to 2D.
+   */
+  static EGL *Get(Surface *surface, Profile profile = kProfileOpenGLES2, bool create = true);
+
+  virtual ~EGL();
+
+  bool MakeCurrent();
+
+  bool SwapBuffers();
+
+  bool SwapBuffersWithDamage(int x, int y, int width, int height);
+
+  bool SwapInterval(int interval = 0);
+
+  void Resize(int width, int height, int dx = 0, int dy = 0);
+
+  Surface *GetSurface() const;
+
+ private:
+
+  struct Private;
+
+  EGL(Surface *surface);
+
+  std::unique_ptr<Private> p_;
 
 };
 

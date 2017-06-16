@@ -37,16 +37,16 @@ list(APPEND all_source_files
         ${graphic_internal_headers}
         ${graphic_internal_sources})
 
-file(GLOB av_headers "${PROJECT_SOURCE_DIR}/include/skland/av/*.hpp")
-file(GLOB av_sources "av/*.cpp")
-file(GLOB av_internal_headers "av/internal/*.hpp")
-file(GLOB av_internal_sources "av/internal/*.cpp")
-
-list(APPEND all_source_files
-        ${av_headers}
-        ${av_sources}
-        ${av_internal_headers}
-        ${av_internal_sources})
+#file(GLOB av_headers "${PROJECT_SOURCE_DIR}/include/skland/av/*.hpp")
+#file(GLOB av_sources "av/*.cpp")
+#file(GLOB av_internal_headers "av/internal/*.hpp")
+#file(GLOB av_internal_sources "av/internal/*.cpp")
+#
+#list(APPEND all_source_files
+#        ${av_headers}
+#        ${av_sources}
+#        ${av_internal_headers}
+#        ${av_internal_sources})
 
 if (LINUX)
 

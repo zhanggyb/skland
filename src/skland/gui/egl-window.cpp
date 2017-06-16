@@ -59,7 +59,7 @@ struct EGLWindow::Private {
   SharedMemoryPool pool;
 
   Buffer frame_buffer_;
-  std::shared_ptr<Canvas> frame_canvas;
+  std::unique_ptr<Canvas> frame_canvas;
 
   Surface *sub_surface;
 
@@ -200,7 +200,7 @@ void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
 
   const Margin &margin = shell_surface->GetMargin();
   RedrawTask *redraw_task = RedrawTask::Get(this);
-  redraw_task->context = Context(shell_surface, p_->frame_canvas);
+  redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
   PushToTail(redraw_task);
   _ASSERT(p_->frame_canvas);
   Damage(this,
@@ -437,7 +437,7 @@ void EGLWindow::RequestUpdate() {
   const Margin &margin = shell_surface->GetMargin();
 
   RedrawTask *redraw_task = RedrawTask::Get(this);
-  redraw_task->context = Context(shell_surface, p_->frame_canvas);
+  redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
   PushToTail(redraw_task);
   _ASSERT(p_->frame_canvas);
   Damage(this,

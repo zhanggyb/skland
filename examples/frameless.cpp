@@ -25,6 +25,9 @@
 #include <skland/gui/key-event.hpp>
 #include <skland/gui/mouse-event.hpp>
 
+#include "SkSurface.h"
+#include "SkCanvas.h"
+
 using namespace skland;
 
 class FramelessWindow : public skland::Window {
@@ -114,7 +117,7 @@ class MainWidget : public AbstractView {
     const Rect &rect = GetGeometry();
     int scale = context->surface()->GetScale();
 
-    Canvas* canvas = context->canvas();
+    Canvas *canvas = context->canvas();
     canvas->Save();
     canvas->Scale(scale, scale);
 
@@ -123,6 +126,23 @@ class MainWidget : public AbstractView {
     canvas->DrawRect(rect, paint);
 
     canvas->Restore();
+
+    SkCanvas *sk_canvas = canvas->GetSkCanvas();
+
+    SkImageInfo info = SkImageInfo::MakeN32(400, 400, kPremul_SkAlphaType);
+    sk_sp<SkSurface> surface = sk_canvas->makeSurface(info);
+
+    SkCanvas* top_canvas = surface->getCanvas();
+    SkRect top_rect = SkRect::MakeXYWH(50, 50, 100, 100);
+    SkPaint top_paint;
+    top_paint.setColor(0xFFFF0000);
+
+    top_canvas->drawRect(top_rect, top_paint);
+    top_canvas->flush();
+
+    surface->draw(sk_canvas, 100, 100, nullptr);
+
+    canvas->Flush();
   }
 
 };

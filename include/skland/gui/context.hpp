@@ -35,7 +35,7 @@ class Context {
   Context()
       : surface_(nullptr) {}
 
-  Context(Surface *surface, const std::shared_ptr<Canvas> canvas)
+  Context(Surface *surface, Canvas *canvas)
       : surface_(surface), canvas_(canvas) {}
 
   Context(const Context &other)
@@ -51,12 +51,12 @@ class Context {
 
   Surface *surface() const { return surface_; }
 
-  Canvas *canvas() const { return canvas_.get(); }
+  Canvas *canvas() const { return canvas_; }
 
  private:
 
   Surface *surface_;
-  std::shared_ptr<Canvas> canvas_;
+  Canvas *canvas_;
 
 };
 

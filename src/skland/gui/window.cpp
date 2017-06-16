@@ -65,10 +65,10 @@ SKLAND_NO_EXPORT struct Window::Private {
   SharedMemoryPool pool;
 
   Buffer frame_buffer;
-  std::shared_ptr<Canvas> frame_canvas;
+  std::unique_ptr<Canvas> frame_canvas;
 
   Buffer main_buffer;
-  std::shared_ptr<Canvas> main_canvas;
+  std::unique_ptr<Canvas> main_canvas;
 
   /** The default title bar */
   TitleBar *title_bar;
@@ -201,8 +201,8 @@ void Window::OnShown() {
   p_->frame_buffer.Setup(p_->pool, width, height,
                          width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
-  p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer.GetData(),
-                                    width, height));
+  p_->frame_canvas = Canvas::MakeRasterDirect(width, height,
+                                              (unsigned char *) p_->frame_buffer.GetData());
   p_->frame_canvas->SetOrigin((float) margin.left * scale,
                               (float) margin.top * scale);
   p_->frame_canvas->Clear();
@@ -213,8 +213,8 @@ void Window::OnShown() {
                           width * 4, WL_SHM_FORMAT_ARGB8888,
                           width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
-    p_->main_canvas.reset(new Canvas((unsigned char *) p_->main_buffer.GetData(),
-                                     width, height));
+    p_->main_canvas = Canvas::MakeRasterDirect(width, height,
+                                               (unsigned char *) p_->main_buffer.GetData());
     p_->main_canvas->SetOrigin((float) margin.left * scale,
                                (float) margin.top * scale);
     p_->main_canvas->Clear();
@@ -237,14 +237,14 @@ void Window::OnUpdate(AbstractView *view) {
   if (p_->inhibit_update) return;
 
   Surface *surface = nullptr;
-  std::shared_ptr<Canvas> canvas;
+  Canvas *canvas = nullptr;
 
   if (p_->main_surface) {
     surface = p_->main_surface;
-    canvas = p_->main_canvas;
+    canvas = p_->main_canvas.get();
   } else {
     surface = this->GetShellSurface();
-    canvas = p_->frame_canvas;
+    canvas = p_->frame_canvas.get();
   }
 
   AbstractView::RedrawTask *redraw_task = AbstractView::RedrawTask::Get(view);
@@ -330,24 +330,23 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
 
   p_->frame_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
-  p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer.GetData(),
-                                    width, height));
+  p_->frame_canvas = Canvas::MakeRasterDirect(width, height,
+                                              (unsigned char *) p_->frame_buffer.GetData());
   p_->frame_canvas->SetOrigin(margin.left * scale, margin.top * scale);
   p_->frame_canvas->Clear();
 
   if (p_->main_surface) {
     p_->main_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
-    p_->main_canvas.reset(new Canvas((unsigned char *) p_->main_buffer.GetData(),
-                                     width,
-                                     height));
+    p_->main_canvas = Canvas::MakeRasterDirect(width, height,
+                                               (unsigned char *) p_->main_buffer.GetData());
     p_->main_canvas->SetOrigin(margin.left * scale,
                                margin.top * scale);
     p_->main_canvas->Clear();
   }
 
   // Set context before draw this window
-  RedrawTask::Get(this)->context = Context(shell_surface, p_->frame_canvas);
+  RedrawTask::Get(this)->context = Context(shell_surface, p_->frame_canvas.get());
 
   Damage(this,
          0, 0,
@@ -751,7 +750,7 @@ void Window::RequestUpdate() {
   Surface *shell_surface = GetShellSurface();
   const Margin &margin = shell_surface->GetMargin();
 
-  redraw_task->context = Context(shell_surface, p_->frame_canvas);
+  redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
   PushToTail(redraw_task);
   _ASSERT(p_->frame_canvas);
   Damage(this,

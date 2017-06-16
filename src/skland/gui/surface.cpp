@@ -423,7 +423,7 @@ void Surface::Sub::InsertBelow(Surface *sibling) {
 
 // ------
 
-Surface::EGL *Surface::EGL::Get(Surface *surface, bool create) {
+Surface::EGL *Surface::EGL::Get(Surface *surface, Profile /*profile*/, bool create) {
   if ((nullptr == surface->p_->egl) && create)
     surface->p_->egl = new EGL(surface);
 

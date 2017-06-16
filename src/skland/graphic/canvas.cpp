@@ -17,10 +17,15 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
+#include "skland/graphic/image-info.hpp"
 
 #include "internal/matrix_private.hpp"
+#include "internal/bitmap_private.hpp"
+#include "internal/layer_private.hpp"
+#include "internal/image-info_private.hpp"
 
-#include "SkBitmap.h"
+#include "skland/core/memory.hpp"
+
 #include "SkCanvas.h"
 
 namespace skland {
@@ -38,6 +43,24 @@ struct Canvas::Private {
   Point2F origin;
 
 };
+
+std::unique_ptr<Canvas> Canvas::MakeRasterDirect(int width, int height, unsigned char *pixels, int format) {
+  size_t stride = (size_t) width * 4;
+
+  // TODO: support more pixel format
+  switch (format) {
+    case kPixelFormatABGR8888:
+    default:break;
+  }
+
+  Bitmap bitmap;
+  if (!bitmap.InstallPixels(ImageInfo::MakeN32Premul(width, height), pixels, stride)) {
+    throw std::runtime_error("ERROR! Invalid bitmap format for Canvas!");
+  }
+
+//  return std::make_unique<Canvas>(bitmap);  // C++ 14
+  return make_unique<Canvas>(bitmap);
+}
 
 Canvas::Canvas() {
   p_.reset(new Private);
@@ -60,6 +83,10 @@ Canvas::Canvas(unsigned char *pixel, int width, int height, int format) {
   p_.reset(new Private(bitmap));
 }
 
+Canvas::Canvas(const Bitmap &bitmap) {
+  p_.reset(new Private(bitmap.p_->sk_bitmap));
+}
+
 Canvas::~Canvas() {
 }
 
@@ -67,6 +94,13 @@ void Canvas::SetOrigin(float x, float y) {
   p_->sk_canvas.translate(x - p_->origin.x, y - p_->origin.y);
   p_->origin.x = x;
   p_->origin.y = y;
+}
+
+Layer Canvas::MakeLayer(const ImageInfo &info) {
+  sk_sp<SkSurface> native = p_->sk_canvas.makeSurface(info.p_->sk_image_info);
+  Layer layer;
+  layer.p_->sp_sk_surface = native;
+  return layer;
 }
 
 void Canvas::DrawLine(float x0, float y0, float x1, float y1, const Paint &paint) {
