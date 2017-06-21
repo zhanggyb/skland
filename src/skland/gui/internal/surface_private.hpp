@@ -20,6 +20,7 @@
 #include <skland/gui/surface.hpp>
 
 namespace skland {
+namespace gui {
 
 struct Surface::Private {
 
@@ -103,6 +104,7 @@ struct Surface::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_SURFACE_PRIVATE_HPP_

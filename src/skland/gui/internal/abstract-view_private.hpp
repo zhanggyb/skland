@@ -24,6 +24,7 @@
 #include "skland/gui/anchor-group.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -137,6 +138,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_

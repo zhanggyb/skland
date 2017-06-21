@@ -23,6 +23,7 @@
 #include <assert.h>
 
 using namespace skland;
+using namespace skland::gui;
 
 static const char *vert_shader_text =
     "uniform mat4 rotation;\n"

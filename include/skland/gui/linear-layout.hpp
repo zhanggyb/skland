@@ -21,6 +21,7 @@
 #include "abstract-layout.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -55,6 +56,7 @@ SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_LINEAR_LAYOUT_HPP_

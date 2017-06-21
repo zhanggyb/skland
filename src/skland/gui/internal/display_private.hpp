@@ -28,6 +28,7 @@
 #include <EGL/eglext.h>
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -136,6 +137,7 @@ struct Display::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_DISPLAY_PRIVATE_HPP_

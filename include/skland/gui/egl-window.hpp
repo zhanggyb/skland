@@ -21,8 +21,13 @@
 
 namespace skland {
 
-class Surface;
+namespace graphic {
 class Canvas;
+}
+
+namespace gui {
+
+class Surface;
 
 /**
  * @ingroup gui
@@ -96,6 +101,7 @@ class EGLWindow : public AbstractShellView {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_EGL_WINDOW_HPP_

@@ -33,8 +33,8 @@ Test::~Test() {
  * Expected result: display and resize a default window
  */
 TEST_F(Test, show) {
-  using skland::Application;
-  using skland::Window;
+  using skland::gui::Application;
+  using skland::gui::Window;
 
   int argc = 1;
   char argv1[] = "show";  // to avoid compile warning

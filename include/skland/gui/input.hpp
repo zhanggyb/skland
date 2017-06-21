@@ -17,13 +17,15 @@
 #ifndef SKLAND_GUI_INPUT_HPP_
 #define SKLAND_GUI_INPUT_HPP_
 
-#include "../core/deque.hpp"
+#include "skland/core/deque.hpp"
+
 #include "abstract-event-handler.hpp"
 
 #include <wayland-client.h>
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class Cursor;
 class KeyEvent;
@@ -64,6 +66,7 @@ SKLAND_EXPORT class Input : public Deque::Element {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INPUT_HPP_

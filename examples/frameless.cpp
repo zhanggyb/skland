@@ -29,8 +29,9 @@
 #include "SkCanvas.h"
 
 using namespace skland;
+using namespace skland::gui;
 
-class FramelessWindow : public skland::Window {
+class FramelessWindow : public Window {
 
  public:
 
@@ -114,6 +115,9 @@ class MainWidget : public AbstractView {
   }
 
   virtual void OnDraw(const Context *context) override {
+    using skland::graphic::Canvas;
+    using skland::graphic::Paint;
+
     const Rect &rect = GetGeometry();
     int scale = context->surface()->GetScale();
 
@@ -148,8 +152,6 @@ class MainWidget : public AbstractView {
 };
 
 int main(int argc, char *argv[]) {
-  using skland::Window;
-
   Application app(argc, argv);
 
   FramelessWindow *win = new FramelessWindow("Frameless Window", Window::kFlagMaskFrameless);

@@ -22,6 +22,7 @@
 class SkMatrix;
 
 namespace skland {
+namespace graphic {
 
 /**
  * @ingroup graphic
@@ -51,6 +52,7 @@ class Matrix {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_MATRIX_HPP_

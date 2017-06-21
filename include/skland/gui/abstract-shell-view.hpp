@@ -27,6 +27,7 @@
 #include <string>
 
 namespace skland {
+namespace gui {
 
 class Context;
 
@@ -291,6 +292,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_ABSTRACT_SHELL_VIEW_HPP_

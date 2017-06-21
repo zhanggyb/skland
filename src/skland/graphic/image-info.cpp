@@ -17,6 +17,7 @@
 #include "internal/image-info_private.hpp"
 
 namespace skland {
+namespace graphic {
 
 ImageInfo ImageInfo::Make(int width, int height, ColorType ct, AlphaType at) {
   SkImageInfo native = SkImageInfo::Make(width, height, (SkColorType) ct, (SkAlphaType) at);
@@ -49,4 +50,5 @@ ImageInfo::~ImageInfo() {
 
 }
 
-}
+} // namespace graphic
+} // namespace skland

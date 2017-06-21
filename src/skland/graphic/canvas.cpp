@@ -29,6 +29,7 @@
 #include "SkCanvas.h"
 
 namespace skland {
+namespace graphic {
 
 struct Canvas::Private {
 
@@ -96,9 +97,9 @@ void Canvas::SetOrigin(float x, float y) {
   p_->origin.y = y;
 }
 
-Layer Canvas::MakeLayer(const ImageInfo &info) {
+Surface Canvas::MakeLayer(const ImageInfo &info) {
   sk_sp<SkSurface> native = p_->sk_canvas.makeSurface(info.p_->sk_image_info);
-  Layer layer;
+  Surface layer;
   layer.p_->sp_sk_surface = native;
   return layer;
 }
@@ -220,4 +221,5 @@ SkCanvas *Canvas::GetSkCanvas() const {
   return &p_->sk_canvas;
 }
 
-}
+} // namespace graphic
+} // namespace skland

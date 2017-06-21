@@ -20,6 +20,7 @@
 #include <memory>
 
 namespace skland {
+namespace graphic {
 
 class ImageInfo;
 
@@ -47,6 +48,7 @@ class Bitmap {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_BITMAP_HPP_

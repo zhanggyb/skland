@@ -19,6 +19,7 @@
 #include "internal/display_native.hpp"
 
 namespace skland {
+namespace gui {
 
 Region::Region()
     : wl_region_(nullptr) {
@@ -30,4 +31,5 @@ Region::~Region() {
     wl_region_destroy(wl_region_);
 }
 
-}
+} // namespace gui
+} // namespace skland

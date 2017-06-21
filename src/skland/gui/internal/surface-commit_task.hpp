@@ -21,6 +21,7 @@
 #include <skland/gui/task.hpp>
 
 namespace skland {
+namespace gui {
 
 SKLAND_NO_EXPORT struct Surface::CommitTask : public Task {
   CommitTask(const CommitTask &) = delete;
@@ -36,6 +37,7 @@ SKLAND_NO_EXPORT struct Surface::CommitTask : public Task {
   Surface *surface;
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_SURFACE_COMMIT_TASK_HPP_

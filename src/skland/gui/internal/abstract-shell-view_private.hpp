@@ -22,6 +22,7 @@
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -121,6 +122,7 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
 
 };
 
+} // namespace gui
 } // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_ABSTRACT_SHELL_VIEW_PRIVATE_HPP_

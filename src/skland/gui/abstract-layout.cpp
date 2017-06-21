@@ -19,7 +19,6 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
-#include <skland/gui/context.hpp>
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
@@ -31,7 +30,11 @@
 #include <skland/core/assert.hpp>
 //#endif
 
+using skland::graphic::Paint;
+using skland::graphic::Canvas;
+
 namespace skland {
+namespace gui {
 
 AbstractLayout::AbstractLayout(const Padding &padding)
     : AbstractView() {
@@ -135,4 +138,5 @@ void AbstractLayout::OnDraw(const Context *context) {
 //#endif
 }
 
-}
+} // namespace gui
+} // namespace skland

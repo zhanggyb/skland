@@ -20,6 +20,7 @@
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
+namespace gui {
 
 struct Surface::Shell::Popup::Private {
 
@@ -47,6 +48,7 @@ struct Surface::Shell::Popup::Private {
 
 };
 
+} // namespace gui
 } // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_SURFACE_SHELL_POPUP_PRIVATE_HPP_

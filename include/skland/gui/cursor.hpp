@@ -21,6 +21,7 @@
 #include <wayland-client.h>
 
 namespace skland {
+namespace gui {
 
 class Cursor {
 
@@ -57,6 +58,7 @@ class Cursor {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_CURSOR_HPP_

@@ -18,8 +18,10 @@
 #include <skland/gui/context.hpp>
 
 using namespace skland;
+using namespace skland::gui;
+using namespace skland::core;
 
-class TimerWatcher : public skland::Trackable {
+class TimerWatcher : public Trackable {
  public:
 
   TimerWatcher(Timer *timer)
@@ -55,8 +57,6 @@ Test::~Test() {
  *
  */
 TEST_F(Test, timer_1) {
-  using skland::Window;
-
   int argc = 1;
   char argv1[] = "resize_1";  // to avoid compile warning
   char *argv[] = {argv1};

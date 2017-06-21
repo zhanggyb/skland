@@ -21,6 +21,7 @@
 #include "display_private.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -96,6 +97,7 @@ SKLAND_NO_EXPORT class Display::Native {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_DISPLAY_PROXY_HPP_

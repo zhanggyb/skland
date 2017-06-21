@@ -28,6 +28,10 @@
 #include <skland/gui/callback.hpp>
 
 using namespace skland;
+using namespace skland::gui;
+
+using graphic::Canvas;
+using graphic::Paint;
 
 class SpinningView : public AbstractView {
 

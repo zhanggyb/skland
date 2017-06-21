@@ -36,6 +36,7 @@
 #include "internal/display_native.hpp"
 
 namespace skland {
+namespace gui {
 
 void SharedMemoryPool::Setup(int32_t size) {
   Destroy();
@@ -135,4 +136,5 @@ int SharedMemoryPool::CreateTempFile(char *tmpname) {
   return fd;
 }
 
-}
+} // namespace gui
+} // namespace skland

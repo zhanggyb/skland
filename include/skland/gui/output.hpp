@@ -28,6 +28,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class Output : public Deque::Element {
 
@@ -43,7 +44,7 @@ class Output : public Deque::Element {
 
   virtual ~Output();
 
-  SignalRef<Output *> destroyed() { return destroyed_; }
+  core::SignalRef<Output *> destroyed() { return destroyed_; }
 
   int GetSubPixel() const;
 
@@ -65,10 +66,11 @@ class Output : public Deque::Element {
 
   std::unique_ptr<Private> p_;
 
-  Signal<Output *> destroyed_;
+  core::Signal<Output *> destroyed_;
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_OUTPUT_HPP_

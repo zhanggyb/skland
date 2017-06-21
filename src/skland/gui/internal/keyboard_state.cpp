@@ -19,6 +19,7 @@
 #include "keymap.hpp"
 
 namespace skland {
+namespace gui {
 
 KeyboardState::~KeyboardState() {
   if (xkb_state_) xkb_state_unref(xkb_state_);
@@ -41,4 +42,5 @@ void KeyboardState::Destroy() {
   }
 }
 
-}
+} // namespace gui
+} // namespace skland

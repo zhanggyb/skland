@@ -19,6 +19,7 @@
 #include <skland/gui/surface.hpp>
 
 namespace skland {
+namespace gui {
 
 MouseEvent::MouseEvent(Input *input)
     : InputEvent(input) {
@@ -64,4 +65,5 @@ uint32_t MouseEvent::GetAxis() const {
   return p_->axis;
 }
 
-}
+} // namespace gui
+} // namespace skland

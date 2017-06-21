@@ -17,6 +17,7 @@
 #include "output_private.hpp"
 
 namespace skland {
+namespace gui {
 
 const struct wl_output_listener Output::Private::kListener = {
     OnGeometry,
@@ -75,4 +76,5 @@ void Output::Private::OnScale(void *data, struct wl_output * /* wl_output */, in
   _this->p_->scale = factor;
 }
 
+} // namespace gui
 } // namespace skland

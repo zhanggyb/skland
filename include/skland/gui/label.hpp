@@ -24,7 +24,11 @@
 namespace skland {
 
 // Forward declarations
+namespace graphic {
 class Font;
+}
+
+namespace gui {
 
 /**
  * @ingroup gui
@@ -42,7 +46,7 @@ SKLAND_EXPORT class Label : public AbstractView {
 
   void SetBackground(const Color &color);
 
-  void SetFont(const Font &font);
+  void SetFont(const graphic::Font &font);
 
  protected:
 
@@ -78,6 +82,7 @@ SKLAND_EXPORT class Label : public AbstractView {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_LABEL_HPP_

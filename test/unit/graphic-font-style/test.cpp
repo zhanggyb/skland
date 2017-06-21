@@ -7,7 +7,7 @@
 #include <skland/graphic/font-style.hpp>
 #include "SkFontStyle.h"
 
-using namespace skland;
+using namespace skland::graphic;
 
 Test::Test()
     : testing::Test() {

@@ -17,6 +17,7 @@
 #include <skland/gui/task.hpp>
 
 namespace skland {
+namespace gui {
 
 Task::~Task() {
   if (previous_) previous_->next_ = next_;
@@ -53,4 +54,5 @@ void Task::Unlink() {
   next_ = nullptr;
 }
 
+} // namespace gui
 } // namespace skland

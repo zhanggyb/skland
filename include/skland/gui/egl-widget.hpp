@@ -23,6 +23,7 @@
 #include "surface.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -93,6 +94,7 @@ class EGLWidget : public AbstractView {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_EGL_WIDGET_HPP_

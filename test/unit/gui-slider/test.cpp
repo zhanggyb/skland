@@ -9,6 +9,7 @@
 #include <skland/gui/slider.hpp>
 
 using namespace skland;
+using namespace skland::gui;
 
 Test::Test()
     : testing::Test() {
@@ -22,7 +23,7 @@ Test::~Test() {
  *
  */
 TEST_F(Test, slider_1) {
-  using skland::Window;
+  using skland::gui::Window;
 
   int argc = 1;
   char argv1[] = "gui-slider";  // to avoid compile warning

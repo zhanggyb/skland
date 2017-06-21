@@ -25,7 +25,7 @@
 
 #include <skland/graphic/canvas.hpp>
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 #include "internal/abstract-view_private.hpp"
 
@@ -33,6 +33,7 @@
 #include "SkImage.h"
 
 namespace skland {
+namespace gui {
 
 const Margin AbstractShellView::kResizingMargin(5, 5, 5, 5);
 
@@ -96,7 +97,7 @@ void AbstractShellView::Show() {
   }
 }
 
-void AbstractShellView::Close(SLOT) {
+void AbstractShellView::Close(core::SLOT) {
   if (Surface::GetShellSurfaceCount() == 1) {
     Application::Exit();
   }
@@ -108,7 +109,7 @@ void AbstractShellView::Close(SLOT) {
   //  delete this;
 }
 
-void AbstractShellView::Minimize(SLOT) {
+void AbstractShellView::Minimize(core::SLOT) {
   Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
@@ -117,7 +118,7 @@ void AbstractShellView::Minimize(SLOT) {
   _ASSERT(IsMinimized());
 }
 
-void AbstractShellView::ToggleMaximize(SLOT) {
+void AbstractShellView::ToggleMaximize(core::SLOT) {
   if (IsFullscreen()) return;
 
   Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
@@ -130,7 +131,7 @@ void AbstractShellView::ToggleMaximize(SLOT) {
   }
 }
 
-void AbstractShellView::ToggleFullscreen(const Output *output, SLOT) {
+void AbstractShellView::ToggleFullscreen(const Output *output, core::SLOT) {
   Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
@@ -573,4 +574,5 @@ AbstractShellView::RedrawTask *AbstractShellView::RedrawTask::Get(const Abstract
   return &shell_view->p_->redraw_task;
 }
 
-}
+} // namespace gui
+} // namespace skland

@@ -22,8 +22,9 @@
 #include "SkSurface.h"
 
 namespace skland {
+namespace graphic {
 
-struct Layer::Private {
+struct Surface::Private {
 
   Private() {}
 
@@ -44,6 +45,7 @@ struct Layer::Private {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_INTERNAL_LAYER_PRIVATE_HPP_

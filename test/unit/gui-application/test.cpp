@@ -6,7 +6,7 @@
 
 #include <skland/gui/application.hpp>
 
-using skland::Application;
+using skland::gui::Application;
 
 Test::Test()
     : testing::Test() {

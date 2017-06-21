@@ -19,6 +19,7 @@
 #include <skland/core/assert.hpp>
 
 namespace skland {
+namespace graphic {
 
 Shader::Shader() {
   p_.reset(new Private);
@@ -46,4 +47,5 @@ Shader::operator bool() const {
   return p_->sk_shader.get() != nullptr;
 }
 
-}
+} // namespace graphic
+} // namespace skland

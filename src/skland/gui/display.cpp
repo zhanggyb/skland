@@ -29,6 +29,7 @@ using std::cerr;
 using std::endl;
 
 namespace skland {
+namespace gui {
 
 Display *Display::kDisplay = nullptr;
 
@@ -208,4 +209,5 @@ void Display::ReleaseCursors() {
   }
 }
 
-}
+} // namespace gui
+} // namespace skland

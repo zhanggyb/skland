@@ -23,7 +23,11 @@
 
 #include <skland/graphic/font.hpp>
 
+using skland::graphic::Font;
+using skland::graphic::Typeface;
+
 namespace skland {
+namespace gui {
 
 struct AbstractButton::Private {
 
@@ -179,4 +183,5 @@ void AbstractButton::SetSensitive(bool sensitive) {
   }
 }
 
-}
+} // namespace gui
+} // namespace skland

@@ -27,9 +27,13 @@
 #include "gui/key-event.hpp"
 #include "gui/mouse-event.hpp"
 
-#include "stock/theme.hpp"
+#include "skland/gui/theme.hpp"
 
 namespace skland {
+
+using graphic::Font;
+
+namespace gui {
 
 struct Label::Private {
 
@@ -78,7 +82,7 @@ void Label::SetBackground(const Color &color) {
   }
 }
 
-void Label::SetFont(const Font &font) {
+void Label::SetFont(const graphic::Font &font) {
   p_->font = font;
   Update();
 }
@@ -128,6 +132,10 @@ void Label::OnKeyUp(KeyEvent *event) {
 }
 
 void Label::OnDraw(const Context *context) {
+  using graphic::Canvas;
+  using graphic::Paint;
+  using graphic::TextBox;
+
   int scale = context->surface()->GetScale();
   const Rect rect = GetGeometry() * scale;
   Canvas::ClipGuard guard(context->canvas(), rect);
@@ -155,4 +163,5 @@ void Label::OnDraw(const Context *context) {
   text_box.Draw(*context->canvas());
 }
 
-}
+} // namespace gui
+} // namespace skland

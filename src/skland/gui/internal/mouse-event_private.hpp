@@ -20,6 +20,7 @@
 #include <skland/gui/mouse-event.hpp>
 
 namespace skland {
+namespace gui {
 
 struct MouseEvent::Private {
 
@@ -53,6 +54,7 @@ struct MouseEvent::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_

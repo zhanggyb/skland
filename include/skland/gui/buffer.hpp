@@ -27,6 +27,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class SharedMemoryPool;
 
@@ -70,7 +71,7 @@ class Buffer {
 
   const Size &GetSize() const;
 
-  DelegateRef<void()> release() {
+  core::DelegateRef<void()> release() {
     return release_;
   }
 
@@ -84,10 +85,11 @@ class Buffer {
 
   static const struct wl_buffer_listener kListener;
 
-  Delegate<void()> release_;
+  core::Delegate<void()> release_;
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_BUFFER_HPP_

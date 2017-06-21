@@ -30,13 +30,14 @@
 class SkCanvas;
 
 namespace skland {
+namespace graphic {
 
 class Paint;
 class Path;
 class Matrix;
 class Bitmap;
 class ImageInfo;
-class Layer;
+class Surface;
 
 /**
  * @ingroup graphic
@@ -75,7 +76,7 @@ class Canvas {
    * @param info
    * @return
    */
-  Layer MakeLayer(const ImageInfo &info);
+  Surface MakeLayer(const ImageInfo &info);
 
   void DrawLine(float x0, float y0, float x1, float y1, const Paint &paint);
 
@@ -187,6 +188,7 @@ class Canvas::ClipGuard {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_CANVAS_HPP_

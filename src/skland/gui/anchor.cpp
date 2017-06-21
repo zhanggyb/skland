@@ -21,6 +21,7 @@
 #include "internal/abstract-view_iterators.hpp"
 
 namespace skland {
+namespace gui {
 
 Anchor::Anchor(AbstractView *view)
     : previous_(nullptr),
@@ -63,6 +64,5 @@ std::pair<Anchor *, Anchor *> Anchor::MakePair(int distance,
   return std::make_pair(anchor1, anchor2);
 }
 
-
-
-}
+} // namespace gui
+} // namespace skland

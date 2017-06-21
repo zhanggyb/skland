@@ -20,6 +20,7 @@
 #include "SkFontStyle.h"
 
 namespace skland {
+namespace graphic {
 
 FontStyle::FontStyle(int weight, int width, Slant slant) {
   data_.value = 0;
@@ -44,4 +45,5 @@ FontStyle &FontStyle::operator=(const FontStyle &other) {
   return *this;
 }
 
-}
+} // namespace graphic
+} // namespace skland

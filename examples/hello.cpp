@@ -21,6 +21,9 @@
 
 int main(int argc, char *argv[]) {
   using namespace skland;
+  using namespace skland::gui;
+  using graphic::Font;
+  using graphic::FontStyle;
 
   Application app(argc, argv);
 
@@ -29,9 +32,9 @@ int main(int argc, char *argv[]) {
 
   Label *label = new Label("Hello Wayland!");
   label->SetForeground(0xFF444444);
-  label->SetFont(skland::Font("Noto Sans CJK SC",
-                              FontStyle(FontStyle::kWeightBold),
-                              24.f));
+  label->SetFont(Font("Noto Sans CJK SC",
+                      FontStyle(FontStyle::kWeightBold),
+                      24.f));
   win.SetContentView(label);
 
   win.Show();

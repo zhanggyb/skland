@@ -22,6 +22,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class Display;
 class Surface;
@@ -52,7 +53,7 @@ class Callback {
   /**
    * @brief A delegate to the 'done' event
    */
-  DelegateRef<void(uint32_t)> done() { return done_; }
+  core::DelegateRef<void(uint32_t)> done() { return done_; }
 
  private:
 
@@ -60,10 +61,11 @@ class Callback {
 
   std::unique_ptr<Private> p_;
 
-  Delegate<void(uint32_t)> done_;
+  core::Delegate<void(uint32_t)> done_;
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif //SKLAND_CALLBACK_HPP

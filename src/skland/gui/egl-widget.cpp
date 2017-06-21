@@ -29,6 +29,7 @@
 #include <skland/core/assert.hpp>
 
 namespace skland {
+namespace gui {
 
 EGLWidget::EGLWidget()
     : EGLWidget(400, 300) {
@@ -166,4 +167,5 @@ void EGLWidget::OnFrame(uint32_t /* serial */) {
   egl_surface_->GetSurface()->Commit();
 }
 
-}
+} // namespace gui
+} // namespace skland

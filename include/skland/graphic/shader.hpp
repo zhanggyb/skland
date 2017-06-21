@@ -20,6 +20,7 @@
 #include <memory>
 
 namespace skland {
+namespace graphic {
 
 class Paint;
 class GradientShader;
@@ -63,6 +64,7 @@ class Shader {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif  // SKLAND_GRAPHIC_SHADER_HPP_

@@ -23,7 +23,6 @@
 #include <cstring>
 
 namespace skland {
-
 namespace core {
 
 /**

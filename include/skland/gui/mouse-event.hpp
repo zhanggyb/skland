@@ -27,6 +27,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class Surface;
 
@@ -77,6 +78,7 @@ SKLAND_EXPORT class MouseEvent : public InputEvent {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_MOUSE_EVENT_HPP_

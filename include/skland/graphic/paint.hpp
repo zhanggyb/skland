@@ -26,6 +26,7 @@
 class SkPaint;
 
 namespace skland {
+namespace graphic {
 
 class Shader;
 
@@ -146,6 +147,7 @@ bool operator==(const Paint &paint1, const Paint &paint2);
 
 bool operator!=(const Paint &paint1, const Paint &paint2);
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_PAINT_HPP_

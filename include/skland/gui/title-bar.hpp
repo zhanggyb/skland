@@ -19,10 +19,11 @@
 
 #include "abstract-button.hpp"
 
-#include "../core/color.hpp"
-#include "../graphic/font.hpp"
+#include "skland/core/color.hpp"
+#include "skland/graphic/font.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -109,11 +110,12 @@ class TitleBar final : public AbstractView {
   MinimizeButton *minimize_button_;
   FullscreenButton *fullscreen_button_;
 
-  Font font_;
+  graphic::Font font_;
 
   std::string title_;
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_TITLE_BAR_HPP_

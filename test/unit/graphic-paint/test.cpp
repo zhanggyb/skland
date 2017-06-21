@@ -9,7 +9,7 @@
 #include <SkPaint.h>
 
 using skland::Color;
-using skland::Paint;
+using skland::graphic::Paint;
 
 Test::Test()
     : testing::Test() {

@@ -34,7 +34,7 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 #include "SkCanvas.h"
 
@@ -42,6 +42,13 @@
 #include <skland/core/assert.hpp>
 
 namespace skland {
+
+using graphic::Canvas;
+using graphic::Paint;
+using graphic::Path;
+using graphic::ClipOperation;
+
+namespace gui {
 
 struct EGLWindow::Private {
 
@@ -320,7 +327,7 @@ void EGLWindow::OnDraw(const Context *context) {
 //    path.AddRoundRect(geometry, radii);
     path.AddRect(geometry);
     canvas->Save();
-    canvas->ClipPath(path, kClipDifference, true);
+    canvas->ClipPath(path, ClipOperation::kClipDifference, true);
     DropShadow(context);
     canvas->Restore();
   } else {
@@ -452,4 +459,5 @@ void EGLWindow::CancelUpdate() {
   redraw_task->Unlink();
 }
 
-}
+} // namespace gui
+} // namespace skland

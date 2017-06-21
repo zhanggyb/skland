@@ -20,22 +20,23 @@
 #include <memory>
 
 namespace skland {
+namespace graphic {
 
 class ImageInfo;
 
-class Layer {
+class Surface {
 
   friend class Canvas;
 
  public:
 
-  Layer();
+  Surface();
 
-  Layer(const Layer &orig);
+  Surface(const Surface &orig);
 
-  ~Layer();
+  ~Surface();
 
-  Layer &operator=(const Layer &other);
+  Surface &operator=(const Surface &other);
 
  private:
 
@@ -45,6 +46,7 @@ class Layer {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif //SKLAND_LAYER_HPP

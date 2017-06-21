@@ -17,6 +17,7 @@
 #include "internal/matrix_private.hpp"
 
 namespace skland {
+namespace graphic {
 
 Matrix::Matrix() {
   p_.reset(new Private);
@@ -38,4 +39,5 @@ const SkMatrix *Matrix::GetSkMatrix() const {
   return &p_->sk_matrix;
 }
 
-}
+} // namespace graphic
+} // namespace skland

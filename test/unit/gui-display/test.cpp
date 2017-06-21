@@ -9,8 +9,8 @@
 
 #include <iostream>
 
-using skland::Application;
-using skland::Display;
+using skland::gui::Application;
+using skland::gui::Display;
 using std::cout;
 using std::endl;
 
@@ -26,7 +26,7 @@ Test::~Test() {
  *
  */
 TEST_F(Test, application) {
-  using skland::Display;
+  using skland::gui::Display;
 
   int argc = 1;
   char argv1[] = "application";  // to avoid compile warning

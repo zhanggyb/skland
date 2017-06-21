@@ -22,6 +22,7 @@
 #include "SkImageInfo.h"
 
 namespace skland {
+namespace graphic {
 
 struct ImageInfo::Private {
 
@@ -44,6 +45,7 @@ struct ImageInfo::Private {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_INTERNAL_IMAGE_INFO_PRIVATE_HPP_

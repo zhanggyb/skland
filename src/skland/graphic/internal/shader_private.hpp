@@ -22,6 +22,7 @@
 #include "SkShader.h"
 
 namespace skland {
+namespace graphic {
 
 /**
  * @ingroup graphic_intern
@@ -51,6 +52,7 @@ struct Shader::Private {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif  // SKLAND_GRAPHIC_INTERNAL_SHADER_PRIVATE_HPP_

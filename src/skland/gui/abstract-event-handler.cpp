@@ -18,6 +18,7 @@
 #include "internal/abstract-event-handler_private.hpp"
 
 namespace skland {
+namespace gui {
 
 Task AbstractEventHandler::kIdleTaskHead;
 Task AbstractEventHandler::kIdleTaskTail;
@@ -31,7 +32,7 @@ AbstractEventHandler::~AbstractEventHandler() {
 
 }
 
-void AbstractEventHandler::AuditDestroyingToken(details::Token */*token*/) {
+void AbstractEventHandler::AuditDestroyingToken(core::details::Token */*token*/) {
 
 }
 
@@ -59,4 +60,6 @@ AbstractEventHandler::EventTask *AbstractEventHandler::EventTask::GetMouseMotion
   return &event_handler->p_->mouse_motion_task;
 }
 
-}
+} // namespace gui
+} // namespace skland
+

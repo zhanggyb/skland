@@ -22,6 +22,7 @@
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
+namespace gui {
 
 struct Surface::Shell::Toplevel::Private {
 
@@ -52,6 +53,7 @@ struct Surface::Shell::Toplevel::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_SURFACE_SHELL_TOPLEVEL_PRIVATE_HPP_

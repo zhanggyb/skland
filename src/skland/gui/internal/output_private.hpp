@@ -20,6 +20,7 @@
 #include <skland/gui/output.hpp>
 
 namespace skland {
+namespace gui {
 
 struct Output::Private {
 
@@ -96,6 +97,7 @@ struct Output::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_OUTPUT_PRIVATE_HPP_

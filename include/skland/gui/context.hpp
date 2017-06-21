@@ -22,7 +22,11 @@
 
 namespace skland {
 
+namespace graphic {
 class Canvas;
+}
+
+namespace gui {
 
 /**
  * @ingroup gui
@@ -35,7 +39,7 @@ class Context {
   Context()
       : surface_(nullptr) {}
 
-  Context(Surface *surface, Canvas *canvas)
+  Context(Surface *surface, graphic::Canvas *canvas)
       : surface_(surface), canvas_(canvas) {}
 
   Context(const Context &other)
@@ -51,15 +55,16 @@ class Context {
 
   Surface *surface() const { return surface_; }
 
-  Canvas *canvas() const { return canvas_; }
+  graphic::Canvas *canvas() const { return canvas_; }
 
  private:
 
   Surface *surface_;
-  Canvas *canvas_;
+  graphic::Canvas *canvas_;
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_CONTEXT_HPP_

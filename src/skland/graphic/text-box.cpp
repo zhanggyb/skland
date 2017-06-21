@@ -22,6 +22,7 @@
 #include "SkTextBox.h"
 
 namespace skland {
+namespace graphic {
 
 struct TextBox::Private {
 
@@ -100,4 +101,5 @@ float TextBox::GetTextHeight() const {
   return p_->sk_text_box.getTextHeight();
 }
 
-}
+} // namespace graphic
+} // namespace skland

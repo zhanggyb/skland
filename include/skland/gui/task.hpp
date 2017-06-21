@@ -22,6 +22,7 @@
 #include <cstdint>
 
 namespace skland {
+namespace gui {
 
 SKLAND_EXPORT class Task {
 
@@ -64,6 +65,7 @@ SKLAND_EXPORT class Task {
 
 };
 
+} // namespace gui
 } // namespace skland
 
 #endif // SKLAND_GUI_TASK_HPP_

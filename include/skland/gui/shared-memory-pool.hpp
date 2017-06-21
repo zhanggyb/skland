@@ -21,6 +21,7 @@
 #include <sys/types.h>
 
 namespace skland {
+namespace gui {
 
 /**
  * @brief Shared memory pool
@@ -71,6 +72,7 @@ class SharedMemoryPool {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_SHARED_MEMORY_POOL_HPP_

@@ -22,6 +22,7 @@
 #include <memory>
 
 namespace skland {
+namespace graphic {
 
 class Canvas;
 class Paint;
@@ -85,6 +86,7 @@ class TextBox {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_TEXT_BOX_HPP_

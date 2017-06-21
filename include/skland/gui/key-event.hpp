@@ -22,6 +22,7 @@
 #include <linux/input-event-codes.h>
 
 namespace skland {
+namespace gui {
 
 class Surface;
 
@@ -92,6 +93,7 @@ class KeyEvent : public InputEvent {
   Surface *surface_;
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_KEY_EVENT_HPP_

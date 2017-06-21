@@ -19,6 +19,7 @@
 #include "SkPath.h"
 
 namespace skland {
+namespace graphic {
 
 struct Path::Private {
 
@@ -199,4 +200,5 @@ bool operator!=(const Path &path1, const Path &path2) {
   return (path1.p_->sk_path) != (path2.p_->sk_path);
 }
 
-}
+} // namespace graphic
+} // namespace skland

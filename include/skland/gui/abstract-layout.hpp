@@ -20,6 +20,7 @@
 #include "abstract-view.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -88,6 +89,7 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_ABSTRACT_LAYOUT_HPP_

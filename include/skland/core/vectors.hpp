@@ -18,7 +18,6 @@
 #define SKLAND_CORE_VECTORS_HPP_
 
 namespace skland {
-
 namespace core {
 
 /**
@@ -237,7 +236,6 @@ inline bool operator!=(const Vector4<T> &vector1, const Vector4<T> &vector2) {
 }
 
 } // namespace core
-
 } // namespace skland
 
 #endif // SKLAND_CORE_VECTORS_HPP_

@@ -27,6 +27,7 @@
 #include "internal/abstract-view_iterators.hpp"
 
 namespace skland {
+namespace gui {
 
 AbstractView::AbstractView()
     : AbstractView(400, 300) {
@@ -1191,4 +1192,5 @@ AbstractView::RedrawTask *AbstractView::RedrawTask::Get(const AbstractView *view
   return &view->p_->redraw_task;
 }
 
-}
+} // namespace gui
+} // namespace skland

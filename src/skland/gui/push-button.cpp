@@ -24,9 +24,18 @@
 #include <skland/graphic/path.hpp>
 #include <skland/graphic/gradient-shader.hpp>
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 namespace skland {
+
+using graphic::Canvas;
+using graphic::Paint;
+using graphic::Path;
+using graphic::Shader;
+using graphic::Font;
+using graphic::TextBox;
+
+namespace gui {
 
 PushButton::PushButton(const std::string &text)
     : AbstractButton(text) {
@@ -123,4 +132,5 @@ void PushButton::OnDraw(const Context *context) {
   text_box.Draw(*canvas);
 }
 
-}
+} // namespace gui
+} // namespace skland

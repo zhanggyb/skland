@@ -24,6 +24,7 @@
 #include "internal/shader_private.hpp"
 
 namespace skland {
+namespace graphic {
 
 struct Paint::Private {
 
@@ -191,4 +192,5 @@ bool operator!=(const Paint &paint1, const Paint &paint2) {
   return paint1.p_ != paint2.p_;
 }
 
-}
+} // namespace graphic
+} // namespace skland

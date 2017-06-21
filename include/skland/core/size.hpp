@@ -18,7 +18,6 @@
 #define SKLAND_CORE_SIZE_HPP_
 
 namespace skland {
-
 namespace core {
 
 /**
@@ -49,11 +48,11 @@ struct Size {
     return width >= 0 && height >= 0;
   }
 
-  inline bool IsEqual(const Size &other) const {
+  inline bool Equal(const Size &other) const {
     return (width == other.width) && (height == other.height);
   }
 
-  inline bool IsEqual(T width, T height) const {
+  inline bool Equal(T width, T height) const {
     return (this->width == width && this->height == height);
   }
 
@@ -67,8 +66,8 @@ struct Size {
     height -= dh;
   }
 
-  T width;
-  T height;
+  union { T w, width; };
+  union { T h, height; };
 };
 
 /**

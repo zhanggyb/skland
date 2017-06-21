@@ -19,6 +19,7 @@
 #include "internal/abstract-view_iterators.hpp"
 
 namespace skland {
+namespace gui {
 
 LinearLayout::LinearLayout(Orientation orientation, const Padding &padding, int space)
     : AbstractLayout(padding) {
@@ -41,4 +42,5 @@ void LinearLayout::OnLayout(int dirty_flag, int left, int top, int right, int bo
 
 }
 
-}
+} // namespace gui
+} // namespace skland

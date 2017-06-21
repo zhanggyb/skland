@@ -31,6 +31,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 // Forward declarations
 
@@ -76,7 +77,7 @@ class Display {
    */
   static const std::set<uint32_t> &GetPixelFormats();
 
-  static SignalRef<const Global &> unregister() { return kDisplay->unregister_; }
+  static core::SignalRef<const Global &> unregister() { return kDisplay->unregister_; }
 
   /**
    * @brief Get a predefined cursor
@@ -109,12 +110,13 @@ class Display {
 
   std::unique_ptr<Private> p_;
 
-  Signal<const Global &> unregister_;
+  core::Signal<const Global &> unregister_;
 
   static Display *kDisplay;
 
 };
 
+} // namespace gui
 } // namespace skland
 
 #endif // SKLAND_GUI_DISPLAY_HPP_

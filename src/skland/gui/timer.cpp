@@ -26,6 +26,7 @@
 #include <skland/core/debug.hpp>
 
 namespace skland {
+namespace gui {
 
 class Timer::EpollTask : public AbstractEpollTask {
 
@@ -168,4 +169,5 @@ bool Timer::SetTime() {
   return true;
 }
 
+} // namespace gui
 } // namespace skland

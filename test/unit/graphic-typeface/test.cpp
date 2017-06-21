@@ -7,7 +7,7 @@
 #include <skland/graphic/typeface.hpp>
 #include <SkTypeface.h>
 
-using namespace skland;
+using namespace skland::graphic;
 
 Test::Test()
     : testing::Test() {

@@ -19,6 +19,7 @@
 #include "internal/abstract-view_iterators.hpp"
 
 namespace skland {
+namespace gui {
 
 RelativeLayout::~RelativeLayout() {
 
@@ -56,4 +57,5 @@ void RelativeLayout::OnLayout(int dirty_flag, int left, int top, int right, int 
   }
 }
 
-}
+} // namespace gui
+} // namespace skland

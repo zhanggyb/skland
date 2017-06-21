@@ -20,6 +20,7 @@
 #include <skland/gui/abstract-shell-view.hpp>
 
 namespace skland {
+namespace gui {
 
 const struct zxdg_surface_v6_listener Surface::Shell::Private::kListener = {
     OnConfigure
@@ -34,4 +35,5 @@ void Surface::Shell::Private::OnConfigure(void *data,
     shell_view->OnXdgSurfaceConfigure(serial);
 }
 
-}
+} // namespace gui
+} // namespace skland

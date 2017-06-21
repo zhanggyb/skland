@@ -20,22 +20,24 @@
 #include "skland/core/memory.hpp"
 
 namespace skland {
+namespace graphic {
 
-Layer::Layer() {
+Surface::Surface() {
   p_ = make_unique<Private>();
 }
 
-Layer::Layer(const Layer &orig) {
+Surface::Surface(const Surface &orig) {
   p_ = make_unique<Private>(orig.p_->sp_sk_surface);
 }
 
-Layer::~Layer() {
+Surface::~Surface() {
 
 }
 
-Layer &Layer::operator=(const Layer &other) {
+Surface &Surface::operator=(const Surface &other) {
   *p_ = *other.p_;
   return *this;
 }
 
-}
+} // namespace graphic
+} // namespace skland

@@ -19,6 +19,7 @@
 #include "internal/display_native.hpp"
 
 namespace skland {
+namespace gui {
 
 Input::Input(uint32_t id, uint32_t version)
     : Deque::Element() {
@@ -53,4 +54,5 @@ uint32_t Input::GetVersion() const {
   return p_->version;
 }
 
-}
+} // namespace gui
+} // namespace skland

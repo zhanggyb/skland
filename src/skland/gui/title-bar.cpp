@@ -23,7 +23,7 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 #include "SkCanvas.h"
 //#include "SkTypeface.h"
@@ -31,6 +31,12 @@
 #include "SkTextBox.h"
 
 namespace skland {
+
+using graphic::Canvas;
+using graphic::Paint;
+using graphic::Path;
+
+namespace gui {
 
 class TitleBar::Button : public AbstractButton {
  public:
@@ -376,4 +382,5 @@ void TitleBar::OnDraw(const Context *context) {
   text_box.draw(context->canvas()->GetSkCanvas());
 }
 
-}
+} // namespace gui
+} // namespace skland

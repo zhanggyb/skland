@@ -13,6 +13,7 @@
 #include <sys/time.h>
 
 using namespace skland;
+using namespace skland::gui;
 
 static const char *vert_shader_text =
     "uniform mat4 rotation;\n"
@@ -195,8 +196,6 @@ Test::~Test() {
  *
  */
 TEST_F(Test, slider_1) {
-  using skland::Window;
-
   int argc = 1;
   char argv1[] = "gui-slider";  // to avoid compile warning
   char *argv[] = {argv1};

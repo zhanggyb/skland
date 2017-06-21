@@ -20,6 +20,7 @@
 #include "abstract-shell-view.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -127,6 +128,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_WINDOW_HPP_

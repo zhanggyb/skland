@@ -20,6 +20,7 @@
 #include <skland/gui/abstract-shell-view.hpp>
 
 namespace skland {
+namespace gui {
 
 const struct zxdg_toplevel_v6_listener Surface::Shell::Toplevel::Private::kListener = {
     OnConfigure,
@@ -73,4 +74,5 @@ void Surface::Shell::Toplevel::Private::OnClose(void *data, struct zxdg_toplevel
     shell_view->OnXdgToplevelClose();
 }
 
+} // namespace gui
 } // namespace skland

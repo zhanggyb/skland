@@ -17,6 +17,7 @@
 #include "internal/typeface_private.hpp"
 
 namespace skland {
+namespace graphic {
 
 Typeface::Typeface(Style style) {
   p_.reset(new Private);
@@ -117,4 +118,5 @@ bool operator==(const Typeface &typeface1, const Typeface &typeface2) {
   return SkTypeface::Equal(typeface1.p_->sk_typeface.get(), typeface2.p_->sk_typeface.get());
 }
 
-}
+} // namespace graphic
+} // namespace skland

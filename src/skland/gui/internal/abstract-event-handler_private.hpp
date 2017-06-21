@@ -20,6 +20,7 @@
 #include <skland/gui/abstract-event-handler.hpp>
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -47,6 +48,7 @@ SKLAND_NO_EXPORT struct AbstractEventHandler::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_

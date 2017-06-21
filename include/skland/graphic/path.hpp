@@ -24,6 +24,7 @@
 class SkPath;
 
 namespace skland {
+namespace graphic {
 
 class Canvas;
 
@@ -145,6 +146,7 @@ bool operator==(const Path &path1, const Path &path2);
 
 bool operator!=(const Path &path1, const Path &path2);
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_PATH_HPP_

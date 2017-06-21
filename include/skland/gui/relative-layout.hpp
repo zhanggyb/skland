@@ -20,6 +20,7 @@
 #include "abstract-layout.hpp"
 
 namespace skland {
+namespace gui {
 
 SKLAND_EXPORT class RelativeLayout final : public AbstractLayout {
 
@@ -41,6 +42,7 @@ SKLAND_EXPORT class RelativeLayout final : public AbstractLayout {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_RELATIVE_LAYOUT_HPP_

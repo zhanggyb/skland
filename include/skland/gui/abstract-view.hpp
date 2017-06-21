@@ -30,6 +30,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class AbstractShellView;
 class AbstractLayout;
@@ -408,7 +409,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   AbstractLayout *GetLayout() const;
 
-  SignalRef<AbstractView *> destroyed() { return destroyed_; }
+  core::SignalRef<AbstractView *> destroyed() { return destroyed_; }
 
  protected:
 
@@ -603,10 +604,11 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   std::unique_ptr<Private> p_;
 
-  Signal<AbstractView *> destroyed_;
+  core::Signal<AbstractView *> destroyed_;
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_ABSTRACT_VIEW_HPP_

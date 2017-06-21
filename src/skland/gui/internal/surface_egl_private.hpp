@@ -23,6 +23,7 @@
 #include <EGL/eglext.h>
 
 namespace skland {
+namespace gui {
 
 struct Surface::EGL::Private {
 
@@ -44,6 +45,7 @@ struct Surface::EGL::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_SURFACE_EGL_PRIVATE_HPP_

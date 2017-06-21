@@ -28,7 +28,7 @@
 #include <skland/gui/region.hpp>
 #include <skland/gui/output.hpp>
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
@@ -36,6 +36,15 @@
 #include <skland/graphic/gradient-shader.hpp>
 
 namespace skland {
+
+using graphic::Canvas;
+using graphic::Paint;
+using graphic::Path;
+using graphic::Shader;
+using graphic::GradientShader;
+using graphic::ClipOperation;
+
+namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -119,13 +128,13 @@ Window::Window(int width, int height, const char *title, int flags)
     titlebar->Resize(GetWidth(), TitleBar::kHeight);
 
     AbstractButton *button = titlebar->GetButton(TitleBar::kButtonClose);
-    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Close));
+    button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::Close));
 
     button = titlebar->GetButton(TitleBar::kButtonMaximize);
-    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::ToggleMaximize));
+    button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::ToggleMaximize));
 
     button = titlebar->GetButton(TitleBar::kButtonMinimize);
-    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Minimize));
+    button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::Minimize));
 
     button = titlebar->GetButton(TitleBar::kButtonFullscreen);
     //button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::SetFullscreen));
@@ -557,7 +566,7 @@ void Window::OnDraw(const Context *context) {
         4.f * scale, 4.f * scale  // bottom-left
     };
     path.AddRoundRect(geometry, radii);
-    Canvas::ClipGuard guard(canvas, path, kClipDifference, true);
+    Canvas::ClipGuard guard(canvas, path, ClipOperation::kClipDifference, true);
     DropShadow(context);
   } else {
     path.AddRect(geometry);
@@ -587,7 +596,7 @@ void Window::OnDraw(const Context *context) {
   }
 
   // Draw the client area:
-  Canvas::ClipGuard guard(canvas, path, kClipIntersect, true);
+  Canvas::ClipGuard guard(canvas, path, ClipOperation::kClipIntersect, true);
 
   paint.SetStyle(Paint::Style::kStyleFill);
   if (p_->title_bar) {
@@ -722,7 +731,7 @@ RectI Window::GetContentGeometry() const {
   return RectI::FromXYWH(x, y, w, h);
 }
 
-void Window::OnFullscreenButtonClicked(SLOT slot) {
+void Window::OnFullscreenButtonClicked(core::SLOT slot) {
   if (IsFullscreen()) {
     ToggleFullscreen(nullptr);
   } else {
@@ -765,4 +774,5 @@ void Window::CancelUpdate() {
   redraw_task->Unlink();
 }
 
-}
+} // namespace gui
+} // namespace skland

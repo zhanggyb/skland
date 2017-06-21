@@ -17,7 +17,9 @@
 #include "display_native.hpp"
 
 namespace skland {
+namespace gui {
 
 PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC Display::Native::kSwapBuffersWithDamageAPI = NULL;
 
-}
+} // namespace gui
+} // namespace skland

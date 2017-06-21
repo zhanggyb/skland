@@ -23,6 +23,7 @@
 #include "shader.hpp"
 
 namespace skland {
+namespace graphic {
 
 class Matrix;
 
@@ -104,6 +105,7 @@ class GradientShader {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_GRADIENT_SHADER_HPP_

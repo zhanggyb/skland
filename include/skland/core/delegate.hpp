@@ -30,6 +30,7 @@
 #include <cstring>
 
 namespace skland {
+namespace core {
 
 /// @cond IGNORE
 
@@ -372,6 +373,7 @@ class DelegateRef<ReturnType(ParamTypes...)> {
   Delegate<ReturnType(ParamTypes...)> *delegate_;
 };
 
+} // namespace core
 } // namespace skland
 
 #endif  // SKLAND_CORE_DELEGATE_HPP_

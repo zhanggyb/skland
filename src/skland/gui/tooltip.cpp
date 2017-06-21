@@ -17,6 +17,7 @@
 #include <skland/gui/tooltip.hpp>
 
 namespace skland {
+namespace gui {
 
 Tooltip::Tooltip(AbstractView *view)
     : AbstractShellView(nullptr) {
@@ -27,4 +28,5 @@ Tooltip::~Tooltip() {
 
 }
 
-}
+} // namespace gui
+} // namespace skland

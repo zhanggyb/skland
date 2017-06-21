@@ -27,6 +27,7 @@
 #include <skland/core/sigcxx.hpp>
 
 namespace skland {
+namespace core {
 
 namespace details {
 
@@ -77,7 +78,7 @@ Trackable::~Trackable() {
 
 void Trackable::UnbindSignal(SLOT slot) {
   if (slot->token_->binding->trackable_object == this) {
-    details::Token* tmp = slot->token_;
+    details::Token *tmp = slot->token_;
     slot->token_ = slot->token_->next;
     slot->skip_ = true;
 
@@ -226,4 +227,5 @@ void Trackable::InsertBinding(int index, details::Binding *node) {
   node->trackable_object = this;
 }
 
-}  // namespace skland
+} // namespace core
+} // namespace skland

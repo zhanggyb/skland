@@ -6,7 +6,7 @@
 
 #include <skland/gui/task.hpp>
 
-using skland::Task;
+using skland::gui::Task;
 
 Test::Test()
     : testing::Test() {

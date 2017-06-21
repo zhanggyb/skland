@@ -27,6 +27,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class Application;
 class Display;
@@ -511,6 +512,7 @@ class Surface::EGL {
 
 };
 
+} // namespace gui
 } // namespace skland
 
 #endif // SKLAND_GUI_VIEW_SURFACE_HPP_

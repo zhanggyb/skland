@@ -20,6 +20,7 @@
 #include <skland/gui/buffer.hpp>
 
 namespace skland {
+namespace gui {
 
 struct Buffer::Private {
 
@@ -57,6 +58,7 @@ struct Buffer::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif //SKLAND_BUFFER_PRIVATE_HPP
