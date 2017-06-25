@@ -14,39 +14,28 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GRAPHIC_LAYER_HPP_
-#define SKLAND_GRAPHIC_LAYER_HPP_
+#include "internal/surface_private.hpp"
 
-#include <memory>
+#include "internal/image-info_private.hpp"
+#include "skland/core/memory.hpp"
 
 namespace skland {
 namespace graphic {
 
-class ImageInfo;
+Surface* Surface::CreateRasterDirect(const ImageInfo &, void *pixels, size_t rowBytes) {
+  Surface* surface = new Surface();
 
-class Surface {
+  // TODO: set p_
+  return surface;
+}
 
-  friend class Canvas;
+Surface::Surface() {
+  p_ = core::make_unique<Private>();
+}
 
- public:
+Surface::~Surface() {
 
-  Surface();
-
-  Surface(const Surface &orig);
-
-  ~Surface();
-
-  Surface &operator=(const Surface &other);
-
- private:
-
-  struct Private;
-
-  std::unique_ptr<Private> p_;
-
-};
+}
 
 } // namespace graphic
 } // namespace skland
-
-#endif //SKLAND_LAYER_HPP

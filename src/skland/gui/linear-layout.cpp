@@ -21,7 +21,7 @@
 namespace skland {
 namespace gui {
 
-LinearLayout::LinearLayout(Orientation orientation, const Padding &padding, int space)
+LinearLayout::LinearLayout(Orientation orientation, const core::Padding &padding, int space)
     : AbstractLayout(padding) {
 
 }

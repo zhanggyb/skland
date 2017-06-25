@@ -110,7 +110,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   int GetMouseLocation(const MouseEvent *event) const;
 
-  RectI GetContentGeometry() const;
+  core::RectI GetContentGeometry() const;
 
  private:
 

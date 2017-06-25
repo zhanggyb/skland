@@ -37,10 +37,10 @@ namespace gui {
 int Theme::kShadowRadius = 33;
 int Theme::kShadowOffsetX = 0;
 int Theme::kShadowOffsetY = 11;
-Margin Theme::kShadowMargin = Margin(kShadowRadius - kShadowOffsetX,
-                                     kShadowRadius - kShadowOffsetY,
-                                     kShadowRadius + kShadowOffsetX,
-                                     kShadowRadius + kShadowOffsetY);
+core::Margin Theme::kShadowMargin = core::Margin(kShadowRadius - kShadowOffsetX,
+                                                 kShadowRadius - kShadowOffsetY,
+                                                 kShadowRadius + kShadowOffsetX,
+                                                 kShadowRadius + kShadowOffsetY);
 std::vector<uint32_t> Theme::kShadowPixels;
 SkPixmap *Theme::kShadowPixmap = nullptr;
 

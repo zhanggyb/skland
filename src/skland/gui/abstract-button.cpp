@@ -23,11 +23,14 @@
 
 #include <skland/graphic/font.hpp>
 
-using skland::graphic::Font;
-using skland::graphic::Typeface;
-
 namespace skland {
 namespace gui {
+
+using core::RectF;
+using core::Bit;
+
+using graphic::Font;
+using graphic::Typeface;
 
 struct AbstractButton::Private {
 
@@ -159,7 +162,7 @@ void AbstractButton::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void AbstractButton::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
   if (dirty_flag) {
     Update();
   } else {
@@ -167,7 +170,7 @@ void AbstractButton::OnConfigureGeometry(int dirty_flag, const Rect &old_geometr
   }
 }
 
-void AbstractButton::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void AbstractButton::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
 
 }
 

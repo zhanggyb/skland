@@ -1,6 +1,6 @@
 /**
  * @defgroup core Core
- * @brief The core functionality
+ * @brief The base and common code used in all other modules
  *
  * ...
  */

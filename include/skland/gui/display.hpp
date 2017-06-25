@@ -63,13 +63,13 @@ class Display {
    * @brief Get a deque of outputs
    * @return
    */
-  static const Deque &GetOutputs();
+  static const core::Deque &GetOutputs();
 
   /**
    * @brief Get a deque of inputs
    * @return
    */
-  static const Deque &GetInputs();
+  static const core::Deque &GetInputs();
 
   /**
    * @brief Get a set of supported pixel formats

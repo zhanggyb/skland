@@ -22,6 +22,8 @@
 namespace skland {
 namespace gui {
 
+using core::Bit;
+
 const struct zxdg_toplevel_v6_listener Surface::Shell::Toplevel::Private::kListener = {
     OnConfigure,
     OnClose

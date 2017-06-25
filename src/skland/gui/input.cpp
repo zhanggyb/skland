@@ -21,6 +21,8 @@
 namespace skland {
 namespace gui {
 
+using core::Deque;
+
 Input::Input(uint32_t id, uint32_t version)
     : Deque::Element() {
   p_.reset(new Private);

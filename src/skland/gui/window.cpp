@@ -36,6 +36,12 @@
 #include <skland/graphic/gradient-shader.hpp>
 
 namespace skland {
+namespace gui {
+
+using core::RectF;
+using core::RectI;
+using core::Margin;
+using core::Deque;
 
 using graphic::Canvas;
 using graphic::Paint;
@@ -43,8 +49,6 @@ using graphic::Path;
 using graphic::Shader;
 using graphic::GradientShader;
 using graphic::ClipOperation;
-
-namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -210,8 +214,8 @@ void Window::OnShown() {
   p_->frame_buffer.Setup(p_->pool, width, height,
                          width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
-  p_->frame_canvas = Canvas::MakeRasterDirect(width, height,
-                                              (unsigned char *) p_->frame_buffer.GetData());
+  p_->frame_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                    (unsigned char *) p_->frame_buffer.GetData()));
   p_->frame_canvas->SetOrigin((float) margin.left * scale,
                               (float) margin.top * scale);
   p_->frame_canvas->Clear();
@@ -222,8 +226,8 @@ void Window::OnShown() {
                           width * 4, WL_SHM_FORMAT_ARGB8888,
                           width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
-    p_->main_canvas = Canvas::MakeRasterDirect(width, height,
-                                               (unsigned char *) p_->main_buffer.GetData());
+    p_->main_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                     (unsigned char *) p_->main_buffer.GetData()));
     p_->main_canvas->SetOrigin((float) margin.left * scale,
                                (float) margin.top * scale);
     p_->main_canvas->Clear();
@@ -312,7 +316,7 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
 
   int width = new_size.width;
   int height = new_size.height;
-  const Margin &margin = shell_surface->GetMargin();
+  const core::Margin &margin = shell_surface->GetMargin();
 
   RectI input_rect(width, height);
 
@@ -339,16 +343,16 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
 
   p_->frame_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
-  p_->frame_canvas = Canvas::MakeRasterDirect(width, height,
-                                              (unsigned char *) p_->frame_buffer.GetData());
+  p_->frame_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                    (unsigned char *) p_->frame_buffer.GetData()));
   p_->frame_canvas->SetOrigin(margin.left * scale, margin.top * scale);
   p_->frame_canvas->Clear();
 
   if (p_->main_surface) {
     p_->main_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
-    p_->main_canvas = Canvas::MakeRasterDirect(width, height,
-                                               (unsigned char *) p_->main_buffer.GetData());
+    p_->main_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                     (unsigned char *) p_->main_buffer.GetData()));
     p_->main_canvas->SetOrigin(margin.left * scale,
                                margin.top * scale);
     p_->main_canvas->Clear();
@@ -546,7 +550,7 @@ void Window::OnDraw(const Context *context) {
   int height = GetHeight() * scale;
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, width, height);
+  RectF geometry = RectF::FromXYWH(0.f, 0.f, width, height);
   bool drop_shadow = !(IsMaximized() || IsFullscreen());
   const Theme::Schema &window_schema = Theme::GetData().window;
   const Theme::Schema &title_bar_schema = Theme::GetData().title_bar;
@@ -757,7 +761,7 @@ void Window::RequestUpdate() {
   RedrawTask *redraw_task = RedrawTask::Get(this);
 
   Surface *shell_surface = GetShellSurface();
-  const Margin &margin = shell_surface->GetMargin();
+  const core::Margin &margin = shell_surface->GetMargin();
 
   redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
   PushToTail(redraw_task);

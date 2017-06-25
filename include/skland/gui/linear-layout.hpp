@@ -35,7 +35,7 @@ SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
  public:
 
   LinearLayout(Orientation orientation = kHorizontal,
-               const Padding &padding = Padding(5),
+               const core::Padding &padding = core::Padding(5),
                int space = 5);
 
  protected:

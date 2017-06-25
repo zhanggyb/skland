@@ -14,38 +14,26 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GRAPHIC_INTERNAL_LAYER_PRIVATE_HPP_
-#define SKLAND_GRAPHIC_INTERNAL_LAYER_PRIVATE_HPP_
-
-#include "skland/graphic/layer.hpp"
-
-#include "SkSurface.h"
+#ifndef SKLAND_GLOBAL_HPP_
+#define SKLAND_GLOBAL_HPP_
 
 namespace skland {
-namespace graphic {
 
-struct Surface::Private {
+/**
+ * @brief The core functions used in all other modules
+ */
+namespace core {}
 
-  Private() {}
+/**
+ * @brief The graphic module based on Skia
+ */
+namespace graphic {}
 
-  Private(sk_sp<SkSurface> native)
-      : sp_sk_surface(native) {}
+/**
+ * @brief The main GUI module
+ */
+namespace gui {}
 
-  Private(const Private &orig)
-      : sp_sk_surface(orig.sp_sk_surface) {}
+}
 
-  Private &operator=(const Private &other) {
-    sp_sk_surface = other.sp_sk_surface;
-    return *this;
-  }
-
-  ~Private() {}
-
-  sk_sp<SkSurface> sp_sk_surface;
-
-};
-
-} // namespace graphic
-} // namespace skland
-
-#endif // SKLAND_GRAPHIC_INTERNAL_LAYER_PRIVATE_HPP_
+#endif // SKLAND_GLOBAL_HPP_

@@ -30,7 +30,7 @@
 namespace skland {
 namespace gui {
 
-class Output : public Deque::Element {
+class Output : public core::Deque::Element {
 
   friend class Surface;
 

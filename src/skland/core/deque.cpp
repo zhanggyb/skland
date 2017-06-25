@@ -19,6 +19,7 @@
 #include <skland/core/assert.hpp>
 
 namespace skland {
+namespace core {
 
 Deque::Element::Element()
     : previous_(nullptr),
@@ -199,4 +200,5 @@ Deque::Element *Deque::operator[](int index) const {
   return item;
 }
 
-}
+} // namespace core
+} // namespace skland

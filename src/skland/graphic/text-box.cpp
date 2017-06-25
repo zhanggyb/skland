@@ -24,6 +24,8 @@
 namespace skland {
 namespace graphic {
 
+using core::RectF;
+
 struct TextBox::Private {
 
   Private(const Private &) = delete;
@@ -61,11 +63,11 @@ void TextBox::SetSpacingAlign(SpacingAlign align) {
   p_->sk_text_box.setSpacingAlign(static_cast<SkTextBox::SpacingAlign >(align));
 }
 
-void TextBox::GetBox(Rect *rect) const {
+void TextBox::GetBox(RectF *rect) const {
   p_->sk_text_box.getBox(reinterpret_cast<SkRect *>(rect));
 }
 
-void TextBox::SetBox(const Rect &rect) {
+void TextBox::SetBox(const RectF &rect) {
   p_->sk_text_box.setBox(reinterpret_cast<const SkRect &>(rect));
 }
 

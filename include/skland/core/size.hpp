@@ -22,7 +22,7 @@ namespace core {
 
 /**
  * @ingroup core
- * @brief Template structure for size
+ * @brief Template structure for size in 2 dimension
  */
 template<typename T>
 struct Size {

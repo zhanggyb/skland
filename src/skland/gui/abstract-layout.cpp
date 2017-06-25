@@ -30,13 +30,16 @@
 #include <skland/core/assert.hpp>
 //#endif
 
-using skland::graphic::Paint;
-using skland::graphic::Canvas;
-
 namespace skland {
 namespace gui {
 
-AbstractLayout::AbstractLayout(const Padding &padding)
+using core::RectF;
+using core::ColorF;
+
+using graphic::Paint;
+using graphic::Canvas;
+
+AbstractLayout::AbstractLayout(const core::Padding &padding)
     : AbstractView() {
   p_->padding = padding;
   p_->need_redraw = false;
@@ -74,7 +77,7 @@ void AbstractLayout::Layout() {
   Update();
 }
 
-void AbstractLayout::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void AbstractLayout::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
   if (dirty_flag) {
     Layout();
   } else {
@@ -83,7 +86,7 @@ void AbstractLayout::OnConfigureGeometry(int dirty_flag, const Rect &old_geometr
   }
 }
 
-void AbstractLayout::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void AbstractLayout::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
   p_->need_layout = true;
 }
 
@@ -133,7 +136,7 @@ void AbstractLayout::OnDraw(const Context *context) {
   float b = rand() % 255 / 255.f;
 
   Paint paint;
-  paint.SetColor(Color(r, g, b, 0.25));
+  paint.SetColor(ColorF(r, g, b, 0.25));
   context->canvas()->DrawRect(GetGeometry(), paint);
 //#endif
 }

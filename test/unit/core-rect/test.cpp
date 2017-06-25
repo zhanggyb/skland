@@ -9,6 +9,7 @@
 #include "SkRect.h"
 
 using namespace skland;
+using namespace skland::core;
 
 Test::Test()
     : testing::Test() {
@@ -19,19 +20,19 @@ Test::~Test() {
 }
 
 TEST_F(Test, constructor_1) {
-  Rect r;
+  RectF r;
 
   ASSERT_TRUE(r.x() == 0 && r.y() == 0 && r.width() == 0 && r.height() == 0);
 }
 
 TEST_F(Test, constructor_2) {
-  Rect r(0, 0, 4, 4);
+  RectF r(0, 0, 4, 4);
 
   ASSERT_TRUE(r.x() == 0 && r.y() == 0 && r.width() == 4 && r.height() == 4);
 }
 
 TEST_F(Test, MoveTo_1) {
-  Rect rect = {10, 10, 20, 20};
+  RectF rect = {10, 10, 20, 20};
 
   rect.MoveTo(20, 20);
 
@@ -39,7 +40,7 @@ TEST_F(Test, MoveTo_1) {
 }
 
 TEST_F(Test, set_size_1) {
-  Rect r;
+  RectF r;
 
   r.Resize(4, 4);
 
@@ -47,7 +48,7 @@ TEST_F(Test, set_size_1) {
 }
 
 TEST_F(Test, set_position_1) {
-  Rect r(0, 0, 4, 4);
+  RectF r(0, 0, 4, 4);
 
   r.MoveTo(1, 1);
 
@@ -55,7 +56,7 @@ TEST_F(Test, set_position_1) {
 }
 
 TEST_F(Test, set_position_2) {
-  Rect r(0, 0, 4, 4);
+  RectF r(0, 0, 4, 4);
 
   r.MoveTo(1, 1);
 
@@ -63,31 +64,31 @@ TEST_F(Test, set_position_2) {
 }
 
 TEST_F(Test, contains_1) {
-  Rect r(0, 0, 4, 4);
+  RectF r(0, 0, 4, 4);
 
   ASSERT_TRUE(r.Contain(1, 1));
 }
 
 TEST_F(Test, contains_2) {
-  Rect r(0, 0, 4, 4);
+  RectF r(0, 0, 4, 4);
 
   ASSERT_TRUE(r.Contain(0, 0));
 }
 
 TEST_F(Test, contains_3) {
-  Rect r(0, 0, 4, 4);
+  RectF r(0, 0, 4, 4);
 
   ASSERT_TRUE(r.Contain(4, 4));
 }
 
 TEST_F(Test, hcenter_1) {
-  Rect r(0, 0, 4, 4);
+  RectF r(0, 0, 4, 4);
 
   ASSERT_TRUE(r.center_x() == 2);
 }
 
 TEST_F(Test, vcenter_1) {
-  Rect r(0, 0, 4, 4);
+  RectF r(0, 0, 4, 4);
 
   ASSERT_TRUE(r.center_y() == 2);
 }

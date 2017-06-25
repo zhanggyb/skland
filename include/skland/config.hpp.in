@@ -22,4 +22,6 @@
 
 /* #define SKLAND_HAVE_EGL @HAVE_EGL@ */
 
+}
+
 #endif  // SKLAND_CONFIG_HPP_

@@ -58,9 +58,9 @@ class TextBox {
 
   void SetSpacingAlign(SpacingAlign align);
 
-  void GetBox(Rect *rect) const;
+  void GetBox(core::RectF *rect) const;
 
-  void SetBox(const Rect &rect);
+  void SetBox(const core::RectF &rect);
 
   void SetBox(float left, float top, float right, float bottom);
 

@@ -36,7 +36,7 @@
 namespace skland {
 namespace gui {
 
-Surface *Surface::Shell::Create(AbstractEventHandler *event_handler, const Margin &margin) {
+Surface *Surface::Shell::Create(AbstractEventHandler *event_handler, const core::Margin &margin) {
   Surface *surface = new Surface(event_handler, margin);
   surface->p_->role.shell = new Shell(surface);
   return surface;
@@ -129,7 +129,7 @@ void Surface::Shell::Remove() {
 
 // ------
 
-Surface *Surface::Shell::Toplevel::Create(AbstractEventHandler *event_handler, const Margin &margin) {
+Surface *Surface::Shell::Toplevel::Create(AbstractEventHandler *event_handler, const core::Margin &margin) {
   Surface *surface = Shell::Create(event_handler, margin);
   Shell *shell = Shell::Get(surface);
   shell->role_.toplevel = new Toplevel(shell);
@@ -196,7 +196,7 @@ Surface::Shell::Toplevel::~Toplevel() {
 
 // ------
 
-Surface *Surface::Shell::Popup::Create(Shell *parent, AbstractEventHandler *view, const Margin &margin) {
+Surface *Surface::Shell::Popup::Create(Shell *parent, AbstractEventHandler *view, const core::Margin &margin) {
   Surface *surface = Shell::Create(view, margin);
   Shell *shell = Shell::Get(surface);
   shell->parent_ = parent;
@@ -221,7 +221,7 @@ Surface::Shell::Popup::~Popup() {
 
 // ------
 
-Surface *Surface::Sub::Create(Surface *parent, AbstractEventHandler *event_handler, const Margin &margin) {
+Surface *Surface::Sub::Create(Surface *parent, AbstractEventHandler *event_handler, const core::Margin &margin) {
   Surface *surface = new Surface(event_handler, margin);
   surface->p_->role.sub = new Sub(surface, parent);
   return surface;
@@ -495,7 +495,7 @@ int Surface::kShellSurfaceCount = 0;
 Task Surface::kCommitTaskHead;
 Task Surface::kCommitTaskTail;
 
-Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
+Surface::Surface(AbstractEventHandler *event_handler, const core::Margin &margin) {
   _ASSERT(nullptr != event_handler);
   p_.reset(new Private(event_handler, margin));
   p_->role.placeholder = nullptr;
@@ -649,7 +649,7 @@ AbstractEventHandler *Surface::GetEventHandler() const {
   return p_->event_handler;
 }
 
-const Margin &Surface::GetMargin() const {
+const core::Margin &Surface::GetMargin() const {
   return p_->margin;
 }
 

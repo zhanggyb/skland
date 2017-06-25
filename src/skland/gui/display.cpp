@@ -31,6 +31,8 @@ using std::endl;
 namespace skland {
 namespace gui {
 
+using core::Deque;
+
 Display *Display::kDisplay = nullptr;
 
 Display::Display() {

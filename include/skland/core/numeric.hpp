@@ -20,6 +20,7 @@
 #include <algorithm>
 
 namespace skland {
+namespace core {
 
 /**
  * @ingroup core
@@ -55,6 +56,7 @@ inline T clamp(T x, T min_value, T max_value) {
   return std::min(std::max(x, min_value), max_value);
 }
 
-}
+} // namespace core
+} // namespace skland
 
 #endif // SKLAND_CORE_NUMERIC_HPP_

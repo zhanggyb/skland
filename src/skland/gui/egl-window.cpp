@@ -42,13 +42,14 @@
 #include <skland/core/assert.hpp>
 
 namespace skland {
+namespace gui {
 
+using core::RectF;
+using core::RectI;
 using graphic::Canvas;
 using graphic::Paint;
 using graphic::Path;
 using graphic::ClipOperation;
-
-namespace gui {
 
 struct EGLWindow::Private {
 
@@ -205,7 +206,7 @@ void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
   p_->frame_canvas->SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
   p_->frame_canvas->Clear();
 
-  const Margin &margin = shell_surface->GetMargin();
+  const core::Margin &margin = shell_surface->GetMargin();
   RedrawTask *redraw_task = RedrawTask::Get(this);
   redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
   PushToTail(redraw_task);
@@ -314,7 +315,7 @@ void EGLWindow::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
+  RectF geometry = RectF::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
 
   if ((!IsMaximized()) || (!IsFullscreen())) {
     // Drop shadow:
@@ -441,7 +442,7 @@ void EGLWindow::OnRelease() {
 
 void EGLWindow::RequestUpdate() {
   Surface *shell_surface = GetShellSurface();
-  const Margin &margin = shell_surface->GetMargin();
+  const core::Margin &margin = shell_surface->GetMargin();
 
   RedrawTask *redraw_task = RedrawTask::Get(this);
   redraw_task->context = Context(shell_surface, p_->frame_canvas.get());

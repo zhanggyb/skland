@@ -38,7 +38,7 @@ struct ViewTask;
  * @ingroup gui
  * @brief Input manager
  */
-SKLAND_EXPORT class Input : public Deque::Element {
+SKLAND_EXPORT class Input : public core::Deque::Element {
 
   friend class Surface;
 

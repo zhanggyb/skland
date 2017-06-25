@@ -37,7 +37,7 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   struct LayoutTask;
 
-  AbstractLayout(const Padding &padding = Padding(5));
+  AbstractLayout(const core::Padding &padding = core::Padding(5));
 
   void AddView(AbstractView *view);
 
@@ -53,9 +53,11 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual ~AbstractLayout();
 
-  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+  virtual void OnConfigureGeometry(int dirty_flag,
+                                   const core::RectF &old_geometry,
+                                   const core::RectF &new_geometry) final;
 
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+  virtual void OnGeometryChange(int dirty_flag, const core::RectF &old_geometry, const core::RectF &new_geometry) final;
 
   virtual void OnChildAdded(AbstractView *view) final;
 

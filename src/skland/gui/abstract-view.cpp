@@ -29,6 +29,10 @@
 namespace skland {
 namespace gui {
 
+using core::RectF;
+using core::clamp;
+using core::Bit;
+
 AbstractView::AbstractView()
     : AbstractView(400, 300) {
 
@@ -189,7 +193,7 @@ void AbstractView::MoveTo(int x, int y) {
   OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
-const Padding &AbstractView::GetPadding() const {
+const core::Padding &AbstractView::GetPadding() const {
   return p_->padding;
 }
 
@@ -341,7 +345,7 @@ float AbstractView::GetYCenter() const {
   return p_->geometry.center_y();
 }
 
-const Rect &AbstractView::GetGeometry() const {
+const RectF &AbstractView::GetGeometry() const {
   return p_->geometry;
 }
 

@@ -17,7 +17,7 @@
 #ifndef SKLAND_GRAPHIC_PATH_HPP_
 #define SKLAND_GRAPHIC_PATH_HPP_
 
-#include "../core/rect.hpp"
+#include "skland/core/rect.hpp"
 
 #include <memory>
 
@@ -69,13 +69,13 @@ class Path {
 
   bool Interpolate(const Path &ending, float weight, Path *out) const;
 
-  void AddRect(const Rect &rect, Direction dir = kClockwise);
+  void AddRect(const core::RectF &rect, Direction dir = kClockwise);
 
-  void AddRect(const Rect &rect, Direction dir, unsigned start);
+  void AddRect(const core::RectF &rect, Direction dir, unsigned start);
 
   void AddRect(float left, float top, float right, float bottom, Direction dir = kClockwise);
 
-  void AddRoundRect(const Rect &rect, const float radii[], Direction dir = kClockwise);
+  void AddRoundRect(const core::RectF &rect, const float radii[], Direction dir = kClockwise);
 
   FillType GetFillType() const;
 
@@ -109,7 +109,7 @@ class Path {
 
   void Swap(Path &other);
 
-  const RectF &GetBounds() const;
+  const core::RectF &GetBounds() const;
 
   void UpdateBoundsCache() const;
 

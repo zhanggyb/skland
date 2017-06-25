@@ -27,15 +27,15 @@
 #include <skland/gui/theme.hpp>
 
 namespace skland {
+namespace gui {
 
+using core::RectF;
 using graphic::Canvas;
 using graphic::Paint;
 using graphic::Path;
 using graphic::Shader;
 using graphic::Font;
 using graphic::TextBox;
-
-namespace gui {
 
 PushButton::PushButton(const std::string &text)
     : AbstractButton(text) {
@@ -49,7 +49,7 @@ PushButton::~PushButton() {
 void PushButton::OnDraw(const Context *context) {
   Canvas *canvas = context->canvas();
 
-  const Rect &geometry = GetGeometry();
+  const RectF &geometry = GetGeometry();
   int scale = context->surface()->GetScale();
   Canvas::ClipGuard guard(canvas, geometry * scale);
 
@@ -57,7 +57,7 @@ void PushButton::OnDraw(const Context *context) {
   canvas->Scale(scale, scale);
 
   Path path;
-  Rect inner_rect = geometry.Shrink(0.5f);
+  RectF inner_rect = geometry.Shrink(0.5f);
   const Theme::Schema &schema = Theme::GetData().button;
   Shader shader;
   Point2F points[2];

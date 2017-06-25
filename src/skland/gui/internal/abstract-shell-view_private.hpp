@@ -116,7 +116,7 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
    *
    * This member variable works with is_damaged.
    */
-  RectI damaged_region;
+  core::RectI damaged_region;
 
   int dirty_flag;
 

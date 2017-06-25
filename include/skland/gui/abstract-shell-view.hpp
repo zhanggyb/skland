@@ -170,7 +170,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   AbstractShellView *GetParent() const;
 
-  static const Margin kResizingMargin;
+  static const core::Margin kResizingMargin;
 
  protected:
 

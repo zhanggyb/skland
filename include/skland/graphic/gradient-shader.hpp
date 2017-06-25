@@ -52,7 +52,7 @@ class GradientShader {
                            const Matrix *local_matrix);
 
   static Shader MakeLinear(const Point2F points[2],
-                           const Color colors[],
+                           const core::ColorF colors[],
                            const float pos[],
                            int count,
                            Shader::TileMode mode,
@@ -60,7 +60,7 @@ class GradientShader {
                            const Matrix *local_matrix);
 
   static Shader MakeLinear(const Point2F points[2],
-                           const Color colors[],
+                           const core::ColorF colors[],
                            const float pos[],
                            int count,
                            Shader::TileMode mode) {
@@ -87,7 +87,7 @@ class GradientShader {
 
   static Shader MakeRadial(const Point2F &center,
                            float radius,
-                           const Color colors[],
+                           const core::ColorF colors[],
                            const float pos[],
                            int count,
                            Shader::TileMode mode,
@@ -96,7 +96,7 @@ class GradientShader {
 
   static Shader MakeRadial(const Point2F &center,
                            float radius,
-                           const Color colors[],
+                           const core::ColorF colors[],
                            const float pos[],
                            int count,
                            Shader::TileMode mode) {

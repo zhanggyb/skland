@@ -133,31 +133,22 @@ inline Rect<T> operator*(const Rect<T> &src, int factor) {
   return Rect<T>(src.left * factor, src.top * factor, src.right * factor, src.bottom * factor);
 }
 
+/**
+ * @ingroup core
+ */
+typedef Rect<int> RectI;
+
+/**
+ * @ingroup core
+ */
+typedef Rect<float> RectF;
+
+/**
+ * @ingroup core
+ */
+typedef Rect<double> RectD;
+
 } // namespace core
-
-/**
- * @ingroup core
- *
- * @note This class has the same structure as SkRect in Skia, this means a
- * pointer or reference to a Rect object can be reinterpret_cast to a SkRect.
- */
-typedef core::Rect<float> Rect;
-
-/**
- * @ingroup core
- */
-typedef core::Rect<int> RectI;
-
-/**
- * @ingroup core
- */
-typedef core::Rect<float> RectF;
-
-/**
- * @ingroup core
- */
-typedef core::Rect<double> RectD;
-
-}
+} // namespace skland
 
 #endif // SKLAND_CORE_RECT_HPP_

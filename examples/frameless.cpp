@@ -29,6 +29,7 @@
 #include "SkCanvas.h"
 
 using namespace skland;
+using namespace skland::core;
 using namespace skland::gui;
 
 class FramelessWindow : public Window {
@@ -73,12 +74,12 @@ class MainWidget : public AbstractView {
 
  protected:
 
-  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+  virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
     if (dirty_flag) Update();
     else CancelUpdate();
   }
 
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
 
   }
 
@@ -118,7 +119,7 @@ class MainWidget : public AbstractView {
     using skland::graphic::Canvas;
     using skland::graphic::Paint;
 
-    const Rect &rect = GetGeometry();
+    const RectF &rect = GetGeometry();
     int scale = context->surface()->GetScale();
 
     Canvas *canvas = context->canvas();
@@ -126,7 +127,7 @@ class MainWidget : public AbstractView {
     canvas->Scale(scale, scale);
 
     Paint paint;
-    paint.SetColor(Color(0.855f, 0.855f, 0.165f, .9f));
+    paint.SetColor(ColorF(0.855f, 0.855f, 0.165f, .9f));
     canvas->DrawRect(rect, paint);
 
     canvas->Restore();

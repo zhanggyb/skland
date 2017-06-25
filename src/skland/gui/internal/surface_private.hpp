@@ -28,7 +28,7 @@ struct Surface::Private {
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  Private(AbstractEventHandler *event_handler, const Margin &margin)
+  Private(AbstractEventHandler *event_handler, const core::Margin &margin)
       : wl_surface(nullptr),
         commit_mode(kSynchronized),
         transform(kTransformNormal),
@@ -52,7 +52,7 @@ struct Surface::Private {
 
   AbstractEventHandler *event_handler;
 
-  Margin margin;
+  core::Margin margin;
 
   /**
    * Position in parent surface

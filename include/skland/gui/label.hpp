@@ -42,9 +42,9 @@ SKLAND_EXPORT class Label : public AbstractView {
 
   Label(int width, int height, const std::string &text);
 
-  void SetForeground(const Color &color);
+  void SetForeground(const core::ColorF &color);
 
-  void SetBackground(const Color &color);
+  void SetBackground(const core::ColorF &color);
 
   void SetFont(const graphic::Font &font);
 
@@ -52,9 +52,13 @@ SKLAND_EXPORT class Label : public AbstractView {
 
   virtual ~Label();
 
-  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
+  virtual void OnConfigureGeometry(int dirty_flag,
+                                   const core::RectF &old_geometry,
+                                   const core::RectF &new_geometry) override;
 
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+  virtual void OnGeometryChange(int dirty_flag,
+                                const core::RectF &old_geometry,
+                                const core::RectF &new_geometry) final;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
 

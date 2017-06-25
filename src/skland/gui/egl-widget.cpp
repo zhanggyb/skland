@@ -31,6 +31,8 @@
 namespace skland {
 namespace gui {
 
+using core::RectF;
+
 EGLWidget::EGLWidget()
     : EGLWidget(400, 300) {
 }
@@ -71,7 +73,7 @@ Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
   return sub_surface_;
 }
 
-void EGLWidget::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void EGLWidget::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
   if (dirty_flag)
     Update();
   else
@@ -84,7 +86,7 @@ void EGLWidget::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, co
   }
 }
 
-void EGLWidget::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void EGLWidget::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
 
 }
 

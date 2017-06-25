@@ -9,6 +9,7 @@
 #include "SkColor.h"
 
 using namespace skland;
+using namespace skland::core;
 
 Test::Test()
     : testing::Test() {
@@ -79,14 +80,14 @@ TEST_F(Test, operator_1) {
 
 TEST_F(Test, operator_2) {
   uint32_t argb = 0xFF4E4E4E;
-  Color color;
+  ColorF color;
   color = argb;
 
   ASSERT_TRUE(argb == color.argb());
 }
 
 TEST_F(Test, cast_1) {
-  Color c(1.f, 1.f, 1.f, 1.f);
+  ColorF c(1.f, 1.f, 1.f, 1.f);
 
   SkColor4f* sk_color = reinterpret_cast<SkColor4f*>(&c);
 

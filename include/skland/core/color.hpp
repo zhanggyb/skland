@@ -193,14 +193,6 @@ inline bool operator!=(const Color<T> &src, const Color<T> &dst) {
   return memcmp(&src, &dst, sizeof(Color<T>)) != 0;
 }
 
-} // namespace core
-
-/**
- * @ingroup core
- * @brief A typedef to color with float values
- */
-typedef core::Color<float> Color;
-
 /**
  * @ingroup core
  * @brief A typedef to color with float values
@@ -213,6 +205,7 @@ typedef core::Color<float> ColorF;
  */
 typedef core::Color<double> ColorD;
 
-}
+} // namespace core
+} // namespace skland
 
 #endif // SKLAND_CORE_COLOR_HPP_

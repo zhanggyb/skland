@@ -35,6 +35,10 @@
 namespace skland {
 namespace gui {
 
+using core::SLOT;
+using core::Bit;
+using core::Margin;
+
 const Margin AbstractShellView::kResizingMargin(5, 5, 5, 5);
 
 AbstractShellView::AbstractShellView(const char *title, AbstractShellView *parent)
@@ -97,7 +101,7 @@ void AbstractShellView::Show() {
   }
 }
 
-void AbstractShellView::Close(core::SLOT) {
+void AbstractShellView::Close(SLOT) {
   if (Surface::GetShellSurfaceCount() == 1) {
     Application::Exit();
   }
@@ -109,7 +113,7 @@ void AbstractShellView::Close(core::SLOT) {
   //  delete this;
 }
 
-void AbstractShellView::Minimize(core::SLOT) {
+void AbstractShellView::Minimize(SLOT) {
   Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 
@@ -118,7 +122,7 @@ void AbstractShellView::Minimize(core::SLOT) {
   _ASSERT(IsMinimized());
 }
 
-void AbstractShellView::ToggleMaximize(core::SLOT) {
+void AbstractShellView::ToggleMaximize(SLOT) {
   if (IsFullscreen()) return;
 
   Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
@@ -131,7 +135,7 @@ void AbstractShellView::ToggleMaximize(core::SLOT) {
   }
 }
 
-void AbstractShellView::ToggleFullscreen(const Output *output, core::SLOT) {
+void AbstractShellView::ToggleFullscreen(const Output *output, SLOT) {
   Surface::Shell::Toplevel *toplevel = Surface::Shell::Toplevel::Get(p_->shell_surface);
   if (nullptr == toplevel) return;
 

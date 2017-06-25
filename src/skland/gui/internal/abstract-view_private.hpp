@@ -97,7 +97,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   LayoutPolicy y_layout_policy;
 
-  Padding padding;
+  core::Padding padding;
 
   /**
    * @brief Bitwise data to indicate if the position or size need to update
@@ -106,9 +106,9 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    */
   int dirty_flag;
 
-  Rect geometry;
+  core::RectF geometry;
 
-  Rect last_geometry;
+  core::RectF last_geometry;
 
   RedrawTask redraw_task;
 
@@ -122,7 +122,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    *
    * This member variable works with is_damaged.
    */
-  RectI damaged_region;
+  core::RectI damaged_region;
 
   bool need_redraw;
   bool is_drawing;

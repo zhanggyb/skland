@@ -25,6 +25,8 @@
 namespace skland {
 namespace gui {
 
+using core::RectF;
+
 /**
  * @ingroup gui
  * @brief A widget use an EGL surface for 3D scene
@@ -48,9 +50,9 @@ class EGLWidget : public AbstractView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+  virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) final;
 
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) final;
+  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) final;
 
   virtual void OnLayout(int, int, int, int, int) final;
 

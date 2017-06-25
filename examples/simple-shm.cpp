@@ -28,10 +28,9 @@
 #include <skland/gui/callback.hpp>
 
 using namespace skland;
+using namespace skland::core;
 using namespace skland::gui;
-
-using graphic::Canvas;
-using graphic::Paint;
+using namespace skland::graphic;
 
 class SpinningView : public AbstractView {
 
@@ -50,12 +49,12 @@ class SpinningView : public AbstractView {
 
  protected:
 
-  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+  virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
     if (!running_animation_)
       Update();
   }
 
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
 
   }
 
@@ -106,7 +105,7 @@ class SpinningView : public AbstractView {
     int scale = context_->surface()->GetScale();
     canvas->Scale(scale, scale);
 
-    const Rect &rect = GetGeometry();
+    const RectF &rect = GetGeometry();
     float radius_ = clamp(std::min(rect.width(), rect.height()) / 2.f - 50.f,
                           50.f, 200.f);
 
@@ -115,20 +114,20 @@ class SpinningView : public AbstractView {
 
     paint.SetColor(color_);
     paint.SetStyle(Paint::Style::kStyleFill);
-    canvas->DrawRect(Rect(rect.l + padding,
-                          rect.t,
-                          rect.r - padding,
-                          rect.b - padding),
+    canvas->DrawRect(RectF(rect.l + padding,
+                           rect.t,
+                           rect.r - padding,
+                           rect.b - padding),
                      paint);
 
-    paint.SetColor(Color(0xEFFFFFFF));
+    paint.SetColor(ColorF(0xEFFFFFFF));
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetStrokeWidth(5.f);
 
-    canvas->DrawArc(Rect(rect.center_x() - radius_,
-                         rect.center_y() - radius_,
-                         rect.center_x() + radius_,
-                         rect.center_y() + radius_),
+    canvas->DrawArc(RectF(rect.center_x() - radius_,
+                          rect.center_y() - radius_,
+                          rect.center_x() + radius_,
+                          rect.center_y() + radius_),
                     angle_, 300.f, false, paint);
     canvas->Restore();
   }
@@ -150,7 +149,7 @@ class SpinningView : public AbstractView {
 
   Callback frame_callback_;
   const Context *context_;
-  Color color_;
+  ColorF color_;
   float angle_;
   bool running_animation_;
 };

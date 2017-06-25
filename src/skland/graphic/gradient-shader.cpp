@@ -44,7 +44,7 @@ Shader GradientShader::MakeLinear(const Point2F *points,
 }
 
 Shader GradientShader::MakeLinear(const Point2F points[],
-                                  const Color colors[],
+                                  const core::ColorF colors[],
                                   const float pos[],
                                   int count,
                                   Shader::TileMode mode,
@@ -85,7 +85,7 @@ Shader GradientShader::MakeRadial(const Point2F &center,
 
 Shader GradientShader::MakeRadial(const Point2F &center,
                                   float radius,
-                                  const Color colors[],
+                                  const core::ColorF colors[],
                                   const float pos[],
                                   int count,
                                   Shader::TileMode mode,

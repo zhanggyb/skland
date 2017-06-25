@@ -87,8 +87,8 @@ struct Display::Private {
   int fd;
   uint32_t epoll_events;
 
-  Deque outputs;
-  Deque inputs;
+  core::Deque outputs;
+  core::Deque inputs;
 
   std::list<Global *> globals;
   std::set<uint32_t> pixel_formats;

@@ -14,19 +14,32 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_SKLAND_HPP_
-#define SKLAND_SKLAND_HPP_
+#ifndef SKLAND_GRAPHIC_INTERNAL_SURFACE_PRIVATE_HPP_
+#define SKLAND_GRAPHIC_INTERNAL_SURFACE_PRIVATE_HPP_
 
-#include "config.hpp"
+#include "skland/graphic/surface.hpp"
 
-#include "core/types.hpp"
-#include "core/exceptions.hpp"
-#include "core/point.hpp"
-#include "core/size.hpp"
-#include "core/rect.hpp"
+#include "SkSurface.h"
 
-#include "gui/application.hpp"
-#include "gui/display.hpp"
-#include "gui/output.hpp"
+namespace skland {
+namespace graphic {
 
-#endif // SKLAND_SKLAND_HPP_
+struct Surface::Private {
+
+  Private(const Private &) = delete;
+  Private &operator=(const Private &) = delete;
+
+  Private()
+      : canvas(nullptr) {}
+
+  ~Private() {}
+
+  Canvas *canvas;
+  sk_sp<SkSurface> sp_sk_surface;
+
+};
+
+} // namespace graphic
+} // namespace skland
+
+#endif // SKLAND_GRAPHIC_INTERNAL_LAYER_PRIVATE_HPP_

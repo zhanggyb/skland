@@ -105,7 +105,7 @@ class Typeface {
 
   bool GetKerningPairAdjustments(const GlyphID glyphs[], int count, int32_t adjustments[]) const;
 
-  Rect GetBounds() const;
+  core::RectF GetBounds() const;
 
  private:
 

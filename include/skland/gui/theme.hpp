@@ -17,6 +17,8 @@
 #ifndef SKLAND_STOCK_THEME_HPP_
 #define SKLAND_STOCK_THEME_HPP_
 
+#include "skland/global.hpp"
+
 #include "skland/core/color.hpp"
 #include "skland/core/margin.hpp"
 #include "skland/core/point.hpp"
@@ -74,7 +76,7 @@ class Theme {
         return *this;
       }
 
-      Color color;
+      core::ColorF color;
       bool shaded;
       int shaded_count;
       std::vector<uint32_t> shaded_colors;
@@ -170,7 +172,7 @@ class Theme {
     return kShadowOffsetY;
   }
 
-  static inline const Margin &GetShadowMargin() {
+  static inline const core::Margin &GetShadowMargin() {
     return kShadowMargin;
   }
 
@@ -215,7 +217,7 @@ class Theme {
   static int kShadowOffsetX;
   static int kShadowOffsetY;
 
-  static Margin kShadowMargin;
+  static core::Margin kShadowMargin;
 
   static std::vector<uint32_t> kShadowPixels;
 

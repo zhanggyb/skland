@@ -39,7 +39,7 @@
  * @ingroup core
  * @brief A helper macro to define a slot parameter with default nullptr
  */
-#define __SLOT__ skland::core::SLOT slot = nullptr
+#define __SLOT__ ::skland::core::SLOT slot = nullptr
 #endif
 
 namespace skland {

@@ -22,6 +22,8 @@
 namespace skland {
 namespace graphic {
 
+using core::clamp;
+
 FontStyle::FontStyle(int weight, int width, Slant slant) {
   data_.value = 0;
   data_.styles.weight = (uint16_t) clamp<int>(weight, kWeightInvisible, kWeightExtraBlack);

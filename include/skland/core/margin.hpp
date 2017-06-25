@@ -17,16 +17,18 @@
 #ifndef SKLAND_CORE_MARGIN_HPP_
 #define SKLAND_CORE_MARGIN_HPP_
 
-#include "bounds.hpp"
+#include "bounding-box.hpp"
 
 namespace skland {
+namespace core {
 
 /**
  * @ingroup core
  * @brief Class specifies content margins
  */
-typedef core::Bounds<int> Margin;
+typedef BoundingBox<int> Margin;
 
+}
 }
 
 #endif // SKLAND_CORE_MARGIN_HPP_
