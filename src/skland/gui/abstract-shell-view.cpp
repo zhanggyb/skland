@@ -17,6 +17,7 @@
 #include "internal/abstract-shell-view_private.hpp"
 
 #include <skland/core/assert.hpp>
+#include "skland/numerical/bit.hpp"
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/mouse-event.hpp>
@@ -36,7 +37,7 @@ namespace skland {
 namespace gui {
 
 using core::SLOT;
-using core::Bit;
+using numerical::Bit;
 using core::Margin;
 
 const Margin AbstractShellView::kResizingMargin(5, 5, 5, 5);

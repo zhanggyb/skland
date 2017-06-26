@@ -22,9 +22,15 @@
 namespace skland {
 namespace graphic {
 
+// Forward declarations
 class Canvas;
 class ImageInfo;
 
+/**
+ * @ingroup graphic
+ * @brief A class responsible for managing the pixels that a canvas draws into
+ *
+ */
 class Surface {
 
   Surface(const Surface &) = delete;
@@ -32,11 +38,17 @@ class Surface {
 
  public:
 
-  static Surface *CreateRasterDirect(const ImageInfo &, void *pixels, size_t rowBytes);
+  /**
+   * @brief Create a new surface object, using the specified pixels/rowbytes as its backend
+   * @param pixels
+   * @param row_bytes
+   * @return
+   */
+  static Surface *CreateRasterDirect(const ImageInfo &, void *pixels, size_t row_bytes);
 
   static Surface *CreateRaster(const ImageInfo &, size_t row_types);
 
-  ~Surface();
+  virtual ~Surface();
 
   Canvas *GetCanvas() const;
 

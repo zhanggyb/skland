@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_TASK_HPP_
 #define SKLAND_GUI_TASK_HPP_
 
-#include "../core/export.hpp"
+#include "skland/core/export.hpp"
 
 #include <cstdint>
 
@@ -40,9 +40,22 @@ SKLAND_EXPORT class Task {
     return (nullptr != previous_) || (nullptr != next_);
   }
 
+  /**
+   * @brief Push back a task to this one
+   * @param other
+   */
   void PushBack(Task *other);
 
   void PushFront(Task *other);
+
+  /**
+   * @brief Push back a task list to this one
+   * @param first
+   * @param last
+   */
+  void PushBack(Task *first, Task *last);
+
+  void PushFront(Task *first, Task *last);
 
   void Unlink();
 

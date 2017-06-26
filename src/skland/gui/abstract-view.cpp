@@ -16,7 +16,9 @@
 
 #include "internal/abstract-view_private.hpp"
 
-#include <skland/core/numeric.hpp>
+#include "skland/numerical/bit.hpp"
+#include "skland/numerical/clamp.hpp"
+
 #include <skland/core/assert.hpp>
 #include <skland/core/debug.hpp>
 
@@ -30,8 +32,8 @@ namespace skland {
 namespace gui {
 
 using core::RectF;
-using core::clamp;
-using core::Bit;
+using numerical::Clamp;
+using numerical::Bit;
 
 AbstractView::AbstractView()
     : AbstractView(400, 300) {
@@ -44,8 +46,8 @@ AbstractView::AbstractView(int width, int height)
   p_->geometry.Resize(width, height);
   p_->last_geometry.Resize(width, height);
 
-  p_->preferred_size.width = clamp(width, p_->minimal_size.width, p_->maximal_size.width);
-  p_->preferred_size.height = clamp(height, p_->minimal_size.height, p_->maximal_size.height);
+  p_->preferred_size.width = Clamp(width, p_->minimal_size.width, p_->maximal_size.width);
+  p_->preferred_size.height = Clamp(height, p_->minimal_size.height, p_->maximal_size.height);
 }
 
 AbstractView::~AbstractView() {

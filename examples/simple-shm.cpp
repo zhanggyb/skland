@@ -19,6 +19,8 @@
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/context.hpp>
 
+#include "skland/numerical/clamp.hpp"
+
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
@@ -31,6 +33,7 @@ using namespace skland;
 using namespace skland::core;
 using namespace skland::gui;
 using namespace skland::graphic;
+using namespace skland::numerical;
 
 class SpinningView : public AbstractView {
 
@@ -106,7 +109,7 @@ class SpinningView : public AbstractView {
     canvas->Scale(scale, scale);
 
     const RectF &rect = GetGeometry();
-    float radius_ = clamp(std::min(rect.width(), rect.height()) / 2.f - 50.f,
+    float radius_ = Clamp(std::min(rect.width(), rect.height()) / 2.f - 50.f,
                           50.f, 200.f);
 
     Paint paint;

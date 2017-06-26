@@ -14,26 +14,43 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GLOBAL_HPP_
-#define SKLAND_GLOBAL_HPP_
+#ifndef SKLAND_GRAPHIC_INTERNAL_CANVAS_PRIVATE_HPP_
+#define SKLAND_GRAPHIC_INTERNAL_CANVAS_PRIVATE_HPP_
+
+#include "skland/graphic/canvas.hpp"
+
+#include "bitmap_private.hpp"
+
+#include "SkCanvas.h"
 
 namespace skland {
+namespace graphic {
 
-/**
- * @brief The core functions used in all other modules
- */
-namespace core {}
+struct Canvas::Private {
 
-/**
- * @brief The graphic module based on Skia
- */
-namespace graphic {}
+  Private()
+      : sk_canvas(nullptr) {
+    sk_canvas = new SkCanvas();
+  }
 
-/**
- * @brief The main GUI module
- */
-namespace gui {}
+  Private(SkCanvas *canvas)
+      : sk_canvas(canvas) {}
+
+  Private(const SkBitmap &bitmap)
+      : sk_canvas(nullptr) {
+    sk_canvas = new SkCanvas(bitmap);
+  }
+
+  ~Private() {
+    delete sk_canvas;
+  }
+
+  SkCanvas *sk_canvas;
+  Point2F origin;
+
+};
 
 }
+}
 
-#endif // SKLAND_GLOBAL_HPP_
+#endif // SKLAND_GRAPHIC_INTERNAL_CANVAS_PRIVATE_HPP_

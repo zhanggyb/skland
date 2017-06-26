@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-#include <skland/gui/abstract-button.hpp>
+#include "skland/gui/abstract-button.hpp"
 
-#include <skland/core/numeric.hpp>
+#include "skland/numerical/clamp.hpp"
+#include "skland/numerical/bit.hpp"
 
-#include <skland/gui/key-event.hpp>
-#include <skland/gui/mouse-event.hpp>
+#include "skland/gui/key-event.hpp"
+#include "skland/gui/mouse-event.hpp"
 
-#include <skland/graphic/font.hpp>
+#include "skland/graphic/font.hpp"
 
 namespace skland {
 namespace gui {
 
 using core::RectF;
-using core::Bit;
+using numerical::Bit;
 
 using graphic::Font;
 using graphic::Typeface;

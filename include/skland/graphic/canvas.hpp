@@ -26,11 +26,13 @@
 
 #include <memory>
 
+// Forward declaration
 class SkCanvas;
 
 namespace skland {
 namespace graphic {
 
+// Forward declarations
 class Paint;
 class Path;
 class Matrix;
@@ -75,7 +77,7 @@ class Canvas {
   /**
    * @brief Create a new surface matching the specified info
    * @param info
-   * @return A pointer to a new created surface object, must be deleted manullay
+   * @return A pointer to a new created surface object, must be deleted manually
    */
   Surface *CreateSurface(const ImageInfo &info);
 
@@ -140,6 +142,8 @@ class Canvas {
   SkCanvas *GetSkCanvas() const;
 
  private:
+
+  Canvas(SkCanvas *native);
 
   struct Private;
 

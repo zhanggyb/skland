@@ -17,8 +17,6 @@
 #ifndef SKLAND_GUI_SURFACE_HPP_
 #define SKLAND_GUI_SURFACE_HPP_
 
-#include "skland/global.hpp"
-
 #include "skland/core/sigcxx.hpp"
 #include "skland/core/margin.hpp"
 #include "skland/core/point.hpp"

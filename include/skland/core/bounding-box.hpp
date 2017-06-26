@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_BOUNDS_HPP_
-#define SKLAND_CORE_BOUNDS_HPP_
+#ifndef SKLAND_CORE_BOUNDING_BOX_HPP_
+#define SKLAND_CORE_BOUNDING_BOX_HPP_
 
 namespace skland {
 namespace core {
@@ -98,4 +98,4 @@ inline bool operator!=(const BoundingBox<T> &s1, const BoundingBox<T> &s2) {
 } // namespace core
 } // namespace skland
 
-#endif // SKLAND_CORE_BOUNDS_HPP_
+#endif // SKLAND_CORE_BOUNDING_BOX_HPP_

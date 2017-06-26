@@ -17,8 +17,6 @@
 #ifndef SKLAND_STOCK_THEME_HPP_
 #define SKLAND_STOCK_THEME_HPP_
 
-#include "skland/global.hpp"
-
 #include "skland/core/color.hpp"
 #include "skland/core/margin.hpp"
 #include "skland/core/point.hpp"

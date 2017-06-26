@@ -46,6 +46,32 @@ void Task::PushFront(Task *other) {
   other->next_ = this;
 }
 
+void Task::PushBack(Task *first, Task *last) {
+  if (first == this) return;
+
+  if (first->previous_) first->previous_->next_ = last->next_;
+  if (last->next_) last->next_->previous_ = first->previous_;
+
+  if (next_) next_->previous_ = last;
+  last->next_ = next_;
+
+  first->previous_ = this;
+  next_ = first;
+}
+
+void Task::PushFront(Task *first, Task *last) {
+  if (last == this) return;
+
+  if (first->previous_) first->previous_->next_ = last->next_;
+  if (last->next_) last->next_->previous_ = first->previous_;
+
+  if (previous_) previous_->next_ = first;
+  first->previous_ = previous_;
+
+  previous_ = last;
+  last->next_ = this;
+}
+
 void Task::Unlink() {
   if (previous_) previous_->next_ = next_;
   if (next_) next_->previous_ = previous_;

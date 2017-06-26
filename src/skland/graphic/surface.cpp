@@ -16,25 +16,36 @@
 
 #include "internal/surface_private.hpp"
 
+#include "internal/canvas_private.hpp"
 #include "internal/image-info_private.hpp"
+
 #include "skland/core/memory.hpp"
 
 namespace skland {
 namespace graphic {
 
-Surface* Surface::CreateRasterDirect(const ImageInfo &, void *pixels, size_t rowBytes) {
-  Surface* surface = new Surface();
+using core::make_unique;
 
-  // TODO: set p_
+Surface *Surface::CreateRasterDirect(const ImageInfo &image_info, void *pixels, size_t row_bytes) {
+  Surface *surface = new Surface();
+
+  surface->p_->sp_sk_surface = SkSurface::MakeRasterDirect(image_info.p_->sk_image_info, pixels, row_bytes);
+  if (!surface->p_->sp_sk_surface) {
+    throw std::runtime_error("Error! Fail to create Surface object!");
+  }
+
+  surface->p_->canvas = new Canvas(surface->p_->sp_sk_surface->getCanvas());
+
   return surface;
 }
 
 Surface::Surface() {
-  p_ = core::make_unique<Private>();
+  p_ = make_unique<Private>();
 }
 
 Surface::~Surface() {
-
+  // The SkCanvas pointer is destroyed in SkSurface
+  p_->canvas->p_->sk_canvas = nullptr;
 }
 
 } // namespace graphic

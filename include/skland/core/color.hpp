@@ -17,7 +17,7 @@
 #ifndef SKLAND_CORE_COLOR_HPP_
 #define SKLAND_CORE_COLOR_HPP_
 
-#include "numeric.hpp"
+#include "skland/numerical/clamp.hpp"
 
 #include <cstdint>
 #include <cstring>
@@ -143,30 +143,36 @@ struct Color {
 
 template<typename T>
 inline Color<T> operator+(const Color<T> &src, short shade) {
+  using numerical::Clamp;
+
   Color<T> color;
-  color.r = clamp(src.r + shade / T(255.), T(0.), T(1.));
-  color.g = clamp(src.g + shade / T(255.), T(0.), T(1.));
-  color.b = clamp(src.b + shade / T(255.), T(0.), T(1.));
+  color.r = Clamp(src.r + shade / T(255.), T(0.), T(1.));
+  color.g = Clamp(src.g + shade / T(255.), T(0.), T(1.));
+  color.b = Clamp(src.b + shade / T(255.), T(0.), T(1.));
   color.a = src.a;
   return color;
 }
 
 template<typename T>
 inline Color<T> operator+(const Color<T> &color1, const Color<T> &color2) {
+  using numerical::Clamp;
+
   Color<T> color;
-  color.r = clamp(color1.r + color2.r, T(0.), T(1.));
-  color.g = clamp(color1.g + color2.g, T(0.), T(1.));
-  color.b = clamp(color1.b + color2.b, T(0.), T(1.));
-  color.a = clamp(color1.a + color2.a, T(0.), T(1.));
+  color.r = Clamp(color1.r + color2.r, T(0.), T(1.));
+  color.g = Clamp(color1.g + color2.g, T(0.), T(1.));
+  color.b = Clamp(color1.b + color2.b, T(0.), T(1.));
+  color.a = Clamp(color1.a + color2.a, T(0.), T(1.));
   return color;
 }
 
 template<typename T>
 inline Color<T> operator-(const Color<T> &src, short shade) {
+  using numerical::Clamp;
+
   Color<T> color;
-  color.r = clamp(src.r - shade / T(255.), T(0.), T(1.));
-  color.g = clamp(src.g - shade / T(255.), T(0.), T(1.));
-  color.b = clamp(src.b - shade / T(255.), T(0.), T(1.));
+  color.r = Clamp(src.r - shade / T(255.), T(0.), T(1.));
+  color.g = Clamp(src.g - shade / T(255.), T(0.), T(1.));
+  color.b = Clamp(src.b - shade / T(255.), T(0.), T(1.));
   color.a = src.a;
 
   return color;
@@ -174,11 +180,13 @@ inline Color<T> operator-(const Color<T> &src, short shade) {
 
 template<typename T>
 inline Color<T> operator-(const Color<T> &color1, const Color<T> &color2) {
+  using numerical::Clamp;
+
   Color<T> color;
-  color.r = clamp(color1.r - color2.r, T(0.), T(1.));
-  color.g = clamp(color1.g - color2.g, T(0.), T(1.));
-  color.b = clamp(color1.b - color2.b, T(0.), T(1.));
-  color.a = clamp(color1.a - color2.a, T(0.), T(1.));
+  color.r = Clamp(color1.r - color2.r, T(0.), T(1.));
+  color.g = Clamp(color1.g - color2.g, T(0.), T(1.));
+  color.b = Clamp(color1.b - color2.b, T(0.), T(1.));
+  color.a = Clamp(color1.a - color2.a, T(0.), T(1.));
 
   return color;
 }

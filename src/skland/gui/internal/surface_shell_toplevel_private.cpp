@@ -16,13 +16,15 @@
 
 #include "surface_shell_toplevel_private.hpp"
 #include "surface_private.hpp"
-#include <skland/core/numeric.hpp>
-#include <skland/gui/abstract-shell-view.hpp>
+
+#include "skland/numerical/bit.hpp"
+
+#include "skland/gui/abstract-shell-view.hpp"
 
 namespace skland {
 namespace gui {
 
-using core::Bit;
+using numerical::Bit;
 
 const struct zxdg_toplevel_v6_listener Surface::Shell::Toplevel::Private::kListener = {
     OnConfigure,

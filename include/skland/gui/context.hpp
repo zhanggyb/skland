@@ -17,8 +17,6 @@
 #ifndef SKLAND_GUI_CONTEXT_HPP_
 #define SKLAND_GUI_CONTEXT_HPP_
 
-#include "skland/global.hpp"
-
 #include "surface.hpp"
 #include "callback.hpp"
 

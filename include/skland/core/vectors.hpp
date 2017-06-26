@@ -39,8 +39,7 @@ struct Vector2 {
 
   template<typename U>
   inline Vector2(const Vector2<U> &other)
-      : x(T(other.x)), y(T(other.y))
-  {}
+      : x(T(other.x)), y(T(other.y)) {}
 
   inline ~Vector2() {}
 
@@ -137,9 +136,8 @@ struct Vector3 {
 
   template<typename U>
   inline Vector3(const Vector3<U> &other)
-      : x(T(other.x)), y(T(other.y)), z(T(other.z))
-  {}
-  
+      : x(T(other.x)), y(T(other.y)), z(T(other.z)) {}
+
   inline Vector3 &operator=(const Vector3 &other) {
     x = other.x;
     y = other.y;
@@ -154,7 +152,7 @@ struct Vector3 {
     z = static_cast<T>(other.z);
     return *this;
   }
-  
+
   inline ~Vector3() {}
 
   union { T x, r, s; };
@@ -197,8 +195,7 @@ struct Vector4 {
 
   template<typename U>
   inline Vector4(const Vector4<U> &other)
-      : x(T(other.x)), y(T(other.y)), z(T(other.z)), w(T(other.w))
-  {}
+      : x(T(other.x)), y(T(other.y)), z(T(other.z)), w(T(other.w)) {}
 
   inline Vector4 &operator=(const Vector4 &other) {
     x = other.x;

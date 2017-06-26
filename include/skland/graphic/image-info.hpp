@@ -85,4 +85,4 @@ class ImageInfo {
 } // namespace graphic
 } // namespace skland
 
-#endif //SKLAND_IMAGE_INFO_HPP
+#endif // SKLAND_GRAPHIC_IMAGE_INFO_HPP_

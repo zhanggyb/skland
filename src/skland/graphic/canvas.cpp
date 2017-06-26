@@ -14,42 +14,21 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/canvas.hpp>
+#include "internal/canvas_private.hpp"
+
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 #include "skland/graphic/image-info.hpp"
 
 #include "internal/matrix_private.hpp"
-#include "internal/bitmap_private.hpp"
 #include "internal/surface_private.hpp"
 #include "internal/image-info_private.hpp"
-
-#include "SkCanvas.h"
 
 namespace skland {
 namespace graphic {
 
 using core::RectF;
 using core::ColorF;
-
-struct Canvas::Private {
-
-  Private()
-      : sk_canvas(nullptr) {}
-
-  Private(const SkBitmap &bitmap)
-      : sk_canvas(nullptr) {
-    sk_canvas = new SkCanvas(bitmap);
-  }
-
-  ~Private() {
-    delete sk_canvas;
-  }
-
-  SkCanvas *sk_canvas;
-  Point2F origin;
-
-};
 
 Canvas *Canvas::CreateRasterDirect(int width, int height, unsigned char *pixels, int format) {
   size_t stride = (size_t) width * 4;
@@ -91,6 +70,10 @@ Canvas::Canvas(unsigned char *pixel, int width, int height, int format) {
 
 Canvas::Canvas(const Bitmap &bitmap) {
   p_.reset(new Private(bitmap.p_->sk_bitmap));
+}
+
+Canvas::Canvas(SkCanvas *native) {
+  p_.reset(new Private(native));
 }
 
 Canvas::~Canvas() {
