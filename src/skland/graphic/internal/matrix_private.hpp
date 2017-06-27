@@ -21,6 +21,7 @@
 #include "SkMatrix.h"
 
 namespace skland {
+namespace graphic {
 
 struct Matrix::Private {
 
@@ -35,6 +36,7 @@ struct Matrix::Private {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif //SKLAND_MATRIX_PRIVATE_HPP

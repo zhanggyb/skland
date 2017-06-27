@@ -20,6 +20,7 @@
 #include "export.hpp"
 
 namespace skland {
+namespace core {
 
 class Deque {
 
@@ -157,6 +158,7 @@ class Deque {
 
 };
 
-}
+} // namespace core
+} // namespace skland
 
 #endif // SKLAND_CORE_DEQUE_HPP_

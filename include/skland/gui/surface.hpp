@@ -17,9 +17,9 @@
 #ifndef SKLAND_GUI_SURFACE_HPP_
 #define SKLAND_GUI_SURFACE_HPP_
 
-#include "../core/sigcxx.hpp"
-#include "../core/margin.hpp"
-#include "../core/point.hpp"
+#include "skland/core/sigcxx.hpp"
+#include "skland/core/margin.hpp"
+#include "skland/core/point.hpp"
 
 #include "task.hpp"
 
@@ -27,6 +27,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class Application;
 class Display;
@@ -81,6 +82,9 @@ class Surface {
   Surface &operator=(const Surface &) = delete;
 
  public:
+
+  using Point = core::Point2I;
+  using Margin = core::Margin;
 
   class Shell;
   class Sub;
@@ -511,6 +515,7 @@ class Surface::EGL {
 
 };
 
+} // namespace gui
 } // namespace skland
 
 #endif // SKLAND_GUI_VIEW_SURFACE_HPP_

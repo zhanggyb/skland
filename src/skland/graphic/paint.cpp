@@ -24,6 +24,10 @@
 #include "internal/shader_private.hpp"
 
 namespace skland {
+namespace graphic {
+
+using core::RectF;
+using core::ColorF;
 
 struct Paint::Private {
 
@@ -82,9 +86,9 @@ void Paint::SetStyle(Style style) {
   p_->sk_paint.setStyle(static_cast<SkPaint::Style>(style));
 }
 
-Color Paint::GetColor() const {
+ColorF Paint::GetColor() const {
   uint32_t value = p_->sk_paint.getColor();
-  return Color::FromUCharRGBA(SkToU8(SkColorGetR(value)),
+  return ColorF::FromUCharRGBA(SkToU8(SkColorGetR(value)),
                               SkToU8(SkColorGetG(value)),
                               SkToU8(SkColorGetB(value)),
                               SkToU8(SkColorGetA(value)));
@@ -94,7 +98,7 @@ void Paint::SetColor(uint32_t argb) {
   p_->sk_paint.setColor(argb);
 }
 
-void Paint::SetColor(const Color &color) {
+void Paint::SetColor(const ColorF &color) {
   p_->sk_paint.setARGB(color.uchar_alpha(),
                        color.uchar_red(),
                        color.uchar_green(),
@@ -175,7 +179,7 @@ int Paint::CountText(const void *text, size_t byte_length) const {
   return p_->sk_paint.countText(text, byte_length);
 }
 
-float Paint::MeasureText(const void *text, size_t length, Rect *boulds) const {
+float Paint::MeasureText(const void *text, size_t length, RectF *boulds) const {
   return p_->sk_paint.measureText(text, length, reinterpret_cast<SkRect *>(boulds));
 }
 
@@ -191,4 +195,5 @@ bool operator!=(const Paint &paint1, const Paint &paint2) {
   return paint1.p_ != paint2.p_;
 }
 
-}
+} // namespace graphic
+} // namespace skland

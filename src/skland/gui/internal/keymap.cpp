@@ -19,6 +19,7 @@
 #include "display_native.hpp"
 
 namespace skland {
+namespace gui {
 
 Keymap::~Keymap() {
   if (xkb_keymap_)
@@ -40,4 +41,5 @@ void Keymap::Destroy() {
   }
 }
 
-}
+} // namespace gui
+} // namespace skland

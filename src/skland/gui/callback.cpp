@@ -20,6 +20,7 @@
 #include "internal/surface_private.hpp"
 
 namespace skland {
+namespace gui {
 
 struct Callback::Private {
 
@@ -91,4 +92,5 @@ void Callback::Setup(const Surface &surface) {
   wl_callback_add_listener(p_->wl_callback, &Private::kListener, this);
 }
 
-}
+} // namespace gui
+} // namespace skland

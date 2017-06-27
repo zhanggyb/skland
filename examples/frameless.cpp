@@ -29,8 +29,10 @@
 #include "SkCanvas.h"
 
 using namespace skland;
+using namespace skland::core;
+using namespace skland::gui;
 
-class FramelessWindow : public skland::Window {
+class FramelessWindow : public Window {
 
  public:
 
@@ -72,12 +74,11 @@ class MainWidget : public AbstractView {
 
  protected:
 
-  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
-    if (dirty_flag) Update();
-    else CancelUpdate();
+  virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
+    Update(0 != dirty_flag);
   }
 
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override {
+  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
 
   }
 
@@ -114,7 +115,10 @@ class MainWidget : public AbstractView {
   }
 
   virtual void OnDraw(const Context *context) override {
-    const Rect &rect = GetGeometry();
+    using skland::graphic::Canvas;
+    using skland::graphic::Paint;
+
+    const RectF &rect = GetGeometry();
     int scale = context->surface()->GetScale();
 
     Canvas *canvas = context->canvas();
@@ -122,7 +126,7 @@ class MainWidget : public AbstractView {
     canvas->Scale(scale, scale);
 
     Paint paint;
-    paint.SetColor(Color(0.855f, 0.855f, 0.165f, .9f));
+    paint.SetColor(ColorF(0.855f, 0.855f, 0.165f, .9f));
     canvas->DrawRect(rect, paint);
 
     canvas->Restore();
@@ -132,7 +136,7 @@ class MainWidget : public AbstractView {
     SkImageInfo info = SkImageInfo::MakeN32(400, 400, kPremul_SkAlphaType);
     sk_sp<SkSurface> surface = sk_canvas->makeSurface(info);
 
-    SkCanvas* top_canvas = surface->getCanvas();
+    SkCanvas *top_canvas = surface->getCanvas();
     SkRect top_rect = SkRect::MakeXYWH(50, 50, 100, 100);
     SkPaint top_paint;
     top_paint.setColor(0xFFFF0000);
@@ -148,8 +152,6 @@ class MainWidget : public AbstractView {
 };
 
 int main(int argc, char *argv[]) {
-  using skland::Window;
-
   Application app(argc, argv);
 
   FramelessWindow *win = new FramelessWindow("Frameless Window", Window::kFlagMaskFrameless);

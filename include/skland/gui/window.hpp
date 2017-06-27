@@ -20,6 +20,7 @@
 #include "abstract-shell-view.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -65,11 +66,11 @@ SKLAND_EXPORT class Window : public AbstractShellView {
    */
   void SetContentView(AbstractView *view);
 
-  const Size &GetMinimalSize() const;
+  const core::Size2I &GetMinimalSize() const;
 
-  const Size &GetPreferredSize() const;
+  const core::Size2I &GetPreferredSize() const;
 
-  const Size &GetMaximalSize() const;
+  const core::Size2I &GetMaximalSize() const;
 
  protected:
 
@@ -79,9 +80,9 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
+  virtual bool OnConfigureSize(const core::Size2I &old_size, const core::Size2I &new_size) final;
 
-  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
+  virtual void OnSizeChange(const core::Size2I &old_size, const core::Size2I &new_size) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -109,7 +110,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   int GetMouseLocation(const MouseEvent *event) const;
 
-  RectI GetContentGeometry() const;
+  core::RectI GetContentGeometry() const;
 
  private:
 
@@ -127,6 +128,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_WINDOW_HPP_

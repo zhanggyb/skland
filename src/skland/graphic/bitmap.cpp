@@ -18,6 +18,7 @@
 #include "internal/image-info_private.hpp"
 
 namespace skland {
+namespace graphic {
 
 Bitmap::Bitmap() {
   p_.reset(new Private);
@@ -40,4 +41,5 @@ bool Bitmap::InstallPixels(const ImageInfo &info, void *pixels, size_t row_bytes
   return p_->sk_bitmap.installPixels(info.p_->sk_image_info, pixels, row_bytes);
 }
 
-}
+} // namespace graphic
+} // namespace skland

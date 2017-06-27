@@ -20,6 +20,7 @@
 #include "abstract-slider.hpp"
 
 namespace skland {
+namespace gui {
 
 class Slider : public AbstractSlider<int> {
 
@@ -60,6 +61,7 @@ class Slider : public AbstractSlider<int> {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_SLIDER_BAR_HPP_

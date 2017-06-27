@@ -20,27 +20,24 @@
 #include "vectors.hpp"
 
 namespace skland {
+namespace core {
 
 /**
  * @ingroup core
  */
-typedef core::Vector2<int> Point;
+typedef Vector2<int> Point2I;
 
 /**
  * @ingroup core
  */
-typedef core::Vector2<int> Point2I;
+typedef Vector2<float> Point2F;
 
 /**
  * @ingroup core
  */
-typedef core::Vector2<float> Point2F;
+typedef Vector2<double> Point2D;
 
-/**
- * @ingroup core
- */
-typedef core::Vector2<double> Point2D;
-
-}
+} // namespace core
+} // namespace skland
 
 #endif // SKLAND_CORE_POINT_HPP_

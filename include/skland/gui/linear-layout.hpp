@@ -21,6 +21,7 @@
 #include "abstract-layout.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -34,7 +35,7 @@ SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
  public:
 
   LinearLayout(Orientation orientation = kHorizontal,
-               const Padding &padding = Padding(5),
+               const core::Padding &padding = core::Padding(5),
                int space = 5);
 
  protected:
@@ -55,6 +56,7 @@ SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_LINEAR_LAYOUT_HPP_

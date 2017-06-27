@@ -18,6 +18,7 @@
 #define SKLAND_GRAPHIC_CLIP_OPERATION_HPP_
 
 namespace skland {
+namespace graphic {
 
 /**
  * @ingroup graphic
@@ -31,6 +32,7 @@ enum ClipOperation {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_CLIP_OPERATION_HPP_

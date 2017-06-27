@@ -20,6 +20,7 @@
 #include "abstract-view.hpp"
 
 namespace skland {
+namespace gui {
 
 class Surface;
 
@@ -69,6 +70,7 @@ class VideoView final : public AbstractView {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif //SKLAND_VIDEO_VIEW_HPP

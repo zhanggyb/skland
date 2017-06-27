@@ -22,6 +22,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 /**
  * @brief A timer emit signal in main thread
@@ -48,7 +49,7 @@ class Timer {
 
   bool IsArmed() const;
 
-  SignalRef<> timeout() { return timeout_; }
+  core::SignalRef<> timeout() { return timeout_; }
 
   /**
    * @brief Get clock time in nanoseconds
@@ -65,10 +66,11 @@ class Timer {
 
   std::unique_ptr<Private> p_;
 
-  Signal<> timeout_;
+  core::Signal<> timeout_;
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_TIMER_HPP_

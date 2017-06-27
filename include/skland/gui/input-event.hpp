@@ -20,6 +20,7 @@
 #include "../core/export.hpp"
 
 namespace skland {
+namespace gui {
 
 class Input;
 class Cursor;
@@ -87,6 +88,7 @@ SKLAND_EXPORT class InputEvent {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INPUT_EVENT_HPP_

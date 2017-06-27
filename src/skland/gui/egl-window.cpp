@@ -34,7 +34,7 @@
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 #include "SkCanvas.h"
 
@@ -42,6 +42,15 @@
 #include <skland/core/assert.hpp>
 
 namespace skland {
+namespace gui {
+
+using core::RectF;
+using core::RectI;
+using core::Size2I;
+using graphic::Canvas;
+using graphic::Paint;
+using graphic::Path;
+using graphic::ClipOperation;
 
 struct EGLWindow::Private {
 
@@ -138,9 +147,9 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   return nullptr != p_->sub_surface ? p_->sub_surface : GetShellSurface();
 }
 
-bool EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  Size min(160, 120);
-  Size max(65536, 65536);
+bool EGLWindow::OnConfigureSize(const Size2I &old_size, const Size2I &new_size) {
+  Size2I min(160, 120);
+  Size2I max(65536, 65536);
   _ASSERT(min.width < max.width && min.height < max.height);
 
   if (new_size.width < min.width || new_size.height < min.height) return false;
@@ -166,7 +175,7 @@ bool EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
   return true;
 }
 
-void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
+void EGLWindow::OnSizeChange(const Size2I &old_size, const Size2I &new_size) {
   int width = new_size.width;
   int height = new_size.height;
 
@@ -198,7 +207,7 @@ void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
   p_->frame_canvas->SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
   p_->frame_canvas->Clear();
 
-  const Margin &margin = shell_surface->GetMargin();
+  const core::Margin &margin = shell_surface->GetMargin();
   RedrawTask *redraw_task = RedrawTask::Get(this);
   redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
   PushToTail(redraw_task);
@@ -307,7 +316,7 @@ void EGLWindow::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
+  RectF geometry = RectF::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
 
   if ((!IsMaximized()) || (!IsFullscreen())) {
     // Drop shadow:
@@ -320,7 +329,7 @@ void EGLWindow::OnDraw(const Context *context) {
 //    path.AddRoundRect(geometry, radii);
     path.AddRect(geometry);
     canvas->Save();
-    canvas->ClipPath(path, kClipDifference, true);
+    canvas->ClipPath(path, ClipOperation::kClipDifference, true);
     DropShadow(context);
     canvas->Restore();
   } else {
@@ -434,7 +443,7 @@ void EGLWindow::OnRelease() {
 
 void EGLWindow::RequestUpdate() {
   Surface *shell_surface = GetShellSurface();
-  const Margin &margin = shell_surface->GetMargin();
+  const core::Margin &margin = shell_surface->GetMargin();
 
   RedrawTask *redraw_task = RedrawTask::Get(this);
   redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
@@ -452,4 +461,5 @@ void EGLWindow::CancelUpdate() {
   redraw_task->Unlink();
 }
 
-}
+} // namespace gui
+} // namespace skland

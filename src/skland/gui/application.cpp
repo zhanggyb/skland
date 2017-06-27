@@ -25,7 +25,7 @@
 
 #include <skland/core/debug.hpp>
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/surface.hpp>
@@ -36,6 +36,7 @@ using std::cerr;
 using std::endl;
 
 namespace skland {
+namespace gui {
 
 class Application::EpollTask : public AbstractEpollTask {
 
@@ -304,4 +305,5 @@ const std::thread::id& Application::GetThreadID() {
   return kInstance->p_->thread_id;
 }
 
-}
+} // namespace gui
+} // namespace skland

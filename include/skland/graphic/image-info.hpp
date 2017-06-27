@@ -23,6 +23,7 @@
 struct SkImageInfo;
 
 namespace skland {
+namespace graphic {
 
 enum AlphaType {
   kAlphaTypeUnknown,
@@ -54,7 +55,7 @@ enum ColorType {
 class ImageInfo {
 
   friend class Bitmap;
-  friend class Layer;
+  friend class Surface;
   friend class Canvas;
 
  public:
@@ -81,6 +82,7 @@ class ImageInfo {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
-#endif //SKLAND_IMAGE_INFO_HPP
+#endif // SKLAND_GRAPHIC_IMAGE_INFO_HPP_

@@ -26,6 +26,17 @@ list(APPEND all_source_files
         ${core_internal_headers}
         ${core_sources})
 
+file(GLOB numerical_headers "${PROJECT_SOURCE_DIR}/include/skland/numerical/*.hpp")
+file(GLOB numerical_sources "numerical/*.cpp")
+file(GLOB numerical_internal_headers "numerical/internal/*.hpp")
+file(GLOB numerical_internal_sources "numerical/internal/*.cpp")
+
+list(APPEND all_source_files
+        ${numerical_headers}
+        ${numerical_sources}
+        ${numerical_internal_headers}
+        ${numerical_internal_sources})
+
 file(GLOB graphic_headers "${PROJECT_SOURCE_DIR}/include/skland/graphic/*.hpp")
 file(GLOB graphic_sources "graphic/*.cpp")
 file(GLOB graphic_internal_headers "graphic/internal/*.hpp")
@@ -49,9 +60,6 @@ list(APPEND all_source_files
 #        ${av_internal_sources})
 
 if (LINUX)
-
-    file(GLOB egl_headers "${PROJECT_SOURCE_DIR}/include/skland/egl/*.hpp")
-    file(GLOB egl_sources "egl/*.cpp")
 
     file(GLOB gui_headers "${PROJECT_SOURCE_DIR}/include/skland/gui/*.hpp")
     file(GLOB gui_sources "gui/*.cpp")

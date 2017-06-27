@@ -1,13 +1,25 @@
 /**
  * @defgroup core Core
- * @brief The core functionality
+ * @brief The base and common code used in all other modules
  *
  * ...
  */
 
 /**
- * @defgroup av Audio/Video
- * @brief Audio/Video process based on FFMPEG
+ * @namespace core
+ * @brief The core module
+ */
+
+/**
+ * @defgroup numerical Numerical
+ * @brief The numerical algorithm module
+ *
+ * ...
+ */
+
+/**
+ * @namespace numerical
+ * @brief The numerical algorithm
  *
  * ...
  */
@@ -17,6 +29,13 @@
  * @brief Graphic classes based on Google Skia
  *
  * Code using Google Skia for drawing 2D in GUI views.
+ */
+
+/**
+ * @namespace graphic
+ * @brief The graphic code based on Skia
+ *
+ * ...
  */
 
 /**
@@ -42,6 +61,13 @@
  */
 
 /**
+ * @namespace gui
+ * @brief The main GUI code
+ *
+ * ...
+ */
+
+/**
  * @ingroup gui
  * @defgroup gui_intern Internal
  * @brief Private code used in GUI module only
@@ -52,6 +78,13 @@
  * @brief Stock resources
  *
  * Stock resources
+ */
+
+/**
+ * @namespace stock
+ * @brief The predefined resources
+ *
+ * ...
  */
 
 /**

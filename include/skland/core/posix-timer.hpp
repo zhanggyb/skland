@@ -63,7 +63,7 @@ class PosixTimer {
    *
    * @warning This delegate was called in thread, and SHOULD not be reset when the timer is armed.
    */
-  DelegateRef<void()> expire() {
+  core::DelegateRef<void()> expire() {
     return expire_;
   }
 
@@ -83,7 +83,7 @@ class PosixTimer {
 
   bool is_armed_;
 
-  Delegate<void()> expire_;
+  core::Delegate<void()> expire_;
 
 };
 

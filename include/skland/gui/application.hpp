@@ -23,6 +23,7 @@
 #include "display.hpp"
 
 namespace skland {
+namespace gui {
 
 class AbstractEpollTask;
 
@@ -109,6 +110,7 @@ SKLAND_EXPORT class Application {
 
 };
 
+} // namespace gui
 } // namespace skland
 
 #endif // SKLAND_GUI_APPLICATION_HPP_

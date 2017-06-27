@@ -16,7 +16,9 @@
 
 #include "internal/abstract-view_private.hpp"
 
-#include <skland/core/numeric.hpp>
+#include "skland/numerical/bit.hpp"
+#include "skland/numerical/clamp.hpp"
+
 #include <skland/core/assert.hpp>
 #include <skland/core/debug.hpp>
 
@@ -27,6 +29,13 @@
 #include "internal/abstract-view_iterators.hpp"
 
 namespace skland {
+namespace gui {
+
+using core::Point2I;
+using core::Size2I;
+using core::RectF;
+using numerical::Clamp;
+using numerical::Bit;
 
 AbstractView::AbstractView()
     : AbstractView(400, 300) {
@@ -39,8 +48,8 @@ AbstractView::AbstractView(int width, int height)
   p_->geometry.Resize(width, height);
   p_->last_geometry.Resize(width, height);
 
-  p_->preferred_size.width = clamp(width, p_->minimal_size.width, p_->maximal_size.width);
-  p_->preferred_size.height = clamp(height, p_->minimal_size.height, p_->maximal_size.height);
+  p_->preferred_size.width = Clamp(width, p_->minimal_size.width, p_->maximal_size.width);
+  p_->preferred_size.height = Clamp(height, p_->minimal_size.height, p_->maximal_size.height);
 }
 
 AbstractView::~AbstractView() {
@@ -188,7 +197,7 @@ void AbstractView::MoveTo(int x, int y) {
   OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
 
-const Padding &AbstractView::GetPadding() const {
+const core::Padding &AbstractView::GetPadding() const {
   return p_->padding;
 }
 
@@ -197,10 +206,10 @@ void AbstractView::Resize(int width, int height) {
 
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
-  Size min;
+  Size2I min;
   min.width = GetMinimalWidth();
   min.height = GetMinimalHeight();
-  Size max;
+  Size2I max;
   max.width = GetMaximalWidth();
   max.height = GetMaximalHeight();
 
@@ -340,7 +349,7 @@ float AbstractView::GetYCenter() const {
   return p_->geometry.center_y();
 }
 
-const Rect &AbstractView::GetGeometry() const {
+const RectF &AbstractView::GetGeometry() const {
   return p_->geometry;
 }
 
@@ -420,18 +429,15 @@ const AnchorGroup &AbstractView::GetAnchorGroup(Alignment align) const {
   }
 }
 
-void AbstractView::Update() {
+void AbstractView::Update(bool validate) {
   if (p_->is_drawing) return;
 
-  if (p_->redraw_task.IsLinked()) return;
-
-  OnUpdate(this);
-}
-
-void AbstractView::CancelUpdate() {
-  if (p_->is_drawing) return;
-
-  p_->redraw_task.Unlink();
+  if (validate) {
+    if (p_->redraw_task.IsLinked()) return;
+    OnUpdate(this);
+  } else {
+    p_->redraw_task.Unlink();
+  }
 }
 
 bool AbstractView::Contain(int x, int y) const {
@@ -540,17 +546,17 @@ Surface *AbstractView::GetSurface(const AbstractView *view) const {
 }
 
 void AbstractView::OnEnterOutput(const Surface *surface, const Output *output) {
-
+  // override this in sub class
 }
 
 void AbstractView::OnLeaveOutput(const Surface *surface, const Output *output) {
-
+  // override this in sub class
 }
 
 AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
   Iterator it(this);
   AbstractView *view = nullptr;
-  Point cursor_xy(event->GetWindowXY());
+  Point2I cursor_xy(event->GetWindowXY());
 
   for (it = it.first_child(); it; ++it) {
     if (it.view()->Contain(cursor_xy.x, cursor_xy.y)) {
@@ -1162,10 +1168,10 @@ void AbstractView::RedrawTask::Run() const {
   if (view_->p_->need_layout) {
     view_->p_->is_layouting = true;
     view_->OnLayout(view_->p_->dirty_flag,
-                   view_->p_->padding.left,
-                   view_->p_->padding.top,
-                   static_cast<int>(view_->p_->geometry.width()) - view_->p_->padding.right,
-                   static_cast<int>(view_->p_->geometry.height()) - view_->p_->padding.bottom);
+                    view_->p_->padding.left,
+                    view_->p_->padding.top,
+                    static_cast<int>(view_->p_->geometry.width()) - view_->p_->padding.right,
+                    static_cast<int>(view_->p_->geometry.height()) - view_->p_->padding.bottom);
     view_->p_->is_layouting = false;
   }
 
@@ -1191,4 +1197,5 @@ AbstractView::RedrawTask *AbstractView::RedrawTask::Get(const AbstractView *view
   return &view->p_->redraw_task;
 }
 
-}
+} // namespace gui
+} // namespace skland

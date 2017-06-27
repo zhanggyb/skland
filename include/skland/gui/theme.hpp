@@ -17,12 +17,12 @@
 #ifndef SKLAND_STOCK_THEME_HPP_
 #define SKLAND_STOCK_THEME_HPP_
 
-#include "../core/color.hpp"
-#include "../core/margin.hpp"
-#include "../core/point.hpp"
+#include "skland/core/color.hpp"
+#include "skland/core/margin.hpp"
+#include "skland/core/point.hpp"
 
-#include "../graphic/shader.hpp"
-#include "../graphic/font.hpp"
+#include "skland/graphic/shader.hpp"
+#include "skland/graphic/font.hpp"
 
 #include <vector>
 #include <string>
@@ -30,6 +30,7 @@
 class SkPixmap;
 
 namespace skland {
+namespace gui {
 
 typedef void *(*ThemeCreateHandle)();
 typedef void(*ThemeDestroyHandle)(void *p);
@@ -46,6 +47,8 @@ class Theme {
   Theme &operator=(const Theme &) = delete;
 
  public:
+
+  using Margin = core::Margin;
 
   struct Schema {
 
@@ -73,7 +76,7 @@ class Theme {
         return *this;
       }
 
-      Color color;
+      core::ColorF color;
       bool shaded;
       int shaded_count;
       std::vector<uint32_t> shaded_colors;
@@ -137,11 +140,11 @@ class Theme {
 
     Schema title_bar;
 
-    Font title_bar_font;
+    graphic::Font title_bar_font;
 
     Schema button;
 
-    Font default_font;
+    graphic::Font default_font;
 
   };
 
@@ -149,7 +152,7 @@ class Theme {
 
     struct GradientShader {
 
-      static Shader MakeLinear(const Point2F points[2], const Schema::ShadedColor &color);
+      static graphic::Shader MakeLinear(const core::Point2F points[2], const Schema::ShadedColor &color);
 
     };
 
@@ -226,6 +229,7 @@ class Theme {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_STOCK_THEME_HPP_

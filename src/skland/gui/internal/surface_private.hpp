@@ -20,6 +20,7 @@
 #include <skland/gui/surface.hpp>
 
 namespace skland {
+namespace gui {
 
 struct Surface::Private {
 
@@ -27,7 +28,7 @@ struct Surface::Private {
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  Private(AbstractEventHandler *event_handler, const Margin &margin)
+  Private(AbstractEventHandler *event_handler, const core::Margin &margin)
       : wl_surface(nullptr),
         commit_mode(kSynchronized),
         transform(kTransformNormal),
@@ -51,14 +52,14 @@ struct Surface::Private {
 
   AbstractEventHandler *event_handler;
 
-  Margin margin;
+  core::Margin margin;
 
   /**
    * Position in parent surface
    *
    * For root surface, this should always be (0, 0)
    */
-  Point relative_position;
+  core::Point2I relative_position;
 
   /**
     * @brief The parent surface
@@ -103,6 +104,7 @@ struct Surface::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_SURFACE_PRIVATE_HPP_

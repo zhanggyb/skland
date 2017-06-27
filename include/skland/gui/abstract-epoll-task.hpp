@@ -18,6 +18,7 @@
 #define SKLAND_GUI_ABSTRACT_EPOLL_TASK_HPP_
 
 namespace skland {
+namespace gui {
 
 class AbstractEpollTask {
 
@@ -31,6 +32,7 @@ class AbstractEpollTask {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_ABSTRACT_EPOLL_TASK_HPP_

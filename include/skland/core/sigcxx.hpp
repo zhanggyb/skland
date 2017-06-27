@@ -34,7 +34,16 @@
 #include <cassert>
 #endif
 
+#ifndef __SLOT__
+/**
+ * @ingroup core
+ * @brief A helper macro to define a slot parameter with default nullptr
+ */
+#define __SLOT__ ::skland::core::SLOT slot = nullptr
+#endif
+
 namespace skland {
+namespace core {
 
 // forward declaration
 class Trackable;
@@ -43,13 +52,6 @@ class Signal;
 class Slot;
 
 typedef Slot *SLOT;
-#ifndef __SLOT__
-/**
- * @ingroup core
- * @brief A helper macro to define a slot parameter with default nullptr
- */
-#define __SLOT__ SLOT slot = nullptr
-#endif
 
 /// @cond IGNORE
 namespace details {
@@ -1060,6 +1062,7 @@ class SignalRef {
 
 };
 
+} // namespace core
 } // namespace skland
 
 #endif  // SKLAND_CORE_SIGCXX_HPP_

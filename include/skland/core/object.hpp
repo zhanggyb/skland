@@ -23,6 +23,7 @@
 #include <string>
 
 namespace skland {
+namespace core {
 
 /**
  * @ingroup core
@@ -413,6 +414,7 @@ void Object::ClearManagedObject(M *_this,
   (*last) = nullptr;
 }
 
-}
+} // namespace core
+} // namespace skland
 
 #endif // SKLAND_CORE_OBJECT_HPP_

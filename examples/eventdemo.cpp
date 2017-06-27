@@ -20,6 +20,7 @@
 #include <skland/gui/relative-layout.hpp>
 
 using namespace skland;
+using namespace skland::gui;
 
 int main(int argc, char *argv[]) {
   Application app(argc, argv);

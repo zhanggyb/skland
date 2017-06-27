@@ -21,6 +21,7 @@
 
 int main(int argc, char *argv[]) {
   using namespace skland;
+  using namespace skland::gui;
 
   Application app(argc, argv);
 //  av::Format::RegisterAll();

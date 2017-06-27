@@ -17,6 +17,9 @@
 #include "internal/typeface_private.hpp"
 
 namespace skland {
+namespace graphic {
+
+using core::RectF;
 
 Typeface::Typeface(Style style) {
   p_.reset(new Private);
@@ -108,13 +111,14 @@ bool Typeface::GetKerningPairAdjustments(const GlyphID *glyphs, int count, int32
   return p_->sk_typeface->getKerningPairAdjustments(glyphs, count, adjustments);
 }
 
-Rect Typeface::GetBounds() const {
+RectF Typeface::GetBounds() const {
   SkRect rect = p_->sk_typeface->getBounds();
-  return *reinterpret_cast<Rect *>(&rect);
+  return *reinterpret_cast<RectF *>(&rect);
 }
 
 bool operator==(const Typeface &typeface1, const Typeface &typeface2) {
   return SkTypeface::Equal(typeface1.p_->sk_typeface.get(), typeface2.p_->sk_typeface.get());
 }
 
-}
+} // namespace graphic
+} // namespace skland

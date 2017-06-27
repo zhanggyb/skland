@@ -17,6 +17,7 @@
 #include <skland/core/object.hpp>
 
 namespace skland {
+namespace core {
 
 Object::Object()
     : Trackable(),
@@ -588,4 +589,5 @@ void Object::MoveBackward(Object *object) {
   }
 }
 
-}
+} // namespace core
+} // namespace skland

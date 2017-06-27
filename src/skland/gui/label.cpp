@@ -27,9 +27,14 @@
 #include "gui/key-event.hpp"
 #include "gui/mouse-event.hpp"
 
-#include "stock/theme.hpp"
+#include "skland/gui/theme.hpp"
 
 namespace skland {
+namespace gui {
+
+using core::RectF;
+using core::ColorF;
+using graphic::Font;
 
 struct Label::Private {
 
@@ -45,8 +50,8 @@ struct Label::Private {
   ~Private() {}
 
   std::string text;
-  Color foreground;
-  Color background;
+  core::ColorF foreground;
+  core::ColorF background;
   Font font;
 
 };
@@ -64,34 +69,30 @@ Label::~Label() {
 
 }
 
-void Label::SetForeground(const Color &color) {
+void Label::SetForeground(const ColorF &color) {
   if (p_->foreground != color) {
     p_->foreground = color;
     Update();
   }
 }
 
-void Label::SetBackground(const Color &color) {
+void Label::SetBackground(const ColorF &color) {
   if (p_->background != color) {
     p_->background = color;
     Update();
   }
 }
 
-void Label::SetFont(const Font &font) {
+void Label::SetFont(const graphic::Font &font) {
   p_->font = font;
   Update();
 }
 
-void Label::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-  if (dirty_flag) {
-    Update();
-  } else {
-    CancelUpdate();
-  }
+void Label::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
+  Update(0 != dirty_flag);
 }
 
-void Label::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void Label::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
 
 }
 
@@ -128,8 +129,12 @@ void Label::OnKeyUp(KeyEvent *event) {
 }
 
 void Label::OnDraw(const Context *context) {
+  using graphic::Canvas;
+  using graphic::Paint;
+  using graphic::TextBox;
+
   int scale = context->surface()->GetScale();
-  const Rect rect = GetGeometry() * scale;
+  const RectF rect = GetGeometry() * scale;
   Canvas::ClipGuard guard(context->canvas(), rect);
 
   Paint paint;
@@ -155,4 +160,5 @@ void Label::OnDraw(const Context *context) {
   text_box.Draw(*context->canvas());
 }
 
-}
+} // namespace gui
+} // namespace skland

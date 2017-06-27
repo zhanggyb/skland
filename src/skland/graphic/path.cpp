@@ -19,6 +19,10 @@
 #include "SkPath.h"
 
 namespace skland {
+namespace graphic {
+
+using core::Point2F;
+using core::RectF;
 
 struct Path::Private {
 
@@ -57,11 +61,11 @@ bool Path::Interpolate(const Path &ending, float weight, Path *out) const {
   return p_->sk_path.interpolate(ending.p_->sk_path, weight, &out->p_->sk_path);
 }
 
-void Path::AddRect(const Rect &rect, Direction dir) {
+void Path::AddRect(const RectF &rect, Direction dir) {
   p_->sk_path.addRect(reinterpret_cast<const SkRect &>(rect), static_cast<SkPath::Direction >(dir));
 }
 
-void Path::AddRect(const Rect &rect, Direction dir, unsigned start) {
+void Path::AddRect(const RectF &rect, Direction dir, unsigned start) {
   p_->sk_path.addRect(reinterpret_cast<const SkRect &>(rect), static_cast<SkPath::Direction >(dir), start);
 }
 
@@ -69,7 +73,7 @@ void Path::AddRect(float left, float top, float right, float bottom, Direction d
   p_->sk_path.addRect(left, top, right, bottom, static_cast<SkPath::Direction >(dir));
 }
 
-void Path::AddRoundRect(const Rect &rect, const float radii[], Direction dir) {
+void Path::AddRoundRect(const RectF &rect, const float radii[], Direction dir) {
   p_->sk_path.addRoundRect(reinterpret_cast<const SkRect &>(rect),
                            radii, static_cast<SkPath::Direction>(dir));
 }
@@ -199,4 +203,5 @@ bool operator!=(const Path &path1, const Path &path2) {
   return (path1.p_->sk_path) != (path2.p_->sk_path);
 }
 
-}
+} // namespace graphic
+} // namespace skland

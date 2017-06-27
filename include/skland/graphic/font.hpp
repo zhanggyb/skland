@@ -27,6 +27,7 @@
 class SkTypeface;
 
 namespace skland {
+namespace graphic {
 
 class Typeface;
 
@@ -155,6 +156,7 @@ class Font {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_FONT_HPP_

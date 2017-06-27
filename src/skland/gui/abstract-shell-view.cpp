@@ -17,6 +17,7 @@
 #include "internal/abstract-shell-view_private.hpp"
 
 #include <skland/core/assert.hpp>
+#include "skland/numerical/bit.hpp"
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/mouse-event.hpp>
@@ -25,7 +26,7 @@
 
 #include <skland/graphic/canvas.hpp>
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 #include "internal/abstract-view_private.hpp"
 
@@ -33,6 +34,14 @@
 #include "SkImage.h"
 
 namespace skland {
+namespace gui {
+
+using Point = core::Point2I;
+using Size = core::Size2I;
+
+using core::Margin;
+using core::SLOT;
+using numerical::Bit;
 
 const Margin AbstractShellView::kResizingMargin(5, 5, 5, 5);
 
@@ -573,4 +582,5 @@ AbstractShellView::RedrawTask *AbstractShellView::RedrawTask::Get(const Abstract
   return &shell_view->p_->redraw_task;
 }
 
-}
+} // namespace gui
+} // namespace skland

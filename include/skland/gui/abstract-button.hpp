@@ -21,7 +21,11 @@
 
 namespace skland {
 
+namespace graphic {
 class Font;
+}
+
+namespace gui {
 
 /**
  * @ingroup gui
@@ -40,7 +44,7 @@ class AbstractButton : public AbstractView {
 
   AbstractButton(const std::string &text);
 
-  SignalRef<> clicked() { return clicked_; }
+  core::SignalRef<> clicked() { return clicked_; }
 
   bool IsSensitive() const;
 
@@ -48,9 +52,9 @@ class AbstractButton : public AbstractView {
 
   bool IsPressed() const;
 
-  const Font &GetFont() const;
+  const graphic::Font &GetFont() const;
 
-  void SetFont(const Font &font);
+  void SetFont(const graphic::Font &font);
 
   const std::string &GetText() const;
 
@@ -74,9 +78,13 @@ class AbstractButton : public AbstractView {
 
   virtual void OnKeyUp(KeyEvent *event) override;
 
-  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
+  virtual void OnConfigureGeometry(int dirty_flag,
+                                   const core::RectF &old_geometry,
+                                   const core::RectF &new_geometry) override;
 
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
+  virtual void OnGeometryChange(int dirty_flag,
+                                const core::RectF &old_geometry,
+                                const core::RectF &new_geometry) override;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
 
@@ -88,9 +96,11 @@ class AbstractButton : public AbstractView {
 
   std::unique_ptr<Private> p_;
 
-  Signal<> clicked_;
+  core::Signal<> clicked_;
+
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_ABSTRACT_BUTTON_HPP_

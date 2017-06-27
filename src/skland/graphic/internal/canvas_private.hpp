@@ -14,57 +14,47 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GRAPHIC_SHADER_HPP_
-#define SKLAND_GRAPHIC_SHADER_HPP_
+#ifndef SKLAND_GRAPHIC_INTERNAL_CANVAS_PRIVATE_HPP_
+#define SKLAND_GRAPHIC_INTERNAL_CANVAS_PRIVATE_HPP_
 
-#include <memory>
+#include "skland/graphic/canvas.hpp"
+
+#include "bitmap_private.hpp"
+
+#include "SkCanvas.h"
 
 namespace skland {
 namespace graphic {
 
-class Paint;
-class GradientShader;
-
 /**
- * @ingroup graphic
- * @brief The base shader class
+ * @ingroup graphic_intern
+ * @brief The private structure used in Canvas
  */
-class Shader {
+struct Canvas::Private {
 
-  friend class Paint;
-  friend class GradientShader;
+  Private()
+      : sk_canvas(nullptr) {
+    sk_canvas = new SkCanvas();
+  }
 
- public:
+  Private(SkCanvas *canvas)
+      : sk_canvas(canvas) {}
 
-  enum TileMode {
-    kTileModeClamp,
-    kTileModeRepeat,
-    kTileModeMirror
-  };
+  Private(const SkBitmap &bitmap)
+      : sk_canvas(nullptr) {
+    sk_canvas = new SkCanvas(bitmap);
+  }
 
-  Shader();
+  ~Private() {
+    delete sk_canvas;
+  }
 
-  Shader(const Shader &other);
-
-  ~Shader();
-
-  Shader &operator=(const Shader &other);
-
-  operator bool() const;
-
- protected:
-
-  struct Private;
-
-  Shader(Private *p);
-
- private:
-
-  std::unique_ptr<Private> p_;
+  SkCanvas *sk_canvas;
+  core::Point2F origin;
 
 };
 
-} // namespace graphic
-} // namespace skland
+}
+}
 
-#endif  // SKLAND_GRAPHIC_SHADER_HPP_
+#endif // SKLAND_GRAPHIC_INTERNAL_CANVAS_PRIVATE_HPP_

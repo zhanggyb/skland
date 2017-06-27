@@ -18,9 +18,11 @@
 #include "surface_private.hpp"
 
 namespace skland {
+namespace gui {
 
 void Surface::CommitTask::Run() const {
   wl_surface_commit(surface->p_->wl_surface);
 }
 
-}
+} // namespace gui
+} // namespace skland

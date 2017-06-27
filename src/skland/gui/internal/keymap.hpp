@@ -20,6 +20,7 @@
 #include <xkbcommon/xkbcommon.h>
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -52,6 +53,7 @@ class Keymap {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_KEYMAP_HPP_

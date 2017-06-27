@@ -23,12 +23,8 @@
 #include <skland/gui/anchor-group.hpp>
 #include <skland/gui/anchor.hpp>
 
-using skland::Application;
-using skland::Window;
-using skland::RelativeLayout;
-using skland::PushButton;
-using skland::Anchor;
-using skland::AnchorGroup;
+using namespace skland;
+using namespace skland::gui;
 
 Test::Test()
     : testing::Test() {
@@ -50,7 +46,7 @@ TEST_F(Test, regular_1) {
 
   Application app(argc, argv);
 
-  skland::Window win(400, 300, "Test Window");
+  Window win(400, 300, "Test Window");
 
   RelativeLayout* layout = new RelativeLayout;
   PushButton * button = new PushButton("Test");
@@ -78,7 +74,7 @@ TEST_F(Test, regular_2) {
 
   Application app(argc, argv);
 
-  skland::Window win(400, 300, "Test Window");
+  Window win(400, 300, "Test Window");
 
   RelativeLayout* layout = new RelativeLayout;
   PushButton * button = new PushButton("Test");

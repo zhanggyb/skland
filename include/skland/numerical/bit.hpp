@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_NUMERIC_HPP_
-#define SKLAND_CORE_NUMERIC_HPP_
-
-#include <algorithm>
+#ifndef SKLAND_BIT_HPP
+#define SKLAND_BIT_HPP
 
 namespace skland {
+namespace numerical {
 
 /**
- * @ingroup core
+ * @ingroup numerical
  * @brief Helper class for bit operation
  */
 class Bit {
@@ -46,15 +45,7 @@ class Bit {
 
 };
 
-/**
- * @ingroup core
- * @brief Clamp given value between min and max
- */
-template<typename T>
-inline T clamp(T x, T min_value, T max_value) {
-  return std::min(std::max(x, min_value), max_value);
-}
+} // namespace numerical
+} // namespace skland
 
-}
-
-#endif // SKLAND_CORE_NUMERIC_HPP_
+#endif //SKLAND_BIT_HPP

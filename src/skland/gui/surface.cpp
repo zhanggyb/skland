@@ -34,6 +34,10 @@
 #include "internal/buffer_private.hpp"
 
 namespace skland {
+namespace gui {
+
+using Point = core::Point2I;
+using core::Margin;
 
 Surface *Surface::Shell::Create(AbstractEventHandler *event_handler, const Margin &margin) {
   Surface *surface = new Surface(event_handler, margin);
@@ -677,4 +681,5 @@ void Surface::ClearCommitTaskList() {
   }
 }
 
-}
+} // namespace gui
+} // namespace skland

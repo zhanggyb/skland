@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 #include <iostream>
 #include <skland/core/assert.hpp>
 #include <skland/graphic/gradient-shader.hpp>
@@ -28,14 +28,19 @@
 #include "internal/theme-dark.hpp"
 
 namespace skland {
+namespace gui {
+
+using core::Point2F;
+using graphic::FontStyle;
+using graphic::Shader;
 
 int Theme::kShadowRadius = 33;
 int Theme::kShadowOffsetX = 0;
 int Theme::kShadowOffsetY = 11;
-Margin Theme::kShadowMargin = Margin(kShadowRadius - kShadowOffsetX,
-                                     kShadowRadius - kShadowOffsetY,
-                                     kShadowRadius + kShadowOffsetX,
-                                     kShadowRadius + kShadowOffsetY);
+core::Margin Theme::kShadowMargin = core::Margin(kShadowRadius - kShadowOffsetX,
+                                                 kShadowRadius - kShadowOffsetY,
+                                                 kShadowRadius + kShadowOffsetX,
+                                                 kShadowRadius + kShadowOffsetY);
 std::vector<uint32_t> Theme::kShadowPixels;
 SkPixmap *Theme::kShadowPixmap = nullptr;
 
@@ -52,11 +57,11 @@ Theme::Data::Data()
 }
 
 Shader Theme::Helper::GradientShader::MakeLinear(const Point2F *points, const Schema::ShadedColor &color) {
-  return skland::GradientShader::MakeLinear(points,
-                                            color.shaded_colors.data(),
-                                            color.shaded_positions.data(),
-                                            color.shaded_count,
-                                            Shader::TileMode::kTileModeClamp);
+  return skland::graphic::GradientShader::MakeLinear(points,
+                                                     color.shaded_colors.data(),
+                                                     color.shaded_positions.data(),
+                                                     color.shaded_count,
+                                                     Shader::TileMode::kTileModeClamp);
 }
 
 void Theme::Initialize() {
@@ -144,4 +149,5 @@ void Theme::GenerateShadowImage() {
   canvas->drawPath(path, paint);
 }
 
+}
 }

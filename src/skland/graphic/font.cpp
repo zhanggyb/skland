@@ -19,6 +19,7 @@
 #include "internal/typeface_private.hpp"
 
 namespace skland {
+namespace graphic {
 
 Font::Font(Typeface::Style style, float size, MaskType mask_type, uint32_t flags) {
   p_.reset(new Private);
@@ -124,4 +125,5 @@ float Font::MeasureText(const void *text, size_t byte_length, TextEncoding encod
   return p_->sk_font->measureText(text, byte_length, (SkTextEncoding) encoding);
 }
 
-}
+} // namespace graphic
+} // namespace skland

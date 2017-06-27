@@ -23,6 +23,7 @@
 #include "shader.hpp"
 
 namespace skland {
+namespace graphic {
 
 class Matrix;
 
@@ -34,7 +35,7 @@ class GradientShader {
 
  public:
 
-  static Shader MakeLinear(const Point2F points[2],
+  static Shader MakeLinear(const core::Point2F points[2],
                            const uint32_t colors[],
                            const float pos[],
                            int count,
@@ -42,7 +43,7 @@ class GradientShader {
     return MakeLinear(points, colors, pos, count, mode, 0, nullptr);
   }
 
-  static Shader MakeLinear(const Point2F points[2],
+  static Shader MakeLinear(const core::Point2F points[2],
                            const uint32_t colors[],
                            const float pos[],
                            int count,
@@ -50,23 +51,23 @@ class GradientShader {
                            uint32_t flags,
                            const Matrix *local_matrix);
 
-  static Shader MakeLinear(const Point2F points[2],
-                           const Color colors[],
+  static Shader MakeLinear(const core::Point2F points[2],
+                           const core::ColorF colors[],
                            const float pos[],
                            int count,
                            Shader::TileMode mode,
                            uint32_t flags,
                            const Matrix *local_matrix);
 
-  static Shader MakeLinear(const Point2F points[2],
-                           const Color colors[],
+  static Shader MakeLinear(const core::Point2F points[2],
+                           const core::ColorF colors[],
                            const float pos[],
                            int count,
                            Shader::TileMode mode) {
     return MakeLinear(points, colors, pos, count, mode, 0, nullptr);
   }
 
-  static Shader MakeRadial(const Point2F &center,
+  static Shader MakeRadial(const core::Point2F &center,
                            float radius,
                            const uint32_t colors[],
                            const float pos[],
@@ -75,7 +76,7 @@ class GradientShader {
                            uint32_t flags,
                            const Matrix *local_matrix);
 
-  static Shader MakeRadial(const Point2F &center,
+  static Shader MakeRadial(const core::Point2F &center,
                            float radius,
                            const uint32_t colors[],
                            const float pos[],
@@ -84,18 +85,18 @@ class GradientShader {
     return MakeRadial(center, radius, colors, pos, count, mode, 0, nullptr);
   }
 
-  static Shader MakeRadial(const Point2F &center,
+  static Shader MakeRadial(const core::Point2F &center,
                            float radius,
-                           const Color colors[],
+                           const core::ColorF colors[],
                            const float pos[],
                            int count,
                            Shader::TileMode mode,
                            uint32_t flags,
                            const Matrix *local_matrix);
 
-  static Shader MakeRadial(const Point2F &center,
+  static Shader MakeRadial(const core::Point2F &center,
                            float radius,
-                           const Color colors[],
+                           const core::ColorF colors[],
                            const float pos[],
                            int count,
                            Shader::TileMode mode) {
@@ -104,6 +105,7 @@ class GradientShader {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_GRADIENT_SHADER_HPP_

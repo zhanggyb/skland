@@ -20,6 +20,7 @@
 #include "abstract-shell-view.hpp"
 
 namespace skland {
+namespace gui {
 
 class PopupShellSurface;
 
@@ -37,6 +38,7 @@ class Tooltip : public AbstractShellView {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_TOOLTIP_HPP_

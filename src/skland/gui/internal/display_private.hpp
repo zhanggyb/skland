@@ -28,6 +28,7 @@
 #include <EGL/eglext.h>
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -86,8 +87,8 @@ struct Display::Private {
   int fd;
   uint32_t epoll_events;
 
-  Deque outputs;
-  Deque inputs;
+  core::Deque outputs;
+  core::Deque inputs;
 
   std::list<Global *> globals;
   std::set<uint32_t> pixel_formats;
@@ -136,6 +137,7 @@ struct Display::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_DISPLAY_PRIVATE_HPP_

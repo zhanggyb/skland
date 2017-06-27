@@ -20,6 +20,7 @@
 #include <skland/gui/mouse-event.hpp>
 
 namespace skland {
+namespace gui {
 
 struct MouseEvent::Private {
 
@@ -42,7 +43,7 @@ struct MouseEvent::Private {
 
   uint32_t serial;
 
-  Point2D surface_xy;
+  core::Point2D surface_xy;
 
   uint32_t time;
 
@@ -53,6 +54,7 @@ struct MouseEvent::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_

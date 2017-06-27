@@ -23,6 +23,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class AbstractView;
 class AnchorGroup;
@@ -73,6 +74,7 @@ class Anchor {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_ANCHOR_HPP_

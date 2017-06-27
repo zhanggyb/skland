@@ -23,7 +23,7 @@
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 #include "SkCanvas.h"
 //#include "SkTypeface.h"
@@ -31,6 +31,12 @@
 #include "SkTextBox.h"
 
 namespace skland {
+namespace gui {
+
+using core::RectF;
+using graphic::Canvas;
+using graphic::Paint;
+using graphic::Path;
 
 class TitleBar::Button : public AbstractButton {
  public:
@@ -75,7 +81,7 @@ class TitleBar::CloseButton : public TitleBar::Button {
 void TitleBar::CloseButton::OnDraw(const Context *context) {
   Canvas *canvas = context->canvas();
   int scale = context->surface()->GetScale();
-  const Rect& rect = GetGeometry();
+  const RectF &rect = GetGeometry();
 
   Canvas::ClipGuard guard(canvas, rect * scale);
 
@@ -125,7 +131,7 @@ class TitleBar::MaximizeButton : public TitleBar::Button {
 void TitleBar::MaximizeButton::OnDraw(const Context *context) {
   Canvas *canvas = context->canvas();
   int scale = context->surface()->GetScale();
-  const Rect& rect = GetGeometry();
+  const RectF &rect = GetGeometry();
 
   Canvas::ClipGuard guard(canvas, rect * scale);
 
@@ -175,7 +181,7 @@ class TitleBar::MinimizeButton : public TitleBar::Button {
 void TitleBar::MinimizeButton::OnDraw(const Context *context) {
   Canvas *canvas = context->canvas();
   int scale = context->surface()->GetScale();
-  const Rect& rect = GetGeometry();
+  const RectF &rect = GetGeometry();
 
   Canvas::ClipGuard guard(canvas, rect * scale);
 
@@ -222,7 +228,7 @@ class TitleBar::FullscreenButton : public TitleBar::Button {
 void TitleBar::FullscreenButton::OnDraw(const Context *context) {
   Canvas *canvas = context->canvas();
   int scale = context->surface()->GetScale();
-  const Rect& rect = GetGeometry();
+  const RectF &rect = GetGeometry();
 
   Canvas::ClipGuard guard(canvas, rect * scale);
 
@@ -300,7 +306,7 @@ AbstractButton *TitleBar::GetButton(ButtonType button_type) const {
   }
 }
 
-void TitleBar::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void TitleBar::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
   int new_y = (GetHeight() - close_button_->GetHeight()) / 2;
   int new_x = kButtonSpace;
   close_button_->MoveTo(new_x, new_y);
@@ -317,7 +323,7 @@ void TitleBar::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, con
   DispatchUpdate();
 }
 
-void TitleBar::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void TitleBar::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
 
 }
 
@@ -365,7 +371,7 @@ void TitleBar::OnDraw(const Context *context) {
   float text_width = paint.MeasureText(title_.c_str(), title_.length());
 
   SkTextBox text_box;
-  const Rect rect = GetGeometry() * scale;
+  const RectF rect = GetGeometry() * scale;
   // Put the foreground at the center
   text_box.setBox(rect.l + (rect.width() - text_width) / 2.f,
                   rect.t + 1.f, // move down a little for better look
@@ -376,4 +382,5 @@ void TitleBar::OnDraw(const Context *context) {
   text_box.draw(context->canvas()->GetSkCanvas());
 }
 
-}
+} // namespace gui
+} // namespace skland

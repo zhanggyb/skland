@@ -6,7 +6,7 @@
 
 #include <skland/core/margin.hpp>
 
-using skland::Margin;
+using skland::core::Margin;
 
 Test::Test()
     : testing::Test() {

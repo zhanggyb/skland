@@ -7,7 +7,7 @@
 #include <skland/graphic/path.hpp>
 #include "SkPath.h"
 
-using namespace skland;
+using namespace skland::graphic;
 
 Test::Test()
     : testing::Test() {

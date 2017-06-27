@@ -22,8 +22,11 @@
 #include "SkGradientShader.h"
 
 namespace skland {
+namespace graphic {
 
-Shader GradientShader::MakeLinear(const Point2F *points,
+using core::Point2F;
+
+Shader GradientShader::MakeLinear(const core::Point2F *points,
                                   const uint32_t *colors,
                                   const float *pos,
                                   int count,
@@ -43,7 +46,7 @@ Shader GradientShader::MakeLinear(const Point2F *points,
 }
 
 Shader GradientShader::MakeLinear(const Point2F points[],
-                                  const Color colors[],
+                                  const core::ColorF colors[],
                                   const float pos[],
                                   int count,
                                   Shader::TileMode mode,
@@ -84,7 +87,7 @@ Shader GradientShader::MakeRadial(const Point2F &center,
 
 Shader GradientShader::MakeRadial(const Point2F &center,
                                   float radius,
-                                  const Color colors[],
+                                  const core::ColorF colors[],
                                   const float pos[],
                                   int count,
                                   Shader::TileMode mode,
@@ -104,4 +107,5 @@ Shader GradientShader::MakeRadial(const Point2F &center,
   return Shader(new Shader::Private(sk_shader));
 }
 
-}
+} // namespace graphic
+} // namespace skland

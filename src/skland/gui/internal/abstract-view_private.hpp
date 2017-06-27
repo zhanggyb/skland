@@ -24,6 +24,7 @@
 #include "skland/gui/anchor-group.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -86,17 +87,17 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   bool visible;
 
-  Size minimal_size;
+  core::Size2I minimal_size;
 
-  Size preferred_size;
+  core::Size2I preferred_size;
 
-  Size maximal_size;
+  core::Size2I maximal_size;
 
   LayoutPolicy x_layout_policy;
 
   LayoutPolicy y_layout_policy;
 
-  Padding padding;
+  core::Padding padding;
 
   /**
    * @brief Bitwise data to indicate if the position or size need to update
@@ -105,9 +106,9 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    */
   int dirty_flag;
 
-  Rect geometry;
+  core::RectF geometry;
 
-  Rect last_geometry;
+  core::RectF last_geometry;
 
   RedrawTask redraw_task;
 
@@ -121,7 +122,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    *
    * This member variable works with is_damaged.
    */
-  RectI damaged_region;
+  core::RectI damaged_region;
 
   bool need_redraw;
   bool is_drawing;
@@ -137,6 +138,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_PRIVATE_HPP_

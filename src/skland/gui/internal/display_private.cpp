@@ -24,6 +24,7 @@
 #include <skland/gui/output.hpp>
 
 namespace skland {
+namespace gui {
 
 const struct wl_display_listener Display::Private::kDisplayListener = {
     OnError,
@@ -371,4 +372,5 @@ bool Display::Private::CheckEGLExtension(const char *extensions, const char *ext
   return false;
 }
 
-}
+} // namespace gui
+} // namespace skland

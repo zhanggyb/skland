@@ -19,10 +19,10 @@
 
 #include "abstract-event-handler.hpp"
 
-#include "../core/types.hpp"
-#include "../core/size.hpp"
-#include "../core/rect.hpp"
-#include "../core/padding.hpp"
+#include "skland/core/types.hpp"
+#include "skland/core/size.hpp"
+#include "skland/core/rect.hpp"
+#include "skland/core/padding.hpp"
 
 #include "context.hpp"
 #include "anchor-group.hpp"
@@ -30,6 +30,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class AbstractShellView;
 class AbstractLayout;
@@ -99,7 +100,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   class Iterator;
   class ConstIterator;
 
-  class RedrawTask: public Task {
+  class RedrawTask : public Task {
 
     RedrawTask() = delete;
     RedrawTask(const RedrawTask &) = delete;
@@ -264,7 +265,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   LayoutPolicy GetLayoutPolicyOnY() const;
 
-  const Padding &GetPadding() const;
+  const core::Padding &GetPadding() const;
 
   /**
    * @brief Move this view to the given position in window coordinate
@@ -364,7 +365,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   float GetYCenter() const;
 
-  const Rect &GetGeometry() const;
+  const core::RectF &GetGeometry() const;
 
   bool IsVisible() const;
 
@@ -389,10 +390,11 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   /**
    * @brief Update the display of this widget
+   * @param[in] validate
+   *   - true Request update
+   *   - false Cancel the update request
    */
-  void Update();
-
-  void CancelUpdate();
+  void Update(bool validate = true);
 
   virtual bool Contain(int x, int y) const;
 
@@ -408,7 +410,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   AbstractLayout *GetLayout() const;
 
-  SignalRef<AbstractView *> destroyed() { return destroyed_; }
+  core::SignalRef<AbstractView *> destroyed() { return destroyed_; }
 
  protected:
 
@@ -497,7 +499,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    *
    * The new size will never smaller than minimal size or larger than maximal size.
    */
-  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
+  virtual void OnConfigureGeometry(int dirty_flag,
+                                   const core::RectF &old_geometry,
+                                   const core::RectF &new_geometry) = 0;
 
   /**
    * @brief Callback when the geometry changes before draw this view
@@ -508,7 +512,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * This virtual method is called only when there's new geometry need to be saved before drawing this
    * view.
    */
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) = 0;
+  virtual void OnGeometryChange(int dirty_flag, const core::RectF &old_geometry, const core::RectF &new_geometry) = 0;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
 
@@ -603,10 +607,11 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   std::unique_ptr<Private> p_;
 
-  Signal<AbstractView *> destroyed_;
+  core::Signal<AbstractView *> destroyed_;
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_ABSTRACT_VIEW_HPP_

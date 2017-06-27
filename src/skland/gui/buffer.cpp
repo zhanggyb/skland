@@ -19,6 +19,10 @@
 #include <skland/gui/shared-memory-pool.hpp>
 
 namespace skland {
+namespace gui {
+
+using Point = core::Point2I;
+using Size = core::Size2I;
 
 const struct wl_buffer_listener Buffer::kListener = {
     OnRelease
@@ -103,4 +107,5 @@ void Buffer::OnRelease(void *data, struct wl_buffer */*buffer*/) {
   if (_this->release_) _this->release_();
 }
 
-}
+} // namespace gui
+} // namespace skland

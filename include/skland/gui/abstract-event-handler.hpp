@@ -17,12 +17,13 @@
 #ifndef SKLAND_GUI_ABSTRACT_EVENT_HANDLER_HPP_
 #define SKLAND_GUI_ABSTRACT_EVENT_HANDLER_HPP_
 
-#include "../core/sigcxx.hpp"
+#include "skland/core/sigcxx.hpp"
 
 #include "task.hpp"
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class MouseEvent;
 class KeyEvent;
@@ -49,7 +50,7 @@ class Output;
  * @see Input
  * @see Surface
  */
-SKLAND_EXPORT class AbstractEventHandler : public Trackable {
+SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
 
   friend class Input;
   friend class Application;
@@ -58,6 +59,9 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
   friend class AbstractView;
   friend class AbstractShellView;
+
+  AbstractEventHandler(const AbstractEventHandler &) = delete;
+  AbstractEventHandler &operator=(const AbstractEventHandler &)  = delete;
 
  public:
 
@@ -168,7 +172,7 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
    * @brief Disable this virtual method
    * @param token
    */
-  virtual void AuditDestroyingToken(details::Token */*token*/) final;
+  virtual void AuditDestroyingToken(core::details::Token */*token*/) final;
 
   static void PushToHead(Task *task) { kIdleTaskHead.PushBack(task); }
 
@@ -195,6 +199,7 @@ SKLAND_EXPORT class AbstractEventHandler : public Trackable {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_ABSTRACT_EVENT_HANDLER_HPP_

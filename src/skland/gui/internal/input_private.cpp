@@ -24,6 +24,7 @@
 #include <iostream>
 
 namespace skland {
+namespace gui {
 
 const struct wl_seat_listener Input::Private::kSeatListener = {
     OnSeatCapabilities,
@@ -329,4 +330,5 @@ void Input::Private::OnTouchCancel(void *data, struct wl_touch *wl_touch) {
 
 }
 
-}
+} // namespace gui
+} // namespace skland

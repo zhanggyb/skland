@@ -8,8 +8,8 @@
 #include <skland/graphic/paint.hpp>
 #include <SkPaint.h>
 
-using skland::Color;
-using skland::Paint;
+using skland::core::ColorF;
+using skland::graphic::Paint;
 
 Test::Test()
     : testing::Test() {
@@ -35,8 +35,8 @@ TEST_F(Test, enums_check_1) {
 }
 
 TEST_F(Test, constructor_1) {
-  Color blue(0.f, 0.f, 1.f, 1.f);
-  Color ret;
+  ColorF blue(0.f, 0.f, 1.f, 1.f);
+  ColorF ret;
 
   Paint paint;
   paint.SetColor(blue);

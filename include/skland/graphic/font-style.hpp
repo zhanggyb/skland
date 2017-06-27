@@ -24,6 +24,7 @@
 class SkFontStyle;
 
 namespace skland {
+namespace graphic {
 
 /**
  * @ingroup graphic
@@ -98,6 +99,8 @@ SKLAND_EXPORT class FontStyle {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
-#endif //SKLAND_FONT_STYLE_HPP
+
+#endif // SKLAND_FONT_STYLE_HPP

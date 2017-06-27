@@ -17,16 +17,18 @@
 #ifndef SKLAND_CORE_PADDING_HPP_
 #define SKLAND_CORE_PADDING_HPP_
 
-#include "bounds.hpp"
+#include "bounding-box.hpp"
 
 namespace skland {
+namespace core {
 
 /**
  * @ingroup core
  * @brief Class specifies content paddings.
  */
-typedef core::Bounds<int> Padding;
+typedef BoundingBox<int> Padding;
 
+}
 }
 
 #endif // SKLAND_CORE_PADDING_HPP_

@@ -9,6 +9,9 @@
 
 #include <skland/core/object.hpp>
 
+using namespace skland;
+using namespace skland::core;
+
 class Test : public testing::Test {
  public:
   Test();
@@ -20,7 +23,7 @@ class Test : public testing::Test {
 };
 
 class TestableManager;
-class TestableSubject : public skland::Object {
+class TestableSubject : public Object {
 
   friend class TestableManager;
 
@@ -45,7 +48,7 @@ class TestableSubject : public skland::Object {
   TestableManager *manager_;
 };
 
-class TestableManager : public skland::Object {
+class TestableManager : public Object {
 
   friend class TestableSubject;
 

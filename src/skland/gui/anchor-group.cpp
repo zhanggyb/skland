@@ -21,6 +21,7 @@
 #include <skland/core/assert.hpp>
 
 namespace skland {
+namespace gui {
 
 AnchorGroup::AnchorGroup(AbstractView *view, Alignment align)
     : view_(view),
@@ -171,4 +172,6 @@ void AnchorGroup::Clear() {
   last_ = nullptr;
 }
 
-}
+} // namespace gui
+} // namespace skland
+

@@ -21,7 +21,7 @@
 #include <skland/gui/mouse-event.hpp>
 #include <skland/gui/key-event.hpp>
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 namespace skland {
 

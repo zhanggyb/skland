@@ -23,6 +23,7 @@
 #include "SkTypeface.h"
 
 namespace skland {
+namespace graphic {
 
 /**
  * @ingroup graphic_intern
@@ -52,6 +53,7 @@ struct Typeface::Private {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_INTERNAL_TYPEFACE_PRIVATE_HPP_

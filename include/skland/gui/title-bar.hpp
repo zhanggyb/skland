@@ -19,10 +19,11 @@
 
 #include "abstract-button.hpp"
 
-#include "../core/color.hpp"
-#include "../graphic/font.hpp"
+#include "skland/core/color.hpp"
+#include "skland/graphic/font.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -72,9 +73,13 @@ class TitleBar final : public AbstractView {
    */
   virtual ~TitleBar();
 
-  virtual void OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
+  virtual void OnConfigureGeometry(int dirty_flag,
+                                   const core::RectF &old_geometry,
+                                   const core::RectF &new_geometry) override;
 
-  virtual void OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) override;
+  virtual void OnGeometryChange(int dirty_flag,
+                                const core::RectF &old_geometry,
+                                const core::RectF &new_geometry) override;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
 
@@ -109,11 +114,12 @@ class TitleBar final : public AbstractView {
   MinimizeButton *minimize_button_;
   FullscreenButton *fullscreen_button_;
 
-  Font font_;
+  graphic::Font font_;
 
   std::string title_;
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_TITLE_BAR_HPP_

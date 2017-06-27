@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 
-#include "internal/layer_private.hpp"
+#ifndef SKLAND_CLAMP_HPP
+#define SKLAND_CLAMP_HPP
 
-#include "internal/image-info_private.hpp"
-#include "skland/core/memory.hpp"
+#include <algorithm>
 
 namespace skland {
+namespace numerical {
 
-Layer::Layer() {
-  p_ = make_unique<Private>();
+/**
+ * @ingroup core
+ * @brief Clamp given value between min and max
+ */
+template<typename T>
+inline T Clamp(T x, T min_value, T max_value) {
+  return std::min(std::max(x, min_value), max_value);
 }
 
-Layer::Layer(const Layer &orig) {
-  p_ = make_unique<Private>(orig.p_->sp_sk_surface);
-}
+} // namespace numerical
+} // namespace skland
 
-Layer::~Layer() {
-
-}
-
-Layer &Layer::operator=(const Layer &other) {
-  *p_ = *other.p_;
-  return *this;
-}
-
-}
+#endif //SKLAND_CLAMP_HPP

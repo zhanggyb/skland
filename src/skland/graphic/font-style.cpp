@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-#include <skland/graphic/font-style.hpp>
+#include "skland/graphic/font-style.hpp"
 
-#include <skland/core/numeric.hpp>
+#include "skland/numerical/clamp.hpp"
 #include "SkFontStyle.h"
 
 namespace skland {
+namespace graphic {
+
+using numerical::Clamp;
 
 FontStyle::FontStyle(int weight, int width, Slant slant) {
   data_.value = 0;
-  data_.styles.weight = (uint16_t) clamp<int>(weight, kWeightInvisible, kWeightExtraBlack);
-  data_.styles.width = (uint8_t) clamp<int>(width, kWidthUltraCondensed, kWidthUltraExpanded);
-  data_.styles.slant = (uint8_t) clamp<int>(slant, kSlantUpright, kSlantOblique);
+  data_.styles.weight = (uint16_t) Clamp<int>(weight, kWeightInvisible, kWeightExtraBlack);
+  data_.styles.width = (uint8_t) Clamp<int>(width, kWidthUltraCondensed, kWidthUltraExpanded);
+  data_.styles.slant = (uint8_t) Clamp<int>(slant, kSlantUpright, kSlantOblique);
 }
 
 FontStyle::FontStyle(const FontStyle &other) {
@@ -44,4 +47,5 @@ FontStyle &FontStyle::operator=(const FontStyle &other) {
   return *this;
 }
 
-}
+} // namespace graphic
+} // namespace skland

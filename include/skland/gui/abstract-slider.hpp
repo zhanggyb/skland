@@ -23,6 +23,7 @@
 #include <algorithm>
 
 namespace skland {
+namespace gui {
 
 template<typename T>
 class AbstractSlider : public AbstractView {
@@ -66,7 +67,7 @@ class AbstractSlider : public AbstractView {
     return step_;
   }
 
-  SignalRef<const T &> changed() {
+  core::SignalRef<const T &> changed() {
     return changed_;
   }
 
@@ -102,7 +103,7 @@ class AbstractSlider : public AbstractView {
   T maximum_;
   T step_;
 
-  Signal<const T &> changed_;
+  core::Signal<const T &> changed_;
 
 };
 
@@ -165,6 +166,7 @@ void AbstractSlider<T>::SetOrientation(Orientation orientation) {
   Update();
 }
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_ABSTRACT_SLIDER_HPP_

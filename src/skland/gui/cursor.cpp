@@ -19,6 +19,7 @@
 #include "internal/display_native.hpp"
 
 namespace skland {
+namespace gui {
 
 Cursor *Cursor::Create(struct wl_cursor *wl_cursor) {
   Cursor *cursor = new Cursor;
@@ -38,4 +39,5 @@ Cursor *Cursor::Create(struct wl_cursor *wl_cursor) {
 Cursor::~Cursor() {
 }
 
-}
+} // namespace gui
+} // namespace skland

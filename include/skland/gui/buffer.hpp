@@ -27,6 +27,7 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
 class SharedMemoryPool;
 
@@ -44,6 +45,13 @@ class Buffer {
   Buffer &operator=(const Buffer &) = delete;
 
  public:
+
+  using Point = core::Point2I;
+  using Size = core::Size2I;
+
+  // FIXME: how to use a variadic template alias?
+  // template<typename RT, typename ... PTs>
+  // using DelegateRef = core::DelegateRef<RT(PTs...)>;
 
   Buffer();
 
@@ -70,7 +78,7 @@ class Buffer {
 
   const Size &GetSize() const;
 
-  DelegateRef<void()> release() {
+  core::DelegateRef<void()> release() {
     return release_;
   }
 
@@ -84,10 +92,11 @@ class Buffer {
 
   static const struct wl_buffer_listener kListener;
 
-  Delegate<void()> release_;
+  core::Delegate<void()> release_;
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_BUFFER_HPP_

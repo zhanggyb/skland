@@ -17,13 +17,14 @@
 #ifndef SKLAND_GRAPHIC_PATH_HPP_
 #define SKLAND_GRAPHIC_PATH_HPP_
 
-#include "../core/rect.hpp"
+#include "skland/core/rect.hpp"
 
 #include <memory>
 
 class SkPath;
 
 namespace skland {
+namespace graphic {
 
 class Canvas;
 
@@ -68,13 +69,13 @@ class Path {
 
   bool Interpolate(const Path &ending, float weight, Path *out) const;
 
-  void AddRect(const Rect &rect, Direction dir = kClockwise);
+  void AddRect(const core::RectF &rect, Direction dir = kClockwise);
 
-  void AddRect(const Rect &rect, Direction dir, unsigned start);
+  void AddRect(const core::RectF &rect, Direction dir, unsigned start);
 
   void AddRect(float left, float top, float right, float bottom, Direction dir = kClockwise);
 
-  void AddRoundRect(const Rect &rect, const float radii[], Direction dir = kClockwise);
+  void AddRoundRect(const core::RectF &rect, const float radii[], Direction dir = kClockwise);
 
   FillType GetFillType() const;
 
@@ -100,33 +101,33 @@ class Path {
 
   int CountPoints() const;
 
-  Point2F GetPoint(int index) const;
+  core::Point2F GetPoint(int index) const;
 
-  int GetPoints(Point2F points[], int max) const;
+  int GetPoints(core::Point2F points[], int max) const;
 
   int CountVerbs() const;
 
   void Swap(Path &other);
 
-  const RectF &GetBounds() const;
+  const core::RectF &GetBounds() const;
 
   void UpdateBoundsCache() const;
 
   void MoveTo(float x, float y);
 
-  void MoveTo(const Point2F &p);
+  void MoveTo(const core::Point2F &p);
 
   void RelativeMoveTo(float dx, float dy);
 
   void LineTo(float x, float y);
 
-  void LineTo(const Point2F &p);
+  void LineTo(const core::Point2F &p);
 
   void RelativeLineTo(float dx, float dy);
 
   void QuadTo(float x1, float y1, float x2, float y2);
 
-  void QuadTo(const Point2F &p1, const Point2F &p2);
+  void QuadTo(const core::Point2F &p1, const core::Point2F &p2);
 
   void RelativeQuadTo(float dx1, float dy1, float dx2, float dy2);
 
@@ -145,6 +146,7 @@ bool operator==(const Path &path1, const Path &path2);
 
 bool operator!=(const Path &path1, const Path &path2);
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_PATH_HPP_

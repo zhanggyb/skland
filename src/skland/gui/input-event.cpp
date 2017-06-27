@@ -19,9 +19,11 @@
 #include <skland/gui/input.hpp>
 
 namespace skland {
+namespace gui {
 
 void InputEvent::SetCursor(const Cursor *cursor) const {
   input_->SetCursor(cursor);
 }
 
-}
+} // namespace gui
+} // namespace skland

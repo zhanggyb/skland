@@ -20,6 +20,7 @@
 #include "abstract-button.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui
@@ -39,6 +40,7 @@ class PushButton : public AbstractButton {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_PUSH_BUTTON_HPP_

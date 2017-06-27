@@ -7,6 +7,7 @@
 #include <skland/core/deque.hpp>
 
 using namespace skland;
+using namespace skland::core;
 
 class Item : public Deque::Element {
 

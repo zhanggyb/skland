@@ -14,40 +14,38 @@
  * limitations under the License.
  */
 
+#include "internal/surface_private.hpp"
+
+#include "internal/canvas_private.hpp"
 #include "internal/image-info_private.hpp"
+
+#include "skland/core/memory.hpp"
 
 namespace skland {
 namespace graphic {
 
-ImageInfo ImageInfo::Make(int width, int height, ColorType ct, AlphaType at) {
-  SkImageInfo native = SkImageInfo::Make(width, height, (SkColorType) ct, (SkAlphaType) at);
-  return ImageInfo(native);
+using core::make_unique;
+
+Surface *Surface::CreateRasterDirect(const ImageInfo &image_info, void *pixels, size_t row_bytes) {
+  Surface *surface = new Surface();
+
+  surface->p_->sp_sk_surface = SkSurface::MakeRasterDirect(image_info.p_->sk_image_info, pixels, row_bytes);
+  if (!surface->p_->sp_sk_surface) {
+    throw std::runtime_error("Error! Fail to create Surface object!");
+  }
+
+  surface->p_->canvas = new Canvas(surface->p_->sp_sk_surface->getCanvas());
+
+  return surface;
 }
 
-ImageInfo ImageInfo::MakeN32Premul(int width, int height) {
-  SkImageInfo native = SkImageInfo::MakeN32Premul(width, height);
-  return ImageInfo(native);
+Surface::Surface() {
+  p_ = make_unique<Private>();
 }
 
-ImageInfo::ImageInfo() {
-  p_.reset(new Private);
-}
-
-ImageInfo::ImageInfo(const ImageInfo &orig) {
-  p_.reset(new Private(*orig.p_));
-}
-
-ImageInfo::ImageInfo(const SkImageInfo &native) {
-  p_.reset(new Private(native));
-}
-
-ImageInfo &ImageInfo::operator=(const ImageInfo &other) {
-  *p_ = *other.p_;
-  return *this;
-}
-
-ImageInfo::~ImageInfo() {
-
+Surface::~Surface() {
+  // The SkCanvas pointer is destroyed in SkSurface
+  p_->canvas->p_->sk_canvas = nullptr;
 }
 
 } // namespace graphic

@@ -17,10 +17,10 @@
 #ifndef SKLAND_GUI_OUTPUT_HPP_
 #define SKLAND_GUI_OUTPUT_HPP_
 
-#include "../core/rect.hpp"
-#include "../core/size.hpp"
-#include "../core/sigcxx.hpp"
-#include "../core/deque.hpp"
+#include "skland/core/rect.hpp"
+#include "skland/core/size.hpp"
+#include "skland/core/sigcxx.hpp"
+#include "skland/core/deque.hpp"
 
 #include <wayland-client.h>
 
@@ -28,8 +28,9 @@
 #include <memory>
 
 namespace skland {
+namespace gui {
 
-class Output : public Deque::Element {
+class Output : public core::Deque::Element {
 
   friend class Surface;
 
@@ -43,7 +44,7 @@ class Output : public Deque::Element {
 
   virtual ~Output();
 
-  SignalRef<Output *> destroyed() { return destroyed_; }
+  core::SignalRef<Output *> destroyed() { return destroyed_; }
 
   int GetSubPixel() const;
 
@@ -65,10 +66,11 @@ class Output : public Deque::Element {
 
   std::unique_ptr<Private> p_;
 
-  Signal<Output *> destroyed_;
+  core::Signal<Output *> destroyed_;
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_OUTPUT_HPP_

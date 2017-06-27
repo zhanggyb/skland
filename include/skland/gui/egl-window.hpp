@@ -21,8 +21,13 @@
 
 namespace skland {
 
-class Surface;
+namespace graphic {
 class Canvas;
+}
+
+namespace gui {
+
+class Surface;
 
 /**
  * @ingroup gui
@@ -52,9 +57,9 @@ class EGLWindow : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
+  virtual bool OnConfigureSize(const core::Size2I &old_size, const core::Size2I &new_size) final;
 
-  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
+  virtual void OnSizeChange(const core::Size2I &old_size, const core::Size2I &new_size) final;
 
   virtual void OnMouseMove(MouseEvent *event) override;
 
@@ -96,6 +101,7 @@ class EGLWindow : public AbstractShellView {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_EGL_WINDOW_HPP_

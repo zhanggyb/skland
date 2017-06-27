@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-#include <skland/gui/abstract-button.hpp>
+#include "skland/gui/abstract-button.hpp"
 
-#include <skland/core/numeric.hpp>
+#include "skland/numerical/clamp.hpp"
+#include "skland/numerical/bit.hpp"
 
-#include <skland/gui/key-event.hpp>
-#include <skland/gui/mouse-event.hpp>
+#include "skland/gui/key-event.hpp"
+#include "skland/gui/mouse-event.hpp"
 
-#include <skland/graphic/font.hpp>
+#include "skland/graphic/font.hpp"
 
 namespace skland {
+namespace gui {
+
+using core::RectF;
+using numerical::Bit;
+
+using graphic::Font;
+using graphic::Typeface;
 
 struct AbstractButton::Private {
 
@@ -155,15 +163,11 @@ void AbstractButton::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnConfigureGeometry(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
-  if (dirty_flag) {
-    Update();
-  } else {
-    CancelUpdate();
-  }
+void AbstractButton::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
+  Update(0 != dirty_flag);
 }
 
-void AbstractButton::OnGeometryChange(int dirty_flag, const Rect &old_geometry, const Rect &new_geometry) {
+void AbstractButton::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
 
 }
 
@@ -179,4 +183,5 @@ void AbstractButton::SetSensitive(bool sensitive) {
   }
 }
 
-}
+} // namespace gui
+} // namespace skland

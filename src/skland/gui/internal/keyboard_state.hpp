@@ -20,6 +20,7 @@
 #include <xkbcommon/xkbcommon.h>
 
 namespace skland {
+namespace gui {
 
 class Keymap;
 
@@ -42,6 +43,7 @@ class KeyboardState {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_KEYBOARD_STATE_HPP_

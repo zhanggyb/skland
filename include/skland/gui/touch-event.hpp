@@ -20,6 +20,7 @@
 #include "input-event.hpp"
 
 namespace skland {
+namespace gui {
 
 class TouchEvent : public InputEvent {
 
@@ -41,6 +42,7 @@ class TouchEvent : public InputEvent {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_TOUCH_EVENT_HPP_

@@ -7,6 +7,7 @@
 #include <skland/core/delegate.hpp>
 
 using namespace skland;
+using namespace skland::core;
 
 class Mockup {
 

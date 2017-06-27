@@ -24,6 +24,7 @@
 #include <skland/graphic/paint.hpp>
 
 namespace skland {
+namespace gui {
 
 Slider::Slider(Orientation orientation)
     : AbstractSlider<int>(orientation),
@@ -84,6 +85,9 @@ void Slider::OnSetMaximum(const int &maximum) {
 }
 
 void Slider::OnDraw(const Context *context) {
+  using graphic::Canvas;
+  using graphic::Paint;
+
   Canvas* canvas = context->canvas();
   Paint paint;
 
@@ -106,4 +110,5 @@ void Slider::OnDraw(const Context *context) {
   canvas->DrawCircle(GetGeometry().center_x(), GetGeometry().center_y(), 5.f, paint);
 }
 
-}
+} // namespace gui
+} // namespace skland

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_BOUNDS_HPP_
-#define SKLAND_CORE_BOUNDS_HPP_
+#ifndef SKLAND_CORE_BOUNDING_BOX_HPP_
+#define SKLAND_CORE_BOUNDING_BOX_HPP_
 
 namespace skland {
 namespace core {
@@ -25,23 +25,23 @@ namespace core {
  * @brief Class specifies bounds around a rectangle
  */
 template<typename T>
-struct Bounds {
+struct BoundingBox {
 
-  inline Bounds()
+  inline BoundingBox()
       : l(T(0)), t(T(0)), r(T(0)), b(T(0)) {}
 
-  inline Bounds(T value)
+  inline BoundingBox(T value)
       : l(value), t(value), r(value), b(value) {}
 
-  inline Bounds(T l, T t, T r, T b)
+  inline BoundingBox(T l, T t, T r, T b)
       : l(l), t(t), r(r), b(b) {}
 
-  inline Bounds(const Bounds &other)
+  inline BoundingBox(const BoundingBox &other)
       : l(other.l), t(other.t), r(other.r), b(other.b) {}
 
-  inline ~Bounds() {}
+  inline ~BoundingBox() {}
 
-  inline Bounds &operator=(const Bounds &other) {
+  inline BoundingBox &operator=(const BoundingBox &other) {
     l = other.l;
     t = other.t;
     r = other.r;
@@ -83,19 +83,19 @@ struct Bounds {
  * @ingroup core
  */
 template<typename T>
-inline bool operator==(const Bounds<T> &s1, const Bounds<T> &s2) {
-  return memcmp(&s1, &s2, sizeof(Bounds<T>)) == 0;
+inline bool operator==(const BoundingBox<T> &s1, const BoundingBox<T> &s2) {
+  return memcmp(&s1, &s2, sizeof(BoundingBox<T>)) == 0;
 }
 
 /**
  * @ingroup core
  */
 template<typename T>
-inline bool operator!=(const Bounds<T> &s1, const Bounds<T> &s2) {
-  return memcmp(&s1, &s2, sizeof(Bounds<T>)) != 0;
+inline bool operator!=(const BoundingBox<T> &s1, const BoundingBox<T> &s2) {
+  return memcmp(&s1, &s2, sizeof(BoundingBox<T>)) != 0;
 }
 
 } // namespace core
 } // namespace skland
 
-#endif // SKLAND_CORE_BOUNDS_HPP_
+#endif // SKLAND_CORE_BOUNDING_BOX_HPP_

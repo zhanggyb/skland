@@ -19,6 +19,7 @@
 #include <skland/gui/abstract-event-handler.hpp>
 
 namespace skland {
+namespace gui {
 
 const struct wl_surface_listener Surface::Private::kListener = {
     OnEnter,
@@ -37,4 +38,5 @@ void Surface::Private::OnLeave(void *data, struct wl_surface *wl_surface, struct
   _this->p_->event_handler->OnLeaveOutput(_this, output);
 }
 
-}
+} // namespace gui
+} // namespace skland

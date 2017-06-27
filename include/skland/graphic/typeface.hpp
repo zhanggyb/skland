@@ -27,6 +27,7 @@
 class SkTypeface;
 
 namespace skland {
+namespace graphic {
 
 typedef uint32_t FontID;
 typedef uint32_t FontTableTag;
@@ -104,7 +105,7 @@ class Typeface {
 
   bool GetKerningPairAdjustments(const GlyphID glyphs[], int count, int32_t adjustments[]) const;
 
-  Rect GetBounds() const;
+  core::RectF GetBounds() const;
 
  private:
 
@@ -116,6 +117,7 @@ class Typeface {
 
 bool operator==(const Typeface &face1, const Typeface &face2);
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_TYPEFACE_HPP_

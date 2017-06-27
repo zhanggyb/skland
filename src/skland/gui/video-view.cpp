@@ -22,6 +22,7 @@
 #include <skland/graphic/paint.hpp>
 
 namespace skland {
+namespace gui {
 
 VideoView::VideoView()
     : VideoView(320, 240) {
@@ -71,10 +72,14 @@ void VideoView::OnKeyDown(KeyEvent *event) {
 }
 
 void VideoView::OnDraw(const Context *context) {
+  using graphic::Canvas;
+  using graphic::Paint;
+
   Canvas* canvas = context->canvas();
   Paint paint;
   paint.SetColor(0xFF29FF29);
   canvas->DrawRect(GetGeometry(), paint);
 }
 
-}
+} // namespace gui
+} // namespace skland

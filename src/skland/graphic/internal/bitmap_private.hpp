@@ -22,6 +22,7 @@
 #include "SkBitmap.h"
 
 namespace skland {
+namespace graphic {
 
 struct Bitmap::Private {
 
@@ -37,6 +38,7 @@ struct Bitmap::Private {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_INTERNAL_BITMAP_PRIVATE_HPP_

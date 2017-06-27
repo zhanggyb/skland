@@ -28,7 +28,7 @@
 #include <skland/gui/region.hpp>
 #include <skland/gui/output.hpp>
 
-#include <skland/stock/theme.hpp>
+#include <skland/gui/theme.hpp>
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
@@ -36,6 +36,20 @@
 #include <skland/graphic/gradient-shader.hpp>
 
 namespace skland {
+namespace gui {
+
+using core::Point2F;
+using core::RectF;
+using core::RectI;
+using core::Margin;
+using core::Deque;
+
+using graphic::Canvas;
+using graphic::Paint;
+using graphic::Path;
+using graphic::Shader;
+using graphic::GradientShader;
+using graphic::ClipOperation;
 
 /**
  * @ingroup gui_intern
@@ -75,11 +89,11 @@ SKLAND_NO_EXPORT struct Window::Private {
 
   AbstractView *content_view;
 
-  Size minimal_size;
+  core::Size2I minimal_size;
 
-  Size preferred_size;
+  core::Size2I preferred_size;
 
-  Size maximal_size;
+  core::Size2I maximal_size;
 
   int flags;
 
@@ -119,13 +133,13 @@ Window::Window(int width, int height, const char *title, int flags)
     titlebar->Resize(GetWidth(), TitleBar::kHeight);
 
     AbstractButton *button = titlebar->GetButton(TitleBar::kButtonClose);
-    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Close));
+    button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::Close));
 
     button = titlebar->GetButton(TitleBar::kButtonMaximize);
-    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::ToggleMaximize));
+    button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::ToggleMaximize));
 
     button = titlebar->GetButton(TitleBar::kButtonMinimize);
-    button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::Minimize));
+    button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::Minimize));
 
     button = titlebar->GetButton(TitleBar::kButtonFullscreen);
     //button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::SetFullscreen));
@@ -161,15 +175,15 @@ void Window::SetContentView(AbstractView *view) {
   SetContentViewGeometry();
 }
 
-const Size &Window::GetMinimalSize() const {
+const core::Size2I &Window::GetMinimalSize() const {
   return p_->minimal_size;
 }
 
-const Size &Window::GetPreferredSize() const {
+const core::Size2I &Window::GetPreferredSize() const {
   return p_->preferred_size;
 }
 
-const Size &Window::GetMaximalSize() const {
+const core::Size2I &Window::GetMaximalSize() const {
   return p_->maximal_size;
 }
 
@@ -201,8 +215,8 @@ void Window::OnShown() {
   p_->frame_buffer.Setup(p_->pool, width, height,
                          width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
-  p_->frame_canvas = Canvas::MakeRasterDirect(width, height,
-                                              (unsigned char *) p_->frame_buffer.GetData());
+  p_->frame_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                    (unsigned char *) p_->frame_buffer.GetData()));
   p_->frame_canvas->SetOrigin((float) margin.left * scale,
                               (float) margin.top * scale);
   p_->frame_canvas->Clear();
@@ -213,8 +227,8 @@ void Window::OnShown() {
                           width * 4, WL_SHM_FORMAT_ARGB8888,
                           width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
-    p_->main_canvas = Canvas::MakeRasterDirect(width, height,
-                                               (unsigned char *) p_->main_buffer.GetData());
+    p_->main_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                     (unsigned char *) p_->main_buffer.GetData()));
     p_->main_canvas->SetOrigin((float) margin.left * scale,
                                (float) margin.top * scale);
     p_->main_canvas->Clear();
@@ -266,7 +280,7 @@ Surface *Window::GetSurface(const AbstractView *view) const {
   return nullptr != p_->main_surface ? p_->main_surface : GetShellSurface();
 }
 
-bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
+bool Window::OnConfigureSize(const core::Size2I &old_size, const core::Size2I &new_size) {
   _ASSERT(p_->minimal_size.width < p_->maximal_size.width &&
       p_->minimal_size.height < p_->maximal_size.height);
 
@@ -290,7 +304,7 @@ bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
   return true;
 }
 
-void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
+void Window::OnSizeChange(const core::Size2I &old_size, const core::Size2I &new_size) {
   Surface *shell_surface = this->GetShellSurface();
 
   int scale = 1;
@@ -303,7 +317,7 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
 
   int width = new_size.width;
   int height = new_size.height;
-  const Margin &margin = shell_surface->GetMargin();
+  const core::Margin &margin = shell_surface->GetMargin();
 
   RectI input_rect(width, height);
 
@@ -330,16 +344,16 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
 
   p_->frame_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
-  p_->frame_canvas = Canvas::MakeRasterDirect(width, height,
-                                              (unsigned char *) p_->frame_buffer.GetData());
+  p_->frame_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                    (unsigned char *) p_->frame_buffer.GetData()));
   p_->frame_canvas->SetOrigin(margin.left * scale, margin.top * scale);
   p_->frame_canvas->Clear();
 
   if (p_->main_surface) {
     p_->main_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
-    p_->main_canvas = Canvas::MakeRasterDirect(width, height,
-                                               (unsigned char *) p_->main_buffer.GetData());
+    p_->main_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                     (unsigned char *) p_->main_buffer.GetData()));
     p_->main_canvas->SetOrigin(margin.left * scale,
                                margin.top * scale);
     p_->main_canvas->Clear();
@@ -537,7 +551,7 @@ void Window::OnDraw(const Context *context) {
   int height = GetHeight() * scale;
 
   Path path;
-  Rect geometry = Rect::FromXYWH(0.f, 0.f, width, height);
+  RectF geometry = RectF::FromXYWH(0.f, 0.f, width, height);
   bool drop_shadow = !(IsMaximized() || IsFullscreen());
   const Theme::Schema &window_schema = Theme::GetData().window;
   const Theme::Schema &title_bar_schema = Theme::GetData().title_bar;
@@ -557,7 +571,7 @@ void Window::OnDraw(const Context *context) {
         4.f * scale, 4.f * scale  // bottom-left
     };
     path.AddRoundRect(geometry, radii);
-    Canvas::ClipGuard guard(canvas, path, kClipDifference, true);
+    Canvas::ClipGuard guard(canvas, path, ClipOperation::kClipDifference, true);
     DropShadow(context);
   } else {
     path.AddRect(geometry);
@@ -587,7 +601,7 @@ void Window::OnDraw(const Context *context) {
   }
 
   // Draw the client area:
-  Canvas::ClipGuard guard(canvas, path, kClipIntersect, true);
+  Canvas::ClipGuard guard(canvas, path, ClipOperation::kClipIntersect, true);
 
   paint.SetStyle(Paint::Style::kStyleFill);
   if (p_->title_bar) {
@@ -722,7 +736,7 @@ RectI Window::GetContentGeometry() const {
   return RectI::FromXYWH(x, y, w, h);
 }
 
-void Window::OnFullscreenButtonClicked(SLOT slot) {
+void Window::OnFullscreenButtonClicked(core::SLOT slot) {
   if (IsFullscreen()) {
     ToggleFullscreen(nullptr);
   } else {
@@ -748,7 +762,7 @@ void Window::RequestUpdate() {
   RedrawTask *redraw_task = RedrawTask::Get(this);
 
   Surface *shell_surface = GetShellSurface();
-  const Margin &margin = shell_surface->GetMargin();
+  const core::Margin &margin = shell_surface->GetMargin();
 
   redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
   PushToTail(redraw_task);
@@ -765,4 +779,5 @@ void Window::CancelUpdate() {
   redraw_task->Unlink();
 }
 
-}
+} // namespace gui
+} // namespace skland

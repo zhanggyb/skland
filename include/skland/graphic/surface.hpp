@@ -14,28 +14,47 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GRAPHIC_LAYER_HPP_
-#define SKLAND_GRAPHIC_LAYER_HPP_
+#ifndef SKLAND_GRAPHIC_SURFACE_HPP_
+#define SKLAND_GRAPHIC_SURFACE_HPP_
 
 #include <memory>
 
 namespace skland {
+namespace graphic {
 
+// Forward declarations
+class Canvas;
 class ImageInfo;
 
-class Layer {
+/**
+ * @ingroup graphic
+ * @brief A class responsible for managing the pixels that a canvas draws into
+ *
+ */
+class Surface {
 
-  friend class Canvas;
+  Surface(const Surface &) = delete;
+  Surface &operator=(const Surface &) = delete;
 
  public:
 
-  Layer();
+  /**
+   * @brief Create a new surface object, using the specified pixels/rowbytes as its backend
+   * @param pixels
+   * @param row_bytes
+   * @return
+   */
+  static Surface *CreateRasterDirect(const ImageInfo &, void *pixels, size_t row_bytes);
 
-  Layer(const Layer &orig);
+  static Surface *CreateRaster(const ImageInfo &, size_t row_types);
 
-  ~Layer();
+  virtual ~Surface();
 
-  Layer &operator=(const Layer &other);
+  Canvas *GetCanvas() const;
+
+ protected:
+
+  Surface();
 
  private:
 
@@ -45,6 +64,7 @@ class Layer {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif //SKLAND_LAYER_HPP

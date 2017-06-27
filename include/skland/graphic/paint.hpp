@@ -26,6 +26,7 @@
 class SkPaint;
 
 namespace skland {
+namespace graphic {
 
 class Shader;
 
@@ -85,11 +86,11 @@ class Paint {
 
   void SetStyle(Style style);
 
-  Color GetColor() const;
+  core::ColorF GetColor() const;
 
   void SetColor(uint32_t argb);
 
-  void SetColor(const Color &color);
+  void SetColor(const core::ColorF &color);
 
   float GetStrokeWidth() const;
 
@@ -127,7 +128,7 @@ class Paint {
 
   int CountText(const void *text, size_t byte_length) const;
 
-  float MeasureText(const void *text, size_t length, Rect *boulds) const;
+  float MeasureText(const void *text, size_t length, core::RectF *boulds) const;
 
   float MeasureText(const void *text, size_t length) const {
     return MeasureText(text, length, nullptr);
@@ -146,6 +147,7 @@ bool operator==(const Paint &paint1, const Paint &paint2);
 
 bool operator!=(const Paint &paint1, const Paint &paint2);
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_PAINT_HPP_

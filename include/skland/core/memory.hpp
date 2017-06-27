@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_MEMORY_HPP
-#define SKLAND_MEMORY_HPP
+#ifndef SKLAND_CORE_MEMORY_HPP_
+#define SKLAND_CORE_MEMORY_HPP_
 
 #include <memory>
 
 namespace skland {
+namespace core {
 
 /**
  * @ingroup core
@@ -36,6 +37,7 @@ std::unique_ptr<T> make_unique(Args &&... args) {
   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-}
+} // namespace core
+} // namespace skland
 
-#endif //SKLAND_MEMORY_HPP
+#endif // SKLAND_CORE_MEMORY_HPP_

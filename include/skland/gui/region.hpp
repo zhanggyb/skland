@@ -20,6 +20,7 @@
 #include <wayland-client.h>
 
 namespace skland {
+namespace gui {
 
 class Region {
 
@@ -48,6 +49,7 @@ class Region {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_REGION_HPP_

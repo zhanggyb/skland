@@ -21,6 +21,7 @@
 #include "abstract-view_private.hpp"
 
 namespace skland {
+namespace gui {
 
 /**
  * @ingroup gui_intern
@@ -190,6 +191,7 @@ class AbstractView::ConstIterator {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif // SKLAND_GUI_INTERNAL_ABSTRACT_VIEW_ITERATORS_HPP_

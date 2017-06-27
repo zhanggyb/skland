@@ -20,6 +20,7 @@
 #include <skland/gui/buffer.hpp>
 
 namespace skland {
+namespace gui {
 
 struct Buffer::Private {
 
@@ -43,9 +44,9 @@ struct Buffer::Private {
   /**
    * @brief Position on surface
    */
-  Point position;
+  core::Point2I position;
 
-  Size size;
+  core::Size2I size;
 
   int32_t stride;
 
@@ -57,6 +58,7 @@ struct Buffer::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif //SKLAND_BUFFER_PRIVATE_HPP

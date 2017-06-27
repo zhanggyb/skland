@@ -22,6 +22,7 @@
 #include "SkFont.h"
 
 namespace skland {
+namespace graphic {
 
 /**
  * @ingroup graphic_intern
@@ -51,6 +52,7 @@ struct Font::Private {
 
 };
 
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_INTERNAL_FONT_META_HPP_

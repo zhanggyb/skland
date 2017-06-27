@@ -28,6 +28,7 @@
 #include "keyboard_state.hpp"
 
 namespace skland {
+namespace gui {
 
 struct Input::Private {
 
@@ -218,6 +219,7 @@ struct Input::Private {
 
 };
 
-}
+} // namespace gui
+} // namespace skland
 
 #endif //SKLAND_INPUT_PRIVATE_HPP
