@@ -137,12 +137,16 @@ class Canvas {
 
   void Flush();
 
-  const Point2F &GetOrigin() const;
+  const core::Point2F &GetOrigin() const;
 
   SkCanvas *GetSkCanvas() const;
 
  private:
 
+  /**
+   * @brief Create a canvas object via a native SkCanvas
+   * @param native
+   */
   Canvas(SkCanvas *native);
 
   struct Private;

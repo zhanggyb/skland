@@ -21,6 +21,9 @@
 namespace skland {
 namespace gui {
 
+using core::Point2I;
+using core::Point2D;
+
 MouseEvent::MouseEvent(Input *input)
     : InputEvent(input) {
   p_.reset(new Private);
@@ -45,7 +48,7 @@ const Point2D &MouseEvent::GetSurfaceXY() const {
 Point2D MouseEvent::GetWindowXY() const {
   Point2D xy;
 
-  Point pos = p_->surface->GetWindowPosition();
+  Point2I pos = p_->surface->GetWindowPosition();
 
   xy.x = pos.x + p_->surface_xy.x;
   xy.y = pos.y + p_->surface_xy.y;

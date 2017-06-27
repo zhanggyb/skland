@@ -21,6 +21,8 @@
 namespace skland {
 namespace gui {
 
+using core::Point2I;
+
 const struct wl_buffer_listener Buffer::kListener = {
     OnRelease
 };
@@ -91,11 +93,11 @@ int Buffer::GetOffset() const {
   return p_->offset;
 }
 
-const Point &Buffer::GetPosition() const {
+const Point2I &Buffer::GetPosition() const {
   return p_->position;
 }
 
-const Size &Buffer::GetSize() const {
+const core::SizeI &Buffer::GetSize() const {
   return p_->size;
 }
 

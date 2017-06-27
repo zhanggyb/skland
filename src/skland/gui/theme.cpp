@@ -28,11 +28,11 @@
 #include "internal/theme-dark.hpp"
 
 namespace skland {
+namespace gui {
 
+using core::Point2F;
 using graphic::FontStyle;
 using graphic::Shader;
-
-namespace gui {
 
 int Theme::kShadowRadius = 33;
 int Theme::kShadowOffsetX = 0;

@@ -44,9 +44,9 @@ struct Buffer::Private {
   /**
    * @brief Position on surface
    */
-  Point position;
+  core::Point2I position;
 
-  Size size;
+  core::SizeI size;
 
   int32_t stride;
 

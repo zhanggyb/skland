@@ -36,6 +36,8 @@
 namespace skland {
 namespace gui {
 
+using core::Point2I;
+
 Surface *Surface::Shell::Create(AbstractEventHandler *event_handler, const core::Margin &margin) {
   Surface *surface = new Surface(event_handler, margin);
   surface->p_->role.shell = new Shell(surface);
@@ -305,7 +307,7 @@ void Surface::Sub::SetRelativePosition(int x, int y) {
 }
 
 void Surface::Sub::SetWindowPosition(int x, int y) {
-  Point parent_global_position = surface_->GetParent()->GetWindowPosition();
+  Point2I parent_global_position = surface_->GetParent()->GetWindowPosition();
   int local_x = x - parent_global_position.x;
   int local_y = y - parent_global_position.y;
   wl_subsurface_set_position(wl_sub_surface_, local_x, local_y);
@@ -610,8 +612,8 @@ Surface *Surface::GetShellSurface() {
   return shell_surface;
 }
 
-Point Surface::GetWindowPosition() const {
-  Point position = p_->relative_position;
+Point2I Surface::GetWindowPosition() const {
+  Point2I position = p_->relative_position;
 
   const Surface *parent = p_->parent;
   const Surface *shell_surface = this;
@@ -622,7 +624,7 @@ Point Surface::GetWindowPosition() const {
     parent = parent->GetParent();
   }
 
-  return position - Point(shell_surface->GetMargin().l, shell_surface->GetMargin().t);
+  return position - Point2I(shell_surface->GetMargin().l, shell_surface->GetMargin().t);
 }
 
 Surface *Surface::GetParent() const {
@@ -653,7 +655,7 @@ const core::Margin &Surface::GetMargin() const {
   return p_->margin;
 }
 
-const Point &Surface::GetRelativePosition() const {
+const Point2I &Surface::GetRelativePosition() const {
   return p_->relative_position;
 }
 

@@ -59,7 +59,7 @@ struct Surface::Private {
    *
    * For root surface, this should always be (0, 0)
    */
-  Point relative_position;
+  core::Point2I relative_position;
 
   /**
     * @brief The parent surface

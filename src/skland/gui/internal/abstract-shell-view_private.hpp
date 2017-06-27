@@ -79,12 +79,12 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
   /**
    * @brief Current window size
    */
-  Size size;
+  core::SizeI size;
 
   /**
    * @brief Last valid window size
    */
-  Size last_size;
+  core::SizeI last_size;
 
   /**
    * @brief A pointer to a shell surface created with a shell view object

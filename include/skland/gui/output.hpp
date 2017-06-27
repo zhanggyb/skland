@@ -17,10 +17,10 @@
 #ifndef SKLAND_GUI_OUTPUT_HPP_
 #define SKLAND_GUI_OUTPUT_HPP_
 
-#include "../core/rect.hpp"
-#include "../core/size.hpp"
-#include "../core/sigcxx.hpp"
-#include "../core/deque.hpp"
+#include "skland/core/rect.hpp"
+#include "skland/core/size.hpp"
+#include "skland/core/sigcxx.hpp"
+#include "skland/core/deque.hpp"
 
 #include <wayland-client.h>
 

@@ -152,7 +152,7 @@ class Surface {
    * @brief Get the position in window coordinates
    * @return Global position
    */
-  Point GetWindowPosition() const;
+  core::Point2I GetWindowPosition() const;
 
   /**
    * @brief Get the parent surface
@@ -188,7 +188,7 @@ class Surface {
 
   const core::Margin &GetMargin() const;
 
-  const Point &GetRelativePosition() const;
+  const core::Point2I &GetRelativePosition() const;
 
  private:
 

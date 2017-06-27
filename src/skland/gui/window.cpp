@@ -38,6 +38,7 @@
 namespace skland {
 namespace gui {
 
+using core::Point2F;
 using core::RectF;
 using core::RectI;
 using core::Margin;
@@ -88,11 +89,11 @@ SKLAND_NO_EXPORT struct Window::Private {
 
   AbstractView *content_view;
 
-  Size minimal_size;
+  core::SizeI minimal_size;
 
-  Size preferred_size;
+  core::SizeI preferred_size;
 
-  Size maximal_size;
+  core::SizeI maximal_size;
 
   int flags;
 
@@ -174,15 +175,15 @@ void Window::SetContentView(AbstractView *view) {
   SetContentViewGeometry();
 }
 
-const Size &Window::GetMinimalSize() const {
+const core::SizeI &Window::GetMinimalSize() const {
   return p_->minimal_size;
 }
 
-const Size &Window::GetPreferredSize() const {
+const core::SizeI &Window::GetPreferredSize() const {
   return p_->preferred_size;
 }
 
-const Size &Window::GetMaximalSize() const {
+const core::SizeI &Window::GetMaximalSize() const {
   return p_->maximal_size;
 }
 
@@ -279,7 +280,7 @@ Surface *Window::GetSurface(const AbstractView *view) const {
   return nullptr != p_->main_surface ? p_->main_surface : GetShellSurface();
 }
 
-bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
+bool Window::OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) {
   _ASSERT(p_->minimal_size.width < p_->maximal_size.width &&
       p_->minimal_size.height < p_->maximal_size.height);
 
@@ -303,7 +304,7 @@ bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
   return true;
 }
 
-void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
+void Window::OnSizeChange(const core::SizeI &old_size, const core::SizeI &new_size) {
   Surface *shell_surface = this->GetShellSurface();
 
   int scale = 1;

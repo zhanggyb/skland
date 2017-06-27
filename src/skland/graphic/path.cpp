@@ -21,6 +21,7 @@
 namespace skland {
 namespace graphic {
 
+using core::Point2F;
 using core::RectF;
 
 struct Path::Private {

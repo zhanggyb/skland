@@ -36,9 +36,11 @@
 namespace skland {
 namespace gui {
 
+using core::Point2I;
+using core::SizeI;
 using core::SLOT;
-using numerical::Bit;
 using core::Margin;
+using numerical::Bit;
 
 const Margin AbstractShellView::kResizingMargin(5, 5, 5, 5);
 
@@ -357,7 +359,7 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
 
   if (width > 0 && height > 0) {
     p_->dirty_flag = 1;
-    Size saved_size = p_->size;
+    SizeI saved_size = p_->size;
     p_->size.width = width;
     p_->size.height = height;
     if (!OnConfigureSize(p_->last_size, p_->size)) {
@@ -377,7 +379,7 @@ void AbstractShellView::OnXdgToplevelClose() {
 }
 
 void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event) {
-  Point cursor = event->GetWindowXY();
+  Point2I cursor = event->GetWindowXY();
   EventTask *mouse_task = EventTask::GetMouseTask(this);
 
   if (nullptr == mouse_task->next()) {

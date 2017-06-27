@@ -67,9 +67,9 @@ class Buffer {
 
   int GetOffset() const;
 
-  const Point &GetPosition() const;
+  const core::Point2I &GetPosition() const;
 
-  const Size &GetSize() const;
+  const core::SizeI &GetSize() const;
 
   core::DelegateRef<void()> release() {
     return release_;

@@ -109,28 +109,22 @@ inline Size<T> operator*(const Size<T> &src, int factor) {
   return Size<T>(src.width * factor, src.height * factor);
 }
 
-}  // namespace core
+/**
+ * @ingroup core
+ */
+typedef Size<int> SizeI;
 
 /**
  * @ingroup core
  */
-typedef core::Size<int> Size;
+typedef Size<float> SizeF;
 
 /**
  * @ingroup core
  */
-typedef core::Size<int> SizeI;
+typedef Size<double> SizeD;
 
-/**
- * @ingroup core
- */
-typedef core::Size<float> SizeF;
-
-/**
- * @ingroup core
- */
-typedef core::Size<double> SizeD;
-
-}
+} // namespace core
+} // namespace skland
 
 #endif // SKLAND_CORE_SIZE_HPP_

@@ -46,6 +46,7 @@ namespace gui {
 
 using core::RectF;
 using core::RectI;
+using core::SizeI;
 using graphic::Canvas;
 using graphic::Paint;
 using graphic::Path;
@@ -146,9 +147,9 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   return nullptr != p_->sub_surface ? p_->sub_surface : GetShellSurface();
 }
 
-bool EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  Size min(160, 120);
-  Size max(65536, 65536);
+bool EGLWindow::OnConfigureSize(const SizeI &old_size, const SizeI &new_size) {
+  SizeI min(160, 120);
+  SizeI max(65536, 65536);
   _ASSERT(min.width < max.width && min.height < max.height);
 
   if (new_size.width < min.width || new_size.height < min.height) return false;
@@ -174,7 +175,7 @@ bool EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
   return true;
 }
 
-void EGLWindow::OnSizeChange(const Size &old_size, const Size &new_size) {
+void EGLWindow::OnSizeChange(const SizeI &old_size, const SizeI &new_size) {
   int width = new_size.width;
   int height = new_size.height;
 

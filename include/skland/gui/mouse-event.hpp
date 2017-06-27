@@ -58,9 +58,9 @@ SKLAND_EXPORT class MouseEvent : public InputEvent {
 
   uint32_t GetSerial() const;
 
-  const Point2D &GetSurfaceXY() const;
+  const core::Point2D &GetSurfaceXY() const;
 
-  Point2D GetWindowXY() const;
+  core::Point2D GetWindowXY() const;
 
   uint32_t GetButton() const;
 

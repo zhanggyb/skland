@@ -66,11 +66,11 @@ SKLAND_EXPORT class Window : public AbstractShellView {
    */
   void SetContentView(AbstractView *view);
 
-  const Size &GetMinimalSize() const;
+  const core::SizeI &GetMinimalSize() const;
 
-  const Size &GetPreferredSize() const;
+  const core::SizeI &GetPreferredSize() const;
 
-  const Size &GetMaximalSize() const;
+  const core::SizeI &GetMaximalSize() const;
 
  protected:
 
@@ -80,9 +80,9 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
+  virtual bool OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) final;
 
-  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
+  virtual void OnSizeChange(const core::SizeI &old_size, const core::SizeI &new_size) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

@@ -26,6 +26,10 @@
 namespace skland {
 namespace graphic {
 
+/**
+ * @ingroup graphic_intern
+ * @brief The private structure used in Canvas
+ */
 struct Canvas::Private {
 
   Private()
@@ -46,7 +50,7 @@ struct Canvas::Private {
   }
 
   SkCanvas *sk_canvas;
-  Point2F origin;
+  core::Point2F origin;
 
 };
 

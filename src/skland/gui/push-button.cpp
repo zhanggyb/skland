@@ -60,7 +60,7 @@ void PushButton::OnDraw(const Context *context) {
   RectF inner_rect = geometry.Shrink(0.5f);
   const Theme::Schema &schema = Theme::GetData().button;
   Shader shader;
-  Point2F points[2];
+  core::Point2F points[2];
   points[0].x = geometry.left;
   points[0].y = geometry.top;
   points[1].x = geometry.left;

@@ -24,7 +24,9 @@
 namespace skland {
 namespace graphic {
 
-Shader GradientShader::MakeLinear(const Point2F *points,
+using core::Point2F;
+
+Shader GradientShader::MakeLinear(const core::Point2F *points,
                                   const uint32_t *colors,
                                   const float *pos,
                                   int count,
