@@ -75,8 +75,7 @@ class MainWidget : public AbstractView {
  protected:
 
   virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
-    if (dirty_flag) Update();
-    else CancelUpdate();
+    Update(0 != dirty_flag);
   }
 
   virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
@@ -137,7 +136,7 @@ class MainWidget : public AbstractView {
     SkImageInfo info = SkImageInfo::MakeN32(400, 400, kPremul_SkAlphaType);
     sk_sp<SkSurface> surface = sk_canvas->makeSurface(info);
 
-    SkCanvas* top_canvas = surface->getCanvas();
+    SkCanvas *top_canvas = surface->getCanvas();
     SkRect top_rect = SkRect::MakeXYWH(50, 50, 100, 100);
     SkPaint top_paint;
     top_paint.setColor(0xFFFF0000);

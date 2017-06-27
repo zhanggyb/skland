@@ -48,6 +48,8 @@ class Theme {
 
  public:
 
+  using Margin = core::Margin;
+
   struct Schema {
 
     struct ShadedColor {
@@ -170,7 +172,7 @@ class Theme {
     return kShadowOffsetY;
   }
 
-  static inline const core::Margin &GetShadowMargin() {
+  static inline const Margin &GetShadowMargin() {
     return kShadowMargin;
   }
 
@@ -215,7 +217,7 @@ class Theme {
   static int kShadowOffsetX;
   static int kShadowOffsetY;
 
-  static core::Margin kShadowMargin;
+  static Margin kShadowMargin;
 
   static std::vector<uint32_t> kShadowPixels;
 

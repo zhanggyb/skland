@@ -32,7 +32,7 @@ namespace skland {
 namespace gui {
 
 using core::Point2I;
-using core::SizeI;
+using core::Size2I;
 using core::RectF;
 using numerical::Clamp;
 using numerical::Bit;
@@ -206,10 +206,10 @@ void AbstractView::Resize(int width, int height) {
 
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
-  SizeI min;
+  Size2I min;
   min.width = GetMinimalWidth();
   min.height = GetMinimalHeight();
-  SizeI max;
+  Size2I max;
   max.width = GetMaximalWidth();
   max.height = GetMaximalHeight();
 
@@ -429,18 +429,15 @@ const AnchorGroup &AbstractView::GetAnchorGroup(Alignment align) const {
   }
 }
 
-void AbstractView::Update() {
+void AbstractView::Update(bool validate) {
   if (p_->is_drawing) return;
 
-  if (p_->redraw_task.IsLinked()) return;
-
-  OnUpdate(this);
-}
-
-void AbstractView::CancelUpdate() {
-  if (p_->is_drawing) return;
-
-  p_->redraw_task.Unlink();
+  if (validate) {
+    if (p_->redraw_task.IsLinked()) return;
+    OnUpdate(this);
+  } else {
+    p_->redraw_task.Unlink();
+  }
 }
 
 bool AbstractView::Contain(int x, int y) const {
@@ -1171,10 +1168,10 @@ void AbstractView::RedrawTask::Run() const {
   if (view_->p_->need_layout) {
     view_->p_->is_layouting = true;
     view_->OnLayout(view_->p_->dirty_flag,
-                   view_->p_->padding.left,
-                   view_->p_->padding.top,
-                   static_cast<int>(view_->p_->geometry.width()) - view_->p_->padding.right,
-                   static_cast<int>(view_->p_->geometry.height()) - view_->p_->padding.bottom);
+                    view_->p_->padding.left,
+                    view_->p_->padding.top,
+                    static_cast<int>(view_->p_->geometry.width()) - view_->p_->padding.right,
+                    static_cast<int>(view_->p_->geometry.height()) - view_->p_->padding.bottom);
     view_->p_->is_layouting = false;
   }
 

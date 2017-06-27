@@ -89,11 +89,7 @@ void Label::SetFont(const graphic::Font &font) {
 }
 
 void Label::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  if (dirty_flag) {
-    Update();
-  } else {
-    CancelUpdate();
-  }
+  Update(0 != dirty_flag);
 }
 
 void Label::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {

@@ -83,6 +83,9 @@ class Surface {
 
  public:
 
+  using Point = core::Point2I;
+  using Margin = core::Margin;
+
   class Shell;
   class Sub;
   class EGL;
@@ -152,7 +155,7 @@ class Surface {
    * @brief Get the position in window coordinates
    * @return Global position
    */
-  core::Point2I GetWindowPosition() const;
+  Point GetWindowPosition() const;
 
   /**
    * @brief Get the parent surface
@@ -186,16 +189,16 @@ class Surface {
 
   AbstractEventHandler *GetEventHandler() const;
 
-  const core::Margin &GetMargin() const;
+  const Margin &GetMargin() const;
 
-  const core::Point2I &GetRelativePosition() const;
+  const Point &GetRelativePosition() const;
 
  private:
 
   struct Private;
   struct CommitTask;
 
-  Surface(AbstractEventHandler *event_handler, const core::Margin &margin = core::Margin());
+  Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
 
   std::unique_ptr<Private> p_;
 
@@ -267,7 +270,7 @@ class Surface::Shell {
   struct Private;
 
   static Surface *Create(AbstractEventHandler *event_handler,
-                         const core::Margin &margin = core::Margin());
+                         const Margin &margin = Margin());
 
   Shell(Surface *surface);
 
@@ -330,7 +333,7 @@ class Surface::Shell::Toplevel {
    * @brief Create a toplevel shell surface
    */
   static Surface *Create(AbstractEventHandler *event_handler,
-                         const core::Margin &margin = core::Margin());
+                         const Margin &margin = Margin());
 
   static Toplevel *Get(const Surface *surface);
 
@@ -382,7 +385,7 @@ class Surface::Shell::Popup {
    */
   static Surface *Create(Shell *parent,
                          AbstractEventHandler *view,
-                         const core::Margin &margin = core::Margin());
+                         const Margin &margin = Margin());
 
  private:
 
@@ -410,7 +413,7 @@ class Surface::Sub {
    */
   static Surface *Create(Surface *parent,
                          AbstractEventHandler *event_handler,
-                         const core::Margin &margin = core::Margin());
+                         const Margin &margin = Margin());
 
   static Sub *Get(const Surface *surface);
 

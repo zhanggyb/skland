@@ -390,10 +390,11 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   /**
    * @brief Update the display of this widget
+   * @param[in] validate
+   *   - true Request update
+   *   - false Cancel the update request
    */
-  void Update();
-
-  void CancelUpdate();
+  void Update(bool validate = true);
 
   virtual bool Contain(int x, int y) const;
 

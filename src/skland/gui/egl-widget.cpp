@@ -74,10 +74,7 @@ Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
 }
 
 void EGLWidget::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  if (dirty_flag)
-    Update();
-  else
-    CancelUpdate();
+  Update(0 != dirty_flag);
 
   if (egl_surface_) {
     Surface::Sub::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());

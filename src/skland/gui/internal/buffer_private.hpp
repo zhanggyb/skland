@@ -46,7 +46,7 @@ struct Buffer::Private {
    */
   core::Point2I position;
 
-  core::SizeI size;
+  core::Size2I size;
 
   int32_t stride;
 

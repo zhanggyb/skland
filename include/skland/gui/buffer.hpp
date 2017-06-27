@@ -46,6 +46,13 @@ class Buffer {
 
  public:
 
+  using Point = core::Point2I;
+  using Size = core::Size2I;
+
+  // FIXME: how to use a variadic template alias?
+  // template<typename RT, typename ... PTs>
+  // using DelegateRef = core::DelegateRef<RT(PTs...)>;
+
   Buffer();
 
   ~Buffer();
@@ -67,9 +74,9 @@ class Buffer {
 
   int GetOffset() const;
 
-  const core::Point2I &GetPosition() const;
+  const Point &GetPosition() const;
 
-  const core::SizeI &GetSize() const;
+  const Size &GetSize() const;
 
   core::DelegateRef<void()> release() {
     return release_;

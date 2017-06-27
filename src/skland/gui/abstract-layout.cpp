@@ -82,7 +82,7 @@ void AbstractLayout::OnConfigureGeometry(int dirty_flag, const RectF &old_geomet
     Layout();
   } else {
     p_->need_layout = false;
-    CancelUpdate();
+    Update(false);
   }
 }
 

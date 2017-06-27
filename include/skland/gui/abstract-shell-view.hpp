@@ -50,6 +50,11 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
  public:
 
   /**
+   * @brief Alias of core::Margin
+   */
+  using Margin = core::Margin;
+
+  /**
    * @brief A task to process shell view rendering in event loop
    */
   class RedrawTask : public Task {
@@ -84,19 +89,19 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    * TODO: use a diagram
    */
   enum Location {
-    kInterior = 0,
-    kResizeTop = 1,
-    kResizeBottom = 2,
-    kResizeLeft = 4,
-    kResizeTopLeft = 5,
-    kResizeBottomLeft = 6,
-    kResizeRight = 8,
-    kResizeTopRight = 9,
-    kResizeBottomRight = 10,
-    kResizeMask = 15,
-    kExterior = 16,
-    kTitleBar = 17,
-    kClientArea = 18
+    kInterior = 0,  /**< Inside the window frame including the title bar */
+    kResizeTop = 1, /**< The top edge for resizing with mouse */
+    kResizeBottom = 2,  /**< The bottom edge for resizing with mouse */
+    kResizeLeft = 4,  /**< The left edge for resizing with mouse */
+    kResizeTopLeft = 5, /**< The top-left corner for resizing with mouse */
+    kResizeBottomLeft = 6,  /**< The bottom-left corner for resizing with mouse */
+    kResizeRight = 8, /**< The right edge for resizing with mouse */
+    kResizeTopRight = 9,  /**< The top-right corner for resizing with mouse */
+    kResizeBottomRight = 10,  /**< The bottom-right corner for resizing with mouse */
+    kResizeMask = 15, /**< The bitwise mask for the resizing flags above */
+    kExterior = 16, /**< Outsize the window frame */
+    kTitleBar = 17, /**< The title bar area */
+    kClientArea = 18  /**< The client area */
   };
 
   /**
@@ -170,7 +175,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   AbstractShellView *GetParent() const;
 
-  static const core::Margin kResizingMargin;
+  static const Margin kResizingMargin;
 
  protected:
 
@@ -197,9 +202,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    */
   virtual void OnShown() = 0;
 
-  virtual bool OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) = 0;
+  virtual bool OnConfigureSize(const core::Size2I &old_size, const core::Size2I &new_size) = 0;
 
-  virtual void OnSizeChange(const core::SizeI &old_size, const core::SizeI &new_size) = 0;
+  virtual void OnSizeChange(const core::Size2I &old_size, const core::Size2I &new_size) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

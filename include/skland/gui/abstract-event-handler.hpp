@@ -60,6 +60,9 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
   friend class AbstractView;
   friend class AbstractShellView;
 
+  AbstractEventHandler(const AbstractEventHandler &) = delete;
+  AbstractEventHandler &operator=(const AbstractEventHandler &)  = delete;
+
  public:
 
   class EventTask : public Task {

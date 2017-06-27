@@ -25,30 +25,30 @@ namespace core {
  * @brief Template structure for size in 2 dimension
  */
 template<typename T>
-struct Size {
+struct Size2 {
 
-  inline Size()
+  inline Size2()
       : width(T(0)), height(T(0)) {}
 
-  inline Size(T width, T height)
+  inline Size2(T width, T height)
       : width(width), height(height) {}
 
-  inline Size(const Size &other)
+  inline Size2(const Size2 &other)
       : width(other.width), height(other.height) {}
 
-  inline Size &operator=(const Size &other) {
+  inline Size2 &operator=(const Size2 &other) {
     width = other.width;
     height = other.height;
     return *this;
   }
 
-  inline ~Size() {}
+  inline ~Size2() {}
 
   inline bool IsValid() const {
     return width >= 0 && height >= 0;
   }
 
-  inline bool Equal(const Size &other) const {
+  inline bool Equal(const Size2 &other) const {
     return (width == other.width) && (height == other.height);
   }
 
@@ -74,7 +74,7 @@ struct Size {
  * @ingroup core
  */
 template<typename T>
-inline bool operator==(const Size<T> &size1, const Size<T> &size2) {
+inline bool operator==(const Size2<T> &size1, const Size2<T> &size2) {
   return ((size1.width == size2.width)
       && (size1.height == size2.height));
 }
@@ -83,7 +83,7 @@ inline bool operator==(const Size<T> &size1, const Size<T> &size2) {
  * @ingroup core
  */
 template<typename T>
-inline bool operator!=(const Size<T> &size1, const Size<T> &size2) {
+inline bool operator!=(const Size2<T> &size1, const Size2<T> &size2) {
   return ((size1.width != size2.width) ||
       (size1.height != size2.height));
 }
@@ -92,37 +92,37 @@ inline bool operator!=(const Size<T> &size1, const Size<T> &size2) {
  * @ingroup core
  */
 template<typename T>
-inline Size<T> operator+(const Size<T> &size1, const Size<T> &size2) {
-  return Size<T>(size1.width + size2.width, size1.height + size2.height);
+inline Size2<T> operator+(const Size2<T> &size1, const Size2<T> &size2) {
+  return Size2<T>(size1.width + size2.width, size1.height + size2.height);
 }
 
 /**
  * @ingroup core
  */
 template<typename T>
-inline Size<T> operator-(const Size<T> &size1, const Size<T> &size2) {
-  return Size<T>(size1.width - size2.width, size1.height - size2.height);
+inline Size2<T> operator-(const Size2<T> &size1, const Size2<T> &size2) {
+  return Size2<T>(size1.width - size2.width, size1.height - size2.height);
 }
 
 template<typename T>
-inline Size<T> operator*(const Size<T> &src, int factor) {
-  return Size<T>(src.width * factor, src.height * factor);
+inline Size2<T> operator*(const Size2<T> &src, int factor) {
+  return Size2<T>(src.width * factor, src.height * factor);
 }
 
 /**
  * @ingroup core
  */
-typedef Size<int> SizeI;
+typedef Size2<int> Size2I;
 
 /**
  * @ingroup core
  */
-typedef Size<float> SizeF;
+typedef Size2<float> Size2F;
 
 /**
  * @ingroup core
  */
-typedef Size<double> SizeD;
+typedef Size2<double> Size2D;
 
 } // namespace core
 } // namespace skland
