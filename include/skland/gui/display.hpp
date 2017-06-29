@@ -17,9 +17,9 @@
 #ifndef SKLAND_GUI_DISPLAY_HPP_
 #define SKLAND_GUI_DISPLAY_HPP_
 
-#include "../core/types.hpp"
-#include "../core/sigcxx.hpp"
-#include "../core/deque.hpp"
+#include "skland/core/types.hpp"
+#include "skland/core/sigcxx.hpp"
+#include "skland/core/deque.hpp"
 
 #include "cursor.hpp"
 
@@ -40,7 +40,7 @@ class Input;
 
 /**
  * @ingroup gui
- * @brief The global display
+ * @brief The global display which serves as the connection to the compositor
  */
 class Display {
 
@@ -49,27 +49,24 @@ class Display {
   friend class Input;
   friend class Callback;
 
+  using Deque = core::Deque;
+
  public:
 
-  struct Global {
-    uint32_t id;
-    std::string interface;
-    uint32_t version;
-  };
-
+  struct Global;
   class Native;
 
   /**
    * @brief Get a deque of outputs
    * @return
    */
-  static const core::Deque &GetOutputs();
+  static const Deque &GetOutputs();
 
   /**
    * @brief Get a deque of inputs
    * @return
    */
-  static const core::Deque &GetInputs();
+  static const Deque &GetInputs();
 
   /**
    * @brief Get a set of supported pixel formats
@@ -94,8 +91,19 @@ class Display {
 
   virtual ~Display();
 
+  /**
+   * @brief Connect to a wayland compositor
+   * @param name The wayland compositor name
+   *
+   * This method is called once in Application.
+   */
   void Connect(const char *name = NULL);
 
+  /**
+   * @brief Disconnect from a wayland compositor
+   *
+   * This method will be called only when application exits.
+   */
   void Disconnect() noexcept;
 
   void AddOutput(Output *output, int index = 0);
@@ -114,6 +122,15 @@ class Display {
 
   static Display *kDisplay;
 
+};
+
+/**
+  * @brief A simple structure to store information of wayland objects
+  */
+struct Display::Global {
+  uint32_t id;
+  std::string interface;
+  uint32_t version;
 };
 
 } // namespace gui

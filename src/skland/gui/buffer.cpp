@@ -16,17 +16,13 @@
 
 #include "internal/buffer_private.hpp"
 
-#include <skland/gui/shared-memory-pool.hpp>
+#include "skland/gui/shared-memory-pool.hpp"
 
 namespace skland {
 namespace gui {
 
 using Point = core::Point2I;
 using Size = core::Size2I;
-
-const struct wl_buffer_listener Buffer::kListener = {
-    OnRelease
-};
 
 Buffer::Buffer() {
   p_.reset(new Private);
@@ -55,7 +51,7 @@ void Buffer::Setup(const SharedMemoryPool &pool,
                                             height,
                                             stride,
                                             format);
-  wl_buffer_add_listener(p_->wl_buffer, &kListener, this);
+  wl_buffer_add_listener(p_->wl_buffer, &Private::kListener, this);
   p_->size.width = width;
   p_->size.height = height;
   p_->stride = stride;
@@ -100,11 +96,6 @@ const Point &Buffer::GetPosition() const {
 
 const Size &Buffer::GetSize() const {
   return p_->size;
-}
-
-void Buffer::OnRelease(void *data, struct wl_buffer */*buffer*/) {
-  Buffer *_this = static_cast<Buffer *>(data);
-  if (_this->release_) _this->release_();
 }
 
 } // namespace gui

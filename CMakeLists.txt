@@ -87,6 +87,7 @@ find_package(Vulkan REQUIRED)
 if (Vulkan_FOUND)
     include_directories(Vulkan_INCLUDE_DIRS)
     set(LIBS ${LIBS} ${Vulkan_LIBRARIES})
+    add_definitions(-DVK_USE_PLATFORM_WAYLAND_KHR)
 endif ()
 
 find_package(Wayland REQUIRED)

@@ -17,15 +17,17 @@
 #ifndef SKLAND_GUI_INTERNAL_DISPLAY_PRIVATE_HPP_
 #define SKLAND_GUI_INTERNAL_DISPLAY_PRIVATE_HPP_
 
-#include <skland/gui/display.hpp>
+#include "skland/gui/display.hpp"
 
-#include <skland/gui/task.hpp>
-#include <skland/gui/abstract-epoll-task.hpp>
+#include "skland/gui/task.hpp"
+#include "skland/gui/abstract-epoll-task.hpp"
 
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
+
+#include <vulkan/vulkan.hpp>
 
 namespace skland {
 namespace gui {
@@ -63,6 +65,10 @@ struct Display::Private {
 
   void ReleaseEGLDisplay();
 
+  void CreateVKInstance();
+
+  void ReleaseVKInstance();
+
   void MakeSwapBufferNonBlock() const;
 
   struct wl_display *wl_display;
@@ -81,6 +87,8 @@ struct Display::Private {
 
   EGLint egl_version_major;  /**< The major version */
   EGLint egl_version_minor;  /**< The minor version */
+
+  vk::Instance vk_instance;
 
   struct xkb_context *xkb_context;
 

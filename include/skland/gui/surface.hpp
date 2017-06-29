@@ -73,6 +73,9 @@ class Region;
  */
 class Surface {
 
+  using Point = core::Point2I;
+  using Margin = core::Margin;
+
   friend class Application;
   friend class Display;
   friend class Callback;
@@ -82,9 +85,6 @@ class Surface {
   Surface &operator=(const Surface &) = delete;
 
  public:
-
-  using Point = core::Point2I;
-  using Margin = core::Margin;
 
   class Shell;
   class Sub;
@@ -176,13 +176,13 @@ class Surface {
   Surface *GetSiblingBelow() const;
 
   /**
-   * @brief The shell surface shows over this one
+   * @brief The shell surface placed over this one
    * @return
    */
   Surface *GetUpperShell() const;
 
   /**
-   * @brief The shell surface shows under this one
+   * @brief The shell surface placed under this one
    * @return
    */
   Surface *GetLowerShell() const;
