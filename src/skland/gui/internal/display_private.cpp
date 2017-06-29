@@ -15,7 +15,7 @@
  */
 
 #include "display_private.hpp"
-#include "display_native.hpp"
+#include "display_proxy.hpp"
 
 #include <skland/core/debug.hpp>
 #include <skland/core/assert.hpp>
@@ -126,13 +126,13 @@ void Display::Private::InitializeEGLDisplay() {
       if (CheckEGLExtension(extensions,
                             swap_damage_ext_to_entrypoint[i].extension)) {
         /* The EXTPROC is identical to the KHR one */
-        Native::kSwapBuffersWithDamageAPI =
+        Proxy::kSwapBuffersWithDamageAPI =
             (PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC)
                 eglGetProcAddress(swap_damage_ext_to_entrypoint[i].entrypoint);
         break;
       }
     }
-    if (Native::kSwapBuffersWithDamageAPI)
+    if (Proxy::kSwapBuffersWithDamageAPI)
       printf("has EGL_EXT_buffer_age and %s\n", swap_damage_ext_to_entrypoint[i].extension);
   }
 }

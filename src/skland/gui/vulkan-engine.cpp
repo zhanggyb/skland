@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-#include <skland/gui/region.hpp>
+#include "skland/gui/vulkan-engine.hpp"
 
 #include "internal/display_proxy.hpp"
+#include "internal/surface_private.hpp"
+#include "internal/abstract-graphic-engine_proxy.hpp"
 
 namespace skland {
 namespace gui {
 
-Region::Region()
-    : wl_region_(nullptr) {
-  wl_region_ = wl_compositor_create_region(Display::Proxy::wl_compositor());
+VulkanEngine::VulkanEngine()
+    : AbstractGraphicEngine() {
+
 }
 
-Region::~Region() {
-  if (wl_region_)
-    wl_region_destroy(wl_region_);
+VulkanEngine::~VulkanEngine() {
+
+}
+
+void VulkanEngine::Setup(Surface *surface) {
+  vk::WaylandSurfaceCreateInfoKHR info = {
+      vk::WaylandSurfaceCreateFlagsKHR(),
+      Display::Proxy::wl_display(),
+      Proxy::GetWaylandSurface(surface)
+  };
+
+  vk_surface_ = Display::Proxy::vk_instance().createWaylandSurfaceKHR(info);
 }
 
 } // namespace gui

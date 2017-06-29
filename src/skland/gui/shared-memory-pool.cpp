@@ -33,7 +33,7 @@
 #include <new>
 #endif
 
-#include "internal/display_native.hpp"
+#include "internal/display_proxy.hpp"
 
 namespace skland {
 namespace gui {
@@ -52,7 +52,7 @@ void SharedMemoryPool::Setup(int32_t size) {
     throw std::runtime_error("Cannot map shared memory");
   }
 
-  wl_shm_pool_ = wl_shm_create_pool(Display::Native().wl_shm(), fd, size);
+  wl_shm_pool_ = wl_shm_create_pool(Display::Proxy::wl_shm(), fd, size);
 
   size_ = size;
   close(fd);

@@ -30,7 +30,7 @@
 
 #include "internal/input_private.hpp"
 #include "internal/output_private.hpp"
-#include "internal/display_native.hpp"
+#include "internal/display_proxy.hpp"
 #include "internal/buffer_private.hpp"
 
 namespace skland {
@@ -70,7 +70,7 @@ Surface::Shell::Shell(Surface *surface)
   _ASSERT(surface_);
   role_.placeholder = nullptr;
 
-  p_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(Display::Native().xdg_shell(), surface_->p_->wl_surface);
+  p_->zxdg_surface = zxdg_shell_v6_get_xdg_surface(Display::Proxy::xdg_shell(), surface_->p_->wl_surface);
   zxdg_surface_v6_add_listener(p_->zxdg_surface, &Private::kListener, this);
 
   Push();
@@ -242,7 +242,7 @@ Surface::Sub::Sub(Surface *surface, Surface *parent)
   _ASSERT(surface_);
   _ASSERT(parent);
 
-  wl_sub_surface_ = wl_subcompositor_get_subsurface(Display::Native().wl_subcompositor(),
+  wl_sub_surface_ = wl_subcompositor_get_subsurface(Display::Proxy::wl_subcompositor(),
                                                     surface_->p_->wl_surface,
                                                     parent->p_->wl_surface);
   SetParent(parent);
@@ -442,8 +442,8 @@ Surface::EGL::EGL(Surface *surface) {
   p_->wl_egl_window =
       wl_egl_window_create(p_->surface->p_->wl_surface, 400, 400);
   p_->egl_surface =
-      eglCreatePlatformWindowSurface(Display::Native().egl_display(),
-                                     Display::Native().egl_config(),
+      eglCreatePlatformWindowSurface(Display::Proxy::egl_display(),
+                                     Display::Proxy::egl_config(),
                                      p_->wl_egl_window,
                                      NULL);
 }
@@ -458,28 +458,28 @@ Surface::EGL::~EGL() {
 
 bool Surface::EGL::MakeCurrent() {
   return EGL_TRUE ==
-      eglMakeCurrent(Display::Native().egl_display(),
+      eglMakeCurrent(Display::Proxy::egl_display(),
                      p_->egl_surface,
                      p_->egl_surface,
-                     Display::Native().egl_context());
+                     Display::Proxy::egl_context());
 }
 
 bool Surface::EGL::SwapBuffers() {
   return EGL_TRUE ==
-      eglSwapBuffers(Display::Native().egl_display(), p_->egl_surface);
+      eglSwapBuffers(Display::Proxy::egl_display(), p_->egl_surface);
 }
 
 bool Surface::EGL::SwapBuffersWithDamage(int x, int y, int width, int height) {
   EGLint rect[4] = {x, y, width, height};
   return EGL_TRUE
-      == Display::Native::kSwapBuffersWithDamageAPI(Display::Native().egl_display(),
+      == Display::Proxy::kSwapBuffersWithDamageAPI(Display::Proxy::egl_display(),
                                                     p_->egl_surface,
                                                     rect,
                                                     4 * sizeof(EGLint));
 }
 
 bool Surface::EGL::SwapInterval(EGLint interval) {
-  return EGL_TRUE == eglSwapInterval(Display::Native().egl_display(), interval);
+  return EGL_TRUE == eglSwapInterval(Display::Proxy::egl_display(), interval);
 }
 
 void Surface::EGL::Resize(int width, int height, int dx, int dy) {
@@ -503,7 +503,7 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
   p_.reset(new Private(event_handler, margin));
   p_->role.placeholder = nullptr;
 
-  p_->wl_surface = wl_compositor_create_surface(Display::Native().wl_compositor());
+  p_->wl_surface = wl_compositor_create_surface(Display::Proxy::wl_compositor());
   wl_surface_add_listener(p_->wl_surface, &Private::kListener, this);
 
   commit_task_.reset(new CommitTask(this));

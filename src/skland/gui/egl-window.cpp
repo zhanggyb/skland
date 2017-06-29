@@ -27,7 +27,7 @@
 #include <skland/gui/buffer.hpp>
 #include <skland/gui/region.hpp>
 
-#include "internal/display_native.hpp"
+#include "internal/display_proxy.hpp"
 #include "internal/abstract-view_iterators.hpp"
 
 #include <skland/graphic/canvas.hpp>

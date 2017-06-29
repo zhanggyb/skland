@@ -54,7 +54,7 @@ class Display {
  public:
 
   struct Global;
-  class Native;
+  struct Proxy;
 
   /**
    * @brief Get a deque of outputs

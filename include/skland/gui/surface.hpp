@@ -79,6 +79,7 @@ class Surface {
   friend class Application;
   friend class Display;
   friend class Callback;
+  friend class AbstractGraphicEngine;
 
   Surface() = delete;
   Surface(const Surface &) = delete;

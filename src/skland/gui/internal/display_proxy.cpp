@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#include "display_native.hpp"
+#include "display_proxy.hpp"
 
 namespace skland {
 namespace gui {
 
-PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC Display::Native::kSwapBuffersWithDamageAPI = NULL;
+PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC Display::Proxy::kSwapBuffersWithDamageAPI = NULL;
 
 } // namespace gui
 } // namespace skland

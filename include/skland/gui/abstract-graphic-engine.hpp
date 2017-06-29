@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_ABSTRACT_GRAPHIC_ENGINE_HPP
-#define SKLAND_ABSTRACT_GRAPHIC_ENGINE_HPP
+#ifndef SKLAND_GUI_ABSTRACT_GRAPHIC_ENGINE_HPP_
+#define SKLAND_GUI_ABSTRACT_GRAPHIC_ENGINE_HPP_
 
 namespace skland {
 namespace gui {
+
+class Surface;
 
 /**
  * @brief The base class for graphic engine to render on a 3D surface
@@ -31,9 +33,19 @@ class AbstractGraphicEngine {
 
   virtual ~AbstractGraphicEngine();
 
+  /**
+   * @brief Setup the surface on which this engine works
+   * @param surface
+   */
+  virtual void Setup(Surface *surface) = 0;
+
+ protected:
+
+  struct Proxy;
+
 };
 
-}
-}
+} // namespace gui
+} // namespace skland
 
-#endif //SKLAND_ABSTRACT_GRAPHIC_ENGINE_HPP
+#endif // SKLAND_GUI_ABSTRACT_GRAPHIC_ENGINE_HPP_

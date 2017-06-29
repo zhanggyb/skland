@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-#include <skland/gui/region.hpp>
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHIC_ENGINE_PROXY_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHIC_ENGINE_PROXY_HPP_
 
-#include "internal/display_proxy.hpp"
+#include "skland/gui/abstract-graphic-engine.hpp"
+
+#include "surface_private.hpp"
 
 namespace skland {
 namespace gui {
 
-Region::Region()
-    : wl_region_(nullptr) {
-  wl_region_ = wl_compositor_create_region(Display::Proxy::wl_compositor());
-}
+struct AbstractGraphicEngine::Proxy {
 
-Region::~Region() {
-  if (wl_region_)
-    wl_region_destroy(wl_region_);
-}
+  static inline struct wl_surface *GetWaylandSurface(const Surface *surface) {
+    return surface->p_->wl_surface;
+  }
+
+};
 
 } // namespace gui
 } // namespace skland
+
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHIC_ENGINE_PROXY_HPP_
