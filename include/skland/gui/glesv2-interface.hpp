@@ -14,38 +14,31 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_ABSTRACT_GRAPHIC_ENGINE_HPP_
-#define SKLAND_GUI_ABSTRACT_GRAPHIC_ENGINE_HPP_
+#ifndef SKLAND_GUI_GLESV2_INTERFACE_HPP_
+#define SKLAND_GUI_GLESV2_INTERFACE_HPP_
+
+#include "abstract-graphics-interface.hpp"
 
 namespace skland {
 namespace gui {
 
-class Surface;
-
 /**
- * @brief The base class for graphic engine to render on a 3D surface
+ * @ingroup gui
+ * @brief OpenGL ES V2
  */
-class AbstractGraphicEngine {
+class GLESV2Interface : public AbstractGraphicsInterface {
 
  public:
 
-  AbstractGraphicEngine();
+  GLESV2Interface();
 
-  virtual ~AbstractGraphicEngine();
+  virtual ~GLESV2Interface();
 
-  /**
-   * @brief Setup the surface on which this engine works
-   * @param surface
-   */
-  virtual void Setup(Surface *surface) = 0;
-
- protected:
-
-  struct Proxy;
+  virtual void Setup(Surface *surface) final;
 
 };
 
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_ABSTRACT_GRAPHIC_ENGINE_HPP_
+#endif // SKLAND_GUI_GLESV2_INTERFACE_HPP_

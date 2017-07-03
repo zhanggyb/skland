@@ -510,6 +510,9 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
 }
 
 Surface::~Surface() {
+  if (p_->graphics_interface)
+    delete p_->graphics_interface;
+
   if (p_->egl)
     delete p_->egl;
 
@@ -650,6 +653,10 @@ Surface *Surface::GetLowerShell() const {
 
 AbstractEventHandler *Surface::GetEventHandler() const {
   return p_->event_handler;
+}
+
+AbstractGraphicsInterface* Surface::GetGraphicsInterface() const {
+  return p_->graphics_interface;
 }
 
 const Margin &Surface::GetMargin() const {

@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-#include "skland/gui/abstract-graphic-engine.hpp"
+#include "skland/gui/glesv2-interface.hpp"
 
 namespace skland {
 namespace gui {
 
-AbstractGraphicEngine::AbstractGraphicEngine() {
+GLESV2Interface::GLESV2Interface()
+    : AbstractGraphicsInterface() {
 
 }
 
-AbstractGraphicEngine::~AbstractGraphicEngine() {
+GLESV2Interface::~GLESV2Interface() {
 
 }
 
+void GLESV2Interface::Setup(Surface *surface) {
+
 }
-}
+
+} // namespace gui
+} // namespace skland

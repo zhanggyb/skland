@@ -36,6 +36,7 @@ class Buffer;
 class Output;
 class InputEvent;
 class Region;
+class AbstractGraphicsInterface;
 
 /**
  * @ingroup gui
@@ -79,7 +80,7 @@ class Surface {
   friend class Application;
   friend class Display;
   friend class Callback;
-  friend class AbstractGraphicEngine;
+  friend class AbstractGraphicsInterface;
 
   Surface() = delete;
   Surface(const Surface &) = delete;
@@ -189,6 +190,8 @@ class Surface {
   Surface *GetLowerShell() const;
 
   AbstractEventHandler *GetEventHandler() const;
+
+  AbstractGraphicsInterface *GetGraphicsInterface() const;
 
   const Margin &GetMargin() const;
 

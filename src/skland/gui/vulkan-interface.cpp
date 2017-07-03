@@ -14,25 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHIC_ENGINE_PROXY_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHIC_ENGINE_PROXY_HPP_
+#include "skland/gui/vulkan-interface.hpp"
 
-#include "skland/gui/abstract-graphic-engine.hpp"
-
-#include "surface_private.hpp"
+#include "internal/display_proxy.hpp"
+#include "internal/surface_private.hpp"
+#include "internal/abstract-graphics-interface_proxy.hpp"
 
 namespace skland {
 namespace gui {
 
-struct AbstractGraphicEngine::Proxy {
+VulkanInterface::VulkanInterface()
+    : AbstractGraphicsInterface() {
 
-  static inline struct wl_surface *GetWaylandSurface(const Surface *surface) {
-    return surface->p_->wl_surface;
-  }
+}
 
-};
+VulkanInterface::~VulkanInterface() {
+
+}
+
+void VulkanInterface::Setup(Surface *surface) {
+  vk::WaylandSurfaceCreateInfoKHR info = {
+      vk::WaylandSurfaceCreateFlagsKHR(),
+      Display::Proxy::wl_display(),
+      Proxy::GetWaylandSurface(surface)
+  };
+
+  vk_surface_ = Display::Proxy::vk_instance().createWaylandSurfaceKHR(info);
+}
 
 } // namespace gui
 } // namespace skland
-
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHIC_ENGINE_PROXY_HPP_
