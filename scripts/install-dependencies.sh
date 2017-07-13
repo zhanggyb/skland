@@ -41,6 +41,7 @@ elif [ "$OS" = "Fedora" ]; then
 		mesa-libwayland-egl-devel \
 		mesa-libGLES-devel \
 		mesa-libGL-devel \
+		mesa-libEGL-devel \
 		vulkan-devel \
 		libwebp-devel \
 		libjpeg-turbo-devel \

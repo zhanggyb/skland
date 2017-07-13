@@ -192,8 +192,8 @@ Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
 }
 
 Surface::Shell::Toplevel::~Toplevel() {
-  _ASSERT(shell_->role_.toplevel == this);
-  _ASSERT(nullptr == shell_->parent_);
+  _ASSERT(p_->shell->role_.toplevel == this);
+  _ASSERT(nullptr == p_->shell->parent_);
   p_->shell->role_.toplevel = nullptr;
 }
 
@@ -215,8 +215,8 @@ Surface::Shell::Popup::Popup(Shell *shell) {
 }
 
 Surface::Shell::Popup::~Popup() {
-  _ASSERT(shell_->parent_);
-  _ASSERT(shell_->role_.popup == this);
+  _ASSERT(p_->shell->parent_);
+  _ASSERT(p_->shell->role_.popup == this);
 
   p_->shell->parent_ = nullptr;
   p_->shell->role_.popup = nullptr;
