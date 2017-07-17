@@ -17,14 +17,13 @@
 #ifndef SKLAND_GRAPHIC_IMAGE_INFO_HPP_
 #define SKLAND_GRAPHIC_IMAGE_INFO_HPP_
 
-#include <memory>
-
-// Forward declaration
-struct SkImageInfo;
-
 namespace skland {
 namespace graphic {
 
+/**
+ * @ingroup graphic
+ * @brief Describes how to interpret the alpha component of a pixel
+ */
 enum AlphaType {
   kAlphaTypeUnknown,
 
@@ -37,6 +36,10 @@ enum AlphaType {
   kAlphaTypeLast = kAlphaTypeUnpremul
 };
 
+/**
+ * @ingroup graphic
+ * @brief Describes how to interpret the components of a pixel
+ */
 enum ColorType {
   kColorTypeUnknown,
 
@@ -52,6 +55,10 @@ enum ColorType {
   kColorTypeLast = kColorTypeRGBAF16
 };
 
+/**
+ * @ingroup graphic
+ * @brief Describes an images' dimensions and pixel type
+ */
 class ImageInfo {
 
   friend class Bitmap;
@@ -60,25 +67,63 @@ class ImageInfo {
 
  public:
 
-  static ImageInfo Make(int width, int height, ColorType ct, AlphaType at);
+  static ImageInfo Make(int width, int height, ColorType ct, AlphaType at) {
+    return ImageInfo(width, height, ct, at);
+  }
 
-  static ImageInfo MakeN32Premul(int width, int height);
+  static ImageInfo MakeN32Premul(int width, int height) {
+    return ImageInfo(width, height, kColorTypeBGRA8888, kAlphaTypePremul);
+  }
 
-  ImageInfo();
+  ImageInfo()
+      : width_(0),
+        height_(0),
+        color_type_(kColorTypeUnknown),
+        alpha_type_(kAlphaTypeUnknown) {}
 
-  ImageInfo(const ImageInfo &orig);
+  ImageInfo(const ImageInfo &orig)
+      : width_(orig.width_),
+        height_(orig.height_),
+        color_type_(orig.color_type_),
+        alpha_type_(orig.alpha_type_) {}
 
-  ~ImageInfo();
+  ~ImageInfo() {}
 
-  ImageInfo &operator=(const ImageInfo &other);
+  ImageInfo &operator=(const ImageInfo &other) {
+    width_ = other.width_;
+    height_ = other.height_;
+    color_type_ = other.color_type_;
+    alpha_type_ = other.alpha_type_;
+    return *this;
+  }
+
+  int width() const { return width_; }
+
+  int height() const { return height_; }
+
+  ColorType color_type() const { return color_type_; }
+
+  AlphaType alpha_type() const { return alpha_type_; }
+
+  void reset() {
+    width_ = 0;
+    height_ = 0;
+    color_type_ = kColorTypeUnknown;
+    alpha_type_ = kAlphaTypeUnknown;
+  }
 
  private:
 
-  ImageInfo(const SkImageInfo &native);
+  ImageInfo(int width, int height, ColorType color_type, AlphaType alpha_type)
+      : width_(width),
+        height_(height),
+        color_type_(color_type),
+        alpha_type_(alpha_type) {}
 
-  struct Private;
-
-  std::unique_ptr<Private> p_;
+  int width_;
+  int height_;
+  ColorType color_type_;
+  AlphaType alpha_type_;
 
 };
 

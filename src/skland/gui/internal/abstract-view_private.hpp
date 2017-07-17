@@ -52,7 +52,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         last_child(nullptr),
         parent(nullptr),
         children_count(0),
-        shell(nullptr),
+        shell_view(nullptr),
         visible(true),
         minimal_size(0, 0),
         preferred_size(100, 100),
@@ -83,7 +83,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
   AbstractView *parent;
   int children_count;
 
-  AbstractShellView *shell;
+  AbstractShellView *shell_view;
 
   bool visible;
 

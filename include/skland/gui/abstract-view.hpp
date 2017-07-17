@@ -97,6 +97,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
  public:
 
+  using Padding = core::Padding;
+  using RectF = core::RectF;
+
   class Iterator;
   class ConstIterator;
 
@@ -265,7 +268,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   LayoutPolicy GetLayoutPolicyOnY() const;
 
-  const core::Padding &GetPadding() const;
+  const Padding &GetPadding() const;
 
   /**
    * @brief Move this view to the given position in window coordinate
@@ -365,7 +368,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   float GetYCenter() const;
 
-  const core::RectF &GetGeometry() const;
+  const RectF &GetGeometry() const;
 
   bool IsVisible() const;
 
@@ -409,6 +412,12 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   AbstractView *GetParent() const;
 
   AbstractLayout *GetLayout() const;
+
+  /**
+   * @brief Get the shell view that contains this View object
+   * @return
+   */
+  AbstractShellView *GetShellView() const;
 
   core::SignalRef<AbstractView *> destroyed() { return destroyed_; }
 
@@ -605,7 +614,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   struct Private;
 
-  std::unique_ptr<Private> p_;
+  std::unique_ptr <Private> p_;
 
   core::Signal<AbstractView *> destroyed_;
 

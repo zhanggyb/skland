@@ -19,36 +19,5 @@
 namespace skland {
 namespace graphic {
 
-ImageInfo ImageInfo::Make(int width, int height, ColorType ct, AlphaType at) {
-  SkImageInfo native = SkImageInfo::Make(width, height, (SkColorType) ct, (SkAlphaType) at);
-  return ImageInfo(native);
-}
-
-ImageInfo ImageInfo::MakeN32Premul(int width, int height) {
-  SkImageInfo native = SkImageInfo::MakeN32Premul(width, height);
-  return ImageInfo(native);
-}
-
-ImageInfo::ImageInfo() {
-  p_.reset(new Private);
-}
-
-ImageInfo::ImageInfo(const ImageInfo &orig) {
-  p_.reset(new Private(*orig.p_));
-}
-
-ImageInfo::ImageInfo(const SkImageInfo &native) {
-  p_.reset(new Private(native));
-}
-
-ImageInfo &ImageInfo::operator=(const ImageInfo &other) {
-  *p_ = *other.p_;
-  return *this;
-}
-
-ImageInfo::~ImageInfo() {
-
-}
-
 } // namespace graphic
 } // namespace skland

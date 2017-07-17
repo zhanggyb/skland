@@ -54,7 +54,7 @@ AbstractView::AbstractView(int width, int height)
 
 AbstractView::~AbstractView() {
   _ASSERT(nullptr == p_->parent);
-  _ASSERT(nullptr == p_->shell);
+  _ASSERT(nullptr == p_->shell_view);
   _ASSERT(nullptr == p_->previous);
   _ASSERT(nullptr == p_->next);
   _ASSERT(0 == p_->children_count);
@@ -361,25 +361,25 @@ void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distan
   if (target == p_->parent || this == target->p_->parent) {
     switch (align) {
       case kAlignLeft: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
         p_->left_anchor_group.PushBack(pair.first);
         target->p_->left_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignTop: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
         p_->top_anchor_group.PushBack(pair.first);
         target->p_->top_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignRight: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
         p_->right_anchor_group.PushBack(pair.first);
         target->p_->right_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignBottom: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
         p_->bottom_anchor_group.PushBack(pair.first);
         target->p_->bottom_anchor_group.PushBack(pair.second);
         break;
@@ -389,25 +389,25 @@ void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distan
   } else if (target->p_->parent == p_->parent) {
     switch (align) {
       case kAlignLeft: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
         p_->right_anchor_group.PushBack(pair.first);
         target->p_->left_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignTop: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
         p_->bottom_anchor_group.PushBack(pair.first);
         target->p_->top_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignRight: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
         p_->left_anchor_group.PushBack(pair.first);
         target->p_->right_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignBottom: {
-        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
+        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
         p_->top_anchor_group.PushBack(pair.first);
         target->p_->bottom_anchor_group.PushBack(pair.second);
         break;
@@ -455,11 +455,11 @@ void AbstractView::Destroy() {
   }
 
   if (p_->parent) {
-    _ASSERT(nullptr == p_->shell);
+    _ASSERT(nullptr == p_->shell_view);
     p_->parent->RemoveChild(this);
-  } else if (p_->shell) {
+  } else if (p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
-    p_->shell->DetachView(this);
+    p_->shell_view->DetachView(this);
   }
 
   if (p_->children_count > 0) {
@@ -477,6 +477,13 @@ AbstractView *AbstractView::GetParent() const {
 
 AbstractLayout *AbstractView::GetLayout() const {
   return p_->layout;
+}
+
+AbstractShellView *AbstractView::GetShellView() const {
+  if (p_->shell_view)
+    return p_->shell_view;
+
+  return static_cast<AbstractShellView *>(GetSurface(this)->GetShellSurface()->GetEventHandler());
 }
 
 void AbstractView::OnChildAdded(AbstractView */*view*/) {
@@ -522,24 +529,24 @@ void AbstractView::OnUpdate(AbstractView *view) {
   }
 
   if (p_->parent) {
-    _ASSERT(nullptr == p_->shell);
+    _ASSERT(nullptr == p_->shell_view);
     p_->parent->OnUpdate(view);
     return;
-  } else if (p_->shell) {
+  } else if (p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
-    p_->shell->OnUpdate(view);
+    p_->shell_view->OnUpdate(view);
   }
 }
 
 Surface *AbstractView::GetSurface(const AbstractView *view) const {
   if (p_->parent) {
-    _ASSERT(nullptr == p_->shell);
+    _ASSERT(nullptr == p_->shell_view);
     return p_->parent->GetSurface(view);
   }
 
-  if (p_->shell) {
+  if (p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
-    return p_->shell->GetSurface(view);
+    return p_->shell_view->GetSurface(view);
   }
 
   return nullptr;
@@ -614,16 +621,16 @@ AbstractView *AbstractView::GetChildAt(int index) const {
 
 void AbstractView::PushFrontChild(AbstractView *child) {
   if (child->p_->parent == this) {
-    _ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell_view);
     return;
   }
 
   if (child->p_->parent) {
-    _ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell_view);
     child->p_->parent->RemoveChild(child);
-  } else if (child->p_->shell) {
+  } else if (child->p_->shell_view) {
     _ASSERT(nullptr == child->p_->parent);
-    child->p_->shell->DetachView(child);
+    child->p_->shell_view->DetachView(child);
   }
 
   _ASSERT(nullptr == child->p_->previous);
@@ -652,16 +659,16 @@ void AbstractView::PushFrontChild(AbstractView *child) {
 
 void AbstractView::InsertChild(AbstractView *child, int index) {
   if (child->p_->parent == this) {
-    _ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell_view);
     return;
   }
 
   if (child->p_->parent) {
-    _ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell_view);
     child->p_->parent->RemoveChild(child);
-  } else if (child->p_->shell) {
+  } else if (child->p_->shell_view) {
     _ASSERT(nullptr == child->p_->parent);
-    child->p_->shell->DetachView(child);
+    child->p_->shell_view->DetachView(child);
   }
 
   _ASSERT(nullptr == child->p_->previous);
@@ -725,16 +732,16 @@ void AbstractView::InsertChild(AbstractView *child, int index) {
 
 void AbstractView::PushBackChild(AbstractView *child) {
   if (child->p_->parent == this) {
-    _ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell_view);
     return;
   }
 
   if (child->p_->parent) {
-    _ASSERT(nullptr == child->p_->shell);
+    _ASSERT(nullptr == child->p_->shell_view);
     child->p_->parent->RemoveChild(child);
-  } else if (child->p_->shell) {
+  } else if (child->p_->shell_view) {
     _ASSERT(nullptr == child->p_->parent);
-    child->p_->shell->DetachView(child);
+    child->p_->shell_view->DetachView(child);
   }
 
   _ASSERT(child->p_->previous == nullptr);

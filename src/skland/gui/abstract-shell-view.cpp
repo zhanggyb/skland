@@ -191,37 +191,37 @@ AbstractShellView *AbstractShellView::GetParent() const {
 }
 
 void AbstractShellView::AttachView(AbstractView *view) {
-  if (view->p_->shell == this) {
+  if (view->p_->shell_view == this) {
     _ASSERT(nullptr == view->p_->parent);
     return;
   }
 
   if (view->p_->parent) {
-    _ASSERT(nullptr == view->p_->shell);
+    _ASSERT(nullptr == view->p_->shell_view);
     view->p_->parent->RemoveChild(view);
     _ASSERT(nullptr == view->p_->parent);
     _ASSERT(nullptr == view->p_->previous);
     _ASSERT(nullptr == view->p_->next);
-  } else if (view->p_->shell) {
+  } else if (view->p_->shell_view) {
     _ASSERT(nullptr == view->p_->parent);
-    view->p_->shell->DetachView(view);
+    view->p_->shell_view->DetachView(view);
   }
 
-  view->p_->shell = this;
+  view->p_->shell_view = this;
 
   OnViewAttached(view);
-  if (view->p_->shell == this)
+  if (view->p_->shell_view == this)
     view->OnAttachedToShellView();
 }
 
 void AbstractShellView::DetachView(AbstractView *view) {
-  if (view->p_->shell != this) return;
+  if (view->p_->shell_view != this) return;
 
   _ASSERT(nullptr == view->p_->parent);
-  view->p_->shell = nullptr;
+  view->p_->shell_view = nullptr;
 
   OnViewDetached(view);
-  if (view->p_->shell != this)
+  if (view->p_->shell_view != this)
     view->OnDetachedFromShellView(this);
 }
 
