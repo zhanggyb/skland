@@ -40,31 +40,11 @@ class AbstractLayout;
  * @brief Layout policy to indicate how a view is resized in a layout
  */
 enum LayoutPolicy {
-
-  /**
-   * Recommend to use the minimal size
-   */
-      kLayoutMinimal,
-
-  /**
-   * Recommend to use the preferred size
-   */
-      kLayoutPreferred,
-
-  /**
-   * Recommend to use the maximal size
-   */
-      kLayoutMaximal,
-
-  /**
-   * Recommend to use the current size and do not change
-   */
-      kLayoutFixed,
-
-  /**
-   * Recommend to expand to any value between minimal and maximal size
-   */
-      kLayoutExpandable
+  kLayoutMinimal,  /**< Recommend to use the minimal size */
+  kLayoutPreferred,  /**< Recommend to use the preferred size */
+  kLayoutMaximal,  /**< Recommend to use the maximal size */
+  kLayoutFixed,  /**< Recommend to use the current size and do not change */
+  kLayoutExpandable  /**< Recommend to expand to any value between minimal and maximal size */
 };
 
 /**
@@ -99,6 +79,15 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   using Padding = core::Padding;  /**< @brief Alias of core::Padding */
   using RectF = core::RectF;  /**< @brief Alias of core::RectF */
+
+  enum DirtyFlagMask {
+    kDirtyLeftMask = 0x1 << 0,
+    kDirtyTopMask = 0x1 << 1,
+    kDirtyRightMask = 0x1 << 2,
+    kDirtyBottomMask = 0x1 << 3,
+    kDirtyWidthMask = 0x1 << 4,
+    kDirtyHeightMask = 0x1 << 5
+  };
 
   class Iterator;
   class ConstIterator;
@@ -614,7 +603,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   struct Private;
 
-  std::unique_ptr <Private> p_;
+  std::unique_ptr<Private> p_;
 
   core::Signal<AbstractView *> destroyed_;
 

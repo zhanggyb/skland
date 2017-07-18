@@ -189,9 +189,9 @@ void AbstractView::MoveTo(int x, int y) {
   p_->geometry.MoveTo(x, y);
 
   if (x == p_->last_geometry.x() && y == p_->last_geometry.y()) {
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyTopMask);
+    Bit::Clear<int>(p_->dirty_flag, kDirtyLeftMask | kDirtyTopMask);
   } else {
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyTopMask);
+    Bit::Set<int>(p_->dirty_flag, kDirtyLeftMask | kDirtyTopMask);
   }
 
   OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
@@ -223,9 +223,9 @@ void AbstractView::Resize(int width, int height) {
   p_->geometry.Resize(width, height);
 
   if (width == p_->last_geometry.width() && height == p_->last_geometry.height()) {
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyBottomMask);
+    Bit::Clear<int>(p_->dirty_flag, kDirtyRightMask | kDirtyBottomMask);
   } else {
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyBottomMask);
+    Bit::Set<int>(p_->dirty_flag, kDirtyRightMask | kDirtyBottomMask);
   }
 
   OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
@@ -257,9 +257,9 @@ void AbstractView::SetLeft(int left) {
   p_->geometry.left = left;
 
   if (p_->geometry.left == p_->last_geometry.left)
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyWidthMask);
+    Bit::Clear<int>(p_->dirty_flag, kDirtyLeftMask | kDirtyWidthMask);
   else
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyLeftMask | Private::kDirtyWidthMask);
+    Bit::Set<int>(p_->dirty_flag, kDirtyLeftMask | kDirtyWidthMask);
 
   OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
@@ -282,9 +282,9 @@ void AbstractView::SetTop(int top) {
   p_->geometry.top = top;
 
   if (p_->geometry.top == p_->last_geometry.top)
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyTopMask | Private::kDirtyHeightMask);
+    Bit::Clear<int>(p_->dirty_flag, kDirtyTopMask | kDirtyHeightMask);
   else
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyTopMask | Private::kDirtyHeightMask);
+    Bit::Set<int>(p_->dirty_flag, kDirtyTopMask | kDirtyHeightMask);
 
   OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
@@ -304,9 +304,9 @@ void AbstractView::SetRight(int right) {
   p_->geometry.right = right;
 
   if (p_->geometry.right == p_->last_geometry.right)
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyWidthMask);
+    Bit::Clear<int>(p_->dirty_flag, kDirtyRightMask | kDirtyWidthMask);
   else
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyRightMask | Private::kDirtyWidthMask);
+    Bit::Set<int>(p_->dirty_flag, kDirtyRightMask | kDirtyWidthMask);
 
   OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }
@@ -326,9 +326,9 @@ void AbstractView::SetBottom(int bottom) {
   p_->geometry.bottom = bottom;
 
   if (p_->geometry.bottom == p_->last_geometry.bottom)
-    Bit::Clear<int>(p_->dirty_flag, Private::kDirtyBottomMask | Private::kDirtyHeightMask);
+    Bit::Clear<int>(p_->dirty_flag, kDirtyBottomMask | kDirtyHeightMask);
   else
-    Bit::Set<int>(p_->dirty_flag, Private::kDirtyBottomMask | Private::kDirtyHeightMask);
+    Bit::Set<int>(p_->dirty_flag, kDirtyBottomMask | kDirtyHeightMask);
 
   OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
 }

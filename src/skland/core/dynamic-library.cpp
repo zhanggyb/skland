@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-#include <skland/core/dynamic-library.hpp>
+#include "skland/core/dynamic-library.hpp"
 
 #include <iostream>
 
+namespace skland {
+namespace core {
+
 using std::cerr;
 using std::endl;
-
-namespace skland {
 
 DynamicLibrary::~DynamicLibrary() {
   if (handle_) dlclose(handle_);
@@ -53,4 +54,5 @@ void *DynamicLibrary::GetSymbol(const char *symbol) {
   return addr;
 }
 
-}
+} // namespace core
+} // namespace skland

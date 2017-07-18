@@ -20,6 +20,7 @@
 #include <errno.h>
 
 namespace skland {
+namespace core {
 
 PosixTimer::PosixTimer()
     : id_(0),
@@ -114,4 +115,5 @@ void PosixTimer::OnExpire(union sigval sigev_value) {
   if (_this->expire_) _this->expire_.Invoke();
 }
 
-}
+} // namespace core
+} // namespace skland
