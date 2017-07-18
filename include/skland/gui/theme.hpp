@@ -152,7 +152,7 @@ class Theme {
 
     struct GradientShader {
 
-      static graphic::Shader MakeLinear(const core::Point2F points[2], const Schema::ShadedColor &color);
+      static graphic::Shader MakeLinear(const core::PointF points[2], const Schema::ShadedColor &color);
 
     };
 

@@ -24,6 +24,10 @@
 namespace skland {
 namespace graphic {
 
+/**
+ * @ingroup graphic_intern
+ * @brief The private structure used in Bitmap
+ */
 struct Bitmap::Private {
 
   Private()

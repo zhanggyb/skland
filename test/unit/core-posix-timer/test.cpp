@@ -7,7 +7,7 @@
 #include <skland/core/posix-timer.hpp>
 #include <iostream>
 
-using skland::PosixTimer;
+using skland::core::PosixTimer;
 
 Test::Test()
     : testing::Test() {

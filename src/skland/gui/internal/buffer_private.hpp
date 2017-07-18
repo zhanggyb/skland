@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_BUFFER_PRIVATE_HPP
-#define SKLAND_BUFFER_PRIVATE_HPP
+#ifndef SKLAND_GUI_INTERNAL_BUFFER_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_BUFFER_PRIVATE_HPP_
 
-#include <skland/gui/buffer.hpp>
+#include "skland/gui/buffer.hpp"
+
+#include <wayland-client.h>
 
 namespace skland {
 namespace gui {
@@ -44,9 +46,9 @@ struct Buffer::Private {
   /**
    * @brief Position on surface
    */
-  core::Point2I position;
+  core::PointI position;
 
-  core::Size2I size;
+  core::SizeI size;
 
   int32_t stride;
 
@@ -56,9 +58,13 @@ struct Buffer::Private {
 
   void *data;
 
+  static void OnRelease(void *data, struct wl_buffer *buffer);
+
+  static const struct wl_buffer_listener kListener;
+
 };
 
 } // namespace gui
 } // namespace skland
 
-#endif //SKLAND_BUFFER_PRIVATE_HPP
+#endif // SKLAND_GUI_INTERNAL_BUFFER_PRIVATE_HPP_

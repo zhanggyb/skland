@@ -15,7 +15,7 @@
  */
 
 #include "display_private.hpp"
-#include "display_native.hpp"
+#include "display_proxy.hpp"
 
 #include <skland/core/debug.hpp>
 #include <skland/core/assert.hpp>
@@ -126,13 +126,13 @@ void Display::Private::InitializeEGLDisplay() {
       if (CheckEGLExtension(extensions,
                             swap_damage_ext_to_entrypoint[i].extension)) {
         /* The EXTPROC is identical to the KHR one */
-        Native::kSwapBuffersWithDamageAPI =
+        Proxy::kSwapBuffersWithDamageAPI =
             (PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC)
                 eglGetProcAddress(swap_damage_ext_to_entrypoint[i].entrypoint);
         break;
       }
     }
-    if (Native::kSwapBuffersWithDamageAPI)
+    if (Proxy::kSwapBuffersWithDamageAPI)
       printf("has EGL_EXT_buffer_age and %s\n", swap_damage_ext_to_entrypoint[i].extension);
   }
 }
@@ -149,6 +149,19 @@ void Display::Private::ReleaseEGLDisplay() {
     egl_version_major = 0;
     egl_version_minor = 0;
   }
+}
+
+void Display::Private::CreateVKInstance() {
+  vk::InstanceCreateInfo create_info = {};
+  vk_instance = vk::createInstance(create_info);
+
+  if (!vk_instance) {
+    throw std::runtime_error("Error! Fail to create Vulkan instance!");
+  }
+}
+
+void Display::Private::ReleaseVKInstance() {
+  vk_instance.destroy();
 }
 
 void Display::Private::MakeSwapBufferNonBlock() const {

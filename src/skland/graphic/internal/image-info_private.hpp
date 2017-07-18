@@ -24,27 +24,6 @@
 namespace skland {
 namespace graphic {
 
-struct ImageInfo::Private {
-
-  Private() {}
-
-  Private(const SkImageInfo &native)
-      : sk_image_info(native) {}
-
-  Private(const Private &orig)
-      : sk_image_info(orig.sk_image_info) {}
-
-  ~Private() {};
-
-  Private &operator=(const Private &other) {
-    sk_image_info = other.sk_image_info;
-    return *this;
-  }
-
-  SkImageInfo sk_image_info;
-
-};
-
 } // namespace graphic
 } // namespace skland
 

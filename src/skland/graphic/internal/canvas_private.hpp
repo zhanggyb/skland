@@ -50,7 +50,7 @@ struct Canvas::Private {
   }
 
   SkCanvas *sk_canvas;
-  core::Point2F origin;
+  core::PointF origin;
 
 };
 

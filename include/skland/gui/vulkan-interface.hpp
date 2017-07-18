@@ -14,47 +14,39 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_
-#define SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_
+#ifndef SKLAND_GUI_VULKAN_INTERFACE_HPP_
+#define SKLAND_GUI_VULKAN_INTERFACE_HPP_
 
-#include <skland/gui/mouse-event.hpp>
+#include "abstract-graphics-interface.hpp"
+
+#include <vulkan/vulkan.hpp>
 
 namespace skland {
 namespace gui {
 
-struct MouseEvent::Private {
+class Surface;
 
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
+/**
+ * @ingroup gui
+ * @brief Vulkan
+ */
+class VulkanInterface : public AbstractGraphicsInterface {
 
-  Private()
-      : surface(nullptr),
-        serial(0),
-        time(0),
-        button(0),
-        state(0),
-        axis(0) {
-  }
+ public:
 
-  ~Private() {}
+  VulkanInterface();
 
-  /** The surface this pointer hovers */
-  Surface *surface;
+  virtual ~VulkanInterface();
 
-  uint32_t serial;
+  virtual void Setup(Surface *surface) final;
 
-  core::PointD surface_xy;
+ private:
 
-  uint32_t time;
-
-  uint32_t button;
-  uint32_t state;
-
-  uint32_t axis;
+  vk::SurfaceKHR vk_surface_;
 
 };
 
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_
+#endif // SKLAND_GUI_VULKAN_ENGINE_HPP_

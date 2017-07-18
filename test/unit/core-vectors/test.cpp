@@ -4,7 +4,7 @@
 
 #include "test.hpp"
 
-#include <skland/core/vectors.hpp>
+#include <skland/core/vector.hpp>
 
 using namespace skland::core;
 typedef Vector2<int> vec2i;

@@ -27,7 +27,7 @@
 namespace skland {
 namespace graphic {
 
-using core::Point2F;
+using core::PointF;
 using core::RectF;
 using core::ColorF;
 
@@ -87,7 +87,10 @@ void Canvas::SetOrigin(float x, float y) {
 }
 
 Surface *Canvas::CreateSurface(const ImageInfo &info) {
-  sk_sp<SkSurface> native = p_->sk_canvas->makeSurface(info.p_->sk_image_info);
+  sk_sp<SkSurface> native = p_->sk_canvas->makeSurface(SkImageInfo::Make(info.width(),
+                                                                         info.height(),
+                                                                         static_cast<SkColorType >(info.color_type()),
+                                                                         static_cast<SkAlphaType >(info.alpha_type())));
   // TODO: create surface
   return nullptr;
 }
@@ -201,7 +204,7 @@ void Canvas::Flush() {
   p_->sk_canvas->flush();
 }
 
-const Point2F &Canvas::GetOrigin() const {
+const PointF &Canvas::GetOrigin() const {
   return p_->origin;
 }
 

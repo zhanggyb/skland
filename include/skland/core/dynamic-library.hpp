@@ -20,6 +20,7 @@
 #include <dlfcn.h>
 
 namespace skland {
+namespace core {
 
 /**
  * @ingroup core
@@ -48,6 +49,7 @@ class DynamicLibrary {
 
 };
 
-}
+} // namespace core
+} // namespace skland
 
 #endif // SKLAND_CORE_DYNAMIC_LIBRARY_HPP_

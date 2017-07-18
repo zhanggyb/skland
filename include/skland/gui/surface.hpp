@@ -36,6 +36,7 @@ class Buffer;
 class Output;
 class InputEvent;
 class Region;
+class AbstractGraphicsInterface;
 
 /**
  * @ingroup gui
@@ -73,18 +74,19 @@ class Region;
  */
 class Surface {
 
+  using Point = core::PointI;
+  using Margin = core::Margin;
+
   friend class Application;
   friend class Display;
   friend class Callback;
+  friend class AbstractGraphicsInterface;
 
   Surface() = delete;
   Surface(const Surface &) = delete;
   Surface &operator=(const Surface &) = delete;
 
  public:
-
-  using Point = core::Point2I;
-  using Margin = core::Margin;
 
   class Shell;
   class Sub;
@@ -176,18 +178,20 @@ class Surface {
   Surface *GetSiblingBelow() const;
 
   /**
-   * @brief The shell surface shows over this one
+   * @brief The shell surface placed over this one
    * @return
    */
   Surface *GetUpperShell() const;
 
   /**
-   * @brief The shell surface shows under this one
+   * @brief The shell surface placed under this one
    * @return
    */
   Surface *GetLowerShell() const;
 
   AbstractEventHandler *GetEventHandler() const;
+
+  AbstractGraphicsInterface *GetGraphicsInterface() const;
 
   const Margin &GetMargin() const;
 

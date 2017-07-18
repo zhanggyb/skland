@@ -17,11 +17,9 @@
 #ifndef SKLAND_GUI_BUFFER_HPP_
 #define SKLAND_GUI_BUFFER_HPP_
 
-#include "../core/point.hpp"
-#include "../core/size.hpp"
-#include "../core/delegate.hpp"
-
-#include <wayland-client.h>
+#include "skland/core/point.hpp"
+#include "skland/core/size.hpp"
+#include "skland/core/delegate.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -46,8 +44,8 @@ class Buffer {
 
  public:
 
-  using Point = core::Point2I;
-  using Size = core::Size2I;
+  using Point = core::PointI;
+  using Size = core::SizeI;
 
   // FIXME: how to use a variadic template alias?
   // template<typename RT, typename ... PTs>
@@ -87,10 +85,6 @@ class Buffer {
   struct Private;
 
   std::unique_ptr<Private> p_;
-
-  static void OnRelease(void *data, struct wl_buffer *buffer);
-
-  static const struct wl_buffer_listener kListener;
 
   core::Delegate<void()> release_;
 

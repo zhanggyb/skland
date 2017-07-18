@@ -24,6 +24,7 @@
 #include <cstdint>
 
 namespace skland {
+namespace core {
 
 /**
  * @ingroup core
@@ -87,6 +88,7 @@ class PosixTimer {
 
 };
 
-}
+} // namespace core
+} // namespace skland
 
 #endif // SKLAND_CORE_TIMER_HPP_

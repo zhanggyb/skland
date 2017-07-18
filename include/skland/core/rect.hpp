@@ -17,9 +17,11 @@
 #ifndef SKLAND_CORE_RECT_HPP_
 #define SKLAND_CORE_RECT_HPP_
 
-#include <cstring>
 #include "point.hpp"
 #include "size.hpp"
+
+#include <cstring>
+#include <algorithm>
 
 namespace skland {
 
@@ -32,35 +34,77 @@ namespace core {
 template<typename T>
 struct Rect {
 
-  inline static Rect FromLTRB(T left, T top, T right, T bottom) {
+  /**
+   * @brief Create a new rectangle from the specified values of left/top/right/bottom
+   * @param left
+   * @param top
+   * @param right
+   * @param bottom
+   * @return
+   */
+  inline static Rect MakeFromLTRB(T left, T top, T right, T bottom) {
     return Rect(left, top, right, bottom);
   }
 
-  inline static Rect FromXYWH(T x, T y, T width, T height) {
+  /**
+   * @brief Create a new rectangle from the specified values of x/y/width/height
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   * @return
+   */
+  inline static Rect MakeFromXYWH(T x, T y, T width, T height) {
     return Rect(x, y, x + width, y + height);
   }
 
-  template<typename R>
-  inline static Rect FromOther(const Rect<R> &other) {
-    return Rect(T(other.left), T(other.top), T(other.right), T(other.bottom));
-  }
-
+  /**
+   * @brief Default constructor
+   *
+   * Create an empty rectangle
+   */
   inline Rect()
       : left(0), top(0), right(0), bottom(0) {}
 
+  /**
+   * @brief Construct a Rect with specified LTRB values
+   * @param left
+   * @param top
+   * @param right
+   * @param bottom
+   */
   inline Rect(T left, T top, T right, T bottom)
       : left(left), top(top), right(right), bottom(bottom) {}
 
+  /**
+   * @brief Construct a Rect with width and height
+   * @param width
+   * @param height
+   */
   inline Rect(T width, T height)
       : left(0), top(0), right(width), bottom(height) {}
 
+  /**
+   * @brief Copy constructor
+   * @param other
+   */
   inline Rect(const Rect &other)
       : left(other.left), top(other.top), right(other.right), bottom(other.bottom) {}
 
+  /**
+   * @brief Copy constructor
+   * @tparam R
+   * @param other
+   */
   template<typename R>
   inline Rect(const Rect<R> &other)
       : left(T(other.left)), top(T(other.top)), right(T(other.right)), bottom(T(other.bottom)) {}
 
+  /**
+   * @brief Overload the assignment operator
+   * @param other
+   * @return
+   */
   inline Rect &operator=(const Rect &other) {
     left = other.left;
     top = other.top;
@@ -69,6 +113,12 @@ struct Rect {
     return *this;
   }
 
+  /**
+   * @brief Overload the assignment operator
+   * @tparam R
+   * @param other
+   * @return
+   */
   template<typename R>
   inline Rect &operator=(const Rect<R> &other) {
     left = T(other.left);
@@ -78,10 +128,43 @@ struct Rect {
     return *this;
   }
 
+  /**
+   * @brief Returns a boolean that indicates whether the rectangle is empty
+   * @return
+   *    - true Empty, width of height is 0 or negative
+   *    - false Not empty
+   */
+  inline bool IsEmpty() const {
+    return (width() <= T(0)) || (height() <= T(0));
+  }
+
+  /**
+   * @brief Returns a boolean that indicates whether the given point is contained in this rectangle
+   * @param x
+   * @param y
+   * @return
+   */
   inline bool Contain(T x, T y) const {
     return left <= x && x < right && top <= y && y < bottom;
   }
 
+  /**
+   * @brief Returns a boolean value that indicates whether this rect completely encloses another
+   * @param other
+   * @return
+   */
+  inline bool Contain(const Rect &other) const {
+    return left <= other.left &&
+        top <= other.top &&
+        right >= other.right &&
+        bottom >= other.bottom;
+  }
+
+  /**
+   * @brief Move the position of this rectangle to the given position
+   * @param x
+   * @param y
+   */
   inline void MoveTo(T x, T y) {
     right = x + width();
     bottom = y + height();
@@ -89,6 +172,11 @@ struct Rect {
     top = y;
   }
 
+  /**
+   * @brief Relatively move
+   * @param dx
+   * @param dy
+   */
   inline void Move(T dx, T dy) {
     left += dx;
     top += dy;
@@ -96,38 +184,123 @@ struct Rect {
     bottom += dy;
   }
 
+  /**
+   * @brief Resize this rectangle
+   * @param width
+   * @param height
+   */
   inline void Resize(T width, T height) {
     right = left + width;
     bottom = top + height;
   }
 
-  inline Rect Shrink(T value) const {
-    return Rect(this->left + value, this->top + value, this->right - value, this->bottom - value);
+  /**
+   * @brief Insets a rectangle by a specified value
+   * @param val
+   * @return
+   */
+  inline Rect Inset(T val) const {
+    return Inset(val, val);
   }
 
-  inline Rect Expand(T value) const {
-    return Rect(this->left - value, this->top - value, this->right + value, this->bottom + value);
+  /**
+   * @brief Insets a rectangle by specified values
+   * @param dx
+   * @param dy
+   * @return
+   */
+  inline Rect Inset(T dx, T dy) const {
+    return Rect(left + dx, top + dy, right - dx, bottom - dy);
   }
 
+  /**
+   * @brief Returns a boolean if this rect intersects another
+   * @param other
+   * @return
+   */
+  inline bool Intersect(const Rect &other) const {
+    return !GetIntersection(*this, other).IsEmpty();
+  }
+
+  /**
+   * @brief Get the intersection of two rectangles
+   * @param rect1
+   * @param rect2
+   * @return
+   */
+  static inline Rect GetIntersection(const Rect &rect1, const Rect &rect2) {
+    return Rect(std::max(rect1.left, rect2.left),
+                std::max(rect1.top, rect2.top),
+                std::min(rect1.right, rect2.right),
+                std::min(rect1.bottom, rect2.bottom));
+  }
+
+  /**
+   * @brief Get the left coordinate
+   * @return
+   */
   inline T x() const { return left; }
 
+  /**
+   * @brief Get the top coordinate
+   * @return
+   */
   inline T y() const { return top; }
 
+  /**
+   * @brief Get the width
+   * @return
+   */
   inline T width() const { return right - left; }
 
+  /**
+   * @brief Get the height
+   * @return
+   */
   inline T height() const { return bottom - top; }
 
+  /**
+   * @brief Get the center of x
+   * @return
+   */
   inline T center_x() const { return left + width() / T(2.0); }
 
+  /**
+   * @brief Get the center of y
+   * @return
+   */
   inline T center_y() const { return top + height() / T(2.0); }
 
-  union { T l, left; };
-  union { T t, top; };
-  union { T r, right; };
-  union { T b, bottom; };
+  /**
+   * @brief Left
+   */
+  union { T l, left, x0; };
+
+  /**
+   * @brief Top
+   */
+  union { T t, top, y0; };
+
+  /**
+   * @brief Right
+   */
+  union { T r, right, x1; };
+
+  /**
+   * @brief Bottom
+   */
+  union { T b, bottom, y1; };
 
 };
 
+/**
+ * @ingroup core
+ * @brief Multiple a given rect with a scalar number
+ * @tparam T
+ * @param src
+ * @param factor
+ * @return
+ */
 template<typename T>
 inline Rect<T> operator*(const Rect<T> &src, int factor) {
   return Rect<T>(src.left * factor, src.top * factor, src.right * factor, src.bottom * factor);
@@ -135,16 +308,32 @@ inline Rect<T> operator*(const Rect<T> &src, int factor) {
 
 /**
  * @ingroup core
+ * @brief Compare twe rectangle objects
+ * @tparam T
+ * @param src
+ * @param dst
+ * @return
+ */
+template<typename T>
+inline bool operator==(const Rect<T> &src, const Rect<T> &dst) {
+  return memcmp(&src, &dst, sizeof(Rect<T>)) == 0;
+}
+
+/**
+ * @ingroup core
+ * @brief A typedef to Rect with integer values
  */
 typedef Rect<int> RectI;
 
 /**
  * @ingroup core
+ * @brief A typedef to Rect with float values
  */
 typedef Rect<float> RectF;
 
 /**
  * @ingroup core
+ * @brief A typedef to Rect with double values
  */
 typedef Rect<double> RectD;
 

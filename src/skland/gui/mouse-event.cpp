@@ -21,8 +21,8 @@
 namespace skland {
 namespace gui {
 
-using core::Point2I;
-using core::Point2D;
+using core::PointI;
+using core::PointD;
 
 MouseEvent::MouseEvent(Input *input)
     : InputEvent(input) {
@@ -41,14 +41,14 @@ uint32_t MouseEvent::GetSerial() const {
   return p_->serial;
 }
 
-const Point2D &MouseEvent::GetSurfaceXY() const {
+const PointD &MouseEvent::GetSurfaceXY() const {
   return p_->surface_xy;
 }
 
-Point2D MouseEvent::GetWindowXY() const {
-  Point2D xy;
+PointD MouseEvent::GetWindowXY() const {
+  PointD xy;
 
-  Point2I pos = p_->surface->GetWindowPosition();
+  PointI pos = p_->surface->GetWindowPosition();
 
   xy.x = pos.x + p_->surface_xy.x;
   xy.y = pos.y + p_->surface_xy.y;

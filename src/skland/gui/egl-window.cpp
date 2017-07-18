@@ -27,7 +27,7 @@
 #include <skland/gui/buffer.hpp>
 #include <skland/gui/region.hpp>
 
-#include "internal/display_native.hpp"
+#include "internal/display_proxy.hpp"
 #include "internal/abstract-view_iterators.hpp"
 
 #include <skland/graphic/canvas.hpp>
@@ -46,7 +46,7 @@ namespace gui {
 
 using core::RectF;
 using core::RectI;
-using core::Size2I;
+using core::SizeI;
 using graphic::Canvas;
 using graphic::Paint;
 using graphic::Path;
@@ -147,9 +147,9 @@ Surface *EGLWindow::GetSurface(const AbstractView *view) const {
   return nullptr != p_->sub_surface ? p_->sub_surface : GetShellSurface();
 }
 
-bool EGLWindow::OnConfigureSize(const Size2I &old_size, const Size2I &new_size) {
-  Size2I min(160, 120);
-  Size2I max(65536, 65536);
+bool EGLWindow::OnConfigureSize(const SizeI &old_size, const SizeI &new_size) {
+  SizeI min(160, 120);
+  SizeI max(65536, 65536);
   _ASSERT(min.width < max.width && min.height < max.height);
 
   if (new_size.width < min.width || new_size.height < min.height) return false;
@@ -175,7 +175,7 @@ bool EGLWindow::OnConfigureSize(const Size2I &old_size, const Size2I &new_size) 
   return true;
 }
 
-void EGLWindow::OnSizeChange(const Size2I &old_size, const Size2I &new_size) {
+void EGLWindow::OnSizeChange(const SizeI &old_size, const SizeI &new_size) {
   int width = new_size.width;
   int height = new_size.height;
 
@@ -316,7 +316,7 @@ void EGLWindow::OnDraw(const Context *context) {
   canvas->Clear();
 
   Path path;
-  RectF geometry = RectF::FromXYWH(0.f, 0.f, GetWidth(), GetHeight());
+  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, GetWidth(), GetHeight());
 
   if ((!IsMaximized()) || (!IsFullscreen())) {
     // Drop shadow:

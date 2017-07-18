@@ -29,7 +29,12 @@ using core::make_unique;
 Surface *Surface::CreateRasterDirect(const ImageInfo &image_info, void *pixels, size_t row_bytes) {
   Surface *surface = new Surface();
 
-  surface->p_->sp_sk_surface = SkSurface::MakeRasterDirect(image_info.p_->sk_image_info, pixels, row_bytes);
+  surface->p_->sp_sk_surface =
+      SkSurface::MakeRasterDirect(SkImageInfo::Make(image_info.width(), image_info.height(),
+                                                    static_cast<SkColorType >(image_info.color_type()),
+                                                    static_cast<SkAlphaType>(image_info.alpha_type())),
+                                  pixels,
+                                  row_bytes);
   if (!surface->p_->sp_sk_surface) {
     throw std::runtime_error("Error! Fail to create Surface object!");
   }

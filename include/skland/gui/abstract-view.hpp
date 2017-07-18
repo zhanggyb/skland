@@ -40,31 +40,11 @@ class AbstractLayout;
  * @brief Layout policy to indicate how a view is resized in a layout
  */
 enum LayoutPolicy {
-
-  /**
-   * Recommend to use the minimal size
-   */
-      kLayoutMinimal,
-
-  /**
-   * Recommend to use the preferred size
-   */
-      kLayoutPreferred,
-
-  /**
-   * Recommend to use the maximal size
-   */
-      kLayoutMaximal,
-
-  /**
-   * Recommend to use the current size and do not change
-   */
-      kLayoutFixed,
-
-  /**
-   * Recommend to expand to any value between minimal and maximal size
-   */
-      kLayoutExpandable
+  kLayoutMinimal,  /**< Recommend to use the minimal size */
+  kLayoutPreferred,  /**< Recommend to use the preferred size */
+  kLayoutMaximal,  /**< Recommend to use the maximal size */
+  kLayoutFixed,  /**< Recommend to use the current size and do not change */
+  kLayoutExpandable  /**< Recommend to expand to any value between minimal and maximal size */
 };
 
 /**
@@ -96,6 +76,18 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   AbstractView &operator=(const AbstractView &) = delete;
 
  public:
+
+  using Padding = core::Padding;  /**< @brief Alias of core::Padding */
+  using RectF = core::RectF;  /**< @brief Alias of core::RectF */
+
+  enum DirtyFlagMask {
+    kDirtyLeftMask = 0x1 << 0,
+    kDirtyTopMask = 0x1 << 1,
+    kDirtyRightMask = 0x1 << 2,
+    kDirtyBottomMask = 0x1 << 3,
+    kDirtyWidthMask = 0x1 << 4,
+    kDirtyHeightMask = 0x1 << 5
+  };
 
   class Iterator;
   class ConstIterator;
@@ -265,7 +257,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   LayoutPolicy GetLayoutPolicyOnY() const;
 
-  const core::Padding &GetPadding() const;
+  const Padding &GetPadding() const;
 
   /**
    * @brief Move this view to the given position in window coordinate
@@ -365,7 +357,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   float GetYCenter() const;
 
-  const core::RectF &GetGeometry() const;
+  const RectF &GetGeometry() const;
 
   bool IsVisible() const;
 
@@ -409,6 +401,12 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   AbstractView *GetParent() const;
 
   AbstractLayout *GetLayout() const;
+
+  /**
+   * @brief Get the shell view that contains this View object
+   * @return
+   */
+  AbstractShellView *GetShellView() const;
 
   core::SignalRef<AbstractView *> destroyed() { return destroyed_; }
 
@@ -512,7 +510,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * This virtual method is called only when there's new geometry need to be saved before drawing this
    * view.
    */
-  virtual void OnGeometryChange(int dirty_flag, const core::RectF &old_geometry, const core::RectF &new_geometry) = 0;
+  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) = 0;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
 

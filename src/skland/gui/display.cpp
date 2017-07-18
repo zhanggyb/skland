@@ -24,10 +24,6 @@
 
 #include <iostream>
 
-using std::cout;
-using std::cerr;
-using std::endl;
-
 namespace skland {
 namespace gui {
 
@@ -65,6 +61,7 @@ void Display::Connect(const char *name) {
   }
 
   p_->InitializeEGLDisplay();
+  p_->CreateVKInstance();
 
   p_->wl_registry = wl_display_get_registry(p_->wl_display);
   wl_registry_add_listener(p_->wl_registry, &Private::kRegistryListener, this);
@@ -129,6 +126,7 @@ void Display::Disconnect() noexcept {
     p_->wl_registry = nullptr;
   }
 
+  p_->ReleaseVKInstance();
   p_->ReleaseEGLDisplay();
 
   wl_display_disconnect(p_->wl_display);

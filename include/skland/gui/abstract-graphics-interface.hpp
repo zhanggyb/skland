@@ -14,47 +14,48 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_
-#define SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_
+#ifndef SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_
+#define SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_
 
-#include <skland/gui/mouse-event.hpp>
+#include <memory>
 
 namespace skland {
 namespace gui {
 
-struct MouseEvent::Private {
+class Surface;
 
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
+/**
+ * @brief The base class for graphic engine to render on a 3D surface
+ */
+class AbstractGraphicsInterface {
 
-  Private()
-      : surface(nullptr),
-        serial(0),
-        time(0),
-        button(0),
-        state(0),
-        axis(0) {
-  }
+ public:
 
-  ~Private() {}
+  AbstractGraphicsInterface();
 
-  /** The surface this pointer hovers */
-  Surface *surface;
+  virtual ~AbstractGraphicsInterface();
 
-  uint32_t serial;
+  /**
+   * @brief Setup the surface on which this engine works
+   * @param surface
+   */
+  virtual void Setup(Surface *surface) = 0;
 
-  core::PointD surface_xy;
+  Surface *GetSurface() const;
 
-  uint32_t time;
+ protected:
 
-  uint32_t button;
-  uint32_t state;
+  struct Proxy;
 
-  uint32_t axis;
+ private:
+
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
 };
 
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_
+#endif // SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_

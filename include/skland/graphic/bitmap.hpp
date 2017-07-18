@@ -18,12 +18,15 @@
 #define SKLAND_GRAPHIC_BITMAP_HPP_
 
 #include <memory>
+#include "image-info.hpp"
 
 namespace skland {
 namespace graphic {
 
-class ImageInfo;
-
+/**
+ * @ingroup graphic_intern
+ * @brief A Bitmap class represents a raster bitmap.
+ */
 class Bitmap {
 
   friend class Canvas;
@@ -40,11 +43,19 @@ class Bitmap {
 
   bool InstallPixels(const ImageInfo &info, void *pixels, size_t row_bytes);
 
+  int GetWidth() const;
+
+  int GetHeight() const;
+
+  ColorType GetColorType() const;
+
+  AlphaType GetAlphaType() const;
+
  private:
 
   struct Private;
 
-  std::unique_ptr<Private> p_;
+  std::unique_ptr <Private> p_;
 
 };
 

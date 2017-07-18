@@ -14,47 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_
-#define SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_
+#include "internal/abstract-graphics-interface_private.hpp"
 
-#include <skland/gui/mouse-event.hpp>
+#include "skland/core/assert.hpp"
 
 namespace skland {
 namespace gui {
 
-struct MouseEvent::Private {
+AbstractGraphicsInterface::AbstractGraphicsInterface() {
+  p_.reset(new Private);
+}
 
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
-
-  Private()
-      : surface(nullptr),
-        serial(0),
-        time(0),
-        button(0),
-        state(0),
-        axis(0) {
+AbstractGraphicsInterface::~AbstractGraphicsInterface() {
+  if (p_->surface) {
+    _ASSERT(p_->surface->p_->graphics_interface == this);
+    p_->surface->p_->graphics_interface = nullptr;
   }
+}
 
-  ~Private() {}
-
-  /** The surface this pointer hovers */
-  Surface *surface;
-
-  uint32_t serial;
-
-  core::PointD surface_xy;
-
-  uint32_t time;
-
-  uint32_t button;
-  uint32_t state;
-
-  uint32_t axis;
-
-};
+Surface* AbstractGraphicsInterface::GetSurface() const {
+  return p_->surface;
+}
 
 } // namespace gui
 } // namespace skland
-
-#endif // SKLAND_GUI_INTERNAL_MOUSE_EVENT_PRIVATE_HPP_

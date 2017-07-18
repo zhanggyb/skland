@@ -38,7 +38,28 @@ Bitmap::~Bitmap() {
 }
 
 bool Bitmap::InstallPixels(const ImageInfo &info, void *pixels, size_t row_bytes) {
-  return p_->sk_bitmap.installPixels(info.p_->sk_image_info, pixels, row_bytes);
+  return p_->sk_bitmap.installPixels(SkImageInfo::Make(info.width(),
+                                                       info.height(),
+                                                       static_cast<SkColorType >(info.color_type()),
+                                                       static_cast<SkAlphaType >(info.alpha_type())),
+                                     pixels,
+                                     row_bytes);
+}
+
+int Bitmap::GetWidth() const {
+  return p_->sk_bitmap.width();
+}
+
+int Bitmap::GetHeight() const {
+  return p_->sk_bitmap.height();
+}
+
+ColorType Bitmap::GetColorType() const {
+  return static_cast<ColorType>(p_->sk_bitmap.colorType());
+}
+
+AlphaType Bitmap::GetAlphaType() const {
+  return static_cast<AlphaType>(p_->sk_bitmap.alphaType());
 }
 
 } // namespace graphic

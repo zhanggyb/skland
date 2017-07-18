@@ -32,18 +32,11 @@ namespace gui {
  */
 SKLAND_NO_EXPORT struct AbstractView::Private {
 
+  using Size = core::SizeI;
+
   Private() = delete;
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
-
-  enum DirtyFlagMask {
-    kDirtyLeftMask = 0x1 << 0,
-    kDirtyTopMask = 0x1 << 1,
-    kDirtyRightMask = 0x1 << 2,
-    kDirtyBottomMask = 0x1 << 3,
-    kDirtyWidthMask = 0x1 << 4,
-    kDirtyHeightMask = 0x1 << 5
-  };
 
   Private(AbstractView *view)
       : previous(nullptr),
@@ -52,7 +45,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         last_child(nullptr),
         parent(nullptr),
         children_count(0),
-        shell(nullptr),
+        shell_view(nullptr),
         visible(true),
         minimal_size(0, 0),
         preferred_size(100, 100),
@@ -83,21 +76,21 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
   AbstractView *parent;
   int children_count;
 
-  AbstractShellView *shell;
+  AbstractShellView *shell_view;
 
   bool visible;
 
-  core::Size2I minimal_size;
+  Size minimal_size;
 
-  core::Size2I preferred_size;
+  Size preferred_size;
 
-  core::Size2I maximal_size;
+  Size maximal_size;
 
   LayoutPolicy x_layout_policy;
 
   LayoutPolicy y_layout_policy;
 
-  core::Padding padding;
+  Padding padding;
 
   /**
    * @brief Bitwise data to indicate if the position or size need to update
@@ -106,9 +99,9 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    */
   int dirty_flag;
 
-  core::RectF geometry;
+  RectF geometry;
 
-  core::RectF last_geometry;
+  RectF last_geometry;
 
   RedrawTask redraw_task;
 

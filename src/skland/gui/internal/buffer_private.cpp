@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-#include <skland/gui/region.hpp>
-
-#include "internal/display_proxy.hpp"
+#include "buffer_private.hpp"
 
 namespace skland {
 namespace gui {
 
-Region::Region()
-    : wl_region_(nullptr) {
-  wl_region_ = wl_compositor_create_region(Display::Proxy::wl_compositor());
+const struct wl_buffer_listener Buffer::Private::kListener = {
+    OnRelease
+};
+
+void Buffer::Private::OnRelease(void *data, struct wl_buffer */*buffer*/) {
+  Buffer *_this = static_cast<Buffer *>(data);
+  if (_this->release_) _this->release_();
 }
 
-Region::~Region() {
-  if (wl_region_)
-    wl_region_destroy(wl_region_);
 }
-
-} // namespace gui
-} // namespace skland
+}

@@ -14,12 +14,33 @@
  * limitations under the License.
  */
 
-#include "display_native.hpp"
+#include "skland/gui/vulkan-interface.hpp"
+
+#include "internal/display_proxy.hpp"
+#include "internal/surface_private.hpp"
+#include "internal/abstract-graphics-interface_proxy.hpp"
 
 namespace skland {
 namespace gui {
 
-PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC Display::Native::kSwapBuffersWithDamageAPI = NULL;
+VulkanInterface::VulkanInterface()
+    : AbstractGraphicsInterface() {
+
+}
+
+VulkanInterface::~VulkanInterface() {
+
+}
+
+void VulkanInterface::Setup(Surface *surface) {
+  vk::WaylandSurfaceCreateInfoKHR info = {
+      vk::WaylandSurfaceCreateFlagsKHR(),
+      Display::Proxy::wl_display(),
+      Proxy::GetWaylandSurface(surface)
+  };
+
+  vk_surface_ = Display::Proxy::vk_instance().createWaylandSurfaceKHR(info);
+}
 
 } // namespace gui
 } // namespace skland
