@@ -14,15 +14,29 @@
  * limitations under the License.
  */
 
-#include "surface-commit_task.hpp"
-#include "surface_private.hpp"
+#ifndef SKLAND_DIALOG_HPP
+#define SKLAND_DIALOG_HPP
+
+#include "abstract-shell-view.hpp"
 
 namespace skland {
 namespace gui {
 
-void Surface::CommitTask::Run() const {
-  wl_surface_commit(surface->p_->wl_surface);
-}
+/**
+ * @ingroup gui
+ * @brief This class is currently for test
+ */
+class Dialog: public AbstractShellView {
+
+ public:
+
+  Dialog(const char* title, AbstractShellView* parent);
+
+  virtual ~Dialog();
+
+};
 
 } // namespace gui
 } // namespace skland
+
+#endif //SKLAND_DIALOG_HPP

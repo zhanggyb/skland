@@ -20,16 +20,20 @@
 #include "skland/gui/surface.hpp"
 #include "skland/gui/abstract-graphics-interface.hpp"
 
+#include "surface_commit-task.hpp"
+
 namespace skland {
 namespace gui {
 
 struct Surface::Private {
 
+  using PointI = core::PointI;
+
   Private() = delete;
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  Private(AbstractEventHandler *event_handler, const core::Margin &margin)
+  Private(Surface *surface, AbstractEventHandler *event_handler, const core::Margin &margin)
       : wl_surface(nullptr),
         commit_mode(kSynchronized),
         transform(kTransformNormal),
@@ -42,7 +46,8 @@ struct Surface::Private {
         upper(nullptr),
         lower(nullptr),
         egl(nullptr),
-        graphics_interface(nullptr) {}
+        graphics_interface(nullptr),
+        commit_task(surface) {}
 
   ~Private() {}
 
@@ -54,14 +59,14 @@ struct Surface::Private {
 
   AbstractEventHandler *event_handler;
 
-  core::Margin margin;
+  Margin margin;
 
   /**
    * Position in parent surface
    *
    * For root surface, this should always be (0, 0)
    */
-  core::PointI relative_position;
+  PointI relative_position;
 
   /**
     * @brief The parent surface
@@ -97,6 +102,8 @@ struct Surface::Private {
     Shell *shell;
     Sub *sub;
   } role;
+
+  CommitTask commit_task;
 
   static void OnEnter(void *data, struct wl_surface *wl_surface,
                       struct wl_output *wl_output);

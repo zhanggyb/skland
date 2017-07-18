@@ -388,6 +388,12 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   void Update(bool validate = true);
 
+  /**
+   * @brief Returns a boolean if this view contains the given pointer position
+   * @param x
+   * @param y
+   * @return
+   */
   virtual bool Contain(int x, int y) const;
 
   /**
@@ -398,8 +404,16 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   void Destroy();
 
+  /**
+   * @brief Get the parent view
+   * @return
+   */
   AbstractView *GetParent() const;
 
+  /**
+   * @brief Get the layout
+   * @return
+   */
   AbstractLayout *GetLayout() const;
 
   /**
@@ -483,8 +497,18 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual Surface *GetSurface(const AbstractView *view) const;
 
+  /**
+   * @brief Callback when this view enters an output
+   * @param surface
+   * @param output
+   */
   virtual void OnEnterOutput(const Surface *surface, const Output *output) override;
 
+  /**
+   * @brief Callback when this view leaves an output
+   * @param surface
+   * @param output
+   */
   virtual void OnLeaveOutput(const Surface *surface, const Output *output) override;
 
   /**
@@ -498,8 +522,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * The new size will never smaller than minimal size or larger than maximal size.
    */
   virtual void OnConfigureGeometry(int dirty_flag,
-                                   const core::RectF &old_geometry,
-                                   const core::RectF &new_geometry) = 0;
+                                   const RectF &old_geometry,
+                                   const RectF &new_geometry) = 0;
 
   /**
    * @brief Callback when the geometry changes before draw this view
@@ -510,7 +534,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * This virtual method is called only when there's new geometry need to be saved before drawing this
    * view.
    */
-  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) = 0;
+  virtual void OnGeometryChange(int dirty_flag,
+                                const RectF &old_geometry,
+                                const RectF &new_geometry) = 0;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
 

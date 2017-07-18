@@ -29,8 +29,6 @@
 namespace skland {
 namespace gui {
 
-class Application;
-class Display;
 class AbstractEventHandler;
 class Buffer;
 class Output;
@@ -199,14 +197,10 @@ class Surface {
 
  private:
 
-  struct Private;
   struct CommitTask;
+  struct Private;
 
   Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
-
-  std::unique_ptr<Private> p_;
-
-  std::unique_ptr<CommitTask> commit_task_;
 
   // global surface stack:
 
@@ -242,6 +236,8 @@ class Surface {
 
   static Task kCommitTaskHead;
   static Task kCommitTaskTail;
+
+  std::unique_ptr<Private> p_;
 
 };
 
