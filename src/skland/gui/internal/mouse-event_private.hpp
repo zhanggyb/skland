@@ -43,7 +43,7 @@ struct MouseEvent::Private {
 
   uint32_t serial;
 
-  core::Point2D surface_xy;
+  core::PointD surface_xy;
 
   uint32_t time;
 

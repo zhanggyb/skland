@@ -30,7 +30,7 @@
 namespace skland {
 namespace gui {
 
-using core::Point2F;
+using core::PointF;
 using graphic::FontStyle;
 using graphic::Shader;
 
@@ -56,7 +56,7 @@ Theme::Data::Data()
 
 }
 
-Shader Theme::Helper::GradientShader::MakeLinear(const Point2F *points, const Schema::ShadedColor &color) {
+Shader Theme::Helper::GradientShader::MakeLinear(const PointF *points, const Schema::ShadedColor &color) {
   return skland::graphic::GradientShader::MakeLinear(points,
                                                      color.shaded_colors.data(),
                                                      color.shaded_positions.data(),

@@ -78,7 +78,42 @@ TEST_F(Test, contains_2) {
 TEST_F(Test, contains_3) {
   RectF r(0, 0, 4, 4);
 
-  ASSERT_TRUE(r.Contain(4, 4));
+  ASSERT_TRUE(!r.Contain(4, 4));
+}
+
+TEST_F(Test, intersect_1) {
+  RectF r1(0, 0, 10, 10);
+  RectF r2(2, 2, 6, 6);
+
+  ASSERT_TRUE(r1.Intersect(r2));
+}
+
+TEST_F(Test, intersect_2) {
+  RectF r1(0, 0, 10, 10);
+  RectF r2(11, 11, 18, 18);
+
+  ASSERT_TRUE(!r1.Intersect(r2));
+}
+
+TEST_F(Test, intersect_3) {
+  RectF r1(0, 0, 10, 10);
+  RectF r2(-2, -2, 18, 18);
+
+  ASSERT_TRUE(r1.Intersect(r2));
+}
+
+TEST_F(Test, intersect_4) {
+  RectF r1(0, 0, 10, 10);
+  RectF r2(9, 9, 18, 18);
+
+  ASSERT_TRUE(r1.Intersect(r2));
+}
+
+TEST_F(Test, intersect_5) {
+  RectF r1(0, 0, 10, 10);
+  RectF r2(-9, -4, 0, 0);
+
+  ASSERT_TRUE(!r1.Intersect(r2));
 }
 
 TEST_F(Test, hcenter_1) {

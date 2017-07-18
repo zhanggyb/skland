@@ -74,7 +74,7 @@ class AbstractGraphicsInterface;
  */
 class Surface {
 
-  using Point = core::Point2I;
+  using Point = core::PointI;
   using Margin = core::Margin;
 
   friend class Application;

@@ -44,8 +44,8 @@ class Buffer {
 
  public:
 
-  using Point = core::Point2I;
-  using Size = core::Size2I;
+  using Point = core::PointI;
+  using Size = core::SizeI;
 
   // FIXME: how to use a variadic template alias?
   // template<typename RT, typename ... PTs>

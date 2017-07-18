@@ -38,7 +38,7 @@
 namespace skland {
 namespace gui {
 
-using core::Point2F;
+using core::PointF;
 using core::RectF;
 using core::RectI;
 using core::Margin;
@@ -89,11 +89,11 @@ SKLAND_NO_EXPORT struct Window::Private {
 
   AbstractView *content_view;
 
-  core::Size2I minimal_size;
+  core::SizeI minimal_size;
 
-  core::Size2I preferred_size;
+  core::SizeI preferred_size;
 
-  core::Size2I maximal_size;
+  core::SizeI maximal_size;
 
   int flags;
 
@@ -175,15 +175,15 @@ void Window::SetContentView(AbstractView *view) {
   SetContentViewGeometry();
 }
 
-const core::Size2I &Window::GetMinimalSize() const {
+const core::SizeI &Window::GetMinimalSize() const {
   return p_->minimal_size;
 }
 
-const core::Size2I &Window::GetPreferredSize() const {
+const core::SizeI &Window::GetPreferredSize() const {
   return p_->preferred_size;
 }
 
-const core::Size2I &Window::GetMaximalSize() const {
+const core::SizeI &Window::GetMaximalSize() const {
   return p_->maximal_size;
 }
 
@@ -280,7 +280,7 @@ Surface *Window::GetSurface(const AbstractView *view) const {
   return nullptr != p_->main_surface ? p_->main_surface : GetShellSurface();
 }
 
-bool Window::OnConfigureSize(const core::Size2I &old_size, const core::Size2I &new_size) {
+bool Window::OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) {
   _ASSERT(p_->minimal_size.width < p_->maximal_size.width &&
       p_->minimal_size.height < p_->maximal_size.height);
 
@@ -304,7 +304,7 @@ bool Window::OnConfigureSize(const core::Size2I &old_size, const core::Size2I &n
   return true;
 }
 
-void Window::OnSizeChange(const core::Size2I &old_size, const core::Size2I &new_size) {
+void Window::OnSizeChange(const core::SizeI &old_size, const core::SizeI &new_size) {
   Surface *shell_surface = this->GetShellSurface();
 
   int scale = 1;
@@ -551,19 +551,19 @@ void Window::OnDraw(const Context *context) {
   int height = GetHeight() * scale;
 
   Path path;
-  RectF geometry = RectF::FromXYWH(0.f, 0.f, width, height);
+  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, width, height);
   bool drop_shadow = !(IsMaximized() || IsFullscreen());
   const Theme::Schema &window_schema = Theme::GetData().window;
   const Theme::Schema &title_bar_schema = Theme::GetData().title_bar;
   Shader shader;
-  Point2F points[2];
+  PointF points[2];
   points[0].x = 0.f;
   points[0].y = 0.f;
   points[1].x = 0.f;
   points[1].y = height;
 
   if (drop_shadow) {
-    geometry = geometry.Shrink(0.5f * scale);
+    geometry = geometry.Inset(-0.5f * scale);
     float radii[] = {
         7.f * scale, 7.f * scale, // top-left
         7.f * scale, 7.f * scale, // top-right
@@ -733,7 +733,7 @@ RectI Window::GetContentGeometry() const {
     y += p_->title_bar->GetHeight();
     h -= p_->title_bar->GetHeight();
   }
-  return RectI::FromXYWH(x, y, w, h);
+  return RectI::MakeFromXYWH(x, y, w, h);
 }
 
 void Window::OnFullscreenButtonClicked(core::SLOT slot) {

@@ -49,10 +49,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
  public:
 
-  /**
-   * @brief Alias of core::Margin
-   */
-  using Margin = core::Margin;
+  using Margin = core::Margin;  /**< @brief Alias of core::Margin */
+  using Size = core::SizeI; /**< @brief Alias of core::SizeI */
 
   /**
    * @brief A task to process shell view rendering in event loop
@@ -202,9 +200,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    */
   virtual void OnShown() = 0;
 
-  virtual bool OnConfigureSize(const core::Size2I &old_size, const core::Size2I &new_size) = 0;
+  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) = 0;
 
-  virtual void OnSizeChange(const core::Size2I &old_size, const core::Size2I &new_size) = 0;
+  virtual void OnSizeChange(const Size &old_size, const Size &new_size) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

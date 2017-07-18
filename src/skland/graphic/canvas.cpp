@@ -27,7 +27,7 @@
 namespace skland {
 namespace graphic {
 
-using core::Point2F;
+using core::PointF;
 using core::RectF;
 using core::ColorF;
 
@@ -204,7 +204,7 @@ void Canvas::Flush() {
   p_->sk_canvas->flush();
 }
 
-const Point2F &Canvas::GetOrigin() const {
+const PointF &Canvas::GetOrigin() const {
   return p_->origin;
 }
 

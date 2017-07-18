@@ -45,14 +45,14 @@ struct Output::Private {
   struct wl_output *wl_output;
 
   /** position within the global compositor space */
-  core::Point2I position_;
+  core::PointI position_;
 
   /** physical_width width in millimeters of the output */
-  core::Size2I physical_size_;
+  core::SizeI physical_size_;
 
   /** The size of a mode, given in physical hardware units of the output device */
-  core::Size2I current_mode_size_;
-  core::Size2I preferred_mode_size_;
+  core::SizeI current_mode_size_;
+  core::SizeI preferred_mode_size_;
   int32_t current_refresh_rate;
   int32_t preferred_refresh_rate;
 

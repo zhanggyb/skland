@@ -36,8 +36,8 @@
 namespace skland {
 namespace gui {
 
-using Point = core::Point2I;
-using Size = core::Size2I;
+using Point = core::PointI;
+using Size = core::SizeI;
 
 using core::Margin;
 using core::SLOT;

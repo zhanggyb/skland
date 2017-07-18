@@ -36,7 +36,7 @@
 namespace skland {
 namespace gui {
 
-using Point = core::Point2I;
+using Point = core::PointI;
 using core::Margin;
 
 Surface *Surface::Shell::Create(AbstractEventHandler *event_handler, const Margin &margin) {

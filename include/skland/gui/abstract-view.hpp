@@ -97,8 +97,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
  public:
 
-  using Padding = core::Padding;
-  using RectF = core::RectF;
+  using Padding = core::Padding;  /**< @brief Alias of core::Padding */
+  using RectF = core::RectF;  /**< @brief Alias of core::RectF */
 
   class Iterator;
   class ConstIterator;
@@ -521,7 +521,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * This virtual method is called only when there's new geometry need to be saved before drawing this
    * view.
    */
-  virtual void OnGeometryChange(int dirty_flag, const core::RectF &old_geometry, const core::RectF &new_geometry) = 0;
+  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) = 0;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
 

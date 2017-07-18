@@ -21,8 +21,8 @@
 namespace skland {
 namespace gui {
 
-using Point = core::Point2I;
-using Size = core::Size2I;
+using Point = core::PointI;
+using Size = core::SizeI;
 
 Buffer::Buffer() {
   p_.reset(new Private);

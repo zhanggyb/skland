@@ -37,8 +37,8 @@ struct Vector2 {
   inline Vector2(const Vector2 &other)
       : x(other.x), y(other.y) {}
 
-  template<typename U>
-  inline Vector2(const Vector2<U> &other)
+  template<typename R>
+  inline Vector2(const Vector2<R> &other)
       : x(T(other.x)), y(T(other.y)) {}
 
   inline ~Vector2() {}
@@ -49,8 +49,8 @@ struct Vector2 {
     return *this;
   }
 
-  template<typename U>
-  inline Vector2 &operator=(const Vector2<U> &other) {
+  template<typename R>
+  inline Vector2 &operator=(const Vector2<R> &other) {
     x = static_cast<T>(other.x);
     y = static_cast<T>(other.y);
     return *this;

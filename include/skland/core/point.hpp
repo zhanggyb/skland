@@ -17,7 +17,7 @@
 #ifndef SKLAND_CORE_POINT_HPP_
 #define SKLAND_CORE_POINT_HPP_
 
-#include "vectors.hpp"
+#include "vector.hpp"
 
 namespace skland {
 namespace core {
@@ -25,17 +25,17 @@ namespace core {
 /**
  * @ingroup core
  */
-typedef Vector2<int> Point2I;
+typedef Vector2<int> PointI;
 
 /**
  * @ingroup core
  */
-typedef Vector2<float> Point2F;
+typedef Vector2<float> PointF;
 
 /**
  * @ingroup core
  */
-typedef Vector2<double> Point2D;
+typedef Vector2<double> PointD;
 
 } // namespace core
 } // namespace skland

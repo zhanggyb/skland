@@ -87,11 +87,11 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   bool visible;
 
-  core::Size2I minimal_size;
+  core::SizeI minimal_size;
 
-  core::Size2I preferred_size;
+  core::SizeI preferred_size;
 
-  core::Size2I maximal_size;
+  core::SizeI maximal_size;
 
   LayoutPolicy x_layout_policy;
 

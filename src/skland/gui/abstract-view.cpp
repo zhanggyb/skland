@@ -31,8 +31,8 @@
 namespace skland {
 namespace gui {
 
-using core::Point2I;
-using core::Size2I;
+using core::PointI;
+using core::SizeI;
 using core::RectF;
 using numerical::Clamp;
 using numerical::Bit;
@@ -206,10 +206,10 @@ void AbstractView::Resize(int width, int height) {
 
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
-  Size2I min;
+  SizeI min;
   min.width = GetMinimalWidth();
   min.height = GetMinimalHeight();
-  Size2I max;
+  SizeI max;
   max.width = GetMaximalWidth();
   max.height = GetMaximalHeight();
 
@@ -563,7 +563,7 @@ void AbstractView::OnLeaveOutput(const Surface *surface, const Output *output) {
 AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
   Iterator it(this);
   AbstractView *view = nullptr;
-  Point2I cursor_xy(event->GetWindowXY());
+  PointI cursor_xy(event->GetWindowXY());
 
   for (it = it.first_child(); it; ++it) {
     if (it.view()->Contain(cursor_xy.x, cursor_xy.y)) {

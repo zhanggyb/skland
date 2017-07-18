@@ -24,9 +24,9 @@
 namespace skland {
 namespace graphic {
 
-using core::Point2F;
+using core::PointF;
 
-Shader GradientShader::MakeLinear(const core::Point2F *points,
+Shader GradientShader::MakeLinear(const core::PointF *points,
                                   const uint32_t *colors,
                                   const float *pos,
                                   int count,
@@ -45,7 +45,7 @@ Shader GradientShader::MakeLinear(const core::Point2F *points,
   return Shader(new Shader::Private(sk_shader));
 }
 
-Shader GradientShader::MakeLinear(const Point2F points[],
+Shader GradientShader::MakeLinear(const PointF points[],
                                   const core::ColorF colors[],
                                   const float pos[],
                                   int count,
@@ -65,7 +65,7 @@ Shader GradientShader::MakeLinear(const Point2F points[],
   return Shader(new Shader::Private(sk_shader));
 }
 
-Shader GradientShader::MakeRadial(const Point2F &center,
+Shader GradientShader::MakeRadial(const PointF &center,
                                   float radius,
                                   const uint32_t colors[],
                                   const float pos[],
@@ -85,7 +85,7 @@ Shader GradientShader::MakeRadial(const Point2F &center,
   return Shader(new Shader::Private(sk_shader));
 }
 
-Shader GradientShader::MakeRadial(const Point2F &center,
+Shader GradientShader::MakeRadial(const PointF &center,
                                   float radius,
                                   const core::ColorF colors[],
                                   const float pos[],
