@@ -17,20 +17,31 @@
 #ifndef SKLAND_CORE_DEQUE_HPP_
 #define SKLAND_CORE_DEQUE_HPP_
 
-#include "export.hpp"
+#include "defines.hpp"
 
 namespace skland {
 namespace core {
 
+/**
+ * @ingroup core
+ * @brief A faster deque container
+ */
 class Deque {
 
  public:
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Deque);
+
+  /**
+   * @brief A nested class represents an element in a deque
+   */
   class Element {
 
     friend class Deque;
 
    public:
+
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Element);
 
     Element();
 
@@ -52,75 +63,78 @@ class Deque {
 
   };
 
+  /**
+   * @brief A nested iterator for deque
+   */
   class Iterator {
 
    public:
 
     explicit Iterator(Element *element = nullptr)
-        : p_(element) {}
+        : ptr_(element) {}
 
-    Iterator(const Iterator &orig)
-        : p_(orig.p_) {}
+    Iterator(const Iterator &orig) = default;
 
-    ~Iterator() {}
+    ~Iterator() = default;
 
-    Iterator &operator=(const Iterator &other) {
-      p_ = other.p_;
-      return *this;
-    }
+    Iterator &operator=(const Iterator &other) = default;
 
     Iterator &operator++() {
-      p_ = p_->next_;
+      ptr_ = ptr_->next_;
       return *this;
     }
 
     Iterator operator++(int) {
       Iterator retval;
-      retval.p_ = p_->next_;
+      retval.ptr_ = ptr_->next_;
       return retval;
     }
 
     Iterator &operator--() {
-      p_ = p_->previous_;
+      ptr_ = ptr_->previous_;
       return *this;
     }
 
     Iterator operator--(int) {
       Iterator retval;
-      retval.p_ = p_->previous_;
+      retval.ptr_ = ptr_->previous_;
       return retval;
     }
 
     bool operator==(const Iterator &other) const {
-      return p_ == other.p_;
+      return ptr_ == other.ptr_;
     }
 
     bool operator==(const Element *element) const {
-      return p_ == element;
+      return ptr_ == element;
     }
 
     bool operator!=(const Iterator &other) const {
-      return p_ != other.p_;
+      return ptr_ != other.ptr_;
     }
 
     bool operator!=(const Element *element) const {
-      return p_ != element;
+      return ptr_ != element;
     }
 
     template<typename T>
     T *cast() const {
-      return static_cast<T *>(p_);
+      return static_cast<T *>(ptr_);
+    }
+
+    explicit operator bool() const {
+      return nullptr != ptr_;
     }
 
    private:
 
-    Element *p_;
+    Element *ptr_;
 
   };
 
   Deque();
 
-  ~Deque();
+  virtual ~Deque();
 
   void PushFront(Element *item);
 
@@ -138,8 +152,16 @@ class Deque {
     return Iterator(first_);
   }
 
+  Iterator rbegin() const {
+    return Iterator(last_);
+  }
+
   Iterator end() const {
-    return Iterator(nullptr);
+    return Iterator(last_->next_);
+  }
+
+  Iterator rend() const {
+    return Iterator(first_->previous_);
   }
 
   int count() const { return count_; }

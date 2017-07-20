@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INPUT_EVENT_HPP_
 #define SKLAND_GUI_INPUT_EVENT_HPP_
 
-#include "../core/export.hpp"
+#include "skland/core/defines.hpp"
 
 namespace skland {
 namespace gui {

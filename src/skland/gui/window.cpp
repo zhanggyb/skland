@@ -57,8 +57,7 @@ using graphic::ClipOperation;
  */
 SKLAND_NO_EXPORT struct Window::Private {
 
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
+  SKLAND_DECLARE_NONCOPYABLE(Private);
 
   Private()
       : main_surface(nullptr),
@@ -89,11 +88,11 @@ SKLAND_NO_EXPORT struct Window::Private {
 
   AbstractView *content_view;
 
-  core::SizeI minimal_size;
+  Size minimal_size;
 
-  core::SizeI preferred_size;
+  Size preferred_size;
 
-  core::SizeI maximal_size;
+  Size maximal_size;
 
   int flags;
 

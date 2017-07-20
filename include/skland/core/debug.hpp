@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_DEFINES_HPP_
-#define SKLAND_CORE_DEFINES_HPP_
+#ifndef SKLAND_CORE_DEBUG_HPP_
+#define SKLAND_CORE_DEBUG_HPP_
 
 #ifdef DEBUG
 
@@ -39,4 +39,4 @@
 
 #endif // END DEBUG
 
-#endif // SKLAND_CORE_DEFINES_HPP_
+#endif // SKLAND_CORE_DEBUG_HPP_

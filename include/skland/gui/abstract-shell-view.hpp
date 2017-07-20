@@ -19,9 +19,9 @@
 
 #include "abstract-event-handler.hpp"
 
-#include "context.hpp"
 #include "../core/rect.hpp"
 #include "../core/margin.hpp"
+#include "context.hpp"
 
 #include <cstdint>
 #include <string>
@@ -43,9 +43,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   friend class AbstractView;
   friend class Surface;
 
+  SKLAND_DECLARE_NONCOPYABLE(AbstractShellView);
   AbstractShellView() = delete;
-  AbstractShellView(const AbstractShellView &) = delete;
-  AbstractShellView &operator=(const AbstractShellView &) = delete;
 
  public:
 
@@ -57,9 +56,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    */
   class RedrawTask : public Task {
 
+    SKLAND_DECLARE_NONCOPYABLE(RedrawTask);
     RedrawTask() = delete;
-    RedrawTask(const RedrawTask &) = delete;
-    RedrawTask &operator=(const RedrawTask &) = delete;
 
    public:
 

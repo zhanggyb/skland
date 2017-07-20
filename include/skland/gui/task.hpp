@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_TASK_HPP_
 #define SKLAND_GUI_TASK_HPP_
 
-#include "skland/core/export.hpp"
+#include "skland/core/defines.hpp"
 
 #include <cstdint>
 
@@ -26,10 +26,9 @@ namespace gui {
 
 SKLAND_EXPORT class Task {
 
-  Task(const Task &) = delete;
-  Task &operator=(const Task &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Task);
 
   Task()
       : previous_(nullptr), next_(nullptr) {}

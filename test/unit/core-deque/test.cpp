@@ -13,24 +13,48 @@ class Item : public Deque::Element {
 
  public:
 
-  Item(int id)
+  SKLAND_DECLARE_NONCOPYABLE(Item);
+  SKLAND_DECLARE_NONMOVABLE(Item);
+
+  explicit Item(int id)
       : id_(id) {}
 
-  virtual ~Item() {}
+  virtual ~Item() = default;
 
   int id() const { return id_; };
 
-  Item* _previous() const {
-    return static_cast<Item*>(Deque::Element::previous());
+  Item *_previous() const {
+    return dynamic_cast<Item *>(Deque::Element::previous());
   }
 
-  Item* _next() const {
-    return static_cast<Item*>(Deque::Element::next());
+  Item *_next() const {
+    return dynamic_cast<Item *>(Deque::Element::next());
   }
 
  private:
 
   int id_;
+
+};
+
+class TestDeque : public Deque {
+
+ public:
+
+  SKLAND_DECLARE_NONCOPYABLE(TestDeque);
+  SKLAND_DECLARE_NONMOVABLE(TestDeque);
+
+  TestDeque() = default;
+
+  virtual ~TestDeque() = default;
+
+  Deque::Element* _first() const {
+    return first();
+  }
+
+  Deque::Element* _last() const {
+    return last();
+  }
 
 };
 
@@ -43,11 +67,11 @@ Test::~Test() {
 }
 
 TEST_F(Test, push_front_1) {
-  Item *item1 = new Item(1);
-  Item *item2 = new Item(2);
-  Item *item3 = new Item(3);
+  auto item1 = new Item(1);
+  auto item2 = new Item(2);
+  auto item3 = new Item(3);
 
-  Deque deque;
+  TestDeque deque;
   deque.PushFront(item1);
   deque.PushFront(item2);
   deque.PushFront(item3);
@@ -57,14 +81,16 @@ TEST_F(Test, push_front_1) {
   ASSERT_TRUE(item1->_previous() == item2);
   ASSERT_TRUE(item2->_previous() == item3);
   ASSERT_TRUE(item3->_previous() == nullptr);
+  ASSERT_TRUE(deque._first() == item3);
+  ASSERT_TRUE(deque._last() == item1);
 }
 
 TEST_F(Test, push_back_1) {
-  Item *item1 = new Item(1);
-  Item *item2 = new Item(2);
-  Item *item3 = new Item(3);
+  auto item1 = new Item(1);
+  auto item2 = new Item(2);
+  auto item3 = new Item(3);
 
-  Deque deque;
+  TestDeque deque;
   deque.PushBack(item1);
   deque.PushBack(item2);
   deque.PushBack(item3);
@@ -74,12 +100,14 @@ TEST_F(Test, push_back_1) {
   ASSERT_TRUE(item1->_next() == item2);
   ASSERT_TRUE(item2->_next() == item3);
   ASSERT_TRUE(item3->_next() == nullptr);
+  ASSERT_TRUE(deque._first() == item1);
+  ASSERT_TRUE(deque._last() == item3);
 }
 
 TEST_F(Test, insert_1) {
-  Item *item1 = new Item(1);
-  Item *item2 = new Item(2);
-  Item *item3 = new Item(3);
+  auto item1 = new Item(1);
+  auto item2 = new Item(2);
+  auto item3 = new Item(3);
 
   Deque deque;
   deque.Insert(item1);
@@ -94,16 +122,16 @@ TEST_F(Test, insert_1) {
 }
 
 TEST_F(Test, insert_2) {
-  Item *item1 = new Item(1);
-  Item *item2 = new Item(2);
-  Item *item3 = new Item(3);
+  auto item1 = new Item(1);
+  auto item2 = new Item(2);
+  auto item3 = new Item(3);
 
   Deque deque;
   deque.Insert(item1);
   deque.Insert(item2);
   deque.Insert(item3);
 
-  Item *item4 = new Item(4);
+  auto item4 = new Item(4);
   deque.Insert(item4);
 
   ASSERT_TRUE(deque.count() == 4);
@@ -114,16 +142,16 @@ TEST_F(Test, insert_2) {
 }
 
 TEST_F(Test, insert_3) {
-  Item *item1 = new Item(1);
-  Item *item2 = new Item(2);
-  Item *item3 = new Item(3);
+  auto item1 = new Item(1);
+  auto item2 = new Item(2);
+  auto item3 = new Item(3);
 
   Deque deque;
   deque.Insert(item1);
   deque.Insert(item2);
   deque.Insert(item3);
 
-  Item *item4 = new Item(4);
+  auto item4 = new Item(4);
   deque.Insert(item4, -1);
 
   ASSERT_TRUE(deque.count() == 4);

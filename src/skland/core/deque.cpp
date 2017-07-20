@@ -28,7 +28,7 @@ Deque::Element::Element()
 }
 
 Deque::Element::~Element() {
-  if (deque_) deque_->Remove(this);
+  if (nullptr != deque_) deque_->Remove(this);
 }
 
 Deque::Deque()
@@ -41,16 +41,21 @@ Deque::~Deque() {
 }
 
 void Deque::PushFront(Element *item) {
+  if (item->deque_ == this) return;
+
+  if (nullptr != item->deque_) item->deque_->Remove(item);
+
   _ASSERT(nullptr == item->deque_);
   _ASSERT(nullptr == item->previous_);
   _ASSERT(nullptr == item->next_);
 
-  if (first_) {
+  if (nullptr != first_) {
     first_->previous_ = item;
     item->next_ = first_;
   } else {
     _ASSERT(nullptr == last_);
     _ASSERT(0 == count_);
+    last_ = item;
   }
   first_ = item;
 
@@ -59,11 +64,15 @@ void Deque::PushFront(Element *item) {
 }
 
 void Deque::PushBack(Element *item) {
+  if (item->deque_ == this) return;
+
+  if (nullptr != item->deque_) item->deque_->Remove(item);
+
   _ASSERT(nullptr == item->deque_);
   _ASSERT(nullptr == item->previous_);
   _ASSERT(nullptr == item->next_);
 
-  if (last_) {
+  if (nullptr != last_) {
     last_->next_ = item;
     item->previous_ = last_;
   } else {
@@ -78,6 +87,10 @@ void Deque::PushBack(Element *item) {
 }
 
 void Deque::Insert(Element *item, int index) {
+  if (item->deque_ == this) return;
+
+  if (nullptr != item->deque_) item->deque_->Remove(item);
+
   _ASSERT(nullptr == item->deque_);
   _ASSERT(nullptr == item->previous_);
   _ASSERT(nullptr == item->next_);
@@ -90,14 +103,14 @@ void Deque::Insert(Element *item, int index) {
   } else {
     if (index >= 0) {
       Element *p = first_;
-      while (p && (index > 0)) {
+      while ((nullptr != p) && (index > 0)) {
         p = p->next_;
         index--;
       }
-      if (p) {  // insert before p
+      if (nullptr != p) {  // insert before p
         item->previous_ = p->previous_;
         item->next_ = p;
-        if (p->previous_) p->previous_->next_ = item;
+        if (nullptr != p->previous_) p->previous_->next_ = item;
         else first_ = item;
         p->previous_ = item;
       } else {  // push back
@@ -107,14 +120,14 @@ void Deque::Insert(Element *item, int index) {
       }
     } else {
       Element *p = last_;
-      while (p && (index < -1)) {
+      while ((nullptr != p) && (index < -1)) {
         p = p->previous_;
         index++;
       }
-      if (p) {  // insert after p
+      if (nullptr != p) {  // insert after p
         item->next_ = p->next_;
         item->previous_ = p;
-        if (p->next_) p->next_->previous_ = item;
+        if (nullptr != p->next_) p->next_->previous_ = item;
         else last_ = item;
         p->next_ = item;
       } else {  // push front
@@ -134,14 +147,14 @@ Deque::Element *Deque::Remove(Element *item) {
 
   _ASSERT(count_ > 0);
 
-  if (item->previous_) {
+  if (nullptr != item->previous_) {
     item->previous_->next_ = item->next_;
   } else {
     _ASSERT(first_ == item);
     first_ = item->next_;
   }
 
-  if (item->next_) {
+  if (nullptr != item->next_) {
     item->next_->previous_ = item->previous_;
   } else {
     _ASSERT(last_ == item);
@@ -162,7 +175,7 @@ void Deque::Clear() {
   Element *ptr = first_;
   Element *next = nullptr;
 
-  while (ptr) {
+  while (nullptr != ptr) {
     next = ptr->next_;
     ptr->previous_ = nullptr;
     ptr->next_ = nullptr;

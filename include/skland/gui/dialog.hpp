@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_DIALOG_HPP
-#define SKLAND_DIALOG_HPP
+#ifndef SKLAND_GUI_DIALOG_HPP_
+#define SKLAND_GUI_DIALOG_HPP_
 
 #include "abstract-shell-view.hpp"
+
+#include <memory>
 
 namespace skland {
 namespace gui {
@@ -26,17 +28,34 @@ namespace gui {
  * @ingroup gui
  * @brief This class is currently for test
  */
-class Dialog: public AbstractShellView {
+SKLAND_EXPORT class Dialog : public AbstractShellView {
+
+  SKLAND_DECLARE_NONCOPYABLE(Dialog);
+  Dialog() = delete;
 
  public:
 
-  Dialog(const char* title, AbstractShellView* parent);
+  Dialog(const char *title, AbstractShellView *parent);
 
   virtual ~Dialog();
+
+ protected:
+
+  virtual void OnShown() final;
+
+  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
+
+  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
+
+ private:
+
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
 };
 
 } // namespace gui
 } // namespace skland
 
-#endif //SKLAND_DIALOG_HPP
+#endif // SKLAND_GUI_DIALOG_HPP_

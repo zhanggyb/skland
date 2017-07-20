@@ -60,16 +60,14 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
   friend class AbstractView;
   friend class AbstractShellView;
 
-  AbstractEventHandler(const AbstractEventHandler &) = delete;
-  AbstractEventHandler &operator=(const AbstractEventHandler &)  = delete;
+  SKLAND_DECLARE_NONCOPYABLE(AbstractEventHandler);
 
  public:
 
   class EventTask : public Task {
 
+    SKLAND_DECLARE_NONCOPYABLE(EventTask);
     EventTask() = delete;
-    EventTask(const EventTask &) = delete;
-    EventTask &operator=(const EventTask &) = delete;
 
    public:
 

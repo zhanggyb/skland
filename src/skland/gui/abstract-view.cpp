@@ -20,7 +20,7 @@
 #include "skland/numerical/clamp.hpp"
 
 #include <skland/core/assert.hpp>
-#include <skland/core/debug.hpp>
+#include "skland/core/debug.hpp"
 
 #include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/abstract-layout.hpp>

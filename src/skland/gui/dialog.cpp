@@ -16,15 +16,42 @@
 
 #include "skland/gui/dialog.hpp"
 
+#include "skland/gui/surface.hpp"
+
 namespace skland {
 namespace gui {
 
+struct Dialog::Private {
+
+  SKLAND_DECLARE_NONCOPYABLE(Private);
+
+  Private()
+      : flags(0) {}
+
+  ~Private() {}
+
+  int flags;
+
+};
+
 Dialog::Dialog(const char *title, AbstractShellView *parent)
     : AbstractShellView(title, parent) {
-
+  p_.reset(new Private);
 }
 
 Dialog::~Dialog() {
+
+}
+
+void Dialog::OnShown() {
+
+}
+
+bool Dialog::OnConfigureSize(const Size &old_size, const Size &new_size) {
+  return true;
+}
+
+void Dialog::OnSizeChange(const Size &old_size, const Size &new_size) {
 
 }
 
