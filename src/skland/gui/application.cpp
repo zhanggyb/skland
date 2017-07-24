@@ -239,11 +239,28 @@ int Application::Run() {
   Task *task = nullptr;
 
   while (true) {
+
+    /*
+     * Run idle tasks (process geometries)
+     */
     while (AbstractView::kIdleTaskHead.next() != &AbstractView::kIdleTaskTail) {
       task = AbstractView::kIdleTaskHead.next();
       task->Unlink();
       task->Run();
     }
+
+    /*
+     * Draw contents on every surface requested
+     */
+    while (Surface::kDrawTaskHead.next() != &Surface::kDrawTaskTail) {
+      task = Surface::kDrawTaskHead.next();
+      task->Unlink();
+      task->Run();
+    }
+
+    /*
+     * Commit every surface requested
+     */
     while (Surface::kCommitTaskHead.next() != &Surface::kCommitTaskTail) {
       task = Surface::kCommitTaskHead.next();
       task->Unlink();
@@ -297,11 +314,11 @@ int Application::GetArgc() {
   return kInstance->p_->argc;
 }
 
-char** Application::GetArgv() {
+char **Application::GetArgv() {
   return kInstance->p_->argv;
 }
 
-const std::thread::id& Application::GetThreadID() {
+const std::thread::id &Application::GetThreadID() {
   return kInstance->p_->thread_id;
 }
 

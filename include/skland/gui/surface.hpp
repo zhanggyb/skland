@@ -80,11 +80,10 @@ class Surface {
   friend class Callback;
   friend class AbstractGraphicsInterface;
 
-  Surface() = delete;
-  Surface(const Surface &) = delete;
-  Surface &operator=(const Surface &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Surface);
+  Surface() = delete;
 
   class Shell;
   class Sub;
@@ -197,6 +196,7 @@ class Surface {
 
  private:
 
+  struct DrawTask;
   struct CommitTask;
   struct Private;
 
@@ -208,6 +208,10 @@ class Surface {
    * @brief Delete all shell surfaces and clear the global stack
    */
   static void Clear();
+
+  static void InitializeDrawTaskList();
+
+  static void ClearDrawTaskList();
 
   /**
     * @brief Initialize the idle task list
@@ -233,6 +237,9 @@ class Surface {
    * @brief The count of shell surface
    */
   static int kShellSurfaceCount;
+
+  static Task kDrawTaskHead;
+  static Task kDrawTaskTail;
 
   static Task kCommitTaskHead;
   static Task kCommitTaskTail;
@@ -308,25 +315,10 @@ class Surface::Shell::Toplevel {
  public:
 
   enum StatesMask {
-    /**
-     * the surface is maximized
-     */
-        kStateMaskMaximized = 0x1, /* 1 */
-
-    /**
-     * the surface is fullscreen
-     */
-        kStateMaskFullscreen = 0x1 << 1,  /* 2 */
-
-    /**
-     * the surface is being resized
-     */
-        kStateMaskResizing = 0x1 << 2, /* 4 */
-
-    /**
-     * the surface is now activated
-     */
-        kStateMaskActivated = 0x1 << 3, /* 8 */
+    kStateMaskMaximized = 0x1, /**< 1: the surface is maximized */
+    kStateMaskFullscreen = 0x1 << 1,      /**< 2: the surface is fullscreen */
+    kStateMaskResizing = 0x1 << 2, /**< 4: the surface is being resized */
+    kStateMaskActivated = 0x1 << 3, /**< 8: the surface is now activated */
   };
 
   /**

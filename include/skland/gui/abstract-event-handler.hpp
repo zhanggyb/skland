@@ -60,16 +60,16 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
   friend class AbstractView;
   friend class AbstractShellView;
 
-  SKLAND_DECLARE_NONCOPYABLE(AbstractEventHandler);
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE(AbstractEventHandler);
 
   class EventTask : public Task {
 
+   public:
+
     SKLAND_DECLARE_NONCOPYABLE(EventTask);
     EventTask() = delete;
-
-   public:
 
     /**
      * @brief Constructor
@@ -151,7 +151,7 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
 
   /**
    * @brief A view request an update
-   * @param view A view in hierachy or null to update this object
+   * @param view A view in hierarchy wants to update this object
    */
   virtual void OnUpdate(AbstractView *view) = 0;
 

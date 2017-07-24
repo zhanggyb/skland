@@ -72,13 +72,14 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   friend class AbstractShellView;
   friend class AbstractLayout;
 
-  AbstractView(const AbstractView &) = delete;
-  AbstractView &operator=(const AbstractView &) = delete;
-
  public:
 
-  using Padding = core::Padding;  /**< @brief Alias of core::Padding */
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractView);
+
+  using Size = core::SizeI; /**< @brief Alias of core::SizeI */
+  using Rect = core::RectI; /**< @brief Alias of core::RectI */
   using RectF = core::RectF;  /**< @brief Alias of core::RectF */
+  using Padding = core::Padding;  /**< @brief Alias of core::Padding */
 
   enum DirtyFlagMask {
     kDirtyLeftMask = 0x1 << 0,
@@ -92,18 +93,37 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   class Iterator;
   class ConstIterator;
 
-  class RedrawTask : public Task {
-
-    RedrawTask() = delete;
-    RedrawTask(const RedrawTask &) = delete;
-    RedrawTask &operator=(const RedrawTask &) = delete;
+  class GeometryTask : public Task {
 
    public:
+
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GeometryTask);
+    GeometryTask() = delete;
+
+    GeometryTask(AbstractView *view)
+        : Task(), view_(view) {}
+
+    virtual ~GeometryTask() = default;
+
+    virtual void Run() const final;
+
+   private:
+
+    AbstractView *view_;
+
+  };
+
+  class RedrawTask : public Task {
+
+   public:
+
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(RedrawTask);
+    RedrawTask() = delete;
 
     RedrawTask(AbstractView *view)
         : Task(), view_(view) {}
 
-    virtual ~RedrawTask() {}
+    virtual ~RedrawTask() = default;
 
     virtual void Run() const final;
 

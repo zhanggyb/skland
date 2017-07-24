@@ -279,12 +279,17 @@ Surface *Window::GetSurface(const AbstractView *view) const {
   return nullptr != p_->main_surface ? p_->main_surface : GetShellSurface();
 }
 
-bool Window::OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) {
+bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
   _ASSERT(p_->minimal_size.width < p_->maximal_size.width &&
       p_->minimal_size.height < p_->maximal_size.height);
 
-  if (new_size.width < p_->minimal_size.width || new_size.height < p_->minimal_size.height) return false;
-  if (new_size.width > p_->maximal_size.width || new_size.height > p_->maximal_size.height) return false;
+  if ((new_size.width < p_->minimal_size.width) ||
+      (new_size.height < p_->minimal_size.height))
+    return false;
+
+  if ((new_size.width > p_->maximal_size.width) ||
+      (new_size.height > p_->maximal_size.height))
+    return false;
 
   RedrawTask *redraw_task = RedrawTask::Get(this);
 
@@ -303,7 +308,7 @@ bool Window::OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new
   return true;
 }
 
-void Window::OnSizeChange(const core::SizeI &old_size, const core::SizeI &new_size) {
+void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   Surface *shell_surface = this->GetShellSurface();
 
   int scale = 1;

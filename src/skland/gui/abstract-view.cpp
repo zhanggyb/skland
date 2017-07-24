@@ -1164,6 +1164,13 @@ void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int 
 
 // -------------------
 
+void AbstractView::GeometryTask::Run() const {
+  view_->OnGeometryChange(view_->p_->dirty_flag, view_->p_->last_geometry, view_->p_->geometry);
+  view_->p_->last_geometry = view_->p_->geometry;
+}
+
+// -------------------
+
 void AbstractView::RedrawTask::Run() const {
   view_->p_->is_drawing = true;
 

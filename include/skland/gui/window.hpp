@@ -30,20 +30,31 @@ namespace gui {
  */
 SKLAND_EXPORT class Window : public AbstractShellView {
 
-  SKLAND_DECLARE_NONCOPYABLE(Window);
-  Window() = delete;
-
  public:
 
-  using Size = core::SizeI; /**< Alias of core::SizeI */
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Window);
+  Window() = delete;
+
   using RectI = core::RectI;  /**< Alias of core::RectI */
 
   enum FlagMask {
     kFlagMaskFrameless = 0x1 << 0
   };
 
+  /**
+   * @brief Construct a 400 x 300 window with given title and flags
+   * @param title
+   * @param flags
+   */
   Window(const char *title, int flags = 0);
 
+  /**
+   * @brief Construct a window with given size, title and flags
+   * @param width
+   * @param height
+   * @param title
+   * @param flags
+   */
   Window(int width, int height, const char *title, int flags = 0);
 
   virtual ~Window();

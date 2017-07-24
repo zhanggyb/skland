@@ -30,9 +30,8 @@ namespace gui {
  */
 SKLAND_NO_EXPORT struct AbstractShellView::Private {
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
   Private() = delete;
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
 
   enum FlagMask {
     kFlagMaskMaximized = 0x1 << 0,

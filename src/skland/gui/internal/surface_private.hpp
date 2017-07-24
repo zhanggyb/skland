@@ -47,7 +47,9 @@ struct Surface::Private {
         lower(nullptr),
         egl(nullptr),
         graphics_interface(nullptr),
-        commit_task(surface) {}
+        commit_task(surface) {
+    draw_task_head.PushBack(&draw_task_tail);
+  }
 
   ~Private() {}
 
@@ -102,6 +104,9 @@ struct Surface::Private {
     Shell *shell;
     Sub *sub;
   } role;
+
+  Task draw_task_head;
+  Task draw_task_tail;
 
   CommitTask commit_task;
 
