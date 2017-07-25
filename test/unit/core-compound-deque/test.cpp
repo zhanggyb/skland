@@ -4,12 +4,12 @@
 
 #include "test.hpp"
 
-#include <skland/core/deque.hpp>
+#include <skland/core/compound-deque.hpp>
 
 using namespace skland;
 using namespace skland::core;
 
-class Item : public Deque::Element {
+class Item : public CompoundDeque::Element {
 
  public:
 
@@ -24,11 +24,11 @@ class Item : public Deque::Element {
   int id() const { return id_; };
 
   Item *_previous() const {
-    return dynamic_cast<Item *>(Deque::Element::previous());
+    return dynamic_cast<Item *>(CompoundDeque::Element::previous());
   }
 
   Item *_next() const {
-    return dynamic_cast<Item *>(Deque::Element::next());
+    return dynamic_cast<Item *>(CompoundDeque::Element::next());
   }
 
  private:
@@ -37,7 +37,7 @@ class Item : public Deque::Element {
 
 };
 
-class TestDeque : public Deque {
+class TestDeque : public CompoundDeque {
 
  public:
 
@@ -48,11 +48,11 @@ class TestDeque : public Deque {
 
   virtual ~TestDeque() = default;
 
-  Deque::Element* _first() const {
+  CompoundDeque::Element* _first() const {
     return first();
   }
 
-  Deque::Element* _last() const {
+  CompoundDeque::Element* _last() const {
     return last();
   }
 
@@ -109,7 +109,7 @@ TEST_F(Test, insert_1) {
   auto item2 = new Item(2);
   auto item3 = new Item(3);
 
-  Deque deque;
+  TestDeque deque;
   deque.Insert(item1);
   deque.Insert(item2);
   deque.Insert(item3);
@@ -126,7 +126,7 @@ TEST_F(Test, insert_2) {
   auto item2 = new Item(2);
   auto item3 = new Item(3);
 
-  Deque deque;
+  TestDeque deque;
   deque.Insert(item1);
   deque.Insert(item2);
   deque.Insert(item3);
@@ -146,7 +146,7 @@ TEST_F(Test, insert_3) {
   auto item2 = new Item(2);
   auto item3 = new Item(3);
 
-  Deque deque;
+  TestDeque deque;
   deque.Insert(item1);
   deque.Insert(item2);
   deque.Insert(item3);

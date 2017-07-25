@@ -13,8 +13,7 @@ class Item : public Deque::Element {
 
  public:
 
-  SKLAND_DECLARE_NONCOPYABLE(Item);
-  SKLAND_DECLARE_NONMOVABLE(Item);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Item);
 
   explicit Item(int id)
       : id_(id) {}
@@ -41,18 +40,17 @@ class TestDeque : public Deque {
 
  public:
 
-  SKLAND_DECLARE_NONCOPYABLE(TestDeque);
-  SKLAND_DECLARE_NONMOVABLE(TestDeque);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(TestDeque);
 
   TestDeque() = default;
 
   virtual ~TestDeque() = default;
 
-  Deque::Element* _first() const {
+  const Deque::Element* _first() const {
     return first();
   }
 
-  Deque::Element* _last() const {
+  const Deque::Element* _last() const {
     return last();
   }
 
@@ -76,13 +74,21 @@ TEST_F(Test, push_front_1) {
   deque.PushFront(item2);
   deque.PushFront(item3);
 
-  ASSERT_TRUE(deque.count() == 3);
-  ASSERT_TRUE(item1->_next() == nullptr);
-  ASSERT_TRUE(item1->_previous() == item2);
-  ASSERT_TRUE(item2->_previous() == item3);
-  ASSERT_TRUE(item3->_previous() == nullptr);
-  ASSERT_TRUE(deque._first() == item3);
-  ASSERT_TRUE(deque._last() == item1);
+  ASSERT_TRUE(deque.GetSize() == 3);
+
+  Deque::ConstIterator it = deque.crbegin();
+  ASSERT_TRUE(it == item1);
+
+//  ASSERT_TRUE(item1->_next() == deque._last());
+//  ASSERT_TRUE(item1->_previous() == item2);
+//  ASSERT_TRUE(item2->_previous() == item3);
+//  ASSERT_TRUE(item3->_previous() == deque._first());
+//  ASSERT_TRUE(deque._first() == item3);
+//  ASSERT_TRUE(deque._last() == item1);
+
+  delete item1;
+  delete item2;
+  delete item3;
 }
 
 TEST_F(Test, push_back_1) {
@@ -95,7 +101,6 @@ TEST_F(Test, push_back_1) {
   deque.PushBack(item2);
   deque.PushBack(item3);
 
-  ASSERT_TRUE(deque.count() == 3);
   ASSERT_TRUE(item1->_previous() == nullptr);
   ASSERT_TRUE(item1->_next() == item2);
   ASSERT_TRUE(item2->_next() == item3);
@@ -114,7 +119,6 @@ TEST_F(Test, insert_1) {
   deque.Insert(item2);
   deque.Insert(item3);
 
-  ASSERT_TRUE(deque.count() == 3);
   ASSERT_TRUE(item1->_next() == nullptr);
   ASSERT_TRUE(item1->_previous() == item2);
   ASSERT_TRUE(item2->_previous() == item3);
@@ -134,7 +138,6 @@ TEST_F(Test, insert_2) {
   auto item4 = new Item(4);
   deque.Insert(item4);
 
-  ASSERT_TRUE(deque.count() == 4);
   ASSERT_TRUE(item1->_previous() == item2);
   ASSERT_TRUE(item2->_previous() == item3);
   ASSERT_TRUE(item3->_previous() == item4);
@@ -154,7 +157,6 @@ TEST_F(Test, insert_3) {
   auto item4 = new Item(4);
   deque.Insert(item4, -1);
 
-  ASSERT_TRUE(deque.count() == 4);
   ASSERT_TRUE(item1->_previous() == item2);
   ASSERT_TRUE(item2->_previous() == item3);
   ASSERT_TRUE(item3->_previous() == nullptr);

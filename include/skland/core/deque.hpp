@@ -19,6 +19,8 @@
 
 #include "defines.hpp"
 
+#include <cstddef>
+
 namespace skland {
 namespace core {
 
@@ -43,23 +45,48 @@ class Deque {
 
     SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Element);
 
-    Element();
+    Element()
+        : previous_(nullptr),
+          next_(nullptr) {}
 
     virtual ~Element();
 
+    bool IsLinked() const {
+      return (nullptr != previous_) || (nullptr != next_);
+    }
+
+    /**
+     * @brief Push another element to the front
+     * @param other
+     */
+    void PushFront(Element *other);
+
+    /**
+     * @brief Push another element to the back
+     * @param other
+     */
+    void PushBack(Element *other);
+
+    void Unlink();
+
    protected:
 
+    /**
+     * @brief Getter of previous_
+     * @return
+     */
     Element *previous() const { return previous_; }
 
+    /**
+     * @brief Getter of next_
+     * @return
+     */
     Element *next() const { return next_; }
-
-    Deque *deque() const { return deque_; }
 
    private:
 
     Element *previous_;
     Element *next_;
-    Deque *deque_;
 
   };
 
@@ -71,7 +98,7 @@ class Deque {
    public:
 
     explicit Iterator(Element *element = nullptr)
-        : ptr_(element) {}
+        : element_(element) {}
 
     Iterator(const Iterator &orig) = default;
 
@@ -80,55 +107,128 @@ class Deque {
     Iterator &operator=(const Iterator &other) = default;
 
     Iterator &operator++() {
-      ptr_ = ptr_->next_;
+      element_ = element_->next_;
       return *this;
     }
 
     Iterator operator++(int) {
-      Iterator retval;
-      retval.ptr_ = ptr_->next_;
-      return retval;
+      return Iterator(element_->next_);
     }
 
     Iterator &operator--() {
-      ptr_ = ptr_->previous_;
+      element_ = element_->previous_;
       return *this;
     }
 
     Iterator operator--(int) {
-      Iterator retval;
-      retval.ptr_ = ptr_->previous_;
-      return retval;
+      return Iterator(element_->previous_);
+    }
+
+    void PushFront(Element *element) {
+      element_->PushFront(element);
+    }
+
+    void PushBack(Element *element) {
+      element_->PushBack(element);
+    }
+
+    void Remove() {
+      element_->Unlink();
     }
 
     bool operator==(const Iterator &other) const {
-      return ptr_ == other.ptr_;
+      return element_ == other.element_;
     }
 
     bool operator==(const Element *element) const {
-      return ptr_ == element;
+      return element_ == element;
     }
 
     bool operator!=(const Iterator &other) const {
-      return ptr_ != other.ptr_;
+      return element_ != other.element_;
     }
 
     bool operator!=(const Element *element) const {
-      return ptr_ != element;
+      return element_ != element;
+    }
+
+    Element *element() const {
+      return element_;
     }
 
     template<typename T>
     T *cast() const {
-      return static_cast<T *>(ptr_);
+      return static_cast<T *>(element_);
     }
 
     explicit operator bool() const {
-      return nullptr != ptr_;
+      return nullptr != element_;
     }
 
    private:
 
-    Element *ptr_;
+    Element *element_;
+
+  };
+
+  class ConstIterator {
+
+   public:
+
+    explicit ConstIterator(const Element *element)
+        : element_(element) {}
+
+    ConstIterator(const ConstIterator &orig) = default;
+
+    ~ConstIterator() = default;
+
+    ConstIterator &operator=(const ConstIterator &other) = default;
+
+    ConstIterator &operator++() {
+      element_ = element_->next_;
+      return *this;
+    }
+
+    ConstIterator operator++(int) {
+      return ConstIterator(element_->next_);
+    }
+
+    ConstIterator &operator--() {
+      element_ = element_->previous_;
+      return *this;
+    }
+
+    ConstIterator operator--(int) {
+      return ConstIterator(element_->previous_);
+    }
+
+    bool operator==(const ConstIterator &other) const {
+      return element_ == other.element_;
+    }
+
+    bool operator==(const Element *element) const {
+      return element_ == element;
+    }
+
+    bool operator!=(const ConstIterator &other) const {
+      return element_ != other.element_;
+    }
+
+    bool operator!=(const Element *element) const {
+      return element_ != element;
+    }
+
+    const Element *element() const {
+      return element_;
+    }
+
+    explicit operator bool() const {
+      return nullptr != element_;
+    }
+
+   private:
+
+    const Element *element_;
 
   };
 
@@ -144,39 +244,56 @@ class Deque {
 
   Element *Remove(Element *item);
 
+  size_t GetSize() const;
+
+  bool IsEmpty() const;
+
   void Clear();
 
   Element *operator[](int index) const;
 
   Iterator begin() const {
-    return Iterator(first_);
+    return Iterator(first_.next_);
+  }
+
+  ConstIterator cbegin() const {
+    return ConstIterator(first_.next_);
   }
 
   Iterator rbegin() const {
-    return Iterator(last_);
+    return Iterator(last_.previous_);
+  }
+
+  ConstIterator crbegin() const {
+    return ConstIterator(last_.previous_);
   }
 
   Iterator end() const {
-    return Iterator(last_->next_);
+    return Iterator(const_cast<Element *>(&last_));
+  }
+
+  ConstIterator cend() const {
+    return ConstIterator(&last_);
   }
 
   Iterator rend() const {
-    return Iterator(first_->previous_);
+    return Iterator(const_cast<Element *>(&first_));
   }
 
-  int count() const { return count_; }
+  ConstIterator crend() const {
+    return ConstIterator(&first_);
+  }
 
  protected:
 
-  Element *first() const { return first_; }
+  const Element *first() const { return &first_; }
 
-  Element *last() const { return last_; }
+  const Element *last() const { return &last_; }
 
  private:
 
-  Element *first_;
-  Element *last_;
-  int count_;
+  Element first_;
+  Element last_;
 
 };
 
