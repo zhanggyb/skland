@@ -28,11 +28,13 @@ namespace gui {
  */
 SKLAND_NO_EXPORT struct AbstractEventHandler::Private {
 
-  Private(AbstractEventHandler *event_handler)
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
+
+  explicit Private(AbstractEventHandler *event_handler)
       : mouse_task(event_handler),
         mouse_motion_task(event_handler) {}
 
-  ~Private() {}
+  ~Private() = default;
 
   /**
    * @brief An event task to handle mouse enter/leave/button events

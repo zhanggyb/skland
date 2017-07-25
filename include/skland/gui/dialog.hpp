@@ -30,12 +30,12 @@ namespace gui {
  */
 SKLAND_EXPORT class Dialog : public AbstractShellView {
 
-  SKLAND_DECLARE_NONCOPYABLE(Dialog);
-  Dialog() = delete;
-
  public:
 
-  Dialog(const char *title, AbstractShellView *parent);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Dialog);
+  Dialog() = delete;
+
+  explicit Dialog(const char *title, AbstractShellView *parent = nullptr);
 
   virtual ~Dialog();
 

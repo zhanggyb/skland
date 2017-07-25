@@ -243,8 +243,8 @@ int Application::Run() {
     /*
      * Run idle tasks (process geometries)
      */
-    while (AbstractView::kIdleTaskHead.next() != &AbstractView::kIdleTaskTail) {
-      task = AbstractView::kIdleTaskHead.next();
+    while (AbstractEventHandler::kIdleTaskHead.next() != &AbstractEventHandler::kIdleTaskTail) {
+      task = AbstractEventHandler::kIdleTaskHead.next();
       task->Unlink();
       task->Run();
     }

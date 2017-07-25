@@ -200,7 +200,7 @@ class Surface {
   struct CommitTask;
   struct Private;
 
-  Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
+  explicit Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
 
   // global surface stack:
 
@@ -255,11 +255,10 @@ class Surface::Shell {
 
   friend class Surface;
 
-  Shell() = delete;
-  Shell(const Shell &) = delete;
-  Shell &operator=(const Shell &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Shell);
+  Shell() = delete;
 
   class Toplevel;
   class Popup;
@@ -279,7 +278,7 @@ class Surface::Shell {
   static Surface *Create(AbstractEventHandler *event_handler,
                          const Margin &margin = Margin());
 
-  Shell(Surface *surface);
+  explicit Shell(Surface *surface);
 
   ~Shell();
 
@@ -308,11 +307,10 @@ class Surface::Shell::Toplevel {
 
   friend class Shell;
 
-  Toplevel() = delete;
-  Toplevel(const Toplevel &) = delete;
-  Toplevel &operator=(const Toplevel &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Toplevel);
+  Toplevel() = delete;
 
   enum StatesMask {
     kStateMaskMaximized = 0x1, /**< 1: the surface is maximized */
@@ -351,7 +349,7 @@ class Surface::Shell::Toplevel {
 
   struct Private;
 
-  Toplevel(Shell *shell_surface);
+  explicit Toplevel(Shell *shell_surface);
 
   ~Toplevel();
 
@@ -366,11 +364,10 @@ class Surface::Shell::Popup {
 
   friend class Shell;
 
-  Popup() = delete;
-  Popup(const Popup &) = delete;
-  Popup &operator=(const Popup &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Popup);
+  Popup() = delete;
 
   /**
    * @brief Create a popup shell surface
@@ -383,7 +380,7 @@ class Surface::Shell::Popup {
 
   struct Private;
 
-  Popup(Shell *shell);
+  explicit Popup(Shell *shell);
 
   ~Popup();
 
@@ -399,6 +396,9 @@ class Surface::Sub {
   friend class Surface;
 
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Sub);
+  Sub() = delete;
 
   /**
    * @brief Create a sub surface
@@ -454,11 +454,10 @@ class Surface::Sub {
  */
 class Surface::EGL {
 
-  EGL() = delete;
-  EGL(const EGL &) = delete;
-  EGL &operator=(const EGL &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(EGL);
+  EGL() = delete;
 
   enum Profile {
     kProfileOpenGLES2,  // OpenGL ES 2
@@ -501,7 +500,7 @@ class Surface::EGL {
 
   struct Private;
 
-  EGL(Surface *surface);
+  explicit EGL(Surface *surface);
 
   std::unique_ptr<Private> p_;
 

@@ -17,19 +17,14 @@
 #include "surface_draw-task.hpp"
 
 #include "surface_private.hpp"
+#include "skland/gui/abstract-event-handler.hpp"
 
 namespace skland {
 namespace gui {
 
 void Surface::DrawTask::Run() const {
-  Task *task = nullptr;
-  while (surface->p_->draw_task_head.next() != &surface->p_->draw_task_tail) {
-    task = surface->p_->draw_task_head.next();
-    task->Unlink();
-
-    // TODO: not run in this way:
-    task->Run();
-  }
+  AbstractEventHandler* event_handler = surface->GetEventHandler();
+  event_handler->RenderSurface(surface);
 }
 
 } // namespace gui

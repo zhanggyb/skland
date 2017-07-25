@@ -14,31 +14,38 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_SURFACE_DRAW_TASK_HPP_
-#define SKLAND_GUI_INTERNAL_SURFACE_DRAW_TASK_HPP_
+#include "test.hpp"
 
-#include "skland/gui/surface.hpp"
+#include <skland/gui/application.hpp>
+#include <skland/gui/dialog.hpp>
 
-namespace skland {
-namespace gui {
+Test::Test()
+    : testing::Test() {
+}
 
-struct Surface::DrawTask : public Task {
+Test::~Test() {
 
-  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(DrawTask);
-  DrawTask() = delete;
+}
 
-  explicit DrawTask(Surface *surface)
-      : surface(surface) {}
+/**
+ * @brief Show a default empty window
+ *
+ * Expected result: display and resize a default window
+ */
+TEST_F(Test, show) {
+  using skland::gui::Application;
+  using skland::gui::Dialog;
 
-  virtual ~DrawTask() = default;
+  int argc = 1;
+  char argv1[] = "show";  // to avoid compile warning
+  char *argv[] = {argv1};
 
-  virtual void Run() const final;
+  Application app(argc, argv);
 
-  Surface *surface;
+  Dialog win("Test Dialog");
+  win.Show();
 
-};
+  int result = app.Run();
 
-} // namespace gui
-} // namespace skland
-
-#endif // SKLAND_GUI_INTERNAL_SURFACE_DRAW_TASK_HPP_
+  ASSERT_TRUE(result == 0);
+}

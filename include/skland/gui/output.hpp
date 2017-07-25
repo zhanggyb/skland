@@ -20,7 +20,7 @@
 #include "skland/core/rect.hpp"
 #include "skland/core/size.hpp"
 #include "skland/core/sigcxx.hpp"
-#include "skland/core/deque.hpp"
+#include "skland/core/compound-deque.hpp"
 
 #include <wayland-client.h>
 
@@ -30,7 +30,7 @@
 namespace skland {
 namespace gui {
 
-class Output : public core::Deque::Element {
+class Output : public core::CompoundDeque::Element {
 
   friend class Surface;
 

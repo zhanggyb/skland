@@ -45,7 +45,7 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
   /**
    * @brief Constructor
    */
-  Private(AbstractShellView *shell_view)
+  explicit Private(AbstractShellView *shell_view)
       : flags(0),
         shell_surface(nullptr),
         parent(nullptr),
@@ -56,7 +56,7 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
   /**
    * @brief Destructor
    */
-  ~Private() {}
+  ~Private() = default;
 
   /**
    * @brief Bitwise flags

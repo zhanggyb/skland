@@ -81,7 +81,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   using RectF = core::RectF;  /**< @brief Alias of core::RectF */
   using Padding = core::Padding;  /**< @brief Alias of core::Padding */
 
-  enum DirtyFlagMask {
+  enum GeometryDirtyFlagMask {
     kDirtyLeftMask = 0x1 << 0,
     kDirtyTopMask = 0x1 << 1,
     kDirtyRightMask = 0x1 << 2,
@@ -515,7 +515,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @param view A view object, it is always this view or a sub view in hierarchy
    * @return A pointer to a surface or nullptr
    */
-  virtual Surface *GetSurface(const AbstractView *view) const;
+  virtual Surface *GetSurface(const AbstractView *view) const override;
+
+  virtual void RenderSurface(const Surface *surface) override;
 
   /**
    * @brief Callback when this view enters an output

@@ -261,6 +261,10 @@ Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
   return p_->shell_surface;
 }
 
+void AbstractShellView::RenderSurface(const Surface *surface) {
+  // override in sub class
+}
+
 void AbstractShellView::OnEnterOutput(const Surface *surface, const Output *output) {
 }
 

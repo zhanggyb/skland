@@ -33,11 +33,10 @@ class AbstractEpollTask;
  */
 SKLAND_EXPORT class Application {
 
-  Application() = delete;
-  Application(const Application &) = delete;
-  Application &operator=(const Application &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Application);
+  Application() = delete;
 
   /**
    * @brief Construct a single application instance

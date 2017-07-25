@@ -42,7 +42,7 @@ using core::PointF;
 using core::RectF;
 using core::RectI;
 using core::Margin;
-using core::Deque;
+using core::CompoundDeque;
 
 using graphic::Canvas;
 using graphic::Paint;
@@ -57,7 +57,7 @@ using graphic::ClipOperation;
  */
 SKLAND_NO_EXPORT struct Window::Private {
 
-  SKLAND_DECLARE_NONCOPYABLE(Private);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
   Private()
       : main_surface(nullptr),
@@ -147,8 +147,8 @@ Window::Window(int width, int height, const char *title, int flags)
 }
 
 Window::~Window() {
-  if (p_->content_view) p_->content_view->Destroy();
-  if (p_->title_bar) p_->title_bar->Destroy();
+  if (nullptr != p_->content_view) p_->content_view->Destroy();
+  if (nullptr != p_->title_bar) p_->title_bar->Destroy();
 
   delete p_->main_surface;
 }
@@ -164,7 +164,7 @@ AbstractView *Window::GetContentView() const {
 void Window::SetContentView(AbstractView *view) {
   if (p_->content_view == view) return;
 
-  if (p_->content_view) p_->content_view->Destroy();
+  if (nullptr != p_->content_view) p_->content_view->Destroy();
   // p_->content_view will be set to nullptr in OnViewDetached()
 
   p_->content_view = view;
@@ -191,12 +191,12 @@ void Window::OnShown() {
 
   int scale = 1;
   if (nullptr == p_->output) {
-    const Deque &outputs = Display::GetOutputs();
-    if (outputs.count()) {
+    const CompoundDeque &outputs = Display::GetOutputs();
+    if (outputs.count() > 0) {
       p_->output = static_cast<const Output *>(outputs[0]);
     }
   }
-  if (p_->output) scale = p_->output->GetScale();
+  if (nullptr != p_->output) scale = p_->output->GetScale();
   shell_surface->SetScale(scale);
 
   // Create buffer:
@@ -207,7 +207,7 @@ void Window::OnShown() {
   height += margin.tb() * scale;
 
   int32_t pool_size = width * 4 * height;
-  if (p_->main_surface) pool_size *= 2; // double buffer for 2 surfaces, not frameless
+  if (nullptr != p_->main_surface) pool_size *= 2; // double buffer for 2 surfaces, not frameless
 
   p_->pool.Setup(pool_size);
 
@@ -220,7 +220,7 @@ void Window::OnShown() {
                               (float) margin.top * scale);
   p_->frame_canvas->Clear();
 
-  if (p_->main_surface) {
+  if (nullptr != p_->main_surface) {
     p_->main_surface->SetScale(scale);
     p_->main_buffer.Setup(p_->pool, width, height,
                           width * 4, WL_SHM_FORMAT_ARGB8888,
@@ -236,11 +236,11 @@ void Window::OnShown() {
   p_->inhibit_update = false;
 
   RequestUpdate();
-  if (p_->title_bar) {
+  if (nullptr != p_->title_bar) {
     AbstractShellView::DispatchUpdate(p_->title_bar);
     p_->title_bar->Resize(GetWidth(), TitleBar::kHeight);
   }
-  if (p_->content_view) {
+  if (nullptr != p_->content_view) {
     AbstractShellView::DispatchUpdate(p_->content_view);
     SetContentViewGeometry();
   }
@@ -252,7 +252,7 @@ void Window::OnUpdate(AbstractView *view) {
   Surface *surface = nullptr;
   Canvas *canvas = nullptr;
 
-  if (p_->main_surface) {
+  if (nullptr != p_->main_surface) {
     surface = p_->main_surface;
     canvas = p_->main_canvas.get();
   } else {
@@ -312,8 +312,8 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   Surface *shell_surface = this->GetShellSurface();
 
   int scale = 1;
-  const Deque &outputs = Display::GetOutputs();
-  if (outputs.count()) {
+  const CompoundDeque &outputs = Display::GetOutputs();
+  if (outputs.count() > 0) {
     p_->output = static_cast<const Output *>(outputs[0]);
     scale = p_->output->GetScale();
   }
@@ -342,7 +342,7 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   height += margin.tb() * scale;
 
   int pool_size = width * 4 * height;
-  if (p_->main_surface) pool_size *= 2;
+  if (nullptr != p_->main_surface) pool_size *= 2;
 
   p_->pool.Setup(pool_size);
 
@@ -353,7 +353,7 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   p_->frame_canvas->SetOrigin(margin.left * scale, margin.top * scale);
   p_->frame_canvas->Clear();
 
-  if (p_->main_surface) {
+  if (nullptr != p_->main_surface) {
     p_->main_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
     p_->main_surface->Attach(&p_->main_buffer);
     p_->main_canvas.reset(Canvas::CreateRasterDirect(width, height,
@@ -374,11 +374,11 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   shell_surface->Commit();
 
   p_->inhibit_update = false;
-  if (p_->title_bar) {
+  if (nullptr != p_->title_bar) {
     DispatchUpdate(p_->title_bar);
     p_->title_bar->Resize(new_size.width, TitleBar::kHeight);
   }
-  if (p_->content_view) {
+  if (nullptr != p_->content_view) {
     DispatchUpdate(p_->content_view);
     SetContentViewGeometry();
   }
@@ -434,7 +434,7 @@ void Window::OnMouseEnter(MouseEvent *event) {
     }
   }
 
-  if (view) DispatchMouseEnterEvent(view, event);
+  if (nullptr != view) DispatchMouseEnterEvent(view, event);
 }
 
 void Window::OnMouseLeave() {
@@ -500,7 +500,7 @@ void Window::OnMouseMove(MouseEvent *event) {
     }
   }
 
-  if (view) DispatchMouseEnterEvent(view, event);
+  if (nullptr != view) DispatchMouseEnterEvent(view, event);
 
   // Now dispatch mouse move event:
 //      task = static_cast<ViewTask *>(handler->p_->mouse_motion_task.next());
@@ -545,7 +545,7 @@ void Window::OnKeyDown(KeyEvent *event) {
 }
 
 void Window::OnDraw(const Context *context) {
-  if (p_->flags & kFlagMaskFrameless) return;
+  if ((0 != p_->flags) & kFlagMaskFrameless) return;
 
   Canvas *canvas = context->canvas();
   canvas->Clear();
@@ -608,7 +608,7 @@ void Window::OnDraw(const Context *context) {
   Canvas::ClipGuard guard(canvas, path, ClipOperation::kClipIntersect, true);
 
   paint.SetStyle(Paint::Style::kStyleFill);
-  if (p_->title_bar) {
+  if (nullptr != p_->title_bar) {
     if (title_bar_schema.active.background.shaded) {
       points[1].y = TitleBar::kHeight * scale;
       shader = GradientShader::MakeLinear(points,
@@ -676,14 +676,14 @@ void Window::OnLeaveOutput(const Surface *surface, const Output *output) {
   p_->output = nullptr;
 
   int scale = 1;
-  const Deque &outputs = Display::GetOutputs();
-  if (outputs.count()) {
+  const CompoundDeque &outputs = Display::GetOutputs();
+  if (outputs.count() > 0) {
     p_->output = static_cast<const Output *>(outputs[0]);
     scale = p_->output->GetScale();
   }
 
   GetShellSurface()->SetScale(scale);
-  if (p_->main_surface) p_->main_surface->SetScale(scale);
+  if (nullptr != p_->main_surface) p_->main_surface->SetScale(scale);
 }
 
 int Window::GetMouseLocation(const MouseEvent *event) const {
@@ -733,7 +733,7 @@ RectI Window::GetContentGeometry() const {
   int y = 0;
   int w = GetWidth();
   int h = GetHeight();
-  if (p_->title_bar) {
+  if (nullptr != p_->title_bar) {
     y += p_->title_bar->GetHeight();
     h -= p_->title_bar->GetHeight();
   }
@@ -744,11 +744,11 @@ void Window::OnFullscreenButtonClicked(core::SLOT slot) {
   if (IsFullscreen()) {
     ToggleFullscreen(nullptr);
   } else {
-    if (p_->output)
+    if (nullptr != p_->output)
       ToggleFullscreen(p_->output);
     else {
-      const Deque &outputs = Display::GetOutputs();
-      if (outputs.count()) {
+      const CompoundDeque &outputs = Display::GetOutputs();
+      if (outputs.count() > 0) {
         p_->output = static_cast<const Output *>(outputs[0]);
         ToggleFullscreen(p_->output);
       }

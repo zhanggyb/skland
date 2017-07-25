@@ -19,8 +19,8 @@
 
 #include "abstract-event-handler.hpp"
 
-#include "../core/rect.hpp"
-#include "../core/margin.hpp"
+#include "skland/core/rect.hpp"
+#include "skland/core/margin.hpp"
 #include "context.hpp"
 
 #include <cstdint>
@@ -49,6 +49,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   AbstractShellView() = delete;
 
   using Size = core::SizeI; /**< @brief Alias of core::SizeI */
+  using Rect = core::RectI; /**< @brief Alias of core::RectI */
   using Margin = core::Margin;  /**< @brief Alias of core::Margin */
 
   /**
@@ -227,6 +228,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   virtual void OnUpdate(AbstractView *view) override;
 
   virtual Surface *GetSurface(const AbstractView *view) const override;
+
+  virtual void RenderSurface(const Surface *surface) override;
 
   virtual void OnEnterOutput(const Surface *surface, const Output *output) override;
 

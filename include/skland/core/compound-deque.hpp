@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_DEQUE_HPP_
-#define SKLAND_CORE_DEQUE_HPP_
+#ifndef SKLAND_CORE_COMPOUND_DEQUE_HPP_
+#define SKLAND_CORE_COMPOUND_DEQUE_HPP_
 
 #include "defines.hpp"
 
@@ -24,20 +24,20 @@ namespace core {
 
 /**
  * @ingroup core
- * @brief A simple double-ended queue container
+ * @brief A compound but faster double-ended queue container
  */
-class Deque {
+class CompoundDeque {
 
  public:
 
-  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Deque);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(CompoundDeque);
 
   /**
    * @brief A nested class represents an element in a deque
    */
   class Element {
 
-    friend class Deque;
+    friend class CompoundDeque;
 
    public:
 
@@ -53,13 +53,13 @@ class Deque {
 
     Element *next() const { return next_; }
 
-    Deque *deque() const { return deque_; }
+    CompoundDeque *deque() const { return deque_; }
 
    private:
 
     Element *previous_;
     Element *next_;
-    Deque *deque_;
+    CompoundDeque *deque_;
 
   };
 
@@ -132,9 +132,9 @@ class Deque {
 
   };
 
-  Deque();
+  CompoundDeque();
 
-  virtual ~Deque();
+  virtual ~CompoundDeque();
 
   void PushFront(Element *item);
 
@@ -183,4 +183,4 @@ class Deque {
 } // namespace core
 } // namespace skland
 
-#endif // SKLAND_CORE_DEQUE_HPP_
+#endif // SKLAND_CORE_COMPOUND_DEQUE_HPP_

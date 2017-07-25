@@ -49,7 +49,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         maximal_size(65536, 65536),
         x_layout_policy(kLayoutPreferred),
         y_layout_policy(kLayoutPreferred),
-        dirty_flag(0),
+        geometry_dirty_flags(0),
         geometry_task(view),
         redraw_task(view),
         is_damaged(false),
@@ -95,7 +95,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    *
    * Use GeometryTypeMask to check this value
    */
-  int dirty_flag;
+  int geometry_dirty_flags;
 
   RectF geometry;
 

@@ -14,31 +14,9 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_SURFACE_DRAW_TASK_HPP_
-#define SKLAND_GUI_INTERNAL_SURFACE_DRAW_TASK_HPP_
+#include <gtest/gtest.h>
 
-#include "skland/gui/surface.hpp"
-
-namespace skland {
-namespace gui {
-
-struct Surface::DrawTask : public Task {
-
-  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(DrawTask);
-  DrawTask() = delete;
-
-  explicit DrawTask(Surface *surface)
-      : surface(surface) {}
-
-  virtual ~DrawTask() = default;
-
-  virtual void Run() const final;
-
-  Surface *surface;
-
-};
-
-} // namespace gui
-} // namespace skland
-
-#endif // SKLAND_GUI_INTERNAL_SURFACE_DRAW_TASK_HPP_
+int main(int argc, char *argv[]) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

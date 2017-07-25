@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_INPUT_HPP_
 #define SKLAND_GUI_INPUT_HPP_
 
-#include "skland/core/deque.hpp"
+#include "skland/core/compound-deque.hpp"
 
 #include "abstract-event-handler.hpp"
 
@@ -38,7 +38,7 @@ struct ViewTask;
  * @ingroup gui
  * @brief Input manager
  */
-SKLAND_EXPORT class Input : public core::Deque::Element {
+SKLAND_EXPORT class Input : public core::CompoundDeque::Element {
 
   friend class Surface;
 
