@@ -156,11 +156,6 @@ class Deque {
       return element_;
     }
 
-    template<typename T>
-    T *cast() const {
-      return static_cast<T *>(element_);
-    }
-
     explicit operator bool() const {
       return nullptr != element_;
     }

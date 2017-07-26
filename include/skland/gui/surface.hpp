@@ -209,20 +209,6 @@ class Surface {
    */
   static void Clear();
 
-  static void InitializeDrawTaskList();
-
-  static void ClearDrawTaskList();
-
-  /**
-    * @brief Initialize the idle task list
-    */
-  static void InitializeCommitTaskList();
-
-  /**
-   * @brief Destroy the redraw task list
-   */
-  static void ClearCommitTaskList();
-
   /**
    * @brief The top shell surface in the stack
    */
@@ -238,11 +224,9 @@ class Surface {
    */
   static int kShellSurfaceCount;
 
-  static Task kDrawTaskHead;
-  static Task kDrawTaskTail;
+  static core::Deque kDrawTaskDeque;
 
-  static Task kCommitTaskHead;
-  static Task kCommitTaskTail;
+  static core::Deque kCommitTaskDeque;
 
   std::unique_ptr<Private> p_;
 

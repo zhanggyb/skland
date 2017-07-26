@@ -496,10 +496,8 @@ Surface *Surface::EGL::GetSurface() const {
 Surface *Surface::kTop = nullptr;
 Surface *Surface::kBottom = nullptr;
 int Surface::kShellSurfaceCount = 0;
-Task Surface::kDrawTaskHead;
-Task Surface::kDrawTaskTail;
-Task Surface::kCommitTaskHead;
-Task Surface::kCommitTaskTail;
+core::Deque Surface::kDrawTaskDeque;
+core::Deque Surface::kCommitTaskDeque;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
   _ASSERT(nullptr != event_handler);
@@ -553,7 +551,7 @@ void Surface::Commit() {
     return;
 
   if (nullptr == p_->parent) {
-    kCommitTaskTail.PushFront(&p_->commit_task);
+    kCommitTaskDeque.PushBack(&p_->commit_task);
     return;
   }
 
@@ -563,7 +561,7 @@ void Surface::Commit() {
     main_surface->Commit();
     main_surface->p_->commit_task.PushFront(&p_->commit_task);
   } else {
-    kCommitTaskTail.PushFront(&p_->commit_task);
+    kCommitTaskDeque.PushBack(&p_->commit_task);
   }
 }
 
@@ -672,34 +670,6 @@ void Surface::Clear() {
   while (kShellSurfaceCount > 0) {
     AbstractEventHandler *event_handler = kTop->GetEventHandler();
     delete event_handler;
-  }
-}
-
-void Surface::InitializeDrawTaskList() {
-  kDrawTaskHead.PushBack(&kDrawTaskTail);
-}
-
-void Surface::ClearDrawTaskList() {
-  Task *task = kDrawTaskHead.next();
-  Task *next_task = nullptr;
-  while (task != &kDrawTaskTail) {
-    next_task = task->next();
-    task->Unlink();
-    task = next_task;
-  }
-}
-
-void Surface::InitializeCommitTaskList() {
-  kCommitTaskHead.PushBack(&kCommitTaskTail);
-}
-
-void Surface::ClearCommitTaskList() {
-  Task *task = kCommitTaskHead.next();
-  Task *next_task = nullptr;
-  while (task != &kCommitTaskTail) {
-    next_task = task->next();
-    task->Unlink();
-    task = next_task;
   }
 }
 

@@ -237,34 +237,41 @@ int Application::Run() {
   int count = 0;
   int ret = 0;
   Task *task = nullptr;
+  core::Deque::Iterator it;
 
   while (true) {
 
     /*
      * Run idle tasks (process geometries)
      */
-    while (AbstractEventHandler::kIdleTaskHead.next() != &AbstractEventHandler::kIdleTaskTail) {
-      task = AbstractEventHandler::kIdleTaskHead.next();
-      task->Unlink();
+    it = AbstractEventHandler::kIdleTaskDeque.begin();
+    while (it != AbstractEventHandler::kIdleTaskDeque.end()) {
+      task = static_cast<Task *>(it.element());
+      it.Remove();
       task->Run();
+      it = AbstractEventHandler::kIdleTaskDeque.begin();
     }
 
     /*
      * Draw contents on every surface requested
      */
-    while (Surface::kDrawTaskHead.next() != &Surface::kDrawTaskTail) {
-      task = Surface::kDrawTaskHead.next();
-      task->Unlink();
+    it = Surface::kDrawTaskDeque.begin();
+    while (it != Surface::kDrawTaskDeque.end()) {
+      task = static_cast<Task *>(it.element());
+      it.Remove();
       task->Run();
+      it = Surface::kDrawTaskDeque.begin();
     }
 
     /*
      * Commit every surface requested
      */
-    while (Surface::kCommitTaskHead.next() != &Surface::kCommitTaskTail) {
-      task = Surface::kCommitTaskHead.next();
-      task->Unlink();
+    it = Surface::kCommitTaskDeque.begin();
+    while (it != Surface::kCommitTaskDeque.end()) {
+      task = static_cast<Task *>(it.element());
+      it.Remove();
       task->Run();
+      it = Surface::kCommitTaskDeque.begin();
     }
 
     wl_display_dispatch_pending(Display::kDisplay->p_->wl_display);

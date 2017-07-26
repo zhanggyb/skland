@@ -87,6 +87,14 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
 
     AbstractEventHandler *event_handler() const { return event_handler_; }
 
+    EventTask *GetPrevious() const {
+      return static_cast<EventTask *>(core::Deque::Element::previous());
+    }
+
+    EventTask *GetNext() const {
+      return static_cast<EventTask *>(core::Deque::Element::next());
+    }
+
     static EventTask *GetMouseTask(const AbstractEventHandler *event_hander);
 
     static EventTask *GetMouseMotionTask(const AbstractEventHandler *event_handler);
@@ -174,9 +182,13 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
    */
   virtual void AuditDestroyingToken(core::details::Token */*token*/) final;
 
-  static void PushToHead(Task *task) { kIdleTaskHead.PushBack(task); }
+  static void PushBackIdleTask(Task *task) {
+    kIdleTaskDeque.PushBack(task);
+  }
 
-  static void PushToTail(Task *task) { kIdleTaskTail.PushFront(task); }
+  static void PushFrontIdleTask(Task *task) {
+    kIdleTaskDeque.PushFront(task);
+  }
 
  private:
 
@@ -184,18 +196,7 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
 
   std::unique_ptr<Private> p_;
 
-  /**
-   * @brief Initialize the idle task list for redraw windows and views
-   */
-  static void InitializeIdleTaskList();
-
-  /**
-   * @brief Destroy the redraw task list
-   */
-  static void ClearIdleTaskList();
-
-  static Task kIdleTaskHead;
-  static Task kIdleTaskTail;
+  static core::Deque kIdleTaskDeque;
 
 };
 

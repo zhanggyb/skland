@@ -35,15 +35,10 @@ Display::Display() {
   p_.reset(new Private);
 
   p_->cursors.resize(kCursorBlank, nullptr);
-  AbstractEventHandler::InitializeIdleTaskList();
-  Surface::InitializeDrawTaskList();
-  Surface::InitializeCommitTaskList();
 }
 
 Display::~Display() {
-  AbstractEventHandler::ClearIdleTaskList();
-  Surface::ClearCommitTaskList();
-  Surface::ClearDrawTaskList();
+
 }
 
 void Display::Connect(const char *name) {

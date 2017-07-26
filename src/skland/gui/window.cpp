@@ -262,7 +262,7 @@ void Window::OnUpdate(AbstractView *view) {
 
   AbstractView::RedrawTask *redraw_task = AbstractView::RedrawTask::Get(view);
   redraw_task->context = Context(surface, canvas);
-  PushToTail(redraw_task);
+  PushBackIdleTask(redraw_task);
   _ASSERT(canvas);
   Damage(view,
          view->GetX() + surface->GetMargin().left,
@@ -299,7 +299,7 @@ bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
   }
 
   p_->inhibit_update = true;
-  PushToTail(redraw_task);
+  PushBackIdleTask(redraw_task);
 
   Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
   // surface size is changed, reset the pointer position and enter/leave widgets
@@ -517,7 +517,7 @@ void Window::OnMouseDown(MouseEvent *event) {
 
     int location = GetMouseLocation(event);
 
-    if (location == kTitleBar && (nullptr == EventTask::GetMouseTask(this)->next())) {
+    if (location == kTitleBar && (nullptr == EventTask::GetMouseTask(this)->GetNext())) {
       MoveWithMouse(event);
       event->Ignore();
       return;
@@ -769,7 +769,7 @@ void Window::RequestUpdate() {
   const core::Margin &margin = shell_surface->GetMargin();
 
   redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
-  PushToTail(redraw_task);
+  PushBackIdleTask(redraw_task);
   _ASSERT(p_->frame_canvas);
   Damage(this,
          0, 0,

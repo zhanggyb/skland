@@ -162,7 +162,7 @@ bool EGLWindow::OnConfigureSize(const SizeI &old_size, const SizeI &new_size) {
     return false;
   }
 
-  PushToTail(redraw_task);
+  PushBackIdleTask(redraw_task);
 
   Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
   // surface size is changed, reset the pointer position and enter/leave widgets
@@ -210,7 +210,7 @@ void EGLWindow::OnSizeChange(const SizeI &old_size, const SizeI &new_size) {
   const core::Margin &margin = shell_surface->GetMargin();
   RedrawTask *redraw_task = RedrawTask::Get(this);
   redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
-  PushToTail(redraw_task);
+  PushBackIdleTask(redraw_task);
   _ASSERT(p_->frame_canvas);
   Damage(this,
          0, 0,
@@ -287,7 +287,7 @@ void EGLWindow::OnMouseDown(MouseEvent *event) {
 
     int location = GetMouseLocation(event);
 
-    if (location == kClientArea && (nullptr == EventTask::GetMouseTask(this)->next())) {
+    if (location == kClientArea && (nullptr == EventTask::GetMouseTask(this)->GetNext())) {
       MoveWithMouse(event);
       event->Ignore();
       return;
@@ -447,7 +447,7 @@ void EGLWindow::RequestUpdate() {
 
   RedrawTask *redraw_task = RedrawTask::Get(this);
   redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
-  PushToTail(redraw_task);
+  PushBackIdleTask(redraw_task);
   _ASSERT(p_->frame_canvas);
   Damage(this,
          0, 0,

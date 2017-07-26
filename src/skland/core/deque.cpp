@@ -21,8 +21,8 @@ namespace skland {
 namespace core {
 
 Deque::Element::~Element() {
-  if (previous_) previous_->next_ = next_;
-  if (next_) next_->previous_ = previous_;
+  if (nullptr != previous_) previous_->next_ = next_;
+  if (nullptr != next_) next_->previous_ = previous_;
 }
 
 void Deque::Element::PushFront(Element *other) {
@@ -30,7 +30,7 @@ void Deque::Element::PushFront(Element *other) {
 
   other->Unlink();
 
-  if (previous_) previous_->next_ = other;
+  if (nullptr != previous_) previous_->next_ = other;
   other->previous_ = previous_;
   previous_ = other;
   other->next_ = this;
@@ -41,15 +41,15 @@ void Deque::Element::PushBack(Element *other) {
 
   other->Unlink();
 
-  if (next_) next_->previous_ = other;
+  if (nullptr != next_) next_->previous_ = other;
   other->next_ = next_;
   next_ = other;
   other->previous_ = this;
 }
 
 void Deque::Element::Unlink() {
-  if (previous_) previous_->next_ = next_;
-  if (next_) next_->previous_ = previous_;
+  if (nullptr != previous_) previous_->next_ = next_;
+  if (nullptr != next_) next_->previous_ = previous_;
 
   previous_ = nullptr;
   next_ = nullptr;
@@ -120,6 +120,7 @@ size_t Deque::GetSize() const {
 }
 
 bool Deque::IsEmpty() const {
+  _ASSERT(last_.previous_ == &first_);
   return first_.next_ == &last_;
 }
 
