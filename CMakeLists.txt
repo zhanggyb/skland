@@ -28,6 +28,10 @@ option(BUILD_UNIT_TEST "Build unit test code" OFF)
 option(BUILD_SHARED_LIBRARY "Build shared library" OFF)
 option(TRACE "Turn trace mode on/off" ON)   # Turn on in development stage
 
+# ----------------------------------------------------------------------------
+# System check
+# ----------------------------------------------------------------------------
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(APPLE TRUE)
     set(UNIX TRUE)
@@ -36,6 +40,27 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(UNIX TRUE)
 else ()
     message(FATAL_ERROR "Unsupported system!")
+endif ()
+
+# TODO: check architecture
+# add_definitions(-D__x86_64__)
+
+# ----------------------------------------------------------------------------
+# Compiler and basic compile options
+# ----------------------------------------------------------------------------
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    # using clang
+    message(STATUS "Use C++ compiler: Clang")
+    # add_definitions(-D__clang__)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # using GCC
+    message(STATUS "Use C++ compiler: GCC")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    # using Intel C++
+    message(STATUS "Use C++ compiler: Intel C++")
+else ()
+    message(FATAL "Unsupported c++ compiler: ${CMAKE_CXX_COMPILER}")
 endif ()
 
 if (NOT CMAKE_BUILD_TYPE)
