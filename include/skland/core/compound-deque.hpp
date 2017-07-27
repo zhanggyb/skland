@@ -71,7 +71,7 @@ class CompoundDeque {
    public:
 
     explicit Iterator(Element *element = nullptr)
-        : ptr_(element) {}
+        : element_(element) {}
 
     Iterator(const Iterator &orig) = default;
 
@@ -80,55 +80,55 @@ class CompoundDeque {
     Iterator &operator=(const Iterator &other) = default;
 
     Iterator &operator++() {
-      ptr_ = ptr_->next_;
+      element_ = element_->next_;
       return *this;
     }
 
     Iterator operator++(int) {
       Iterator retval;
-      retval.ptr_ = ptr_->next_;
+      retval.element_ = element_->next_;
       return retval;
     }
 
     Iterator &operator--() {
-      ptr_ = ptr_->previous_;
+      element_ = element_->previous_;
       return *this;
     }
 
     Iterator operator--(int) {
       Iterator retval;
-      retval.ptr_ = ptr_->previous_;
+      retval.element_ = element_->previous_;
       return retval;
     }
 
     bool operator==(const Iterator &other) const {
-      return ptr_ == other.ptr_;
+      return element_ == other.element_;
     }
 
     bool operator==(const Element *element) const {
-      return ptr_ == element;
+      return element_ == element;
     }
 
     bool operator!=(const Iterator &other) const {
-      return ptr_ != other.ptr_;
+      return element_ != other.element_;
     }
 
     bool operator!=(const Element *element) const {
-      return ptr_ != element;
+      return element_ != element;
     }
 
     template<typename T>
     T *cast() const {
-      return static_cast<T *>(ptr_);
+      return static_cast<T *>(element_);
     }
 
     explicit operator bool() const {
-      return nullptr != ptr_;
+      return nullptr != element_;
     }
 
    private:
 
-    Element *ptr_;
+    Element *element_;
 
   };
 

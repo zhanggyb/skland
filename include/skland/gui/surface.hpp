@@ -212,7 +212,22 @@ class Surface {
 
   };
 
-  struct CommitTask;
+  struct CommitTask : public Task {
+
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(CommitTask);
+    CommitTask() = delete;
+
+    CommitTask(Surface *surface)
+        : Task(), surface(surface) {}
+
+    virtual ~CommitTask() {}
+
+    virtual void Run() const;
+
+    Surface *surface;
+
+  };
+
   struct Private;
 
   explicit Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
@@ -241,7 +256,7 @@ class Surface {
 
   static core::Deque<DrawTask> kDrawTaskDeque;
 
-  static core::Deque<Task> kCommitTaskDeque;
+  static core::Deque<CommitTask> kCommitTaskDeque;
 
   std::unique_ptr<Private> p_;
 

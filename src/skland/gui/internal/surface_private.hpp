@@ -20,8 +20,6 @@
 #include "skland/gui/surface.hpp"
 #include "skland/gui/abstract-graphics-interface.hpp"
 
-#include "surface_commit-task.hpp"
-
 namespace skland {
 namespace gui {
 
