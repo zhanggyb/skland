@@ -9,7 +9,7 @@
 using namespace skland;
 using namespace skland::core;
 
-class Item : public Deque::Element {
+class Item : public BiNode {
 
  public:
 
@@ -22,11 +22,11 @@ class Item : public Deque::Element {
 
   int id() const { return id_; };
 
-  Deque::Element *_previous() const {
+  BiNode *_previous() const {
     return previous();
   }
 
-  Deque::Element *_next() const {
+  BiNode *_next() const {
     return next();
   }
 
@@ -36,7 +36,7 @@ class Item : public Deque::Element {
 
 };
 
-class TestDeque : public Deque {
+class TestDeque : public Deque<BiNode> {
 
  public:
 
@@ -46,11 +46,11 @@ class TestDeque : public Deque {
 
   virtual ~TestDeque() = default;
 
-  const Deque::Element *_first() const {
+  const BiNode *_first() const {
     return first();
   }
 
-  const Deque::Element *_last() const {
+  const BiNode *_last() const {
     return last();
   }
 
@@ -76,7 +76,7 @@ TEST_F(Test, push_front_1) {
 
   ASSERT_TRUE(deque.GetSize() == 3);
 
-  Deque::ConstIterator it = deque.crbegin();
+  Deque<BiNode>::ConstIterator it = deque.crbegin();
   ASSERT_TRUE(it == item1);
 
   it = deque.cend();
@@ -194,7 +194,7 @@ TEST_F(Test, get_1) {
   deque.Insert(item2);
   deque.Insert(item1);
 
-  Deque::Element* item = deque[0];
+  BiNode *item = deque[0];
   ASSERT_TRUE(item = item1);
 
   item = deque[-1];
@@ -235,6 +235,92 @@ TEST_F(Test, iterator_1) {
   ASSERT_TRUE(it.element() == item1);
   --it;
   ASSERT_TRUE(it == deque.rend());
+
+  delete item1;
+  delete item2;
+  delete item3;
+
+  ASSERT_TRUE(deque.IsEmpty());
+}
+
+TEST_F(Test, end_1) {
+  auto item1 = new Item(1);
+  auto item2 = new Item(2);
+  auto item3 = new Item(3);
+
+  TestDeque deque;
+  deque.Insert(item3);
+  deque.Insert(item2);
+  deque.Insert(item1);
+
+  TestDeque::Iterator it = deque.end();
+  ASSERT_TRUE(it.element() == nullptr);
+
+  delete item1;
+  delete item2;
+  delete item3;
+
+  ASSERT_TRUE(deque.IsEmpty());
+}
+
+TEST_F(Test, rend_1) {
+  auto item1 = new Item(1);
+  auto item2 = new Item(2);
+  auto item3 = new Item(3);
+
+  TestDeque deque;
+  deque.Insert(item3);
+  deque.Insert(item2);
+  deque.Insert(item1);
+
+  TestDeque::Iterator it = deque.rend();
+  ASSERT_TRUE(it.element() == nullptr);
+
+  delete item1;
+  delete item2;
+  delete item3;
+
+  ASSERT_TRUE(deque.IsEmpty());
+}
+
+TEST_F(Test, boolean_1) {
+  auto item1 = new Item(1);
+  auto item2 = new Item(2);
+  auto item3 = new Item(3);
+
+  TestDeque deque;
+  deque.Insert(item3);
+  deque.Insert(item2);
+  deque.Insert(item1);
+
+  TestDeque::Iterator it = deque.end();
+  ASSERT_TRUE(!it);
+
+  --it;
+  ASSERT_TRUE(it);
+
+  delete item1;
+  delete item2;
+  delete item3;
+
+  ASSERT_TRUE(deque.IsEmpty());
+}
+
+TEST_F(Test, boolean_2) {
+  auto item1 = new Item(1);
+  auto item2 = new Item(2);
+  auto item3 = new Item(3);
+
+  TestDeque deque;
+  deque.Insert(item3);
+  deque.Insert(item2);
+  deque.Insert(item1);
+
+  TestDeque::Iterator it = deque.rend();
+  ASSERT_TRUE(!it);
+
+  ++it;
+  ASSERT_TRUE(it);
 
   delete item1;
   delete item2;

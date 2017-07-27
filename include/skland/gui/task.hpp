@@ -25,7 +25,7 @@
 namespace skland {
 namespace gui {
 
-SKLAND_EXPORT class Task : public core::Deque::Element {
+SKLAND_EXPORT class Task : public core::BiNode {
 
  public:
 

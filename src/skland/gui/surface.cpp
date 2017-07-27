@@ -19,7 +19,6 @@
 #include "internal/surface_shell_toplevel_private.hpp"
 #include "internal/surface_shell_popup_private.hpp"
 #include "internal/surface_egl_private.hpp"
-#include "internal/surface_draw-task.hpp"
 #include "internal/surface_commit-task.hpp"
 
 #include <skland/gui/abstract-event-handler.hpp>
@@ -493,11 +492,18 @@ Surface *Surface::EGL::GetSurface() const {
 
 // ------
 
+void Surface::DrawTask::Run() const {
+  AbstractEventHandler* event_handler = surface->GetEventHandler();
+  event_handler->RenderSurface(surface);
+}
+
+// ------
+
 Surface *Surface::kTop = nullptr;
 Surface *Surface::kBottom = nullptr;
 int Surface::kShellSurfaceCount = 0;
-core::Deque Surface::kDrawTaskDeque;
-core::Deque Surface::kCommitTaskDeque;
+core::Deque<Surface::DrawTask> Surface::kDrawTaskDeque;
+core::Deque<Task> Surface::kCommitTaskDeque;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
   _ASSERT(nullptr != event_handler);

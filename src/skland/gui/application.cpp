@@ -237,7 +237,8 @@ int Application::Run() {
   int count = 0;
   int ret = 0;
   Task *task = nullptr;
-  core::Deque::Iterator it;
+  core::Deque<Task>::Iterator it;
+  core::Deque<Surface::DrawTask>::Iterator draw_task_it;
 
   while (true) {
 
@@ -255,12 +256,12 @@ int Application::Run() {
     /*
      * Draw contents on every surface requested
      */
-    it = Surface::kDrawTaskDeque.begin();
-    while (it != Surface::kDrawTaskDeque.end()) {
-      task = static_cast<Task *>(it.element());
-      it.Remove();
+    draw_task_it= Surface::kDrawTaskDeque.begin();
+    while (draw_task_it != Surface::kDrawTaskDeque.end()) {
+      task = static_cast<Task *>(draw_task_it.element());
+      draw_task_it.Remove();
       task->Run();
-      it = Surface::kDrawTaskDeque.begin();
+      draw_task_it = Surface::kDrawTaskDeque.begin();
     }
 
     /*

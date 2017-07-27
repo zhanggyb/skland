@@ -20,12 +20,12 @@
 namespace skland {
 namespace core {
 
-Deque::Element::~Element() {
+BiNode::~BiNode() {
   if (nullptr != previous_) previous_->next_ = next_;
   if (nullptr != next_) next_->previous_ = previous_;
 }
 
-void Deque::Element::PushFront(Element *other) {
+void BiNode::PushFront(BiNode *other) {
   if (other == this) return;
 
   other->Unlink();
@@ -36,7 +36,7 @@ void Deque::Element::PushFront(Element *other) {
   other->next_ = this;
 }
 
-void Deque::Element::PushBack(Element *other) {
+void BiNode::PushBack(BiNode *other) {
   if (other == this) return;
 
   other->Unlink();
@@ -47,107 +47,12 @@ void Deque::Element::PushBack(Element *other) {
   other->previous_ = this;
 }
 
-void Deque::Element::Unlink() {
+void BiNode::Unlink() {
   if (nullptr != previous_) previous_->next_ = next_;
   if (nullptr != next_) next_->previous_ = previous_;
 
   previous_ = nullptr;
   next_ = nullptr;
-}
-
-// -----------------
-
-Deque::Deque() {
-  first_.next_ = &last_;
-  last_.previous_ = &first_;
-}
-
-Deque::~Deque() {
-  Clear();
-}
-
-void Deque::PushFront(Element *item) {
-  item->Unlink();
-  first_.PushBack(item);
-}
-
-void Deque::PushBack(Element *item) {
-  item->Unlink();
-  last_.PushFront(item);
-}
-
-void Deque::Insert(Element *item, int index) {
-  if (index >= 0) {
-    Element *p = first_.next_;
-    while ((&last_ != p) && (index > 0)) {
-      p = p->next_;
-      index--;
-    }
-    p->PushFront(item);
-  } else {
-    Element *p = last_.previous_;
-    while ((&first_ != p) && (index < -1)) {
-      p = p->previous_;
-      index++;
-    }
-    p->PushBack(item);
-  }
-}
-
-Deque::Element *Deque::Remove(Element *item) {
-  if (nullptr == item) return nullptr;
-
-  for (Iterator it = begin(); it != end(); ++it) {
-    if (it == item) {
-      it.Remove();
-      return item;
-    }
-  }
-
-  return nullptr;
-}
-
-size_t Deque::GetSize() const {
-  size_t ret = 0;
-
-  Element *element = first_.next_;
-  while (element != &last_) {
-    ++ret;
-    element = element->next_;
-  }
-
-  return ret;
-}
-
-bool Deque::IsEmpty() const {
-  _ASSERT(last_.previous_ == &first_);
-  return first_.next_ == &last_;
-}
-
-void Deque::Clear() {
-  while (first_.next_ != &last_) {
-    first_.next_->Unlink();
-  }
-}
-
-Deque::Element *Deque::operator[](int index) const {
-  Element *p = nullptr;
-
-  if (index >= 0) {
-    p = first_.next_;
-    while ((&last_ != p) && (index > 0)) {
-      p = p->next_;
-      index--;
-    }
-  } else {
-    p = last_.previous_;
-    while ((&first_ != p) && (index < -1)) {
-      p = p->previous_;
-      index++;
-    }
-  }
-
-  return p;
 }
 
 } // namespace core

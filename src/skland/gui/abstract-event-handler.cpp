@@ -20,7 +20,7 @@
 namespace skland {
 namespace gui {
 
-core::Deque AbstractEventHandler::kIdleTaskDeque;
+core::Deque<Task> AbstractEventHandler::kIdleTaskDeque;
 
 AbstractEventHandler::AbstractEventHandler()
     : Trackable() {

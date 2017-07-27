@@ -88,11 +88,11 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
     AbstractEventHandler *event_handler() const { return event_handler_; }
 
     EventTask *GetPrevious() const {
-      return static_cast<EventTask *>(core::Deque::Element::previous());
+      return static_cast<EventTask *>(core::BiNode::previous());
     }
 
     EventTask *GetNext() const {
-      return static_cast<EventTask *>(core::Deque::Element::next());
+      return static_cast<EventTask *>(core::BiNode::next());
     }
 
     static EventTask *GetMouseTask(const AbstractEventHandler *event_hander);
@@ -196,7 +196,7 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
 
   std::unique_ptr<Private> p_;
 
-  static core::Deque kIdleTaskDeque;
+  static core::Deque<Task> kIdleTaskDeque;
 
 };
 

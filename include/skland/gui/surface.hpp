@@ -196,7 +196,22 @@ class Surface {
 
  private:
 
-  struct DrawTask;
+  struct DrawTask : public Task {
+
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(DrawTask);
+    DrawTask() = delete;
+
+    explicit DrawTask(Surface *surface)
+        : surface(surface) {}
+
+    virtual ~DrawTask() = default;
+
+    virtual void Run() const final;
+
+    Surface *surface;
+
+  };
+
   struct CommitTask;
   struct Private;
 
@@ -224,9 +239,9 @@ class Surface {
    */
   static int kShellSurfaceCount;
 
-  static core::Deque kDrawTaskDeque;
+  static core::Deque<DrawTask> kDrawTaskDeque;
 
-  static core::Deque kCommitTaskDeque;
+  static core::Deque<Task> kCommitTaskDeque;
 
   std::unique_ptr<Private> p_;
 

@@ -56,7 +56,7 @@ enum LayoutPolicy {
  * don't use this class directly. Instead, you use or create a subclass.
  *
  * A view can have parent and subviews, when you create a GUI application, it
- * generates a view hierachy.
+ * generates a view hierarchy.
  *
  * A view object can have arbitrary number of surfaces or shares the surface
  * with others which is managed in one of parent views.

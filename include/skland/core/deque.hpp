@@ -26,69 +26,100 @@ namespace core {
 
 /**
  * @ingroup core
- * @brief A simple double-ended queue container
+ * @brief A bidirectional node used in deque or custom list
+ *
+ * You usually don't use this class directly. Instead, you use or create a subclass.
+ *
+ * A BiNode object can be linked to another by using the PushBack(), PushFront().
+ * When needed, use a Deque to manage all nodes, for example:
+ * @code
+ *  class CustomNode: public core::BiNode {}
+ *
+ *  core::Deque<CustomNode> deque;
+ *  auto node1 = new CustomNode;
+ *  auto node2 = new CustomNode;
+ *  deque.PushBack(node1);
+ *  deque.Insert(node2);
+ * @endcode
  */
+class BiNode {
+
+  template<typename T> friend
+  class Deque;
+
+ public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(BiNode);
+
+  /**
+   * @brief Default constructor
+   */
+  BiNode()
+      : previous_(nullptr),
+        next_(nullptr) {}
+
+  /**
+   * @brief Constructor
+   */
+  virtual ~BiNode();
+
+  /**
+   * @brief Check if this node is linked to another
+   * @return
+   */
+  bool IsLinked() const {
+    return (nullptr != previous_) || (nullptr != next_);
+  }
+
+  /**
+   * @brief Push another node to the front
+   * @param other
+   */
+  void PushFront(BiNode *other);
+
+  /**
+   * @brief Push another node to the back
+   * @param other
+   */
+  void PushBack(BiNode *other);
+
+  /**
+   * @brief Break the link to both the previous and next node
+   */
+  void Unlink();
+
+ protected:
+
+  /**
+   * @brief Getter of previous node
+   * @return
+   */
+  BiNode *previous() const { return previous_; }
+
+  /**
+   * @brief Getter of next node
+   * @return
+   */
+  BiNode *next() const { return next_; }
+
+ private:
+
+  BiNode *previous_;
+  BiNode *next_;
+
+};
+
+/**
+ * @ingroup core
+ * @brief A simple double-ended queue container
+ * @tparam T Must be a BiNode class or subclass
+ */
+template<typename T = BiNode>
 class Deque {
 
  public:
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Deque);
-
-  /**
-   * @brief A nested class represents an element in a deque
-   */
-  class Element {
-
-    friend class Deque;
-
-   public:
-
-    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Element);
-
-    Element()
-        : previous_(nullptr),
-          next_(nullptr) {}
-
-    virtual ~Element();
-
-    bool IsLinked() const {
-      return (nullptr != previous_) || (nullptr != next_);
-    }
-
-    /**
-     * @brief Push another element to the front
-     * @param other
-     */
-    void PushFront(Element *other);
-
-    /**
-     * @brief Push another element to the back
-     * @param other
-     */
-    void PushBack(Element *other);
-
-    void Unlink();
-
-   protected:
-
-    /**
-     * @brief Getter of previous_
-     * @return
-     */
-    Element *previous() const { return previous_; }
-
-    /**
-     * @brief Getter of next_
-     * @return
-     */
-    Element *next() const { return next_; }
-
-   private:
-
-    Element *previous_;
-    Element *next_;
-
-  };
 
   /**
    * @brief A nested iterator for deque
@@ -97,7 +128,7 @@ class Deque {
 
    public:
 
-    explicit Iterator(Element *element = nullptr)
+    explicit Iterator(BiNode *element = nullptr)
         : element_(element) {}
 
     Iterator(const Iterator &orig) = default;
@@ -124,11 +155,11 @@ class Deque {
       return Iterator(element_->previous_);
     }
 
-    void PushFront(Element *element) {
+    void PushFront(T *element) {
       element_->PushFront(element);
     }
 
-    void PushBack(Element *element) {
+    void PushBack(T *element) {
       element_->PushBack(element);
     }
 
@@ -140,7 +171,7 @@ class Deque {
       return element_ == other.element_;
     }
 
-    bool operator==(const Element *element) const {
+    bool operator==(const T *element) const {
       return element_ == element;
     }
 
@@ -148,29 +179,38 @@ class Deque {
       return element_ != other.element_;
     }
 
-    bool operator!=(const Element *element) const {
+    bool operator!=(const T *element) const {
       return element_ != element;
     }
 
-    Element *element() const {
-      return element_;
+    T *element() const {
+      return nullptr == element_->previous_ ?
+             nullptr : (nullptr == element_->next_ ?
+                        nullptr : (static_cast<T *>(element_)));
     }
 
     explicit operator bool() const {
-      return nullptr != element_;
+      return nullptr == element_ ?
+             false : (nullptr == element_->previous_ ?
+                      false : (nullptr != element_->next_));
     }
 
    private:
 
-    Element *element_;
+    BiNode *element_;
 
   };
 
+  /**
+   * @brief A nested const iterator class
+   */
   class ConstIterator {
 
    public:
 
-    explicit ConstIterator(const Element *element)
+    ConstIterator() = delete;
+
+    explicit ConstIterator(const BiNode *element = nullptr)
         : element_(element) {}
 
     ConstIterator(const ConstIterator &orig) = default;
@@ -201,7 +241,7 @@ class Deque {
       return element_ == other.element_;
     }
 
-    bool operator==(const Element *element) const {
+    bool operator==(const T *element) const {
       return element_ == element;
     }
 
@@ -209,21 +249,25 @@ class Deque {
       return element_ != other.element_;
     }
 
-    bool operator!=(const Element *element) const {
+    bool operator!=(const T *element) const {
       return element_ != element;
     }
 
-    const Element *element() const {
-      return element_;
+    const T *element() const {
+      return nullptr == element_->previous_ ?
+             nullptr : (nullptr == element_->next_ ?
+                        nullptr : (static_cast<const T *>(element_)));
     }
 
     explicit operator bool() const {
-      return nullptr != element_;
+      return nullptr == element_ ?
+             false : (nullptr == element_->previous_ ?
+                      false : (nullptr != element_->next_));
     }
 
    private:
 
-    const Element *element_;
+    const BiNode *element_;
 
   };
 
@@ -231,13 +275,13 @@ class Deque {
 
   virtual ~Deque();
 
-  void PushFront(Element *item);
+  void PushFront(T *item);
 
-  void PushBack(Element *item);
+  void PushBack(T *item);
 
-  void Insert(Element *item, int index = 0);
+  void Insert(T *item, int index = 0);
 
-  Element *Remove(Element *item);
+  T *Remove(T *item);
 
   size_t GetSize() const;
 
@@ -245,7 +289,7 @@ class Deque {
 
   void Clear();
 
-  Element *operator[](int index) const;
+  T *operator[](int index) const;
 
   Iterator begin() const {
     return Iterator(first_.next_);
@@ -264,7 +308,7 @@ class Deque {
   }
 
   Iterator end() const {
-    return Iterator(const_cast<Element *>(&last_));
+    return Iterator(const_cast<BiNode *>(&last_));
   }
 
   ConstIterator cend() const {
@@ -272,7 +316,7 @@ class Deque {
   }
 
   Iterator rend() const {
-    return Iterator(const_cast<Element *>(&first_));
+    return Iterator(const_cast<BiNode *>(&first_));
   }
 
   ConstIterator crend() const {
@@ -281,16 +325,118 @@ class Deque {
 
  protected:
 
-  const Element *first() const { return &first_; }
+  const BiNode *first() const { return &first_; }
 
-  const Element *last() const { return &last_; }
+  const BiNode *last() const { return &last_; }
 
  private:
 
-  Element first_;
-  Element last_;
+  BiNode first_;
+  BiNode last_;
 
 };
+
+template<typename T>
+Deque<T>::Deque() {
+  first_.next_ = &last_;
+  last_.previous_ = &first_;
+}
+
+template<typename T>
+Deque<T>::~Deque() {
+  Clear();
+}
+
+template<typename T>
+void Deque<T>::PushFront(T *item) {
+  item->Unlink();
+  first_.PushBack(item);
+}
+
+template<typename T>
+void Deque<T>::PushBack(T *item) {
+  item->Unlink();
+  last_.PushFront(item);
+}
+
+template<typename T>
+void Deque<T>::Insert(T *item, int index) {
+  if (index >= 0) {
+    T *p = first_.next_;
+    while ((&last_ != p) && (index > 0)) {
+      p = p->next_;
+      index--;
+    }
+    p->PushFront(item);
+  } else {
+    T *p = last_.previous_;
+    while ((&first_ != p) && (index < -1)) {
+      p = p->previous_;
+      index++;
+    }
+    p->PushBack(item);
+  }
+}
+
+template<typename T>
+T *Deque<T>::Remove(T *item) {
+  if (nullptr == item) return nullptr;
+
+  for (Iterator it = begin(); it != end(); ++it) {
+    if (it == item) {
+      it.Remove();
+      return item;
+    }
+  }
+
+  return nullptr;
+}
+
+template<typename T>
+size_t Deque<T>::GetSize() const {
+  size_t ret = 0;
+
+  T *element = first_.next_;
+  while (element != &last_) {
+    ++ret;
+    element = element->next_;
+  }
+
+  return ret;
+}
+
+template<typename T>
+bool Deque<T>::IsEmpty() const {
+  return first_.next_ == &last_;
+}
+
+template<typename T>
+void Deque<T>::Clear() {
+  while (first_.next_ != &last_) {
+    first_.next_->Unlink();
+  }
+}
+
+template<typename T>
+T *Deque<T>::operator[](int index) const {
+  T *p = nullptr;
+
+  if (index >= 0) {
+    p = first_.next_;
+    while ((&last_ != p) && (index > 0)) {
+      p = p->next_;
+      index--;
+    }
+  } else {
+    p = last_.previous_;
+    while ((&first_ != p) && (index < -1)) {
+      p = p->previous_;
+      index++;
+    }
+  }
+
+  return p;
+}
 
 } // namespace core
 } // namespace skland
