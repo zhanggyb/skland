@@ -261,6 +261,10 @@ Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
   return p_->shell_surface;
 }
 
+void AbstractShellView::RenderSurface(const Surface *surface) {
+  // override in sub class
+}
+
 void AbstractShellView::OnEnterOutput(const Surface *surface, const Output *output) {
 }
 
@@ -383,33 +387,33 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *
   Point cursor = event->GetWindowXY();
   EventTask *mouse_task = EventTask::GetMouseTask(this);
 
-  if (nullptr == mouse_task->next()) {
+  if (nullptr == mouse_task->GetNext()) {
     _ASSERT(mouse_task->event_handler() == this);
-    _ASSERT(nullptr == mouse_task->previous());
+    _ASSERT(nullptr == mouse_task->GetPrevious());
     if (view->Contain(cursor.x, cursor.y)) {
       view->OnMouseEnter(event);
       if (event->IsAccepted()) {
         mouse_task->PushBack(EventTask::GetMouseTask(view));
-        mouse_task = static_cast<EventTask *>(mouse_task->next());
+        mouse_task = static_cast<EventTask *>(mouse_task->GetNext());
         DispatchMouseEnterEvent(view, event, mouse_task);
       } else if (event->IsIgnored()) {
         DispatchMouseEnterEvent(view, event, mouse_task);
       }
     }
   } else {
-    while (mouse_task->next()) mouse_task = static_cast<EventTask *>(mouse_task->next()); // move to tail
+    while (mouse_task->GetNext()) mouse_task = static_cast<EventTask *>(mouse_task->GetNext()); // move to tail
     AbstractView *last = nullptr;
     EventTask *tail = nullptr;
-    while (mouse_task->previous()) {
+    while (mouse_task->GetPrevious()) {
       tail = mouse_task;
       last = static_cast<AbstractView *>(tail->event_handler());
       if (last->Contain(cursor.x, cursor.y)) {
         break;
       }
-      mouse_task = static_cast<EventTask *>(mouse_task->previous());
+      mouse_task = static_cast<EventTask *>(mouse_task->GetPrevious());
       tail->Unlink();
       last->OnMouseLeave();
-      if (nullptr == mouse_task->previous()) break;
+      if (nullptr == mouse_task->GetPrevious()) break;
     }
 
     DispatchMouseEnterEvent(last, event, mouse_task);
@@ -417,36 +421,36 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *
 }
 
 void AbstractShellView::DispatchMouseLeaveEvent() {
-  Task *it = EventTask::GetMouseTask(this)->next();
+  EventTask *it = EventTask::GetMouseTask(this)->GetNext();
 
-  Task *tmp = nullptr;
+  EventTask *tmp = nullptr;
   while (it) {
     tmp = it;
-    it = it->next();
+    it = it->GetNext();
     tmp->Unlink();
-    static_cast<EventTask *>(tmp)->event_handler()->OnMouseLeave();
+    tmp->event_handler()->OnMouseLeave();
   }
 }
 
 void AbstractShellView::DispatchMouseDownEvent(MouseEvent *event) {
   _ASSERT(event->GetState() == kMouseButtonPressed);
 
-  Task *it = EventTask::GetMouseTask(this)->next();
+  EventTask *it = EventTask::GetMouseTask(this)->GetNext();
   while (it) {
-    static_cast<EventTask *>(it)->event_handler()->OnMouseDown(event);
+    it->event_handler()->OnMouseDown(event);
     if (event->IsRejected()) break;
-    it = it->next();
+    it = it->GetNext();
   }
 }
 
 void AbstractShellView::DispatchMouseUpEvent(MouseEvent *event) {
   _ASSERT(event->GetState() == kMouseButtonReleased);
 
-  Task *it = EventTask::GetMouseTask(this)->next();
+  EventTask *it = EventTask::GetMouseTask(this)->GetNext();
   while (it) {
-    static_cast<EventTask *>(it)->event_handler()->OnMouseUp(event);
+    it->event_handler()->OnMouseUp(event);
     if (event->IsRejected()) break;
-    it = it->next();
+    it = it->GetNext();
   }
 }
 
@@ -457,7 +461,7 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent
     sub->OnMouseEnter(event);
     if (event->IsAccepted()) {
       tail->PushBack(EventTask::GetMouseTask(sub));
-      tail = static_cast<EventTask *>(tail->next());
+      tail = static_cast<EventTask *>(tail->GetNext());
       parent = sub;
       sub = parent->DispatchMouseEnterEvent(event);
     } else if (event->IsIgnored()) {

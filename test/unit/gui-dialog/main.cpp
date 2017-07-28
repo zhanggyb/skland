@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-#include "surface-commit_task.hpp"
-#include "surface_private.hpp"
+#include <gtest/gtest.h>
 
-namespace skland {
-namespace gui {
-
-void Surface::CommitTask::Run() const {
-  wl_surface_commit(surface->p_->wl_surface);
+int main(int argc, char *argv[]) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
-
-} // namespace gui
-} // namespace skland

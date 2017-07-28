@@ -17,64 +17,27 @@
 #ifndef SKLAND_GUI_TASK_HPP_
 #define SKLAND_GUI_TASK_HPP_
 
-#include "skland/core/export.hpp"
+#include "skland/core/defines.hpp"
+#include "skland/core/deque.hpp"
 
 #include <cstdint>
 
 namespace skland {
 namespace gui {
 
-SKLAND_EXPORT class Task {
-
-  Task(const Task &) = delete;
-  Task &operator=(const Task &) = delete;
+SKLAND_EXPORT class Task : public core::BiNode {
 
  public:
 
-  Task()
-      : previous_(nullptr), next_(nullptr) {}
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Task);
 
-  virtual ~Task();
+  Task() = default;
 
-  bool IsLinked() const {
-    return (nullptr != previous_) || (nullptr != next_);
-  }
-
-  /**
-   * @brief Push back a task to this one
-   * @param other
-   */
-  void PushBack(Task *other);
-
-  void PushFront(Task *other);
-
-  /**
-   * @brief Push back a task list to this one
-   * @param first
-   * @param last
-   */
-  void PushBack(Task *first, Task *last);
-
-  void PushFront(Task *first, Task *last);
-
-  void Unlink();
+  virtual ~Task() = default;
 
   virtual void Run() const {
     // override this
   }
-
-  Task *previous() const {
-    return previous_;
-  }
-
-  Task *next() const {
-    return next_;
-  }
-
- private:
-
-  Task *previous_;
-  Task *next_;
 
 };
 

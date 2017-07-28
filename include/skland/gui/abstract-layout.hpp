@@ -30,10 +30,9 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   friend class AbstractView;
 
-  AbstractLayout(const AbstractLayout &) = delete;
-  AbstractLayout &operator=(const AbstractLayout &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractLayout);
 
   struct LayoutTask;
 

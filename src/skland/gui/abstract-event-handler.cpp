@@ -20,8 +20,7 @@
 namespace skland {
 namespace gui {
 
-Task AbstractEventHandler::kIdleTaskHead;
-Task AbstractEventHandler::kIdleTaskTail;
+core::Deque<Task> AbstractEventHandler::kIdleTaskDeque;
 
 AbstractEventHandler::AbstractEventHandler()
     : Trackable() {
@@ -34,20 +33,6 @@ AbstractEventHandler::~AbstractEventHandler() {
 
 void AbstractEventHandler::AuditDestroyingToken(core::details::Token */*token*/) {
 
-}
-
-void AbstractEventHandler::InitializeIdleTaskList() {
-  kIdleTaskHead.PushBack(&kIdleTaskTail);
-}
-
-void AbstractEventHandler::ClearIdleTaskList() {
-  Task *task = kIdleTaskHead.next();
-  Task *next_task = nullptr;
-  while (task != &kIdleTaskTail) {
-    next_task = task->next();
-    task->Unlink();
-    task = next_task;
-  }
 }
 
 // --------------------

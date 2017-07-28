@@ -56,7 +56,7 @@ enum LayoutPolicy {
  * don't use this class directly. Instead, you use or create a subclass.
  *
  * A view can have parent and subviews, when you create a GUI application, it
- * generates a view hierachy.
+ * generates a view hierarchy.
  *
  * A view object can have arbitrary number of surfaces or shares the surface
  * with others which is managed in one of parent views.
@@ -72,15 +72,16 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   friend class AbstractShellView;
   friend class AbstractLayout;
 
-  AbstractView(const AbstractView &) = delete;
-  AbstractView &operator=(const AbstractView &) = delete;
-
  public:
 
-  using Padding = core::Padding;  /**< @brief Alias of core::Padding */
-  using RectF = core::RectF;  /**< @brief Alias of core::RectF */
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractView);
 
-  enum DirtyFlagMask {
+  using Size = core::SizeI; /**< @brief Alias of core::SizeI */
+  using Rect = core::RectI; /**< @brief Alias of core::RectI */
+  using RectF = core::RectF;  /**< @brief Alias of core::RectF */
+  using Padding = core::Padding;  /**< @brief Alias of core::Padding */
+
+  enum GeometryDirtyFlagMask {
     kDirtyLeftMask = 0x1 << 0,
     kDirtyTopMask = 0x1 << 1,
     kDirtyRightMask = 0x1 << 2,
@@ -92,18 +93,37 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   class Iterator;
   class ConstIterator;
 
-  class RedrawTask : public Task {
-
-    RedrawTask() = delete;
-    RedrawTask(const RedrawTask &) = delete;
-    RedrawTask &operator=(const RedrawTask &) = delete;
+  class GeometryTask : public Task {
 
    public:
+
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GeometryTask);
+    GeometryTask() = delete;
+
+    GeometryTask(AbstractView *view)
+        : Task(), view_(view) {}
+
+    virtual ~GeometryTask() = default;
+
+    virtual void Run() const final;
+
+   private:
+
+    AbstractView *view_;
+
+  };
+
+  class RedrawTask : public Task {
+
+   public:
+
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(RedrawTask);
+    RedrawTask() = delete;
 
     RedrawTask(AbstractView *view)
         : Task(), view_(view) {}
 
-    virtual ~RedrawTask() {}
+    virtual ~RedrawTask() = default;
 
     virtual void Run() const final;
 
@@ -388,6 +408,12 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   void Update(bool validate = true);
 
+  /**
+   * @brief Returns a boolean if this view contains the given pointer position
+   * @param x
+   * @param y
+   * @return
+   */
   virtual bool Contain(int x, int y) const;
 
   /**
@@ -398,8 +424,16 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   void Destroy();
 
+  /**
+   * @brief Get the parent view
+   * @return
+   */
   AbstractView *GetParent() const;
 
+  /**
+   * @brief Get the layout
+   * @return
+   */
   AbstractLayout *GetLayout() const;
 
   /**
@@ -481,10 +515,22 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @param view A view object, it is always this view or a sub view in hierarchy
    * @return A pointer to a surface or nullptr
    */
-  virtual Surface *GetSurface(const AbstractView *view) const;
+  virtual Surface *GetSurface(const AbstractView *view) const override;
 
+  virtual void RenderSurface(const Surface *surface) override;
+
+  /**
+   * @brief Callback when this view enters an output
+   * @param surface
+   * @param output
+   */
   virtual void OnEnterOutput(const Surface *surface, const Output *output) override;
 
+  /**
+   * @brief Callback when this view leaves an output
+   * @param surface
+   * @param output
+   */
   virtual void OnLeaveOutput(const Surface *surface, const Output *output) override;
 
   /**
@@ -498,8 +544,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * The new size will never smaller than minimal size or larger than maximal size.
    */
   virtual void OnConfigureGeometry(int dirty_flag,
-                                   const core::RectF &old_geometry,
-                                   const core::RectF &new_geometry) = 0;
+                                   const RectF &old_geometry,
+                                   const RectF &new_geometry) = 0;
 
   /**
    * @brief Callback when the geometry changes before draw this view
@@ -510,7 +556,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * This virtual method is called only when there's new geometry need to be saved before drawing this
    * view.
    */
-  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) = 0;
+  virtual void OnGeometryChange(int dirty_flag,
+                                const RectF &old_geometry,
+                                const RectF &new_geometry) = 0;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
 

@@ -27,7 +27,7 @@
 namespace skland {
 namespace gui {
 
-using core::Deque;
+using core::CompoundDeque;
 
 Display *Display::kDisplay = nullptr;
 
@@ -35,13 +35,10 @@ Display::Display() {
   p_.reset(new Private);
 
   p_->cursors.resize(kCursorBlank, nullptr);
-  AbstractEventHandler::InitializeIdleTaskList();
-  Surface::InitializeCommitTaskList();
 }
 
 Display::~Display() {
-  AbstractEventHandler::ClearIdleTaskList();
-  Surface::ClearCommitTaskList();
+
 }
 
 void Display::Connect(const char *name) {
@@ -132,11 +129,11 @@ void Display::Disconnect() noexcept {
   wl_display_disconnect(p_->wl_display);
 }
 
-const Deque &Display::GetOutputs() {
+const CompoundDeque &Display::GetOutputs() {
   return kDisplay->p_->outputs;
 }
 
-const Deque &Display::GetInputs() {
+const CompoundDeque &Display::GetInputs() {
   return kDisplay->p_->inputs;
 }
 
@@ -154,7 +151,7 @@ void Display::AddOutput(Output *output, int index) {
 
 void Display::DestroyOutput(uint32_t id) {
   Output *output = nullptr;
-  for (Deque::Iterator it = p_->outputs.begin(); it != p_->outputs.end(); ++it) {
+  for (CompoundDeque::Iterator it = p_->outputs.begin(); it != p_->outputs.end(); ++it) {
     output = it.cast<Output>();
     if (output->GetID() == id) {
       delete output;

@@ -237,17 +237,43 @@ int Application::Run() {
   int count = 0;
   int ret = 0;
   Task *task = nullptr;
+  core::Deque<Task>::Iterator it;
+  core::Deque<Surface::DrawTask>::Iterator draw_task_it;
+  core::Deque<Surface::CommitTask>::Iterator commit_task_it;
 
   while (true) {
-    while (AbstractView::kIdleTaskHead.next() != &AbstractView::kIdleTaskTail) {
-      task = AbstractView::kIdleTaskHead.next();
-      task->Unlink();
+
+    /*
+     * Run idle tasks (process geometries)
+     */
+    it = AbstractEventHandler::kIdleTaskDeque.begin();
+    while (it != AbstractEventHandler::kIdleTaskDeque.end()) {
+      task = it.element();
+      it.Remove();
       task->Run();
+      it = AbstractEventHandler::kIdleTaskDeque.begin();
     }
-    while (Surface::kCommitTaskHead.next() != &Surface::kCommitTaskTail) {
-      task = Surface::kCommitTaskHead.next();
-      task->Unlink();
+
+    /*
+     * Draw contents on every surface requested
+     */
+    draw_task_it= Surface::kDrawTaskDeque.begin();
+    while (draw_task_it != Surface::kDrawTaskDeque.end()) {
+      task = draw_task_it.element();
+      draw_task_it.Remove();
       task->Run();
+      draw_task_it = Surface::kDrawTaskDeque.begin();
+    }
+
+    /*
+     * Commit every surface requested
+     */
+    commit_task_it = Surface::kCommitTaskDeque.begin();
+    while (commit_task_it != Surface::kCommitTaskDeque.end()) {
+      task = commit_task_it.element();
+      commit_task_it.Remove();
+      task->Run();
+      commit_task_it = Surface::kCommitTaskDeque.begin();
     }
 
     wl_display_dispatch_pending(Display::kDisplay->p_->wl_display);
@@ -297,11 +323,11 @@ int Application::GetArgc() {
   return kInstance->p_->argc;
 }
 
-char** Application::GetArgv() {
+char **Application::GetArgv() {
   return kInstance->p_->argv;
 }
 
-const std::thread::id& Application::GetThreadID() {
+const std::thread::id &Application::GetThreadID() {
   return kInstance->p_->thread_id;
 }
 

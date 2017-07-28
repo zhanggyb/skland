@@ -19,7 +19,7 @@
 
 #include "skland/core/types.hpp"
 #include "skland/core/sigcxx.hpp"
-#include "skland/core/deque.hpp"
+#include "skland/core/compound-deque.hpp"
 
 #include "cursor.hpp"
 
@@ -49,7 +49,7 @@ class Display {
   friend class Input;
   friend class Callback;
 
-  using Deque = core::Deque;
+  using CompoundDeque = core::CompoundDeque;
 
  public:
 
@@ -60,13 +60,13 @@ class Display {
    * @brief Get a deque of outputs
    * @return
    */
-  static const Deque &GetOutputs();
+  static const CompoundDeque &GetOutputs();
 
   /**
    * @brief Get a deque of inputs
    * @return
    */
-  static const Deque &GetInputs();
+  static const CompoundDeque &GetInputs();
 
   /**
    * @brief Get a set of supported pixel formats

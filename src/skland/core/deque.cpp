@@ -14,190 +14,45 @@
  * limitations under the License.
  */
 
-#include <skland/core/deque.hpp>
-
-#include <skland/core/assert.hpp>
+#include "skland/core/deque.hpp"
+#include "skland/core/assert.hpp"
 
 namespace skland {
 namespace core {
 
-Deque::Element::Element()
-    : previous_(nullptr),
-      next_(nullptr),
-      deque_(nullptr) {
+BiNode::~BiNode() {
+  if (nullptr != previous_) previous_->next_ = next_;
+  if (nullptr != next_) next_->previous_ = previous_;
 }
 
-Deque::Element::~Element() {
-  if (deque_) deque_->Remove(this);
+void BiNode::PushFront(BiNode *other) {
+  if (other == this) return;
+
+  other->Unlink();
+
+  if (nullptr != previous_) previous_->next_ = other;
+  other->previous_ = previous_;
+  previous_ = other;
+  other->next_ = this;
 }
 
-Deque::Deque()
-    : first_(nullptr), last_(nullptr), count_(0) {
+void BiNode::PushBack(BiNode *other) {
+  if (other == this) return;
 
+  other->Unlink();
+
+  if (nullptr != next_) next_->previous_ = other;
+  other->next_ = next_;
+  next_ = other;
+  other->previous_ = this;
 }
 
-Deque::~Deque() {
-  Clear();
-}
+void BiNode::Unlink() {
+  if (nullptr != previous_) previous_->next_ = next_;
+  if (nullptr != next_) next_->previous_ = previous_;
 
-void Deque::PushFront(Element *item) {
-  _ASSERT(nullptr == item->deque_);
-  _ASSERT(nullptr == item->previous_);
-  _ASSERT(nullptr == item->next_);
-
-  if (first_) {
-    first_->previous_ = item;
-    item->next_ = first_;
-  } else {
-    _ASSERT(nullptr == last_);
-    _ASSERT(0 == count_);
-  }
-  first_ = item;
-
-  item->deque_ = this;
-  count_++;
-}
-
-void Deque::PushBack(Element *item) {
-  _ASSERT(nullptr == item->deque_);
-  _ASSERT(nullptr == item->previous_);
-  _ASSERT(nullptr == item->next_);
-
-  if (last_) {
-    last_->next_ = item;
-    item->previous_ = last_;
-  } else {
-    _ASSERT(nullptr == first_);
-    _ASSERT(0 == count_);
-    first_ = item;
-  }
-  last_ = item;
-
-  item->deque_ = this;
-  count_++;
-}
-
-void Deque::Insert(Element *item, int index) {
-  _ASSERT(nullptr == item->deque_);
-  _ASSERT(nullptr == item->previous_);
-  _ASSERT(nullptr == item->next_);
-
-  if (nullptr == first_) {
-    _ASSERT(nullptr == last_);
-    _ASSERT(0 == count_);
-    last_ = item;
-    first_ = item;
-  } else {
-    if (index >= 0) {
-      Element *p = first_;
-      while (p && (index > 0)) {
-        p = p->next_;
-        index--;
-      }
-      if (p) {  // insert before p
-        item->previous_ = p->previous_;
-        item->next_ = p;
-        if (p->previous_) p->previous_->next_ = item;
-        else first_ = item;
-        p->previous_ = item;
-      } else {  // push back
-        last_->next_ = item;
-        item->previous_ = last_;
-        last_ = item;
-      }
-    } else {
-      Element *p = last_;
-      while (p && (index < -1)) {
-        p = p->previous_;
-        index++;
-      }
-      if (p) {  // insert after p
-        item->next_ = p->next_;
-        item->previous_ = p;
-        if (p->next_) p->next_->previous_ = item;
-        else last_ = item;
-        p->next_ = item;
-      } else {  // push front
-        first_->previous_ = item;
-        item->next_ = first_;
-        first_ = item;
-      }
-    }
-  }
-
-  item->deque_ = this;
-  count_++;
-}
-
-Deque::Element *Deque::Remove(Element *item) {
-  if (item->deque_ != this) return nullptr;
-
-  _ASSERT(count_ > 0);
-
-  if (item->previous_) {
-    item->previous_->next_ = item->next_;
-  } else {
-    _ASSERT(first_ == item);
-    first_ = item->next_;
-  }
-
-  if (item->next_) {
-    item->next_->previous_ = item->previous_;
-  } else {
-    _ASSERT(last_ == item);
-    last_ = item->previous_;
-  }
-
-  count_--;
-  _ASSERT(count_ >= 0);
-
-  item->previous_ = nullptr;
-  item->next_ = nullptr;
-  item->deque_ = nullptr;
-
-  return item;
-}
-
-void Deque::Clear() {
-  Element *ptr = first_;
-  Element *next = nullptr;
-
-  while (ptr) {
-    next = ptr->next_;
-    ptr->previous_ = nullptr;
-    ptr->next_ = nullptr;
-    ptr->deque_ = nullptr;
-    delete ptr;
-    ptr = next;
-  }
-
-  count_ = 0;
-  first_ = nullptr;
-  last_ = nullptr;
-}
-
-Deque::Element *Deque::operator[](int index) const {
-  if (index < 0) index = count_ + index;
-
-  Element *item = nullptr;
-  int mid = (count_ + 1) / 2;
-
-  if (index >= 0 && index < mid) {
-    item = first_;
-    while (index > 0) {
-      item = item->next_;
-      index--;
-    }
-  } else if (index >= mid && index < count_) {
-    item = last_;
-    int max = count_ - 1;
-    while (index < max) {
-      item = item->previous_;
-      index++;
-    }
-  }
-
-  return item;
+  previous_ = nullptr;
+  next_ = nullptr;
 }
 
 } // namespace core

@@ -14,49 +14,38 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INPUT_HPP_
-#define SKLAND_GUI_INPUT_HPP_
+#ifndef SKLAND_GUI_DIALOG_HPP_
+#define SKLAND_GUI_DIALOG_HPP_
 
-#include "skland/core/compound-deque.hpp"
+#include "abstract-shell-view.hpp"
 
-#include "abstract-event-handler.hpp"
-
-#include <wayland-client.h>
 #include <memory>
 
 namespace skland {
 namespace gui {
 
-class Cursor;
-class KeyEvent;
-class MouseEvent;
-class TouchEvent;
-class AbstractView;
-struct ViewTask;
-
 /**
  * @ingroup gui
- * @brief Input manager
+ * @brief This class is currently for test
  */
-SKLAND_EXPORT class Input : public core::CompoundDeque::Element {
-
-  friend class Surface;
-
-  Input() = delete;
-  Input(const Input &) = delete;
-  Input &operator=(const Input &) = delete;
+SKLAND_EXPORT class Dialog : public AbstractShellView {
 
  public:
 
-  Input(uint32_t id, uint32_t version);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Dialog);
+  Dialog() = delete;
 
-  virtual ~Input();
+  explicit Dialog(const char *title, AbstractShellView *parent = nullptr);
 
-  void SetCursor(const Cursor *cursor) const;
+  virtual ~Dialog();
 
-  uint32_t GetID() const;
+ protected:
 
-  uint32_t GetVersion() const;
+  virtual void OnShown() final;
+
+  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
+
+  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
 
  private:
 
@@ -69,4 +58,4 @@ SKLAND_EXPORT class Input : public core::CompoundDeque::Element {
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_INPUT_HPP_
+#endif // SKLAND_GUI_DIALOG_HPP_

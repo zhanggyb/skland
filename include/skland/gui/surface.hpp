@@ -29,8 +29,6 @@
 namespace skland {
 namespace gui {
 
-class Application;
-class Display;
 class AbstractEventHandler;
 class Buffer;
 class Output;
@@ -82,11 +80,10 @@ class Surface {
   friend class Callback;
   friend class AbstractGraphicsInterface;
 
-  Surface() = delete;
-  Surface(const Surface &) = delete;
-  Surface &operator=(const Surface &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Surface);
+  Surface() = delete;
 
   class Shell;
   class Sub;
@@ -199,14 +196,41 @@ class Surface {
 
  private:
 
+  struct DrawTask : public Task {
+
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(DrawTask);
+    DrawTask() = delete;
+
+    explicit DrawTask(Surface *surface)
+        : surface(surface) {}
+
+    virtual ~DrawTask() = default;
+
+    virtual void Run() const final;
+
+    Surface *surface;
+
+  };
+
+  struct CommitTask : public Task {
+
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(CommitTask);
+    CommitTask() = delete;
+
+    CommitTask(Surface *surface)
+        : Task(), surface(surface) {}
+
+    virtual ~CommitTask() {}
+
+    virtual void Run() const;
+
+    Surface *surface;
+
+  };
+
   struct Private;
-  struct CommitTask;
 
-  Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
-
-  std::unique_ptr<Private> p_;
-
-  std::unique_ptr<CommitTask> commit_task_;
+  explicit Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
 
   // global surface stack:
 
@@ -214,16 +238,6 @@ class Surface {
    * @brief Delete all shell surfaces and clear the global stack
    */
   static void Clear();
-
-  /**
-    * @brief Initialize the idle task list
-    */
-  static void InitializeCommitTaskList();
-
-  /**
-   * @brief Destroy the redraw task list
-   */
-  static void ClearCommitTaskList();
 
   /**
    * @brief The top shell surface in the stack
@@ -240,8 +254,11 @@ class Surface {
    */
   static int kShellSurfaceCount;
 
-  static Task kCommitTaskHead;
-  static Task kCommitTaskTail;
+  static core::Deque<DrawTask> kDrawTaskDeque;
+
+  static core::Deque<CommitTask> kCommitTaskDeque;
+
+  std::unique_ptr<Private> p_;
 
 };
 
@@ -252,11 +269,10 @@ class Surface::Shell {
 
   friend class Surface;
 
-  Shell() = delete;
-  Shell(const Shell &) = delete;
-  Shell &operator=(const Shell &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Shell);
+  Shell() = delete;
 
   class Toplevel;
   class Popup;
@@ -276,7 +292,7 @@ class Surface::Shell {
   static Surface *Create(AbstractEventHandler *event_handler,
                          const Margin &margin = Margin());
 
-  Shell(Surface *surface);
+  explicit Shell(Surface *surface);
 
   ~Shell();
 
@@ -305,32 +321,16 @@ class Surface::Shell::Toplevel {
 
   friend class Shell;
 
-  Toplevel() = delete;
-  Toplevel(const Toplevel &) = delete;
-  Toplevel &operator=(const Toplevel &) = delete;
-
  public:
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Toplevel);
+  Toplevel() = delete;
+
   enum StatesMask {
-    /**
-     * the surface is maximized
-     */
-        kStateMaskMaximized = 0x1, /* 1 */
-
-    /**
-     * the surface is fullscreen
-     */
-        kStateMaskFullscreen = 0x1 << 1,  /* 2 */
-
-    /**
-     * the surface is being resized
-     */
-        kStateMaskResizing = 0x1 << 2, /* 4 */
-
-    /**
-     * the surface is now activated
-     */
-        kStateMaskActivated = 0x1 << 3, /* 8 */
+    kStateMaskMaximized = 0x1, /**< 1: the surface is maximized */
+    kStateMaskFullscreen = 0x1 << 1,      /**< 2: the surface is fullscreen */
+    kStateMaskResizing = 0x1 << 2, /**< 4: the surface is being resized */
+    kStateMaskActivated = 0x1 << 3, /**< 8: the surface is now activated */
   };
 
   /**
@@ -363,7 +363,7 @@ class Surface::Shell::Toplevel {
 
   struct Private;
 
-  Toplevel(Shell *shell_surface);
+  explicit Toplevel(Shell *shell_surface);
 
   ~Toplevel();
 
@@ -378,11 +378,10 @@ class Surface::Shell::Popup {
 
   friend class Shell;
 
-  Popup() = delete;
-  Popup(const Popup &) = delete;
-  Popup &operator=(const Popup &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Popup);
+  Popup() = delete;
 
   /**
    * @brief Create a popup shell surface
@@ -395,7 +394,7 @@ class Surface::Shell::Popup {
 
   struct Private;
 
-  Popup(Shell *shell);
+  explicit Popup(Shell *shell);
 
   ~Popup();
 
@@ -411,6 +410,9 @@ class Surface::Sub {
   friend class Surface;
 
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Sub);
+  Sub() = delete;
 
   /**
    * @brief Create a sub surface
@@ -466,11 +468,10 @@ class Surface::Sub {
  */
 class Surface::EGL {
 
-  EGL() = delete;
-  EGL(const EGL &) = delete;
-  EGL &operator=(const EGL &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(EGL);
+  EGL() = delete;
 
   enum Profile {
     kProfileOpenGLES2,  // OpenGL ES 2
@@ -513,7 +514,7 @@ class Surface::EGL {
 
   struct Private;
 
-  EGL(Surface *surface);
+  explicit EGL(Surface *surface);
 
   std::unique_ptr<Private> p_;
 

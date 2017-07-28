@@ -60,18 +60,16 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
   friend class AbstractView;
   friend class AbstractShellView;
 
-  AbstractEventHandler(const AbstractEventHandler &) = delete;
-  AbstractEventHandler &operator=(const AbstractEventHandler &)  = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE(AbstractEventHandler);
 
   class EventTask : public Task {
 
-    EventTask() = delete;
-    EventTask(const EventTask &) = delete;
-    EventTask &operator=(const EventTask &) = delete;
-
    public:
+
+    SKLAND_DECLARE_NONCOPYABLE(EventTask);
+    EventTask() = delete;
 
     /**
      * @brief Constructor
@@ -88,6 +86,14 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
     virtual ~EventTask() {}
 
     AbstractEventHandler *event_handler() const { return event_handler_; }
+
+    EventTask *GetPrevious() const {
+      return static_cast<EventTask *>(core::BiNode::previous());
+    }
+
+    EventTask *GetNext() const {
+      return static_cast<EventTask *>(core::BiNode::next());
+    }
 
     static EventTask *GetMouseTask(const AbstractEventHandler *event_hander);
 
@@ -153,16 +159,18 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
 
   /**
    * @brief A view request an update
-   * @param view A view in hierachy or null to update this object
+   * @param view A view in hierarchy wants to update this object
    */
   virtual void OnUpdate(AbstractView *view) = 0;
 
   /**
    * @brief Get surface for the given view
-   * @param view A view in hierachy or null to get shell surface for this object
+   * @param view A view in hierarchy or null to get shell surface for this object
    * @return A pointer to a surface or nullptr
    */
   virtual Surface *GetSurface(const AbstractView *view) const = 0;
+
+  virtual void RenderSurface(const Surface *surface) = 0;
 
   virtual void OnEnterOutput(const Surface *surface, const Output *output) = 0;
 
@@ -174,9 +182,13 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
    */
   virtual void AuditDestroyingToken(core::details::Token */*token*/) final;
 
-  static void PushToHead(Task *task) { kIdleTaskHead.PushBack(task); }
+  static void PushBackIdleTask(Task *task) {
+    kIdleTaskDeque.PushBack(task);
+  }
 
-  static void PushToTail(Task *task) { kIdleTaskTail.PushFront(task); }
+  static void PushFrontIdleTask(Task *task) {
+    kIdleTaskDeque.PushFront(task);
+  }
 
  private:
 
@@ -184,18 +196,7 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
 
   std::unique_ptr<Private> p_;
 
-  /**
-   * @brief Initialize the idle task list for redraw windows and views
-   */
-  static void InitializeIdleTaskList();
-
-  /**
-   * @brief Destroy the redraw task list
-   */
-  static void ClearIdleTaskList();
-
-  static Task kIdleTaskHead;
-  static Task kIdleTaskTail;
+  static core::Deque<Task> kIdleTaskDeque;
 
 };
 

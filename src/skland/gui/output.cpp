@@ -23,10 +23,10 @@
 namespace skland {
 namespace gui {
 
-using core::Deque;
+using core::CompoundDeque;
 
 Output::Output(uint32_t id, uint32_t version)
-    : Deque::Element() {
+    : CompoundDeque::Element() {
   p_.reset(new Private);
   p_->id = id;
   p_->version = version;

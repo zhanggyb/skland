@@ -14,30 +14,38 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_SURFACE_COMMIT_TASK_HPP_
-#define SKLAND_GUI_INTERNAL_SURFACE_COMMIT_TASK_HPP_
+#include "test.hpp"
 
-#include <skland/gui/surface.hpp>
-#include <skland/gui/task.hpp>
+#include <skland/gui/application.hpp>
+#include <skland/gui/dialog.hpp>
 
-namespace skland {
-namespace gui {
+Test::Test()
+    : testing::Test() {
+}
 
-SKLAND_NO_EXPORT struct Surface::CommitTask : public Task {
-  CommitTask(const CommitTask &) = delete;
-  CommitTask &operator=(const CommitTask &) = delete;
+Test::~Test() {
 
-  CommitTask(Surface *surface)
-      : Task(), surface(surface) {}
+}
 
-  virtual ~CommitTask() {}
+/**
+ * @brief Show a default empty window
+ *
+ * Expected result: display and resize a default window
+ */
+TEST_F(Test, show) {
+  using skland::gui::Application;
+  using skland::gui::Dialog;
 
-  virtual void Run() const;
+  int argc = 1;
+  char argv1[] = "show";  // to avoid compile warning
+  char *argv[] = {argv1};
 
-  Surface *surface;
-};
+  Application app(argc, argv);
 
-} // namespace gui
-} // namespace skland
+  Dialog win("Test Dialog");
+  win.Show();
 
-#endif // SKLAND_GUI_INTERNAL_SURFACE_COMMIT_TASK_HPP_
+  int result = app.Run();
+
+  ASSERT_TRUE(result == 0);
+}

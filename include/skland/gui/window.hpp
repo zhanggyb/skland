@@ -30,18 +30,31 @@ namespace gui {
  */
 SKLAND_EXPORT class Window : public AbstractShellView {
 
-  Window() = delete;
-  Window(const Window &) = delete;
-  Window &operator=(const Window &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Window);
+  Window() = delete;
+
+  using RectI = core::RectI;  /**< Alias of core::RectI */
 
   enum FlagMask {
     kFlagMaskFrameless = 0x1 << 0
   };
 
+  /**
+   * @brief Construct a 400 x 300 window with given title and flags
+   * @param title
+   * @param flags
+   */
   Window(const char *title, int flags = 0);
 
+  /**
+   * @brief Construct a window with given size, title and flags
+   * @param width
+   * @param height
+   * @param title
+   * @param flags
+   */
   Window(int width, int height, const char *title, int flags = 0);
 
   virtual ~Window();
@@ -66,11 +79,11 @@ SKLAND_EXPORT class Window : public AbstractShellView {
    */
   void SetContentView(AbstractView *view);
 
-  const core::SizeI &GetMinimalSize() const;
+  const Size &GetMinimalSize() const;
 
-  const core::SizeI &GetPreferredSize() const;
+  const Size &GetPreferredSize() const;
 
-  const core::SizeI &GetMaximalSize() const;
+  const Size &GetMaximalSize() const;
 
  protected:
 
@@ -80,9 +93,9 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  virtual bool OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) final;
+  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnSizeChange(const core::SizeI &old_size, const core::SizeI &new_size) final;
+  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -110,7 +123,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   int GetMouseLocation(const MouseEvent *event) const;
 
-  core::RectI GetContentGeometry() const;
+  RectI GetContentGeometry() const;
 
  private:
 

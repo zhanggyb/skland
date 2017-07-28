@@ -32,11 +32,8 @@ namespace gui {
  */
 SKLAND_NO_EXPORT struct AbstractView::Private {
 
-  using Size = core::SizeI;
-
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
   Private() = delete;
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
 
   Private(AbstractView *view)
       : previous(nullptr),
@@ -52,7 +49,8 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         maximal_size(65536, 65536),
         x_layout_policy(kLayoutPreferred),
         y_layout_policy(kLayoutPreferred),
-        dirty_flag(0),
+        geometry_dirty_flags(0),
+        geometry_task(view),
         redraw_task(view),
         is_damaged(false),
         need_redraw(true),
@@ -65,7 +63,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         is_layouting(false),
         layout(nullptr) {}
 
-  ~Private() {}
+  ~Private() = default;
 
   AbstractView *previous;
   AbstractView *next;
@@ -97,11 +95,13 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    *
    * Use GeometryTypeMask to check this value
    */
-  int dirty_flag;
+  int geometry_dirty_flags;
 
   RectF geometry;
 
   RectF last_geometry;
+
+  GeometryTask geometry_task;
 
   RedrawTask redraw_task;
 
@@ -115,7 +115,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
    *
    * This member variable works with is_damaged.
    */
-  core::RectI damaged_region;
+  Rect damaged_region;
 
   bool need_redraw;
   bool is_drawing;

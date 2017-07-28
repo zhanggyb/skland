@@ -19,9 +19,9 @@
 
 #include "abstract-event-handler.hpp"
 
+#include "skland/core/rect.hpp"
+#include "skland/core/margin.hpp"
 #include "context.hpp"
-#include "../core/rect.hpp"
-#include "../core/margin.hpp"
 
 #include <cstdint>
 #include <string>
@@ -43,25 +43,24 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   friend class AbstractView;
   friend class Surface;
 
-  AbstractShellView() = delete;
-  AbstractShellView(const AbstractShellView &) = delete;
-  AbstractShellView &operator=(const AbstractShellView &) = delete;
-
  public:
 
-  using Margin = core::Margin;  /**< @brief Alias of core::Margin */
+  SKLAND_DECLARE_NONCOPYABLE(AbstractShellView);
+  AbstractShellView() = delete;
+
   using Size = core::SizeI; /**< @brief Alias of core::SizeI */
+  using Rect = core::RectI; /**< @brief Alias of core::RectI */
+  using Margin = core::Margin;  /**< @brief Alias of core::Margin */
 
   /**
    * @brief A task to process shell view rendering in event loop
    */
   class RedrawTask : public Task {
 
-    RedrawTask() = delete;
-    RedrawTask(const RedrawTask &) = delete;
-    RedrawTask &operator=(const RedrawTask &) = delete;
-
    public:
+
+    SKLAND_DECLARE_NONCOPYABLE(RedrawTask);
+    RedrawTask() = delete;
 
     RedrawTask(AbstractShellView *shell_view)
         : Task(), shell_view_(shell_view) {}
@@ -178,7 +177,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
  protected:
 
   /**
-   * @brief Attach a given view to this shell view
+   * @brief Attach a view to this shell view
    * @param view
    *
    * @note This method does not check if the given view is nullptr.
@@ -200,6 +199,14 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    */
   virtual void OnShown() = 0;
 
+  /**
+   * @brief Configure the size of this shell view
+   * @param old_size
+   * @param new_size
+   * @return
+   *    - true: accept the new size
+   *    - false: drop the new size and maintain the old one
+   */
   virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) = 0;
 
   virtual void OnSizeChange(const Size &old_size, const Size &new_size) = 0;
@@ -221,6 +228,8 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   virtual void OnUpdate(AbstractView *view) override;
 
   virtual Surface *GetSurface(const AbstractView *view) const override;
+
+  virtual void RenderSurface(const Surface *surface) override;
 
   virtual void OnEnterOutput(const Surface *surface, const Output *output) override;
 

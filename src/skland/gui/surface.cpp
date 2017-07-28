@@ -19,7 +19,6 @@
 #include "internal/surface_shell_toplevel_private.hpp"
 #include "internal/surface_shell_popup_private.hpp"
 #include "internal/surface_egl_private.hpp"
-#include "internal/surface-commit_task.hpp"
 
 #include <skland/gui/abstract-event-handler.hpp>
 #include <skland/gui/buffer.hpp>
@@ -473,9 +472,9 @@ bool Surface::EGL::SwapBuffersWithDamage(int x, int y, int width, int height) {
   EGLint rect[4] = {x, y, width, height};
   return EGL_TRUE
       == Display::Proxy::kSwapBuffersWithDamageAPI(Display::Proxy::egl_display(),
-                                                    p_->egl_surface,
-                                                    rect,
-                                                    4 * sizeof(EGLint));
+                                                   p_->egl_surface,
+                                                   rect,
+                                                   4 * sizeof(EGLint));
 }
 
 bool Surface::EGL::SwapInterval(EGLint interval) {
@@ -492,21 +491,30 @@ Surface *Surface::EGL::GetSurface() const {
 
 // ------
 
+void Surface::DrawTask::Run() const {
+  AbstractEventHandler* event_handler = surface->GetEventHandler();
+  event_handler->RenderSurface(surface);
+}
+
+void Surface::CommitTask::Run() const {
+  wl_surface_commit(surface->p_->wl_surface);
+}
+
+// ------
+
 Surface *Surface::kTop = nullptr;
 Surface *Surface::kBottom = nullptr;
 int Surface::kShellSurfaceCount = 0;
-Task Surface::kCommitTaskHead;
-Task Surface::kCommitTaskTail;
+core::Deque<Surface::DrawTask> Surface::kDrawTaskDeque;
+core::Deque<Surface::CommitTask> Surface::kCommitTaskDeque;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
   _ASSERT(nullptr != event_handler);
-  p_.reset(new Private(event_handler, margin));
+  p_.reset(new Private(this, event_handler, margin));
   p_->role.placeholder = nullptr;
 
   p_->wl_surface = wl_compositor_create_surface(Display::Proxy::wl_compositor());
   wl_surface_add_listener(p_->wl_surface, &Private::kListener, this);
-
-  commit_task_.reset(new CommitTask(this));
 }
 
 Surface::~Surface() {
@@ -548,11 +556,11 @@ void Surface::Commit() {
     return;
   }
 
-  if (commit_task_->IsLinked())
+  if (p_->commit_task.IsLinked())
     return;
 
   if (nullptr == p_->parent) {
-    kCommitTaskTail.PushFront(commit_task_.get());
+    kCommitTaskDeque.PushBack(&p_->commit_task);
     return;
   }
 
@@ -560,9 +568,9 @@ void Surface::Commit() {
     // Synchronized mode need to commit the main surface too
     Surface *main_surface = GetShellSurface();
     main_surface->Commit();
-    main_surface->commit_task_->PushFront(commit_task_.get());
+    main_surface->p_->commit_task.PushFront(&p_->commit_task);
   } else {
-    kCommitTaskTail.PushFront(commit_task_.get());
+    kCommitTaskDeque.PushBack(&p_->commit_task);
   }
 }
 
@@ -655,7 +663,7 @@ AbstractEventHandler *Surface::GetEventHandler() const {
   return p_->event_handler;
 }
 
-AbstractGraphicsInterface* Surface::GetGraphicsInterface() const {
+AbstractGraphicsInterface *Surface::GetGraphicsInterface() const {
   return p_->graphics_interface;
 }
 
@@ -671,20 +679,6 @@ void Surface::Clear() {
   while (kShellSurfaceCount > 0) {
     AbstractEventHandler *event_handler = kTop->GetEventHandler();
     delete event_handler;
-  }
-}
-
-void Surface::InitializeCommitTaskList() {
-  kCommitTaskHead.PushBack(&kCommitTaskTail);
-}
-
-void Surface::ClearCommitTaskList() {
-  Task *task = kCommitTaskHead.next();
-  Task *next_task = nullptr;
-  while (task != &kCommitTaskTail) {
-    next_task = task->next();
-    task->Unlink();
-    task = next_task;
   }
 }
 

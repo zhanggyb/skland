@@ -20,7 +20,7 @@
 #include "skland/numerical/clamp.hpp"
 
 #include <skland/core/assert.hpp>
-#include <skland/core/debug.hpp>
+#include "skland/core/debug.hpp"
 
 #include <skland/gui/abstract-shell-view.hpp>
 #include <skland/gui/abstract-layout.hpp>
@@ -189,12 +189,12 @@ void AbstractView::MoveTo(int x, int y) {
   p_->geometry.MoveTo(x, y);
 
   if (x == p_->last_geometry.x() && y == p_->last_geometry.y()) {
-    Bit::Clear<int>(p_->dirty_flag, kDirtyLeftMask | kDirtyTopMask);
+    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyLeftMask | kDirtyTopMask);
   } else {
-    Bit::Set<int>(p_->dirty_flag, kDirtyLeftMask | kDirtyTopMask);
+    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyLeftMask | kDirtyTopMask);
   }
 
-  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
 }
 
 const core::Padding &AbstractView::GetPadding() const {
@@ -223,12 +223,12 @@ void AbstractView::Resize(int width, int height) {
   p_->geometry.Resize(width, height);
 
   if (width == p_->last_geometry.width() && height == p_->last_geometry.height()) {
-    Bit::Clear<int>(p_->dirty_flag, kDirtyRightMask | kDirtyBottomMask);
+    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyRightMask | kDirtyBottomMask);
   } else {
-    Bit::Set<int>(p_->dirty_flag, kDirtyRightMask | kDirtyBottomMask);
+    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyRightMask | kDirtyBottomMask);
   }
 
-  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetX() const {
@@ -257,11 +257,11 @@ void AbstractView::SetLeft(int left) {
   p_->geometry.left = left;
 
   if (p_->geometry.left == p_->last_geometry.left)
-    Bit::Clear<int>(p_->dirty_flag, kDirtyLeftMask | kDirtyWidthMask);
+    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyLeftMask | kDirtyWidthMask);
   else
-    Bit::Set<int>(p_->dirty_flag, kDirtyLeftMask | kDirtyWidthMask);
+    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyLeftMask | kDirtyWidthMask);
 
-  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetTop() const {
@@ -282,11 +282,11 @@ void AbstractView::SetTop(int top) {
   p_->geometry.top = top;
 
   if (p_->geometry.top == p_->last_geometry.top)
-    Bit::Clear<int>(p_->dirty_flag, kDirtyTopMask | kDirtyHeightMask);
+    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyTopMask | kDirtyHeightMask);
   else
-    Bit::Set<int>(p_->dirty_flag, kDirtyTopMask | kDirtyHeightMask);
+    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyTopMask | kDirtyHeightMask);
 
-  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetRight() const {
@@ -304,11 +304,11 @@ void AbstractView::SetRight(int right) {
   p_->geometry.right = right;
 
   if (p_->geometry.right == p_->last_geometry.right)
-    Bit::Clear<int>(p_->dirty_flag, kDirtyRightMask | kDirtyWidthMask);
+    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyRightMask | kDirtyWidthMask);
   else
-    Bit::Set<int>(p_->dirty_flag, kDirtyRightMask | kDirtyWidthMask);
+    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyRightMask | kDirtyWidthMask);
 
-  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetBottom() const {
@@ -326,11 +326,11 @@ void AbstractView::SetBottom(int bottom) {
   p_->geometry.bottom = bottom;
 
   if (p_->geometry.bottom == p_->last_geometry.bottom)
-    Bit::Clear<int>(p_->dirty_flag, kDirtyBottomMask | kDirtyHeightMask);
+    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyBottomMask | kDirtyHeightMask);
   else
-    Bit::Set<int>(p_->dirty_flag, kDirtyBottomMask | kDirtyHeightMask);
+    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyBottomMask | kDirtyHeightMask);
 
-  OnConfigureGeometry(p_->dirty_flag, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetWidth() const {
@@ -550,6 +550,10 @@ Surface *AbstractView::GetSurface(const AbstractView *view) const {
   }
 
   return nullptr;
+}
+
+void AbstractView::RenderSurface(const Surface *surface) {
+  // override in sub class
 }
 
 void AbstractView::OnEnterOutput(const Surface *surface, const Output *output) {
@@ -1164,17 +1168,27 @@ void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int 
 
 // -------------------
 
+void AbstractView::GeometryTask::Run() const {
+  if (view_->p_->geometry_dirty_flags) {
+    view_->OnGeometryChange(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
+    view_->p_->last_geometry = view_->p_->geometry;
+    view_->p_->geometry_dirty_flags = 0;
+  }
+}
+
+// -------------------
+
 void AbstractView::RedrawTask::Run() const {
   view_->p_->is_drawing = true;
 
-  if (view_->p_->dirty_flag) {
-    view_->OnGeometryChange(view_->p_->dirty_flag, view_->p_->last_geometry, view_->p_->geometry);
+  if (view_->p_->geometry_dirty_flags) {
+    view_->OnGeometryChange(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
     view_->p_->last_geometry = view_->p_->geometry;
   }
 
   if (view_->p_->need_layout) {
     view_->p_->is_layouting = true;
-    view_->OnLayout(view_->p_->dirty_flag,
+    view_->OnLayout(view_->p_->geometry_dirty_flags,
                     view_->p_->padding.left,
                     view_->p_->padding.top,
                     static_cast<int>(view_->p_->geometry.width()) - view_->p_->padding.right,
@@ -1192,7 +1206,7 @@ void AbstractView::RedrawTask::Run() const {
                               view_->p_->damaged_region.height());
   }
 
-  view_->p_->dirty_flag = 0;
+  view_->p_->geometry_dirty_flags = 0;
   view_->p_->need_layout = false;
   view_->p_->is_damaged = false;
   view_->p_->visible = true;
