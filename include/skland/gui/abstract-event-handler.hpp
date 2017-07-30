@@ -157,11 +157,13 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
    */
   virtual void OnKeyUp(KeyEvent *event) = 0;
 
+  virtual void OnRequestSaveGeometry(AbstractView *view) = 0;
+
   /**
    * @brief A view request an update
    * @param view A view in hierarchy wants to update this object
    */
-  virtual void OnUpdate(AbstractView *view) = 0;
+  virtual void OnRequestUpdate(AbstractView *view) = 0;
 
   /**
    * @brief Get surface for the given view

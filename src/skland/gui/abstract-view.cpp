@@ -361,25 +361,25 @@ void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distan
   if (target == p_->parent || this == target->p_->parent) {
     switch (align) {
       case kAlignLeft: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->left_anchor_group.PushBack(pair.first);
         target->p_->left_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignTop: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->top_anchor_group.PushBack(pair.first);
         target->p_->top_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignRight: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->right_anchor_group.PushBack(pair.first);
         target->p_->right_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignBottom: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->bottom_anchor_group.PushBack(pair.first);
         target->p_->bottom_anchor_group.PushBack(pair.second);
         break;
@@ -389,25 +389,25 @@ void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distan
   } else if (target->p_->parent == p_->parent) {
     switch (align) {
       case kAlignLeft: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->right_anchor_group.PushBack(pair.first);
         target->p_->left_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignTop: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->bottom_anchor_group.PushBack(pair.first);
         target->p_->top_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignRight: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->left_anchor_group.PushBack(pair.first);
         target->p_->right_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignBottom: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->top_anchor_group.PushBack(pair.first);
         target->p_->bottom_anchor_group.PushBack(pair.second);
         break;
@@ -429,12 +429,21 @@ const AnchorGroup &AbstractView::GetAnchorGroup(Alignment align) const {
   }
 }
 
+void AbstractView::SaveGeometry(bool validate) {
+  if (validate) {
+    if (p_->geometry_task.IsLinked()) return;
+
+  } else {
+    p_->geometry_task.Unlink();
+  }
+}
+
 void AbstractView::Update(bool validate) {
   if (p_->is_drawing) return;
 
   if (validate) {
     if (p_->redraw_task.IsLinked()) return;
-    OnUpdate(this);
+    OnRequestUpdate(this);
   } else {
     p_->redraw_task.Unlink();
   }
@@ -517,7 +526,25 @@ void AbstractView::DispatchUpdate() {
   }
 }
 
-void AbstractView::OnUpdate(AbstractView *view) {
+void AbstractView::OnRequestSaveGeometry(AbstractView *view) {
+  if (p_->geometry_task.IsLinked()) {
+    if (view != this) {
+      p_->geometry_task.PushBack(&view->p_->geometry_task);
+    }
+    return;
+  }
+
+  if (p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    p_->parent->OnRequestSaveGeometry(view);
+    return;
+  } else if (p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
+    p_->shell_view->OnRequestSaveGeometry(view);
+  }
+}
+
+void AbstractView::OnRequestUpdate(AbstractView *view) {
   if (p_->redraw_task.IsLinked()) {
     if (view != this) {
       // This view is going to be redrawn, just push back the task of the sub view
@@ -530,11 +557,11 @@ void AbstractView::OnUpdate(AbstractView *view) {
 
   if (p_->parent) {
     _ASSERT(nullptr == p_->shell_view);
-    p_->parent->OnUpdate(view);
+    p_->parent->OnRequestUpdate(view);
     return;
   } else if (p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
-    p_->shell_view->OnUpdate(view);
+    p_->shell_view->OnRequestUpdate(view);
   }
 }
 
@@ -1170,7 +1197,7 @@ void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int 
 
 void AbstractView::GeometryTask::Run() const {
   if (view_->p_->geometry_dirty_flags) {
-    view_->OnGeometryChange(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
+    view_->OnSaveGeometry(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
     view_->p_->last_geometry = view_->p_->geometry;
     view_->p_->geometry_dirty_flags = 0;
   }
@@ -1182,7 +1209,7 @@ void AbstractView::RedrawTask::Run() const {
   view_->p_->is_drawing = true;
 
   if (view_->p_->geometry_dirty_flags) {
-    view_->OnGeometryChange(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
+    view_->OnSaveGeometry(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
     view_->p_->last_geometry = view_->p_->geometry;
   }
 

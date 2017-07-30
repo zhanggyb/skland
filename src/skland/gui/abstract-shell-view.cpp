@@ -253,7 +253,11 @@ void AbstractShellView::OnKeyUp(KeyEvent *event) {
   // override in sub class
 }
 
-void AbstractShellView::OnUpdate(AbstractView *view) {
+void AbstractShellView::OnRequestSaveGeometry(AbstractView *view) {
+  // override in sub class
+}
+
+void AbstractShellView::OnRequestUpdate(AbstractView *view) {
   // override in sub class
 }
 

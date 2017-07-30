@@ -167,7 +167,7 @@ void AbstractButton::OnConfigureGeometry(int dirty_flag, const RectF &old_geomet
   Update(0 != dirty_flag);
 }
 
-void AbstractButton::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
+void AbstractButton::OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
 
 }
 

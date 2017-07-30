@@ -86,7 +86,7 @@ void AbstractLayout::OnConfigureGeometry(int dirty_flag, const RectF &old_geomet
   }
 }
 
-void AbstractLayout::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
+void AbstractLayout::OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
   p_->need_layout = true;
 }
 

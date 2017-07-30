@@ -46,13 +46,13 @@ class EGLWidget : public AbstractView {
 
  protected:
 
-  virtual void OnUpdate(AbstractView *view) final;
+  virtual void OnRequestUpdate(AbstractView *view) final;
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
   virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) final;
 
-  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) final;
+  virtual void OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) final;
 
   virtual void OnLayout(int, int, int, int, int) final;
 

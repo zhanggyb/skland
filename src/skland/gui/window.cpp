@@ -246,7 +246,7 @@ void Window::OnShown() {
   }
 }
 
-void Window::OnUpdate(AbstractView *view) {
+void Window::OnRequestUpdate(AbstractView *view) {
   if (p_->inhibit_update) return;
 
   Surface *surface = nullptr;

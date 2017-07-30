@@ -492,7 +492,7 @@ Surface *Surface::EGL::GetSurface() const {
 // ------
 
 void Surface::DrawTask::Run() const {
-  AbstractEventHandler* event_handler = surface->GetEventHandler();
+  AbstractEventHandler *event_handler = surface->GetEventHandler();
   event_handler->RenderSurface(surface);
 }
 
@@ -505,7 +505,7 @@ void Surface::CommitTask::Run() const {
 Surface *Surface::kTop = nullptr;
 Surface *Surface::kBottom = nullptr;
 int Surface::kShellSurfaceCount = 0;
-core::Deque<Surface::DrawTask> Surface::kDrawTaskDeque;
+core::Deque<Surface::DrawTask> Surface::kRenderTaskDeque;
 core::Deque<Surface::CommitTask> Surface::kCommitTaskDeque;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
@@ -610,6 +610,12 @@ int32_t Surface::GetScale() const {
 
 void Surface::DamageBuffer(int32_t x, int32_t y, int32_t width, int32_t height) {
   wl_surface_damage_buffer(p_->wl_surface, x, y, width, height);
+}
+
+void Surface::Update(bool validate) {
+  if (p_->render_task.IsLinked()) return;
+
+  kRenderTaskDeque.PushBack(&p_->render_task);
 }
 
 Surface *Surface::GetShellSurface() {

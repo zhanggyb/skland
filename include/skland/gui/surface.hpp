@@ -148,6 +148,8 @@ class Surface {
 
   void DamageBuffer(int32_t x, int32_t y, int32_t width, int32_t height);
 
+  void Update(bool validate = true);
+
   Surface *GetShellSurface();
 
   /**
@@ -254,7 +256,7 @@ class Surface {
    */
   static int kShellSurfaceCount;
 
-  static core::Deque<DrawTask> kDrawTaskDeque;
+  static core::Deque<DrawTask> kRenderTaskDeque;
 
   static core::Deque<CommitTask> kCommitTaskDeque;
 

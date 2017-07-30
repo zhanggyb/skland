@@ -20,6 +20,8 @@
 #include "skland/gui/surface.hpp"
 #include "skland/gui/abstract-graphics-interface.hpp"
 
+#include "skland/gui/abstract-view.hpp"
+
 namespace skland {
 namespace gui {
 
@@ -45,8 +47,8 @@ struct Surface::Private {
         lower(nullptr),
         egl(nullptr),
         graphics_interface(nullptr),
+        render_task(surface),
         commit_task(surface) {
-    draw_task_head.PushBack(&draw_task_tail);
   }
 
   ~Private() {}
@@ -103,10 +105,10 @@ struct Surface::Private {
     Sub *sub;
   } role;
 
-  Task draw_task_head;
-  Task draw_task_tail;
-
+  DrawTask render_task;
   CommitTask commit_task;
+
+  core::Deque<AbstractView::RedrawTask> redraw_task_deque;
 
   static void OnEnter(void *data, struct wl_surface *wl_surface,
                       struct wl_output *wl_output);

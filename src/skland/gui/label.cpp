@@ -92,7 +92,7 @@ void Label::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const
   Update(0 != dirty_flag);
 }
 
-void Label::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
+void Label::OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
 
 }
 

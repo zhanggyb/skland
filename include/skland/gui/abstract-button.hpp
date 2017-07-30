@@ -82,9 +82,9 @@ class AbstractButton : public AbstractView {
                                    const core::RectF &old_geometry,
                                    const core::RectF &new_geometry) override;
 
-  virtual void OnGeometryChange(int dirty_flag,
-                                const core::RectF &old_geometry,
-                                const core::RectF &new_geometry) override;
+  virtual void OnSaveGeometry(int dirty_flag,
+                              const core::RectF &old_geometry,
+                              const core::RectF &new_geometry) override;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
 

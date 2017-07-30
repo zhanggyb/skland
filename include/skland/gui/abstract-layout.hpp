@@ -56,7 +56,7 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
                                    const core::RectF &old_geometry,
                                    const core::RectF &new_geometry) final;
 
-  virtual void OnGeometryChange(int dirty_flag, const core::RectF &old_geometry, const core::RectF &new_geometry) final;
+  virtual void OnSaveGeometry(int dirty_flag, const core::RectF &old_geometry, const core::RectF &new_geometry) final;
 
   virtual void OnChildAdded(AbstractView *view) final;
 

@@ -400,6 +400,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   const AnchorGroup &GetAnchorGroup(Alignment align) const;
 
+  void SaveGeometry(bool validate = true);
+
   /**
    * @brief Update the display of this widget
    * @param[in] validate
@@ -504,11 +506,13 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual void DispatchUpdate();
 
+  virtual void OnRequestSaveGeometry(AbstractView *view) override;
+
   /**
    * @brief A view request an update
    * @param view This view or a sub view in hierarchy
    */
-  virtual void OnUpdate(AbstractView *view) override;
+  virtual void OnRequestUpdate(AbstractView *view) override;
 
   /**
    * @brief Get surface for the given view
@@ -556,9 +560,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * This virtual method is called only when there's new geometry need to be saved before drawing this
    * view.
    */
-  virtual void OnGeometryChange(int dirty_flag,
-                                const RectF &old_geometry,
-                                const RectF &new_geometry) = 0;
+  virtual void OnSaveGeometry(int dirty_flag,
+                              const RectF &old_geometry,
+                              const RectF &new_geometry) = 0;
 
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
 

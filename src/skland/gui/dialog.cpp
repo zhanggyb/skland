@@ -16,14 +16,19 @@
 
 #include "skland/gui/dialog.hpp"
 
+#include "skland/core/rect.hpp"
 #include "skland/gui/shared-memory-pool.hpp"
 #include "skland/gui/title-bar.hpp"
 #include "skland/gui/buffer.hpp"
+#include <skland/gui/region.hpp>
 
+#include <skland/graphic/paint.hpp>
 #include "skland/graphic/canvas.hpp"
 
 namespace skland {
 namespace gui {
+
+using core::RectI;
 
 using graphic::Canvas;
 
@@ -62,7 +67,26 @@ Dialog::~Dialog() {
 }
 
 void Dialog::OnShown() {
+  Surface *shell_surface = GetShellSurface();
 
+  shell_surface->SetScale(1);
+
+  // Create buffer:
+  int width = GetWidth();
+  int height = GetHeight();
+
+  int32_t pool_size = width * 4 * height;
+
+  p_->pool.Setup(pool_size);
+  p_->buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->buffer);
+  p_->canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                              (unsigned char *) p_->buffer.GetData()));
+  p_->canvas->Clear();
+
+  shell_surface->Update(true);
+  Damage(this, 0, 0, width, height);
+  shell_surface->Commit();
 }
 
 bool Dialog::OnConfigureSize(const Size &old_size, const Size &new_size) {
@@ -70,7 +94,42 @@ bool Dialog::OnConfigureSize(const Size &old_size, const Size &new_size) {
 }
 
 void Dialog::OnSizeChange(const Size &old_size, const Size &new_size) {
+  Surface *shell_surface = GetShellSurface();
 
+  shell_surface->SetScale(1);
+
+  int width = new_size.width;
+  int height = new_size.height;
+
+  Region input_region;
+  input_region.Add(0, 0, width, height);
+  shell_surface->SetInputRegion(input_region);
+
+  int pool_size = width * 4 * height;
+  p_->pool.Setup(pool_size);
+
+  p_->buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->buffer);
+  p_->canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                              (unsigned char *) p_->buffer.GetData()));
+  p_->canvas->Clear();
+
+  shell_surface->Update(true);
+  Damage(this, 0, 0, width, height);
+  shell_surface->Commit();
+}
+
+void Dialog::RenderSurface(const Surface *surface) {
+  using graphic::Paint;
+
+  Surface *shell_surface = GetShellSurface();
+
+  if (surface == shell_surface) {
+    Paint paint;
+    paint.SetColor(0xFFDFDF2F);
+    p_->canvas->DrawRect(core::RectF(0.f, 0.f, GetWidth(), GetHeight()), paint);
+    p_->canvas->Flush();
+  }
 }
 
 } // namespace gui

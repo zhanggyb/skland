@@ -89,7 +89,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnShown() final;
 
-  virtual void OnUpdate(AbstractView *view) override;
+  virtual void OnRequestUpdate(AbstractView *view) override;
 
   virtual Surface *GetSurface(const AbstractView *view) const;
 

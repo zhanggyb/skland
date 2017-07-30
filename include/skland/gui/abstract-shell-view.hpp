@@ -225,7 +225,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnKeyUp(KeyEvent *event) override;
 
-  virtual void OnUpdate(AbstractView *view) override;
+  virtual void OnRequestSaveGeometry(AbstractView *view) override;
+
+  virtual void OnRequestUpdate(AbstractView *view) override;
 
   virtual Surface *GetSurface(const AbstractView *view) const override;
 

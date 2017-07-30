@@ -323,7 +323,7 @@ void TitleBar::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, co
   DispatchUpdate();
 }
 
-void TitleBar::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
+void TitleBar::OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
 
 }
 

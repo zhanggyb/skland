@@ -50,7 +50,7 @@ EGLWidget::~EGLWidget() {
   delete sub_surface_;
 }
 
-void EGLWidget::OnUpdate(AbstractView *view) {
+void EGLWidget::OnRequestUpdate(AbstractView *view) {
   _ASSERT(view == this);
 
   if (nullptr == sub_surface_) {
@@ -66,7 +66,7 @@ void EGLWidget::OnUpdate(AbstractView *view) {
 //    surface_->SetDesync();
   }
 
-  AbstractView::OnUpdate(view);
+  AbstractView::OnRequestUpdate(view);
 }
 
 Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
@@ -83,7 +83,7 @@ void EGLWidget::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, c
   }
 }
 
-void EGLWidget::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
+void EGLWidget::OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
 
 }
 

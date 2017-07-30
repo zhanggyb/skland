@@ -257,12 +257,12 @@ int Application::Run() {
     /*
      * Draw contents on every surface requested
      */
-    draw_task_it= Surface::kDrawTaskDeque.begin();
-    while (draw_task_it != Surface::kDrawTaskDeque.end()) {
+    draw_task_it= Surface::kRenderTaskDeque.begin();
+    while (draw_task_it != Surface::kRenderTaskDeque.end()) {
       task = draw_task_it.element();
       draw_task_it.Remove();
       task->Run();
-      draw_task_it = Surface::kDrawTaskDeque.begin();
+      draw_task_it = Surface::kRenderTaskDeque.begin();
     }
 
     /*

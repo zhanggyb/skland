@@ -47,6 +47,8 @@ SKLAND_EXPORT class Dialog : public AbstractShellView {
 
   virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
 
+  virtual void RenderSurface(const Surface* surface) final;
+
  private:
 
   struct Private;
