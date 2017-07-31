@@ -279,36 +279,42 @@ Surface *Window::GetSurface(const AbstractView *view) const {
   return nullptr != p_->main_surface ? p_->main_surface : GetShellSurface();
 }
 
-bool Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
+void Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
   _ASSERT(p_->minimal_size.width < p_->maximal_size.width &&
       p_->minimal_size.height < p_->maximal_size.height);
 
   if ((new_size.width < p_->minimal_size.width) ||
-      (new_size.height < p_->minimal_size.height))
-    return false;
+      (new_size.height < p_->minimal_size.height)) {
+    SaveSize(false);
+    return;
+  }
 
   if ((new_size.width > p_->maximal_size.width) ||
-      (new_size.height > p_->maximal_size.height))
-    return false;
+      (new_size.height > p_->maximal_size.height)) {
+    SaveSize(false);
+    return;
+  }
 
-  RedrawTask *redraw_task = RedrawTask::Get(this);
+//  RedrawTask *redraw_task = RedrawTask::Get(this);
 
   if (old_size == new_size) {
-    redraw_task->Unlink();
-    return false;
+//    redraw_task->Unlink();
+    SaveSize(false);
+    return;
   }
 
   p_->inhibit_update = true;
-  PushBackIdleTask(redraw_task);
+//  PushBackIdleTask(redraw_task);
 
   Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
   // surface size is changed, reset the pointer position and enter/leave widgets
   DispatchMouseLeaveEvent();
 
-  return true;
+  SaveSize();
+  return;
 }
 
-void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
+void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
   Surface *shell_surface = this->GetShellSurface();
 
   int scale = 1;
@@ -364,7 +370,7 @@ void Window::OnSizeChange(const Size &old_size, const Size &new_size) {
   }
 
   // Set context before draw this window
-  RedrawTask::Get(this)->context = Context(shell_surface, p_->frame_canvas.get());
+//  RedrawTask::Get(this)->context = Context(shell_surface, p_->frame_canvas.get());
 
   Damage(this,
          0, 0,
@@ -763,13 +769,13 @@ void Window::SetContentViewGeometry() {
 }
 
 void Window::RequestUpdate() {
-  RedrawTask *redraw_task = RedrawTask::Get(this);
+//  RedrawTask *redraw_task = RedrawTask::Get(this);
 
   Surface *shell_surface = GetShellSurface();
   const core::Margin &margin = shell_surface->GetMargin();
 
-  redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
-  PushBackIdleTask(redraw_task);
+//  redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
+//  PushBackIdleTask(redraw_task);
   _ASSERT(p_->frame_canvas);
   Damage(this,
          0, 0,
@@ -779,8 +785,8 @@ void Window::RequestUpdate() {
 }
 
 void Window::CancelUpdate() {
-  RedrawTask *redraw_task = RedrawTask::Get(this);
-  redraw_task->Unlink();
+//  RedrawTask *redraw_task = RedrawTask::Get(this);
+//  redraw_task->Unlink();
 }
 
 } // namespace gui

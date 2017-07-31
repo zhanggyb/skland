@@ -89,11 +89,11 @@ void Dialog::OnShown() {
   shell_surface->Commit();
 }
 
-bool Dialog::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  return true;
+void Dialog::OnConfigureSize(const Size &old_size, const Size &new_size) {
+  SaveSize();
 }
 
-void Dialog::OnSizeChange(const Size &old_size, const Size &new_size) {
+void Dialog::OnSaveSize(const Size &old_size, const Size &new_size) {
   Surface *shell_surface = GetShellSurface();
 
   shell_surface->SetScale(1);
@@ -129,6 +129,9 @@ void Dialog::RenderSurface(const Surface *surface) {
     paint.SetColor(0xFFDFDF2F);
     p_->canvas->DrawRect(core::RectF(0.f, 0.f, GetWidth(), GetHeight()), paint);
     p_->canvas->Flush();
+
+    shell_surface->Damage(0, 0, GetWidth(), GetHeight());
+    shell_surface->Commit();
   }
 }
 

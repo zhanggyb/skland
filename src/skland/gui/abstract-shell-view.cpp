@@ -190,6 +190,18 @@ AbstractShellView *AbstractShellView::GetParent() const {
   return p_->parent;
 }
 
+void AbstractShellView::SaveSize(bool validate) {
+  if (validate) {
+    p_->dirty_flag = 1;
+    if (p_->geometry_task.IsLinked()) return;
+    PushBackIdleTask(&p_->geometry_task);
+  } else {
+    p_->geometry_task.Unlink();
+    p_->size = p_->last_size;
+    p_->dirty_flag = 0;
+  }
+}
+
 void AbstractShellView::AttachView(AbstractView *view) {
   if (view->p_->shell_view == this) {
     _ASSERT(nullptr == view->p_->parent);
@@ -275,9 +287,9 @@ void AbstractShellView::OnEnterOutput(const Surface *surface, const Output *outp
 void AbstractShellView::OnLeaveOutput(const Surface *surface, const Output *output) {
 }
 
-void AbstractShellView::OnDraw(const Context *context) {
+//void AbstractShellView::OnDraw(const Context *context) {
   // override in sub class
-}
+//}
 
 void AbstractShellView::OnMaximized(bool maximized) {
 
@@ -367,14 +379,9 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
   }
 
   if (width > 0 && height > 0) {
-    p_->dirty_flag = 1;
-    Size saved_size = p_->size;
     p_->size.width = width;
     p_->size.height = height;
-    if (!OnConfigureSize(p_->last_size, p_->size)) {
-      p_->size = saved_size;
-      p_->dirty_flag = 0;
-    }
+    OnConfigureSize(p_->last_size, p_->size);
   }
 
   if (focus != IsFocused()) {
@@ -568,26 +575,12 @@ void AbstractShellView::DropShadow(const Context *context) {
 
 // ---------
 
-void AbstractShellView::RedrawTask::Run() const {
+void AbstractShellView::GeometryTask::Run() const {
   if (shell_view_->p_->dirty_flag) {
-    shell_view_->OnSizeChange(shell_view_->p_->last_size, shell_view_->p_->size);
+    shell_view_->OnSaveSize(shell_view_->p_->last_size, shell_view_->p_->size);
     shell_view_->p_->last_size = shell_view_->p_->size;
     shell_view_->p_->dirty_flag = 0;
   }
-
-  shell_view_->OnDraw(&context);
-
-  if (shell_view_->p_->is_damaged) {
-    context.surface()->Damage(shell_view_->p_->damaged_region.x(),
-                              shell_view_->p_->damaged_region.y(),
-                              shell_view_->p_->damaged_region.width(),
-                              shell_view_->p_->damaged_region.height());
-    shell_view_->p_->is_damaged = false;
-  }
-}
-
-AbstractShellView::RedrawTask *AbstractShellView::RedrawTask::Get(const AbstractShellView *shell_view) {
-  return &shell_view->p_->redraw_task;
 }
 
 } // namespace gui

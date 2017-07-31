@@ -43,11 +43,11 @@ SKLAND_EXPORT class Dialog : public AbstractShellView {
 
   virtual void OnShown() final;
 
-  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
+  virtual void OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
+  virtual void OnSaveSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void RenderSurface(const Surface* surface) final;
+  virtual void RenderSurface(const Surface *surface) final;
 
  private:
 

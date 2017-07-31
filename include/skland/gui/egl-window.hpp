@@ -57,9 +57,9 @@ class EGLWindow : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual bool OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) final;
+  virtual void OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) final;
 
-  virtual void OnSizeChange(const core::SizeI &old_size, const core::SizeI &new_size) final;
+  virtual void OnSaveSize(const core::SizeI &old_size, const core::SizeI &new_size) final;
 
   virtual void OnMouseMove(MouseEvent *event) override;
 

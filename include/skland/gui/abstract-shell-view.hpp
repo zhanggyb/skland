@@ -37,6 +37,12 @@ class Context;
  *
  * This is the base class for windows/menus/dialogs etc to show a shell surface
  * and managed by compositor.
+ *
+ * A sub class of an AbstractShellView usually should implement 4 virtual methods:
+ *  - OnShown()
+ *  - OnConfigureSize()
+ *  - OnSaveSize()
+ *  - RenderSurface()
  */
 SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
@@ -53,25 +59,21 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   using Margin = core::Margin;  /**< @brief Alias of core::Margin */
 
   /**
-   * @brief A task to process shell view rendering in event loop
+   * @brief A nested class to update the size
    */
-  class RedrawTask : public Task {
+  class GeometryTask : public Task {
 
    public:
 
-    SKLAND_DECLARE_NONCOPYABLE(RedrawTask);
-    RedrawTask() = delete;
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GeometryTask);
+    GeometryTask() = delete;
 
-    RedrawTask(AbstractShellView *shell_view)
+    GeometryTask(AbstractShellView *shell_view)
         : Task(), shell_view_(shell_view) {}
 
-    virtual ~RedrawTask() {}
+    virtual ~GeometryTask() = default;
 
     virtual void Run() const final;
-
-    static RedrawTask *Get(const AbstractShellView *shell_view);
-
-    Context context;
 
    private:
 
@@ -172,6 +174,12 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   AbstractShellView *GetParent() const;
 
+  /**
+   * @brief Schedule resize this shell view
+   * @param validate
+   */
+  void SaveSize(bool validate = true);
+
   static const Margin kResizingMargin;
 
  protected:
@@ -207,9 +215,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    *    - true: accept the new size
    *    - false: drop the new size and maintain the old one
    */
-  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) = 0;
+  virtual void OnConfigureSize(const Size &old_size, const Size &new_size) = 0;
 
-  virtual void OnSizeChange(const Size &old_size, const Size &new_size) = 0;
+  virtual void OnSaveSize(const Size &old_size, const Size &new_size) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -237,7 +245,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnLeaveOutput(const Surface *surface, const Output *output) override;
 
-  virtual void OnDraw(const Context *context);
+//  virtual void OnDraw(const Context *context);
 
   virtual void OnMaximized(bool);
 

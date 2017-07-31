@@ -93,9 +93,9 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual Surface *GetSurface(const AbstractView *view) const;
 
-  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
+  virtual void OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
+  virtual void OnSaveSize(const Size &old_size, const Size &new_size) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -109,7 +109,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnKeyDown(KeyEvent *event) override;
 
-  virtual void OnDraw(const Context *context) override;
+  virtual void OnDraw(const Context *context);
 
   virtual void OnFocus(bool);
 
