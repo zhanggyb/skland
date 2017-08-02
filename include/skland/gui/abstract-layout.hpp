@@ -76,7 +76,7 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual void OnKeyUp(KeyEvent *event) override;
 
-  virtual void OnDraw(const Context *context) override;
+  virtual void OnDraw(const Context &context) override;
 
   virtual void OnViewAdded(AbstractView *view) = 0;
 

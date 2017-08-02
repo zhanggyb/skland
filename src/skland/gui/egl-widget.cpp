@@ -55,13 +55,13 @@ void EGLWidget::OnRequestUpdate(AbstractView *view) {
 
   if (nullptr == sub_surface_) {
     _ASSERT(nullptr == egl_surface_);
-    Surface *parent_surface = AbstractView::GetSurface(this);
-    if (nullptr == parent_surface) return;
-
-    sub_surface_ = Surface::Sub::Create(parent_surface, this);
-    egl_surface_ = Surface::EGL::Get(sub_surface_);
-    Region region;
-    sub_surface_->SetInputRegion(region);
+//    Surface *parent_surface = AbstractView::GetSurface(this);
+//    if (nullptr == parent_surface) return;
+//
+//    sub_surface_ = Surface::Sub::Create(parent_surface, this);
+//    egl_surface_ = Surface::EGL::Get(sub_surface_);
+//    Region region;
+//    sub_surface_->SetInputRegion(region);
 //    egl_surface_->Resize(GetWidth(), GetHeight());
 //    surface_->SetDesync();
   }
@@ -119,7 +119,7 @@ void EGLWidget::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 
-void EGLWidget::OnDraw(const Context *context) {
+void EGLWidget::OnDraw(const Context &context) {
   if (!animating_) {
     animating_ = true;
     frame_callback_.Setup(*egl_surface_->GetSurface());

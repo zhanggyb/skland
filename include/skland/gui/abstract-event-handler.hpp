@@ -164,13 +164,6 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
    */
   virtual void OnRequestUpdate(AbstractView *view) = 0;
 
-  /**
-   * @brief Get surface for the given view
-   * @param view A view in hierarchy or null to get shell surface for this object
-   * @return A pointer to a surface or nullptr
-   */
-  virtual Surface *GetSurface(const AbstractView *view) const = 0;
-
   virtual void OnRenderSurface(Surface *surface) = 0;
 
   virtual void OnEnterOutput(const Surface *surface, const Output *output) = 0;

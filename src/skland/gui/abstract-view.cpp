@@ -486,7 +486,10 @@ AbstractShellView *AbstractView::GetShellView() const {
   if (p_->shell_view)
     return p_->shell_view;
 
-  return static_cast<AbstractShellView *>(GetSurface(this)->GetShellSurface()->GetEventHandler());
+  if (p_->parent)
+    return p_->parent->GetShellView();
+
+  return nullptr;
 }
 
 void AbstractView::OnChildAdded(AbstractView */*view*/) {
@@ -557,20 +560,6 @@ void AbstractView::OnRequestUpdate(AbstractView *view) {
     _ASSERT(nullptr == p_->parent);
     p_->shell_view->OnRequestUpdate(view);
   }
-}
-
-Surface *AbstractView::GetSurface(const AbstractView *view) const {
-  if (p_->parent) {
-    _ASSERT(nullptr == p_->shell_view);
-    return p_->parent->GetSurface(view);
-  }
-
-  if (p_->shell_view) {
-    _ASSERT(nullptr == p_->parent);
-    return p_->shell_view->GetSurface(view);
-  }
-
-  return nullptr;
 }
 
 void AbstractView::OnRenderSurface(Surface *surface) {

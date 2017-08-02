@@ -128,18 +128,18 @@ void Label::OnKeyUp(KeyEvent *event) {
   event->Ignore();
 }
 
-void Label::OnDraw(const Context *context) {
+void Label::OnDraw(const Context &context) {
   using graphic::Canvas;
   using graphic::Paint;
   using graphic::TextBox;
 
-  int scale = context->surface()->GetScale();
+  int scale = context.surface()->GetScale();
   const RectF rect = GetGeometry() * scale;
-  Canvas::ClipGuard guard(context->canvas(), rect);
+  Canvas::ClipGuard guard(context.canvas(), rect);
 
   Paint paint;
   paint.SetColor(p_->background);
-  context->canvas()->DrawRect(rect, paint);
+  context.canvas()->DrawRect(rect, paint);
 
   paint.SetColor(p_->foreground);
   paint.SetAntiAlias(true);
@@ -157,7 +157,7 @@ void Label::OnDraw(const Context *context) {
                   rect.b);
   text_box.SetSpacingAlign(TextBox::kSpacingAlignCenter);
   text_box.SetText(p_->text.c_str(), p_->text.length(), paint);
-  text_box.Draw(*context->canvas());
+  text_box.Draw(*context.canvas());
 }
 
 } // namespace gui

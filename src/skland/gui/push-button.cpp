@@ -46,11 +46,11 @@ PushButton::~PushButton() {
 
 }
 
-void PushButton::OnDraw(const Context *context) {
-  Canvas *canvas = context->canvas();
+void PushButton::OnDraw(const Context &context) {
+  Canvas *canvas = context.canvas();
 
   const RectF &geometry = GetGeometry();
-  int scale = context->surface()->GetScale();
+  int scale = context.surface()->GetScale();
   Canvas::ClipGuard guard(canvas, geometry * scale);
 
   canvas->Clear();

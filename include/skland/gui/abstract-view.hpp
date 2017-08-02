@@ -461,7 +461,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Callback to draw this view on a canvas
    * @param context
    */
-  virtual void OnDraw(const Context *context) = 0;
+  virtual void OnDraw(const Context &context) = 0;
 
   /**
    * @brief Callback when a child view is added
@@ -513,13 +513,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @param view This view or a sub view in hierarchy
    */
   virtual void OnRequestUpdate(AbstractView *view) override;
-
-  /**
-   * @brief Get surface for the given view
-   * @param view A view object, it is always this view or a sub view in hierarchy
-   * @return A pointer to a surface or nullptr
-   */
-  virtual Surface *GetSurface(const AbstractView *view) const override;
 
   virtual void OnRenderSurface(Surface *surface) override;
 

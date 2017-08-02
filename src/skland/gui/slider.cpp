@@ -84,11 +84,11 @@ void Slider::OnSetMaximum(const int &maximum) {
   set_maximum(maximum);
 }
 
-void Slider::OnDraw(const Context *context) {
+void Slider::OnDraw(const Context &context) {
   using graphic::Canvas;
   using graphic::Paint;
 
-  Canvas* canvas = context->canvas();
+  Canvas* canvas = context.canvas();
   Paint paint;
 
   if (hover_) {

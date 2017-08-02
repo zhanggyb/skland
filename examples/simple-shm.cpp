@@ -18,16 +18,16 @@
 #include <skland/gui/window.hpp>
 #include <skland/gui/abstract-view.hpp>
 #include <skland/gui/context.hpp>
+#include <skland/gui/callback.hpp>
+#include <skland/gui/key-event.hpp>
+#include <skland/gui/mouse-event.hpp>
 
 #include "skland/numerical/clamp.hpp"
 
 #include <skland/graphic/canvas.hpp>
 #include <skland/graphic/paint.hpp>
 
-#include <skland/gui/key-event.hpp>
-#include <skland/gui/mouse-event.hpp>
 #include <iostream>
-#include <skland/gui/callback.hpp>
 
 using namespace skland;
 using namespace skland::core;
@@ -39,73 +39,73 @@ class SpinningView : public AbstractView {
 
  public:
 
-  SpinningView()
-      : AbstractView(),
-        context_(nullptr),
-        angle_(0.f),
-        running_animation_(false) {
+  SpinningView() {
     color_ = 0xFF4FBF4F;
     frame_callback_.done().Set(this, &SpinningView::OnFrame);
   }
 
-  virtual ~SpinningView() {}
+  ~SpinningView() override = default;
 
  protected:
 
-  virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
+  void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
     if (!running_animation_)
       Update();
   }
 
-  virtual void OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
+  void OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
 
   }
 
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final {
+  void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final {
 
   }
 
-  virtual void OnMouseEnter(MouseEvent *event) override {
+  void OnMouseEnter(MouseEvent *event) override {
     event->Accept();
   }
 
-  virtual void OnMouseLeave() override {
+  void OnMouseLeave() override {
 
   }
 
-  virtual void OnMouseMove(MouseEvent *event) override {
+  void OnMouseMove(MouseEvent *event) override {
     event->Ignore();
   }
 
-  virtual void OnMouseDown(MouseEvent *event) override {
+  void OnMouseDown(MouseEvent *event) override {
     event->Ignore();
   }
 
-  virtual void OnMouseUp(MouseEvent *event) override {
+  void OnMouseUp(MouseEvent *event) override {
     event->Ignore();
   }
 
-  virtual void OnKeyDown(KeyEvent *event) override {
+  void OnKeyDown(KeyEvent *event) override {
     event->Ignore();
   }
 
-  virtual void OnKeyUp(KeyEvent *event) override {
+  void OnKeyUp(KeyEvent *event) override {
     event->Ignore();
   }
 
-  virtual void OnDraw(const Context *context) override {
-    context_ = context;
+  void OnDraw(const Context &context) override {
+    if (!running_animation_) running_animation_ = true;
 
-    OnFrame(0);
+    angle_ += 5.f;
+    if (angle_ > 360.f) angle_ = 0.f;
+
+    frame_callback_.Setup(*context.surface());
+    Animate(context);
   }
 
  private:
 
-  void Animate() {
+  void Animate(const Context &context) {
     static const int padding = 0;
-    Canvas *canvas = context_->canvas();
+    Canvas *canvas = context.canvas();
     canvas->Save();
-    int scale = context_->surface()->GetScale();
+    int scale = context.surface()->GetScale();
     canvas->Scale(scale, scale);
 
     const RectF &rect = GetGeometry();
@@ -136,34 +136,22 @@ class SpinningView : public AbstractView {
   }
 
   void OnFrame(uint32_t serial) {
-    if (!running_animation_) running_animation_ = true;
-
-    angle_ += 5.f;
-    if (angle_ > 360.f) angle_ = 0.f;
-
-    frame_callback_.Setup(*context_->surface());
-    Animate();
-    context_->surface()->Damage(context_->surface()->GetMargin().l + GetX(),
-                                context_->surface()->GetMargin().t + GetY(),
-                                GetWidth(),
-                                GetHeight());
-    context_->surface()->Commit();
+    Update();
   }
 
   Callback frame_callback_;
-  const Context *context_;
   ColorF color_;
-  float angle_;
-  bool running_animation_;
+  float angle_ = 0.f;
+  bool running_animation_ = false;
 };
 
 int main(int argc, char *argv[]) {
   Application app(argc, argv);
 
-  Window *win = new Window(320, 280, "Simple Shm");
+  auto *win = new Window(320, 280, "Simple Shm");
   win->SetAppId("Simple-Shm");
 
-  SpinningView *widget = new SpinningView;
+  auto *widget = new SpinningView;
   win->SetContentView(widget);
 
   win->Show();

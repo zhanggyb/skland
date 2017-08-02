@@ -47,7 +47,7 @@ class TitleBar::Button : public AbstractButton {
 
  protected:
 
-  virtual void OnDraw(const Context *context) override;
+  virtual void OnDraw(const Context &context) override;
 
  private:
 
@@ -62,7 +62,7 @@ TitleBar::Button::~Button() {
 
 }
 
-void TitleBar::Button::OnDraw(const Context *context) {
+void TitleBar::Button::OnDraw(const Context &context) {
   // override in sub class
 }
 
@@ -75,12 +75,12 @@ class TitleBar::CloseButton : public TitleBar::Button {
 
  protected:
 
-  virtual void OnDraw(const Context *context) final;
+  virtual void OnDraw(const Context &context) final;
 };
 
-void TitleBar::CloseButton::OnDraw(const Context *context) {
-  Canvas *canvas = context->canvas();
-  int scale = context->surface()->GetScale();
+void TitleBar::CloseButton::OnDraw(const Context &context) {
+  Canvas *canvas = context.canvas();
+  int scale = context.surface()->GetScale();
   const RectF &rect = GetGeometry();
 
   Canvas::ClipGuard guard(canvas, rect * scale);
@@ -125,12 +125,12 @@ class TitleBar::MaximizeButton : public TitleBar::Button {
 
  protected:
 
-  virtual void OnDraw(const Context *context) final;
+  virtual void OnDraw(const Context &context) final;
 };
 
-void TitleBar::MaximizeButton::OnDraw(const Context *context) {
-  Canvas *canvas = context->canvas();
-  int scale = context->surface()->GetScale();
+void TitleBar::MaximizeButton::OnDraw(const Context &context) {
+  Canvas *canvas = context.canvas();
+  int scale = context.surface()->GetScale();
   const RectF &rect = GetGeometry();
 
   Canvas::ClipGuard guard(canvas, rect * scale);
@@ -175,12 +175,12 @@ class TitleBar::MinimizeButton : public TitleBar::Button {
 
  protected:
 
-  virtual void OnDraw(const Context *context) final;
+  virtual void OnDraw(const Context &context) final;
 };
 
-void TitleBar::MinimizeButton::OnDraw(const Context *context) {
-  Canvas *canvas = context->canvas();
-  int scale = context->surface()->GetScale();
+void TitleBar::MinimizeButton::OnDraw(const Context &context) {
+  Canvas *canvas = context.canvas();
+  int scale = context.surface()->GetScale();
   const RectF &rect = GetGeometry();
 
   Canvas::ClipGuard guard(canvas, rect * scale);
@@ -222,12 +222,12 @@ class TitleBar::FullscreenButton : public TitleBar::Button {
 
  protected:
 
-  virtual void OnDraw(const Context *context) final;
+  virtual void OnDraw(const Context &context) final;
 };
 
-void TitleBar::FullscreenButton::OnDraw(const Context *context) {
-  Canvas *canvas = context->canvas();
-  int scale = context->surface()->GetScale();
+void TitleBar::FullscreenButton::OnDraw(const Context &context) {
+  Canvas *canvas = context.canvas();
+  int scale = context.surface()->GetScale();
   const RectF &rect = GetGeometry();
 
   Canvas::ClipGuard guard(canvas, rect * scale);
@@ -359,8 +359,8 @@ void TitleBar::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 
-void TitleBar::OnDraw(const Context *context) {
-  int scale = context->surface()->GetScale();
+void TitleBar::OnDraw(const Context &context) {
+  int scale = context.surface()->GetScale();
   Paint paint;
   paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
   paint.SetAntiAlias(true);
@@ -379,7 +379,7 @@ void TitleBar::OnDraw(const Context *context) {
                   rect.b);
   text_box.setSpacingAlign(SkTextBox::kCenter_SpacingAlign);
   text_box.setText(title_.c_str(), title_.length(), paint.GetSkPaint());
-  text_box.draw(context->canvas()->GetSkCanvas());
+  text_box.draw(context.canvas()->GetSkCanvas());
 }
 
 } // namespace gui

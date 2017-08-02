@@ -114,14 +114,14 @@ class MainWidget : public AbstractView {
     event->Ignore();
   }
 
-  virtual void OnDraw(const Context *context) override {
+  virtual void OnDraw(const Context &context) override {
     using skland::graphic::Canvas;
     using skland::graphic::Paint;
 
     const RectF &rect = GetGeometry();
-    int scale = context->surface()->GetScale();
+    int scale = context.surface()->GetScale();
 
-    Canvas *canvas = context->canvas();
+    Canvas *canvas = context.canvas();
     canvas->Save();
     canvas->Scale(scale, scale);
 

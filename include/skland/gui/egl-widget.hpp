@@ -70,7 +70,7 @@ class EGLWidget : public AbstractView {
 
   virtual void OnKeyUp(KeyEvent *event) override;
 
-  virtual void OnDraw(const Context *context) final;
+  virtual void OnDraw(const Context &context) final;
 
   virtual void OnInitialize();
 

@@ -275,10 +275,6 @@ void AbstractShellView::OnRequestUpdate(AbstractView *view) {
   // override in sub class
 }
 
-Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
-  return p_->shell_surface;
-}
-
 void AbstractShellView::OnEnterOutput(const Surface *surface, const Output *output) {
 }
 
@@ -326,7 +322,7 @@ void AbstractShellView::DispatchUpdate(AbstractView *view) {
   view->DispatchUpdate();
 }
 
-void AbstractShellView::Draw(AbstractView *view, const Context *context) {
+void AbstractShellView::Draw(AbstractView *view, const Context &context) {
   view->OnDraw(context);
 }
 

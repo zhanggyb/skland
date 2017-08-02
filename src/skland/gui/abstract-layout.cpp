@@ -127,7 +127,7 @@ void AbstractLayout::OnKeyUp(KeyEvent *event) {
   event->Ignore();
 }
 
-void AbstractLayout::OnDraw(const Context *context) {
+void AbstractLayout::OnDraw(const Context &context) {
 //#ifdef DEBUG
   srand(Timer::GetClockTime());
   float r = rand() % 255 / 255.f;

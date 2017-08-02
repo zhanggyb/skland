@@ -36,7 +36,7 @@ class PushButton : public AbstractButton {
 
   virtual ~PushButton();
 
-  virtual void OnDraw(const Context *context) override;
+  virtual void OnDraw(const Context &context) override;
 
 };
 

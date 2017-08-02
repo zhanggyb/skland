@@ -395,7 +395,7 @@ void Window::OnRenderSurface(Surface *surface) {
   while (it != deque.end()) {
     view = it.element()->view();
     it.Remove();
-    Draw(view, &context);
+    Draw(view, context);
     surface->Damage(view->GetX() + margin.l,
                     view->GetY() + margin.t,
                     view->GetWidth(),

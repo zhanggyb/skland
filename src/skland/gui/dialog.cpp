@@ -16,7 +16,8 @@
 
 #include "skland/gui/dialog.hpp"
 
-#include "skland/core/rect.hpp"
+#include "skland/core/memory.hpp"
+
 #include "skland/gui/shared-memory-pool.hpp"
 #include "skland/gui/title-bar.hpp"
 #include "skland/gui/buffer.hpp"
@@ -58,7 +59,7 @@ struct Dialog::Private {
 
 Dialog::Dialog(const char *title, AbstractShellView *parent)
     : AbstractShellView(title, parent) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 }
 
 Dialog::~Dialog() {

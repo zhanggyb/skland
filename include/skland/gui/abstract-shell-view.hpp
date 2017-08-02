@@ -237,13 +237,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnRequestUpdate(AbstractView *view) override;
 
-  virtual Surface *GetSurface(const AbstractView *view) const override;
-
   virtual void OnEnterOutput(const Surface *surface, const Output *output) override;
 
   virtual void OnLeaveOutput(const Surface *surface, const Output *output) override;
-
-//  virtual void OnDraw(const Context *context);
 
   virtual void OnMaximized(bool);
 
@@ -273,7 +269,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   static void DispatchUpdate(AbstractView *view);
 
-  static void Draw(AbstractView *view, const Context *context);
+  static void Draw(AbstractView *view, const Context &context);
 
  private:
 
