@@ -97,6 +97,8 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnSaveSize(const Size &old_size, const Size &new_size) final;
 
+  virtual void OnRenderSurface(Surface *surface) final;
+
   virtual void OnMouseEnter(MouseEvent *event) override;
 
   virtual void OnMouseLeave() override;
@@ -108,8 +110,6 @@ SKLAND_EXPORT class Window : public AbstractShellView {
   virtual void OnMouseUp(MouseEvent *event) override;
 
   virtual void OnKeyDown(KeyEvent *event) override;
-
-  virtual void OnDraw(const Context *context);
 
   virtual void OnFocus(bool);
 
@@ -131,11 +131,9 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   void OnFullscreenButtonClicked(__SLOT__);
 
+  void RenderFrame(const Context *context);
+
   void SetContentViewGeometry();
-
-  void RequestUpdate();
-
-  void CancelUpdate();
 
   std::unique_ptr<Private> p_;
 

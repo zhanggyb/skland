@@ -20,8 +20,6 @@
 #include "skland/gui/surface.hpp"
 #include "skland/gui/abstract-graphics-interface.hpp"
 
-#include "skland/gui/abstract-view.hpp"
-
 namespace skland {
 namespace gui {
 
@@ -105,7 +103,7 @@ struct Surface::Private {
     Sub *sub;
   } role;
 
-  DrawTask render_task;
+  RenderTask render_task;
   CommitTask commit_task;
 
   core::Deque<AbstractView::RedrawTask> redraw_task_deque;

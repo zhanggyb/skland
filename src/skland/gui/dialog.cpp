@@ -85,7 +85,7 @@ void Dialog::OnShown() {
   p_->canvas->Clear();
 
   shell_surface->Update(true);
-  Damage(this, 0, 0, width, height);
+//  Damage(this, 0, 0, width, height);
   shell_surface->Commit();
 }
 
@@ -115,15 +115,12 @@ void Dialog::OnSaveSize(const Size &old_size, const Size &new_size) {
   p_->canvas->Clear();
 
   shell_surface->Update(true);
-  Damage(this, 0, 0, width, height);
-  shell_surface->Commit();
 }
 
-void Dialog::RenderSurface(const Surface *surface) {
+void Dialog::OnRenderSurface(Surface *surface) {
   using graphic::Paint;
 
   Surface *shell_surface = GetShellSurface();
-
   if (surface == shell_surface) {
     Paint paint;
     paint.SetColor(0xFFDFDF2F);
@@ -133,6 +130,9 @@ void Dialog::RenderSurface(const Surface *surface) {
     shell_surface->Damage(0, 0, GetWidth(), GetHeight());
     shell_surface->Commit();
   }
+
+  surface->Damage(0, 0, GetWidth(), GetHeight());
+  surface->Commit();
 }
 
 } // namespace gui

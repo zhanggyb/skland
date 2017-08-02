@@ -182,8 +182,6 @@ LayoutPolicy AbstractView::GetLayoutPolicyOnY() const {
 }
 
 void AbstractView::MoveTo(int x, int y) {
-  _ASSERT(!p_->is_drawing);
-
   if (p_->geometry.x() == x && p_->geometry.y() == y) return;
 
   p_->geometry.MoveTo(x, y);
@@ -202,8 +200,6 @@ const core::Padding &AbstractView::GetPadding() const {
 }
 
 void AbstractView::Resize(int width, int height) {
-  _ASSERT(!p_->is_drawing);
-
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
   SizeI min;
@@ -439,8 +435,6 @@ void AbstractView::SaveGeometry(bool validate) {
 }
 
 void AbstractView::Update(bool validate) {
-  if (p_->is_drawing) return;
-
   if (validate) {
     if (p_->redraw_task.IsLinked()) return;
     OnRequestUpdate(this);
@@ -548,9 +542,9 @@ void AbstractView::OnRequestUpdate(AbstractView *view) {
   if (p_->redraw_task.IsLinked()) {
     if (view != this) {
       // This view is going to be redrawn, just push back the task of the sub view
-      _ASSERT(p_->redraw_task.context.canvas());
+//      _ASSERT(p_->redraw_task.context.canvas());
       p_->redraw_task.PushBack(&view->p_->redraw_task);
-      view->p_->redraw_task.context = p_->redraw_task.context;
+//      view->p_->redraw_task.context = p_->redraw_task.context;
     }
     return;
   }
@@ -579,7 +573,7 @@ Surface *AbstractView::GetSurface(const AbstractView *view) const {
   return nullptr;
 }
 
-void AbstractView::RenderSurface(const Surface *surface) {
+void AbstractView::OnRenderSurface(Surface *surface) {
   // override in sub class
 }
 
@@ -1186,13 +1180,6 @@ void AbstractView::MoveBackward(AbstractView *view) {
   }
 }
 
-void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int width, int height) {
-  view->p_->is_damaged = true;
-  view->p_->damaged_region.l = surface_x;
-  view->p_->damaged_region.t = surface_y;
-  view->p_->damaged_region.Resize(width, height);
-}
-
 // -------------------
 
 void AbstractView::GeometryTask::Run() const {
@@ -1206,39 +1193,39 @@ void AbstractView::GeometryTask::Run() const {
 // -------------------
 
 void AbstractView::RedrawTask::Run() const {
-  view_->p_->is_drawing = true;
-
-  if (view_->p_->geometry_dirty_flags) {
-    view_->OnSaveGeometry(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
-    view_->p_->last_geometry = view_->p_->geometry;
-  }
-
-  if (view_->p_->need_layout) {
-    view_->p_->is_layouting = true;
-    view_->OnLayout(view_->p_->geometry_dirty_flags,
-                    view_->p_->padding.left,
-                    view_->p_->padding.top,
-                    static_cast<int>(view_->p_->geometry.width()) - view_->p_->padding.right,
-                    static_cast<int>(view_->p_->geometry.height()) - view_->p_->padding.bottom);
-    view_->p_->is_layouting = false;
-  }
-
-  if (view_->p_->need_redraw)   // This boolean flag is reset in AbstractLayout
-    view_->OnDraw(&context);
-
-  if (view_->p_->is_damaged) {
-    context.surface()->Damage(view_->p_->damaged_region.x(),
-                              view_->p_->damaged_region.y(),
-                              view_->p_->damaged_region.width(),
-                              view_->p_->damaged_region.height());
-  }
-
-  view_->p_->geometry_dirty_flags = 0;
-  view_->p_->need_layout = false;
-  view_->p_->is_damaged = false;
-  view_->p_->visible = true;
-
-  view_->p_->is_drawing = false;
+//  view_->p_->is_drawing = true;
+//
+//  if (view_->p_->geometry_dirty_flags) {
+//    view_->OnSaveGeometry(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
+//    view_->p_->last_geometry = view_->p_->geometry;
+//  }
+//
+//  if (view_->p_->need_layout) {
+//    view_->p_->is_layouting = true;
+//    view_->OnLayout(view_->p_->geometry_dirty_flags,
+//                    view_->p_->padding.left,
+//                    view_->p_->padding.top,
+//                    static_cast<int>(view_->p_->geometry.width()) - view_->p_->padding.right,
+//                    static_cast<int>(view_->p_->geometry.height()) - view_->p_->padding.bottom);
+//    view_->p_->is_layouting = false;
+//  }
+//
+//  if (view_->p_->need_redraw)   // This boolean flag is reset in AbstractLayout
+//    view_->OnDraw(&context);
+//
+//  if (view_->p_->is_damaged) {
+//    context.surface()->Damage(view_->p_->damaged_region.x(),
+//                              view_->p_->damaged_region.y(),
+//                              view_->p_->damaged_region.width(),
+//                              view_->p_->damaged_region.height());
+//  }
+//
+//  view_->p_->geometry_dirty_flags = 0;
+//  view_->p_->need_layout = false;
+//  view_->p_->is_damaged = false;
+//  view_->p_->visible = true;
+//
+//  view_->p_->is_drawing = false;
 }
 
 AbstractView::RedrawTask *AbstractView::RedrawTask::Get(const AbstractView *view) {

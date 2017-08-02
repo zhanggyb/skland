@@ -194,7 +194,9 @@ void AbstractShellView::SaveSize(bool validate) {
   if (validate) {
     p_->dirty_flag = 1;
     if (p_->geometry_task.IsLinked()) return;
-    PushBackIdleTask(&p_->geometry_task);
+
+    core::Deque<Task> &defferred_task_deque = Application::GetTaskDeque();
+    defferred_task_deque.PushBack(&p_->geometry_task);
   } else {
     p_->geometry_task.Unlink();
     p_->size = p_->last_size;
@@ -277,10 +279,6 @@ Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
   return p_->shell_surface;
 }
 
-void AbstractShellView::RenderSurface(const Surface *surface) {
-  // override in sub class
-}
-
 void AbstractShellView::OnEnterOutput(const Surface *surface, const Output *output) {
 }
 
@@ -288,14 +286,14 @@ void AbstractShellView::OnLeaveOutput(const Surface *surface, const Output *outp
 }
 
 //void AbstractShellView::OnDraw(const Context *context) {
-  // override in sub class
+// override in sub class
 //}
 
 void AbstractShellView::OnMaximized(bool maximized) {
 
 }
 
-void AbstractShellView::OnFullscreen(bool) {
+void AbstractShellView::OnFullscreen(bool fullscreened) {
 
 }
 
@@ -323,27 +321,13 @@ Surface *AbstractShellView::GetShellSurface() const {
   return p_->shell_surface;
 }
 
-void AbstractShellView::Damage(AbstractShellView *shell_view,
-                               int surface_x, int surface_y,
-                               int width, int height) {
-  shell_view->p_->is_damaged = true;
-  shell_view->p_->damaged_region.l = surface_x;
-  shell_view->p_->damaged_region.t = surface_y;
-  shell_view->p_->damaged_region.Resize(width, height);
-}
-
-void AbstractShellView::Damage(AbstractView *view,
-                               int surface_x, int surface_y,
-                               int width, int height) {
-  view->p_->is_damaged = true;
-  view->p_->damaged_region.l = surface_x;
-  view->p_->damaged_region.t = surface_y;
-  view->p_->damaged_region.Resize(width, height);
-}
-
 void AbstractShellView::DispatchUpdate(AbstractView *view) {
   view->Update();
   view->DispatchUpdate();
+}
+
+void AbstractShellView::Draw(AbstractView *view, const Context *context) {
+  view->OnDraw(context);
 }
 
 void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {

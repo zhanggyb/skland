@@ -20,8 +20,6 @@
 namespace skland {
 namespace gui {
 
-core::Deque<Task> AbstractEventHandler::kIdleTaskDeque;
-
 AbstractEventHandler::AbstractEventHandler()
     : Trackable() {
   p_.reset(new Private(this));

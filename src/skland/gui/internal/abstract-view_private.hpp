@@ -52,9 +52,6 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         geometry_dirty_flags(0),
         geometry_task(view),
         redraw_task(view),
-        is_damaged(false),
-        need_redraw(true),
-        is_drawing(false),
         left_anchor_group(view, kAlignLeft),
         top_anchor_group(view, kAlignTop),
         right_anchor_group(view, kAlignRight),
@@ -104,21 +101,6 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
   GeometryTask geometry_task;
 
   RedrawTask redraw_task;
-
-  /**
-   * @brief If need to call wayland API to damage area on the surface
-   */
-  bool is_damaged;
-
-  /**
-   * @brief The damage region
-   *
-   * This member variable works with is_damaged.
-   */
-  Rect damaged_region;
-
-  bool need_redraw;
-  bool is_drawing;
 
   AnchorGroup left_anchor_group;
   AnchorGroup top_anchor_group;

@@ -53,7 +53,6 @@ class Output;
 SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
 
   friend class Input;
-  friend class Application;
   friend class Display;
   friend class Surface;
 
@@ -172,7 +171,7 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
    */
   virtual Surface *GetSurface(const AbstractView *view) const = 0;
 
-  virtual void RenderSurface(const Surface *surface) = 0;
+  virtual void OnRenderSurface(Surface *surface) = 0;
 
   virtual void OnEnterOutput(const Surface *surface, const Output *output) = 0;
 
@@ -184,21 +183,11 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
    */
   virtual void AuditDestroyingToken(core::details::Token */*token*/) final;
 
-  static void PushBackIdleTask(Task *task) {
-    kIdleTaskDeque.PushBack(task);
-  }
-
-  static void PushFrontIdleTask(Task *task) {
-    kIdleTaskDeque.PushFront(task);
-  }
-
  private:
 
   struct Private;
 
   std::unique_ptr<Private> p_;
-
-  static core::Deque<Task> kIdleTaskDeque;
 
 };
 

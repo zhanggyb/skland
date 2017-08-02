@@ -24,7 +24,6 @@
 #include "skland/core/rect.hpp"
 #include "skland/core/padding.hpp"
 
-#include "context.hpp"
 #include "anchor-group.hpp"
 
 #include <memory>
@@ -34,6 +33,7 @@ namespace gui {
 
 class AbstractShellView;
 class AbstractLayout;
+class Context;
 
 /**
  * @ingroup gui
@@ -100,7 +100,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
     SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GeometryTask);
     GeometryTask() = delete;
 
-    GeometryTask(AbstractView *view)
+    explicit GeometryTask(AbstractView *view)
         : Task(), view_(view) {}
 
     virtual ~GeometryTask() = default;
@@ -120,16 +120,16 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
     SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(RedrawTask);
     RedrawTask() = delete;
 
-    RedrawTask(AbstractView *view)
+    explicit RedrawTask(AbstractView *view)
         : Task(), view_(view) {}
 
     virtual ~RedrawTask() = default;
 
     virtual void Run() const final;
 
-    static RedrawTask *Get(const AbstractView *view);
+    AbstractView *view() const { return view_; }
 
-    Context context;
+    static RedrawTask *Get(const AbstractView *view);
 
    private:
 
@@ -521,7 +521,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   virtual Surface *GetSurface(const AbstractView *view) const override;
 
-  virtual void RenderSurface(const Surface *surface) override;
+  virtual void OnRenderSurface(Surface *surface) override;
 
   /**
    * @brief Callback when this view enters an output
@@ -643,13 +643,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   static void MoveForward(AbstractView *view);
 
   static void MoveBackward(AbstractView *view);
-
-  /**
-   * @brief Mark damage area of the given object
-   *
-   * 'Damange a region on the surface' is a wayland concept.
-   */
-  static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
 
  private:
 

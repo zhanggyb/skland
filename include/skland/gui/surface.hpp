@@ -21,6 +21,8 @@
 #include "skland/core/margin.hpp"
 #include "skland/core/point.hpp"
 
+#include "skland/gui/abstract-view.hpp"
+
 #include "task.hpp"
 
 #include <wayland-egl.h>
@@ -29,7 +31,6 @@
 namespace skland {
 namespace gui {
 
-class AbstractEventHandler;
 class Buffer;
 class Output;
 class InputEvent;
@@ -150,6 +151,12 @@ class Surface {
 
   void Update(bool validate = true);
 
+  /**
+   * @brief Get defferred redraw task deque
+   * @return
+   */
+  core::Deque<AbstractView::RedrawTask> &GetRedrawTaskDeque() const;
+
   Surface *GetShellSurface();
 
   /**
@@ -198,35 +205,43 @@ class Surface {
 
  private:
 
-  struct DrawTask : public Task {
+  class RenderTask : public Task {
 
-    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(DrawTask);
-    DrawTask() = delete;
+   public:
 
-    explicit DrawTask(Surface *surface)
-        : surface(surface) {}
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(RenderTask);
+    RenderTask() = delete;
 
-    virtual ~DrawTask() = default;
+    explicit RenderTask(Surface *surface)
+        : surface_(surface) {}
 
-    virtual void Run() const final;
+    virtual ~RenderTask() = default;
 
-    Surface *surface;
+    void Run() const final;
+
+   private:
+
+    Surface *surface_;
 
   };
 
-  struct CommitTask : public Task {
+  class CommitTask : public Task {
+
+   public:
 
     SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(CommitTask);
     CommitTask() = delete;
 
-    CommitTask(Surface *surface)
-        : Task(), surface(surface) {}
+    explicit CommitTask(Surface *surface)
+        : Task(), surface_(surface) {}
 
-    virtual ~CommitTask() {}
+    virtual ~CommitTask() = default;
 
-    virtual void Run() const;
+    void Run() const final;
 
-    Surface *surface;
+   private:
+
+    Surface *surface_;
 
   };
 
@@ -256,7 +271,7 @@ class Surface {
    */
   static int kShellSurfaceCount;
 
-  static core::Deque<DrawTask> kRenderTaskDeque;
+  static core::Deque<RenderTask> kRenderTaskDeque;
 
   static core::Deque<CommitTask> kCommitTaskDeque;
 

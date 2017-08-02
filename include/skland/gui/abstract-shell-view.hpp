@@ -239,8 +239,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual Surface *GetSurface(const AbstractView *view) const override;
 
-  virtual void RenderSurface(const Surface *surface) override;
-
   virtual void OnEnterOutput(const Surface *surface, const Output *output) override;
 
   virtual void OnLeaveOutput(const Surface *surface, const Output *output) override;
@@ -273,25 +271,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void DropShadow(const Context *context);
 
-  /**
-   * @brief Mark damage area of the given object
-   *
-   * 'Damange an area in the surface' is a wayland concept.
-   */
-  static void Damage(AbstractShellView *shell_view,
-                     int surface_x, int surface_y,
-                     int width, int height);
-
-  /**
-   * @brief Mark damage area of the given object
-   *
-   * 'Damange an area in the surface' is a wayland concept.
-   */
-  static void Damage(AbstractView *view,
-                     int surface_x, int surface_y,
-                     int width, int height);
-
   static void DispatchUpdate(AbstractView *view);
+
+  static void Draw(AbstractView *view, const Context *context);
 
  private:
 

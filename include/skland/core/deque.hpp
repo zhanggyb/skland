@@ -163,8 +163,15 @@ class Deque {
       element_->PushBack(element);
     }
 
+    /**
+     * @brief Unlink the bi-node object and invalidate this iterator
+     *
+     * @note Once this method is called, this iterator is invalidated and
+     * should not be used, but it can be assigned to another one.
+     */
     void Remove() {
       element_->Unlink();
+      element_ = nullptr;
     }
 
     bool operator==(const Iterator &other) const {
@@ -184,9 +191,7 @@ class Deque {
     }
 
     T *element() const {
-      return nullptr == element_->previous_ ?
-             nullptr : (nullptr == element_->next_ ?
-                        nullptr : (static_cast<T *>(element_)));
+      return static_cast<T *>(element_);
     }
 
     explicit operator bool() const {

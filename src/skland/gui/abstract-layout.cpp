@@ -42,7 +42,6 @@ using graphic::Canvas;
 AbstractLayout::AbstractLayout(const core::Padding &padding)
     : AbstractView() {
   p_->padding = padding;
-  p_->need_redraw = false;
 }
 
 AbstractLayout::~AbstractLayout() {
@@ -137,7 +136,7 @@ void AbstractLayout::OnDraw(const Context *context) {
 
   Paint paint;
   paint.SetColor(ColorF(r, g, b, 0.25));
-  context->canvas()->DrawRect(GetGeometry(), paint);
+//  context->canvas()->DrawRect(GetGeometry(), paint);
 //#endif
 }
 

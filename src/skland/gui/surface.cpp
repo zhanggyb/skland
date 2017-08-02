@@ -491,13 +491,12 @@ Surface *Surface::EGL::GetSurface() const {
 
 // ------
 
-void Surface::DrawTask::Run() const {
-  AbstractEventHandler *event_handler = surface->GetEventHandler();
-  event_handler->RenderSurface(surface);
+void Surface::RenderTask::Run() const {
+  surface_->p_->event_handler->OnRenderSurface(surface_);
 }
 
 void Surface::CommitTask::Run() const {
-  wl_surface_commit(surface->p_->wl_surface);
+  wl_surface_commit(surface_->p_->wl_surface);
 }
 
 // ------
@@ -505,7 +504,7 @@ void Surface::CommitTask::Run() const {
 Surface *Surface::kTop = nullptr;
 Surface *Surface::kBottom = nullptr;
 int Surface::kShellSurfaceCount = 0;
-core::Deque<Surface::DrawTask> Surface::kRenderTaskDeque;
+core::Deque<Surface::RenderTask> Surface::kRenderTaskDeque;
 core::Deque<Surface::CommitTask> Surface::kCommitTaskDeque;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
@@ -616,6 +615,10 @@ void Surface::Update(bool validate) {
   if (p_->render_task.IsLinked()) return;
 
   kRenderTaskDeque.PushBack(&p_->render_task);
+}
+
+core::Deque<AbstractView::RedrawTask> &Surface::GetRedrawTaskDeque() const {
+  return p_->redraw_task_deque;
 }
 
 Surface *Surface::GetShellSurface() {
