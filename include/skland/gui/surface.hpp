@@ -94,12 +94,12 @@ class Surface {
    * @brief Transform enums
    */
   enum Transform {
-    kTransformNormal     = 0,           /**< WL_OUTPUT_TRANSFORM_NORMAL */
-    kTransform90         = 1,           /**< WL_OUTPUT_TRANSFORM_90 */
-    kTransform180        = 2,           /**< WL_OUTPUT_TRANSFORM_180 */
-    kTransform270        = 3,           /**< WL_OUTPUT_TRANSFORM_270 */
-    kTransformFlipped    = 4,           /**< WL_OUTPUT_TRANSFORM_FLIPPED */
-    kTransformFlipped90  = 5,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_90 */
+    kTransformNormal = 0,           /**< WL_OUTPUT_TRANSFORM_NORMAL */
+    kTransform90 = 1,           /**< WL_OUTPUT_TRANSFORM_90 */
+    kTransform180 = 2,           /**< WL_OUTPUT_TRANSFORM_180 */
+    kTransform270 = 3,           /**< WL_OUTPUT_TRANSFORM_270 */
+    kTransformFlipped = 4,           /**< WL_OUTPUT_TRANSFORM_FLIPPED */
+    kTransformFlipped90 = 5,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_90 */
     kTransformFlipped180 = 6,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_180 */
     kTransformFlipped270 = 7            /**< WL_OUTPUT_TRANSFORM_FLIPPED_270 */
   };
@@ -199,6 +199,12 @@ class Surface {
   Surface *GetLowerShell() const;
 
   AbstractEventHandler *GetEventHandler() const;
+
+  /**
+   * @brief Set the GPU interface for this surface
+   * @param interface An allocated GPUInterface object or nullptr to unset and use shm back.
+   */
+  void SetGPUInterface(AbstractGPUInterface *interface);
 
   AbstractGPUInterface *GetGPUInterface() const;
 

@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-#include <skland/gui/window.hpp>
+#include "skland/gui/window.hpp"
 
-#include <skland/core/assert.hpp>
+#include "skland/core/assert.hpp"
+#include "skland/core/memory.hpp"
 
-#include <skland/gui/application.hpp>
-#include <skland/gui/mouse-event.hpp>
-#include <skland/gui/key-event.hpp>
-#include <skland/gui/title-bar.hpp>
+#include "skland/gui/application.hpp"
+#include "skland/gui/mouse-event.hpp"
+#include "skland/gui/key-event.hpp"
+#include "skland/gui/title-bar.hpp"
 
-#include <skland/gui/shared-memory-pool.hpp>
-#include <skland/gui/buffer.hpp>
-#include <skland/gui/region.hpp>
-#include <skland/gui/output.hpp>
+#include "skland/gui/shared-memory-pool.hpp"
+#include "skland/gui/buffer.hpp"
+#include "skland/gui/region.hpp"
+#include "skland/gui/output.hpp"
 
-#include <skland/gui/theme.hpp>
+#include "skland/gui/theme.hpp"
 
-#include <skland/graphic/canvas.hpp>
-#include <skland/graphic/paint.hpp>
-#include <skland/graphic/path.hpp>
-#include <skland/graphic/gradient-shader.hpp>
+#include "skland/graphic/canvas.hpp"
+#include "skland/graphic/paint.hpp"
+#include "skland/graphic/path.hpp"
+#include "skland/graphic/gradient-shader.hpp"
 
 namespace skland {
 namespace gui {
@@ -110,7 +111,7 @@ Window::Window(const char *title, int flags)
 
 Window::Window(int width, int height, const char *title, int flags)
     : AbstractShellView(width, height, title, nullptr) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
   p_->flags = flags;
 
   Surface *shell_surface = GetShellSurface();

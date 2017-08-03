@@ -44,12 +44,11 @@ struct Surface::Private {
         upper(nullptr),
         lower(nullptr),
         egl(nullptr),
-        graphics_interface(nullptr),
+        gpu_interface(nullptr),
         render_task(surface),
-        commit_task(surface) {
-  }
+        commit_task(surface) {}
 
-  ~Private() {}
+  ~Private() = default;
 
   struct wl_surface *wl_surface;
 
@@ -95,7 +94,7 @@ struct Surface::Private {
 
   EGL *egl;
 
-  AbstractGPUInterface *graphics_interface;
+  AbstractGPUInterface *gpu_interface;
 
   union {
     void *placeholder;

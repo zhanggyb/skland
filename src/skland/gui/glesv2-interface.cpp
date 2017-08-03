@@ -16,20 +16,64 @@
 
 #include "skland/gui/glesv2-interface.hpp"
 
+#include "skland/core/assert.hpp"
+#include "skland/core/memory.hpp"
+
+#include "internal/abstract-gpu-interface_proxy.hpp"
+#include "internal/display_proxy.hpp"
+
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include <wayland-egl.h>
+
 namespace skland {
 namespace gui {
 
+struct GLESV2Interface::Private {
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
+
+  Private() = default;
+
+  ~Private() = default;
+
+  EGLSurface egl_surface = nullptr;
+
+  struct wl_egl_window *wl_egl_window = nullptr;
+
+};
+
 GLESV2Interface::GLESV2Interface()
     : AbstractGPUInterface() {
-
+  p_ = core::make_unique<Private>();
 }
 
 GLESV2Interface::~GLESV2Interface() {
-
+  Destroy();
 }
 
-void GLESV2Interface::Setup(Surface *surface) {
+void GLESV2Interface::OnSetup() {
+  Create();
+}
 
+void GLESV2Interface::Create() {
+  Destroy();
+
+  p_->wl_egl_window = wl_egl_window_create(Proxy::GetWaylandSurface(GetSurface()), 400, 300);
+  p_->egl_surface = eglCreatePlatformWindowSurface(Display::Proxy::egl_display(),
+                                                   Display::Proxy::egl_config(),
+                                                   p_->wl_egl_window,
+                                                   NULL);
+}
+
+void GLESV2Interface::Destroy() {
+  if (nullptr != p_->egl_surface) {
+    _ASSERT(nullptr != p_->wl_egl_window);
+    eglDestroySurface(Display::Proxy::egl_display(), p_->egl_surface);
+    wl_egl_window_destroy(p_->wl_egl_window);
+    p_->wl_egl_window = nullptr;
+    p_->egl_surface = nullptr;
+  }
 }
 
 } // namespace gui

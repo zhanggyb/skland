@@ -19,8 +19,8 @@
 #include "internal/surface_shell_toplevel_private.hpp"
 #include "internal/surface_shell_popup_private.hpp"
 #include "internal/surface_egl_private.hpp"
+#include "internal/abstract-gpu-interface_private.hpp"
 
-#include <skland/gui/abstract-event-handler.hpp>
 #include <skland/gui/buffer.hpp>
 
 #include <skland/core/assert.hpp>
@@ -451,6 +451,7 @@ Surface::EGL::~EGL() {
   if (p_->egl_surface) {
     _ASSERT(p_->wl_egl_window);
     wl_egl_window_destroy(p_->wl_egl_window);
+    // ERROR: should destroy egl_surface
   }
   p_->surface->p_->egl = nullptr;
 }
@@ -517,8 +518,8 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
 }
 
 Surface::~Surface() {
-  if (p_->graphics_interface)
-    delete p_->graphics_interface;
+  if (p_->gpu_interface)
+    delete p_->gpu_interface;
 
   if (p_->egl)
     delete p_->egl;
@@ -672,8 +673,30 @@ AbstractEventHandler *Surface::GetEventHandler() const {
   return p_->event_handler;
 }
 
+void Surface::SetGPUInterface(AbstractGPUInterface *interface) {
+  if (p_->gpu_interface == interface) {
+    _ASSERT(p_->gpu_interface->p_->surface == this);
+    return;
+  }
+
+  if (nullptr != p_->gpu_interface) {
+    delete p_->gpu_interface;
+    _ASSERT(p_->gpu_interface == nullptr);
+  }
+
+  p_->gpu_interface = interface;
+  if (nullptr != interface) {
+    if (nullptr != interface->p_->surface) {
+      _ASSERT(interface->p_->surface->p_->gpu_interface == interface);
+      interface->p_->surface->p_->gpu_interface = nullptr;
+    }
+    interface->p_->surface = this;
+    interface->OnSetup();
+  }
+}
+
 AbstractGPUInterface *Surface::GetGPUInterface() const {
-  return p_->graphics_interface;
+  return p_->gpu_interface;
 }
 
 const Margin &Surface::GetMargin() const {

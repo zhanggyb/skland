@@ -37,13 +37,11 @@ class Surface;
  */
 class EGLWindow : public AbstractShellView {
 
-  EGLWindow() = delete;
-  EGLWindow(const EGLWindow &) = delete;
-  EGLWindow &operator=(const EGLWindow &) = delete;
-
  public:
 
-  EGLWindow(const char *title);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(EGLWindow);
+
+  explicit EGLWindow(const char *title);
 
   EGLWindow(int width, int height, const char *title);
 
@@ -53,13 +51,11 @@ class EGLWindow : public AbstractShellView {
 
   virtual void OnShown() final;
 
-  virtual void OnUpdate(AbstractView *view) final;
+  virtual void OnRequestUpdate(AbstractView *view) final;
 
-  virtual Surface *GetSurface(const AbstractView *view) const final;
+  virtual void OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) final;
-
-  virtual void OnSaveSize(const core::SizeI &old_size, const core::SizeI &new_size) final;
+  virtual void OnSaveSize(const Size &old_size, const Size &new_size) final;
 
   virtual void OnRenderSurface(Surface *surface) final;
 

@@ -36,7 +36,19 @@ class GLESV2Interface : public AbstractGPUInterface {
 
   virtual ~GLESV2Interface();
 
-  virtual void Setup(Surface *surface) final;
+ protected:
+
+  virtual void OnSetup() final;
+
+ private:
+
+  struct Private;
+
+  void Create();
+
+  void Destroy();
+
+  std::unique_ptr<Private> p_;
 
 };
 

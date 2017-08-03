@@ -38,7 +38,9 @@ class VulkanInterface : public AbstractGPUInterface {
 
   virtual ~VulkanInterface();
 
-  virtual void Setup(Surface *surface) final;
+ protected:
+
+  virtual void OnSetup() final;
 
  private:
 

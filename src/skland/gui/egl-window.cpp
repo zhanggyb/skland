@@ -14,32 +14,34 @@
  * limitations under the License.
  */
 
-#include <skland/gui/egl-window.hpp>
+#include "skland/gui/egl-window.hpp"
 
-#include <skland/gui/key-event.hpp>
-#include <skland/gui/mouse-event.hpp>
+#include "skland/core/assert.hpp"
+#include "skland/core/memory.hpp"
 
-#include <skland/gui/surface.hpp>
-#include <skland/gui/callback.hpp>
-#include <skland/gui/title-bar.hpp>
+#include "skland/gui/key-event.hpp"
+#include "skland/gui/mouse-event.hpp"
 
-#include <skland/gui/shared-memory-pool.hpp>
-#include <skland/gui/buffer.hpp>
-#include <skland/gui/region.hpp>
+#include "skland/gui/surface.hpp"
+#include "skland/gui/callback.hpp"
+#include "skland/gui/title-bar.hpp"
+
+#include "skland/gui/shared-memory-pool.hpp"
+#include "skland/gui/buffer.hpp"
+#include "skland/gui/region.hpp"
 
 #include "internal/display_proxy.hpp"
 #include "internal/abstract-view_iterators.hpp"
 
-#include <skland/graphic/canvas.hpp>
-#include <skland/graphic/paint.hpp>
-#include <skland/graphic/path.hpp>
+#include "skland/graphic/canvas.hpp"
+#include "skland/graphic/paint.hpp"
+#include "skland/graphic/path.hpp"
 
-#include <skland/gui/theme.hpp>
+#include "skland/gui/theme.hpp"
 
 #include "SkCanvas.h"
 
 #include <GLES2/gl2.h>
-#include <skland/core/assert.hpp>
 
 namespace skland {
 namespace gui {
@@ -57,12 +59,9 @@ struct EGLWindow::Private {
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  Private()
-      : sub_surface(nullptr),
-        egl_surface(nullptr),
-        animating(false) {}
+  Private() {}
 
-  ~Private() {}
+  ~Private() = default;
 
   /* Properties for frame surface, JUST experimental */
   SharedMemoryPool pool;
@@ -70,13 +69,13 @@ struct EGLWindow::Private {
   Buffer frame_buffer_;
   std::unique_ptr<Canvas> frame_canvas;
 
-  Surface *sub_surface;
+  Surface *sub_surface = nullptr;
 
-  Surface::EGL *egl_surface;
+  Surface::EGL *egl_surface = nullptr;
 
   Callback frame_callback;
 
-  bool animating;
+  bool animating = false;
 
 };
 
@@ -86,7 +85,7 @@ EGLWindow::EGLWindow(const char *title)
 
 EGLWindow::EGLWindow(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 
   Surface *parent = GetShellSurface();
 
@@ -136,18 +135,11 @@ void EGLWindow::OnShown() {
   RequestUpdate();
 }
 
-void EGLWindow::OnUpdate(AbstractView *view) {
-  return;
+void EGLWindow::OnRequestUpdate(AbstractView *view) {
+
 }
 
-Surface *EGLWindow::GetSurface(const AbstractView *view) const {
-  if (nullptr == view)
-    return GetShellSurface();
-
-  return nullptr != p_->sub_surface ? p_->sub_surface : GetShellSurface();
-}
-
-void EGLWindow::OnConfigureSize(const SizeI &old_size, const SizeI &new_size) {
+void EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
   SizeI min(160, 120);
   SizeI max(65536, 65536);
   _ASSERT(min.width < max.width && min.height < max.height);
@@ -183,7 +175,7 @@ void EGLWindow::OnConfigureSize(const SizeI &old_size, const SizeI &new_size) {
   return;
 }
 
-void EGLWindow::OnSaveSize(const SizeI &old_size, const SizeI &new_size) {
+void EGLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
   int width = new_size.width;
   int height = new_size.height;
 

@@ -32,6 +32,8 @@ class Surface;
  */
 class AbstractGPUInterface {
 
+  friend class Surface;
+
  public:
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractGPUInterface);
@@ -40,17 +42,17 @@ class AbstractGPUInterface {
 
   virtual ~AbstractGPUInterface();
 
-  /**
-   * @brief Setup the surface on which this engine works
-   * @param surface
-   */
-  virtual void Setup(Surface *surface) = 0;
-
   Surface *GetSurface() const;
 
  protected:
 
   struct Proxy;
+
+  /**
+   * @brief Setup the surface on which this engine works
+   * @param surface
+   */
+  virtual void OnSetup() = 0;
 
  private:
 

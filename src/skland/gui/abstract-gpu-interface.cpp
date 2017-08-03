@@ -28,8 +28,8 @@ AbstractGPUInterface::AbstractGPUInterface() {
 
 AbstractGPUInterface::~AbstractGPUInterface() {
   if (nullptr != p_->surface) {
-    _ASSERT(p_->surface->p_->graphics_interface == this);
-    p_->surface->p_->graphics_interface = nullptr;
+    _ASSERT(p_->surface->p_->gpu_interface == this);
+    p_->surface->p_->gpu_interface = nullptr;
   }
 }
 
