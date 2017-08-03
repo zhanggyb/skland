@@ -34,9 +34,7 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractLayout);
 
-  struct LayoutTask;
-
-  AbstractLayout(const core::Padding &padding = core::Padding(5));
+  AbstractLayout(const Padding &padding = Padding(5));
 
   void AddView(AbstractView *view);
 
@@ -53,10 +51,12 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
   virtual ~AbstractLayout();
 
   virtual void OnConfigureGeometry(int dirty_flag,
-                                   const core::RectF &old_geometry,
-                                   const core::RectF &new_geometry) final;
+                                   const RectF &old_geometry,
+                                   const RectF &new_geometry) final;
 
-  virtual void OnSaveGeometry(int dirty_flag, const core::RectF &old_geometry, const core::RectF &new_geometry) final;
+  virtual void OnSaveGeometry(int dirty_flag,
+                              const RectF &old_geometry,
+                              const RectF &new_geometry) final;
 
   virtual void OnChildAdded(AbstractView *view) final;
 

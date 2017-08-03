@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_GLESV2_INTERFACE_HPP_
 #define SKLAND_GUI_GLESV2_INTERFACE_HPP_
 
-#include "abstract-graphics-interface.hpp"
+#include "abstract-gpu-interface.hpp"
 
 namespace skland {
 namespace gui {
@@ -26,9 +26,11 @@ namespace gui {
  * @ingroup gui
  * @brief OpenGL ES V2
  */
-class GLESV2Interface : public AbstractGraphicsInterface {
+class GLESV2Interface : public AbstractGPUInterface {
 
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GLESV2Interface);
 
   GLESV2Interface();
 

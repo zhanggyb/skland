@@ -29,13 +29,12 @@ namespace gui {
  */
 SKLAND_EXPORT class LinearLayout final : public AbstractLayout {
 
-  LinearLayout(const LinearLayout &) = delete;
-  LinearLayout &operator=(const LinearLayout &) = delete;
-
  public:
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(LinearLayout);
+
   LinearLayout(Orientation orientation = kHorizontal,
-               const core::Padding &padding = core::Padding(5),
+               const Padding &padding = Padding(5),
                int space = 5);
 
  protected:

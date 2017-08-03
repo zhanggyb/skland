@@ -26,6 +26,8 @@ SKLAND_EXPORT class RelativeLayout final : public AbstractLayout {
 
  public:
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(RelativeLayout);
+
   using AbstractLayout::AbstractLayout;
 
  protected:

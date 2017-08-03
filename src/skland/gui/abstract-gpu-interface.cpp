@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHICS_INTERFACE_PROXY_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHICS_INTERFACE_PROXY_HPP_
+#include "internal/abstract-gpu-interface_private.hpp"
 
-#include "skland/gui/abstract-graphics-interface.hpp"
-
-#include "surface_private.hpp"
+#include "skland/core/assert.hpp"
 
 namespace skland {
 namespace gui {
 
-struct AbstractGraphicsInterface::Proxy {
+AbstractGPUInterface::AbstractGPUInterface() {
+  p_.reset(new Private);
+}
 
-  static inline struct wl_surface *GetWaylandSurface(const Surface *surface) {
-    return surface->p_->wl_surface;
+AbstractGPUInterface::~AbstractGPUInterface() {
+  if (p_->surface) {
+    _ASSERT(p_->surface->p_->graphics_interface == this);
+    p_->surface->p_->graphics_interface = nullptr;
   }
+}
 
-};
+Surface* AbstractGPUInterface::GetSurface() const {
+  return p_->surface;
+}
 
 } // namespace gui
 } // namespace skland
-
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHICS_INTERFACE_PROXY_HPP_

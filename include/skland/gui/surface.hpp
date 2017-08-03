@@ -35,7 +35,7 @@ class Buffer;
 class Output;
 class InputEvent;
 class Region;
-class AbstractGraphicsInterface;
+class AbstractGPUInterface;
 
 /**
  * @ingroup gui
@@ -79,7 +79,7 @@ class Surface {
   friend class Application;
   friend class Display;
   friend class Callback;
-  friend class AbstractGraphicsInterface;
+  friend class AbstractGPUInterface;
 
  public:
 
@@ -90,23 +90,26 @@ class Surface {
   class Sub;
   class EGL;
 
+  /**
+   * @brief Transform enums
+   */
   enum Transform {
-    kTransformNormal = 0, // WL_OUTPUT_TRANSFORM_NORMAL
-    kTransform90 = 1, // WL_OUTPUT_TRANSFORM_90
-    kTransform180 = 2,  // WL_OUTPUT_TRANSFORM_180
-    kTransform270 = 3,  // WL_OUTPUT_TRANSFORM_270
-    kTransformFlipped = 4,  // WL_OUTPUT_TRANSFORM_FLIPPED
-    kTransformFlipped90 = 5,  // WL_OUTPUT_TRANSFORM_FLIPPED_90
-    kTransformFlipped180 = 6, // WL_OUTPUT_TRANSFORM_FLIPPED_180
-    kTransformFlipped270 = 7  // WL_OUTPUT_TRANSFORM_FLIPPED_270
+    kTransformNormal     = 0,           /**< WL_OUTPUT_TRANSFORM_NORMAL */
+    kTransform90         = 1,           /**< WL_OUTPUT_TRANSFORM_90 */
+    kTransform180        = 2,           /**< WL_OUTPUT_TRANSFORM_180 */
+    kTransform270        = 3,           /**< WL_OUTPUT_TRANSFORM_270 */
+    kTransformFlipped    = 4,           /**< WL_OUTPUT_TRANSFORM_FLIPPED */
+    kTransformFlipped90  = 5,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_90 */
+    kTransformFlipped180 = 6,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_180 */
+    kTransformFlipped270 = 7            /**< WL_OUTPUT_TRANSFORM_FLIPPED_270 */
   };
 
   /**
     * @brief Commit behaviour of the sub-surface
     */
   enum CommitMode {
-    kSynchronized,
-    kDesynchronized
+    kSynchronized,                      /**< Synchronized mode */
+    kDesynchronized                     /**< Desynchronized mode */
   };
 
   virtual ~Surface();
@@ -197,7 +200,7 @@ class Surface {
 
   AbstractEventHandler *GetEventHandler() const;
 
-  AbstractGraphicsInterface *GetGraphicsInterface() const;
+  AbstractGPUInterface *GetGraphicsInterface() const;
 
   const Margin &GetMargin() const;
 

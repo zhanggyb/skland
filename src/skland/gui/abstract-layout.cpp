@@ -73,15 +73,15 @@ void AbstractLayout::RemoveView(AbstractView *view) {
 
 void AbstractLayout::Layout() {
   p_->need_layout = true;
-  Update();
+  SaveGeometry();
 }
 
 void AbstractLayout::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  if (dirty_flag) {
+  if (0 != dirty_flag) {
     Layout();
   } else {
     p_->need_layout = false;
-    Update(false);
+    SaveGeometry(false);
   }
 }
 

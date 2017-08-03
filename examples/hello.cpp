@@ -22,15 +22,14 @@
 int main(int argc, char *argv[]) {
   using namespace skland;
   using namespace skland::gui;
-  using graphic::Font;
-  using graphic::FontStyle;
+  using namespace skland::graphic;
 
   Application app(argc, argv);
 
   Window win(320, 240, "Hello");
   win.SetAppId("Hello");
 
-  Label *label = new Label("Hello Wayland!");
+  auto *label = new Label("Hello Wayland!");
   label->SetForeground(0xFF444444);
   label->SetFont(Font("Noto Sans CJK SC",
                       FontStyle(FontStyle::kWeightBold),

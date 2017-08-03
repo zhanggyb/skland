@@ -53,6 +53,8 @@ class Display {
 
  public:
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Display);
+
   struct Global;
   struct Proxy;
 
@@ -97,7 +99,7 @@ class Display {
    *
    * This method is called once in Application.
    */
-  void Connect(const char *name = NULL);
+  void Connect(const char *name = nullptr);
 
   /**
    * @brief Disconnect from a wayland compositor

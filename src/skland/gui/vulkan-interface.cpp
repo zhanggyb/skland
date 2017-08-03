@@ -18,13 +18,13 @@
 
 #include "internal/display_proxy.hpp"
 #include "internal/surface_private.hpp"
-#include "internal/abstract-graphics-interface_proxy.hpp"
+#include "internal/abstract-gpu-interface_proxy.hpp"
 
 namespace skland {
 namespace gui {
 
 VulkanInterface::VulkanInterface()
-    : AbstractGraphicsInterface() {
+    : AbstractGPUInterface() {
 
 }
 

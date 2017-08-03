@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_VULKAN_INTERFACE_HPP_
-#define SKLAND_GUI_VULKAN_INTERFACE_HPP_
+#ifndef SKLAND_GUI_ABSTRACT_GPU_INTERFACE_HPP_
+#define SKLAND_GUI_ABSTRACT_GPU_INTERFACE_HPP_
 
-#include "abstract-gpu-interface.hpp"
+#include "skland/core/defines.hpp"
 
-#include <vulkan/vulkan.hpp>
+#include <memory>
 
 namespace skland {
 namespace gui {
@@ -28,25 +28,39 @@ class Surface;
 
 /**
  * @ingroup gui
- * @brief Vulkan
+ * @brief The base class for graphic engine to render on a 3D surface
  */
-class VulkanInterface : public AbstractGPUInterface {
+class AbstractGPUInterface {
 
  public:
 
-  VulkanInterface();
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractGPUInterface);
 
-  virtual ~VulkanInterface();
+  AbstractGPUInterface();
 
-  virtual void Setup(Surface *surface) final;
+  virtual ~AbstractGPUInterface();
+
+  /**
+   * @brief Setup the surface on which this engine works
+   * @param surface
+   */
+  virtual void Setup(Surface *surface) = 0;
+
+  Surface *GetSurface() const;
+
+ protected:
+
+  struct Proxy;
 
  private:
 
-  vk::SurfaceKHR vk_surface_;
+  struct Private;
+
+  std::unique_ptr<Private> p_;
 
 };
 
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_VULKAN_ENGINE_HPP_
+#endif // SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_

@@ -39,6 +39,8 @@ class SpinningView : public AbstractView {
 
  public:
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(SpinningView);
+
   SpinningView() {
     color_ = 0xFF4FBF4F;
     frame_callback_.done().Set(this, &SpinningView::OnFrame);
@@ -50,11 +52,11 @@ class SpinningView : public AbstractView {
 
   void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
     if (!running_animation_)
-      Update();
+      SaveGeometry(0 != dirty_flag);
   }
 
   void OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
-
+    Update(0 != dirty_flag);
   }
 
   void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final {

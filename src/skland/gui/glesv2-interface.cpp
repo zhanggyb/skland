@@ -20,7 +20,7 @@ namespace skland {
 namespace gui {
 
 GLESV2Interface::GLESV2Interface()
-    : AbstractGraphicsInterface() {
+    : AbstractGPUInterface() {
 
 }
 

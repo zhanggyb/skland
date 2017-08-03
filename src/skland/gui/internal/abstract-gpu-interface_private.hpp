@@ -14,48 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_
-#define SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_GPU_INTERFACE_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_GPU_INTERFACE_PRIVATE_HPP_
 
-#include <memory>
+#include "skland/gui/abstract-gpu-interface.hpp"
+
+#include "surface_private.hpp"
 
 namespace skland {
 namespace gui {
 
-class Surface;
-
 /**
- * @brief The base class for graphic engine to render on a 3D surface
+ * @ingroup gui_intern
+ * @brief Structure for private data in AbstractGPUInterface
  */
-class AbstractGraphicsInterface {
+struct AbstractGPUInterface::Private {
 
- public:
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
-  AbstractGraphicsInterface();
+  Private() = default;
 
-  virtual ~AbstractGraphicsInterface();
+  ~Private() = default;
 
-  /**
-   * @brief Setup the surface on which this engine works
-   * @param surface
-   */
-  virtual void Setup(Surface *surface) = 0;
-
-  Surface *GetSurface() const;
-
- protected:
-
-  struct Proxy;
-
- private:
-
-  struct Private;
-
-  std::unique_ptr<Private> p_;
+  Surface *surface = nullptr;
 
 };
 
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_
+#endif // SKLAND_GUI_INTERN_ABSTRACT_GPU_INTERFACE_PRIVATE_HPP_
