@@ -35,7 +35,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
   Private() = delete;
 
-  Private(AbstractView *view)
+  explicit Private(AbstractView *view)
       : previous(nullptr),
         next(nullptr),
         first_child(nullptr),

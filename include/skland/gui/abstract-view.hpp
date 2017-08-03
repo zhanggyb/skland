@@ -623,7 +623,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   void ClearChildren();
 
-  static bool SwapIndex(AbstractView *object1, AbstractView *object2);
+  static bool SwapIndex(AbstractView *view1, AbstractView *view2);
 
   static bool InsertSiblingBefore(AbstractView *src, AbstractView *dst);
 

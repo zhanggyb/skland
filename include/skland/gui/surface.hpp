@@ -200,7 +200,7 @@ class Surface {
 
   AbstractEventHandler *GetEventHandler() const;
 
-  AbstractGPUInterface *GetGraphicsInterface() const;
+  AbstractGPUInterface *GetGPUInterface() const;
 
   const Margin &GetMargin() const;
 

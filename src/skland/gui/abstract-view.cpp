@@ -452,15 +452,15 @@ void AbstractView::Destroy() {
 
   OnDestroy();
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     _ASSERT(p_->layout == p_->parent);
     p_->layout->RemoveView(this);
   }
 
-  if (p_->parent) {
+  if (nullptr != p_->parent) {
     _ASSERT(nullptr == p_->shell_view);
     p_->parent->RemoveChild(this);
-  } else if (p_->shell_view) {
+  } else if (nullptr != p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
     p_->shell_view->DetachView(this);
   }
@@ -483,11 +483,15 @@ AbstractLayout *AbstractView::GetLayout() const {
 }
 
 AbstractShellView *AbstractView::GetShellView() const {
-  if (p_->shell_view)
+  if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
     return p_->shell_view;
+  }
 
-  if (p_->parent)
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
     return p_->parent->GetShellView();
+  }
 
   return nullptr;
 }
@@ -833,70 +837,70 @@ void AbstractView::ClearChildren() {
   p_->last_child = nullptr;
 }
 
-bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {
-  if (object1 == nullptr || object2 == nullptr) return false;
-  if (object1 == object2) return false;
-  if (object1->p_->parent != object2->p_->parent) return false;
-  if (object1->p_->parent == nullptr) return false;
+bool AbstractView::SwapIndex(AbstractView *view1, AbstractView *view2) {
+  if (view1 == nullptr || view2 == nullptr) return false;
+  if (view1 == view2) return false;
+  if (view1->p_->parent != view2->p_->parent) return false;
+  if (view1->p_->parent == nullptr) return false;
 
   AbstractView *tmp1 = nullptr;
   AbstractView *tmp2 = nullptr;
 
-  if (object1->p_->next == object2) {    // view1 is just the previous sibling of view2
+  if (view1->p_->next == view2) {    // view1 is just the previous sibling of view2
 
-    _ASSERT(object2->p_->previous == object1);
-    tmp1 = object1->p_->previous;
-    tmp2 = object2->p_->next;
-    object2->p_->previous = tmp1;
-    object1->p_->previous = object2;
-    object2->p_->next = object1;
-    object1->p_->next = tmp2;
+    _ASSERT(view2->p_->previous == view1);
+    tmp1 = view1->p_->previous;
+    tmp2 = view2->p_->next;
+    view2->p_->previous = tmp1;
+    view1->p_->previous = view2;
+    view2->p_->next = view1;
+    view1->p_->next = tmp2;
 
-    if (tmp1 != nullptr) tmp1->p_->next = object2;
-    else object1->p_->parent->p_->first_child = object2;
+    if (tmp1 != nullptr) tmp1->p_->next = view2;
+    else view1->p_->parent->p_->first_child = view2;
 
-    if (tmp2 != nullptr) tmp2->p_->previous = object1;
-    else object2->p_->parent->p_->last_child = object2;
+    if (tmp2 != nullptr) tmp2->p_->previous = view1;
+    else view2->p_->parent->p_->last_child = view2;
 
-  } else if (object1->p_->previous == object2) {
-    _ASSERT(object2->p_->next == object1);
+  } else if (view1->p_->previous == view2) {
+    _ASSERT(view2->p_->next == view1);
 
-    tmp1 = object2->p_->previous;
-    tmp2 = object1->p_->next;
-    object1->p_->previous = tmp1;
-    object2->p_->previous = object1;
-    object1->p_->next = object2;
-    object2->p_->next = tmp2;
+    tmp1 = view2->p_->previous;
+    tmp2 = view1->p_->next;
+    view1->p_->previous = tmp1;
+    view2->p_->previous = view1;
+    view1->p_->next = view2;
+    view2->p_->next = tmp2;
 
-    if (tmp1 != nullptr) tmp1->p_->next = object1;
-    else object2->p_->parent->p_->first_child = object1;
+    if (tmp1 != nullptr) tmp1->p_->next = view1;
+    else view2->p_->parent->p_->first_child = view1;
 
-    if (tmp2 != nullptr) tmp2->p_->previous = object2;
-    else object1->p_->parent->p_->last_child = object2;
+    if (tmp2 != nullptr) tmp2->p_->previous = view2;
+    else view1->p_->parent->p_->last_child = view2;
 
   } else {
 
-    tmp1 = object1->p_->previous;
-    tmp2 = object2->p_->previous;
-    object1->p_->previous = tmp2;
-    object2->p_->previous = tmp1;
+    tmp1 = view1->p_->previous;
+    tmp2 = view2->p_->previous;
+    view1->p_->previous = tmp2;
+    view2->p_->previous = tmp1;
 
-    if (tmp1 != nullptr) tmp1->p_->next = object2;
-    else object1->p_->parent->p_->first_child = object2;
+    if (tmp1 != nullptr) tmp1->p_->next = view2;
+    else view1->p_->parent->p_->first_child = view2;
 
-    if (tmp2 != nullptr) tmp2->p_->next = object1;
-    else object2->p_->parent->p_->first_child = object1;
+    if (tmp2 != nullptr) tmp2->p_->next = view1;
+    else view2->p_->parent->p_->first_child = view1;
 
-    tmp1 = object1->p_->next;
-    tmp2 = object2->p_->next;
-    object1->p_->next = tmp2;
-    object2->p_->next = tmp1;
+    tmp1 = view1->p_->next;
+    tmp2 = view2->p_->next;
+    view1->p_->next = tmp2;
+    view2->p_->next = tmp1;
 
-    if (tmp1 != nullptr) tmp1->p_->previous = object2;
-    else object1->p_->parent->p_->last_child = object2;
+    if (tmp1 != nullptr) tmp1->p_->previous = view2;
+    else view1->p_->parent->p_->last_child = view2;
 
-    if (tmp2 != nullptr) tmp2->p_->previous = object1;
-    else object2->p_->parent->p_->last_child = object1;
+    if (tmp2 != nullptr) tmp2->p_->previous = view1;
+    else view2->p_->parent->p_->last_child = view1;
 
   }
 

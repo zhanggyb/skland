@@ -672,7 +672,7 @@ AbstractEventHandler *Surface::GetEventHandler() const {
   return p_->event_handler;
 }
 
-AbstractGPUInterface *Surface::GetGraphicsInterface() const {
+AbstractGPUInterface *Surface::GetGPUInterface() const {
   return p_->graphics_interface;
 }
 

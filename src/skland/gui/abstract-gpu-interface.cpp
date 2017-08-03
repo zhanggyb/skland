@@ -17,22 +17,23 @@
 #include "internal/abstract-gpu-interface_private.hpp"
 
 #include "skland/core/assert.hpp"
+#include "skland/core/memory.hpp"
 
 namespace skland {
 namespace gui {
 
 AbstractGPUInterface::AbstractGPUInterface() {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 }
 
 AbstractGPUInterface::~AbstractGPUInterface() {
-  if (p_->surface) {
+  if (nullptr != p_->surface) {
     _ASSERT(p_->surface->p_->graphics_interface == this);
     p_->surface->p_->graphics_interface = nullptr;
   }
 }
 
-Surface* AbstractGPUInterface::GetSurface() const {
+Surface *AbstractGPUInterface::GetSurface() const {
   return p_->surface;
 }
 
