@@ -40,11 +40,11 @@ class Context;
  * @brief Layout policy to indicate how a view is resized in a layout
  */
 enum LayoutPolicy {
-  kLayoutMinimal,  /**< Recommend to use the minimal size */
-  kLayoutPreferred,  /**< Recommend to use the preferred size */
-  kLayoutMaximal,  /**< Recommend to use the maximal size */
-  kLayoutFixed,  /**< Recommend to use the current size and do not change */
-  kLayoutExpandable  /**< Recommend to expand to any value between minimal and maximal size */
+  kLayoutMinimal,                       /**< Recommend to use the minimal size */
+  kLayoutPreferred,                     /**< Recommend to use the preferred size */
+  kLayoutMaximal,                       /**< Recommend to use the maximal size */
+  kLayoutFixed,                         /**< Recommend to use the current size and do not change */
+  kLayoutExpandable                     /**< Recommend to expand to any value between minimal and maximal size */
 };
 
 /**
@@ -58,8 +58,10 @@ enum LayoutPolicy {
  * A view can have parent and subviews, when you create a GUI application, it
  * generates a view hierarchy.
  *
- * A view object can have arbitrary number of surfaces or shares the surface
- * with others which is managed in one of parent views.
+ * As a sub class of AbstractEventHandler, a view object can have arbitrary
+ * number of surfaces. Or it can share the surface with others which is managed
+ * in one of parent views. But in most cases, it draws on the surface hold in a
+ * shell view (e.g. Window).
  *
  * An AbstractView object SHOULD always be created by new operator and MUST be
  * destroyed by Destroy() method.
@@ -76,10 +78,10 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractView);
 
-  using Size = core::SizeI; /**< @brief Alias of core::SizeI */
-  using Rect = core::RectI; /**< @brief Alias of core::RectI */
-  using RectF = core::RectF;  /**< @brief Alias of core::RectF */
-  using Padding = core::Padding;  /**< @brief Alias of core::Padding */
+  using Size    = core::SizeI;          /**< @brief Alias of core::SizeI */
+  using Rect    = core::RectI;          /**< @brief Alias of core::RectI */
+  using RectF   = core::RectF;          /**< @brief Alias of core::RectF */
+  using Padding = core::Padding;        /**< @brief Alias of core::Padding */
 
   enum GeometryDirtyFlagMask {
     kDirtyLeftMask = 0x1 << 0,
@@ -377,6 +379,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   float GetYCenter() const;
 
+  /**
+   * @brief Get the geometry of this view
+   */
   const RectF &GetGeometry() const;
 
   bool IsVisible() const;
@@ -399,8 +404,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   void AddAnchorTo(AbstractView *target, Alignment align, int distance);
 
   const AnchorGroup &GetAnchorGroup(Alignment align) const;
-
-  void SaveGeometry(bool validate = true);
 
   /**
    * @brief Update the display of this widget
@@ -498,17 +501,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   virtual void OnDetachedFromShellView(AbstractShellView *shell_view);
 
   /**
-   * @brief Update this view and all sub views
-   *
-   * By default this method will update this view and all recursively update all
-   * sub views.  Sub class can override this method to select part of sub views
-   * to update.
-   */
-  virtual void DispatchUpdate();
-
-  virtual void OnRequestSaveGeometry(AbstractView *view) override;
-
-  /**
    * @brief A view request an update
    * @param view This view or a sub view in hierarchy
    */
@@ -544,6 +536,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
                                    const RectF &old_geometry,
                                    const RectF &new_geometry) = 0;
 
+  virtual void OnRequestSaveGeometry(AbstractView *view) override;
+
   /**
    * @brief Callback when the geometry changes before draw this view
    * @param dirty_flag Bitwise flag of which part of geometry changes
@@ -560,6 +554,22 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
 
   /**
+   * @brief Callback when destroyed
+   *
+   * By default this method does nothing, sub class can override this.
+   */
+  virtual void OnDestroy();
+
+  /**
+   * @brief Update this view and all sub views
+   *
+   * By default this method will update this view and all recursively update all
+   * sub views.  Sub class can override this method to select part of sub views
+   * to update.
+   */
+  virtual void DispatchUpdate();
+
+  /**
    * @brief Dispatch mouse enter event down to the target view
    * @param event
    * @return
@@ -572,11 +582,12 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   virtual AbstractView *DispatchMouseEnterEvent(MouseEvent *event);
 
   /**
-   * @brief Callback when destroyed
-   *
-   * By default this method does nothing, sub class can override this.
+   * @brief Schedule change the geometry of this view
+   * @param[in] validate
+   *	- true: schedule change the geometry in task deque
+   *	- false: cancel the geometry task
    */
-  virtual void OnDestroy();
+  void RequestSaveGeometry(bool validate = true);
 
   void TrackMouseMotion(MouseEvent *event);
 

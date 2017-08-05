@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-#include "gui/label.hpp"
+#include "skland/gui/label.hpp"
 
-#include "core/color.hpp"
+#include "skland/core/memory.hpp"
 
-#include "graphic/font.hpp"
-#include "graphic/canvas.hpp"
-#include "graphic/paint.hpp"
-#include "graphic/text-box.hpp"
+#include "skland/graphic/font.hpp"
+#include "skland/graphic/canvas.hpp"
+#include "skland/graphic/paint.hpp"
+#include "skland/graphic/text-box.hpp"
 
-#include "gui/context.hpp"
-#include "gui/key-event.hpp"
-#include "gui/mouse-event.hpp"
+#include "skland/gui/context.hpp"
+#include "skland/gui/key-event.hpp"
+#include "skland/gui/mouse-event.hpp"
 
 #include "skland/gui/theme.hpp"
 
@@ -62,7 +62,7 @@ Label::Label(const std::string &text)
 
 Label::Label(int width, int height, const std::string &text)
     : AbstractView(width, height) {
-  p_.reset(new Private(text));
+  p_ = core::make_unique<Private>(text);
 }
 
 Label::~Label() {

@@ -44,6 +44,8 @@ class AbstractGPUInterface {
 
   Surface *GetSurface() const;
 
+  virtual void SetViewportSize(int width, int height) = 0;
+
  protected:
 
   struct Proxy;

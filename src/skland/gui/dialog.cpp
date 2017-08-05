@@ -91,7 +91,7 @@ void Dialog::OnShown() {
 }
 
 void Dialog::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  SaveSize();
+  RequestSaveSize();
 }
 
 void Dialog::OnSaveSize(const Size &old_size, const Size &new_size) {

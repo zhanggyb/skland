@@ -16,15 +16,17 @@
 
 #include "internal/abstract-view_private.hpp"
 
+#include "skland/core/assert.hpp"
+#include "skland/core/debug.hpp"
+#include "skland/core/memory.hpp"
+
 #include "skland/numerical/bit.hpp"
 #include "skland/numerical/clamp.hpp"
 
-#include <skland/core/assert.hpp>
-#include "skland/core/debug.hpp"
-
-#include <skland/gui/abstract-shell-view.hpp>
-#include <skland/gui/abstract-layout.hpp>
-#include <skland/gui/mouse-event.hpp>
+#include "skland/gui/abstract-shell-view.hpp"
+#include "skland/gui/abstract-layout.hpp"
+#include "skland/gui/mouse-event.hpp"
+#include "skland/gui/application.hpp"
 
 #include "internal/abstract-view_iterators.hpp"
 
@@ -44,7 +46,7 @@ AbstractView::AbstractView()
 
 AbstractView::AbstractView(int width, int height)
     : AbstractEventHandler() {
-  p_.reset(new Private(this));
+  p_ = core::make_unique<Private>(this);
   p_->geometry.Resize(width, height);
   p_->last_geometry.Resize(width, height);
 
@@ -425,22 +427,14 @@ const AnchorGroup &AbstractView::GetAnchorGroup(Alignment align) const {
   }
 }
 
-void AbstractView::SaveGeometry(bool validate) {
-  if (validate) {
-    if (p_->geometry_task.IsLinked()) return;
-
-  } else {
-    p_->geometry_task.Unlink();
-  }
-}
-
 void AbstractView::Update(bool validate) {
-  if (validate) {
-    if (p_->redraw_task.IsLinked()) return;
-    OnRequestUpdate(this);
-  } else {
+  if (!validate) {
     p_->redraw_task.Unlink();
+    return;
   }
+
+  if (p_->redraw_task.IsLinked()) return;
+  OnRequestUpdate(this);
 }
 
 bool AbstractView::Contain(int x, int y) const {
@@ -527,24 +521,6 @@ void AbstractView::DispatchUpdate() {
   }
 }
 
-void AbstractView::OnRequestSaveGeometry(AbstractView *view) {
-  if (p_->geometry_task.IsLinked()) {
-    if (view != this) {
-      p_->geometry_task.PushBack(&view->p_->geometry_task);
-    }
-    return;
-  }
-
-  if (p_->parent) {
-    _ASSERT(nullptr == p_->shell_view);
-    p_->parent->OnRequestSaveGeometry(view);
-    return;
-  } else if (p_->shell_view) {
-    _ASSERT(nullptr == p_->parent);
-    p_->shell_view->OnRequestSaveGeometry(view);
-  }
-}
-
 void AbstractView::OnRequestUpdate(AbstractView *view) {
   if (p_->redraw_task.IsLinked()) {
     if (view != this) {
@@ -578,6 +554,28 @@ void AbstractView::OnLeaveOutput(const Surface *surface, const Output *output) {
   // override this in sub class
 }
 
+void AbstractView::OnRequestSaveGeometry(AbstractView *view) {
+  if (p_->geometry_task.IsLinked()) {
+    if (view != this) {
+      p_->geometry_task.PushBack(&view->p_->geometry_task);
+    }
+    return;
+  }
+
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    p_->parent->OnRequestSaveGeometry(view);
+    return;
+  } else if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
+    p_->shell_view->OnRequestSaveGeometry(view);
+  }
+}
+
+void AbstractView::OnDestroy() {
+  // override in sub class
+}
+
 AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
   Iterator it(this);
   AbstractView *view = nullptr;
@@ -593,8 +591,26 @@ AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
   return view;
 }
 
-void AbstractView::OnDestroy() {
-  // override in sub class
+void AbstractView::RequestSaveGeometry(bool validate) {
+  if (!validate) {
+    p_->geometry_task.Unlink();
+    p_->geometry = p_->last_geometry;
+    p_->geometry_dirty_flags = 0;
+    return;
+  }
+
+  if (p_->geometry_task.IsLinked()) return;
+
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    p_->parent->OnRequestSaveGeometry(this);
+  } else if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
+    p_->shell_view->OnRequestSaveGeometry(this);
+  } else {
+    core::Deque<Task> &deque = Application::GetTaskDeque();
+    deque.PushBack(&p_->geometry_task);
+  }
 }
 
 void AbstractView::TrackMouseMotion(MouseEvent *event) {

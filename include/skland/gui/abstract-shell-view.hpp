@@ -54,9 +54,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   SKLAND_DECLARE_NONCOPYABLE(AbstractShellView);
   AbstractShellView() = delete;
 
-  using Size = core::SizeI; /**< @brief Alias of core::SizeI */
-  using Rect = core::RectI; /**< @brief Alias of core::RectI */
-  using Margin = core::Margin;  /**< @brief Alias of core::Margin */
+  using Size   = core::SizeI;           /**< @brief Alias of core::SizeI */
+  using Rect   = core::RectI;           /**< @brief Alias of core::RectI */
+  using Margin = core::Margin;          /**< @brief Alias of core::Margin */
 
   /**
    * @brief A nested class to update the size
@@ -174,12 +174,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   AbstractShellView *GetParent() const;
 
-  /**
-   * @brief Schedule resize this shell view
-   * @param validate
-   */
-  void SaveSize(bool validate = true);
-
   static const Margin kResizingMargin;
 
  protected:
@@ -250,6 +244,14 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   virtual void OnViewAttached(AbstractView *view);
 
   virtual void OnViewDetached(AbstractView *view);
+
+  /**
+   * @brief Schedule resize this shell view
+   * @param validate
+   *	- true: schedule resize this shell view in task deque
+   *	- false: cancel the scheduled resize task
+   */
+  void RequestSaveSize(bool validate = true);
 
   void MoveWithMouse(MouseEvent *event) const;
 

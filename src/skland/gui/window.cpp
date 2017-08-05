@@ -266,31 +266,24 @@ void Window::OnRequestUpdate(AbstractView *view) {
   surface->Update();
 }
 
-Surface *Window::GetSurface(const AbstractView *view) const {
-  if (nullptr == view)
-    return GetShellSurface();
-
-  return nullptr != p_->main_surface ? p_->main_surface : GetShellSurface();
-}
-
 void Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  _ASSERT(p_->minimal_size.width < p_->maximal_size.width &&
-      p_->minimal_size.height < p_->maximal_size.height);
+  _ASSERT((p_->minimal_size.width < p_->maximal_size.width) &&
+          (p_->minimal_size.height < p_->maximal_size.height));
 
   if ((new_size.width < p_->minimal_size.width) ||
       (new_size.height < p_->minimal_size.height)) {
-    SaveSize(false);
+    RequestSaveSize(false);
     return;
   }
 
   if ((new_size.width > p_->maximal_size.width) ||
       (new_size.height > p_->maximal_size.height)) {
-    SaveSize(false);
+    RequestSaveSize(false);
     return;
   }
 
   if (old_size == new_size) {
-    SaveSize(false);
+    RequestSaveSize(false);
     return;
   }
 
@@ -300,7 +293,7 @@ void Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
   // surface size is changed, reset the pointer position and enter/leave widgets
   DispatchMouseLeaveEvent();
 
-  SaveSize();
+  RequestSaveSize();
 }
 
 void Window::OnSaveSize(const Size &old_size, const Size &new_size) {

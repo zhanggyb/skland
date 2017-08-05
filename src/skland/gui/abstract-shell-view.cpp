@@ -190,20 +190,6 @@ AbstractShellView *AbstractShellView::GetParent() const {
   return p_->parent;
 }
 
-void AbstractShellView::SaveSize(bool validate) {
-  if (validate) {
-    p_->dirty_flag = 1;
-    if (p_->geometry_task.IsLinked()) return;
-
-    core::Deque<Task> &defferred_task_deque = Application::GetTaskDeque();
-    defferred_task_deque.PushBack(&p_->geometry_task);
-  } else {
-    p_->geometry_task.Unlink();
-    p_->size = p_->last_size;
-    p_->dirty_flag = 0;
-  }
-}
-
 void AbstractShellView::AttachView(AbstractView *view) {
   if (view->p_->shell_view == this) {
     _ASSERT(nullptr == view->p_->parent);
@@ -303,6 +289,21 @@ void AbstractShellView::OnViewAttached(AbstractView *view) {
 
 void AbstractShellView::OnViewDetached(AbstractView *view) {
 
+}
+
+void AbstractShellView::RequestSaveSize(bool validate) {
+  if (!validate) {
+    p_->geometry_task.Unlink();
+    p_->size = p_->last_size;
+    p_->dirty_flag = 0;
+    return;
+  }
+
+  p_->dirty_flag = 1;
+  if (p_->geometry_task.IsLinked()) return;
+
+  core::Deque<Task> &defferred_task_deque = Application::GetTaskDeque();
+  defferred_task_deque.PushBack(&p_->geometry_task);
 }
 
 void AbstractShellView::MoveWithMouse(MouseEvent *event) const {

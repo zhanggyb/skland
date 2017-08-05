@@ -36,6 +36,8 @@ class GLESV2Interface : public AbstractGPUInterface {
 
   virtual ~GLESV2Interface();
 
+  virtual void SetViewportSize(int width, int height) final;
+
  protected:
 
   virtual void OnSetup() final;

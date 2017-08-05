@@ -73,7 +73,7 @@ void AbstractLayout::RemoveView(AbstractView *view) {
 
 void AbstractLayout::Layout() {
   p_->need_layout = true;
-  SaveGeometry();
+  RequestSaveGeometry();
 }
 
 void AbstractLayout::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
@@ -81,7 +81,7 @@ void AbstractLayout::OnConfigureGeometry(int dirty_flag, const RectF &old_geomet
     Layout();
   } else {
     p_->need_layout = false;
-    SaveGeometry(false);
+    RequestSaveGeometry(false);
   }
 }
 

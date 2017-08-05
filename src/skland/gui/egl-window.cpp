@@ -145,11 +145,11 @@ void EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
   _ASSERT(min.width < max.width && min.height < max.height);
 
   if (new_size.width < min.width || new_size.height < min.height) {
-    SaveSize(false);
+    RequestSaveSize(false);
     return;
   }
   if (new_size.width > max.width || new_size.height > max.height) {
-    SaveSize(false);
+    RequestSaveSize(false);
     return;
   }
 
@@ -157,7 +157,7 @@ void EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
 
   if (old_size == new_size) {
 //    redraw_task->Unlink();
-    SaveSize(false);
+    RequestSaveSize(false);
     return;
   }
 
@@ -171,7 +171,7 @@ void EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
 
   DispatchMouseLeaveEvent();
 
-  SaveSize();
+  RequestSaveSize();
   return;
 }
 

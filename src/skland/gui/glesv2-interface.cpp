@@ -52,6 +52,10 @@ GLESV2Interface::~GLESV2Interface() {
   Destroy();
 }
 
+void GLESV2Interface::SetViewportSize(int width, int height) {
+  wl_egl_window_resize(p_->wl_egl_window, width, height, 0, 0);
+}
+
 void GLESV2Interface::OnSetup() {
   Create();
 }

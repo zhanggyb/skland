@@ -91,8 +91,6 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   virtual void OnRequestUpdate(AbstractView *view) override;
 
-  virtual Surface *GetSurface(const AbstractView *view) const;
-
   virtual void OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
   virtual void OnSaveSize(const Size &old_size, const Size &new_size) final;
