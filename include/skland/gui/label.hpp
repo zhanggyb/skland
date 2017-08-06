@@ -54,15 +54,11 @@ SKLAND_EXPORT class Label : public AbstractView {
 
   virtual ~Label();
 
-  virtual void OnConfigureGeometry(int dirty_flag,
-                                   const RectF &old_geometry,
+  virtual void OnConfigureGeometry(const RectF &old_geometry,
                                    const RectF &new_geometry) override;
 
-  virtual void OnSaveGeometry(int dirty_flag,
-                              const RectF &old_geometry,
+  virtual void OnSaveGeometry(const RectF &old_geometry,
                               const RectF &new_geometry) final;
-
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

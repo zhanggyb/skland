@@ -254,7 +254,8 @@ void AbstractShellView::OnKeyUp(KeyEvent *event) {
 }
 
 void AbstractShellView::OnRequestSaveGeometry(AbstractView *view) {
-  // override in sub class
+  AbstractView::GeometryTask* task = AbstractView::GeometryTask::Get(view);
+  Application::GetTaskDeque().PushBack(task);
 }
 
 void AbstractShellView::OnRequestUpdate(AbstractView *view) {
@@ -295,11 +296,9 @@ void AbstractShellView::RequestSaveSize(bool validate) {
   if (!validate) {
     p_->geometry_task.Unlink();
     p_->size = p_->last_size;
-    p_->dirty_flag = 0;
     return;
   }
 
-  p_->dirty_flag = 1;
   if (p_->geometry_task.IsLinked()) return;
 
   core::Deque<Task> &defferred_task_deque = Application::GetTaskDeque();
@@ -557,11 +556,8 @@ void AbstractShellView::DropShadow(const Context *context) {
 // ---------
 
 void AbstractShellView::GeometryTask::Run() const {
-  if (shell_view_->p_->dirty_flag) {
-    shell_view_->OnSaveSize(shell_view_->p_->last_size, shell_view_->p_->size);
-    shell_view_->p_->last_size = shell_view_->p_->size;
-    shell_view_->p_->dirty_flag = 0;
-  }
+  shell_view_->OnSaveSize(shell_view_->p_->last_size, shell_view_->p_->size);
+  shell_view_->p_->last_size = shell_view_->p_->size;
 }
 
 } // namespace gui

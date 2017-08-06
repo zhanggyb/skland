@@ -50,13 +50,15 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual ~AbstractLayout();
 
-  virtual void OnConfigureGeometry(int dirty_flag,
-                                   const RectF &old_geometry,
+  virtual void OnConfigureGeometry(const RectF &old_geometry,
                                    const RectF &new_geometry) final;
 
-  virtual void OnSaveGeometry(int dirty_flag,
-                              const RectF &old_geometry,
+  virtual void OnRequestSaveGeometry(AbstractView *view) override;
+
+  virtual void OnSaveGeometry(const RectF &old_geometry,
                               const RectF &new_geometry) final;
+
+  virtual void OnRequestUpdate(AbstractView *view) override;
 
   virtual void OnChildAdded(AbstractView *view) final;
 
@@ -82,9 +84,13 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
 
   virtual void OnViewRemoved(AbstractView *view) = 0;
 
+  virtual void OnLayout(int left, int top, int right, int bottom) = 0;
+
  private:
 
   struct Private;
+
+  bool is_geometry_saved_;
 
 //  std::unique_ptr<Private> p_;
 

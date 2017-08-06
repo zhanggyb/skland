@@ -49,15 +49,12 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
         maximal_size(65536, 65536),
         x_layout_policy(kLayoutPreferred),
         y_layout_policy(kLayoutPreferred),
-        geometry_dirty_flags(0),
         geometry_task(view),
         redraw_task(view),
         left_anchor_group(view, kAlignLeft),
         top_anchor_group(view, kAlignTop),
         right_anchor_group(view, kAlignRight),
         bottom_anchor_group(view, kAlignBottom),
-        need_layout(false),
-        is_layouting(false),
         layout(nullptr) {}
 
   ~Private() = default;
@@ -87,13 +84,6 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   Padding padding;
 
-  /**
-   * @brief Bitwise data to indicate if the position or size need to update
-   *
-   * Use GeometryTypeMask to check this value
-   */
-  int geometry_dirty_flags;
-
   RectF geometry;
 
   RectF last_geometry;
@@ -107,8 +97,6 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
   AnchorGroup right_anchor_group;
   AnchorGroup bottom_anchor_group;
 
-  bool need_layout;
-  bool is_layouting;
   AbstractLayout *layout;
 
 };

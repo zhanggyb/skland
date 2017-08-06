@@ -306,7 +306,7 @@ AbstractButton *TitleBar::GetButton(ButtonType button_type) const {
   }
 }
 
-void TitleBar::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
+void TitleBar::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
   int new_y = (GetHeight() - close_button_->GetHeight()) / 2;
   int new_x = kButtonSpace;
   close_button_->MoveTo(new_x, new_y);
@@ -319,16 +319,10 @@ void TitleBar::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, co
 
   new_x = GetWidth() - kButtonSpace - fullscreen_button_->GetWidth();
   fullscreen_button_->MoveTo(new_x, new_y);
+}
 
+void TitleBar::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
   DispatchUpdate();
-}
-
-void TitleBar::OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-
-}
-
-void TitleBar::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
-
 }
 
 void TitleBar::OnMouseEnter(MouseEvent *event) {

@@ -88,16 +88,12 @@ void Label::SetFont(const graphic::Font &font) {
   Update();
 }
 
-void Label::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  Update(0 != dirty_flag);
+void Label::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  RequestSaveGeometry(old_geometry != new_geometry);
 }
 
-void Label::OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-
-}
-
-void Label::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
-
+void Label::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  Update();
 }
 
 void Label::OnMouseEnter(MouseEvent *event) {

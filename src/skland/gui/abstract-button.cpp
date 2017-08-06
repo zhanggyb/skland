@@ -163,16 +163,12 @@ void AbstractButton::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  Update(0 != dirty_flag);
+void AbstractButton::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  RequestSaveGeometry(old_geometry != new_geometry);
 }
 
-void AbstractButton::OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-
-}
-
-void AbstractButton::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
-
+void AbstractButton::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  Update();
 }
 
 void AbstractButton::SetSensitive(bool sensitive) {

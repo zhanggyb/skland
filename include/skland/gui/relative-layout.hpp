@@ -38,7 +38,7 @@ SKLAND_EXPORT class RelativeLayout final : public AbstractLayout {
 
   virtual void OnViewRemoved(AbstractView *view);
 
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
+  virtual void OnLayout(int left, int top, int right, int bottom) final;
 
  private:
 

@@ -73,8 +73,8 @@ Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
   return sub_surface_;
 }
 
-void EGLWidget::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  Update(0 != dirty_flag);
+void EGLWidget::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  RequestSaveGeometry(old_geometry != new_geometry);
 
   if (egl_surface_) {
     Surface::Sub::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
@@ -83,12 +83,8 @@ void EGLWidget::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, c
   }
 }
 
-void EGLWidget::OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-
-}
-
-void EGLWidget::OnLayout(int, int, int, int, int) {
-
+void EGLWidget::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  Update();
 }
 
 void EGLWidget::OnMouseEnter(MouseEvent *event) {

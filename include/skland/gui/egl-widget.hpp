@@ -50,11 +50,9 @@ class EGLWidget : public AbstractView {
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) final;
+  virtual void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
 
-  virtual void OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) final;
-
-  virtual void OnLayout(int, int, int, int, int) final;
+  virtual void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

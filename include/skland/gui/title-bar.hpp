@@ -33,6 +33,8 @@ class TitleBar final : public AbstractView {
 
  public:
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(TitleBar);
+
   enum ButtonType {
     kButtonClose,
     kButtonMaximize,
@@ -73,15 +75,11 @@ class TitleBar final : public AbstractView {
    */
   virtual ~TitleBar();
 
-  virtual void OnConfigureGeometry(int dirty_flag,
-                                   const core::RectF &old_geometry,
-                                   const core::RectF &new_geometry) override;
+  virtual void OnConfigureGeometry(const RectF &old_geometry,
+                                   const RectF &new_geometry) override;
 
-  virtual void OnSaveGeometry(int dirty_flag,
-                              const core::RectF &old_geometry,
-                              const core::RectF &new_geometry) override;
-
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
+  virtual void OnSaveGeometry(const RectF &old_geometry,
+                              const RectF &new_geometry) override;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 

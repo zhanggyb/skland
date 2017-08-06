@@ -50,17 +50,13 @@ class SpinningView : public AbstractView {
 
  protected:
 
-  void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
+  void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
     if (!running_animation_)
-      RequestSaveGeometry(0 != dirty_flag);
+      RequestSaveGeometry(old_geometry != new_geometry);
   }
 
-  void OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
-    Update(0 != dirty_flag);
-  }
-
-  void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final {
-
+  void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
+    Update(old_geometry != new_geometry);
   }
 
   void OnMouseEnter(MouseEvent *event) override {

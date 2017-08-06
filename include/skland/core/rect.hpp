@@ -319,6 +319,11 @@ inline bool operator==(const Rect<T> &src, const Rect<T> &dst) {
   return memcmp(&src, &dst, sizeof(Rect<T>)) == 0;
 }
 
+template<typename T>
+inline bool operator!=(const Rect<T> &src, const Rect<T> &dst) {
+  return memcmp(&src, &dst, sizeof(Rect<T>)) != 0;
+}
+
 /**
  * @ingroup core
  * @brief A typedef to Rect with integer values

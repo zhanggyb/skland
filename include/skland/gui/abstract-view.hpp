@@ -109,6 +109,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
     virtual void Run() const final;
 
+    static GeometryTask *Get(const AbstractView *view);
+
    private:
 
     AbstractView *view_;
@@ -532,8 +534,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    *
    * The new size will never smaller than minimal size or larger than maximal size.
    */
-  virtual void OnConfigureGeometry(int dirty_flag,
-                                   const RectF &old_geometry,
+  virtual void OnConfigureGeometry(const RectF &old_geometry,
                                    const RectF &new_geometry) = 0;
 
   virtual void OnRequestSaveGeometry(AbstractView *view) override;
@@ -547,11 +548,8 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * This virtual method is called only when there's new geometry need to be saved before drawing this
    * view.
    */
-  virtual void OnSaveGeometry(int dirty_flag,
-                              const RectF &old_geometry,
+  virtual void OnSaveGeometry(const RectF &old_geometry,
                               const RectF &new_geometry) = 0;
-
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
 
   /**
    * @brief Callback when destroyed

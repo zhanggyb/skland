@@ -74,16 +74,12 @@ class MainWidget : public AbstractView {
 
  protected:
 
-  virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
-    Update(0 != dirty_flag);
+  virtual void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
+    RequestSaveGeometry(old_geometry != new_geometry);
   }
 
-  virtual void OnSaveGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
-
-  }
-
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final {
-
+  virtual void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
+    Update();
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {
