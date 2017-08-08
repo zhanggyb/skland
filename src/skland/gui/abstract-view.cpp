@@ -104,7 +104,7 @@ void AbstractView::SetPreferredWidth(int width) {
 
   p_->preferred_size.width = width;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -114,7 +114,7 @@ void AbstractView::SetPreferredHeight(int height) {
 
   p_->preferred_size.height = height;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -134,7 +134,7 @@ void AbstractView::SetMaximalWidth(int width) {
 
   p_->maximal_size.width = width;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -146,7 +146,7 @@ void AbstractView::SetMaximalHeight(int height) {
 
   p_->maximal_size.height = height;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -162,7 +162,7 @@ int AbstractView::GetMaximalHeight() const {
 void AbstractView::SetLayoutPolicyOnX(LayoutPolicy policy) {
   p_->x_layout_policy = policy;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -174,7 +174,7 @@ LayoutPolicy AbstractView::GetLayoutPolicyOnX() const {
 void AbstractView::SetLayoutPolicyOnY(LayoutPolicy policy) {
   p_->y_layout_policy = policy;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -200,6 +200,7 @@ void AbstractView::Resize(int width, int height) {
   SizeI min;
   min.width = GetMinimalWidth();
   min.height = GetMinimalHeight();
+
   SizeI max;
   max.width = GetMaximalWidth();
   max.height = GetMaximalHeight();
@@ -224,38 +225,42 @@ int AbstractView::GetY() const {
 }
 
 int AbstractView::GetLeft() const {
-  if (p_->parent)
+  if (nullptr != p_->parent)
     return static_cast<int>(p_->geometry.left - p_->parent->p_->geometry.left);
 
   return static_cast<int>(p_->geometry.left);
 }
 
 void AbstractView::SetLeft(int left) {
-  if (p_->parent) left += p_->parent->p_->geometry.left;
+  if (nullptr != p_->parent) left += p_->parent->p_->geometry.left;
 
   if (left == p_->geometry.left) return;
 
   int width = static_cast<int>(p_->geometry.right) - left;
-  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+  if ((width < p_->minimal_size.width) ||
+      (width > p_->maximal_size.width))
+    return;
 
   p_->geometry.left = left;
   OnConfigureGeometry(p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetTop() const {
-  if (p_->parent)
+  if (nullptr != p_->parent)
     return static_cast<int>(p_->geometry.top - p_->parent->p_->geometry.top);
 
   return static_cast<int>(p_->geometry.top);
 }
 
 void AbstractView::SetTop(int top) {
-  if (p_->parent) top += p_->parent->p_->geometry.top;
+  if (nullptr != p_->parent) top += p_->parent->p_->geometry.top;
 
   if (top == p_->geometry.top) return;
 
   int height = static_cast<int>(p_->geometry.bottom) - top;
-  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
+  if ((height < p_->minimal_size.height) ||
+      (height > p_->maximal_size.height))
+    return;
 
   p_->geometry.top = top;
   OnConfigureGeometry(p_->last_geometry, p_->geometry);
@@ -266,12 +271,14 @@ int AbstractView::GetRight() const {
 }
 
 void AbstractView::SetRight(int right) {
-  if (p_->parent) right += p_->parent->p_->geometry.left; // relative to parent
+  if (nullptr != p_->parent) right += p_->parent->p_->geometry.left; // relative to parent
 
   if (right == p_->geometry.right) return;
 
   int width = right - static_cast<int>(p_->geometry.left);
-  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+  if ((width < p_->minimal_size.width) ||
+      (width > p_->maximal_size.width))
+    return;
 
   p_->geometry.right = right;
   OnConfigureGeometry(p_->last_geometry, p_->geometry);
@@ -282,12 +289,14 @@ int AbstractView::GetBottom() const {
 }
 
 void AbstractView::SetBottom(int bottom) {
-  if (p_->parent) bottom += p_->parent->p_->geometry.top; // relative to parent
+  if (nullptr != p_->parent) bottom += p_->parent->p_->geometry.top; // relative to parent
 
   if (bottom == p_->geometry.bottom) return;
 
   int height = bottom - static_cast<int>(p_->geometry.top);
-  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
+  if ((height < p_->minimal_size.height) ||
+      (height > p_->maximal_size.height))
+    return;
 
   p_->geometry.bottom = bottom;
   OnConfigureGeometry(p_->last_geometry, p_->geometry);

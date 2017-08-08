@@ -254,8 +254,12 @@ void AbstractShellView::OnKeyUp(KeyEvent *event) {
 }
 
 void AbstractShellView::OnRequestSaveGeometry(AbstractView *view) {
-  AbstractView::GeometryTask* task = AbstractView::GeometryTask::Get(view);
-  Application::GetTaskDeque().PushBack(task);
+  if (p_->geometry_task.IsLinked()) {
+    p_->geometry_task.PushBack(AbstractView::GeometryTask::Get(view));
+    return;
+  }
+
+  Application::GetTaskDeque().PushBack(AbstractView::GeometryTask::Get(view));
 }
 
 void AbstractShellView::OnRequestUpdate(AbstractView *view) {

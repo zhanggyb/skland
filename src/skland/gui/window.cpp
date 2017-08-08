@@ -61,20 +61,14 @@ SKLAND_NO_EXPORT struct Window::Private {
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
   Private()
-      : main_surface(nullptr),
-        title_bar(nullptr),
-        content_view(nullptr),
-        minimal_size(160, 120),
+      : minimal_size(160, 120),
         preferred_size(640, 480),
-        maximal_size(65536, 65536),
-        flags(0),
-        output(nullptr),
-        inhibit_update(true) {}
+        maximal_size(65536, 65536) {}
 
   ~Private() = default;
 
   /** The surface for rendering views in this window */
-  Surface *main_surface;
+  Surface *main_surface = nullptr;
 
   SharedMemoryPool pool;
 
@@ -85,9 +79,9 @@ SKLAND_NO_EXPORT struct Window::Private {
   std::unique_ptr<Canvas> main_canvas;
 
   /** The default title bar */
-  TitleBar *title_bar;
+  TitleBar *title_bar = nullptr;
 
-  AbstractView *content_view;
+  AbstractView *content_view = nullptr;
 
   Size minimal_size;
 
@@ -95,11 +89,11 @@ SKLAND_NO_EXPORT struct Window::Private {
 
   Size maximal_size;
 
-  int flags;
+  int flags = 0;
 
-  const Output *output;
+  const Output *output = nullptr;
 
-  bool inhibit_update;
+  bool inhibit_update = true;
 
 };
 
@@ -116,7 +110,7 @@ Window::Window(int width, int height, const char *title, int flags)
 
   Surface *shell_surface = GetShellSurface();
 
-  if (!(flags & kFlagMaskFrameless)) {
+  if (0 == (flags & kFlagMaskFrameless)) {
     // Create a sub surface for views in this window:
     p_->main_surface = Surface::Sub::Create(shell_surface, this, Theme::GetShadowMargin());
     _ASSERT(p_->main_surface->GetParent() == shell_surface);
@@ -252,23 +246,14 @@ void Window::OnShown() {
 void Window::OnRequestUpdate(AbstractView *view) {
   if (p_->inhibit_update) return;
 
-  Surface *surface = nullptr;
-
-  if (nullptr != p_->main_surface) {
-    surface = p_->main_surface;
-  } else {
-    surface = this->GetShellSurface();
-  }
-
-  AbstractView::RedrawTask *task = AbstractView::RedrawTask::Get(view);
-  core::Deque<AbstractView::RedrawTask> &deque = surface->GetRedrawTaskDeque();
-  deque.PushBack(task);
+  Surface *surface = nullptr != p_->main_surface ? p_->main_surface : this->GetShellSurface();
+  surface->GetRedrawTaskDeque().PushBack(AbstractView::RedrawTask::Get(view));
   surface->Update();
 }
 
 void Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
   _ASSERT((p_->minimal_size.width < p_->maximal_size.width) &&
-          (p_->minimal_size.height < p_->maximal_size.height));
+      (p_->minimal_size.height < p_->maximal_size.height));
 
   if ((new_size.width < p_->minimal_size.width) ||
       (new_size.height < p_->minimal_size.height)) {
@@ -367,7 +352,7 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
 void Window::OnRenderSurface(Surface *surface) {
   Surface *shell_surface = GetShellSurface();
   Context context(surface, nullptr);
-  const core::Margin &margin = surface->GetMargin();
+  const Margin &margin = surface->GetMargin();
 
   if (nullptr != p_->main_surface) {
     if (shell_surface == surface) {
@@ -377,14 +362,16 @@ void Window::OnRenderSurface(Surface *surface) {
       surface->Commit();
       return;
     }
-    context.set_canvas(p_->main_canvas.get());
-  } else {
-    context.set_canvas(p_->frame_canvas.get());
   }
 
   core::Deque<AbstractView::RedrawTask> &deque = surface->GetRedrawTaskDeque();
-
   core::Deque<AbstractView::RedrawTask>::Iterator it = deque.begin();
+  if (p_->main_surface == surface) {
+    context.set_canvas(p_->main_canvas.get());
+  } else if (shell_surface == surface) {
+    context.set_canvas(p_->frame_canvas.get());
+  }
+
   AbstractView *view = nullptr;
   while (it != deque.end()) {
     view = it.element()->view();

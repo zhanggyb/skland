@@ -67,6 +67,138 @@ TEST_F(Test, regular_1) {
  *
  * Expected result: display and resize a default window
  */
+TEST_F(Test, layout_left) {
+  int argc = 1;
+  char argv1[] = "show";  // to avoid compile warning
+  char *argv[] = {argv1};
+
+  Application app(argc, argv);
+
+  Window win(400, 300, "Relative Layout - Left");
+
+  RelativeLayout* layout = new RelativeLayout;
+  PushButton * button = new PushButton("Test");
+
+  layout->AddView(button);
+  button->MoveTo(200, 200);
+
+  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
+//  button->AddAnchorTo(layout, skland::kAlignTop, 20);
+//  button->AddAnchorTo(layout, skland::kAlignRight, 20);
+//  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
+
+  win.SetContentView(layout);
+  win.Show();
+
+  int result = app.Run();
+
+  ASSERT_TRUE(result == 0);
+}
+
+/**
+ * @brief Show a relative layout in a simple window
+ *
+ * Expected result: display and resize a default window
+ */
+TEST_F(Test, layout_top) {
+  int argc = 1;
+  char argv1[] = "show";  // to avoid compile warning
+  char *argv[] = {argv1};
+
+  Application app(argc, argv);
+
+  Window win(400, 300, "Relative Layout - Top");
+
+  RelativeLayout* layout = new RelativeLayout;
+  PushButton * button = new PushButton("Test");
+
+  layout->AddView(button);
+  button->MoveTo(200, 200);
+
+//  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
+  button->AddAnchorTo(layout, skland::kAlignTop, 20);
+//  button->AddAnchorTo(layout, skland::kAlignRight, 20);
+//  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
+
+  win.SetContentView(layout);
+  win.Show();
+
+  int result = app.Run();
+
+  ASSERT_TRUE(result == 0);
+}
+
+/**
+ * @brief Show a relative layout in a simple window
+ *
+ * Expected result: display and resize a default window
+ */
+TEST_F(Test, layout_right) {
+  int argc = 1;
+  char argv1[] = "show";  // to avoid compile warning
+  char *argv[] = {argv1};
+
+  Application app(argc, argv);
+
+  Window win(400, 300, "Relative Layout - Right");
+
+  RelativeLayout* layout = new RelativeLayout;
+  PushButton * button = new PushButton("Test");
+
+  layout->AddView(button);
+  button->MoveTo(200, 200);
+
+//  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
+//  button->AddAnchorTo(layout, skland::kAlignTop, 20);
+  button->AddAnchorTo(layout, skland::kAlignRight, 20);
+//  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
+
+  win.SetContentView(layout);
+  win.Show();
+
+  int result = app.Run();
+
+  ASSERT_TRUE(result == 0);
+}
+
+/**
+ * @brief Show a relative layout in a simple window
+ *
+ * Expected result: display and resize a default window
+ */
+TEST_F(Test, layout_bottom) {
+  int argc = 1;
+  char argv1[] = "show";  // to avoid compile warning
+  char *argv[] = {argv1};
+
+  Application app(argc, argv);
+
+  Window win(400, 300, "Relative Layout - Bottom");
+
+  RelativeLayout* layout = new RelativeLayout;
+  PushButton * button = new PushButton("Test");
+
+  layout->AddView(button);
+  button->MoveTo(200, 200);
+
+//  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
+//  button->AddAnchorTo(layout, skland::kAlignTop, 20);
+//  button->AddAnchorTo(layout, skland::kAlignRight, 20);
+  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
+
+  win.SetContentView(layout);
+  win.Show();
+
+  int result = app.Run();
+
+  ASSERT_TRUE(result == 0);
+}
+
+/**
+ * @brief Show a relative layout in a simple window
+ *
+ * Expected result: display and resize a default window
+ */
 TEST_F(Test, regular_2) {
   int argc = 1;
   char argv1[] = "show";  // to avoid compile warning

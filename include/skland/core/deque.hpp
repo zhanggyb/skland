@@ -54,9 +54,7 @@ class BiNode {
   /**
    * @brief Default constructor
    */
-  BiNode()
-      : previous_(nullptr),
-        next_(nullptr) {}
+  BiNode() = default;
 
   /**
    * @brief Constructor
@@ -104,8 +102,8 @@ class BiNode {
 
  private:
 
-  BiNode *previous_;
-  BiNode *next_;
+  BiNode *previous_ = nullptr;
+  BiNode *next_ = nullptr;
 
 };
 
@@ -399,15 +397,15 @@ T *Deque<T>::Remove(T *item) {
 
 template<typename T>
 size_t Deque<T>::GetSize() const {
-  size_t ret = 0;
+  size_t size = 0;
 
-  T *element = first_.next_;
+  BiNode *element = first_.next_;
   while (element != &last_) {
-    ++ret;
+    ++size;
     element = element->next_;
   }
 
-  return ret;
+  return size;
 }
 
 template<typename T>

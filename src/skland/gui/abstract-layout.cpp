@@ -74,9 +74,7 @@ void AbstractLayout::RemoveView(AbstractView *view) {
 }
 
 void AbstractLayout::Layout() {
-  const RectF &geometry = GetGeometry();
-  OnLayout(geometry.left, geometry.top, geometry.right, geometry.bottom);
-//  RequestSaveGeometry();
+  OnLayout(0, 0, GetWidth(), GetHeight());
 }
 
 void AbstractLayout::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
@@ -91,7 +89,7 @@ void AbstractLayout::OnRequestSaveGeometry(AbstractView *view) {
 
 void AbstractLayout::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
 //  is_geometry_saved_ = true;
-  OnLayout(new_geometry.left, new_geometry.top, new_geometry.right, new_geometry.bottom);
+  OnLayout(0, 0, GetWidth(), GetHeight());
 }
 
 void AbstractLayout::OnRequestUpdate(AbstractView *view) {

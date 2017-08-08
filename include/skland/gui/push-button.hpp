@@ -18,6 +18,7 @@
 #define SKLAND_GUI_PUSH_BUTTON_HPP_
 
 #include "abstract-button.hpp"
+#include "skland/core/color.hpp"
 
 namespace skland {
 namespace gui {
@@ -30,13 +31,21 @@ class PushButton : public AbstractButton {
 
  public:
 
-  PushButton(const std::string &text);
+  using ColorF = core::ColorF;
+
+  explicit PushButton(const std::string &text);
 
  protected:
 
   virtual ~PushButton();
 
   virtual void OnDraw(const Context &context) override;
+
+ private:
+
+  ColorF regular_;
+  ColorF highlight_;
+  ColorF active_;
 
 };
 

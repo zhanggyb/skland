@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
   Window win(400, 300, "Event Demo");
   win.SetAppId("Event-Demo");
 
-  RelativeLayout *layout = new RelativeLayout;
-  PushButton *button = new PushButton("Test");
+  auto *layout = new RelativeLayout;
+  auto *button = new PushButton("Test");
 
   layout->AddView(button);
   button->MoveTo(200, 200);
