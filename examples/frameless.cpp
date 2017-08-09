@@ -32,36 +32,6 @@ using namespace skland;
 using namespace skland::core;
 using namespace skland::gui;
 
-class FramelessWindow : public Window {
-
- public:
-
-  FramelessWindow(const char *title, int flags)
-      : FramelessWindow(400, 300, title, flags) {
-
-  }
-
-  FramelessWindow(int width, int height, const char *title, int flags)
-      : Window(width, height, title, flags) {}
-
-  virtual ~FramelessWindow() {}
-
-  virtual void OnMouseDown(MouseEvent *event) override {
-    if (event->GetButton() == MouseButton::kMouseButtonLeft) {
-      int location = GetMouseLocation(event);
-      if (location == kClientArea) {
-        MoveWithMouse(event);
-        return;
-      }
-      if (location < kResizeMask) {
-        ResizeWithMouse(event, (uint32_t) location);
-        return;
-      }
-    }
-  }
-
-};
-
 class MainWidget : public AbstractView {
 
  public:
@@ -150,10 +120,10 @@ class MainWidget : public AbstractView {
 int main(int argc, char *argv[]) {
   Application app(argc, argv);
 
-  FramelessWindow *win = new FramelessWindow("Frameless Window", Window::kFlagMaskFrameless);
+  auto *win = new Window("Frameless Window");
   win->SetAppId("Frameless-Demo");
 
-  MainWidget *widget = new MainWidget;
+  auto *widget = new MainWidget;
   win->SetContentView(widget);
 
   win->Show();

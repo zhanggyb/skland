@@ -68,15 +68,15 @@ SKLAND_NO_EXPORT struct Window::Private {
   ~Private() = default;
 
   /** The surface for rendering views in this window */
-  Surface *main_surface = nullptr;
+  Surface *widget_surface = nullptr;
 
   SharedMemoryPool pool;
 
   Buffer frame_buffer;
   std::unique_ptr<Canvas> frame_canvas;
 
-  Buffer main_buffer;
-  std::unique_ptr<Canvas> main_canvas;
+  Buffer widget_buffer;
+  std::unique_ptr<Canvas> widget_canvas;
 
   /** The default title bar */
   TitleBar *title_bar = nullptr;
@@ -89,8 +89,6 @@ SKLAND_NO_EXPORT struct Window::Private {
 
   Size maximal_size;
 
-  int flags = 0;
-
   const Output *output = nullptr;
 
   bool inhibit_update = true;
@@ -99,53 +97,50 @@ SKLAND_NO_EXPORT struct Window::Private {
 
 // --------------
 
-Window::Window(const char *title, int flags)
-    : Window(640, 480, title, flags) {
+Window::Window(const char *title)
+    : Window(640, 480, title) {
 }
 
-Window::Window(int width, int height, const char *title, int flags)
+Window::Window(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
   p_ = core::make_unique<Private>();
-  p_->flags = flags;
 
   Surface *shell_surface = GetShellSurface();
 
-  if (0 == (flags & kFlagMaskFrameless)) {
-    // Create a sub surface for views in this window:
-    p_->main_surface = Surface::Sub::Create(shell_surface, this, Theme::GetShadowMargin());
-    _ASSERT(p_->main_surface->GetParent() == shell_surface);
-    _ASSERT(p_->main_surface->GetSiblingBelow() == shell_surface);
-    Region empty_region;
-    p_->main_surface->SetInputRegion(empty_region);
+  // Create a sub surface for views in this window:
+  p_->widget_surface = Surface::Sub::Create(shell_surface, this, Theme::GetShadowMargin());
+  _ASSERT(p_->widget_surface->GetParent() == shell_surface);
+  _ASSERT(p_->widget_surface->GetSiblingBelow() == shell_surface);
+  Region empty_region;
+  p_->widget_surface->SetInputRegion(empty_region);
 
-    // Create the default title bar:
-    TitleBar *titlebar = new TitleBar;
-    p_->title_bar = titlebar;
-    AttachView(p_->title_bar);
+  // Create the default title bar:
+  TitleBar *titlebar = new TitleBar;
+  p_->title_bar = titlebar;
+  AttachView(p_->title_bar);
 
-    titlebar->SetTitle(title);
-    titlebar->Resize(GetWidth(), TitleBar::kHeight);
+  titlebar->SetTitle(title);
+  titlebar->Resize(GetWidth(), TitleBar::kHeight);
 
-    AbstractButton *button = titlebar->GetButton(TitleBar::kButtonClose);
-    button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::Close));
+  AbstractButton *button = titlebar->GetButton(TitleBar::kButtonClose);
+  button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::Close));
 
-    button = titlebar->GetButton(TitleBar::kButtonMaximize);
-    button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::ToggleMaximize));
+  button = titlebar->GetButton(TitleBar::kButtonMaximize);
+  button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::ToggleMaximize));
 
-    button = titlebar->GetButton(TitleBar::kButtonMinimize);
-    button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::Minimize));
+  button = titlebar->GetButton(TitleBar::kButtonMinimize);
+  button->clicked().Connect(this, static_cast<void (Window::*)(core::SLOT)>(&AbstractShellView::Minimize));
 
-    button = titlebar->GetButton(TitleBar::kButtonFullscreen);
-    //button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::SetFullscreen));
-    button->clicked().Connect(this, &Window::OnFullscreenButtonClicked);
-  }
+  button = titlebar->GetButton(TitleBar::kButtonFullscreen);
+  //button->clicked().Connect(this, static_cast<void (Window::*)(SLOT)>(&AbstractShellView::SetFullscreen));
+  button->clicked().Connect(this, &Window::OnFullscreenButtonClicked);
 }
 
 Window::~Window() {
   if (nullptr != p_->content_view) p_->content_view->Destroy();
   if (nullptr != p_->title_bar) p_->title_bar->Destroy();
 
-  delete p_->main_surface;
+  delete p_->widget_surface;
 }
 
 AbstractView *Window::GetTitleBar() const {
@@ -202,8 +197,7 @@ void Window::OnShown() {
   width += margin.lr() * scale;
   height += margin.tb() * scale;
 
-  int32_t pool_size = width * 4 * height;
-  if (nullptr != p_->main_surface) pool_size *= 2; // double buffer for 2 surfaces, not frameless
+  int32_t pool_size = width * 4 * height * 2; // double buffer for 2 surfaces, not frameless
 
   p_->pool.Setup(pool_size);
 
@@ -216,20 +210,20 @@ void Window::OnShown() {
   p_->frame_canvas->SetOrigin((float) margin.left * scale,
                               (float) margin.top * scale);
   p_->frame_canvas->Clear();
+  p_->frame_canvas->Flush();
 
-  if (nullptr != p_->main_surface) {
-    p_->main_surface->SetScale(scale);
-    p_->main_buffer.Setup(p_->pool, width, height,
-                          width * 4, WL_SHM_FORMAT_ARGB8888,
-                          width * 4 * height);
-    p_->main_surface->Attach(&p_->main_buffer);
-    p_->main_surface->Update();
-    p_->main_canvas.reset(Canvas::CreateRasterDirect(width, height,
-                                                     (unsigned char *) p_->main_buffer.GetData()));
-    p_->main_canvas->SetOrigin((float) margin.left * scale,
-                               (float) margin.top * scale);
-    p_->main_canvas->Clear();
-  }
+  p_->widget_surface->SetScale(scale);
+  p_->widget_buffer.Setup(p_->pool, width, height,
+                        width * 4, WL_SHM_FORMAT_ARGB8888,
+                        width * 4 * height);
+  p_->widget_surface->Attach(&p_->widget_buffer);
+  p_->widget_surface->Update();
+  p_->widget_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                   (unsigned char *) p_->widget_buffer.GetData()));
+  p_->widget_canvas->SetOrigin((float) margin.left * scale,
+                             (float) margin.top * scale);
+  p_->widget_canvas->Clear();
+  p_->widget_canvas->Flush();
 
   p_->inhibit_update = false;
 
@@ -246,7 +240,7 @@ void Window::OnShown() {
 void Window::OnRequestUpdate(AbstractView *view) {
   if (p_->inhibit_update) return;
 
-  Surface *surface = nullptr != p_->main_surface ? p_->main_surface : this->GetShellSurface();
+  Surface *surface = p_->widget_surface;
   surface->GetRedrawTaskDeque().PushBack(AbstractView::RedrawTask::Get(view));
   surface->Update();
 }
@@ -315,7 +309,7 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
   height += margin.tb() * scale;
 
   int pool_size = width * 4 * height;
-  if (nullptr != p_->main_surface) pool_size *= 2;
+  if (nullptr != p_->widget_surface) pool_size *= 2;
 
   p_->pool.Setup(pool_size);
 
@@ -326,17 +320,17 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
                                                     (unsigned char *) p_->frame_buffer.GetData()));
   p_->frame_canvas->SetOrigin(margin.left * scale, margin.top * scale);
   p_->frame_canvas->Clear();
+  p_->frame_canvas->Flush();
 
-  if (nullptr != p_->main_surface) {
-    p_->main_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
-    p_->main_surface->Attach(&p_->main_buffer);
-    p_->main_surface->Update();
-    p_->main_canvas.reset(Canvas::CreateRasterDirect(width, height,
-                                                     (unsigned char *) p_->main_buffer.GetData()));
-    p_->main_canvas->SetOrigin(margin.left * scale,
-                               margin.top * scale);
-    p_->main_canvas->Clear();
-  }
+  p_->widget_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
+  p_->widget_surface->Attach(&p_->widget_buffer);
+  p_->widget_surface->Update();
+  p_->widget_canvas.reset(Canvas::CreateRasterDirect(width, height,
+                                                   (unsigned char *) p_->widget_buffer.GetData()));
+  p_->widget_canvas->SetOrigin(margin.left * scale,
+                             margin.top * scale);
+  p_->widget_canvas->Clear();
+  p_->widget_canvas->Flush();
 
   p_->inhibit_update = false;
   if (nullptr != p_->title_bar) {
@@ -350,28 +344,20 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
 }
 
 void Window::OnRenderSurface(Surface *surface) {
-  Surface *shell_surface = GetShellSurface();
-  Context context(surface, nullptr);
   const Margin &margin = surface->GetMargin();
 
-  if (nullptr != p_->main_surface) {
-    if (shell_surface == surface) {
-      context.set_canvas(p_->frame_canvas.get());
-      RenderFrame(&context);
-      surface->Damage(0, 0, GetWidth() + margin.lr(), GetHeight() + margin.tb());
-      surface->Commit();
-      return;
-    }
+  if (surface == GetShellSurface()) {
+    Context context(surface, p_->frame_canvas.get());
+    RenderFrame(&context);
+    surface->Damage(0, 0, GetWidth() + margin.lr(), GetHeight() + margin.tb());
+    surface->Commit();
+    return;
   }
 
   core::Deque<AbstractView::RedrawTask> &deque = surface->GetRedrawTaskDeque();
   core::Deque<AbstractView::RedrawTask>::Iterator it = deque.begin();
-  if (p_->main_surface == surface) {
-    context.set_canvas(p_->main_canvas.get());
-  } else if (shell_surface == surface) {
-    context.set_canvas(p_->frame_canvas.get());
-  }
-
+  Context context(surface, p_->widget_canvas.get());
+  
   AbstractView *view = nullptr;
   while (it != deque.end()) {
     view = it.element()->view();
@@ -573,8 +559,8 @@ void Window::OnEnterOutput(const Surface *surface, const Output *output) {
   Surface *shell_surface = GetShellSurface();
   if (surface == shell_surface) {
     shell_surface->SetScale(output->GetScale());
-  } else if (surface == p_->main_surface) {
-    p_->main_surface->SetScale(output->GetScale());
+  } else if (surface == p_->widget_surface) {
+    p_->widget_surface->SetScale(output->GetScale());
   }
 }
 
@@ -591,7 +577,7 @@ void Window::OnLeaveOutput(const Surface *surface, const Output *output) {
   }
 
   GetShellSurface()->SetScale(scale);
-  if (nullptr != p_->main_surface) p_->main_surface->SetScale(scale);
+  if (nullptr != p_->widget_surface) p_->widget_surface->SetScale(scale);
 }
 
 int Window::GetMouseLocation(const MouseEvent *event) const {

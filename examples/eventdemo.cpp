@@ -34,10 +34,10 @@ int main(int argc, char *argv[]) {
   layout->AddView(button);
   button->MoveTo(200, 200);
 
-  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
-  button->AddAnchorTo(layout, skland::kAlignTop, 20);
+//  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
+//  button->AddAnchorTo(layout, skland::kAlignTop, 20);
   button->AddAnchorTo(layout, skland::kAlignRight, 20);
-  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
+//  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
 
   win.SetContentView(layout);
   win.Show();

@@ -37,3 +37,19 @@ add_custom_command(
         DEPENDS "${LATEX_BINARY_DIR}/signal_slot.tex"
         WORKING_DIRECTORY "${LATEX_BINARY_DIR}"
         COMMENT "${PDFLATEX_COMPILER} ${LATEX_BINARY_DIR}/signal_slot.tex")
+
+add_custom_command(
+        TARGET tikz
+        PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E ${COPY_OR_LINK} "${LATEX_SOURCE_DIR}/main_loop.tex" "${LATEX_BINARY_DIR}/main_loop.tex"
+        WORKING_DIRECTORY ${LATEX_BINARY_DIR}
+        COMMENT "${COPY_OR_LINK_MESSAGE} \"${LATEX_SOURCE_DIR}/main_loop.tex\" to \"${LATEX_BINARY_DIR}/main_loop.tex\""
+        VERBATIM)
+
+add_custom_command(
+        TARGET tikz
+        COMMAND "${PDFLATEX_COMPILER}"
+        ARGS "-shell-escape" "main_loop"
+        DEPENDS "${LATEX_BINARY_DIR}/main_loop.tex"
+        WORKING_DIRECTORY "${LATEX_BINARY_DIR}"
+        COMMENT "${PDFLATEX_COMPILER} ${LATEX_BINARY_DIR}/main_loop.tex")

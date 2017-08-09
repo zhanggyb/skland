@@ -16,6 +16,8 @@
 
 #include "skland/gui/abstract-button.hpp"
 
+#include "skland/core/memory.hpp"
+
 #include "skland/numerical/clamp.hpp"
 #include "skland/numerical/bit.hpp"
 
@@ -67,17 +69,17 @@ struct AbstractButton::Private {
 
 AbstractButton::AbstractButton()
     : AbstractView(80, 20) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 }
 
 AbstractButton::AbstractButton(int width, int height)
     : AbstractView(width, height) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 }
 
 AbstractButton::AbstractButton(const std::string &text)
     : AbstractView(80, 20) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
   p_->text = text;
 }
 

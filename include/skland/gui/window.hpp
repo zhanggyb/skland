@@ -37,16 +37,12 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   using RectI = core::RectI;  /**< Alias of core::RectI */
 
-  enum FlagMask {
-    kFlagMaskFrameless = 0x1 << 0
-  };
-
   /**
    * @brief Construct a 400 x 300 window with given title and flags
    * @param title
    * @param flags
    */
-  Window(const char *title, int flags = 0);
+  explicit Window(const char *title);
 
   /**
    * @brief Construct a window with given size, title and flags
@@ -55,7 +51,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
    * @param title
    * @param flags
    */
-  Window(int width, int height, const char *title, int flags = 0);
+  Window(int width, int height, const char *title);
 
   virtual ~Window();
 

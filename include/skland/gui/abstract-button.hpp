@@ -33,16 +33,15 @@ namespace gui {
  */
 class AbstractButton : public AbstractView {
 
-  AbstractButton(const AbstractButton &) = delete;
-  AbstractButton &operator=(const AbstractButton &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractButton);
 
   AbstractButton();
 
   AbstractButton(int width, int height);
 
-  AbstractButton(const std::string &text);
+  explicit AbstractButton(const std::string &text);
 
   core::SignalRef<> clicked() { return clicked_; }
 

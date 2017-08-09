@@ -67,7 +67,7 @@ void GLESV2Interface::Create() {
   p_->egl_surface = eglCreatePlatformWindowSurface(Display::Proxy::egl_display(),
                                                    Display::Proxy::egl_config(),
                                                    p_->wl_egl_window,
-                                                   NULL);
+                                                   nullptr);
 }
 
 void GLESV2Interface::Destroy() {

@@ -224,7 +224,7 @@ class Surface {
     explicit RenderTask(Surface *surface)
         : surface_(surface) {}
 
-    virtual ~RenderTask() = default;
+    ~RenderTask() final = default;
 
     void Run() const final;
 
@@ -242,9 +242,9 @@ class Surface {
     CommitTask() = delete;
 
     explicit CommitTask(Surface *surface)
-        : Task(), surface_(surface) {}
+        : surface_(surface) {}
 
-    virtual ~CommitTask() = default;
+    ~CommitTask() final = default;
 
     void Run() const final;
 
