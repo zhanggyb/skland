@@ -46,10 +46,10 @@ PushButton::PushButton(const std::string &text)
     : AbstractButton(text) {
 
   /* Debug */
-  srand(Timer::GetClockTime());
-  regular_.red = rand() % 255 / 255.f;
-  regular_.green = rand() % 255 / 255.f;
-  regular_.blue = rand() % 255 / 255.f;
+  srand((unsigned int) Timer::GetClockTime());
+  regular_.red = std::rand() % 255 / 255.f;
+  regular_.green = std::rand() % 255 / 255.f;
+  regular_.blue = std::rand() % 255 / 255.f;
 
   highlight_ = regular_ + 25;
   active_ = regular_ - 25;
@@ -64,8 +64,6 @@ PushButton::~PushButton() {
 }
 
 void PushButton::OnDraw(const Context &context) {
-  using ColorF = core::ColorF;
-
   Canvas *canvas = context.canvas();
 
   const RectF &geometry = GetGeometry();

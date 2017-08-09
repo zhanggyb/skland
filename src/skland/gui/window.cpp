@@ -670,7 +670,7 @@ void Window::RenderFrame(const Context *context) {
   points[1].y = height;
 
   if (drop_shadow) {
-    geometry = geometry.Inset(-0.5f * scale);
+//    geometry = geometry.Inset(-0.5f * scale);
     float radii[] = {
         7.f * scale, 7.f * scale, // top-left
         7.f * scale, 7.f * scale, // top-right
@@ -704,6 +704,7 @@ void Window::RenderFrame(const Context *context) {
   if (drop_shadow) {
     paint.SetColor(window_schema.inactive.outline.color);
     paint.SetStyle(Paint::Style::kStyleStroke);
+    paint.SetStrokeWidth(0.5f);
     context->canvas()->DrawPath(path, paint);
   }
 
