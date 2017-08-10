@@ -19,13 +19,14 @@
 #include "internal/surface_shell_toplevel_private.hpp"
 #include "internal/surface_shell_popup_private.hpp"
 #include "internal/surface_egl_private.hpp"
-#include "internal/abstract-gpu-interface_private.hpp"
+#include "internal/abstract-gl-interface_private.hpp"
 
-#include <skland/gui/buffer.hpp>
+#include "skland/core/assert.hpp"
+#include "skland/core/memory.hpp"
 
-#include <skland/core/assert.hpp>
-#include <skland/gui/input-event.hpp>
-#include <skland/gui/region.hpp>
+#include "skland/gui/buffer.hpp"
+#include "skland/gui/input-event.hpp"
+#include "skland/gui/region.hpp"
 
 #include "internal/input_private.hpp"
 #include "internal/output_private.hpp"
@@ -64,7 +65,7 @@ void Surface::Shell::AckConfigure(uint32_t serial) const {
 
 Surface::Shell::Shell(Surface *surface)
     : surface_(surface), parent_(nullptr) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 
   _ASSERT(surface_);
   role_.placeholder = nullptr;
@@ -92,7 +93,7 @@ void Surface::Shell::Push() {
 
   _ASSERT(Surface::kShellSurfaceCount >= 0);
 
-  if (Surface::kTop) {
+  if (nullptr != Surface::kTop) {
     Surface::kTop->p_->upper = surface_;
     surface_->p_->lower = Surface::kTop;
     Surface::kTop = surface_;
@@ -109,14 +110,14 @@ void Surface::Shell::Push() {
 void Surface::Shell::Remove() {
   _ASSERT(nullptr == surface_->p_->parent);
 
-  if (surface_->p_->upper) {
+  if (nullptr != surface_->p_->upper) {
     surface_->p_->upper->p_->lower = surface_->p_->lower;
   } else {
     _ASSERT(Surface::kTop == surface_);
     Surface::kTop = surface_->p_->lower;
   }
 
-  if (surface_->p_->lower) {
+  if (nullptr != surface_->p_->lower) {
     surface_->p_->lower->p_->upper = surface_->p_->upper;
   } else {
     _ASSERT(Surface::kBottom == surface_);
@@ -140,7 +141,7 @@ Surface *Surface::Shell::Toplevel::Create(AbstractEventHandler *event_handler, c
 
 Surface::Shell::Toplevel *Surface::Shell::Toplevel::Get(const Surface *surface) {
   Shell *shell = Shell::Get(surface);
-  if (nullptr == shell || shell->parent_) return nullptr;
+  if ((nullptr == shell) || (nullptr != shell->parent_)) return nullptr;
   return shell->role_.toplevel;
 }
 
@@ -181,9 +182,9 @@ void Surface::Shell::Toplevel::SetMinimized() const {
 }
 
 Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 
-  _ASSERT(shell_surface);
+  _ASSERT(nullptr != shell_surface);
   p_->shell = shell_surface;
 
   p_->zxdg_toplevel = zxdg_surface_v6_get_toplevel(shell_surface->p_->zxdg_surface);
@@ -207,8 +208,8 @@ Surface *Surface::Shell::Popup::Create(Shell *parent, AbstractEventHandler *view
 }
 
 Surface::Shell::Popup::Popup(Shell *shell) {
-  _ASSERT(shell);
-  p_.reset(new Private);
+  _ASSERT(nullptr != shell);
+  p_ = core::make_unique<Private>();
   p_->shell = shell;
   // TODO: initialize xdg_popup_
 }
@@ -238,8 +239,8 @@ Surface::Sub *Surface::Sub::Get(const Surface *surface) {
 
 Surface::Sub::Sub(Surface *surface, Surface *parent)
     : surface_(surface), wl_sub_surface_(nullptr) {
-  _ASSERT(surface_);
-  _ASSERT(parent);
+  _ASSERT(nullptr != surface_);
+  _ASSERT(nullptr != parent);
 
   wl_sub_surface_ = wl_subcompositor_get_subsurface(Display::Proxy::wl_subcompositor(),
                                                     surface_->p_->wl_surface,
@@ -269,10 +270,10 @@ Surface::Sub::~Sub() {
   }
 
   // Break the link node
-  if (surface_->p_->above) surface_->p_->above->p_->below = surface_->p_->below;
-  if (surface_->p_->below) surface_->p_->below->p_->above = surface_->p_->above;
+  if (nullptr != surface_->p_->above) surface_->p_->above->p_->below = surface_->p_->below;
+  if (nullptr != surface_->p_->below) surface_->p_->below->p_->above = surface_->p_->above;
 
-  if (wl_sub_surface_)
+  if (nullptr != wl_sub_surface_)
     wl_subsurface_destroy(wl_sub_surface_);
 
   surface_->p_->role.sub = nullptr;
@@ -434,8 +435,8 @@ Surface::EGL *Surface::EGL::Get(Surface *surface, Profile /*profile*/, bool crea
 }
 
 Surface::EGL::EGL(Surface *surface) {
-  _ASSERT(surface);
-  p_.reset(new Private);
+  _ASSERT(nullptr != surface);
+  p_ = core::make_unique<Private>();
   p_->surface = surface;
 
   p_->wl_egl_window =
@@ -444,12 +445,12 @@ Surface::EGL::EGL(Surface *surface) {
       eglCreatePlatformWindowSurface(Display::Proxy::egl_display(),
                                      Display::Proxy::egl_config(),
                                      p_->wl_egl_window,
-                                     NULL);
+                                     nullptr);
 }
 
 Surface::EGL::~EGL() {
-  if (p_->egl_surface) {
-    _ASSERT(p_->wl_egl_window);
+  if (nullptr != p_->egl_surface) {
+    _ASSERT(nullptr != p_->wl_egl_window);
     wl_egl_window_destroy(p_->wl_egl_window);
     // ERROR: should destroy egl_surface
   }
@@ -510,7 +511,7 @@ core::Deque<Surface::CommitTask> Surface::kCommitTaskDeque;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
   _ASSERT(nullptr != event_handler);
-  p_.reset(new Private(this, event_handler, margin));
+  p_ = core::make_unique<Private>(this, event_handler, margin);
   p_->role.placeholder = nullptr;
 
   p_->wl_surface = wl_compositor_create_surface(Display::Proxy::wl_compositor());
@@ -518,8 +519,11 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
 }
 
 Surface::~Surface() {
-  if (p_->gpu_interface)
-    delete p_->gpu_interface;
+  if (p_->gl_interface) {
+//    delete p_->gl_interface;
+    _ASSERT(p_->gl_interface->p_->surface == this);
+    p_->gl_interface->p_->surface = nullptr;
+  }
 
   if (p_->egl)
     delete p_->egl;
@@ -626,7 +630,7 @@ Surface *Surface::GetShellSurface() {
   Surface *shell_surface = this;
   Surface *parent = p_->parent;
 
-  while (parent) {
+  while (nullptr != parent) {
     shell_surface = parent;
     parent = parent->p_->parent;
   }
@@ -640,7 +644,7 @@ Point Surface::GetWindowPosition() const {
   const Surface *parent = p_->parent;
   const Surface *shell_surface = this;
 
-  while (parent) {
+  while (nullptr != parent) {
     position += parent->GetRelativePosition();
     if (nullptr == parent->p_->parent) shell_surface = parent;
     parent = parent->GetParent();
@@ -673,30 +677,27 @@ AbstractEventHandler *Surface::GetEventHandler() const {
   return p_->event_handler;
 }
 
-void Surface::SetGPUInterface(AbstractGPUInterface *interface) {
-  if (p_->gpu_interface == interface) {
-    _ASSERT(p_->gpu_interface->p_->surface == this);
+void Surface::SetGLInterface(AbstractGLInterface *interface) {
+  if (p_->gl_interface == interface) {
+    _ASSERT(p_->gl_interface->p_->surface == this);
     return;
   }
 
-  if (nullptr != p_->gpu_interface) {
-    delete p_->gpu_interface;
-    _ASSERT(p_->gpu_interface == nullptr);
-  }
+  if (nullptr != p_->gl_interface) p_->gl_interface->p_->surface = nullptr;
 
-  p_->gpu_interface = interface;
-  if (nullptr != interface) {
-    if (nullptr != interface->p_->surface) {
-      _ASSERT(interface->p_->surface->p_->gpu_interface == interface);
-      interface->p_->surface->p_->gpu_interface = nullptr;
-    }
-    interface->p_->surface = this;
-    interface->OnSetup();
+  p_->gl_interface = interface;
+  if (nullptr == interface) return;
+
+  if (nullptr != interface->p_->surface) {
+    _ASSERT(interface->p_->surface->p_->gl_interface == interface);
+    interface->p_->surface->p_->gl_interface = nullptr;
   }
+  interface->p_->surface = this;
+  interface->OnSetup();
 }
 
-AbstractGPUInterface *Surface::GetGPUInterface() const {
-  return p_->gpu_interface;
+AbstractGLInterface *Surface::GetGLInterface() const {
+  return p_->gl_interface;
 }
 
 const Margin &Surface::GetMargin() const {

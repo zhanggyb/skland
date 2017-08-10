@@ -18,7 +18,7 @@
 #define SKLAND_GUI_INTERNAL_SURFACE_PRIVATE_HPP_
 
 #include "skland/gui/surface.hpp"
-#include "skland/gui/abstract-gpu-interface.hpp"
+#include "skland/gui/abstract-gl-interface.hpp"
 
 namespace skland {
 namespace gui {
@@ -44,7 +44,7 @@ struct Surface::Private {
         upper(nullptr),
         lower(nullptr),
         egl(nullptr),
-        gpu_interface(nullptr),
+        gl_interface(nullptr),
         render_task(surface),
         commit_task(surface) {}
 
@@ -94,7 +94,7 @@ struct Surface::Private {
 
   EGL *egl;
 
-  AbstractGPUInterface *gpu_interface;
+  AbstractGLInterface *gl_interface;
 
   union {
     void *placeholder;

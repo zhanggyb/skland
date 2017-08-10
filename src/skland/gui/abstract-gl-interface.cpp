@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "internal/abstract-gpu-interface_private.hpp"
+#include "internal/abstract-gl-interface_private.hpp"
 
 #include "skland/core/assert.hpp"
 #include "skland/core/memory.hpp"
@@ -22,18 +22,18 @@
 namespace skland {
 namespace gui {
 
-AbstractGPUInterface::AbstractGPUInterface() {
+AbstractGLInterface::AbstractGLInterface() {
   p_ = core::make_unique<Private>();
 }
 
-AbstractGPUInterface::~AbstractGPUInterface() {
+AbstractGLInterface::~AbstractGLInterface() {
   if (nullptr != p_->surface) {
-    _ASSERT(p_->surface->p_->gpu_interface == this);
-    p_->surface->p_->gpu_interface = nullptr;
+    _ASSERT(p_->surface->p_->gl_interface == this);
+    p_->surface->p_->gl_interface = nullptr;
   }
 }
 
-Surface *AbstractGPUInterface::GetSurface() const {
+Surface *AbstractGLInterface::GetSurface() const {
   return p_->surface;
 }
 

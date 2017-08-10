@@ -49,6 +49,7 @@ if (LINUX)
     # add_subdirectory(gui-main-window)
     add_subdirectory(gui-slider)
     add_subdirectory(gui-egl-widget)
+    add_subdirectory(gui-gl-view)
     add_subdirectory(gui-linear-layout)
     add_subdirectory(gui-relative-layout)
 

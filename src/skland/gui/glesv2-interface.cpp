@@ -19,7 +19,7 @@
 #include "skland/core/assert.hpp"
 #include "skland/core/memory.hpp"
 
-#include "internal/abstract-gpu-interface_proxy.hpp"
+#include "internal/abstract-gl-interface_proxy.hpp"
 #include "internal/display_proxy.hpp"
 
 #include <EGL/egl.h>
@@ -44,7 +44,7 @@ struct GLESV2Interface::Private {
 };
 
 GLESV2Interface::GLESV2Interface()
-    : AbstractGPUInterface() {
+    : AbstractGLInterface() {
   p_ = core::make_unique<Private>();
 }
 

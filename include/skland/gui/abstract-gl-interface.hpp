@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_ABSTRACT_GPU_INTERFACE_HPP_
-#define SKLAND_GUI_ABSTRACT_GPU_INTERFACE_HPP_
+#ifndef SKLAND_GUI_ABSTRACT_GL_INTERFACE_HPP_
+#define SKLAND_GUI_ABSTRACT_GL_INTERFACE_HPP_
 
 #include "skland/core/defines.hpp"
 
@@ -28,19 +28,19 @@ class Surface;
 
 /**
  * @ingroup gui
- * @brief The base class for graphic engine to render on a 3D surface
+ * @brief The base class for graphic library to render on a 3D surface
  */
-class AbstractGPUInterface {
+class AbstractGLInterface {
 
   friend class Surface;
 
  public:
 
-  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractGPUInterface);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractGLInterface);
 
-  AbstractGPUInterface();
+  AbstractGLInterface();
 
-  virtual ~AbstractGPUInterface();
+  virtual ~AbstractGLInterface();
 
   Surface *GetSurface() const;
 

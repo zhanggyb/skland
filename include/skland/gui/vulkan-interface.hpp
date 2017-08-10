@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_VULKAN_INTERFACE_HPP_
 #define SKLAND_GUI_VULKAN_INTERFACE_HPP_
 
-#include "abstract-gpu-interface.hpp"
+#include "abstract-gl-interface.hpp"
 
 #include <vulkan/vulkan.hpp>
 
@@ -30,7 +30,7 @@ class Surface;
  * @ingroup gui
  * @brief Vulkan
  */
-class VulkanInterface : public AbstractGPUInterface {
+class VulkanInterface : public AbstractGLInterface {
 
  public:
 

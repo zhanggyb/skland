@@ -35,7 +35,7 @@ class Buffer;
 class Output;
 class InputEvent;
 class Region;
-class AbstractGPUInterface;
+class AbstractGLInterface;
 
 /**
  * @ingroup gui
@@ -79,7 +79,7 @@ class Surface {
   friend class Application;
   friend class Display;
   friend class Callback;
-  friend class AbstractGPUInterface;
+  friend class AbstractGLInterface;
 
  public:
 
@@ -201,12 +201,14 @@ class Surface {
   AbstractEventHandler *GetEventHandler() const;
 
   /**
-   * @brief Set the GPU interface for this surface
-   * @param interface An allocated GPUInterface object or nullptr to unset and use shm back.
+   * @brief Set the graphic library interface for this surface
+   * @param interface An allocated GLInterface object or nullptr to unset and use shm back.
+   *
+   * @note The GLInterface will not be deleted when the surface destroyed.
    */
-  void SetGPUInterface(AbstractGPUInterface *interface);
+  void SetGLInterface(AbstractGLInterface *interface);
 
-  AbstractGPUInterface *GetGPUInterface() const;
+  AbstractGLInterface *GetGLInterface() const;
 
   const Margin &GetMargin() const;
 
