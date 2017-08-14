@@ -86,7 +86,7 @@ class EGLWidget : public AbstractView {
 
   Surface *sub_surface_;
 
-  Surface::EGL *egl_surface_;
+//  Surface::EGL *egl_surface_;
 
   Callback frame_callback_;
 

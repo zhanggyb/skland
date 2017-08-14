@@ -6,8 +6,8 @@
 
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
-#include <skland/gui/egl-widget.hpp>
 #include "skland/gui/gl-view.hpp"
+#include "skland/gui/glesv2-interface.hpp"
 
 #include <GLES2/gl2.h>
 #include <sys/time.h>
@@ -57,16 +57,16 @@ create_shader(const char *source, GLenum shader_type) {
   return shader;
 }
 
-class Triangle : public EGLWidget {
+class Triangle : public GLView {
 
  public:
 
-  Triangle()
-      : EGLWidget() {
+  Triangle() {
+    SetGLInterface(new GLESV2Interface);
   }
 
   virtual ~Triangle() {
-    glDeleteProgram(program);
+    glDeleteProgram(program_);
   }
 
  protected:
@@ -79,12 +79,12 @@ class Triangle : public EGLWidget {
 
  private:
 
-  GLuint program;
+  GLuint program_ = 0;
 
-  GLuint rotation_uniform;
-  GLuint pos;
-  GLuint col;
-
+  GLuint rotation_uniform_ = 0;
+  GLuint pos_ = 0;
+  GLuint col_ = 0;
+  
 };
 
 void Triangle::OnInitialize() {
@@ -96,31 +96,31 @@ void Triangle::OnInitialize() {
   frag = create_shader(frag_shader_text, GL_FRAGMENT_SHADER);
   vert = create_shader(vert_shader_text, GL_VERTEX_SHADER);
 
-  program = glCreateProgram();
-  glAttachShader(program, frag);
-  glAttachShader(program, vert);
-  glLinkProgram(program);
+  program_ = glCreateProgram();
+  glAttachShader(program_, frag);
+  glAttachShader(program_, vert);
+  glLinkProgram(program_);
 
-  glGetProgramiv(program, GL_LINK_STATUS, &status);
+  glGetProgramiv(program_, GL_LINK_STATUS, &status);
   if (!status) {
     char log[1000];
     GLsizei len;
-    glGetProgramInfoLog(program, 1000, &len, log);
+    glGetProgramInfoLog(program_, 1000, &len, log);
     fprintf(stderr, "Error: linking:\n%*s\n", len, log);
     exit(1);
   }
 
-  glUseProgram(program);
+  glUseProgram(program_);
 
-  pos = 0;
-  col = 1;
+  pos_ = 0;
+  col_ = 1;
 
-  glBindAttribLocation(program, pos, "pos");
-  glBindAttribLocation(program, col, "color");
-  glLinkProgram(program);
+  glBindAttribLocation(program_, pos_, "pos");
+  glBindAttribLocation(program_, col_, "color");
+  glLinkProgram(program_);
 
-  rotation_uniform =
-      glGetUniformLocation(program, "rotation");
+  rotation_uniform_ = (GLuint)
+      glGetUniformLocation(program_, "rotation");
 
   SwapBuffers();
 }
@@ -133,9 +133,9 @@ void Triangle::OnRender() {
   MakeCurrent();
 
   static const GLfloat verts[3][2] = {
-      {-0.5, -0.5},
-      {0.5, -0.5},
-      {0, 0.5}
+      {-0.5f, -0.5f},
+      {0.5f, -0.5f},
+      {0.f, 0.5f}
   };
   static const GLfloat colors[3][3] = {
       {1, 0, 0},
@@ -152,10 +152,10 @@ void Triangle::OnRender() {
   static const uint32_t speed_div = 5;
   struct timeval tv;
 
-  gettimeofday(&tv, NULL);
-  uint32_t time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+  gettimeofday(&tv, nullptr);
+  uint32_t time = (uint32_t) (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 
-  angle = (time / speed_div) % 360 * M_PI / 180.0;
+  angle = (GLfloat) ((time / speed_div) % 360 * M_PI / 180.0);
   rotation[0][0] = cos(angle);
   rotation[0][2] = sin(angle);
   rotation[2][0] = -sin(angle);
@@ -163,21 +163,21 @@ void Triangle::OnRender() {
 
   glViewport(0, 0, GetWidth(), GetHeight());
 
-  glUniformMatrix4fv(rotation_uniform, 1, GL_FALSE,
+  glUniformMatrix4fv(rotation_uniform_, 1, GL_FALSE,
                      (GLfloat *) rotation);
 
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 0, verts);
-  glVertexAttribPointer(col, 3, GL_FLOAT, GL_FALSE, 0, colors);
-  glEnableVertexAttribArray(pos);
-  glEnableVertexAttribArray(col);
+  glVertexAttribPointer(pos_, 2, GL_FLOAT, GL_FALSE, 0, verts);
+  glVertexAttribPointer(col_, 3, GL_FLOAT, GL_FALSE, 0, colors);
+  glEnableVertexAttribArray(pos_);
+  glEnableVertexAttribArray(col_);
 
   glDrawArrays(GL_TRIANGLES, 0, 3);
 
-  glDisableVertexAttribArray(pos);
-  glDisableVertexAttribArray(col);
+  glDisableVertexAttribArray(pos_);
+  glDisableVertexAttribArray(col_);
 
   SwapBuffers();
 }
@@ -200,10 +200,10 @@ TEST_F(Test, slider_1) {
 
   Application app(argc, argv);
 
-  Window *win = new Window(480, 360, "Test GLView");
+  auto *win = new Window(480, 360, "Test GLView");
   win->SetAppId("EGLWidget");
 
-  GLView *view = new GLView;
+  auto *view = new Triangle;
   win->SetContentView(view);
 
   win->Show();

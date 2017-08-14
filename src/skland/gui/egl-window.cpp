@@ -71,7 +71,7 @@ struct EGLWindow::Private {
 
   Surface *sub_surface = nullptr;
 
-  Surface::EGL *egl_surface = nullptr;
+//  Surface::EGL *egl_surface = nullptr;
 
   Callback frame_callback;
 
@@ -98,14 +98,14 @@ EGLWindow::EGLWindow(int width, int height, const char *title)
 
   Surface::Sub::Get(p_->sub_surface)->SetWindowPosition(0, 0);
 
-  p_->egl_surface = Surface::EGL::Get(p_->sub_surface);
-  p_->egl_surface->Resize(GetWidth(), GetHeight());
+//  p_->egl_surface = Surface::EGL::Get(p_->sub_surface);
+//  p_->egl_surface->Resize(GetWidth(), GetHeight());
 
   p_->frame_callback.done().Set(this, &EGLWindow::OnFrame);
 }
 
 EGLWindow::~EGLWindow() {
-  delete p_->egl_surface;
+//  delete p_->egl_surface;
   delete p_->sub_surface;
 }
 
@@ -166,7 +166,7 @@ void EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
   Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
   // surface size is changed, reset the pointer position and enter/leave widgets
 
-  p_->egl_surface->Resize(new_size.width, new_size.height);
+//  p_->egl_surface->Resize(new_size.width, new_size.height);
   OnResize(new_size.width, new_size.height);
 
   DispatchMouseLeaveEvent();
@@ -357,7 +357,7 @@ void EGLWindow::OnDraw(const Context *context) {
 
   if (!p_->animating) {
     p_->animating = true;
-    p_->frame_callback.Setup(*p_->egl_surface->GetSurface());
+//    p_->frame_callback.Setup(*p_->egl_surface->GetSurface());
     OnInitialize();
   }
 }
@@ -375,21 +375,22 @@ void EGLWindow::OnResize(int /*width*/, int /*height*/) {
 }
 
 void EGLWindow::OnRender() {
-  p_->egl_surface->MakeCurrent();
+//  p_->egl_surface->MakeCurrent();
 
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
 
-  p_->egl_surface->SwapBuffers();
+//  p_->egl_surface->SwapBuffers();
 }
 
 bool EGLWindow::MakeCurrent() {
-  return p_->egl_surface->MakeCurrent();
+//  return p_->egl_surface->MakeCurrent();
+  return false;
 }
 
 void EGLWindow::SwapBuffers() {
-  p_->egl_surface->SwapBuffers();
+//  p_->egl_surface->SwapBuffers();
 }
 
 int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
@@ -436,9 +437,9 @@ int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
 }
 
 void EGLWindow::OnFrame(uint32_t serial) {
-  p_->frame_callback.Setup(*p_->egl_surface->GetSurface());
+//  p_->frame_callback.Setup(*p_->egl_surface->GetSurface());
   OnRender();
-  p_->egl_surface->GetSurface()->Commit();
+//  p_->egl_surface->GetSurface()->Commit();
 }
 
 void EGLWindow::OnRelease() {

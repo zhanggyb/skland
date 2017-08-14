@@ -46,6 +46,10 @@ class AbstractGLInterface {
 
   virtual void SetViewportSize(int width, int height) = 0;
 
+  virtual void MakeCurrent() = 0;
+
+  virtual void SwapBuffers() = 0;
+
  protected:
 
   struct Proxy;

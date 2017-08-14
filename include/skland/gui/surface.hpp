@@ -73,7 +73,7 @@ class AbstractGLInterface;
  */
 class Surface {
 
-  using Point = core::PointI;
+  using Point  = core::PointI;
   using Margin = core::Margin;
 
   friend class Application;
@@ -88,18 +88,17 @@ class Surface {
 
   class Shell;
   class Sub;
-  class EGL;
 
   /**
    * @brief Transform enums
    */
   enum Transform {
-    kTransformNormal = 0,           /**< WL_OUTPUT_TRANSFORM_NORMAL */
-    kTransform90 = 1,           /**< WL_OUTPUT_TRANSFORM_90 */
-    kTransform180 = 2,           /**< WL_OUTPUT_TRANSFORM_180 */
-    kTransform270 = 3,           /**< WL_OUTPUT_TRANSFORM_270 */
-    kTransformFlipped = 4,           /**< WL_OUTPUT_TRANSFORM_FLIPPED */
-    kTransformFlipped90 = 5,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_90 */
+    kTransformNormal     = 0,           /**< WL_OUTPUT_TRANSFORM_NORMAL */
+    kTransform90         = 1,           /**< WL_OUTPUT_TRANSFORM_90 */
+    kTransform180        = 2,           /**< WL_OUTPUT_TRANSFORM_180 */
+    kTransform270        = 3,           /**< WL_OUTPUT_TRANSFORM_270 */
+    kTransformFlipped    = 4,           /**< WL_OUTPUT_TRANSFORM_FLIPPED */
+    kTransformFlipped90  = 5,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_90 */
     kTransformFlipped180 = 6,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_180 */
     kTransformFlipped270 = 7            /**< WL_OUTPUT_TRANSFORM_FLIPPED_270 */
   };
@@ -124,12 +123,11 @@ class Surface {
   /**
    * @brief Add this surface in the commit task list
    *
-   * This method add this surface in the commit task list and will
-   * commit the native wayland surface in the event loop.
+   * This method add this surface in the commit task list and will commit the
+   * native wayland surface in the event loop.
    *
-   * If this surface is a sub surface and commit behaviour is
-   * synchronized, this method will commit the shell surface (main
-   * surface) too.
+   * If this surface is a sub surface and commit behaviour is synchronized, this
+   * method will commit the shell surface (main surface) too.
    */
   void Commit();
 
@@ -202,7 +200,8 @@ class Surface {
 
   /**
    * @brief Set the graphic library interface for this surface
-   * @param interface An allocated GLInterface object or nullptr to unset and use shm back.
+   * @param interface An allocated GLInterface object or nullptr to unset and
+   * use shm back.
    *
    * @note The GLInterface will not be deleted when the surface destroyed.
    */
@@ -355,10 +354,10 @@ class Surface::Shell::Toplevel {
   Toplevel() = delete;
 
   enum StatesMask {
-    kStateMaskMaximized = 0x1, /**< 1: the surface is maximized */
-    kStateMaskFullscreen = 0x1 << 1,      /**< 2: the surface is fullscreen */
-    kStateMaskResizing = 0x1 << 2, /**< 4: the surface is being resized */
-    kStateMaskActivated = 0x1 << 3, /**< 8: the surface is now activated */
+    kStateMaskMaximized  = 0x1,         /**< 1: the surface is maximized */
+    kStateMaskFullscreen = 0x1 << 1,    /**< 2: the surface is fullscreen */
+    kStateMaskResizing   = 0x1 << 2,    /**< 4: the surface is being resized */
+    kStateMaskActivated  = 0x1 << 3,    /**< 8: the surface is now activated */
   };
 
   /**
@@ -494,59 +493,6 @@ class Surface::Sub {
 /**
  * @brief EGL surface role
  */
-class Surface::EGL {
-
- public:
-
-  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(EGL);
-  EGL() = delete;
-
-  enum Profile {
-    kProfileOpenGLES2,  // OpenGL ES 2
-    kProfileOpenGLES3,  // OpenGL ES 3
-    kProfileOpenGL1_4,  // OpenGL 1.4
-    kProfileOpenGL2_1,  // OpenGL 2.1
-    kProfileOpenGL3_3,  // OpenGL 3.3
-    kProfileOpenGL4_4,  // OpenGL 4.4
-    kProfileVulkan      // Vulkan
-  };
-
-  /**
-   * @brief Get the EGL surface
-   * @param[in] surface The surface object
-   * @param[in] create
-   *            - true: create and turn the surface role to 3D surface
-   *            - false: just get the existing EGL surface, return null if not exists
-   *
-   * If the surface is not an EGL surface, this method will create one and
-   * change the surface behavior. Delete the EGL object returned by this
-   * method will turn this surface back to 2D.
-   */
-  static EGL *Get(Surface *surface, Profile profile = kProfileOpenGLES2, bool create = true);
-
-  virtual ~EGL();
-
-  bool MakeCurrent();
-
-  bool SwapBuffers();
-
-  bool SwapBuffersWithDamage(int x, int y, int width, int height);
-
-  bool SwapInterval(int interval = 0);
-
-  void Resize(int width, int height, int dx = 0, int dy = 0);
-
-  Surface *GetSurface() const;
-
- private:
-
-  struct Private;
-
-  explicit EGL(Surface *surface);
-
-  std::unique_ptr<Private> p_;
-
-};
 
 } // namespace gui
 } // namespace skland

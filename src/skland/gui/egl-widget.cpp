@@ -40,13 +40,13 @@ EGLWidget::EGLWidget()
 EGLWidget::EGLWidget(int width, int height)
     : AbstractView(width, height),
       sub_surface_(nullptr),
-      egl_surface_(nullptr),
+//      egl_surface_(nullptr),
       animating_(false) {
   frame_callback_.done().Set(this, &EGLWidget::OnFrame);
 }
 
 EGLWidget::~EGLWidget() {
-  delete egl_surface_;
+//  delete egl_surface_;
   delete sub_surface_;
 }
 
@@ -54,7 +54,7 @@ void EGLWidget::OnRequestUpdate(AbstractView *view) {
   _ASSERT(view == this);
 
   if (nullptr == sub_surface_) {
-    _ASSERT(nullptr == egl_surface_);
+//    _ASSERT(nullptr == egl_surface_);
 //    Surface *parent_surface = AbstractView::GetSurface(this);
 //    if (nullptr == parent_surface) return;
 //
@@ -74,13 +74,13 @@ Surface *EGLWidget::GetSurface(const AbstractView * /* view */) const {
 }
 
 void EGLWidget::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-  RequestSaveGeometry(old_geometry != new_geometry);
-
-  if (egl_surface_) {
-    Surface::Sub::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
-    egl_surface_->Resize((int) new_geometry.width(), (int) new_geometry.height());
-    OnResize((int) new_geometry.width(), (int) new_geometry.height());
-  }
+//  RequestSaveGeometry(old_geometry != new_geometry);
+//
+//  if (egl_surface_) {
+//    Surface::Sub::Get(sub_surface_)->SetWindowPosition(GetX(), GetY());
+//    egl_surface_->Resize((int) new_geometry.width(), (int) new_geometry.height());
+//    OnResize((int) new_geometry.width(), (int) new_geometry.height());
+//  }
 }
 
 void EGLWidget::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
@@ -116,22 +116,22 @@ void EGLWidget::OnKeyUp(KeyEvent *event) {
 }
 
 void EGLWidget::OnDraw(const Context &context) {
-  if (!animating_) {
-    animating_ = true;
-    frame_callback_.Setup(*egl_surface_->GetSurface());
-    OnInitialize();
-    egl_surface_->GetSurface()->Commit();
-  }
+//  if (!animating_) {
+//    animating_ = true;
+//    frame_callback_.Setup(*egl_surface_->GetSurface());
+//    OnInitialize();
+//    egl_surface_->GetSurface()->Commit();
+//  }
 }
 
 void EGLWidget::OnInitialize() {
-  egl_surface_->MakeCurrent();
+//  egl_surface_->MakeCurrent();
 
-  glClearColor(0.1, 0.1, .85, 1.0);
-  glClear(GL_COLOR_BUFFER_BIT);
-  glFlush();
+//  glClearColor(0.1, 0.1, .85, 1.0);
+//  glClear(GL_COLOR_BUFFER_BIT);
+//  glFlush();
 
-  egl_surface_->SwapBuffers();
+//  egl_surface_->SwapBuffers();
 }
 
 void EGLWidget::OnResize(int width, int height) {
@@ -139,27 +139,27 @@ void EGLWidget::OnResize(int width, int height) {
 }
 
 void EGLWidget::OnRender() {
-  egl_surface_->MakeCurrent();
+//  egl_surface_->MakeCurrent();
 
-  glClearColor(0.36, 0.85, 0.27, 0.9);
-  glClear(GL_COLOR_BUFFER_BIT);
-  glFlush();
+//  glClearColor(0.36, 0.85, 0.27, 0.9);
+//  glClear(GL_COLOR_BUFFER_BIT);
+//  glFlush();
 
-  egl_surface_->SwapBuffers();
+//  egl_surface_->SwapBuffers();
 }
 
 bool EGLWidget::MakeCurrent() {
-  return egl_surface_->MakeCurrent();
+//  return egl_surface_->MakeCurrent();
 }
 
 void EGLWidget::SwapBuffers() {
-  egl_surface_->SwapBuffers();
+//  egl_surface_->SwapBuffers();
 }
 
 void EGLWidget::OnFrame(uint32_t /* serial */) {
-  frame_callback_.Setup(*egl_surface_->GetSurface());
-  OnRender();
-  egl_surface_->GetSurface()->Commit();
+//  frame_callback_.Setup(*egl_surface_->GetSurface());
+//  OnRender();
+//  egl_surface_->GetSurface()->Commit();
 }
 
 } // namespace gui

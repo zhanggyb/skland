@@ -38,6 +38,10 @@ class GLESV2Interface : public AbstractGLInterface {
 
   virtual void SetViewportSize(int width, int height) final;
 
+  virtual void MakeCurrent() final;
+
+  virtual void SwapBuffers() final;
+
  protected:
 
   virtual void OnSetup() final;

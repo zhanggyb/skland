@@ -43,7 +43,6 @@ struct Surface::Private {
         below(nullptr),
         upper(nullptr),
         lower(nullptr),
-        egl(nullptr),
         gl_interface(nullptr),
         render_task(surface),
         commit_task(surface) {}
@@ -91,8 +90,6 @@ struct Surface::Private {
    * @brief The shell surface shows back
    */
   Surface *lower;
-
-  EGL *egl;
 
   AbstractGLInterface *gl_interface;
 

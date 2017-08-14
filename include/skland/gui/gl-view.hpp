@@ -25,6 +25,7 @@ namespace skland {
 namespace gui {
 
 class Surface;
+class AbstractGLInterface;
 
 class GLView : public AbstractView {
 
@@ -34,9 +35,11 @@ class GLView : public AbstractView {
 
   virtual ~GLView();
 
-  Surface *gl_surface() const { return gl_surface_; }
+  void SetGLInterface(AbstractGLInterface *interface);
 
  protected:
+
+  virtual void OnRequestUpdate(AbstractView *view) final;
 
   virtual void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
 
@@ -60,11 +63,23 @@ class GLView : public AbstractView {
 
   virtual void OnRenderSurface(Surface *surface) override;
 
+  virtual void OnInitialize() = 0;
+
+  virtual void OnResize(int width, int height) = 0;
+
+  virtual void OnRender() = 0;
+
+  void SwapBuffers();
+
+  void MakeCurrent();
+
  private:
 
   void OnFrame(uint32_t serial);
 
   Surface *gl_surface_ = nullptr;
+
+  AbstractGLInterface *interface_ = nullptr;
 
   Callback callback_;
 

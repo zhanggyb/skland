@@ -18,7 +18,6 @@
 #include "internal/surface_shell_private.hpp"
 #include "internal/surface_shell_toplevel_private.hpp"
 #include "internal/surface_shell_popup_private.hpp"
-#include "internal/surface_egl_private.hpp"
 #include "internal/abstract-gl-interface_private.hpp"
 
 #include "skland/core/assert.hpp"
@@ -427,72 +426,6 @@ void Surface::Sub::InsertBelow(Surface *sibling) {
 
 // ------
 
-Surface::EGL *Surface::EGL::Get(Surface *surface, Profile /*profile*/, bool create) {
-  if ((nullptr == surface->p_->egl) && create)
-    surface->p_->egl = new EGL(surface);
-
-  return surface->p_->egl;
-}
-
-Surface::EGL::EGL(Surface *surface) {
-  _ASSERT(nullptr != surface);
-  p_ = core::make_unique<Private>();
-  p_->surface = surface;
-
-  p_->wl_egl_window =
-      wl_egl_window_create(p_->surface->p_->wl_surface, 400, 400);
-  p_->egl_surface =
-      eglCreatePlatformWindowSurface(Display::Proxy::egl_display(),
-                                     Display::Proxy::egl_config(),
-                                     p_->wl_egl_window,
-                                     nullptr);
-}
-
-Surface::EGL::~EGL() {
-  if (nullptr != p_->egl_surface) {
-    _ASSERT(nullptr != p_->wl_egl_window);
-    wl_egl_window_destroy(p_->wl_egl_window);
-    // ERROR: should destroy egl_surface
-  }
-  p_->surface->p_->egl = nullptr;
-}
-
-bool Surface::EGL::MakeCurrent() {
-  return EGL_TRUE ==
-      eglMakeCurrent(Display::Proxy::egl_display(),
-                     p_->egl_surface,
-                     p_->egl_surface,
-                     Display::Proxy::egl_context());
-}
-
-bool Surface::EGL::SwapBuffers() {
-  return EGL_TRUE ==
-      eglSwapBuffers(Display::Proxy::egl_display(), p_->egl_surface);
-}
-
-bool Surface::EGL::SwapBuffersWithDamage(int x, int y, int width, int height) {
-  EGLint rect[4] = {x, y, width, height};
-  return EGL_TRUE
-      == Display::Proxy::kSwapBuffersWithDamageAPI(Display::Proxy::egl_display(),
-                                                   p_->egl_surface,
-                                                   rect,
-                                                   4 * sizeof(EGLint));
-}
-
-bool Surface::EGL::SwapInterval(EGLint interval) {
-  return EGL_TRUE == eglSwapInterval(Display::Proxy::egl_display(), interval);
-}
-
-void Surface::EGL::Resize(int width, int height, int dx, int dy) {
-  wl_egl_window_resize(p_->wl_egl_window, width, height, dx, dy);
-}
-
-Surface *Surface::EGL::GetSurface() const {
-  return p_->surface;
-}
-
-// ------
-
 void Surface::RenderTask::Run() const {
   surface_->p_->event_handler->OnRenderSurface(surface_);
 }
@@ -525,8 +458,8 @@ Surface::~Surface() {
     p_->gl_interface->p_->surface = nullptr;
   }
 
-  if (p_->egl)
-    delete p_->egl;
+//  if (p_->egl)
+//    delete p_->egl;
 
   if (nullptr == p_->parent)
     delete p_->role.shell; // deleting a shell surface will break the links to up_ and down_
@@ -538,7 +471,7 @@ Surface::~Surface() {
 }
 
 void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
-  if (nullptr != p_->egl) return;
+  if (nullptr != p_->gl_interface) return;
 
   if (nullptr == buffer) {
     wl_surface_attach(p_->wl_surface, NULL, x, y);
@@ -549,10 +482,9 @@ void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
 }
 
 void Surface::Commit() {
-  if (nullptr != p_->egl) {
-    // EGL surface does not use commit
+  if (nullptr != p_->gl_interface) {
+    // GL surface does not use commit
     if (p_->commit_mode == kSynchronized) {
-      // Synchronized mode need to commit the main surface
       Surface *main_surface = GetShellSurface();
       main_surface->Commit();
     }

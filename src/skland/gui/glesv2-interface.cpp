@@ -43,8 +43,7 @@ struct GLESV2Interface::Private {
 
 };
 
-GLESV2Interface::GLESV2Interface()
-    : AbstractGLInterface() {
+GLESV2Interface::GLESV2Interface() {
   p_ = core::make_unique<Private>();
 }
 
@@ -54,6 +53,17 @@ GLESV2Interface::~GLESV2Interface() {
 
 void GLESV2Interface::SetViewportSize(int width, int height) {
   wl_egl_window_resize(p_->wl_egl_window, width, height, 0, 0);
+}
+
+void GLESV2Interface::MakeCurrent() {
+  eglMakeCurrent(Display::Proxy::egl_display(),
+                 p_->egl_surface,
+                 p_->egl_surface,
+                 Display::Proxy::egl_context());
+}
+
+void GLESV2Interface::SwapBuffers() {
+  eglSwapBuffers(Display::Proxy::egl_display(), p_->egl_surface);
 }
 
 void GLESV2Interface::OnSetup() {

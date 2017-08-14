@@ -22,6 +22,8 @@
 #include "skland/gui/mouse-event.hpp"
 #include "skland/gui/key-event.hpp"
 #include "skland/gui/context.hpp"
+#include "skland/gui/abstract-gl-interface.hpp"
+#include "skland/gui/region.hpp"
 
 namespace skland {
 namespace gui {
@@ -32,6 +34,20 @@ GLView::GLView() {
 
 GLView::~GLView() {
   delete gl_surface_;
+  delete interface_;
+}
+
+void GLView::SetGLInterface(AbstractGLInterface *interface) {
+  interface_ = interface;
+}
+
+void GLView::OnRequestUpdate(AbstractView *view) {
+  if ((view == this) && (nullptr != gl_surface_)) {
+    gl_surface_->Update();
+    return;
+  }
+
+  AbstractView::OnRequestUpdate(view);
 }
 
 void GLView::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
@@ -40,6 +56,11 @@ void GLView::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geo
 
 void GLView::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
   Update();
+
+  if (nullptr != gl_surface_) {
+    interface_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
+    OnResize((int) new_geometry.width(), (int) new_geometry.height());
+  }
 }
 
 void GLView::OnMouseEnter(MouseEvent *event) {
@@ -73,15 +94,40 @@ void GLView::OnKeyUp(KeyEvent *event) {
 void GLView::OnDraw(const Context &context) {
   if (nullptr == gl_surface_) {
     gl_surface_ = Surface::Sub::Create(context.surface(), this);
+    gl_surface_->SetGLInterface(interface_);
+
+    Region region;
+    gl_surface_->SetInputRegion(region);
+
+    interface_->SetViewportSize(GetWidth(), GetHeight());
+    callback_.Setup(*gl_surface_);
+    OnInitialize();
   }
+
+  _ASSERT(nullptr != gl_surface_);
+  _ASSERT(gl_surface_->GetParent() == context.surface());
+  Surface::Sub::Get(gl_surface_)->SetWindowPosition(GetX(), GetY());
+  gl_surface_->Commit();
 }
 
 void GLView::OnRenderSurface(Surface *surface) {
+  _ASSERT(gl_surface_ == surface);
+  Surface::Sub::Get(gl_surface_)->SetWindowPosition(GetX(), GetY());
+  gl_surface_->Commit();
+}
 
+void GLView::SwapBuffers() {
+  if (nullptr != interface_) interface_->SwapBuffers();
+}
+
+void GLView::MakeCurrent() {
+  if (nullptr != interface_) interface_->MakeCurrent();
 }
 
 void GLView::OnFrame(uint32_t serial) {
-
+  callback_.Setup(*gl_surface_);
+  OnRender();
+  gl_surface_->Commit();
 }
 
 } // namespace gui
