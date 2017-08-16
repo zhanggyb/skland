@@ -18,6 +18,7 @@
 #define SKLAND_GUI_ABSTRACT_GL_INTERFACE_HPP_
 
 #include "skland/core/defines.hpp"
+#include "skland/core/sigcxx.hpp"
 
 #include <memory>
 
@@ -42,7 +43,9 @@ class AbstractGLInterface {
 
   virtual ~AbstractGLInterface();
 
-  Surface *GetSurface() const;
+  void Setup(Surface *surface);
+
+  void Release(Surface *surface);
 
   virtual void SetViewportSize(int width, int height) = 0;
 
@@ -50,21 +53,21 @@ class AbstractGLInterface {
 
   virtual void SwapBuffers() = 0;
 
+  core::SignalRef<> destroyed() { return destroyed_; }
+
  protected:
 
   struct Proxy;
 
-  /**
-   * @brief Setup the surface on which this engine works
-   * @param surface
-   */
-  virtual void OnSetup() = 0;
+  virtual void OnSetup(Surface *surface) = 0;
+
+  virtual void OnRelease(Surface *surface) = 0;
 
  private:
 
   struct Private;
 
-  std::unique_ptr<Private> p_;
+  core::Signal<> destroyed_;
 
 };
 

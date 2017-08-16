@@ -117,23 +117,21 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   };
 
-  class RedrawTask : public Task {
+  class RedrawNode : public core::BiNode {
 
    public:
 
-    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(RedrawTask);
-    RedrawTask() = delete;
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(RedrawNode);
+    RedrawNode() = delete;
 
-    explicit RedrawTask(AbstractView *view)
-        : Task(), view_(view) {}
+    explicit RedrawNode(AbstractView *view)
+        : core::BiNode(), view_(view) {}
 
-    virtual ~RedrawTask() = default;
-
-    virtual void Run() const final;
+    virtual ~RedrawNode() = default;
 
     AbstractView *view() const { return view_; }
 
-    static RedrawTask *Get(const AbstractView *view);
+    static RedrawNode *Get(const AbstractView *view);
 
    private:
 

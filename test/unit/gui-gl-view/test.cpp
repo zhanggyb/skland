@@ -84,7 +84,7 @@ class Triangle : public GLView {
   GLuint rotation_uniform_ = 0;
   GLuint pos_ = 0;
   GLuint col_ = 0;
-  
+
 };
 
 void Triangle::OnInitialize() {

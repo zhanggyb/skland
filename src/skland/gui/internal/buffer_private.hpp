@@ -26,37 +26,28 @@ namespace gui {
 
 struct Buffer::Private {
 
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
-  Private()
-      : wl_buffer(nullptr),
-        stride(0),
-        format(0),
-        offset(0),
-        data(nullptr) {}
+  Private() = default;
 
-  ~Private() {
-    if (wl_buffer)
-      wl_buffer_destroy(wl_buffer);
-  }
+  ~Private() = default;
 
-  struct wl_buffer *wl_buffer;
+  struct wl_buffer *wl_buffer = nullptr;
 
   /**
    * @brief Position on surface
    */
-  core::PointI position;
+  Point position;
 
-  core::SizeI size;
+  Size size;
 
-  int32_t stride;
+  int32_t stride = 0;
 
-  uint32_t format;
+  uint32_t format = 0;
 
-  int offset;
+  int offset = 0;
 
-  void *data;
+  void *data = nullptr;
 
   static void OnRelease(void *data, struct wl_buffer *buffer);
 

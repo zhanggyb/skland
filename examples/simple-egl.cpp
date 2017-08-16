@@ -16,7 +16,7 @@
 
 
 #include <skland/gui/application.hpp>
-#include <skland/gui/egl-window.hpp>
+#include <skland/gui/gl-window.hpp>
 
 #include <GLES2/gl2.h>
 #include <sys/time.h>
@@ -67,11 +67,11 @@ create_shader(const char *source, GLenum shader_type) {
   return shader;
 }
 
-class SimpleEGLWindow : public EGLWindow {
+class SimpleEGLWindow : public GLWindow {
  public:
 
   SimpleEGLWindow()
-      : EGLWindow(250, 250, "Simple EGL") {}
+      : GLWindow(250, 250, "Simple EGL") {}
 
   virtual  ~SimpleEGLWindow() {
     glDeleteProgram(program);

@@ -90,7 +90,7 @@ SKLAND_NO_EXPORT struct AbstractView::Private {
 
   GeometryTask geometry_task;
 
-  RedrawTask redraw_task;
+  RedrawNode redraw_task;
 
   AnchorGroup left_anchor_group;
   AnchorGroup top_anchor_group;

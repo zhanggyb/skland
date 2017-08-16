@@ -241,7 +241,7 @@ void Window::OnRequestUpdate(AbstractView *view) {
   if (p_->inhibit_update) return;
 
   Surface *surface = p_->widget_surface;
-  surface->GetRedrawTaskDeque().PushBack(AbstractView::RedrawTask::Get(view));
+  surface->GetRedrawNodeDeque().PushBack(AbstractView::RedrawNode::Get(view));
   surface->Update();
 }
 
@@ -354,8 +354,8 @@ void Window::OnRenderSurface(Surface *surface) {
     return;
   }
 
-  core::Deque<AbstractView::RedrawTask> &deque = surface->GetRedrawTaskDeque();
-  core::Deque<AbstractView::RedrawTask>::Iterator it = deque.begin();
+  core::Deque<AbstractView::RedrawNode> &deque = surface->GetRedrawNodeDeque();
+  core::Deque<AbstractView::RedrawNode>::Iterator it = deque.begin();
   Context context(surface, p_->widget_canvas.get());
   
   AbstractView *view = nullptr;

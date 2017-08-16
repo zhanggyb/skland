@@ -452,10 +452,8 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
 }
 
 Surface::~Surface() {
-  if (p_->gl_interface) {
-//    delete p_->gl_interface;
-    _ASSERT(p_->gl_interface->p_->surface == this);
-    p_->gl_interface->p_->surface = nullptr;
+  if (nullptr != p_->gl_interface) {
+    p_->gl_interface->Release(this);
   }
 
 //  if (p_->egl)
@@ -466,19 +464,18 @@ Surface::~Surface() {
   else
     delete p_->role.sub; // deleting all sub surfaces and break the links to above_ and below_
 
-  if (p_->wl_surface)
+  if (nullptr != p_->wl_surface)
     wl_surface_destroy(p_->wl_surface);
 }
 
 void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
-  if (nullptr != p_->gl_interface) return;
-
   if (nullptr == buffer) {
     wl_surface_attach(p_->wl_surface, NULL, x, y);
-  } else {
-    buffer->SetPosition(x, y);
-    wl_surface_attach(p_->wl_surface, buffer->p_->wl_buffer, x, y);
+    return;
   }
+
+  buffer->SetPosition(x, y);
+  wl_surface_attach(p_->wl_surface, buffer->p_->wl_buffer, x, y);
 }
 
 void Surface::Commit() {
@@ -486,7 +483,8 @@ void Surface::Commit() {
     // GL surface does not use commit
     if (p_->commit_mode == kSynchronized) {
       Surface *main_surface = GetShellSurface();
-      main_surface->Commit();
+      if (main_surface != this)
+        main_surface->Commit();
     }
 
     return;
@@ -508,6 +506,10 @@ void Surface::Commit() {
   } else {
     kCommitTaskDeque.PushBack(&p_->commit_task);
   }
+}
+
+void Surface::SetCommitMode(CommitMode mode) {
+  p_->commit_mode = mode;
 }
 
 void Surface::Damage(int surface_x, int surface_y, int width, int height) {
@@ -554,8 +556,8 @@ void Surface::Update(bool validate) {
   kRenderTaskDeque.PushBack(&p_->render_task);
 }
 
-core::Deque<AbstractView::RedrawTask> &Surface::GetRedrawTaskDeque() const {
-  return p_->redraw_task_deque;
+core::Deque<AbstractView::RedrawNode> &Surface::GetRedrawNodeDeque() const {
+  return p_->redraw_node_deque;
 }
 
 Surface *Surface::GetShellSurface() {
@@ -610,22 +612,8 @@ AbstractEventHandler *Surface::GetEventHandler() const {
 }
 
 void Surface::SetGLInterface(AbstractGLInterface *interface) {
-  if (p_->gl_interface == interface) {
-    _ASSERT(p_->gl_interface->p_->surface == this);
-    return;
-  }
-
-  if (nullptr != p_->gl_interface) p_->gl_interface->p_->surface = nullptr;
-
-  p_->gl_interface = interface;
-  if (nullptr == interface) return;
-
-  if (nullptr != interface->p_->surface) {
-    _ASSERT(interface->p_->surface->p_->gl_interface == interface);
-    interface->p_->surface->p_->gl_interface = nullptr;
-  }
-  interface->p_->surface = this;
-  interface->OnSetup();
+  interface->Setup(this);
+  interface->destroyed().Connect(this, &Surface::OnGLInterfaceDestroyed);
 }
 
 AbstractGLInterface *Surface::GetGLInterface() const {
@@ -638,6 +626,10 @@ const Margin &Surface::GetMargin() const {
 
 const Point &Surface::GetRelativePosition() const {
   return p_->relative_position;
+}
+
+void Surface::OnGLInterfaceDestroyed(core::SLOT /* slot */) {
+  p_->gl_interface = nullptr;
 }
 
 void Surface::Clear() {

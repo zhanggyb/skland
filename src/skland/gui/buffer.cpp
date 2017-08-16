@@ -16,6 +16,7 @@
 
 #include "internal/buffer_private.hpp"
 
+#include "skland/core/memory.hpp"
 #include "skland/gui/shared-memory-pool.hpp"
 
 namespace skland {
@@ -25,11 +26,11 @@ using Point = core::PointI;
 using Size = core::SizeI;
 
 Buffer::Buffer() {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 }
 
 Buffer::~Buffer() {
-
+  Destroy();
 }
 
 void Buffer::Setup(const SharedMemoryPool &pool,
@@ -61,7 +62,7 @@ void Buffer::Setup(const SharedMemoryPool &pool,
 }
 
 void Buffer::Destroy() {
-  if (p_->wl_buffer) {
+  if (nullptr != p_->wl_buffer) {
     p_->data = nullptr;
     p_->offset = 0;
     p_->format = 0;
@@ -70,6 +71,8 @@ void Buffer::Destroy() {
     p_->size.height = 0;
     wl_buffer_destroy(p_->wl_buffer);
     p_->wl_buffer = nullptr;
+
+    destroyed_.Emit();
   }
 }
 

@@ -66,18 +66,18 @@ void GLESV2Interface::SwapBuffers() {
   eglSwapBuffers(Display::Proxy::egl_display(), p_->egl_surface);
 }
 
-void GLESV2Interface::OnSetup() {
-  Create();
-}
-
-void GLESV2Interface::Create() {
+void GLESV2Interface::OnSetup(Surface *surface) {
   Destroy();
 
-  p_->wl_egl_window = wl_egl_window_create(Proxy::GetWaylandSurface(GetSurface()), 400, 300);
+  p_->wl_egl_window = wl_egl_window_create(Proxy::GetWaylandSurface(surface), 400, 300);
   p_->egl_surface = eglCreatePlatformWindowSurface(Display::Proxy::egl_display(),
                                                    Display::Proxy::egl_config(),
                                                    p_->wl_egl_window,
                                                    nullptr);
+}
+
+void GLESV2Interface::OnRelease(Surface *surface) {
+  Destroy();
 }
 
 void GLESV2Interface::Destroy() {

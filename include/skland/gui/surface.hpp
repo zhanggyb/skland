@@ -71,7 +71,7 @@ class AbstractGLInterface;
  * You can also use Surface::EGL::Get() to transform a 2D surface to 3D surface,
  * and delete the Surface::EGL object will transform back to 2D.
  */
-class Surface {
+class Surface : public core::Trackable {
 
   using Point  = core::PointI;
   using Margin = core::Margin;
@@ -93,12 +93,12 @@ class Surface {
    * @brief Transform enums
    */
   enum Transform {
-    kTransformNormal     = 0,           /**< WL_OUTPUT_TRANSFORM_NORMAL */
-    kTransform90         = 1,           /**< WL_OUTPUT_TRANSFORM_90 */
-    kTransform180        = 2,           /**< WL_OUTPUT_TRANSFORM_180 */
-    kTransform270        = 3,           /**< WL_OUTPUT_TRANSFORM_270 */
-    kTransformFlipped    = 4,           /**< WL_OUTPUT_TRANSFORM_FLIPPED */
-    kTransformFlipped90  = 5,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_90 */
+    kTransformNormal = 0,           /**< WL_OUTPUT_TRANSFORM_NORMAL */
+    kTransform90 = 1,           /**< WL_OUTPUT_TRANSFORM_90 */
+    kTransform180 = 2,           /**< WL_OUTPUT_TRANSFORM_180 */
+    kTransform270 = 3,           /**< WL_OUTPUT_TRANSFORM_270 */
+    kTransformFlipped = 4,           /**< WL_OUTPUT_TRANSFORM_FLIPPED */
+    kTransformFlipped90 = 5,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_90 */
     kTransformFlipped180 = 6,           /**< WL_OUTPUT_TRANSFORM_FLIPPED_180 */
     kTransformFlipped270 = 7            /**< WL_OUTPUT_TRANSFORM_FLIPPED_270 */
   };
@@ -131,6 +131,8 @@ class Surface {
    */
   void Commit();
 
+  void SetCommitMode(CommitMode mode);
+
   /**
    * @brief Mark the damaged region of the surface
    */
@@ -156,7 +158,7 @@ class Surface {
    * @brief Get defferred redraw task deque
    * @return
    */
-  core::Deque<AbstractView::RedrawTask> &GetRedrawTaskDeque() const;
+  core::Deque<AbstractView::RedrawNode> &GetRedrawNodeDeque() const;
 
   Surface *GetShellSurface();
 
@@ -203,7 +205,7 @@ class Surface {
    * @param interface An allocated GLInterface object or nullptr to unset and
    * use shm back.
    *
-   * @note The GLInterface will not be deleted when the surface destroyed.
+   * @note The GLInterface will be deleted when the surface destroyed.
    */
   void SetGLInterface(AbstractGLInterface *interface);
 
@@ -255,9 +257,14 @@ class Surface {
 
   };
 
+  /**
+   * @brief A private structure for surface properties
+   */
   struct Private;
 
   explicit Surface(AbstractEventHandler *event_handler, const Margin &margin = Margin());
+
+  void OnGLInterfaceDestroyed(__SLOT__);
 
   // global surface stack:
 
@@ -354,10 +361,10 @@ class Surface::Shell::Toplevel {
   Toplevel() = delete;
 
   enum StatesMask {
-    kStateMaskMaximized  = 0x1,         /**< 1: the surface is maximized */
+    kStateMaskMaximized = 0x1,         /**< 1: the surface is maximized */
     kStateMaskFullscreen = 0x1 << 1,    /**< 2: the surface is fullscreen */
-    kStateMaskResizing   = 0x1 << 2,    /**< 4: the surface is being resized */
-    kStateMaskActivated  = 0x1 << 3,    /**< 8: the surface is now activated */
+    kStateMaskResizing = 0x1 << 2,    /**< 4: the surface is being resized */
+    kStateMaskActivated = 0x1 << 3,    /**< 8: the surface is now activated */
   };
 
   /**

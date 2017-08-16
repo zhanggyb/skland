@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "skland/gui/egl-window.hpp"
+#include "skland/gui/gl-window.hpp"
 
 #include "skland/core/assert.hpp"
 #include "skland/core/memory.hpp"
@@ -25,6 +25,7 @@
 #include "skland/gui/surface.hpp"
 #include "skland/gui/callback.hpp"
 #include "skland/gui/title-bar.hpp"
+#include "skland/gui/glesv2-interface.hpp"
 
 #include "skland/gui/shared-memory-pool.hpp"
 #include "skland/gui/buffer.hpp"
@@ -54,12 +55,11 @@ using graphic::Paint;
 using graphic::Path;
 using graphic::ClipOperation;
 
-struct EGLWindow::Private {
+struct GLWindow::Private {
 
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
-  Private() {}
+  Private() = default;
 
   ~Private() = default;
 
@@ -67,49 +67,34 @@ struct EGLWindow::Private {
   SharedMemoryPool pool;
 
   Buffer frame_buffer_;
-  std::unique_ptr<Canvas> frame_canvas;
-
-  Surface *sub_surface = nullptr;
+//  std::unique_ptr<Canvas> frame_canvas;
 
 //  Surface::EGL *egl_surface = nullptr;
 
-  Callback frame_callback;
+//  GLESV2Interface *gl_interface = nullptr;
+//  Surface *gl_surface = nullptr;
 
-  bool animating = false;
+//  Callback frame_callback;
+
+//  bool animating = false;
 
 };
 
-EGLWindow::EGLWindow(const char *title)
-    : EGLWindow(400, 300, title) {
+GLWindow::GLWindow(const char *title)
+    : GLWindow(400, 300, title) {
 }
 
-EGLWindow::EGLWindow(int width, int height, const char *title)
+GLWindow::GLWindow(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
   p_ = core::make_unique<Private>();
-
-  Surface *parent = GetShellSurface();
-
-  p_->sub_surface = Surface::Sub::Create(parent, this);
-  _ASSERT(p_->sub_surface->GetParent() == parent);
-  _ASSERT(p_->sub_surface->GetSiblingBelow() == parent);
-
-  Region empty_region;
-  p_->sub_surface->SetInputRegion(empty_region);
-
-  Surface::Sub::Get(p_->sub_surface)->SetWindowPosition(0, 0);
-
-//  p_->egl_surface = Surface::EGL::Get(p_->sub_surface);
-//  p_->egl_surface->Resize(GetWidth(), GetHeight());
-
-  p_->frame_callback.done().Set(this, &EGLWindow::OnFrame);
 }
 
-EGLWindow::~EGLWindow() {
-//  delete p_->egl_surface;
-  delete p_->sub_surface;
+GLWindow::~GLWindow() {
+//  delete p_->gl_interface;
+//  delete p_->gl_surface;
 }
 
-void EGLWindow::OnShown() {
+void GLWindow::OnShown() {
   Surface *shell_surface = this->GetShellSurface();
 
   // Create buffer:
@@ -125,21 +110,22 @@ void EGLWindow::OnShown() {
   p_->frame_buffer_.Setup(p_->pool, width, height,
                           width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer_);
-  p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer_.GetData(),
-                                    p_->frame_buffer_.GetSize().width,
-                                    p_->frame_buffer_.GetSize().height));
-  p_->frame_canvas->SetOrigin((float) shell_surface->GetMargin().left,
-                              (float) shell_surface->GetMargin().top);
-  p_->frame_canvas->Clear();
+  Canvas canvas((unsigned char *) p_->frame_buffer_.GetData(),
+                p_->frame_buffer_.GetSize().width,
+                p_->frame_buffer_.GetSize().height);
+//  p_->frame_canvas->SetOrigin((float) shell_surface->GetMargin().left,
+//                              (float) shell_surface->GetMargin().top);
+  canvas.Clear();
+  canvas.Flush();
 
-  RequestUpdate();
+  shell_surface->Update();
 }
 
-void EGLWindow::OnRequestUpdate(AbstractView *view) {
+void GLWindow::OnRequestUpdate(AbstractView *view) {
 
 }
 
-void EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
+void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
   SizeI min(160, 120);
   SizeI max(65536, 65536);
   _ASSERT(min.width < max.width && min.height < max.height);
@@ -153,29 +139,18 @@ void EGLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
     return;
   }
 
-//  RedrawTask *redraw_task = RedrawTask::Get(this);
-
   if (old_size == new_size) {
-//    redraw_task->Unlink();
     RequestSaveSize(false);
     return;
   }
 
-//  PushBackIdleTask(redraw_task);
-
   Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
-  // surface size is changed, reset the pointer position and enter/leave widgets
-
-//  p_->egl_surface->Resize(new_size.width, new_size.height);
-  OnResize(new_size.width, new_size.height);
 
   DispatchMouseLeaveEvent();
-
   RequestSaveSize();
-  return;
 }
 
-void EGLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
+void GLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
   int width = new_size.width;
   int height = new_size.height;
 
@@ -201,29 +176,39 @@ void EGLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
 
   p_->frame_buffer_.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer_);
-  p_->frame_canvas.reset(new Canvas((unsigned char *) p_->frame_buffer_.GetData(),
-                                    p_->frame_buffer_.GetSize().width,
-                                    p_->frame_buffer_.GetSize().height));
-  p_->frame_canvas->SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
-  p_->frame_canvas->Clear();
+  Canvas canvas((unsigned char *) p_->frame_buffer_.GetData(),
+                p_->frame_buffer_.GetSize().width,
+                p_->frame_buffer_.GetSize().height);
+//  p_->frame_canvas->SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
+  canvas.Clear();
+  canvas.Flush();
 
 //  const core::Margin &margin = shell_surface->GetMargin();
 //  RedrawTask *redraw_task = RedrawTask::Get(this);
 //  redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
 //  PushBackIdleTask(redraw_task);
-  _ASSERT(p_->frame_canvas);
 //  Damage(this,
 //         0, 0,
 //         GetWidth() + margin.lr(),
 //         GetHeight() + margin.tb());
+  shell_surface->Update();
+}
+
+void GLWindow::OnRenderSurface(Surface *surface) {
+  Surface *shell_surface = GetShellSurface();
+  Canvas canvas((unsigned char *) p_->frame_buffer_.GetData(),
+                p_->frame_buffer_.GetSize().width,
+                p_->frame_buffer_.GetSize().height);
+  canvas.SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
+  OnDraw(Context(shell_surface, &canvas));
+  shell_surface->Damage(0,
+                        0,
+                        GetWidth() + shell_surface->GetMargin().lr(),
+                        GetHeight() + shell_surface->GetMargin().tb());
   shell_surface->Commit();
 }
 
-void EGLWindow::OnRenderSurface(Surface *surface) {
-  // TODO: render this window
-}
-
-void EGLWindow::OnMouseMove(MouseEvent *event) {
+void GLWindow::OnMouseMove(MouseEvent *event) {
   AbstractView *view = nullptr;
   switch (GetMouseLocation(event)) {
     case kResizeTop: {
@@ -285,7 +270,7 @@ void EGLWindow::OnMouseMove(MouseEvent *event) {
   if (view) DispatchMouseEnterEvent(view, event);
 }
 
-void EGLWindow::OnMouseDown(MouseEvent *event) {
+void GLWindow::OnMouseDown(MouseEvent *event) {
   if ((event->GetButton() == MouseButton::kMouseButtonLeft) &&
       (event->GetState() == MouseButtonState::kMouseButtonPressed)) {
 
@@ -307,16 +292,16 @@ void EGLWindow::OnMouseDown(MouseEvent *event) {
   DispatchMouseDownEvent(event);
 }
 
-void EGLWindow::OnMouseUp(MouseEvent *event) {
+void GLWindow::OnMouseUp(MouseEvent *event) {
 
 }
 
-void EGLWindow::OnKeyDown(KeyEvent *event) {
+void GLWindow::OnKeyDown(KeyEvent *event) {
 
 }
 
-void EGLWindow::OnDraw(const Context *context) {
-  Canvas *canvas = context->canvas();
+void GLWindow::OnDraw(const Context &context) {
+  Canvas *canvas = context.canvas();
   canvas->Clear();
 
   Path path;
@@ -334,17 +319,17 @@ void EGLWindow::OnDraw(const Context *context) {
     path.AddRect(geometry);
     canvas->Save();
     canvas->ClipPath(path, ClipOperation::kClipDifference, true);
-    DropShadow(context);
+    DropShadow(&context);
     canvas->Restore();
   } else {
     path.AddRect(geometry);
   }
 
-  // Fill color:
-//  Paint paint;
-//  paint.SetAntiAlias(true);
-//  paint.SetColor(0xEFF0F0F0);
-//  canvas->DrawPath(path, paint);
+//   Fill color:
+  Paint paint;
+  paint.SetAntiAlias(true);
+  paint.SetColor(0xEFF0F0F0);
+  canvas->DrawPath(path, paint);
 
   // Draw the client area:
 //  paint.SetColor(0xEFE0E0E0);
@@ -354,27 +339,21 @@ void EGLWindow::OnDraw(const Context *context) {
 //  canvas->Restore();
 
   canvas->Flush();
-
-  if (!p_->animating) {
-    p_->animating = true;
-//    p_->frame_callback.Setup(*p_->egl_surface->GetSurface());
-    OnInitialize();
-  }
 }
 
-void EGLWindow::OnFocus(bool) {
-  RequestUpdate();
+void GLWindow::OnFocus(bool focus) {
+  GetShellSurface()->Update();
 }
 
-void EGLWindow::OnInitialize() {
+void GLWindow::OnInitialize() {
 
 }
 
-void EGLWindow::OnResize(int /*width*/, int /*height*/) {
+void GLWindow::OnResize(int /*width*/, int /*height*/) {
 
 }
 
-void EGLWindow::OnRender() {
+void GLWindow::OnRender() {
 //  p_->egl_surface->MakeCurrent();
 
   glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -384,16 +363,16 @@ void EGLWindow::OnRender() {
 //  p_->egl_surface->SwapBuffers();
 }
 
-bool EGLWindow::MakeCurrent() {
-//  return p_->egl_surface->MakeCurrent();
+bool GLWindow::MakeCurrent() {
+//  p_->gl_surface->GetGLInterface()->MakeCurrent();
   return false;
 }
 
-void EGLWindow::SwapBuffers() {
-//  p_->egl_surface->SwapBuffers();
+void GLWindow::SwapBuffers() {
+//  p_->gl_surface->GetGLInterface()->SwapBuffers();
 }
 
-int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
+int GLWindow::GetMouseLocation(const MouseEvent *event) const {
   int vlocation, hlocation, location;
   int x = static_cast<int>(event->GetSurfaceXY().x),
       y = static_cast<int>(event->GetSurfaceXY().y);
@@ -436,34 +415,10 @@ int EGLWindow::GetMouseLocation(const MouseEvent *event) const {
   return location;
 }
 
-void EGLWindow::OnFrame(uint32_t serial) {
-//  p_->frame_callback.Setup(*p_->egl_surface->GetSurface());
-  OnRender();
-//  p_->egl_surface->GetSurface()->Commit();
-}
-
-void EGLWindow::OnRelease() {
-//  fprintf(stderr, "on release\n");
-}
-
-void EGLWindow::RequestUpdate() {
-  Surface *shell_surface = GetShellSurface();
-//  const core::Margin &margin = shell_surface->GetMargin();
-
-//  RedrawTask *redraw_task = RedrawTask::Get(this);
-//  redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
-//  PushBackIdleTask(redraw_task);
-  _ASSERT(p_->frame_canvas);
-//  Damage(this,
-//         0, 0,
-//         GetWidth() + margin.lr(),
-//         GetHeight() + margin.tb());
-  shell_surface->Commit();
-}
-
-void EGLWindow::CancelUpdate() {
-//  RedrawTask *redraw_task = RedrawTask::Get(this);
-//  redraw_task->Unlink();
+void GLWindow::OnFrame(uint32_t serial) {
+//  p_->frame_callback.Setup(*p_->gl_surface);
+//  OnRender();
+//  p_->gl_surface->Commit();
 }
 
 } // namespace gui

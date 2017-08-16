@@ -35,17 +35,17 @@ class Surface;
  *
  * @example simple-egl.cpp
  */
-class EGLWindow : public AbstractShellView {
+class GLWindow : public AbstractShellView {
 
  public:
 
-  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(EGLWindow);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GLWindow);
 
-  explicit EGLWindow(const char *title);
+  explicit GLWindow(const char *title);
 
-  EGLWindow(int width, int height, const char *title);
+  GLWindow(int width, int height, const char *title);
 
-  virtual ~EGLWindow();
+  virtual ~GLWindow();
 
  protected:
 
@@ -67,7 +67,7 @@ class EGLWindow : public AbstractShellView {
 
   virtual void OnKeyDown(KeyEvent *event) override;
 
-  virtual void OnDraw(const Context *context) final;
+  virtual void OnDraw(const Context &context) final;
 
   virtual void OnFocus(bool);
 
@@ -88,12 +88,6 @@ class EGLWindow : public AbstractShellView {
   int GetMouseLocation(const MouseEvent *event) const;
 
   void OnFrame(uint32_t serial);
-
-  void OnRelease();
-
-  void RequestUpdate();
-
-  void CancelUpdate();
 
   std::unique_ptr<Private> p_;
 

@@ -19,7 +19,7 @@
 
 #include "abstract-view.hpp"
 
-#include "skland/gui/callback.hpp"
+#include "callback.hpp"
 
 namespace skland {
 namespace gui {

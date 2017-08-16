@@ -36,7 +36,7 @@ void VulkanInterface::OnSetup() {
   vk::WaylandSurfaceCreateInfoKHR info = {
       vk::WaylandSurfaceCreateFlagsKHR(),
       Display::Proxy::wl_display(),
-      Proxy::GetWaylandSurface(GetSurface())
+//      Proxy::GetWaylandSurface(GetSurface())
   };
 
   vk_surface_ = Display::Proxy::vk_instance().createWaylandSurfaceKHR(info);

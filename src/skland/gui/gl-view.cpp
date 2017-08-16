@@ -33,12 +33,20 @@ GLView::GLView() {
 }
 
 GLView::~GLView() {
-  delete gl_surface_;
+  // Note: delete interface_ before destroying gl_surface_:
   delete interface_;
+  delete gl_surface_;
 }
 
 void GLView::SetGLInterface(AbstractGLInterface *interface) {
+  if (interface_ == interface)
+    return;
+
   interface_ = interface;
+
+  if (nullptr != gl_surface_) {
+    gl_surface_->SetGLInterface(interface_);
+  }
 }
 
 void GLView::OnRequestUpdate(AbstractView *view) {
@@ -52,15 +60,17 @@ void GLView::OnRequestUpdate(AbstractView *view) {
 
 void GLView::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
   RequestSaveGeometry(old_geometry != new_geometry);
+
+  if (nullptr != gl_surface_) {
+//    if ((old_geometry.width() != new_geometry.width()) || (old_geometry.height() != new_geometry.height())) {
+      interface_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
+      OnResize((int) new_geometry.width(), (int) new_geometry.height());
+//    }
+  }
 }
 
 void GLView::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
   Update();
-
-  if (nullptr != gl_surface_) {
-    interface_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
-    OnResize((int) new_geometry.width(), (int) new_geometry.height());
-  }
 }
 
 void GLView::OnMouseEnter(MouseEvent *event) {
@@ -95,6 +105,7 @@ void GLView::OnDraw(const Context &context) {
   if (nullptr == gl_surface_) {
     gl_surface_ = Surface::Sub::Create(context.surface(), this);
     gl_surface_->SetGLInterface(interface_);
+//    gl_surface_->SetCommitMode(Surface::kDesynchronized);
 
     Region region;
     gl_surface_->SetInputRegion(region);

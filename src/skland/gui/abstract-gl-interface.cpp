@@ -16,25 +16,36 @@
 
 #include "internal/abstract-gl-interface_private.hpp"
 
-#include "skland/core/assert.hpp"
-#include "skland/core/memory.hpp"
-
 namespace skland {
 namespace gui {
 
 AbstractGLInterface::AbstractGLInterface() {
-  p_ = core::make_unique<Private>();
+
 }
 
 AbstractGLInterface::~AbstractGLInterface() {
-  if (nullptr != p_->surface) {
-    _ASSERT(p_->surface->p_->gl_interface == this);
-    p_->surface->p_->gl_interface = nullptr;
-  }
+  destroyed_.Emit();
 }
 
-Surface *AbstractGLInterface::GetSurface() const {
-  return p_->surface;
+void AbstractGLInterface::Setup(Surface *surface) {
+  if (surface->p_->gl_interface == this) return;
+
+  if (nullptr != surface->p_->gl_interface) {
+    AbstractGLInterface *orig = surface->p_->gl_interface;
+    surface->p_->gl_interface = nullptr;
+    orig->OnRelease(surface);
+  }
+
+  surface->p_->gl_interface = this;
+
+  OnSetup(surface);
+}
+
+void AbstractGLInterface::Release(Surface *surface) {
+  if (surface->p_->gl_interface != this) return;
+
+  surface->p_->gl_interface = nullptr;
+  OnRelease(surface);
 }
 
 } // namespace gui

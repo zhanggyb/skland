@@ -27,11 +27,10 @@ struct Surface::Private {
 
   using PointI = core::PointI;
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
   Private() = delete;
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
 
-  Private(Surface *surface, AbstractEventHandler *event_handler, const core::Margin &margin)
+  Private(Surface *surface, AbstractEventHandler *event_handler, const Margin &margin)
       : wl_surface(nullptr),
         commit_mode(kSynchronized),
         transform(kTransformNormal),
@@ -45,7 +44,8 @@ struct Surface::Private {
         lower(nullptr),
         gl_interface(nullptr),
         render_task(surface),
-        commit_task(surface) {}
+        commit_task(surface) {
+  }
 
   ~Private() = default;
 
@@ -102,7 +102,7 @@ struct Surface::Private {
   RenderTask render_task;
   CommitTask commit_task;
 
-  core::Deque<AbstractView::RedrawTask> redraw_task_deque;
+  core::Deque<AbstractView::RedrawNode> redraw_node_deque;
 
   static void OnEnter(void *data, struct wl_surface *wl_surface,
                       struct wl_output *wl_output);

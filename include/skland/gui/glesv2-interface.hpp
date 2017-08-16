@@ -44,13 +44,13 @@ class GLESV2Interface : public AbstractGLInterface {
 
  protected:
 
-  virtual void OnSetup() final;
+  virtual void OnSetup(Surface *surface) final;
+
+  virtual void OnRelease(Surface *surface) final;
 
  private:
 
   struct Private;
-
-  void Create();
 
   void Destroy();
 

@@ -19,7 +19,8 @@
 
 #include "skland/core/point.hpp"
 #include "skland/core/size.hpp"
-#include "skland/core/delegate.hpp"
+#include "skland/core/sigcxx.hpp"
+#include "skland/core/defines.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -39,10 +40,9 @@ class Buffer {
 
   friend class Surface;
 
-  Buffer(const Buffer &) = delete;
-  Buffer &operator=(const Buffer &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Buffer);
 
   using Point = core::PointI;
   using Size = core::SizeI;
@@ -76,8 +76,12 @@ class Buffer {
 
   const Size &GetSize() const;
 
-  core::DelegateRef<void()> release() {
+  core::SignalRef<> release() {
     return release_;
+  }
+
+  core::SignalRef<> destroyed() {
+    return destroyed_;
   }
 
  private:
@@ -86,7 +90,9 @@ class Buffer {
 
   std::unique_ptr<Private> p_;
 
-  core::Delegate<void()> release_;
+  core::Signal<> release_;
+
+  core::Signal<> destroyed_;
 
 };
 
