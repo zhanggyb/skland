@@ -192,7 +192,7 @@ void SimpleEGLWindow::OnRender() {
 int main(int argc, char *argv[]) {
   Application app(argc, argv);
 
-  SimpleEGLWindow *win = new SimpleEGLWindow();
+  auto *win = new SimpleEGLWindow();
   win->SetAppId("Simple-EGL");
   win->Show();
   // All window objects will be deleted when application exits

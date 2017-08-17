@@ -31,7 +31,7 @@ class Surface;
 
 /**
  * @ingroup gui
- * @brief A window contains an EGL surface for 3D scene
+ * @brief A window renders content with different graphic interfaces
  *
  * @example simple-egl.cpp
  */
@@ -40,7 +40,7 @@ class GLWindow : public AbstractShellView {
  public:
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GLWindow);
-
+  
   explicit GLWindow(const char *title);
 
   GLWindow(int width, int height, const char *title);
@@ -67,7 +67,7 @@ class GLWindow : public AbstractShellView {
 
   void OnKeyDown(KeyEvent *event) override;
 
-  virtual void OnFocus(bool);
+  void OnFocus(bool);
 
   virtual void OnInitialize();
 

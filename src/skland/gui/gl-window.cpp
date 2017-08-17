@@ -66,14 +66,12 @@ struct GLWindow::Private {
   SharedMemoryPool pool;
 
   Buffer frame_buffer;
-//  std::unique_ptr<Canvas> frame_canvas;
 
-//  Surface::EGL *egl_surface = nullptr;
+  AbstractGLInterface *gl_interface = nullptr;
 
-//  GLESV2Interface *gl_interface = nullptr;
-//  Surface *gl_surface = nullptr;
+  Surface *gl_surface = nullptr;
 
-//  Callback frame_callback;
+  Callback frame_callback;
 
 //  bool animating = false;
 
@@ -86,11 +84,13 @@ GLWindow::GLWindow(const char *title)
 GLWindow::GLWindow(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
   p_ = core::make_unique<Private>();
+
+  p_->frame_callback.done().Set(this, &GLWindow::OnFrame);
 }
 
 GLWindow::~GLWindow() {
-//  delete p_->gl_interface;
-//  delete p_->gl_surface;
+  delete p_->gl_interface;
+  delete p_->gl_surface;
 }
 
 void GLWindow::OnShown() {
@@ -98,8 +98,8 @@ void GLWindow::OnShown() {
   const Margin &margin = shell_surface->GetMargin();
 
   // Create buffer and attach it to the shell surface:
-  int width = GetWidth() + margin.lr();
-  int height = GetHeight() + margin.tb();
+  int width = GetWidth() + margin.lr();  // buffer width with horizontal margins
+  int height = GetHeight() + margin.tb();  // buffer height with vertical margins
   int32_t pool_size = width * 4 * height;
 
   p_->pool.Setup(pool_size);
@@ -107,6 +107,20 @@ void GLWindow::OnShown() {
                          width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
   shell_surface->Update();
+
+  // Create a sub surface and use it as a gl surface for 3D
+  p_->gl_surface = Surface::Sub::Create(shell_surface, this);
+
+  Region region;  // zero region
+  p_->gl_surface->SetInputRegion(region);
+
+  p_->gl_interface = new GLESV2Interface;  // Currently use GLES for demo
+  p_->gl_surface->SetGLInterface(p_->gl_interface);
+  p_->gl_interface->SetViewportSize(GetWidth(), GetHeight());
+
+  Surface::Sub::Get(p_->gl_surface)->SetWindowPosition(0, 0);
+
+  p_->gl_surface->Update();
 }
 
 void GLWindow::OnRequestUpdate(AbstractView *view) {
@@ -114,28 +128,28 @@ void GLWindow::OnRequestUpdate(AbstractView *view) {
 }
 
 void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  Size min(160, 120);
-  Size max(65536, 65536);
-  _ASSERT(min.width < max.width && min.height < max.height);
-
-  if (new_size.width < min.width || new_size.height < min.height) {
-    RequestSaveSize(false);
-    return;
-  }
-  if (new_size.width > max.width || new_size.height > max.height) {
+  if (new_size.width < 160) {
     RequestSaveSize(false);
     return;
   }
 
+  if (new_size.height < 120) {
+    RequestSaveSize(false);
+    return;
+  }
+  
   if (old_size == new_size) {
     RequestSaveSize(false);
     return;
   }
 
-  Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
+  Surface::Shell::Get(GetShellSurface())->ResizeWindow(new_size.width, new_size.height);  // Call xdg surface api
+
+  p_->gl_interface->SetViewportSize(new_size.width, new_size.height);
+  OnResize(new_size.width, new_size.height);
 
   DispatchMouseLeaveEvent();
-  RequestSaveSize();
+  RequestSaveSize(true);
 }
 
 void GLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
@@ -169,9 +183,16 @@ void GLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
 }
 
 void GLWindow::OnRenderSurface(Surface *surface) {
+  if (surface == p_->gl_surface) {
+    p_->frame_callback.Setup(*p_->gl_surface);
+    OnInitialize();
+    p_->gl_surface->Commit();
+    return;
+  }
+  
   Surface *shell_surface = GetShellSurface();
   const Margin &margin = shell_surface->GetMargin();
-
+  
   Canvas canvas((unsigned char *) p_->frame_buffer.GetData(),
                 p_->frame_buffer.GetSize().width,
                 p_->frame_buffer.GetSize().height);
@@ -179,10 +200,11 @@ void GLWindow::OnRenderSurface(Surface *surface) {
   DrawFrame(Context(shell_surface, &canvas));
   shell_surface->Damage(0, 0, GetWidth() + margin.lr(), GetHeight() + margin.tb());
   shell_surface->Commit();
+  return;
 }
 
 void GLWindow::OnMouseMove(MouseEvent *event) {
-  AbstractView *view = nullptr;
+//  AbstractView *view = nullptr;
   switch (GetMouseLocation(event)) {
     case kResizeTop: {
       DispatchMouseLeaveEvent();
@@ -240,7 +262,7 @@ void GLWindow::OnMouseMove(MouseEvent *event) {
     }
   }
 
-  if (nullptr != view) DispatchMouseEnterEvent(view, event);
+//  if (nullptr != view) DispatchMouseEnterEvent(view, event);
 }
 
 void GLWindow::OnMouseDown(MouseEvent *event) {
@@ -286,22 +308,22 @@ void GLWindow::OnResize(int /*width*/, int /*height*/) {
 }
 
 void GLWindow::OnRender() {
-//  p_->egl_surface->MakeCurrent();
+  p_->gl_interface->MakeCurrent();
 
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
 
-//  p_->egl_surface->SwapBuffers();
+  p_->gl_interface->SwapBuffers();
 }
 
 bool GLWindow::MakeCurrent() {
-//  p_->gl_surface->GetGLInterface()->MakeCurrent();
+  p_->gl_interface->MakeCurrent();
   return false;
 }
 
 void GLWindow::SwapBuffers() {
-//  p_->gl_surface->GetGLInterface()->SwapBuffers();
+  p_->gl_interface->SwapBuffers();
 }
 
 int GLWindow::GetMouseLocation(const MouseEvent *event) const {
@@ -373,10 +395,12 @@ void GLWindow::DrawFrame(const Context &context) {
   }
 
 //   Fill color:
+  /*
   Paint paint;
   paint.SetAntiAlias(true);
   paint.SetColor(0xEFF0F0F0);
   canvas->DrawPath(path, paint);
+   */
 
   // Draw the client area:
 //  paint.SetColor(0xEFE0E0E0);
@@ -389,9 +413,9 @@ void GLWindow::DrawFrame(const Context &context) {
 }
 
 void GLWindow::OnFrame(uint32_t serial) {
-//  p_->frame_callback.Setup(*p_->gl_surface);
-//  OnRender();
-//  p_->gl_surface->Commit();
+  p_->frame_callback.Setup(*p_->gl_surface);
+  OnRender();
+  p_->gl_surface->Commit();
 }
 
 } // namespace gui
