@@ -267,7 +267,7 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void DispatchMouseUpEvent(MouseEvent *event);
 
-  void DropShadow(const Context *context);
+  void DropShadow(const Context &context);
 
   static void DispatchUpdate(AbstractView *view);
 

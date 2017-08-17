@@ -53,6 +53,8 @@ SKLAND_EXPORT class Dialog : public AbstractShellView {
 
   struct Private;
 
+  void DrawFrame(const Context &context);
+
   std::unique_ptr<Private> p_;
 
 };

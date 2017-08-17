@@ -73,7 +73,6 @@ SKLAND_NO_EXPORT struct Window::Private {
   SharedMemoryPool pool;
 
   Buffer frame_buffer;
-  std::unique_ptr<Canvas> frame_canvas;
 
   Buffer widget_buffer;
   std::unique_ptr<Canvas> widget_canvas;
@@ -205,23 +204,17 @@ void Window::OnShown() {
                          width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
   shell_surface->Update();
-  p_->frame_canvas.reset(Canvas::CreateRasterDirect(width, height,
-                                                    (unsigned char *) p_->frame_buffer.GetData()));
-  p_->frame_canvas->SetOrigin((float) margin.left * scale,
-                              (float) margin.top * scale);
-  p_->frame_canvas->Clear();
-  p_->frame_canvas->Flush();
 
   p_->widget_surface->SetScale(scale);
   p_->widget_buffer.Setup(p_->pool, width, height,
-                        width * 4, WL_SHM_FORMAT_ARGB8888,
-                        width * 4 * height);
+                          width * 4, WL_SHM_FORMAT_ARGB8888,
+                          width * 4 * height);
   p_->widget_surface->Attach(&p_->widget_buffer);
   p_->widget_surface->Update();
   p_->widget_canvas.reset(Canvas::CreateRasterDirect(width, height,
-                                                   (unsigned char *) p_->widget_buffer.GetData()));
+                                                     (unsigned char *) p_->widget_buffer.GetData()));
   p_->widget_canvas->SetOrigin((float) margin.left * scale,
-                             (float) margin.top * scale);
+                               (float) margin.top * scale);
   p_->widget_canvas->Clear();
   p_->widget_canvas->Flush();
 
@@ -316,19 +309,14 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
   p_->frame_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
   shell_surface->Attach(&p_->frame_buffer);
   shell_surface->Update();
-  p_->frame_canvas.reset(Canvas::CreateRasterDirect(width, height,
-                                                    (unsigned char *) p_->frame_buffer.GetData()));
-  p_->frame_canvas->SetOrigin(margin.left * scale, margin.top * scale);
-  p_->frame_canvas->Clear();
-  p_->frame_canvas->Flush();
 
   p_->widget_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
   p_->widget_surface->Attach(&p_->widget_buffer);
   p_->widget_surface->Update();
   p_->widget_canvas.reset(Canvas::CreateRasterDirect(width, height,
-                                                   (unsigned char *) p_->widget_buffer.GetData()));
+                                                     (unsigned char *) p_->widget_buffer.GetData()));
   p_->widget_canvas->SetOrigin(margin.left * scale,
-                             margin.top * scale);
+                               margin.top * scale);
   p_->widget_canvas->Clear();
   p_->widget_canvas->Flush();
 
@@ -347,8 +335,12 @@ void Window::OnRenderSurface(Surface *surface) {
   const Margin &margin = surface->GetMargin();
 
   if (surface == GetShellSurface()) {
-    Context context(surface, p_->frame_canvas.get());
-    RenderFrame(&context);
+    Canvas canvas((unsigned char *) p_->frame_buffer.GetData(),
+                  p_->frame_buffer.GetSize().width,
+                  p_->frame_buffer.GetSize().height);
+    canvas.SetOrigin(margin.left, margin.top);
+    Context context(surface, &canvas);
+    DrawFrame(context);
     surface->Damage(0, 0, GetWidth() + margin.lr(), GetHeight() + margin.tb());
     surface->Commit();
     return;
@@ -357,7 +349,7 @@ void Window::OnRenderSurface(Surface *surface) {
   core::Deque<AbstractView::RedrawNode> &deque = surface->GetRedrawNodeDeque();
   core::Deque<AbstractView::RedrawNode>::Iterator it = deque.begin();
   Context context(surface, p_->widget_canvas.get());
-  
+
   AbstractView *view = nullptr;
   while (it != deque.end()) {
     view = it.element()->view();
@@ -650,10 +642,10 @@ void Window::OnFullscreenButtonClicked(core::SLOT slot) {
   }
 }
 
-void Window::RenderFrame(const Context *context) {
-  context->canvas()->Clear();
+void Window::DrawFrame(const Context &context) {
+  context.canvas()->Clear();
 
-  int scale = context->surface()->GetScale();
+  int scale = context.surface()->GetScale();
   int width = GetWidth() * scale;
   int height = GetHeight() * scale;
 
@@ -678,7 +670,7 @@ void Window::RenderFrame(const Context *context) {
         4.f * scale, 4.f * scale  // bottom-left
     };
     path.AddRoundRect(geometry, radii);
-    Canvas::ClipGuard guard(context->canvas(), path, ClipOperation::kClipDifference, true);
+    Canvas::ClipGuard guard(context.canvas(), path, ClipOperation::kClipDifference, true);
     DropShadow(context);
   } else {
     path.AddRect(geometry);
@@ -697,7 +689,7 @@ void Window::RenderFrame(const Context *context) {
   } else {
     paint.SetColor(window_schema.active.background.color);
   }
-  context->canvas()->DrawPath(path, paint);
+  context.canvas()->DrawPath(path, paint);
   paint.SetShader(Shader());  // Clear shader
 
   // Draw outline
@@ -705,11 +697,11 @@ void Window::RenderFrame(const Context *context) {
     paint.SetColor(window_schema.inactive.outline.color);
     paint.SetStyle(Paint::Style::kStyleStroke);
     paint.SetStrokeWidth(0.5f);
-    context->canvas()->DrawPath(path, paint);
+    context.canvas()->DrawPath(path, paint);
   }
 
   // Draw the client area:
-  Canvas::ClipGuard guard(context->canvas(), path, ClipOperation::kClipIntersect, true);
+  Canvas::ClipGuard guard(context.canvas(), path, ClipOperation::kClipIntersect, true);
 
   paint.SetStyle(Paint::Style::kStyleFill);
   if (nullptr != p_->title_bar) {
@@ -724,7 +716,7 @@ void Window::RenderFrame(const Context *context) {
     } else {
       paint.SetColor(title_bar_schema.active.background.color);
     }
-    context->canvas()->DrawRect(p_->title_bar->GetGeometry() * scale, paint);
+    context.canvas()->DrawRect(p_->title_bar->GetGeometry() * scale, paint);
     paint.SetShader(Shader());  // Clear shader
   }
 
@@ -738,8 +730,8 @@ void Window::RenderFrame(const Context *context) {
   } else {
     paint.SetColor(window_schema.active.foreground.color);
   }
-  context->canvas()->DrawRect(GetContentGeometry() * scale, paint);
-  context->canvas()->Flush();
+  context.canvas()->DrawRect(GetContentGeometry() * scale, paint);
+  context.canvas()->Flush();
 }
 
 void Window::SetContentViewGeometry() {

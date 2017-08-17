@@ -60,13 +60,12 @@ struct GLWindow::Private {
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
   Private() = default;
-
   ~Private() = default;
 
   /* Properties for frame surface, JUST experimental */
   SharedMemoryPool pool;
 
-  Buffer frame_buffer_;
+  Buffer frame_buffer;
 //  std::unique_ptr<Canvas> frame_canvas;
 
 //  Surface::EGL *egl_surface = nullptr;
@@ -96,28 +95,17 @@ GLWindow::~GLWindow() {
 
 void GLWindow::OnShown() {
   Surface *shell_surface = this->GetShellSurface();
+  const Margin &margin = shell_surface->GetMargin();
 
-  // Create buffer:
-  int width = GetWidth();
-  int height = GetHeight();
-  width += shell_surface->GetMargin().lr();
-  height += shell_surface->GetMargin().tb();
-
+  // Create buffer and attach it to the shell surface:
+  int width = GetWidth() + margin.lr();
+  int height = GetHeight() + margin.tb();
   int32_t pool_size = width * 4 * height;
 
   p_->pool.Setup(pool_size);
-
-  p_->frame_buffer_.Setup(p_->pool, width, height,
-                          width * 4, WL_SHM_FORMAT_ARGB8888);
-  shell_surface->Attach(&p_->frame_buffer_);
-  Canvas canvas((unsigned char *) p_->frame_buffer_.GetData(),
-                p_->frame_buffer_.GetSize().width,
-                p_->frame_buffer_.GetSize().height);
-//  p_->frame_canvas->SetOrigin((float) shell_surface->GetMargin().left,
-//                              (float) shell_surface->GetMargin().top);
-  canvas.Clear();
-  canvas.Flush();
-
+  p_->frame_buffer.Setup(p_->pool, width, height,
+                         width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->frame_buffer);
   shell_surface->Update();
 }
 
@@ -126,8 +114,8 @@ void GLWindow::OnRequestUpdate(AbstractView *view) {
 }
 
 void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  SizeI min(160, 120);
-  SizeI max(65536, 65536);
+  Size min(160, 120);
+  Size max(65536, 65536);
   _ASSERT(min.width < max.width && min.height < max.height);
 
   if (new_size.width < min.width || new_size.height < min.height) {
@@ -151,16 +139,16 @@ void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
 }
 
 void GLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
+  Surface *shell_surface = this->GetShellSurface();
+  const Margin &margin = shell_surface->GetMargin();
   int width = new_size.width;
   int height = new_size.height;
 
   RectI input_rect(width, height);
-  Surface *shell_surface = this->GetShellSurface();
 
-  input_rect.left = shell_surface->GetMargin().left - kResizingMargin.left;
-  input_rect.top = shell_surface->GetMargin().top - kResizingMargin.top;
-  input_rect.Resize(width + kResizingMargin.lr(),
-                    height + kResizingMargin.tb());
+  input_rect.left = margin.left - kResizingMargin.left;
+  input_rect.top = margin.top - kResizingMargin.top;
+  input_rect.Resize(width + kResizingMargin.lr(), height + kResizingMargin.tb());
 
   Region input_region;
   input_region.Add(input_rect.x(), input_rect.y(),
@@ -168,43 +156,28 @@ void GLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
   shell_surface->SetInputRegion(input_region);
 
   // Reset buffer:
-  width += shell_surface->GetMargin().lr();
-  height += shell_surface->GetMargin().tb();
+  width += margin.lr();
+  height += margin.tb();
 
   int pool_size = width * 4 * height;
   p_->pool.Setup(pool_size);
 
-  p_->frame_buffer_.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-  shell_surface->Attach(&p_->frame_buffer_);
-  Canvas canvas((unsigned char *) p_->frame_buffer_.GetData(),
-                p_->frame_buffer_.GetSize().width,
-                p_->frame_buffer_.GetSize().height);
-//  p_->frame_canvas->SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
-  canvas.Clear();
-  canvas.Flush();
+  p_->frame_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->frame_buffer);
 
-//  const core::Margin &margin = shell_surface->GetMargin();
-//  RedrawTask *redraw_task = RedrawTask::Get(this);
-//  redraw_task->context = Context(shell_surface, p_->frame_canvas.get());
-//  PushBackIdleTask(redraw_task);
-//  Damage(this,
-//         0, 0,
-//         GetWidth() + margin.lr(),
-//         GetHeight() + margin.tb());
   shell_surface->Update();
 }
 
 void GLWindow::OnRenderSurface(Surface *surface) {
   Surface *shell_surface = GetShellSurface();
-  Canvas canvas((unsigned char *) p_->frame_buffer_.GetData(),
-                p_->frame_buffer_.GetSize().width,
-                p_->frame_buffer_.GetSize().height);
-  canvas.SetOrigin(shell_surface->GetMargin().left, shell_surface->GetMargin().top);
-  OnDraw(Context(shell_surface, &canvas));
-  shell_surface->Damage(0,
-                        0,
-                        GetWidth() + shell_surface->GetMargin().lr(),
-                        GetHeight() + shell_surface->GetMargin().tb());
+  const Margin &margin = shell_surface->GetMargin();
+
+  Canvas canvas((unsigned char *) p_->frame_buffer.GetData(),
+                p_->frame_buffer.GetSize().width,
+                p_->frame_buffer.GetSize().height);
+  canvas.SetOrigin(margin.left, margin.top);
+  DrawFrame(Context(shell_surface, &canvas));
+  shell_surface->Damage(0, 0, GetWidth() + margin.lr(), GetHeight() + margin.tb());
   shell_surface->Commit();
 }
 
@@ -267,7 +240,7 @@ void GLWindow::OnMouseMove(MouseEvent *event) {
     }
   }
 
-  if (view) DispatchMouseEnterEvent(view, event);
+  if (nullptr != view) DispatchMouseEnterEvent(view, event);
 }
 
 void GLWindow::OnMouseDown(MouseEvent *event) {
@@ -298,47 +271,6 @@ void GLWindow::OnMouseUp(MouseEvent *event) {
 
 void GLWindow::OnKeyDown(KeyEvent *event) {
 
-}
-
-void GLWindow::OnDraw(const Context &context) {
-  Canvas *canvas = context.canvas();
-  canvas->Clear();
-
-  Path path;
-  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, GetWidth(), GetHeight());
-
-  if ((!IsMaximized()) || (!IsFullscreen())) {
-    // Drop shadow:
-//    float radii[] = {
-//        7.f, 7.f, // top-left
-//        7.f, 7.f, // top-right
-//        4.f, 4.f, // bottom-right
-//        4.f, 4.f  // bottom-left
-//    };
-//    path.AddRoundRect(geometry, radii);
-    path.AddRect(geometry);
-    canvas->Save();
-    canvas->ClipPath(path, ClipOperation::kClipDifference, true);
-    DropShadow(&context);
-    canvas->Restore();
-  } else {
-    path.AddRect(geometry);
-  }
-
-//   Fill color:
-  Paint paint;
-  paint.SetAntiAlias(true);
-  paint.SetColor(0xEFF0F0F0);
-  canvas->DrawPath(path, paint);
-
-  // Draw the client area:
-//  paint.SetColor(0xEFE0E0E0);
-//  canvas->Save();
-//  canvas->ClipPath(path, kClipIntersect, true);
-//  canvas->DrawRect(Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight()), paint);
-//  canvas->Restore();
-
-  canvas->Flush();
 }
 
 void GLWindow::OnFocus(bool focus) {
@@ -413,6 +345,47 @@ int GLWindow::GetMouseLocation(const MouseEvent *event) const {
     location = AbstractShellView::kClientArea;
 
   return location;
+}
+
+void GLWindow::DrawFrame(const Context &context) {
+  Canvas *canvas = context.canvas();
+  canvas->Clear();
+
+  Path path;
+  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, GetWidth(), GetHeight());
+
+  if ((!IsMaximized()) || (!IsFullscreen())) {
+    // Drop shadow:
+//    float radii[] = {
+//        7.f, 7.f, // top-left
+//        7.f, 7.f, // top-right
+//        4.f, 4.f, // bottom-right
+//        4.f, 4.f  // bottom-left
+//    };
+//    path.AddRoundRect(geometry, radii);
+    path.AddRect(geometry);
+    canvas->Save();
+    canvas->ClipPath(path, ClipOperation::kClipDifference, true);
+    DropShadow(context);
+    canvas->Restore();
+  } else {
+    path.AddRect(geometry);
+  }
+
+//   Fill color:
+  Paint paint;
+  paint.SetAntiAlias(true);
+  paint.SetColor(0xEFF0F0F0);
+  canvas->DrawPath(path, paint);
+
+  // Draw the client area:
+//  paint.SetColor(0xEFE0E0E0);
+//  canvas->Save();
+//  canvas->ClipPath(path, kClipIntersect, true);
+//  canvas->DrawRect(Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight()), paint);
+//  canvas->Restore();
+
+  canvas->Flush();
 }
 
 void GLWindow::OnFrame(uint32_t serial) {

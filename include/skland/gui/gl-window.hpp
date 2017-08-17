@@ -49,25 +49,23 @@ class GLWindow : public AbstractShellView {
 
  protected:
 
-  virtual void OnShown() final;
+  void OnShown() final;
 
-  virtual void OnRequestUpdate(AbstractView *view) final;
+  void OnRequestUpdate(AbstractView *view) final;
 
-  virtual void OnConfigureSize(const Size &old_size, const Size &new_size) final;
+  void OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnSaveSize(const Size &old_size, const Size &new_size) final;
+  void OnSaveSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnRenderSurface(Surface *surface) final;
+  void OnRenderSurface(Surface *surface) final;
 
-  virtual void OnMouseMove(MouseEvent *event) override;
+  void OnMouseMove(MouseEvent *event) override;
 
-  virtual void OnMouseDown(MouseEvent *event) override;
+  void OnMouseDown(MouseEvent *event) override;
 
-  virtual void OnMouseUp(MouseEvent *event) override;
+  void OnMouseUp(MouseEvent *event) override;
 
-  virtual void OnKeyDown(KeyEvent *event) override;
-
-  virtual void OnDraw(const Context &context) final;
+  void OnKeyDown(KeyEvent *event) override;
 
   virtual void OnFocus(bool);
 
@@ -86,6 +84,8 @@ class GLWindow : public AbstractShellView {
   struct Private;
 
   int GetMouseLocation(const MouseEvent *event) const;
+
+  void DrawFrame(const Context &context);
 
   void OnFrame(uint32_t serial);
 

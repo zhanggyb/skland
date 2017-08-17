@@ -83,37 +83,37 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
  protected:
 
-  virtual void OnShown() final;
+  void OnShown() final;
 
-  virtual void OnRequestUpdate(AbstractView *view) override;
+  void OnRequestUpdate(AbstractView *view) override;
 
-  virtual void OnConfigureSize(const Size &old_size, const Size &new_size) final;
+  void OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnSaveSize(const Size &old_size, const Size &new_size) final;
+  void OnSaveSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnRenderSurface(Surface *surface) final;
+  void OnRenderSurface(Surface *surface) final;
 
-  virtual void OnMouseEnter(MouseEvent *event) override;
+  void OnMouseEnter(MouseEvent *event) override;
 
-  virtual void OnMouseLeave() override;
+  void OnMouseLeave() override;
 
-  virtual void OnMouseMove(MouseEvent *event) override;
+  void OnMouseMove(MouseEvent *event) override;
 
-  virtual void OnMouseDown(MouseEvent *event) override;
+  void OnMouseDown(MouseEvent *event) override;
 
-  virtual void OnMouseUp(MouseEvent *event) override;
+  void OnMouseUp(MouseEvent *event) override;
 
-  virtual void OnKeyDown(KeyEvent *event) override;
+  void OnKeyDown(KeyEvent *event) override;
 
-  virtual void OnFocus(bool);
+  void OnFocus(bool);
 
-  virtual void OnViewAttached(AbstractView *view) final;
+  void OnViewAttached(AbstractView *view) final;
 
-  virtual void OnViewDetached(AbstractView *view) final;
+  void OnViewDetached(AbstractView *view) final;
 
-  virtual void OnEnterOutput(const Surface *surface, const Output *output) final;
+  void OnEnterOutput(const Surface *surface, const Output *output) final;
 
-  virtual void OnLeaveOutput(const Surface *surface, const Output *output) final;
+  void OnLeaveOutput(const Surface *surface, const Output *output) final;
 
   int GetMouseLocation(const MouseEvent *event) const;
 
@@ -125,7 +125,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   void OnFullscreenButtonClicked(__SLOT__);
 
-  void RenderFrame(const Context *context);
+  void DrawFrame(const Context &context);
 
   void SetContentViewGeometry();
 

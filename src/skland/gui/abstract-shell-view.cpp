@@ -468,8 +468,8 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent
   }
 }
 
-void AbstractShellView::DropShadow(const Context *context) {
-  int scale = context->surface()->GetScale();
+void AbstractShellView::DropShadow(const Context &context) {
+  int scale = context.surface()->GetScale();
   float rad = (Theme::GetShadowRadius() - 1.f); // The spread radius
   float offset_x = Theme::GetShadowOffsetX();
   float offset_y = Theme::GetShadowOffsetY();
@@ -484,7 +484,7 @@ void AbstractShellView::DropShadow(const Context *context) {
   }
 
   // shadow map
-  SkCanvas *c = context->canvas()->GetSkCanvas();
+  SkCanvas *c = context.canvas()->GetSkCanvas();
   c->save();
   c->scale(scale, scale);
   sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::GetShadowPixmap(), nullptr, nullptr);
