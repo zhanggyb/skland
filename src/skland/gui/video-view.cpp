@@ -39,7 +39,7 @@ VideoView::~VideoView() {
   delete surface_;
 }
 
-void VideoView::OnUpdate(AbstractView *view) {
+void VideoView::OnRequestUpdate(AbstractView *view) {
 
 }
 

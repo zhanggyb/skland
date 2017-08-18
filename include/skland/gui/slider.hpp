@@ -14,38 +14,50 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_SLIDER_BAR_HPP_
-#define SKLAND_GUI_SLIDER_BAR_HPP_
+#ifndef SKLAND_GUI_SLIDER_HPP_
+#define SKLAND_GUI_SLIDER_HPP_
 
 #include "abstract-slider.hpp"
+#include "skland/core/color.hpp"
 
 namespace skland {
 namespace gui {
 
+/**
+ * @ingroup gui
+ * @brief Slider
+ */
 class Slider : public AbstractSlider<int> {
-
-  Slider(const Slider &) = delete;
-  Slider &operator=(const Slider &) = delete;
 
  public:
 
-  Slider(Orientation orientation = kHorizontal);
+  using ColorF = core::ColorF;
 
-  virtual ~Slider();
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Slider);
+
+  Slider(Orientation orientation = kHorizontal);
 
  protected:
 
-  virtual void OnSizeChanged(int width, int height) final;
+  virtual ~Slider();
+
+  virtual void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
+
+  virtual void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
 
   virtual void OnMouseEnter(MouseEvent *event) final;
 
-  virtual void OnMouseLeave(MouseEvent *event) final;
+  virtual void OnMouseLeave() final;
 
   virtual void OnMouseMove(MouseEvent *event) final;
 
-  virtual void OnMouseButton(MouseEvent *event) final;
+  virtual void OnMouseDown(MouseEvent *event) final;
 
-  virtual void OnKeyboardKey(KeyEvent *event) final;
+  virtual void OnMouseUp(MouseEvent *event) final;
+
+  virtual void OnKeyDown(KeyEvent *event) final;
+
+  virtual void OnKeyUp(KeyEvent *event) final;
 
   virtual void OnSetValue(const int &value) final;
 
@@ -53,11 +65,15 @@ class Slider : public AbstractSlider<int> {
 
   virtual void OnSetMaximum(const int &maximum) final;
 
-  virtual void OnDraw(const Context *context) override;
+  virtual void OnDraw(const Context &context) override;
 
  private:
 
   bool hover_;
+
+  ColorF regular_;
+  ColorF highlight_;
+  ColorF active_;
 
 };
 

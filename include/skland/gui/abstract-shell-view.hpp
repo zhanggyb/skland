@@ -37,6 +37,12 @@ class Context;
  *
  * This is the base class for windows/menus/dialogs etc to show a shell surface
  * and managed by compositor.
+ *
+ * A sub class of an AbstractShellView usually should implement 4 virtual methods:
+ *  - OnShown()
+ *  - OnConfigureSize()
+ *  - OnSaveSize()
+ *  - RenderSurface()
  */
 SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
@@ -48,30 +54,26 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   SKLAND_DECLARE_NONCOPYABLE(AbstractShellView);
   AbstractShellView() = delete;
 
-  using Size = core::SizeI; /**< @brief Alias of core::SizeI */
-  using Rect = core::RectI; /**< @brief Alias of core::RectI */
-  using Margin = core::Margin;  /**< @brief Alias of core::Margin */
+  using Size   = core::SizeI;           /**< @brief Alias of core::SizeI */
+  using Rect   = core::RectI;           /**< @brief Alias of core::RectI */
+  using Margin = core::Margin;          /**< @brief Alias of core::Margin */
 
   /**
-   * @brief A task to process shell view rendering in event loop
+   * @brief A nested class to update the size
    */
-  class RedrawTask : public Task {
+  class GeometryTask : public Task {
 
    public:
 
-    SKLAND_DECLARE_NONCOPYABLE(RedrawTask);
-    RedrawTask() = delete;
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GeometryTask);
+    GeometryTask() = delete;
 
-    RedrawTask(AbstractShellView *shell_view)
+    GeometryTask(AbstractShellView *shell_view)
         : Task(), shell_view_(shell_view) {}
 
-    virtual ~RedrawTask() {}
+    virtual ~GeometryTask() = default;
 
     virtual void Run() const final;
-
-    static RedrawTask *Get(const AbstractShellView *shell_view);
-
-    Context context;
 
    private:
 
@@ -207,9 +209,9 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
    *    - true: accept the new size
    *    - false: drop the new size and maintain the old one
    */
-  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) = 0;
+  virtual void OnConfigureSize(const Size &old_size, const Size &new_size) = 0;
 
-  virtual void OnSizeChange(const Size &old_size, const Size &new_size) = 0;
+  virtual void OnSaveSize(const Size &old_size, const Size &new_size) = 0;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -225,17 +227,13 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   virtual void OnKeyUp(KeyEvent *event) override;
 
-  virtual void OnUpdate(AbstractView *view) override;
+  virtual void OnRequestSaveGeometry(AbstractView *view) override;
 
-  virtual Surface *GetSurface(const AbstractView *view) const override;
-
-  virtual void RenderSurface(const Surface *surface) override;
+  virtual void OnRequestUpdate(AbstractView *view) override;
 
   virtual void OnEnterOutput(const Surface *surface, const Output *output) override;
 
   virtual void OnLeaveOutput(const Surface *surface, const Output *output) override;
-
-  virtual void OnDraw(const Context *context);
 
   virtual void OnMaximized(bool);
 
@@ -246,6 +244,14 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
   virtual void OnViewAttached(AbstractView *view);
 
   virtual void OnViewDetached(AbstractView *view);
+
+  /**
+   * @brief Schedule resize this shell view
+   * @param validate
+   *	- true: schedule resize this shell view in task deque
+   *	- false: cancel the scheduled resize task
+   */
+  void RequestSaveSize(bool validate = true);
 
   void MoveWithMouse(MouseEvent *event) const;
 
@@ -261,27 +267,11 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   void DispatchMouseUpEvent(MouseEvent *event);
 
-  void DropShadow(const Context *context);
-
-  /**
-   * @brief Mark damage area of the given object
-   *
-   * 'Damange an area in the surface' is a wayland concept.
-   */
-  static void Damage(AbstractShellView *shell_view,
-                     int surface_x, int surface_y,
-                     int width, int height);
-
-  /**
-   * @brief Mark damage area of the given object
-   *
-   * 'Damange an area in the surface' is a wayland concept.
-   */
-  static void Damage(AbstractView *view,
-                     int surface_x, int surface_y,
-                     int width, int height);
+  void DropShadow(const Context &context);
 
   static void DispatchUpdate(AbstractView *view);
+
+  static void Draw(AbstractView *view, const Context &context);
 
  private:
 

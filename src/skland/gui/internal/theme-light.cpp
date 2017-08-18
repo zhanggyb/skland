@@ -30,7 +30,7 @@ class ThemeLight : public Theme {
 
   ThemeLight()
       : Theme() {
-    data().window.inactive.outline.color = 0xEF999999;
+    data().window.inactive.outline.color = 0xFF000000;
     data().window.inactive.background.color = 0xEFF0F0F0;
     data().window.active.background.color = 0xEFF0F0F0;
     data().window.inactive.foreground.color = 0xEFE0E0E0;

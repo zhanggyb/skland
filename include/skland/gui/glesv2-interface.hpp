@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_GLESV2_INTERFACE_HPP_
 #define SKLAND_GUI_GLESV2_INTERFACE_HPP_
 
-#include "abstract-graphics-interface.hpp"
+#include "abstract-gl-interface.hpp"
 
 namespace skland {
 namespace gui {
@@ -26,15 +26,35 @@ namespace gui {
  * @ingroup gui
  * @brief OpenGL ES V2
  */
-class GLESV2Interface : public AbstractGraphicsInterface {
+class GLESV2Interface : public AbstractGLInterface {
 
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GLESV2Interface);
 
   GLESV2Interface();
 
   virtual ~GLESV2Interface();
 
-  virtual void Setup(Surface *surface) final;
+  virtual void SetViewportSize(int width, int height) final;
+
+  virtual void MakeCurrent() final;
+
+  virtual void SwapBuffers() final;
+
+ protected:
+
+  virtual void OnSetup(Surface *surface) final;
+
+  virtual void OnRelease(Surface *surface) final;
+
+ private:
+
+  struct Private;
+
+  void Destroy();
+
+  std::unique_ptr<Private> p_;
 
 };
 

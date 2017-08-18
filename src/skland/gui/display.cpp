@@ -16,7 +16,8 @@
 
 #include "internal/display_private.hpp"
 
-#include <skland/core/exceptions.hpp>
+#include "skland/core/exceptions.hpp"
+#include "skland/core/memory.hpp"
 
 #include <skland/gui/output.hpp>
 #include <skland/gui/input.hpp>
@@ -32,8 +33,7 @@ using core::CompoundDeque;
 Display *Display::kDisplay = nullptr;
 
 Display::Display() {
-  p_.reset(new Private);
-
+  p_ = core::make_unique<Private>();
   p_->cursors.resize(kCursorBlank, nullptr);
 }
 

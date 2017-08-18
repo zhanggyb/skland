@@ -54,9 +54,7 @@ class BiNode {
   /**
    * @brief Default constructor
    */
-  BiNode()
-      : previous_(nullptr),
-        next_(nullptr) {}
+  BiNode() = default;
 
   /**
    * @brief Constructor
@@ -104,8 +102,8 @@ class BiNode {
 
  private:
 
-  BiNode *previous_;
-  BiNode *next_;
+  BiNode *previous_ = nullptr;
+  BiNode *next_ = nullptr;
 
 };
 
@@ -163,8 +161,15 @@ class Deque {
       element_->PushBack(element);
     }
 
+    /**
+     * @brief Unlink the bi-node object and invalidate this iterator
+     *
+     * @note Once this method is called, this iterator is invalidated and
+     * should not be used, but it can be assigned to another one.
+     */
     void Remove() {
       element_->Unlink();
+      element_ = nullptr;
     }
 
     bool operator==(const Iterator &other) const {
@@ -184,9 +189,7 @@ class Deque {
     }
 
     T *element() const {
-      return nullptr == element_->previous_ ?
-             nullptr : (nullptr == element_->next_ ?
-                        nullptr : (static_cast<T *>(element_)));
+      return static_cast<T *>(element_);
     }
 
     explicit operator bool() const {
@@ -394,15 +397,15 @@ T *Deque<T>::Remove(T *item) {
 
 template<typename T>
 size_t Deque<T>::GetSize() const {
-  size_t ret = 0;
+  size_t size = 0;
 
-  T *element = first_.next_;
+  BiNode *element = first_.next_;
   while (element != &last_) {
-    ++ret;
+    ++size;
     element = element->next_;
   }
 
-  return ret;
+  return size;
 }
 
 template<typename T>

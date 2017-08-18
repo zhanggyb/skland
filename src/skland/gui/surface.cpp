@@ -18,14 +18,14 @@
 #include "internal/surface_shell_private.hpp"
 #include "internal/surface_shell_toplevel_private.hpp"
 #include "internal/surface_shell_popup_private.hpp"
-#include "internal/surface_egl_private.hpp"
+#include "internal/abstract-gl-interface_private.hpp"
 
-#include <skland/gui/abstract-event-handler.hpp>
-#include <skland/gui/buffer.hpp>
+#include "skland/core/assert.hpp"
+#include "skland/core/memory.hpp"
 
-#include <skland/core/assert.hpp>
-#include <skland/gui/input-event.hpp>
-#include <skland/gui/region.hpp>
+#include "skland/gui/buffer.hpp"
+#include "skland/gui/input-event.hpp"
+#include "skland/gui/region.hpp"
 
 #include "internal/input_private.hpp"
 #include "internal/output_private.hpp"
@@ -64,7 +64,7 @@ void Surface::Shell::AckConfigure(uint32_t serial) const {
 
 Surface::Shell::Shell(Surface *surface)
     : surface_(surface), parent_(nullptr) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 
   _ASSERT(surface_);
   role_.placeholder = nullptr;
@@ -92,7 +92,7 @@ void Surface::Shell::Push() {
 
   _ASSERT(Surface::kShellSurfaceCount >= 0);
 
-  if (Surface::kTop) {
+  if (nullptr != Surface::kTop) {
     Surface::kTop->p_->upper = surface_;
     surface_->p_->lower = Surface::kTop;
     Surface::kTop = surface_;
@@ -109,14 +109,14 @@ void Surface::Shell::Push() {
 void Surface::Shell::Remove() {
   _ASSERT(nullptr == surface_->p_->parent);
 
-  if (surface_->p_->upper) {
+  if (nullptr != surface_->p_->upper) {
     surface_->p_->upper->p_->lower = surface_->p_->lower;
   } else {
     _ASSERT(Surface::kTop == surface_);
     Surface::kTop = surface_->p_->lower;
   }
 
-  if (surface_->p_->lower) {
+  if (nullptr != surface_->p_->lower) {
     surface_->p_->lower->p_->upper = surface_->p_->upper;
   } else {
     _ASSERT(Surface::kBottom == surface_);
@@ -140,7 +140,7 @@ Surface *Surface::Shell::Toplevel::Create(AbstractEventHandler *event_handler, c
 
 Surface::Shell::Toplevel *Surface::Shell::Toplevel::Get(const Surface *surface) {
   Shell *shell = Shell::Get(surface);
-  if (nullptr == shell || shell->parent_) return nullptr;
+  if ((nullptr == shell) || (nullptr != shell->parent_)) return nullptr;
   return shell->role_.toplevel;
 }
 
@@ -181,9 +181,9 @@ void Surface::Shell::Toplevel::SetMinimized() const {
 }
 
 Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 
-  _ASSERT(shell_surface);
+  _ASSERT(nullptr != shell_surface);
   p_->shell = shell_surface;
 
   p_->zxdg_toplevel = zxdg_surface_v6_get_toplevel(shell_surface->p_->zxdg_surface);
@@ -207,8 +207,8 @@ Surface *Surface::Shell::Popup::Create(Shell *parent, AbstractEventHandler *view
 }
 
 Surface::Shell::Popup::Popup(Shell *shell) {
-  _ASSERT(shell);
-  p_.reset(new Private);
+  _ASSERT(nullptr != shell);
+  p_ = core::make_unique<Private>();
   p_->shell = shell;
   // TODO: initialize xdg_popup_
 }
@@ -238,8 +238,8 @@ Surface::Sub *Surface::Sub::Get(const Surface *surface) {
 
 Surface::Sub::Sub(Surface *surface, Surface *parent)
     : surface_(surface), wl_sub_surface_(nullptr) {
-  _ASSERT(surface_);
-  _ASSERT(parent);
+  _ASSERT(nullptr != surface_);
+  _ASSERT(nullptr != parent);
 
   wl_sub_surface_ = wl_subcompositor_get_subsurface(Display::Proxy::wl_subcompositor(),
                                                     surface_->p_->wl_surface,
@@ -269,10 +269,10 @@ Surface::Sub::~Sub() {
   }
 
   // Break the link node
-  if (surface_->p_->above) surface_->p_->above->p_->below = surface_->p_->below;
-  if (surface_->p_->below) surface_->p_->below->p_->above = surface_->p_->above;
+  if (nullptr != surface_->p_->above) surface_->p_->above->p_->below = surface_->p_->below;
+  if (nullptr != surface_->p_->below) surface_->p_->below->p_->above = surface_->p_->above;
 
-  if (wl_sub_surface_)
+  if (nullptr != wl_sub_surface_)
     wl_subsurface_destroy(wl_sub_surface_);
 
   surface_->p_->role.sub = nullptr;
@@ -426,78 +426,12 @@ void Surface::Sub::InsertBelow(Surface *sibling) {
 
 // ------
 
-Surface::EGL *Surface::EGL::Get(Surface *surface, Profile /*profile*/, bool create) {
-  if ((nullptr == surface->p_->egl) && create)
-    surface->p_->egl = new EGL(surface);
-
-  return surface->p_->egl;
-}
-
-Surface::EGL::EGL(Surface *surface) {
-  _ASSERT(surface);
-  p_.reset(new Private);
-  p_->surface = surface;
-
-  p_->wl_egl_window =
-      wl_egl_window_create(p_->surface->p_->wl_surface, 400, 400);
-  p_->egl_surface =
-      eglCreatePlatformWindowSurface(Display::Proxy::egl_display(),
-                                     Display::Proxy::egl_config(),
-                                     p_->wl_egl_window,
-                                     NULL);
-}
-
-Surface::EGL::~EGL() {
-  if (p_->egl_surface) {
-    _ASSERT(p_->wl_egl_window);
-    wl_egl_window_destroy(p_->wl_egl_window);
-  }
-  p_->surface->p_->egl = nullptr;
-}
-
-bool Surface::EGL::MakeCurrent() {
-  return EGL_TRUE ==
-      eglMakeCurrent(Display::Proxy::egl_display(),
-                     p_->egl_surface,
-                     p_->egl_surface,
-                     Display::Proxy::egl_context());
-}
-
-bool Surface::EGL::SwapBuffers() {
-  return EGL_TRUE ==
-      eglSwapBuffers(Display::Proxy::egl_display(), p_->egl_surface);
-}
-
-bool Surface::EGL::SwapBuffersWithDamage(int x, int y, int width, int height) {
-  EGLint rect[4] = {x, y, width, height};
-  return EGL_TRUE
-      == Display::Proxy::kSwapBuffersWithDamageAPI(Display::Proxy::egl_display(),
-                                                   p_->egl_surface,
-                                                   rect,
-                                                   4 * sizeof(EGLint));
-}
-
-bool Surface::EGL::SwapInterval(EGLint interval) {
-  return EGL_TRUE == eglSwapInterval(Display::Proxy::egl_display(), interval);
-}
-
-void Surface::EGL::Resize(int width, int height, int dx, int dy) {
-  wl_egl_window_resize(p_->wl_egl_window, width, height, dx, dy);
-}
-
-Surface *Surface::EGL::GetSurface() const {
-  return p_->surface;
-}
-
-// ------
-
-void Surface::DrawTask::Run() const {
-  AbstractEventHandler* event_handler = surface->GetEventHandler();
-  event_handler->RenderSurface(surface);
+void Surface::RenderTask::Run() const {
+  surface_->p_->event_handler->OnRenderSurface(surface_);
 }
 
 void Surface::CommitTask::Run() const {
-  wl_surface_commit(surface->p_->wl_surface);
+  wl_surface_commit(surface_->p_->wl_surface);
 }
 
 // ------
@@ -505,12 +439,12 @@ void Surface::CommitTask::Run() const {
 Surface *Surface::kTop = nullptr;
 Surface *Surface::kBottom = nullptr;
 int Surface::kShellSurfaceCount = 0;
-core::Deque<Surface::DrawTask> Surface::kDrawTaskDeque;
+core::Deque<Surface::RenderTask> Surface::kRenderTaskDeque;
 core::Deque<Surface::CommitTask> Surface::kCommitTaskDeque;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
   _ASSERT(nullptr != event_handler);
-  p_.reset(new Private(this, event_handler, margin));
+  p_ = core::make_unique<Private>(this, event_handler, margin);
   p_->role.placeholder = nullptr;
 
   p_->wl_surface = wl_compositor_create_surface(Display::Proxy::wl_compositor());
@@ -518,39 +452,39 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
 }
 
 Surface::~Surface() {
-  if (p_->graphics_interface)
-    delete p_->graphics_interface;
+  if (nullptr != p_->gl_interface) {
+    p_->gl_interface->Release(this);
+  }
 
-  if (p_->egl)
-    delete p_->egl;
+//  if (p_->egl)
+//    delete p_->egl;
 
   if (nullptr == p_->parent)
     delete p_->role.shell; // deleting a shell surface will break the links to up_ and down_
   else
     delete p_->role.sub; // deleting all sub surfaces and break the links to above_ and below_
 
-  if (p_->wl_surface)
+  if (nullptr != p_->wl_surface)
     wl_surface_destroy(p_->wl_surface);
 }
 
 void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
-  if (nullptr != p_->egl) return;
-
   if (nullptr == buffer) {
     wl_surface_attach(p_->wl_surface, NULL, x, y);
-  } else {
-    buffer->SetPosition(x, y);
-    wl_surface_attach(p_->wl_surface, buffer->p_->wl_buffer, x, y);
+    return;
   }
+
+  buffer->SetPosition(x, y);
+  wl_surface_attach(p_->wl_surface, buffer->p_->wl_buffer, x, y);
 }
 
 void Surface::Commit() {
-  if (nullptr != p_->egl) {
-    // EGL surface does not use commit
+  if (nullptr != p_->gl_interface) {
+    // GL surface does not use commit
     if (p_->commit_mode == kSynchronized) {
-      // Synchronized mode need to commit the main surface
       Surface *main_surface = GetShellSurface();
-      main_surface->Commit();
+      if (main_surface != this)
+        main_surface->Commit();
     }
 
     return;
@@ -572,6 +506,10 @@ void Surface::Commit() {
   } else {
     kCommitTaskDeque.PushBack(&p_->commit_task);
   }
+}
+
+void Surface::SetCommitMode(CommitMode mode) {
+  p_->commit_mode = mode;
 }
 
 void Surface::Damage(int surface_x, int surface_y, int width, int height) {
@@ -612,11 +550,21 @@ void Surface::DamageBuffer(int32_t x, int32_t y, int32_t width, int32_t height) 
   wl_surface_damage_buffer(p_->wl_surface, x, y, width, height);
 }
 
+void Surface::Update(bool validate) {
+  if (p_->render_task.IsLinked()) return;
+
+  kRenderTaskDeque.PushBack(&p_->render_task);
+}
+
+core::Deque<AbstractView::RedrawNode> &Surface::GetRedrawNodeDeque() const {
+  return p_->redraw_node_deque;
+}
+
 Surface *Surface::GetShellSurface() {
   Surface *shell_surface = this;
   Surface *parent = p_->parent;
 
-  while (parent) {
+  while (nullptr != parent) {
     shell_surface = parent;
     parent = parent->p_->parent;
   }
@@ -630,7 +578,7 @@ Point Surface::GetWindowPosition() const {
   const Surface *parent = p_->parent;
   const Surface *shell_surface = this;
 
-  while (parent) {
+  while (nullptr != parent) {
     position += parent->GetRelativePosition();
     if (nullptr == parent->p_->parent) shell_surface = parent;
     parent = parent->GetParent();
@@ -663,8 +611,13 @@ AbstractEventHandler *Surface::GetEventHandler() const {
   return p_->event_handler;
 }
 
-AbstractGraphicsInterface *Surface::GetGraphicsInterface() const {
-  return p_->graphics_interface;
+void Surface::SetGLInterface(AbstractGLInterface *interface) {
+  interface->Setup(this);
+  interface->destroyed().Connect(this, &Surface::OnGLInterfaceDestroyed);
+}
+
+AbstractGLInterface *Surface::GetGLInterface() const {
+  return p_->gl_interface;
 }
 
 const Margin &Surface::GetMargin() const {
@@ -673,6 +626,10 @@ const Margin &Surface::GetMargin() const {
 
 const Point &Surface::GetRelativePosition() const {
   return p_->relative_position;
+}
+
+void Surface::OnGLInterfaceDestroyed(core::SLOT /* slot */) {
+  p_->gl_interface = nullptr;
 }
 
 void Surface::Clear() {

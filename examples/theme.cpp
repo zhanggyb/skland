@@ -19,24 +19,23 @@
 #include <skland/gui/label.hpp>
 #include <skland/gui/theme.hpp>
 
-using namespace skland;
-using namespace skland::gui;
-
 int main(int argc, char *argv[]) {
-  using skland::gui::Window;
-  using skland::graphic::Font;
-  using skland::graphic::FontStyle;
+  using namespace skland;
+  using namespace skland::gui;
+  using namespace skland::graphic;
 
   Application app(argc, argv);
   Theme::Load("dark");
 
-  Window *win = new Window(320, 240, "Dark Theme");
+  auto *win = new Window(320, 240, "Dark Theme");
   win->SetAppId("Theme");
 
-  Label *label = new Label("Hello Wayland!");
+  auto *label = new Label("Hello Wayland!");
   label->SetForeground(0xFF777777);
   label->SetFont(Font("Noto Sans CJK SC",
-                      FontStyle(FontStyle::kWeightBold, FontStyle::kWidthNormal, FontStyle::kSlantUpright),
+                      FontStyle(FontStyle::kWeightBold,
+                                FontStyle::kWidthNormal,
+                                FontStyle::kSlantUpright),
                       24.f));
   win->SetContentView(label);
 

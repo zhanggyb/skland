@@ -28,16 +28,16 @@ int main(int argc, char *argv[]) {
   Window win(400, 300, "Event Demo");
   win.SetAppId("Event-Demo");
 
-  RelativeLayout *layout = new RelativeLayout;
-  PushButton *button = new PushButton("Test");
+  auto *layout = new RelativeLayout;
+  auto *button = new PushButton("Test");
 
   layout->AddView(button);
   button->MoveTo(200, 200);
 
-  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
-  button->AddAnchorTo(layout, skland::kAlignTop, 20);
+//  button->AddAnchorTo(layout, skland::kAlignLeft, 20);
+//  button->AddAnchorTo(layout, skland::kAlignTop, 20);
   button->AddAnchorTo(layout, skland::kAlignRight, 20);
-  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
+//  button->AddAnchorTo(layout, skland::kAlignBottom, 20);
 
   win.SetContentView(layout);
   win.Show();

@@ -32,36 +32,6 @@ using namespace skland;
 using namespace skland::core;
 using namespace skland::gui;
 
-class FramelessWindow : public Window {
-
- public:
-
-  FramelessWindow(const char *title, int flags)
-      : FramelessWindow(400, 300, title, flags) {
-
-  }
-
-  FramelessWindow(int width, int height, const char *title, int flags)
-      : Window(width, height, title, flags) {}
-
-  virtual ~FramelessWindow() {}
-
-  virtual void OnMouseDown(MouseEvent *event) override {
-    if (event->GetButton() == MouseButton::kMouseButtonLeft) {
-      int location = GetMouseLocation(event);
-      if (location == kClientArea) {
-        MoveWithMouse(event);
-        return;
-      }
-      if (location < kResizeMask) {
-        ResizeWithMouse(event, (uint32_t) location);
-        return;
-      }
-    }
-  }
-
-};
-
 class MainWidget : public AbstractView {
 
  public:
@@ -74,16 +44,12 @@ class MainWidget : public AbstractView {
 
  protected:
 
-  virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
-    Update(0 != dirty_flag);
+  virtual void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
+    RequestSaveGeometry(old_geometry != new_geometry);
   }
 
-  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) override {
-
-  }
-
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final {
-
+  virtual void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
+    Update();
   }
 
   virtual void OnMouseEnter(MouseEvent *event) override {
@@ -114,14 +80,14 @@ class MainWidget : public AbstractView {
     event->Ignore();
   }
 
-  virtual void OnDraw(const Context *context) override {
+  virtual void OnDraw(const Context &context) override {
     using skland::graphic::Canvas;
     using skland::graphic::Paint;
 
     const RectF &rect = GetGeometry();
-    int scale = context->surface()->GetScale();
+    int scale = context.surface()->GetScale();
 
-    Canvas *canvas = context->canvas();
+    Canvas *canvas = context.canvas();
     canvas->Save();
     canvas->Scale(scale, scale);
 
@@ -154,10 +120,10 @@ class MainWidget : public AbstractView {
 int main(int argc, char *argv[]) {
   Application app(argc, argv);
 
-  FramelessWindow *win = new FramelessWindow("Frameless Window", Window::kFlagMaskFrameless);
+  auto *win = new Window("Frameless Window");
   win->SetAppId("Frameless-Demo");
 
-  MainWidget *widget = new MainWidget;
+  auto *widget = new MainWidget;
   win->SetContentView(widget);
 
   win->Show();

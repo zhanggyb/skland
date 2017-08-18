@@ -24,7 +24,6 @@
 #include "skland/core/rect.hpp"
 #include "skland/core/padding.hpp"
 
-#include "context.hpp"
 #include "anchor-group.hpp"
 
 #include <memory>
@@ -34,17 +33,18 @@ namespace gui {
 
 class AbstractShellView;
 class AbstractLayout;
+class Context;
 
 /**
  * @ingroup gui
  * @brief Layout policy to indicate how a view is resized in a layout
  */
 enum LayoutPolicy {
-  kLayoutMinimal,  /**< Recommend to use the minimal size */
-  kLayoutPreferred,  /**< Recommend to use the preferred size */
-  kLayoutMaximal,  /**< Recommend to use the maximal size */
-  kLayoutFixed,  /**< Recommend to use the current size and do not change */
-  kLayoutExpandable  /**< Recommend to expand to any value between minimal and maximal size */
+  kLayoutMinimal,                       /**< Recommend to use the minimal size */
+  kLayoutPreferred,                     /**< Recommend to use the preferred size */
+  kLayoutMaximal,                       /**< Recommend to use the maximal size */
+  kLayoutFixed,                         /**< Recommend to use the current size and do not change */
+  kLayoutExpandable                     /**< Recommend to expand to any value between minimal and maximal size */
 };
 
 /**
@@ -58,8 +58,10 @@ enum LayoutPolicy {
  * A view can have parent and subviews, when you create a GUI application, it
  * generates a view hierarchy.
  *
- * A view object can have arbitrary number of surfaces or shares the surface
- * with others which is managed in one of parent views.
+ * As a sub class of AbstractEventHandler, a view object can have arbitrary
+ * number of surfaces. Or it can share the surface with others which is managed
+ * in one of parent views. But in most cases, it draws on the surface hold in a
+ * shell view (e.g. Window).
  *
  * An AbstractView object SHOULD always be created by new operator and MUST be
  * destroyed by Destroy() method.
@@ -76,10 +78,10 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractView);
 
-  using Size = core::SizeI; /**< @brief Alias of core::SizeI */
-  using Rect = core::RectI; /**< @brief Alias of core::RectI */
-  using RectF = core::RectF;  /**< @brief Alias of core::RectF */
-  using Padding = core::Padding;  /**< @brief Alias of core::Padding */
+  using Size    = core::SizeI;          /**< @brief Alias of core::SizeI */
+  using Rect    = core::RectI;          /**< @brief Alias of core::RectI */
+  using RectF   = core::RectF;          /**< @brief Alias of core::RectF */
+  using Padding = core::Padding;        /**< @brief Alias of core::Padding */
 
   enum GeometryDirtyFlagMask {
     kDirtyLeftMask = 0x1 << 0,
@@ -100,12 +102,14 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
     SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GeometryTask);
     GeometryTask() = delete;
 
-    GeometryTask(AbstractView *view)
+    explicit GeometryTask(AbstractView *view)
         : Task(), view_(view) {}
 
     virtual ~GeometryTask() = default;
 
     virtual void Run() const final;
+
+    static GeometryTask *Get(const AbstractView *view);
 
    private:
 
@@ -113,23 +117,21 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
 
   };
 
-  class RedrawTask : public Task {
+  class RedrawNode : public core::BiNode {
 
    public:
 
-    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(RedrawTask);
-    RedrawTask() = delete;
+    SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(RedrawNode);
+    RedrawNode() = delete;
 
-    RedrawTask(AbstractView *view)
-        : Task(), view_(view) {}
+    explicit RedrawNode(AbstractView *view)
+        : core::BiNode(), view_(view) {}
 
-    virtual ~RedrawTask() = default;
+    virtual ~RedrawNode() = default;
 
-    virtual void Run() const final;
+    AbstractView *view() const { return view_; }
 
-    static RedrawTask *Get(const AbstractView *view);
-
-    Context context;
+    static RedrawNode *Get(const AbstractView *view);
 
    private:
 
@@ -377,6 +379,9 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   float GetYCenter() const;
 
+  /**
+   * @brief Get the geometry of this view
+   */
   const RectF &GetGeometry() const;
 
   bool IsVisible() const;
@@ -459,7 +464,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * @brief Callback to draw this view on a canvas
    * @param context
    */
-  virtual void OnDraw(const Context *context) = 0;
+  virtual void OnDraw(const Context &context) = 0;
 
   /**
    * @brief Callback when a child view is added
@@ -496,28 +501,12 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   virtual void OnDetachedFromShellView(AbstractShellView *shell_view);
 
   /**
-   * @brief Update this view and all sub views
-   *
-   * By default this method will update this view and all recursively update all
-   * sub views.  Sub class can override this method to select part of sub views
-   * to update.
-   */
-  virtual void DispatchUpdate();
-
-  /**
    * @brief A view request an update
    * @param view This view or a sub view in hierarchy
    */
-  virtual void OnUpdate(AbstractView *view) override;
+  virtual void OnRequestUpdate(AbstractView *view) override;
 
-  /**
-   * @brief Get surface for the given view
-   * @param view A view object, it is always this view or a sub view in hierarchy
-   * @return A pointer to a surface or nullptr
-   */
-  virtual Surface *GetSurface(const AbstractView *view) const override;
-
-  virtual void RenderSurface(const Surface *surface) override;
+  virtual void OnRenderSurface(Surface *surface) override;
 
   /**
    * @brief Callback when this view enters an output
@@ -543,9 +532,10 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    *
    * The new size will never smaller than minimal size or larger than maximal size.
    */
-  virtual void OnConfigureGeometry(int dirty_flag,
-                                   const RectF &old_geometry,
+  virtual void OnConfigureGeometry(const RectF &old_geometry,
                                    const RectF &new_geometry) = 0;
+
+  virtual void OnRequestSaveGeometry(AbstractView *view) override;
 
   /**
    * @brief Callback when the geometry changes before draw this view
@@ -556,11 +546,24 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    * This virtual method is called only when there's new geometry need to be saved before drawing this
    * view.
    */
-  virtual void OnGeometryChange(int dirty_flag,
-                                const RectF &old_geometry,
-                                const RectF &new_geometry) = 0;
+  virtual void OnSaveGeometry(const RectF &old_geometry,
+                              const RectF &new_geometry) = 0;
 
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) = 0;
+  /**
+   * @brief Callback when destroyed
+   *
+   * By default this method does nothing, sub class can override this.
+   */
+  virtual void OnDestroy();
+
+  /**
+   * @brief Update this view and all sub views
+   *
+   * By default this method will update this view and all recursively update all
+   * sub views.  Sub class can override this method to select part of sub views
+   * to update.
+   */
+  virtual void DispatchUpdate();
 
   /**
    * @brief Dispatch mouse enter event down to the target view
@@ -575,11 +578,12 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   virtual AbstractView *DispatchMouseEnterEvent(MouseEvent *event);
 
   /**
-   * @brief Callback when destroyed
-   *
-   * By default this method does nothing, sub class can override this.
+   * @brief Schedule change the geometry of this view
+   * @param[in] validate
+   *	- true: schedule change the geometry in task deque
+   *	- false: cancel the geometry task
    */
-  virtual void OnDestroy();
+  void RequestSaveGeometry(bool validate = true);
 
   void TrackMouseMotion(MouseEvent *event);
 
@@ -626,7 +630,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   void ClearChildren();
 
-  static bool SwapIndex(AbstractView *object1, AbstractView *object2);
+  static bool SwapIndex(AbstractView *view1, AbstractView *view2);
 
   static bool InsertSiblingBefore(AbstractView *src, AbstractView *dst);
 
@@ -639,13 +643,6 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
   static void MoveForward(AbstractView *view);
 
   static void MoveBackward(AbstractView *view);
-
-  /**
-   * @brief Mark damage area of the given object
-   *
-   * 'Damange a region on the surface' is a wayland concept.
-   */
-  static void Damage(AbstractView *view, int surface_x, int surface_y, int width, int height);
 
  private:
 

@@ -67,7 +67,7 @@ class Triangle: public EGLWidget {
   }
 
   virtual ~Triangle() {
-    glDeleteProgram(program);
+    glDeleteProgram(program_);
   }
 
  protected:
@@ -80,11 +80,11 @@ class Triangle: public EGLWidget {
 
  private:
 
-  GLuint program;
+  GLuint program_;
 
-  GLuint rotation_uniform;
-  GLuint pos;
-  GLuint col;
+  GLuint rotation_uniform_;
+  GLuint pos_;
+  GLuint col_;
 
 };
 
@@ -98,31 +98,31 @@ void Triangle::OnInitialize() {
   frag = create_shader(frag_shader_text, GL_FRAGMENT_SHADER);
   vert = create_shader(vert_shader_text, GL_VERTEX_SHADER);
 
-  program = glCreateProgram();
-  glAttachShader(program, frag);
-  glAttachShader(program, vert);
-  glLinkProgram(program);
+  program_ = glCreateProgram();
+  glAttachShader(program_, frag);
+  glAttachShader(program_, vert);
+  glLinkProgram(program_);
 
-  glGetProgramiv(program, GL_LINK_STATUS, &status);
+  glGetProgramiv(program_, GL_LINK_STATUS, &status);
   if (!status) {
     char log[1000];
     GLsizei len;
-    glGetProgramInfoLog(program, 1000, &len, log);
+    glGetProgramInfoLog(program_, 1000, &len, log);
     fprintf(stderr, "Error: linking:\n%*s\n", len, log);
     exit(1);
   }
 
-  glUseProgram(program);
+  glUseProgram(program_);
 
-  pos = 0;
-  col = 1;
+  pos_ = 0;
+  col_ = 1;
 
-  glBindAttribLocation(program, pos, "pos");
-  glBindAttribLocation(program, col, "color");
-  glLinkProgram(program);
+  glBindAttribLocation(program_, pos_, "pos");
+  glBindAttribLocation(program_, col_, "color");
+  glLinkProgram(program_);
 
-  rotation_uniform =
-      glGetUniformLocation(program, "rotation");
+  rotation_uniform_ =
+      glGetUniformLocation(program_, "rotation");
 
   SwapBuffers();
 }
@@ -165,21 +165,21 @@ void Triangle::OnRender() {
 
   glViewport(0, 0, GetWidth(), GetHeight());
 
-  glUniformMatrix4fv(rotation_uniform, 1, GL_FALSE,
+  glUniformMatrix4fv(rotation_uniform_, 1, GL_FALSE,
                      (GLfloat *) rotation);
 
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 0, verts);
-  glVertexAttribPointer(col, 3, GL_FLOAT, GL_FALSE, 0, colors);
-  glEnableVertexAttribArray(pos);
-  glEnableVertexAttribArray(col);
+  glVertexAttribPointer(pos_, 2, GL_FLOAT, GL_FALSE, 0, verts);
+  glVertexAttribPointer(col_, 3, GL_FLOAT, GL_FALSE, 0, colors);
+  glEnableVertexAttribArray(pos_);
+  glEnableVertexAttribArray(col_);
 
   glDrawArrays(GL_TRIANGLES, 0, 3);
 
-  glDisableVertexAttribArray(pos);
-  glDisableVertexAttribArray(col);
+  glDisableVertexAttribArray(pos_);
+  glDisableVertexAttribArray(col_);
 
   SwapBuffers();
 }

@@ -37,7 +37,7 @@ class Context {
  public:
 
   Context()
-      : surface_(nullptr) {}
+      : surface_(nullptr), canvas_(nullptr) {}
 
   Context(Surface *surface, graphic::Canvas *canvas)
       : surface_(surface), canvas_(canvas) {}
@@ -55,7 +55,11 @@ class Context {
 
   Surface *surface() const { return surface_; }
 
+  void set_surface(Surface *surface) { surface_ = surface; }
+
   graphic::Canvas *canvas() const { return canvas_; }
+
+  void set_canvas(graphic::Canvas *canvas) { canvas_ = canvas; }
 
  private:
 

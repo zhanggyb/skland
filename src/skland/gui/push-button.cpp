@@ -23,8 +23,12 @@
 #include <skland/graphic/text-box.hpp>
 #include <skland/graphic/path.hpp>
 #include <skland/graphic/gradient-shader.hpp>
+#include "skland/graphic/font-style.hpp"
 
 #include <skland/gui/theme.hpp>
+
+#include <skland/gui/timer.hpp>
+#include "skland/core/color.hpp"
 
 namespace skland {
 namespace gui {
@@ -36,85 +40,61 @@ using graphic::Path;
 using graphic::Shader;
 using graphic::Font;
 using graphic::TextBox;
+using graphic::FontStyle;
 
 PushButton::PushButton(const std::string &text)
     : AbstractButton(text) {
 
+  /* Debug */
+  srand((unsigned int) Timer::GetClockTime());
+  regular_.red = std::rand() % 255 / 255.f;
+  regular_.green = std::rand() % 255 / 255.f;
+  regular_.blue = std::rand() % 255 / 255.f;
+
+  highlight_ = regular_ + 25;
+  active_ = regular_ - 25;
+
+  SetFont(Font("Noto Sans CJK SC",
+               FontStyle(),
+               12.f));
 }
 
 PushButton::~PushButton() {
 
 }
 
-void PushButton::OnDraw(const Context *context) {
-  Canvas *canvas = context->canvas();
+void PushButton::OnDraw(const Context &context) {
+  Canvas *canvas = context.canvas();
 
   const RectF &geometry = GetGeometry();
-  int scale = context->surface()->GetScale();
+  int scale = context.surface()->GetScale();
   Canvas::ClipGuard guard(canvas, geometry * scale);
 
   canvas->Clear();
   canvas->Scale(scale, scale);
 
-  Path path;
-  RectF inner_rect = geometry.Inset(-0.5f);
-  const Theme::Schema &schema = Theme::GetData().button;
-  Shader shader;
-  core::PointF points[2];
-  points[0].x = geometry.left;
-  points[0].y = geometry.top;
-  points[1].x = geometry.left;
-  points[1].y = geometry.bottom;
-
-  float radii[] = {
-      4.f, 4.f,
-      4.f, 4.f,
-      4.f, 4.f,
-      4.f, 4.f
-  };
-
-  path.AddRoundRect(inner_rect, radii);
-
   Paint paint;
   paint.SetAntiAlias(true);
   if (IsHovered()) {
     if (IsPressed()) {
-      if (schema.active.background.shaded) {
-        shader = Theme::Helper::GradientShader::MakeLinear(points, schema.active.background);
-        paint.SetShader(shader);
-      } else {
-        paint.SetColor(Theme::GetData().button.active.background.color);
-      }
+      paint.SetColor(active_);
+      canvas->DrawRect(GetGeometry(), paint);
     } else {
-      if (schema.highlight.background.shaded) {
-        shader = Theme::Helper::GradientShader::MakeLinear(points, schema.highlight.background);
-        paint.SetShader(shader);
-      } else {
-        paint.SetColor(Theme::GetData().button.highlight.background.color);
-      }
+      paint.SetColor(highlight_);
+      canvas->DrawRect(GetGeometry(), paint);
     }
   } else {
-    if (schema.inactive.background.shaded) {
-      shader = Theme::Helper::GradientShader::MakeLinear(points, schema.inactive.background);
-      paint.SetShader(shader);
-    } else {
-      paint.SetColor(Theme::GetData().button.inactive.background.color);
-    }
+    paint.SetColor(regular_);
+    canvas->DrawRect(GetGeometry(), paint);
   }
-
-  canvas->DrawPath(path, paint);
-  paint.SetShader(Shader());
-
-  paint.SetStyle(Paint::Style::kStyleStroke);
-  paint.SetColor(schema.inactive.outline.color);
-  path.Reset();
-  path.AddRoundRect(inner_rect, radii);
-  canvas->DrawPath(path, paint);
 
   const Font &font = GetFont();
   const std::string &text = GetText();
 
-  paint.SetColor(schema.inactive.foreground.color);
+//  paint.SetColor(schema.inactive.foreground.color);
+  ColorF text_color = regular_;
+  text_color.ReverseRGB();
+  paint.SetColor(text_color);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font);
   paint.SetTextSize(font.GetSize());

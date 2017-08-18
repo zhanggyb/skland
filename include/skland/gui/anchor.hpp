@@ -17,7 +17,8 @@
 #ifndef SKLAND_GUI_ANCHOR_HPP_
 #define SKLAND_GUI_ANCHOR_HPP_
 
-#include "../core/types.hpp"
+#include "skland/core/types.hpp"
+#include "skland/core/defines.hpp"
 
 #include <utility>
 #include <memory>
@@ -36,11 +37,10 @@ class Anchor {
 
   friend class AnchorGroup;
 
-  Anchor() = delete;
-  Anchor(const Anchor &) = delete;
-  Anchor &operator=(const Anchor &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Anchor);
+  Anchor() = delete;
 
   ~Anchor();
 

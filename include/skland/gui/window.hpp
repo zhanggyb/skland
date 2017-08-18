@@ -37,16 +37,12 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   using RectI = core::RectI;  /**< Alias of core::RectI */
 
-  enum FlagMask {
-    kFlagMaskFrameless = 0x1 << 0
-  };
-
   /**
    * @brief Construct a 400 x 300 window with given title and flags
    * @param title
    * @param flags
    */
-  Window(const char *title, int flags = 0);
+  explicit Window(const char *title);
 
   /**
    * @brief Construct a window with given size, title and flags
@@ -55,7 +51,7 @@ SKLAND_EXPORT class Window : public AbstractShellView {
    * @param title
    * @param flags
    */
-  Window(int width, int height, const char *title, int flags = 0);
+  Window(int width, int height, const char *title);
 
   virtual ~Window();
 
@@ -87,39 +83,37 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
  protected:
 
-  virtual void OnShown() final;
+  void OnShown() final;
 
-  virtual void OnUpdate(AbstractView *view) override;
+  void OnRequestUpdate(AbstractView *view) override;
 
-  virtual Surface *GetSurface(const AbstractView *view) const;
+  void OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
-  virtual bool OnConfigureSize(const Size &old_size, const Size &new_size) final;
+  void OnSaveSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnSizeChange(const Size &old_size, const Size &new_size) final;
+  void OnRenderSurface(Surface *surface) final;
 
-  virtual void OnMouseEnter(MouseEvent *event) override;
+  void OnMouseEnter(MouseEvent *event) override;
 
-  virtual void OnMouseLeave() override;
+  void OnMouseLeave() override;
 
-  virtual void OnMouseMove(MouseEvent *event) override;
+  void OnMouseMove(MouseEvent *event) override;
 
-  virtual void OnMouseDown(MouseEvent *event) override;
+  void OnMouseDown(MouseEvent *event) override;
 
-  virtual void OnMouseUp(MouseEvent *event) override;
+  void OnMouseUp(MouseEvent *event) override;
 
-  virtual void OnKeyDown(KeyEvent *event) override;
+  void OnKeyDown(KeyEvent *event) override;
 
-  virtual void OnDraw(const Context *context) override;
+  void OnFocus(bool);
 
-  virtual void OnFocus(bool);
+  void OnViewAttached(AbstractView *view) final;
 
-  virtual void OnViewAttached(AbstractView *view) final;
+  void OnViewDetached(AbstractView *view) final;
 
-  virtual void OnViewDetached(AbstractView *view) final;
+  void OnEnterOutput(const Surface *surface, const Output *output) final;
 
-  virtual void OnEnterOutput(const Surface *surface, const Output *output) final;
-
-  virtual void OnLeaveOutput(const Surface *surface, const Output *output) final;
+  void OnLeaveOutput(const Surface *surface, const Output *output) final;
 
   int GetMouseLocation(const MouseEvent *event) const;
 
@@ -131,11 +125,9 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   void OnFullscreenButtonClicked(__SLOT__);
 
+  void DrawFrame(const Context &context);
+
   void SetContentViewGeometry();
-
-  void RequestUpdate();
-
-  void CancelUpdate();
 
   std::unique_ptr<Private> p_;
 

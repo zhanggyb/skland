@@ -42,7 +42,7 @@ class VideoView final : public AbstractView {
 
  protected:
 
-  virtual void OnUpdate(AbstractView *view);
+  virtual void OnRequestUpdate(AbstractView *view);
 
   virtual Surface *GetSurface(const AbstractView *view) const;
 

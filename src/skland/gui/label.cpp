@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-#include "gui/label.hpp"
+#include "skland/gui/label.hpp"
 
-#include "core/color.hpp"
+#include "skland/core/memory.hpp"
 
-#include "graphic/font.hpp"
-#include "graphic/canvas.hpp"
-#include "graphic/paint.hpp"
-#include "graphic/text-box.hpp"
+#include "skland/graphic/font.hpp"
+#include "skland/graphic/canvas.hpp"
+#include "skland/graphic/paint.hpp"
+#include "skland/graphic/text-box.hpp"
 
-#include "gui/context.hpp"
-#include "gui/key-event.hpp"
-#include "gui/mouse-event.hpp"
+#include "skland/gui/context.hpp"
+#include "skland/gui/key-event.hpp"
+#include "skland/gui/mouse-event.hpp"
 
 #include "skland/gui/theme.hpp"
 
@@ -62,7 +62,7 @@ Label::Label(const std::string &text)
 
 Label::Label(int width, int height, const std::string &text)
     : AbstractView(width, height) {
-  p_.reset(new Private(text));
+  p_ = core::make_unique<Private>(text);
 }
 
 Label::~Label() {
@@ -88,16 +88,12 @@ void Label::SetFont(const graphic::Font &font) {
   Update();
 }
 
-void Label::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  Update(0 != dirty_flag);
+void Label::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  RequestSaveGeometry(old_geometry != new_geometry);
 }
 
-void Label::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-
-}
-
-void Label::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
-
+void Label::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  Update();
 }
 
 void Label::OnMouseEnter(MouseEvent *event) {
@@ -128,18 +124,18 @@ void Label::OnKeyUp(KeyEvent *event) {
   event->Ignore();
 }
 
-void Label::OnDraw(const Context *context) {
+void Label::OnDraw(const Context &context) {
   using graphic::Canvas;
   using graphic::Paint;
   using graphic::TextBox;
 
-  int scale = context->surface()->GetScale();
+  int scale = context.surface()->GetScale();
   const RectF rect = GetGeometry() * scale;
-  Canvas::ClipGuard guard(context->canvas(), rect);
+  Canvas::ClipGuard guard(context.canvas(), rect);
 
   Paint paint;
   paint.SetColor(p_->background);
-  context->canvas()->DrawRect(rect, paint);
+  context.canvas()->DrawRect(rect, paint);
 
   paint.SetColor(p_->foreground);
   paint.SetAntiAlias(true);
@@ -157,7 +153,7 @@ void Label::OnDraw(const Context *context) {
                   rect.b);
   text_box.SetSpacingAlign(TextBox::kSpacingAlignCenter);
   text_box.SetText(p_->text.c_str(), p_->text.length(), paint);
-  text_box.Draw(*context->canvas());
+  text_box.Draw(*context.canvas());
 }
 
 } // namespace gui

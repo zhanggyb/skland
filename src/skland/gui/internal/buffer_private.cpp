@@ -24,8 +24,8 @@ const struct wl_buffer_listener Buffer::Private::kListener = {
 };
 
 void Buffer::Private::OnRelease(void *data, struct wl_buffer */*buffer*/) {
-  Buffer *_this = static_cast<Buffer *>(data);
-  if (_this->release_) _this->release_();
+  auto *_this = static_cast<Buffer *>(data);
+  _this->release_.Emit();
 }
 
 }

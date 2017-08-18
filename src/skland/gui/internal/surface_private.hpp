@@ -18,7 +18,7 @@
 #define SKLAND_GUI_INTERNAL_SURFACE_PRIVATE_HPP_
 
 #include "skland/gui/surface.hpp"
-#include "skland/gui/abstract-graphics-interface.hpp"
+#include "skland/gui/abstract-gl-interface.hpp"
 
 namespace skland {
 namespace gui {
@@ -27,11 +27,10 @@ struct Surface::Private {
 
   using PointI = core::PointI;
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
   Private() = delete;
-  Private(const Private &) = delete;
-  Private &operator=(const Private &) = delete;
 
-  Private(Surface *surface, AbstractEventHandler *event_handler, const core::Margin &margin)
+  Private(Surface *surface, AbstractEventHandler *event_handler, const Margin &margin)
       : wl_surface(nullptr),
         commit_mode(kSynchronized),
         transform(kTransformNormal),
@@ -43,13 +42,12 @@ struct Surface::Private {
         below(nullptr),
         upper(nullptr),
         lower(nullptr),
-        egl(nullptr),
-        graphics_interface(nullptr),
+        gl_interface(nullptr),
+        render_task(surface),
         commit_task(surface) {
-    draw_task_head.PushBack(&draw_task_tail);
   }
 
-  ~Private() {}
+  ~Private() = default;
 
   struct wl_surface *wl_surface;
 
@@ -93,9 +91,7 @@ struct Surface::Private {
    */
   Surface *lower;
 
-  EGL *egl;
-
-  AbstractGraphicsInterface *graphics_interface;
+  AbstractGLInterface *gl_interface;
 
   union {
     void *placeholder;
@@ -103,10 +99,10 @@ struct Surface::Private {
     Sub *sub;
   } role;
 
-  Task draw_task_head;
-  Task draw_task_tail;
-
+  RenderTask render_task;
   CommitTask commit_task;
+
+  core::Deque<AbstractView::RedrawNode> redraw_node_deque;
 
   static void OnEnter(void *data, struct wl_surface *wl_surface,
                       struct wl_output *wl_output);

@@ -34,8 +34,8 @@ TEST_F(Test, slider_1) {
   Window *win = new Window(320, 240, "Slider Test");
   win->SetAppId("Test");
 
-//  Slider* slider = new Slider;
-//  win->SetMainWidget(slider);
+  Slider* slider = new Slider;
+  win->SetContentView(slider);
 
   win->Show();
 

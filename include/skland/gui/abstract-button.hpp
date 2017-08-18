@@ -33,16 +33,15 @@ namespace gui {
  */
 class AbstractButton : public AbstractView {
 
-  AbstractButton(const AbstractButton &) = delete;
-  AbstractButton &operator=(const AbstractButton &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractButton);
 
   AbstractButton();
 
   AbstractButton(int width, int height);
 
-  AbstractButton(const std::string &text);
+  explicit AbstractButton(const std::string &text);
 
   core::SignalRef<> clicked() { return clicked_; }
 
@@ -78,15 +77,11 @@ class AbstractButton : public AbstractView {
 
   virtual void OnKeyUp(KeyEvent *event) override;
 
-  virtual void OnConfigureGeometry(int dirty_flag,
-                                   const core::RectF &old_geometry,
+  virtual void OnConfigureGeometry(const core::RectF &old_geometry,
                                    const core::RectF &new_geometry) override;
 
-  virtual void OnGeometryChange(int dirty_flag,
-                                const core::RectF &old_geometry,
-                                const core::RectF &new_geometry) override;
-
-  virtual void OnLayout(int dirty_flag, int left, int top, int right, int bottom) final;
+  virtual void OnSaveGeometry(const core::RectF &old_geometry,
+                              const core::RectF &new_geometry) override;
 
   void SetSensitive(bool sensitive);
 

@@ -148,39 +148,11 @@ find_library(DL_LIBRARY "dl")
 set(LIBS ${LIBS} ${DL_LIBRARY})
 
 # ----------------------------------------------------------------------------
-# Document build option
-# ----------------------------------------------------------------------------
-find_package(Doxygen)
-option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" ${DOXYGEN_FOUND})
-
-if (BUILD_DOCUMENTATION)
-    if (NOT DOXYGEN_FOUND)
-        message(FATAL_ERROR "Doxygen is needed to build the documentation.")
-    endif ()
-
-    set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in)
-    set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-    set(doxy_main_page ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
-
-    configure_file(${doxyfile_in} ${doxyfile} @ONLY)
-
-    add_custom_target(doc
-            COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            COMMENT "Generating API documentation with Doxygen"
-            VERBATIM)
-    #    add_custom_command(TARGET doc
-    #            POST_BUILD
-    #            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/doc ${CMAKE_CURRENT_BINARY_DIR}/html/doc
-    #            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    #            COMMENT "Copy \"${CMAKE_CURRENT_SOURCE_DIR}/doc\" to \"${CMAKE_CURRENT_BINARY_DIR}/html\""
-    #            VERBATIM)
-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share/doc)
-endif ()
-
-# ----------------------------------------------------------------------------
 # Global definitions
 # ----------------------------------------------------------------------------
+
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
 if (BUILD_SHARED_LIBRARY)
     add_definitions(-DSKLAND_SHARED_EXPORT)
 endif ()
@@ -188,6 +160,8 @@ endif ()
 # ----------------------------------------------------------------------------
 # Sub directories
 # ----------------------------------------------------------------------------
+
+# Set global varaibles to use native SKIA apis:
 set(SKIA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/skia)
 list(APPEND SKIA_PUBLIC_INCLUDES
         "${SKIA_SOURCE_DIR}/include/android"
@@ -204,10 +178,8 @@ list(APPEND SKIA_PUBLIC_INCLUDES
         "${SKIA_SOURCE_DIR}/include/utils"
         "${SKIA_SOURCE_DIR}/include/private")
 
+add_subdirectory(doc)
 add_subdirectory(deps)
-
-include_directories(${PROJECT_SOURCE_DIR}/include)
-
 add_subdirectory(src)
 
 if (LINUX)

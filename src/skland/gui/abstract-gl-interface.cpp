@@ -14,48 +14,39 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_
-#define SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_
-
-#include <memory>
+#include "internal/abstract-gl-interface_private.hpp"
 
 namespace skland {
 namespace gui {
 
-class Surface;
+AbstractGLInterface::AbstractGLInterface() {
 
-/**
- * @brief The base class for graphic engine to render on a 3D surface
- */
-class AbstractGraphicsInterface {
+}
 
- public:
+AbstractGLInterface::~AbstractGLInterface() {
+  destroyed_.Emit();
+}
 
-  AbstractGraphicsInterface();
+void AbstractGLInterface::Setup(Surface *surface) {
+  if (surface->p_->gl_interface == this) return;
 
-  virtual ~AbstractGraphicsInterface();
+  if (nullptr != surface->p_->gl_interface) {
+    AbstractGLInterface *orig = surface->p_->gl_interface;
+    surface->p_->gl_interface = nullptr;
+    orig->OnRelease(surface);
+  }
 
-  /**
-   * @brief Setup the surface on which this engine works
-   * @param surface
-   */
-  virtual void Setup(Surface *surface) = 0;
+  surface->p_->gl_interface = this;
 
-  Surface *GetSurface() const;
+  OnSetup(surface);
+}
 
- protected:
+void AbstractGLInterface::Release(Surface *surface) {
+  if (surface->p_->gl_interface != this) return;
 
-  struct Proxy;
-
- private:
-
-  struct Private;
-
-  std::unique_ptr<Private> p_;
-
-};
+  surface->p_->gl_interface = nullptr;
+  OnRelease(surface);
+}
 
 } // namespace gui
 } // namespace skland
-
-#endif // SKLAND_GUI_ABSTRACT_GRAPHICS_INTERFACE_HPP_

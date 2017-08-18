@@ -253,15 +253,16 @@ void AbstractShellView::OnKeyUp(KeyEvent *event) {
   // override in sub class
 }
 
-void AbstractShellView::OnUpdate(AbstractView *view) {
-  // override in sub class
+void AbstractShellView::OnRequestSaveGeometry(AbstractView *view) {
+  if (p_->geometry_task.IsLinked()) {
+    p_->geometry_task.PushBack(AbstractView::GeometryTask::Get(view));
+    return;
+  }
+
+  Application::GetTaskDeque().PushBack(AbstractView::GeometryTask::Get(view));
 }
 
-Surface *AbstractShellView::GetSurface(const AbstractView * /* view */) const {
-  return p_->shell_surface;
-}
-
-void AbstractShellView::RenderSurface(const Surface *surface) {
+void AbstractShellView::OnRequestUpdate(AbstractView *view) {
   // override in sub class
 }
 
@@ -271,15 +272,15 @@ void AbstractShellView::OnEnterOutput(const Surface *surface, const Output *outp
 void AbstractShellView::OnLeaveOutput(const Surface *surface, const Output *output) {
 }
 
-void AbstractShellView::OnDraw(const Context *context) {
-  // override in sub class
-}
+//void AbstractShellView::OnDraw(const Context *context) {
+// override in sub class
+//}
 
 void AbstractShellView::OnMaximized(bool maximized) {
 
 }
 
-void AbstractShellView::OnFullscreen(bool) {
+void AbstractShellView::OnFullscreen(bool fullscreened) {
 
 }
 
@@ -295,6 +296,19 @@ void AbstractShellView::OnViewDetached(AbstractView *view) {
 
 }
 
+void AbstractShellView::RequestSaveSize(bool validate) {
+  if (!validate) {
+    p_->geometry_task.Unlink();
+    p_->size = p_->last_size;
+    return;
+  }
+
+  if (p_->geometry_task.IsLinked()) return;
+
+  core::Deque<Task> &defferred_task_deque = Application::GetTaskDeque();
+  defferred_task_deque.PushBack(&p_->geometry_task);
+}
+
 void AbstractShellView::MoveWithMouse(MouseEvent *event) const {
   Surface::Shell::Toplevel::Get(p_->shell_surface)->Move(*event, event->GetSerial());
 }
@@ -307,27 +321,13 @@ Surface *AbstractShellView::GetShellSurface() const {
   return p_->shell_surface;
 }
 
-void AbstractShellView::Damage(AbstractShellView *shell_view,
-                               int surface_x, int surface_y,
-                               int width, int height) {
-  shell_view->p_->is_damaged = true;
-  shell_view->p_->damaged_region.l = surface_x;
-  shell_view->p_->damaged_region.t = surface_y;
-  shell_view->p_->damaged_region.Resize(width, height);
-}
-
-void AbstractShellView::Damage(AbstractView *view,
-                               int surface_x, int surface_y,
-                               int width, int height) {
-  view->p_->is_damaged = true;
-  view->p_->damaged_region.l = surface_x;
-  view->p_->damaged_region.t = surface_y;
-  view->p_->damaged_region.Resize(width, height);
-}
-
 void AbstractShellView::DispatchUpdate(AbstractView *view) {
   view->Update();
   view->DispatchUpdate();
+}
+
+void AbstractShellView::Draw(AbstractView *view, const Context &context) {
+  view->OnDraw(context);
 }
 
 void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {
@@ -363,14 +363,9 @@ void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states
   }
 
   if (width > 0 && height > 0) {
-    p_->dirty_flag = 1;
-    Size saved_size = p_->size;
     p_->size.width = width;
     p_->size.height = height;
-    if (!OnConfigureSize(p_->last_size, p_->size)) {
-      p_->size = saved_size;
-      p_->dirty_flag = 0;
-    }
+    OnConfigureSize(p_->last_size, p_->size);
   }
 
   if (focus != IsFocused()) {
@@ -473,8 +468,8 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent
   }
 }
 
-void AbstractShellView::DropShadow(const Context *context) {
-  int scale = context->surface()->GetScale();
+void AbstractShellView::DropShadow(const Context &context) {
+  int scale = context.surface()->GetScale();
   float rad = (Theme::GetShadowRadius() - 1.f); // The spread radius
   float offset_x = Theme::GetShadowOffsetX();
   float offset_y = Theme::GetShadowOffsetY();
@@ -489,7 +484,7 @@ void AbstractShellView::DropShadow(const Context *context) {
   }
 
   // shadow map
-  SkCanvas *c = context->canvas()->GetSkCanvas();
+  SkCanvas *c = context.canvas()->GetSkCanvas();
   c->save();
   c->scale(scale, scale);
   sk_sp<SkImage> image = SkImage::MakeFromRaster(*Theme::GetShadowPixmap(), nullptr, nullptr);
@@ -564,26 +559,9 @@ void AbstractShellView::DropShadow(const Context *context) {
 
 // ---------
 
-void AbstractShellView::RedrawTask::Run() const {
-  if (shell_view_->p_->dirty_flag) {
-    shell_view_->OnSizeChange(shell_view_->p_->last_size, shell_view_->p_->size);
-    shell_view_->p_->last_size = shell_view_->p_->size;
-    shell_view_->p_->dirty_flag = 0;
-  }
-
-  shell_view_->OnDraw(&context);
-
-  if (shell_view_->p_->is_damaged) {
-    context.surface()->Damage(shell_view_->p_->damaged_region.x(),
-                              shell_view_->p_->damaged_region.y(),
-                              shell_view_->p_->damaged_region.width(),
-                              shell_view_->p_->damaged_region.height());
-    shell_view_->p_->is_damaged = false;
-  }
-}
-
-AbstractShellView::RedrawTask *AbstractShellView::RedrawTask::Get(const AbstractShellView *shell_view) {
-  return &shell_view->p_->redraw_task;
+void AbstractShellView::GeometryTask::Run() const {
+  shell_view_->OnSaveSize(shell_view_->p_->last_size, shell_view_->p_->size);
+  shell_view_->p_->last_size = shell_view_->p_->size;
 }
 
 } // namespace gui

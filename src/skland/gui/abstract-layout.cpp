@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <skland/gui/timer.hpp>
 #include <skland/core/assert.hpp>
+#include "skland/gui/context.hpp"
 //#endif
 
 namespace skland {
@@ -39,10 +40,10 @@ using core::ColorF;
 using graphic::Paint;
 using graphic::Canvas;
 
-AbstractLayout::AbstractLayout(const core::Padding &padding)
-    : AbstractView() {
+AbstractLayout::AbstractLayout(const Padding &padding)
+    : AbstractView(),
+      is_geometry_saved_(false) {
   p_->padding = padding;
-  p_->need_redraw = false;
 }
 
 AbstractLayout::~AbstractLayout() {
@@ -73,21 +74,28 @@ void AbstractLayout::RemoveView(AbstractView *view) {
 }
 
 void AbstractLayout::Layout() {
-  p_->need_layout = true;
-  Update();
+  OnLayout(0, 0, GetWidth(), GetHeight());
 }
 
-void AbstractLayout::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  if (dirty_flag) {
-    Layout();
-  } else {
-    p_->need_layout = false;
-    Update(false);
-  }
+void AbstractLayout::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+//  is_geometry_saved_ = false;
+  RequestSaveGeometry(old_geometry != new_geometry);
 }
 
-void AbstractLayout::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  p_->need_layout = true;
+void AbstractLayout::OnRequestSaveGeometry(AbstractView *view) {
+//  if (!is_geometry_saved_) return;
+  AbstractView::OnRequestSaveGeometry(view);
+}
+
+void AbstractLayout::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+//  is_geometry_saved_ = true;
+  OnLayout(0, 0, GetWidth(), GetHeight());
+}
+
+void AbstractLayout::OnRequestUpdate(AbstractView *view) {
+  if (view == this) return; // This layout does not need to update
+
+  AbstractView::OnRequestUpdate(view);
 }
 
 void AbstractLayout::OnChildAdded(AbstractView *view) {
@@ -128,8 +136,8 @@ void AbstractLayout::OnKeyUp(KeyEvent *event) {
   event->Ignore();
 }
 
-void AbstractLayout::OnDraw(const Context *context) {
-//#ifdef DEBUG
+void AbstractLayout::OnDraw(const Context &context) {
+  //#ifdef DEBUG
   srand(Timer::GetClockTime());
   float r = rand() % 255 / 255.f;
   float g = rand() % 255 / 255.f;
@@ -137,8 +145,8 @@ void AbstractLayout::OnDraw(const Context *context) {
 
   Paint paint;
   paint.SetColor(ColorF(r, g, b, 0.25));
-  context->canvas()->DrawRect(GetGeometry(), paint);
-//#endif
+  context.canvas()->DrawRect(GetGeometry(), paint);
+  //#endif
 }
 
 } // namespace gui

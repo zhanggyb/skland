@@ -16,15 +16,17 @@
 
 #include "internal/abstract-view_private.hpp"
 
+#include "skland/core/assert.hpp"
+#include "skland/core/debug.hpp"
+#include "skland/core/memory.hpp"
+
 #include "skland/numerical/bit.hpp"
 #include "skland/numerical/clamp.hpp"
 
-#include <skland/core/assert.hpp>
-#include "skland/core/debug.hpp"
-
-#include <skland/gui/abstract-shell-view.hpp>
-#include <skland/gui/abstract-layout.hpp>
-#include <skland/gui/mouse-event.hpp>
+#include "skland/gui/abstract-shell-view.hpp"
+#include "skland/gui/abstract-layout.hpp"
+#include "skland/gui/mouse-event.hpp"
+#include "skland/gui/application.hpp"
 
 #include "internal/abstract-view_iterators.hpp"
 
@@ -44,7 +46,7 @@ AbstractView::AbstractView()
 
 AbstractView::AbstractView(int width, int height)
     : AbstractEventHandler() {
-  p_.reset(new Private(this));
+  p_ = core::make_unique<Private>(this);
   p_->geometry.Resize(width, height);
   p_->last_geometry.Resize(width, height);
 
@@ -102,7 +104,7 @@ void AbstractView::SetPreferredWidth(int width) {
 
   p_->preferred_size.width = width;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -112,7 +114,7 @@ void AbstractView::SetPreferredHeight(int height) {
 
   p_->preferred_size.height = height;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -132,7 +134,7 @@ void AbstractView::SetMaximalWidth(int width) {
 
   p_->maximal_size.width = width;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -144,7 +146,7 @@ void AbstractView::SetMaximalHeight(int height) {
 
   p_->maximal_size.height = height;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -160,7 +162,7 @@ int AbstractView::GetMaximalHeight() const {
 void AbstractView::SetLayoutPolicyOnX(LayoutPolicy policy) {
   p_->x_layout_policy = policy;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -172,7 +174,7 @@ LayoutPolicy AbstractView::GetLayoutPolicyOnX() const {
 void AbstractView::SetLayoutPolicyOnY(LayoutPolicy policy) {
   p_->y_layout_policy = policy;
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     // TODO: relayout
   }
 }
@@ -182,19 +184,10 @@ LayoutPolicy AbstractView::GetLayoutPolicyOnY() const {
 }
 
 void AbstractView::MoveTo(int x, int y) {
-  _ASSERT(!p_->is_drawing);
-
   if (p_->geometry.x() == x && p_->geometry.y() == y) return;
 
   p_->geometry.MoveTo(x, y);
-
-  if (x == p_->last_geometry.x() && y == p_->last_geometry.y()) {
-    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyLeftMask | kDirtyTopMask);
-  } else {
-    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyLeftMask | kDirtyTopMask);
-  }
-
-  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->last_geometry, p_->geometry);
 }
 
 const core::Padding &AbstractView::GetPadding() const {
@@ -202,13 +195,12 @@ const core::Padding &AbstractView::GetPadding() const {
 }
 
 void AbstractView::Resize(int width, int height) {
-  _ASSERT(!p_->is_drawing);
-
   if (p_->geometry.width() == width && p_->geometry.height() == height) return;
 
   SizeI min;
   min.width = GetMinimalWidth();
   min.height = GetMinimalHeight();
+
   SizeI max;
   max.width = GetMaximalWidth();
   max.height = GetMaximalHeight();
@@ -221,14 +213,7 @@ void AbstractView::Resize(int width, int height) {
   if (width > max.width || height > max.height) return;
 
   p_->geometry.Resize(width, height);
-
-  if (width == p_->last_geometry.width() && height == p_->last_geometry.height()) {
-    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyRightMask | kDirtyBottomMask);
-  } else {
-    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyRightMask | kDirtyBottomMask);
-  }
-
-  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetX() const {
@@ -240,53 +225,45 @@ int AbstractView::GetY() const {
 }
 
 int AbstractView::GetLeft() const {
-  if (p_->parent)
+  if (nullptr != p_->parent)
     return static_cast<int>(p_->geometry.left - p_->parent->p_->geometry.left);
 
   return static_cast<int>(p_->geometry.left);
 }
 
 void AbstractView::SetLeft(int left) {
-  if (p_->parent) left += p_->parent->p_->geometry.left;
+  if (nullptr != p_->parent) left += p_->parent->p_->geometry.left;
 
   if (left == p_->geometry.left) return;
 
   int width = static_cast<int>(p_->geometry.right) - left;
-  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+  if ((width < p_->minimal_size.width) ||
+      (width > p_->maximal_size.width))
+    return;
 
   p_->geometry.left = left;
-
-  if (p_->geometry.left == p_->last_geometry.left)
-    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyLeftMask | kDirtyWidthMask);
-  else
-    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyLeftMask | kDirtyWidthMask);
-
-  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetTop() const {
-  if (p_->parent)
+  if (nullptr != p_->parent)
     return static_cast<int>(p_->geometry.top - p_->parent->p_->geometry.top);
 
   return static_cast<int>(p_->geometry.top);
 }
 
 void AbstractView::SetTop(int top) {
-  if (p_->parent) top += p_->parent->p_->geometry.top;
+  if (nullptr != p_->parent) top += p_->parent->p_->geometry.top;
 
   if (top == p_->geometry.top) return;
 
   int height = static_cast<int>(p_->geometry.bottom) - top;
-  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
+  if ((height < p_->minimal_size.height) ||
+      (height > p_->maximal_size.height))
+    return;
 
   p_->geometry.top = top;
-
-  if (p_->geometry.top == p_->last_geometry.top)
-    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyTopMask | kDirtyHeightMask);
-  else
-    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyTopMask | kDirtyHeightMask);
-
-  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetRight() const {
@@ -294,21 +271,17 @@ int AbstractView::GetRight() const {
 }
 
 void AbstractView::SetRight(int right) {
-  if (p_->parent) right += p_->parent->p_->geometry.left; // relative to parent
+  if (nullptr != p_->parent) right += p_->parent->p_->geometry.left; // relative to parent
 
   if (right == p_->geometry.right) return;
 
   int width = right - static_cast<int>(p_->geometry.left);
-  if (width < p_->minimal_size.width || width > p_->maximal_size.width) return;
+  if ((width < p_->minimal_size.width) ||
+      (width > p_->maximal_size.width))
+    return;
 
   p_->geometry.right = right;
-
-  if (p_->geometry.right == p_->last_geometry.right)
-    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyRightMask | kDirtyWidthMask);
-  else
-    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyRightMask | kDirtyWidthMask);
-
-  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetBottom() const {
@@ -316,21 +289,17 @@ int AbstractView::GetBottom() const {
 }
 
 void AbstractView::SetBottom(int bottom) {
-  if (p_->parent) bottom += p_->parent->p_->geometry.top; // relative to parent
+  if (nullptr != p_->parent) bottom += p_->parent->p_->geometry.top; // relative to parent
 
   if (bottom == p_->geometry.bottom) return;
 
   int height = bottom - static_cast<int>(p_->geometry.top);
-  if (height < p_->minimal_size.height || height > p_->maximal_size.height) return;
+  if ((height < p_->minimal_size.height) ||
+      (height > p_->maximal_size.height))
+    return;
 
   p_->geometry.bottom = bottom;
-
-  if (p_->geometry.bottom == p_->last_geometry.bottom)
-    Bit::Clear<int>(p_->geometry_dirty_flags, kDirtyBottomMask | kDirtyHeightMask);
-  else
-    Bit::Set<int>(p_->geometry_dirty_flags, kDirtyBottomMask | kDirtyHeightMask);
-
-  OnConfigureGeometry(p_->geometry_dirty_flags, p_->last_geometry, p_->geometry);
+  OnConfigureGeometry(p_->last_geometry, p_->geometry);
 }
 
 int AbstractView::GetWidth() const {
@@ -361,25 +330,25 @@ void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distan
   if (target == p_->parent || this == target->p_->parent) {
     switch (align) {
       case kAlignLeft: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->left_anchor_group.PushBack(pair.first);
         target->p_->left_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignTop: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->top_anchor_group.PushBack(pair.first);
         target->p_->top_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignRight: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->right_anchor_group.PushBack(pair.first);
         target->p_->right_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignBottom: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->bottom_anchor_group.PushBack(pair.first);
         target->p_->bottom_anchor_group.PushBack(pair.second);
         break;
@@ -389,25 +358,25 @@ void AbstractView::AddAnchorTo(AbstractView *target, Alignment align, int distan
   } else if (target->p_->parent == p_->parent) {
     switch (align) {
       case kAlignLeft: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->right_anchor_group.PushBack(pair.first);
         target->p_->left_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignTop: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->bottom_anchor_group.PushBack(pair.first);
         target->p_->top_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignRight: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->left_anchor_group.PushBack(pair.first);
         target->p_->right_anchor_group.PushBack(pair.second);
         break;
       }
       case kAlignBottom: {
-        std::pair < Anchor * , Anchor * > pair = Anchor::MakePair(distance, this, target);
+        std::pair<Anchor *, Anchor *> pair = Anchor::MakePair(distance, this, target);
         p_->top_anchor_group.PushBack(pair.first);
         target->p_->bottom_anchor_group.PushBack(pair.second);
         break;
@@ -430,14 +399,13 @@ const AnchorGroup &AbstractView::GetAnchorGroup(Alignment align) const {
 }
 
 void AbstractView::Update(bool validate) {
-  if (p_->is_drawing) return;
-
-  if (validate) {
-    if (p_->redraw_task.IsLinked()) return;
-    OnUpdate(this);
-  } else {
+  if (!validate) {
     p_->redraw_task.Unlink();
+    return;
   }
+
+  if (p_->redraw_task.IsLinked()) return;
+  OnRequestUpdate(this);
 }
 
 bool AbstractView::Contain(int x, int y) const {
@@ -449,15 +417,15 @@ void AbstractView::Destroy() {
 
   OnDestroy();
 
-  if (p_->layout) {
+  if (nullptr != p_->layout) {
     _ASSERT(p_->layout == p_->parent);
     p_->layout->RemoveView(this);
   }
 
-  if (p_->parent) {
+  if (nullptr != p_->parent) {
     _ASSERT(nullptr == p_->shell_view);
     p_->parent->RemoveChild(this);
-  } else if (p_->shell_view) {
+  } else if (nullptr != p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
     p_->shell_view->DetachView(this);
   }
@@ -480,10 +448,17 @@ AbstractLayout *AbstractView::GetLayout() const {
 }
 
 AbstractShellView *AbstractView::GetShellView() const {
-  if (p_->shell_view)
+  if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
     return p_->shell_view;
+  }
 
-  return static_cast<AbstractShellView *>(GetSurface(this)->GetShellSurface()->GetEventHandler());
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    return p_->parent->GetShellView();
+  }
+
+  return nullptr;
 }
 
 void AbstractView::OnChildAdded(AbstractView */*view*/) {
@@ -517,42 +492,28 @@ void AbstractView::DispatchUpdate() {
   }
 }
 
-void AbstractView::OnUpdate(AbstractView *view) {
+void AbstractView::OnRequestUpdate(AbstractView *view) {
   if (p_->redraw_task.IsLinked()) {
     if (view != this) {
       // This view is going to be redrawn, just push back the task of the sub view
-      _ASSERT(p_->redraw_task.context.canvas());
+//      _ASSERT(p_->redraw_task.context.canvas());
       p_->redraw_task.PushBack(&view->p_->redraw_task);
-      view->p_->redraw_task.context = p_->redraw_task.context;
+//      view->p_->redraw_task.context = p_->redraw_task.context;
     }
     return;
   }
 
   if (p_->parent) {
     _ASSERT(nullptr == p_->shell_view);
-    p_->parent->OnUpdate(view);
+    p_->parent->OnRequestUpdate(view);
     return;
   } else if (p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
-    p_->shell_view->OnUpdate(view);
+    p_->shell_view->OnRequestUpdate(view);
   }
 }
 
-Surface *AbstractView::GetSurface(const AbstractView *view) const {
-  if (p_->parent) {
-    _ASSERT(nullptr == p_->shell_view);
-    return p_->parent->GetSurface(view);
-  }
-
-  if (p_->shell_view) {
-    _ASSERT(nullptr == p_->parent);
-    return p_->shell_view->GetSurface(view);
-  }
-
-  return nullptr;
-}
-
-void AbstractView::RenderSurface(const Surface *surface) {
+void AbstractView::OnRenderSurface(Surface *surface) {
   // override in sub class
 }
 
@@ -562,6 +523,28 @@ void AbstractView::OnEnterOutput(const Surface *surface, const Output *output) {
 
 void AbstractView::OnLeaveOutput(const Surface *surface, const Output *output) {
   // override this in sub class
+}
+
+void AbstractView::OnRequestSaveGeometry(AbstractView *view) {
+  if (p_->geometry_task.IsLinked()) {
+    if (view != this) {
+      p_->geometry_task.PushBack(&view->p_->geometry_task);
+    }
+    return;
+  }
+
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    p_->parent->OnRequestSaveGeometry(view);
+    return;
+  } else if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
+    p_->shell_view->OnRequestSaveGeometry(view);
+  }
+}
+
+void AbstractView::OnDestroy() {
+  // override in sub class
 }
 
 AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
@@ -579,8 +562,25 @@ AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
   return view;
 }
 
-void AbstractView::OnDestroy() {
-  // override in sub class
+void AbstractView::RequestSaveGeometry(bool validate) {
+  if (!validate) {
+    p_->geometry_task.Unlink();
+    p_->geometry = p_->last_geometry;
+    return;
+  }
+
+  if (p_->geometry_task.IsLinked()) return;
+
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    p_->parent->OnRequestSaveGeometry(this);
+  } else if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
+    p_->shell_view->OnRequestSaveGeometry(this);
+  } else {
+    core::Deque<Task> &deque = Application::GetTaskDeque();
+    deque.PushBack(&p_->geometry_task);
+  }
 }
 
 void AbstractView::TrackMouseMotion(MouseEvent *event) {
@@ -823,70 +823,70 @@ void AbstractView::ClearChildren() {
   p_->last_child = nullptr;
 }
 
-bool AbstractView::SwapIndex(AbstractView *object1, AbstractView *object2) {
-  if (object1 == nullptr || object2 == nullptr) return false;
-  if (object1 == object2) return false;
-  if (object1->p_->parent != object2->p_->parent) return false;
-  if (object1->p_->parent == nullptr) return false;
+bool AbstractView::SwapIndex(AbstractView *view1, AbstractView *view2) {
+  if (view1 == nullptr || view2 == nullptr) return false;
+  if (view1 == view2) return false;
+  if (view1->p_->parent != view2->p_->parent) return false;
+  if (view1->p_->parent == nullptr) return false;
 
   AbstractView *tmp1 = nullptr;
   AbstractView *tmp2 = nullptr;
 
-  if (object1->p_->next == object2) {    // view1 is just the previous sibling of view2
+  if (view1->p_->next == view2) {    // view1 is just the previous sibling of view2
 
-    _ASSERT(object2->p_->previous == object1);
-    tmp1 = object1->p_->previous;
-    tmp2 = object2->p_->next;
-    object2->p_->previous = tmp1;
-    object1->p_->previous = object2;
-    object2->p_->next = object1;
-    object1->p_->next = tmp2;
+    _ASSERT(view2->p_->previous == view1);
+    tmp1 = view1->p_->previous;
+    tmp2 = view2->p_->next;
+    view2->p_->previous = tmp1;
+    view1->p_->previous = view2;
+    view2->p_->next = view1;
+    view1->p_->next = tmp2;
 
-    if (tmp1 != nullptr) tmp1->p_->next = object2;
-    else object1->p_->parent->p_->first_child = object2;
+    if (tmp1 != nullptr) tmp1->p_->next = view2;
+    else view1->p_->parent->p_->first_child = view2;
 
-    if (tmp2 != nullptr) tmp2->p_->previous = object1;
-    else object2->p_->parent->p_->last_child = object2;
+    if (tmp2 != nullptr) tmp2->p_->previous = view1;
+    else view2->p_->parent->p_->last_child = view2;
 
-  } else if (object1->p_->previous == object2) {
-    _ASSERT(object2->p_->next == object1);
+  } else if (view1->p_->previous == view2) {
+    _ASSERT(view2->p_->next == view1);
 
-    tmp1 = object2->p_->previous;
-    tmp2 = object1->p_->next;
-    object1->p_->previous = tmp1;
-    object2->p_->previous = object1;
-    object1->p_->next = object2;
-    object2->p_->next = tmp2;
+    tmp1 = view2->p_->previous;
+    tmp2 = view1->p_->next;
+    view1->p_->previous = tmp1;
+    view2->p_->previous = view1;
+    view1->p_->next = view2;
+    view2->p_->next = tmp2;
 
-    if (tmp1 != nullptr) tmp1->p_->next = object1;
-    else object2->p_->parent->p_->first_child = object1;
+    if (tmp1 != nullptr) tmp1->p_->next = view1;
+    else view2->p_->parent->p_->first_child = view1;
 
-    if (tmp2 != nullptr) tmp2->p_->previous = object2;
-    else object1->p_->parent->p_->last_child = object2;
+    if (tmp2 != nullptr) tmp2->p_->previous = view2;
+    else view1->p_->parent->p_->last_child = view2;
 
   } else {
 
-    tmp1 = object1->p_->previous;
-    tmp2 = object2->p_->previous;
-    object1->p_->previous = tmp2;
-    object2->p_->previous = tmp1;
+    tmp1 = view1->p_->previous;
+    tmp2 = view2->p_->previous;
+    view1->p_->previous = tmp2;
+    view2->p_->previous = tmp1;
 
-    if (tmp1 != nullptr) tmp1->p_->next = object2;
-    else object1->p_->parent->p_->first_child = object2;
+    if (tmp1 != nullptr) tmp1->p_->next = view2;
+    else view1->p_->parent->p_->first_child = view2;
 
-    if (tmp2 != nullptr) tmp2->p_->next = object1;
-    else object2->p_->parent->p_->first_child = object1;
+    if (tmp2 != nullptr) tmp2->p_->next = view1;
+    else view2->p_->parent->p_->first_child = view1;
 
-    tmp1 = object1->p_->next;
-    tmp2 = object2->p_->next;
-    object1->p_->next = tmp2;
-    object2->p_->next = tmp1;
+    tmp1 = view1->p_->next;
+    tmp2 = view2->p_->next;
+    view1->p_->next = tmp2;
+    view2->p_->next = tmp1;
 
-    if (tmp1 != nullptr) tmp1->p_->previous = object2;
-    else object1->p_->parent->p_->last_child = object2;
+    if (tmp1 != nullptr) tmp1->p_->previous = view2;
+    else view1->p_->parent->p_->last_child = view2;
 
-    if (tmp2 != nullptr) tmp2->p_->previous = object1;
-    else object2->p_->parent->p_->last_child = object1;
+    if (tmp2 != nullptr) tmp2->p_->previous = view1;
+    else view2->p_->parent->p_->last_child = view1;
 
   }
 
@@ -1159,62 +1159,21 @@ void AbstractView::MoveBackward(AbstractView *view) {
   }
 }
 
-void AbstractView::Damage(AbstractView *view, int surface_x, int surface_y, int width, int height) {
-  view->p_->is_damaged = true;
-  view->p_->damaged_region.l = surface_x;
-  view->p_->damaged_region.t = surface_y;
-  view->p_->damaged_region.Resize(width, height);
-}
-
 // -------------------
 
 void AbstractView::GeometryTask::Run() const {
-  if (view_->p_->geometry_dirty_flags) {
-    view_->OnGeometryChange(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
-    view_->p_->last_geometry = view_->p_->geometry;
-    view_->p_->geometry_dirty_flags = 0;
-  }
+  view_->OnSaveGeometry(view_->p_->last_geometry,
+                        view_->p_->geometry);
+  view_->p_->last_geometry = view_->p_->geometry;
+}
+
+AbstractView::GeometryTask *AbstractView::GeometryTask::Get(const AbstractView *view) {
+  return &view->p_->geometry_task;
 }
 
 // -------------------
 
-void AbstractView::RedrawTask::Run() const {
-  view_->p_->is_drawing = true;
-
-  if (view_->p_->geometry_dirty_flags) {
-    view_->OnGeometryChange(view_->p_->geometry_dirty_flags, view_->p_->last_geometry, view_->p_->geometry);
-    view_->p_->last_geometry = view_->p_->geometry;
-  }
-
-  if (view_->p_->need_layout) {
-    view_->p_->is_layouting = true;
-    view_->OnLayout(view_->p_->geometry_dirty_flags,
-                    view_->p_->padding.left,
-                    view_->p_->padding.top,
-                    static_cast<int>(view_->p_->geometry.width()) - view_->p_->padding.right,
-                    static_cast<int>(view_->p_->geometry.height()) - view_->p_->padding.bottom);
-    view_->p_->is_layouting = false;
-  }
-
-  if (view_->p_->need_redraw)   // This boolean flag is reset in AbstractLayout
-    view_->OnDraw(&context);
-
-  if (view_->p_->is_damaged) {
-    context.surface()->Damage(view_->p_->damaged_region.x(),
-                              view_->p_->damaged_region.y(),
-                              view_->p_->damaged_region.width(),
-                              view_->p_->damaged_region.height());
-  }
-
-  view_->p_->geometry_dirty_flags = 0;
-  view_->p_->need_layout = false;
-  view_->p_->is_damaged = false;
-  view_->p_->visible = true;
-
-  view_->p_->is_drawing = false;
-}
-
-AbstractView::RedrawTask *AbstractView::RedrawTask::Get(const AbstractView *view) {
+AbstractView::RedrawNode *AbstractView::RedrawNode::Get(const AbstractView *view) {
   return &view->p_->redraw_task;
 }
 

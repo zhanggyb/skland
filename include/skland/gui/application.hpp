@@ -20,6 +20,8 @@
 #include <cstdint>
 #include <thread>
 
+#include "skland/core/deque.hpp"
+#include "task.hpp"
 #include "display.hpp"
 
 namespace skland {
@@ -97,6 +99,12 @@ SKLAND_EXPORT class Application {
    * @return A const reference to the main thread id
    */
   static const std::thread::id &GetThreadID();
+
+  /**
+   * @brief Get the defferred task deque
+   * @return
+   */
+  static core::Deque<Task> &GetTaskDeque();
 
  private:
 

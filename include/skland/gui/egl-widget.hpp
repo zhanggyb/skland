@@ -46,15 +46,13 @@ class EGLWidget : public AbstractView {
 
  protected:
 
-  virtual void OnUpdate(AbstractView *view) final;
+  virtual void OnRequestUpdate(AbstractView *view) final;
 
   virtual Surface *GetSurface(const AbstractView *view) const final;
 
-  virtual void OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) final;
+  virtual void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
 
-  virtual void OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) final;
-
-  virtual void OnLayout(int, int, int, int, int) final;
+  virtual void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
 
   virtual void OnMouseEnter(MouseEvent *event) override;
 
@@ -70,7 +68,7 @@ class EGLWidget : public AbstractView {
 
   virtual void OnKeyUp(KeyEvent *event) override;
 
-  virtual void OnDraw(const Context *context) final;
+  virtual void OnDraw(const Context &context) final;
 
   virtual void OnInitialize();
 
@@ -88,7 +86,7 @@ class EGLWidget : public AbstractView {
 
   Surface *sub_surface_;
 
-  Surface::EGL *egl_surface_;
+//  Surface::EGL *egl_surface_;
 
   Callback frame_callback_;
 

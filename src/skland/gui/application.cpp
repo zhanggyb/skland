@@ -80,6 +80,8 @@ struct Application::Private {
 
   std::thread::id thread_id;
 
+  core::Deque<Task> task_deque;
+
   /**
 * @brief Create an epoll file descriptor
 * @return a nonnegative file descriptor or -1
@@ -237,8 +239,8 @@ int Application::Run() {
   int count = 0;
   int ret = 0;
   Task *task = nullptr;
-  core::Deque<Task>::Iterator it;
-  core::Deque<Surface::DrawTask>::Iterator draw_task_it;
+  core::Deque<Task>::Iterator defferred_task_it;
+  core::Deque<Surface::RenderTask>::Iterator draw_task_it;
   core::Deque<Surface::CommitTask>::Iterator commit_task_it;
 
   while (true) {
@@ -246,23 +248,23 @@ int Application::Run() {
     /*
      * Run idle tasks (process geometries)
      */
-    it = AbstractEventHandler::kIdleTaskDeque.begin();
-    while (it != AbstractEventHandler::kIdleTaskDeque.end()) {
-      task = it.element();
-      it.Remove();
+    defferred_task_it = kInstance->p_->task_deque.begin();
+    while (defferred_task_it != kInstance->p_->task_deque.end()) {
+      task = defferred_task_it.element();
+      defferred_task_it.Remove();
       task->Run();
-      it = AbstractEventHandler::kIdleTaskDeque.begin();
+      defferred_task_it = kInstance->p_->task_deque.begin();
     }
 
     /*
      * Draw contents on every surface requested
      */
-    draw_task_it= Surface::kDrawTaskDeque.begin();
-    while (draw_task_it != Surface::kDrawTaskDeque.end()) {
+    draw_task_it = Surface::kRenderTaskDeque.begin();
+    while (draw_task_it != Surface::kRenderTaskDeque.end()) {
       task = draw_task_it.element();
       draw_task_it.Remove();
       task->Run();
-      draw_task_it = Surface::kDrawTaskDeque.begin();
+      draw_task_it = Surface::kRenderTaskDeque.begin();
     }
 
     /*
@@ -329,6 +331,10 @@ char **Application::GetArgv() {
 
 const std::thread::id &Application::GetThreadID() {
   return kInstance->p_->thread_id;
+}
+
+core::Deque<Task> &Application::GetTaskDeque() {
+  return kInstance->p_->task_deque;
 }
 
 } // namespace gui

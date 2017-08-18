@@ -16,6 +16,8 @@
 
 #include "skland/gui/abstract-button.hpp"
 
+#include "skland/core/memory.hpp"
+
 #include "skland/numerical/clamp.hpp"
 #include "skland/numerical/bit.hpp"
 
@@ -67,17 +69,17 @@ struct AbstractButton::Private {
 
 AbstractButton::AbstractButton()
     : AbstractView(80, 20) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 }
 
 AbstractButton::AbstractButton(int width, int height)
     : AbstractView(width, height) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 }
 
 AbstractButton::AbstractButton(const std::string &text)
     : AbstractView(80, 20) {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
   p_->text = text;
 }
 
@@ -163,16 +165,12 @@ void AbstractButton::OnKeyUp(KeyEvent *event) {
   event->Accept();
 }
 
-void AbstractButton::OnConfigureGeometry(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-  Update(0 != dirty_flag);
+void AbstractButton::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  RequestSaveGeometry(old_geometry != new_geometry);
 }
 
-void AbstractButton::OnGeometryChange(int dirty_flag, const RectF &old_geometry, const RectF &new_geometry) {
-
-}
-
-void AbstractButton::OnLayout(int dirty_flag, int left, int top, int right, int bottom) {
-
+void AbstractButton::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  Update();
 }
 
 void AbstractButton::SetSensitive(bool sensitive) {

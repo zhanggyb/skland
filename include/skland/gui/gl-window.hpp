@@ -31,47 +31,43 @@ class Surface;
 
 /**
  * @ingroup gui
- * @brief A window contains an EGL surface for 3D scene
+ * @brief A window renders content with different graphic interfaces
  *
  * @example simple-egl.cpp
  */
-class EGLWindow : public AbstractShellView {
-
-  EGLWindow() = delete;
-  EGLWindow(const EGLWindow &) = delete;
-  EGLWindow &operator=(const EGLWindow &) = delete;
+class GLWindow : public AbstractShellView {
 
  public:
 
-  EGLWindow(const char *title);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GLWindow);
+  
+  explicit GLWindow(const char *title);
 
-  EGLWindow(int width, int height, const char *title);
+  GLWindow(int width, int height, const char *title);
 
-  virtual ~EGLWindow();
+  virtual ~GLWindow();
 
  protected:
 
-  virtual void OnShown() final;
+  void OnShown() final;
 
-  virtual void OnUpdate(AbstractView *view) final;
+  void OnRequestUpdate(AbstractView *view) final;
 
-  virtual Surface *GetSurface(const AbstractView *view) const final;
+  void OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
-  virtual bool OnConfigureSize(const core::SizeI &old_size, const core::SizeI &new_size) final;
+  void OnSaveSize(const Size &old_size, const Size &new_size) final;
 
-  virtual void OnSizeChange(const core::SizeI &old_size, const core::SizeI &new_size) final;
+  void OnRenderSurface(Surface *surface) final;
 
-  virtual void OnMouseMove(MouseEvent *event) override;
+  void OnMouseMove(MouseEvent *event) override;
 
-  virtual void OnMouseDown(MouseEvent *event) override;
+  void OnMouseDown(MouseEvent *event) override;
 
-  virtual void OnMouseUp(MouseEvent *event) override;
+  void OnMouseUp(MouseEvent *event) override;
 
-  virtual void OnKeyDown(KeyEvent *event) override;
+  void OnKeyDown(KeyEvent *event) override;
 
-  virtual void OnDraw(const Context *context) final;
-
-  virtual void OnFocus(bool);
+  void OnFocus(bool);
 
   virtual void OnInitialize();
 
@@ -89,13 +85,9 @@ class EGLWindow : public AbstractShellView {
 
   int GetMouseLocation(const MouseEvent *event) const;
 
+  void DrawFrame(const Context &context);
+
   void OnFrame(uint32_t serial);
-
-  void OnRelease();
-
-  void RequestUpdate();
-
-  void CancelUpdate();
 
   std::unique_ptr<Private> p_;
 

@@ -18,13 +18,13 @@
 
 #include "internal/display_proxy.hpp"
 #include "internal/surface_private.hpp"
-#include "internal/abstract-graphics-interface_proxy.hpp"
+#include "internal/abstract-gl-interface_proxy.hpp"
 
 namespace skland {
 namespace gui {
 
 VulkanInterface::VulkanInterface()
-    : AbstractGraphicsInterface() {
+    : AbstractGLInterface() {
 
 }
 
@@ -32,11 +32,11 @@ VulkanInterface::~VulkanInterface() {
 
 }
 
-void VulkanInterface::Setup(Surface *surface) {
+void VulkanInterface::OnSetup() {
   vk::WaylandSurfaceCreateInfoKHR info = {
       vk::WaylandSurfaceCreateFlagsKHR(),
       Display::Proxy::wl_display(),
-      Proxy::GetWaylandSurface(surface)
+//      Proxy::GetWaylandSurface(GetSurface())
   };
 
   vk_surface_ = Display::Proxy::vk_instance().createWaylandSurfaceKHR(info);
