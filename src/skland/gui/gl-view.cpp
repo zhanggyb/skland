@@ -22,7 +22,7 @@
 #include "skland/gui/mouse-event.hpp"
 #include "skland/gui/key-event.hpp"
 #include "skland/gui/context.hpp"
-#include "skland/gui/abstract-gl-interface.hpp"
+#include "skland/gui/abstract-gr-api.hpp"
 #include "skland/gui/region.hpp"
 
 namespace skland {
@@ -38,14 +38,14 @@ GLView::~GLView() {
   delete gl_surface_;
 }
 
-void GLView::SetGLInterface(AbstractGLInterface *interface) {
+void GLView::SetGLInterface(AbstractGRAPI *interface) {
   if (interface_ == interface)
     return;
 
   interface_ = interface;
 
   if (nullptr != gl_surface_) {
-    gl_surface_->SetGLInterface(interface_);
+    gl_surface_->SetGRAPI(interface_);
   }
 }
 
@@ -104,7 +104,7 @@ void GLView::OnKeyUp(KeyEvent *event) {
 void GLView::OnDraw(const Context &context) {
   if (nullptr == gl_surface_) {
     gl_surface_ = Surface::Sub::Create(context.surface(), this);
-    gl_surface_->SetGLInterface(interface_);
+    gl_surface_->SetGRAPI(interface_);
 //    gl_surface_->SetCommitMode(Surface::kDesynchronized);
 
     Region region;

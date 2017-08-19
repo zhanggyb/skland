@@ -15,20 +15,20 @@
  */
 
 #include "internal/abstract-shell-view_private.hpp"
+#include "internal/abstract-view_private.hpp"
 
-#include <skland/core/assert.hpp>
+#include "skland/core/assert.hpp"
+#include "skland/core/memory.hpp"
+
 #include "skland/numerical/bit.hpp"
 
-#include <skland/gui/application.hpp>
-#include <skland/gui/mouse-event.hpp>
-#include <skland/gui/key-event.hpp>
-#include <skland/gui/region.hpp>
+#include "skland/gui/application.hpp"
+#include "skland/gui/mouse-event.hpp"
+#include "skland/gui/key-event.hpp"
+#include "skland/gui/region.hpp"
+#include "skland/gui/theme.hpp"
 
-#include <skland/graphic/canvas.hpp>
-
-#include <skland/gui/theme.hpp>
-
-#include "internal/abstract-view_private.hpp"
+#include "skland/graphic/canvas.hpp"
 
 #include "SkCanvas.h"
 #include "SkImage.h"
@@ -52,15 +52,14 @@ AbstractShellView::AbstractShellView(const char *title, AbstractShellView *paren
 AbstractShellView::AbstractShellView(int width,
                                      int height,
                                      const char *title,
-                                     AbstractShellView *parent)
-    : AbstractEventHandler() {
-  p_.reset(new Private(this));
+                                     AbstractShellView *parent) {
+  p_ = core::make_unique<Private>(this);
   p_->size.width = width;
   p_->size.height = height;
   p_->last_size = p_->size;
   p_->parent = parent;
 
-  if (title) p_->title = title;
+  if (nullptr != title) p_->title = title;
 
   if (nullptr == p_->parent) {
     p_->shell_surface = Surface::Shell::Toplevel::Create(this, Theme::GetShadowMargin());
@@ -305,8 +304,7 @@ void AbstractShellView::RequestSaveSize(bool validate) {
 
   if (p_->geometry_task.IsLinked()) return;
 
-  core::Deque<Task> &defferred_task_deque = Application::GetTaskDeque();
-  defferred_task_deque.PushBack(&p_->geometry_task);
+  Application::GetTaskDeque().PushBack(&p_->geometry_task);
 }
 
 void AbstractShellView::MoveWithMouse(MouseEvent *event) const {
@@ -330,54 +328,6 @@ void AbstractShellView::Draw(AbstractView *view, const Context &context) {
   view->OnDraw(context);
 }
 
-void AbstractShellView::OnXdgSurfaceConfigure(uint32_t serial) {
-  Surface::Shell *shell_surface = Surface::Shell::Get(p_->shell_surface);
-  shell_surface->AckConfigure(serial);
-
-  if (!IsShown()) {
-    Bit::Set<int>(p_->flags, Private::kFlagMaskShown);
-    shell_surface->ResizeWindow(p_->size.width, p_->size.height);
-    OnShown();
-  }
-}
-
-void AbstractShellView::OnXdgToplevelConfigure(int width, int height, int states) {
-  bool maximized = (0 != (states & Surface::Shell::Toplevel::kStateMaskMaximized));
-  bool fullscreen = (0 != (states & Surface::Shell::Toplevel::kStateMaskFullscreen));
-  bool resizing = (0 != (states & Surface::Shell::Toplevel::kStateMaskResizing));
-  bool focus = (0 != (states & Surface::Shell::Toplevel::kStateMaskActivated));
-
-  if (maximized != IsMaximized()) {
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskMaximized);
-    OnMaximized(maximized);
-  }
-
-  if (fullscreen != IsFullscreen()) {
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskFullscreen);
-    OnFullscreen(fullscreen);
-  }
-
-  if (resizing != IsResizing()) {
-    // TODO: no need to use this flag
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskResizing);
-  }
-
-  if (width > 0 && height > 0) {
-    p_->size.width = width;
-    p_->size.height = height;
-    OnConfigureSize(p_->last_size, p_->size);
-  }
-
-  if (focus != IsFocused()) {
-    Bit::Inverse<int>(p_->flags, Private::kFlagMaskFocused);
-    OnFocus(focus);
-  }
-}
-
-void AbstractShellView::OnXdgToplevelClose() {
-  Close();
-}
-
 void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *event) {
   Point cursor = event->GetWindowXY();
   EventTask *mouse_task = EventTask::GetMouseTask(this);
@@ -390,9 +340,9 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *
       if (event->IsAccepted()) {
         mouse_task->PushBack(EventTask::GetMouseTask(view));
         mouse_task = static_cast<EventTask *>(mouse_task->GetNext());
-        DispatchMouseEnterEvent(view, event, mouse_task);
+        p_->DispatchMouseEnterEvent(view, event, mouse_task);
       } else if (event->IsIgnored()) {
-        DispatchMouseEnterEvent(view, event, mouse_task);
+        p_->DispatchMouseEnterEvent(view, event, mouse_task);
       }
     }
   } else {
@@ -411,7 +361,7 @@ void AbstractShellView::DispatchMouseEnterEvent(AbstractView *view, MouseEvent *
       if (nullptr == mouse_task->GetPrevious()) break;
     }
 
-    DispatchMouseEnterEvent(last, event, mouse_task);
+    p_->DispatchMouseEnterEvent(last, event, mouse_task);
   }
 }
 
@@ -446,25 +396,6 @@ void AbstractShellView::DispatchMouseUpEvent(MouseEvent *event) {
     it->event_handler()->OnMouseUp(event);
     if (event->IsRejected()) break;
     it = it->GetNext();
-  }
-}
-
-void AbstractShellView::DispatchMouseEnterEvent(AbstractView *parent, MouseEvent *event, EventTask *tail) {
-  AbstractView *sub = parent->DispatchMouseEnterEvent(event);
-  while (sub) {
-    _ASSERT(sub != parent);
-    sub->OnMouseEnter(event);
-    if (event->IsAccepted()) {
-      tail->PushBack(EventTask::GetMouseTask(sub));
-      tail = static_cast<EventTask *>(tail->GetNext());
-      parent = sub;
-      sub = parent->DispatchMouseEnterEvent(event);
-    } else if (event->IsIgnored()) {
-      parent = sub;
-      sub = parent->DispatchMouseEnterEvent(event);
-    } else {
-      break;
-    }
   }
 }
 

@@ -17,7 +17,7 @@
 #include "surface_shell_private.hpp"
 
 #include "surface_private.hpp"
-#include <skland/gui/abstract-shell-view.hpp>
+#include "abstract-shell-view_private.hpp"
 
 namespace skland {
 namespace gui {
@@ -32,7 +32,7 @@ void Surface::Shell::Private::OnConfigure(void *data,
   Shell *_this = static_cast<Shell *>(data);
   AbstractShellView *shell_view = dynamic_cast<AbstractShellView *>(_this->surface_->p_->event_handler);
   if (shell_view)
-    shell_view->OnXdgSurfaceConfigure(serial);
+    shell_view->p_->OnXdgSurfaceConfigure(serial);
 }
 
 } // namespace gui

@@ -40,7 +40,7 @@ class GLWindow : public AbstractShellView {
  public:
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GLWindow);
-  
+
   explicit GLWindow(const char *title);
 
   GLWindow(int width, int height, const char *title);
@@ -82,12 +82,6 @@ class GLWindow : public AbstractShellView {
  private:
 
   struct Private;
-
-  int GetMouseLocation(const MouseEvent *event) const;
-
-  void DrawFrame(const Context &context);
-
-  void OnFrame(uint32_t serial);
 
   std::unique_ptr<Private> p_;
 

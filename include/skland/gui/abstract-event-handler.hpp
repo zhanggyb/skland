@@ -61,6 +61,12 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
 
  public:
 
+  template<typename ... ParamTypes>
+  using SignalRef = typename core::SignalRef<ParamTypes...>;
+
+  template<typename ... ParamTypes>
+  using Signal = typename core::Signal<ParamTypes...>;
+
   SKLAND_DECLARE_NONCOPYABLE(AbstractEventHandler);
 
   class EventTask : public Task {

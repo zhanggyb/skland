@@ -21,8 +21,7 @@
 #include "skland/core/margin.hpp"
 #include "skland/core/point.hpp"
 
-#include "skland/gui/abstract-view.hpp"
-
+#include "abstract-view.hpp"
 #include "task.hpp"
 
 #include <wayland-egl.h>
@@ -35,7 +34,7 @@ class Buffer;
 class Output;
 class InputEvent;
 class Region;
-class AbstractGLInterface;
+class AbstractGRAPI;
 
 /**
  * @ingroup gui
@@ -79,7 +78,7 @@ class Surface : public core::Trackable {
   friend class Application;
   friend class Display;
   friend class Callback;
-  friend class AbstractGLInterface;
+  friend class AbstractGRAPI;
 
  public:
 
@@ -207,9 +206,9 @@ class Surface : public core::Trackable {
    *
    * @note The GLInterface will be deleted when the surface destroyed.
    */
-  void SetGLInterface(AbstractGLInterface *interface);
+  void SetGRAPI(AbstractGRAPI *interface);
 
-  AbstractGLInterface *GetGLInterface() const;
+  AbstractGRAPI *GetGRAPI() const;
 
   const Margin &GetMargin() const;
 

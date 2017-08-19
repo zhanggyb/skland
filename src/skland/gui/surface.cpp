@@ -18,7 +18,7 @@
 #include "internal/surface_shell_private.hpp"
 #include "internal/surface_shell_toplevel_private.hpp"
 #include "internal/surface_shell_popup_private.hpp"
-#include "internal/abstract-gl-interface_private.hpp"
+#include "internal/abstract-gr-api_private.hpp"
 
 #include "skland/core/assert.hpp"
 #include "skland/core/memory.hpp"
@@ -452,8 +452,8 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
 }
 
 Surface::~Surface() {
-  if (nullptr != p_->gl_interface) {
-    p_->gl_interface->Release(this);
+  if (nullptr != p_->gr_api) {
+    p_->gr_api->Release(this);
   }
 
 //  if (p_->egl)
@@ -479,7 +479,7 @@ void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
 }
 
 void Surface::Commit() {
-  if (nullptr != p_->gl_interface) {
+  if (nullptr != p_->gr_api) {
     // GL surface does not use commit
     if (p_->commit_mode == kSynchronized) {
       Surface *main_surface = GetShellSurface();
@@ -611,13 +611,13 @@ AbstractEventHandler *Surface::GetEventHandler() const {
   return p_->event_handler;
 }
 
-void Surface::SetGLInterface(AbstractGLInterface *interface) {
+void Surface::SetGRAPI(AbstractGRAPI *interface) {
   interface->Setup(this);
   interface->destroyed().Connect(this, &Surface::OnGLInterfaceDestroyed);
 }
 
-AbstractGLInterface *Surface::GetGLInterface() const {
-  return p_->gl_interface;
+AbstractGRAPI *Surface::GetGRAPI() const {
+  return p_->gr_api;
 }
 
 const Margin &Surface::GetMargin() const {
@@ -629,7 +629,7 @@ const Point &Surface::GetRelativePosition() const {
 }
 
 void Surface::OnGLInterfaceDestroyed(core::SLOT /* slot */) {
-  p_->gl_interface = nullptr;
+  p_->gr_api = nullptr;
 }
 
 void Surface::Clear() {

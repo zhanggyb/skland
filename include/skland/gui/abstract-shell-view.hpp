@@ -277,19 +277,6 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   struct Private;
 
-  void OnXdgSurfaceConfigure(uint32_t serial);
-
-  void OnXdgToplevelConfigure(int width, int height, int states);
-
-  void OnXdgToplevelClose();
-
-  void DispatchMouseEnterEvent(AbstractView *parent,
-                               MouseEvent *event,
-                               EventTask *tail);
-
-  /**
-   * @brief The private data
-   */
   std::unique_ptr<Private> p_;
 
 };

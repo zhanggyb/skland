@@ -25,7 +25,7 @@ namespace skland {
 namespace gui {
 
 class Surface;
-class AbstractGLInterface;
+class AbstractGRAPI;
 
 class GLView : public AbstractView {
 
@@ -35,7 +35,7 @@ class GLView : public AbstractView {
 
   virtual ~GLView();
 
-  void SetGLInterface(AbstractGLInterface *interface);
+  void SetGLInterface(AbstractGRAPI *interface);
 
  protected:
 
@@ -79,7 +79,7 @@ class GLView : public AbstractView {
 
   Surface *gl_surface_ = nullptr;
 
-  AbstractGLInterface *interface_ = nullptr;
+  AbstractGRAPI *interface_ = nullptr;
 
   Callback callback_;
 

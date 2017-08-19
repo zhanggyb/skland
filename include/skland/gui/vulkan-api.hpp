@@ -14,39 +14,41 @@
  * limitations under the License.
  */
 
-#include "internal/abstract-gl-interface_private.hpp"
+#ifndef SKLAND_GUI_VULKAN_INTERFACE_HPP_
+#define SKLAND_GUI_VULKAN_INTERFACE_HPP_
+
+#include "abstract-gr-api.hpp"
+
+#include <vulkan/vulkan.hpp>
 
 namespace skland {
 namespace gui {
 
-AbstractGLInterface::AbstractGLInterface() {
+class Surface;
 
-}
+/**
+ * @ingroup gui
+ * @brief Vulkan
+ */
+class VulkanInterface : public AbstractGRAPI {
 
-AbstractGLInterface::~AbstractGLInterface() {
-  destroyed_.Emit();
-}
+ public:
 
-void AbstractGLInterface::Setup(Surface *surface) {
-  if (surface->p_->gl_interface == this) return;
+  VulkanInterface();
 
-  if (nullptr != surface->p_->gl_interface) {
-    AbstractGLInterface *orig = surface->p_->gl_interface;
-    surface->p_->gl_interface = nullptr;
-    orig->OnRelease(surface);
-  }
+  virtual ~VulkanInterface();
 
-  surface->p_->gl_interface = this;
+ protected:
 
-  OnSetup(surface);
-}
+  virtual void OnSetup() final;
 
-void AbstractGLInterface::Release(Surface *surface) {
-  if (surface->p_->gl_interface != this) return;
+ private:
 
-  surface->p_->gl_interface = nullptr;
-  OnRelease(surface);
-}
+  vk::SurfaceKHR vk_surface_;
+
+};
 
 } // namespace gui
 } // namespace skland
+
+#endif // SKLAND_GUI_VULKAN_ENGINE_HPP_

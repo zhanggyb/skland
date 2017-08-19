@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#include "skland/gui/glesv2-interface.hpp"
+#include "skland/gui/glesv2-api.hpp"
 
 #include "skland/core/assert.hpp"
 #include "skland/core/memory.hpp"
 
-#include "internal/abstract-gl-interface_proxy.hpp"
+#include "internal/abstract-gr-api_proxy.hpp"
 #include "internal/display_proxy.hpp"
 
 #include <EGL/egl.h>
@@ -29,7 +29,7 @@
 namespace skland {
 namespace gui {
 
-struct GLESV2Interface::Private {
+struct GLESV2API::Private {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
@@ -43,30 +43,30 @@ struct GLESV2Interface::Private {
 
 };
 
-GLESV2Interface::GLESV2Interface() {
+GLESV2API::GLESV2API() {
   p_ = core::make_unique<Private>();
 }
 
-GLESV2Interface::~GLESV2Interface() {
+GLESV2API::~GLESV2API() {
   Destroy();
 }
 
-void GLESV2Interface::SetViewportSize(int width, int height) {
+void GLESV2API::SetViewportSize(int width, int height) {
   wl_egl_window_resize(p_->wl_egl_window, width, height, 0, 0);
 }
 
-void GLESV2Interface::MakeCurrent() {
+void GLESV2API::MakeCurrent() {
   eglMakeCurrent(Display::Proxy::egl_display(),
                  p_->egl_surface,
                  p_->egl_surface,
                  Display::Proxy::egl_context());
 }
 
-void GLESV2Interface::SwapBuffers() {
+void GLESV2API::SwapBuffers() {
   eglSwapBuffers(Display::Proxy::egl_display(), p_->egl_surface);
 }
 
-void GLESV2Interface::OnSetup(Surface *surface) {
+void GLESV2API::OnSetup(Surface *surface) {
   Destroy();
 
   p_->wl_egl_window = wl_egl_window_create(Proxy::GetWaylandSurface(surface), 400, 300);
@@ -76,11 +76,11 @@ void GLESV2Interface::OnSetup(Surface *surface) {
                                                    nullptr);
 }
 
-void GLESV2Interface::OnRelease(Surface *surface) {
+void GLESV2API::OnRelease(Surface *surface) {
   Destroy();
 }
 
-void GLESV2Interface::Destroy() {
+void GLESV2API::Destroy() {
   if (nullptr != p_->egl_surface) {
     _ASSERT(nullptr != p_->wl_egl_window);
     eglDestroySurface(Display::Proxy::egl_display(), p_->egl_surface);

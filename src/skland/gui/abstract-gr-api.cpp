@@ -14,32 +14,38 @@
  * limitations under the License.
  */
 
-#include "skland/gui/vulkan-interface.hpp"
-
-#include "internal/display_proxy.hpp"
-#include "internal/surface_private.hpp"
-#include "internal/abstract-gl-interface_proxy.hpp"
+#include "internal/abstract-gr-api_private.hpp"
 
 namespace skland {
 namespace gui {
 
-VulkanInterface::VulkanInterface()
-    : AbstractGLInterface() {
+AbstractGRAPI::AbstractGRAPI() {
 
 }
 
-VulkanInterface::~VulkanInterface() {
-
+AbstractGRAPI::~AbstractGRAPI() {
+  destroyed_.Emit();
 }
 
-void VulkanInterface::OnSetup() {
-  vk::WaylandSurfaceCreateInfoKHR info = {
-      vk::WaylandSurfaceCreateFlagsKHR(),
-      Display::Proxy::wl_display(),
-//      Proxy::GetWaylandSurface(GetSurface())
-  };
+void AbstractGRAPI::Setup(Surface *surface) {
+  if (surface->p_->gr_api == this) return;
 
-  vk_surface_ = Display::Proxy::vk_instance().createWaylandSurfaceKHR(info);
+  if (nullptr != surface->p_->gr_api) {
+    AbstractGRAPI *orig = surface->p_->gr_api;
+    surface->p_->gr_api = nullptr;
+    orig->OnRelease(surface);
+  }
+
+  surface->p_->gr_api = this;
+
+  OnSetup(surface);
+}
+
+void AbstractGRAPI::Release(Surface *surface) {
+  if (surface->p_->gr_api != this) return;
+
+  surface->p_->gr_api = nullptr;
+  OnRelease(surface);
 }
 
 } // namespace gui

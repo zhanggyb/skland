@@ -18,6 +18,7 @@
 
 #include "skland/core/assert.hpp"
 #include "skland/core/memory.hpp"
+#include "skland/core/property.hpp"
 
 #include "skland/gui/application.hpp"
 #include "skland/gui/mouse-event.hpp"
@@ -56,16 +57,17 @@ using graphic::ClipOperation;
  * @ingroup gui_intern
  * @brief The private structure for Window
  */
-SKLAND_NO_EXPORT struct Window::Private {
+struct Window::Private : public core::Property<Window> {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
-  Private()
-      : minimal_size(160, 120),
+  explicit Private(Window *owner)
+      : core::Property<Window>(owner),
+        minimal_size(160, 120),
         preferred_size(640, 480),
         maximal_size(65536, 65536) {}
 
-  ~Private() = default;
+  ~Private() final = default;
 
   /** The surface for rendering views in this window */
   Surface *widget_surface = nullptr;
@@ -92,7 +94,109 @@ SKLAND_NO_EXPORT struct Window::Private {
 
   bool inhibit_update = true;
 
+  void DrawFrame(const Context &context);
+
+  void SetContentViewGeometry();
+
 };
+
+void Window::Private::DrawFrame(const Context &context) {
+  context.canvas()->Clear();
+
+  int scale = context.surface()->GetScale();
+  int width = owner->GetWidth() * scale;
+  int height = owner->GetHeight() * scale;
+
+  Path path;
+  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, width, height);
+  bool drop_shadow = !(owner->IsMaximized() || owner->IsFullscreen());
+  const Theme::Schema &window_schema = Theme::GetData().window;
+  const Theme::Schema &title_bar_schema = Theme::GetData().title_bar;
+  Shader shader;
+  PointF points[2];
+  points[0].x = 0.f;
+  points[0].y = 0.f;
+  points[1].x = 0.f;
+  points[1].y = height;
+
+  if (drop_shadow) {
+//    geometry = geometry.Inset(-0.5f * scale);
+    float radii[] = {
+        7.f * scale, 7.f * scale, // top-left
+        7.f * scale, 7.f * scale, // top-right
+        4.f * scale, 4.f * scale, // bottom-right
+        4.f * scale, 4.f * scale  // bottom-left
+    };
+    path.AddRoundRect(geometry, radii);
+    Canvas::ClipGuard guard(context.canvas(), path, ClipOperation::kClipDifference, true);
+    owner->DropShadow(context);
+  } else {
+    path.AddRect(geometry);
+  }
+
+  // Fill color:
+  Paint paint;
+  paint.SetAntiAlias(true);
+  if (window_schema.active.background.shaded) {
+    shader = GradientShader::MakeLinear(points,
+                                        window_schema.active.background.shaded_colors.data(),
+                                        window_schema.active.background.shaded_positions.data(),
+                                        window_schema.active.background.shaded_count,
+                                        Shader::TileMode::kTileModeClamp);
+    paint.SetShader(shader);
+  } else {
+    paint.SetColor(window_schema.active.background.color);
+  }
+  context.canvas()->DrawPath(path, paint);
+  paint.SetShader(Shader());  // Clear shader
+
+  // Draw outline
+  if (drop_shadow) {
+    paint.SetColor(window_schema.inactive.outline.color);
+    paint.SetStyle(Paint::Style::kStyleStroke);
+    paint.SetStrokeWidth(0.5f);
+    context.canvas()->DrawPath(path, paint);
+  }
+
+  // Draw the client area:
+  Canvas::ClipGuard guard(context.canvas(), path, ClipOperation::kClipIntersect, true);
+
+  paint.SetStyle(Paint::Style::kStyleFill);
+  if (nullptr != title_bar) {
+    if (title_bar_schema.active.background.shaded) {
+      points[1].y = TitleBar::kHeight * scale;
+      shader = GradientShader::MakeLinear(points,
+                                          title_bar_schema.active.background.shaded_colors.data(),
+                                          title_bar_schema.active.background.shaded_positions.data(),
+                                          title_bar_schema.active.background.shaded_count,
+                                          Shader::TileMode::kTileModeClamp);
+      paint.SetShader(shader);
+    } else {
+      paint.SetColor(title_bar_schema.active.background.color);
+    }
+    context.canvas()->DrawRect(title_bar->GetGeometry() * scale, paint);
+    paint.SetShader(Shader());  // Clear shader
+  }
+
+  if (window_schema.active.foreground.shaded) {
+    points[1].y = owner->GetHeight();
+    shader = GradientShader::MakeLinear(points,
+                                        window_schema.active.foreground.shaded_colors.data(),
+                                        window_schema.active.foreground.shaded_positions.data(),
+                                        window_schema.active.foreground.shaded_count,
+                                        Shader::TileMode::kTileModeClamp);
+  } else {
+    paint.SetColor(window_schema.active.foreground.color);
+  }
+  context.canvas()->DrawRect(owner->GetContentGeometry() * scale, paint);
+  context.canvas()->Flush();
+}
+
+void Window::Private::SetContentViewGeometry() {
+  const RectI geometry = owner->GetContentGeometry();
+  content_view->MoveTo(geometry.x(), geometry.y());
+  content_view->Resize(geometry.width(), geometry.height());
+}
 
 // --------------
 
@@ -102,7 +206,7 @@ Window::Window(const char *title)
 
 Window::Window(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
-  p_ = core::make_unique<Private>();
+  p_ = core::make_unique<Private>(this);
 
   Surface *shell_surface = GetShellSurface();
 
@@ -160,7 +264,7 @@ void Window::SetContentView(AbstractView *view) {
   if (nullptr == p_->content_view) return;
 
   AttachView(p_->content_view);
-  SetContentViewGeometry();
+  p_->SetContentViewGeometry();
 }
 
 const core::SizeI &Window::GetMinimalSize() const {
@@ -226,7 +330,7 @@ void Window::OnShown() {
   }
   if (nullptr != p_->content_view) {
     DispatchUpdate(p_->content_view);
-    SetContentViewGeometry();
+    p_->SetContentViewGeometry();
   }
 }
 
@@ -283,7 +387,7 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
   int height = new_size.height;
   const core::Margin &margin = shell_surface->GetMargin();
 
-  RectI input_rect(width, height);
+  Rect input_rect(width, height);
 
   input_rect.left = margin.left - kResizingMargin.left;
   input_rect.top = margin.top - kResizingMargin.top;
@@ -327,7 +431,7 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
   }
   if (nullptr != p_->content_view) {
     DispatchUpdate(p_->content_view);
-    SetContentViewGeometry();
+    p_->SetContentViewGeometry();
   }
 }
 
@@ -340,7 +444,7 @@ void Window::OnRenderSurface(Surface *surface) {
                   p_->frame_buffer.GetSize().height);
     canvas.SetOrigin(margin.left, margin.top);
     Context context(surface, &canvas);
-    DrawFrame(context);
+    p_->DrawFrame(context);
     surface->Damage(0, 0, GetWidth() + margin.lr(), GetHeight() + margin.tb());
     surface->Commit();
     return;
@@ -623,7 +727,7 @@ RectI Window::GetContentGeometry() const {
     y += p_->title_bar->GetHeight();
     h -= p_->title_bar->GetHeight();
   }
-  return RectI::MakeFromXYWH(x, y, w, h);
+  return Rect::MakeFromXYWH(x, y, w, h);
 }
 
 void Window::OnFullscreenButtonClicked(core::SLOT slot) {
@@ -631,7 +735,7 @@ void Window::OnFullscreenButtonClicked(core::SLOT slot) {
     ToggleFullscreen(nullptr);
   } else {
     if (nullptr != p_->output)
-      ToggleFullscreen(p_->output);
+      p_->owner->ToggleFullscreen(p_->output);
     else {
       const CompoundDeque &outputs = Display::GetOutputs();
       if (outputs.count() > 0) {
@@ -640,104 +744,6 @@ void Window::OnFullscreenButtonClicked(core::SLOT slot) {
       }
     }
   }
-}
-
-void Window::DrawFrame(const Context &context) {
-  context.canvas()->Clear();
-
-  int scale = context.surface()->GetScale();
-  int width = GetWidth() * scale;
-  int height = GetHeight() * scale;
-
-  Path path;
-  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, width, height);
-  bool drop_shadow = !(IsMaximized() || IsFullscreen());
-  const Theme::Schema &window_schema = Theme::GetData().window;
-  const Theme::Schema &title_bar_schema = Theme::GetData().title_bar;
-  Shader shader;
-  PointF points[2];
-  points[0].x = 0.f;
-  points[0].y = 0.f;
-  points[1].x = 0.f;
-  points[1].y = height;
-
-  if (drop_shadow) {
-//    geometry = geometry.Inset(-0.5f * scale);
-    float radii[] = {
-        7.f * scale, 7.f * scale, // top-left
-        7.f * scale, 7.f * scale, // top-right
-        4.f * scale, 4.f * scale, // bottom-right
-        4.f * scale, 4.f * scale  // bottom-left
-    };
-    path.AddRoundRect(geometry, radii);
-    Canvas::ClipGuard guard(context.canvas(), path, ClipOperation::kClipDifference, true);
-    DropShadow(context);
-  } else {
-    path.AddRect(geometry);
-  }
-
-  // Fill color:
-  Paint paint;
-  paint.SetAntiAlias(true);
-  if (window_schema.active.background.shaded) {
-    shader = GradientShader::MakeLinear(points,
-                                        window_schema.active.background.shaded_colors.data(),
-                                        window_schema.active.background.shaded_positions.data(),
-                                        window_schema.active.background.shaded_count,
-                                        Shader::TileMode::kTileModeClamp);
-    paint.SetShader(shader);
-  } else {
-    paint.SetColor(window_schema.active.background.color);
-  }
-  context.canvas()->DrawPath(path, paint);
-  paint.SetShader(Shader());  // Clear shader
-
-  // Draw outline
-  if (drop_shadow) {
-    paint.SetColor(window_schema.inactive.outline.color);
-    paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetStrokeWidth(0.5f);
-    context.canvas()->DrawPath(path, paint);
-  }
-
-  // Draw the client area:
-  Canvas::ClipGuard guard(context.canvas(), path, ClipOperation::kClipIntersect, true);
-
-  paint.SetStyle(Paint::Style::kStyleFill);
-  if (nullptr != p_->title_bar) {
-    if (title_bar_schema.active.background.shaded) {
-      points[1].y = TitleBar::kHeight * scale;
-      shader = GradientShader::MakeLinear(points,
-                                          title_bar_schema.active.background.shaded_colors.data(),
-                                          title_bar_schema.active.background.shaded_positions.data(),
-                                          title_bar_schema.active.background.shaded_count,
-                                          Shader::TileMode::kTileModeClamp);
-      paint.SetShader(shader);
-    } else {
-      paint.SetColor(title_bar_schema.active.background.color);
-    }
-    context.canvas()->DrawRect(p_->title_bar->GetGeometry() * scale, paint);
-    paint.SetShader(Shader());  // Clear shader
-  }
-
-  if (window_schema.active.foreground.shaded) {
-    points[1].y = GetHeight();
-    shader = GradientShader::MakeLinear(points,
-                                        window_schema.active.foreground.shaded_colors.data(),
-                                        window_schema.active.foreground.shaded_positions.data(),
-                                        window_schema.active.foreground.shaded_count,
-                                        Shader::TileMode::kTileModeClamp);
-  } else {
-    paint.SetColor(window_schema.active.foreground.color);
-  }
-  context.canvas()->DrawRect(GetContentGeometry() * scale, paint);
-  context.canvas()->Flush();
-}
-
-void Window::SetContentViewGeometry() {
-  const RectI geometry = GetContentGeometry();
-  p_->content_view->MoveTo(geometry.x(), geometry.y());
-  p_->content_view->Resize(geometry.width(), geometry.height());
 }
 
 } // namespace gui

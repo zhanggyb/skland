@@ -14,51 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_GLESV2_INTERFACE_HPP_
-#define SKLAND_GUI_GLESV2_INTERFACE_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_GR_API_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_GR_API_PRIVATE_HPP_
 
-#include "abstract-gl-interface.hpp"
+#include "skland/gui/abstract-gr-api.hpp"
+
+#include "surface_private.hpp"
 
 namespace skland {
 namespace gui {
 
 /**
- * @ingroup gui
- * @brief OpenGL ES V2
+ * @ingroup gui_intern
+ * @brief Structure for private data in AbstractGPUInterface
  */
-class GLESV2Interface : public AbstractGLInterface {
+struct AbstractGRAPI::Private {
 
- public:
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
-  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GLESV2Interface);
+  Private() = default;
 
-  GLESV2Interface();
+  ~Private() = default;
 
-  virtual ~GLESV2Interface();
-
-  virtual void SetViewportSize(int width, int height) final;
-
-  virtual void MakeCurrent() final;
-
-  virtual void SwapBuffers() final;
-
- protected:
-
-  virtual void OnSetup(Surface *surface) final;
-
-  virtual void OnRelease(Surface *surface) final;
-
- private:
-
-  struct Private;
-
-  void Destroy();
-
-  std::unique_ptr<Private> p_;
+  Surface *surface = nullptr;
 
 };
 
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_GLESV2_INTERFACE_HPP_
+#endif // SKLAND_GUI_INTERNAL_ABSTRACT_GR_API_PRIVATE_HPP_

@@ -447,7 +447,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    */
   AbstractShellView *GetShellView() const;
 
-  core::SignalRef<AbstractView *> destroyed() { return destroyed_; }
+  SignalRef<AbstractView *> destroyed() { return destroyed_; }
 
  protected:
 

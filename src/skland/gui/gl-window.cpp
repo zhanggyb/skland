@@ -18,6 +18,7 @@
 
 #include "skland/core/assert.hpp"
 #include "skland/core/memory.hpp"
+#include "skland/core/property.hpp"
 
 #include "skland/gui/key-event.hpp"
 #include "skland/gui/mouse-event.hpp"
@@ -25,7 +26,7 @@
 #include "skland/gui/surface.hpp"
 #include "skland/gui/callback.hpp"
 #include "skland/gui/title-bar.hpp"
-#include "skland/gui/glesv2-interface.hpp"
+#include "skland/gui/glesv2-api.hpp"
 
 #include "skland/gui/shared-memory-pool.hpp"
 #include "skland/gui/buffer.hpp"
@@ -55,27 +56,127 @@ using graphic::Paint;
 using graphic::Path;
 using graphic::ClipOperation;
 
-struct GLWindow::Private {
+struct GLWindow::Private : public core::Property<GLWindow> {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
-  Private() = default;
-  ~Private() = default;
+  explicit Private(GLWindow *window)
+      : core::Property<GLWindow>(window) {}
+
+  ~Private() final = default;
 
   /* Properties for frame surface, JUST experimental */
   SharedMemoryPool pool;
 
   Buffer frame_buffer;
 
-  AbstractGLInterface *gl_interface = nullptr;
+  AbstractGRAPI *gr_api = nullptr;
 
   Surface *gl_surface = nullptr;
 
   Callback frame_callback;
 
+  int GetMouseLocation(const MouseEvent *event) const;
+
+  void DrawFrame(const Context &context);
+
+  void OnFrame(uint32_t serial);
+
 //  bool animating = false;
 
 };
+
+void GLWindow::Private::DrawFrame(const Context &context) {
+  Canvas *canvas = context.canvas();
+  canvas->Clear();
+
+  Path path;
+  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, owner->GetWidth(), owner->GetHeight());
+
+  if ((!owner->IsMaximized()) || (!owner->IsFullscreen())) {
+    // Drop shadow:
+//    float radii[] = {
+//        7.f, 7.f, // top-left
+//        7.f, 7.f, // top-right
+//        4.f, 4.f, // bottom-right
+//        4.f, 4.f  // bottom-left
+//    };
+//    path.AddRoundRect(geometry, radii);
+    path.AddRect(geometry);
+    canvas->Save();
+    canvas->ClipPath(path, ClipOperation::kClipDifference, true);
+    owner->DropShadow(context);
+    canvas->Restore();
+  } else {
+    path.AddRect(geometry);
+  }
+
+//   Fill color:
+  /*
+  Paint paint;
+  paint.SetAntiAlias(true);
+  paint.SetColor(0xEFF0F0F0);
+  canvas->DrawPath(path, paint);
+   */
+
+  // Draw the client area:
+//  paint.SetColor(0xEFE0E0E0);
+//  canvas->Save();
+//  canvas->ClipPath(path, kClipIntersect, true);
+//  canvas->DrawRect(Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight()), paint);
+//  canvas->Restore();
+
+  canvas->Flush();
+}
+
+int GLWindow::Private::GetMouseLocation(const MouseEvent *event) const {
+  int vlocation, hlocation, location;
+  int x = static_cast<int>(event->GetSurfaceXY().x),
+      y = static_cast<int>(event->GetSurfaceXY().y);
+
+  // TODO: maximized or frameless
+
+  if (x < (Theme::GetShadowMargin().left - kResizingMargin.left))
+    hlocation = AbstractShellView::kExterior;
+  else if (x < Theme::GetShadowMargin().left + kResizingMargin.left)
+    hlocation = AbstractShellView::kResizeLeft;
+  else if (x < Theme::GetShadowMargin().left + owner->GetWidth() - kResizingMargin.right)
+    hlocation = AbstractShellView::kInterior;
+  else if (x < Theme::GetShadowMargin().left + owner->GetWidth() + kResizingMargin.right)
+    hlocation = AbstractShellView::kResizeRight;
+  else
+    hlocation = AbstractShellView::kExterior;
+
+  if (y < (Theme::GetShadowMargin().top - kResizingMargin.top))
+    vlocation = AbstractShellView::kExterior;
+  else if (y < Theme::GetShadowMargin().top + kResizingMargin.top)
+    vlocation = AbstractShellView::kResizeTop;
+  else if (y < Theme::GetShadowMargin().top + owner->GetHeight() - kResizingMargin.bottom)
+    vlocation = AbstractShellView::kInterior;
+  else if (y < Theme::GetShadowMargin().top + owner->GetHeight() + kResizingMargin.bottom)
+    vlocation = AbstractShellView::kResizeBottom;
+  else
+    vlocation = AbstractShellView::kExterior;
+
+  location = vlocation | hlocation;
+  if (location & AbstractShellView::kExterior)
+    location = AbstractShellView::kExterior;
+
+//  if (location == AbstractShellView::kInterior &&
+//      y < Theme::GetShadowMargin().top + 22 /* title_bar_size_ */)
+//    location = AbstractShellView::kTitleBar;
+//  else
+  if (location == AbstractShellView::kInterior)
+    location = AbstractShellView::kClientArea;
+
+  return location;
+}
+
+void GLWindow::Private::OnFrame(uint32_t serial) {
+  frame_callback.Setup(*gl_surface);
+  owner->OnRender();
+  gl_surface->Commit();
+}
 
 GLWindow::GLWindow(const char *title)
     : GLWindow(400, 300, title) {
@@ -83,13 +184,13 @@ GLWindow::GLWindow(const char *title)
 
 GLWindow::GLWindow(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
-  p_ = core::make_unique<Private>();
+  p_ = core::make_unique<Private>(this);
 
-  p_->frame_callback.done().Set(this, &GLWindow::OnFrame);
+  p_->frame_callback.done().Set(p_.get(), &Private::OnFrame);
 }
 
 GLWindow::~GLWindow() {
-  delete p_->gl_interface;
+  delete p_->gr_api;
   delete p_->gl_surface;
 }
 
@@ -114,9 +215,9 @@ void GLWindow::OnShown() {
   Region region;  // zero region
   p_->gl_surface->SetInputRegion(region);
 
-  p_->gl_interface = new GLESV2Interface;  // Currently use GLES for demo
-  p_->gl_surface->SetGLInterface(p_->gl_interface);
-  p_->gl_interface->SetViewportSize(GetWidth(), GetHeight());
+  p_->gr_api = new GLESV2API;  // Currently use GLES for demo
+  p_->gl_surface->SetGRAPI(p_->gr_api);
+  p_->gr_api->SetViewportSize(GetWidth(), GetHeight());
 
   Surface::Sub::Get(p_->gl_surface)->SetWindowPosition(0, 0);
 
@@ -137,7 +238,7 @@ void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
     RequestSaveSize(false);
     return;
   }
-  
+
   if (old_size == new_size) {
     RequestSaveSize(false);
     return;
@@ -145,7 +246,7 @@ void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
 
   Surface::Shell::Get(GetShellSurface())->ResizeWindow(new_size.width, new_size.height);  // Call xdg surface api
 
-  p_->gl_interface->SetViewportSize(new_size.width, new_size.height);
+  p_->gr_api->SetViewportSize(new_size.width, new_size.height);
   OnResize(new_size.width, new_size.height);
 
   DispatchMouseLeaveEvent();
@@ -189,23 +290,22 @@ void GLWindow::OnRenderSurface(Surface *surface) {
     p_->gl_surface->Commit();
     return;
   }
-  
+
   Surface *shell_surface = GetShellSurface();
   const Margin &margin = shell_surface->GetMargin();
-  
+
   Canvas canvas((unsigned char *) p_->frame_buffer.GetData(),
                 p_->frame_buffer.GetSize().width,
                 p_->frame_buffer.GetSize().height);
   canvas.SetOrigin(margin.left, margin.top);
-  DrawFrame(Context(shell_surface, &canvas));
+  p_->DrawFrame(Context(shell_surface, &canvas));
   shell_surface->Damage(0, 0, GetWidth() + margin.lr(), GetHeight() + margin.tb());
   shell_surface->Commit();
-  return;
 }
 
 void GLWindow::OnMouseMove(MouseEvent *event) {
 //  AbstractView *view = nullptr;
-  switch (GetMouseLocation(event)) {
+  switch (p_->GetMouseLocation(event)) {
     case kResizeTop: {
       DispatchMouseLeaveEvent();
       event->SetCursor(Display::GetCursor(kCursorTop));
@@ -269,7 +369,7 @@ void GLWindow::OnMouseDown(MouseEvent *event) {
   if ((event->GetButton() == MouseButton::kMouseButtonLeft) &&
       (event->GetState() == MouseButtonState::kMouseButtonPressed)) {
 
-    int location = GetMouseLocation(event);
+    int location = p_->GetMouseLocation(event);
 
     if (location == kClientArea && (nullptr == EventTask::GetMouseTask(this)->GetNext())) {
       MoveWithMouse(event);
@@ -308,114 +408,22 @@ void GLWindow::OnResize(int /*width*/, int /*height*/) {
 }
 
 void GLWindow::OnRender() {
-  p_->gl_interface->MakeCurrent();
+  p_->gr_api->MakeCurrent();
 
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
 
-  p_->gl_interface->SwapBuffers();
+  p_->gr_api->SwapBuffers();
 }
 
 bool GLWindow::MakeCurrent() {
-  p_->gl_interface->MakeCurrent();
+  p_->gr_api->MakeCurrent();
   return false;
 }
 
 void GLWindow::SwapBuffers() {
-  p_->gl_interface->SwapBuffers();
-}
-
-int GLWindow::GetMouseLocation(const MouseEvent *event) const {
-  int vlocation, hlocation, location;
-  int x = static_cast<int>(event->GetSurfaceXY().x),
-      y = static_cast<int>(event->GetSurfaceXY().y);
-
-  // TODO: maximized or frameless
-
-  if (x < (Theme::GetShadowMargin().left - kResizingMargin.left))
-    hlocation = AbstractShellView::kExterior;
-  else if (x < Theme::GetShadowMargin().left + kResizingMargin.left)
-    hlocation = AbstractShellView::kResizeLeft;
-  else if (x < Theme::GetShadowMargin().left + GetWidth() - kResizingMargin.right)
-    hlocation = AbstractShellView::kInterior;
-  else if (x < Theme::GetShadowMargin().left + GetWidth() + kResizingMargin.right)
-    hlocation = AbstractShellView::kResizeRight;
-  else
-    hlocation = AbstractShellView::kExterior;
-
-  if (y < (Theme::GetShadowMargin().top - kResizingMargin.top))
-    vlocation = AbstractShellView::kExterior;
-  else if (y < Theme::GetShadowMargin().top + kResizingMargin.top)
-    vlocation = AbstractShellView::kResizeTop;
-  else if (y < Theme::GetShadowMargin().top + GetHeight() - kResizingMargin.bottom)
-    vlocation = AbstractShellView::kInterior;
-  else if (y < Theme::GetShadowMargin().top + GetHeight() + kResizingMargin.bottom)
-    vlocation = AbstractShellView::kResizeBottom;
-  else
-    vlocation = AbstractShellView::kExterior;
-
-  location = vlocation | hlocation;
-  if (location & AbstractShellView::kExterior)
-    location = AbstractShellView::kExterior;
-
-//  if (location == AbstractShellView::kInterior &&
-//      y < Theme::GetShadowMargin().top + 22 /* title_bar_size_ */)
-//    location = AbstractShellView::kTitleBar;
-//  else
-  if (location == AbstractShellView::kInterior)
-    location = AbstractShellView::kClientArea;
-
-  return location;
-}
-
-void GLWindow::DrawFrame(const Context &context) {
-  Canvas *canvas = context.canvas();
-  canvas->Clear();
-
-  Path path;
-  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, GetWidth(), GetHeight());
-
-  if ((!IsMaximized()) || (!IsFullscreen())) {
-    // Drop shadow:
-//    float radii[] = {
-//        7.f, 7.f, // top-left
-//        7.f, 7.f, // top-right
-//        4.f, 4.f, // bottom-right
-//        4.f, 4.f  // bottom-left
-//    };
-//    path.AddRoundRect(geometry, radii);
-    path.AddRect(geometry);
-    canvas->Save();
-    canvas->ClipPath(path, ClipOperation::kClipDifference, true);
-    DropShadow(context);
-    canvas->Restore();
-  } else {
-    path.AddRect(geometry);
-  }
-
-//   Fill color:
-  /*
-  Paint paint;
-  paint.SetAntiAlias(true);
-  paint.SetColor(0xEFF0F0F0);
-  canvas->DrawPath(path, paint);
-   */
-
-  // Draw the client area:
-//  paint.SetColor(0xEFE0E0E0);
-//  canvas->Save();
-//  canvas->ClipPath(path, kClipIntersect, true);
-//  canvas->DrawRect(Rect::FromXYWH(0.f, 0.f, GetWidth(), GetHeight()), paint);
-//  canvas->Restore();
-
-  canvas->Flush();
-}
-
-void GLWindow::OnFrame(uint32_t serial) {
-  p_->frame_callback.Setup(*p_->gl_surface);
-  OnRender();
-  p_->gl_surface->Commit();
+  p_->gr_api->SwapBuffers();
 }
 
 } // namespace gui

@@ -47,9 +47,11 @@ class Buffer {
   using Point = core::PointI;
   using Size = core::SizeI;
 
-  // FIXME: how to use a variadic template alias?
-  // template<typename RT, typename ... PTs>
-  // using DelegateRef = core::DelegateRef<RT(PTs...)>;
+  template<typename ... ParamTypes>
+  using SignalRef = typename core::SignalRef<ParamTypes...>;
+
+  template<typename ... ParamTypes>
+  using Signal = typename core::Signal<ParamTypes...>;
 
   Buffer();
 
@@ -76,11 +78,11 @@ class Buffer {
 
   const Size &GetSize() const;
 
-  core::SignalRef<> release() {
+  SignalRef<> release() {
     return release_;
   }
 
-  core::SignalRef<> destroyed() {
+  SignalRef<> destroyed() {
     return destroyed_;
   }
 
@@ -90,9 +92,9 @@ class Buffer {
 
   std::unique_ptr<Private> p_;
 
-  core::Signal<> release_;
+  Signal<> release_;
 
-  core::Signal<> destroyed_;
+  Signal<> destroyed_;
 
 };
 

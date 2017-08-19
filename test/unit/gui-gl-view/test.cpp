@@ -7,7 +7,7 @@
 #include <skland/gui/application.hpp>
 #include <skland/gui/window.hpp>
 #include "skland/gui/gl-view.hpp"
-#include "skland/gui/glesv2-interface.hpp"
+#include "skland/gui/glesv2-api.hpp"
 
 #include <GLES2/gl2.h>
 #include <sys/time.h>
@@ -62,7 +62,7 @@ class Triangle : public GLView {
  public:
 
   Triangle() {
-    SetGLInterface(new GLESV2Interface);
+    SetGLInterface(new GLESV2API);
   }
 
   virtual ~Triangle() {

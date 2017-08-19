@@ -35,8 +35,6 @@ SKLAND_EXPORT class Window : public AbstractShellView {
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Window);
   Window() = delete;
 
-  using RectI = core::RectI;  /**< Alias of core::RectI */
-
   /**
    * @brief Construct a 400 x 300 window with given title and flags
    * @param title
@@ -117,17 +115,13 @@ SKLAND_EXPORT class Window : public AbstractShellView {
 
   int GetMouseLocation(const MouseEvent *event) const;
 
-  RectI GetContentGeometry() const;
+  Rect GetContentGeometry() const;
 
  private:
 
-  struct Private;
-
   void OnFullscreenButtonClicked(__SLOT__);
 
-  void DrawFrame(const Context &context);
-
-  void SetContentViewGeometry();
+  struct Private;
 
   std::unique_ptr<Private> p_;
 

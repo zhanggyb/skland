@@ -19,6 +19,7 @@
 
 #include "skland/gui/abstract-shell-view.hpp"
 
+#include "skland/core/property.hpp"
 #include "xdg-shell-unstable-v6-client-protocol.h"
 
 namespace skland {
@@ -28,7 +29,7 @@ namespace gui {
  * @ingroup gui_intern
  * @brief A structure for private data in AbstractShellView
  */
-SKLAND_NO_EXPORT struct AbstractShellView::Private {
+struct AbstractShellView::Private : public core::Property<AbstractShellView> {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
   Private() = delete;
@@ -46,7 +47,8 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
    * @brief Constructor
    */
   explicit Private(AbstractShellView *shell_view)
-      : flags(0),
+      : core::Property<AbstractShellView>(shell_view),
+        flags(0),
         shell_surface(nullptr),
         parent(nullptr),
         geometry_task(shell_view),
@@ -55,7 +57,7 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
   /**
    * @brief Destructor
    */
-  ~Private() = default;
+  ~Private() final = default;
 
   /**
    * @brief Bitwise flags
@@ -106,12 +108,15 @@ SKLAND_NO_EXPORT struct AbstractShellView::Private {
    */
   bool is_damaged;
 
-  /**
-   * @brief The damage region
-   *
-   * This member variable works with is_damaged.
-   */
-  core::RectI damaged_region;
+  void OnXdgSurfaceConfigure(uint32_t serial);
+
+  void OnXdgToplevelConfigure(int width, int height, int states);
+
+  void OnXdgToplevelClose();
+
+  void DispatchMouseEnterEvent(AbstractView *parent,
+                               MouseEvent *event,
+                               EventTask *tail);
 
 };
 

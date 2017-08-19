@@ -18,7 +18,7 @@
 #define SKLAND_GUI_INTERNAL_SURFACE_PRIVATE_HPP_
 
 #include "skland/gui/surface.hpp"
-#include "skland/gui/abstract-gl-interface.hpp"
+#include "skland/gui/abstract-gr-api.hpp"
 
 namespace skland {
 namespace gui {
@@ -42,7 +42,7 @@ struct Surface::Private {
         below(nullptr),
         upper(nullptr),
         lower(nullptr),
-        gl_interface(nullptr),
+        gr_api(nullptr),
         render_task(surface),
         commit_task(surface) {
   }
@@ -91,7 +91,7 @@ struct Surface::Private {
    */
   Surface *lower;
 
-  AbstractGLInterface *gl_interface;
+  AbstractGRAPI *gr_api;
 
   union {
     void *placeholder;

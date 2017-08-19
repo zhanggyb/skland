@@ -14,25 +14,51 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHICS_INTERFACE_PROXY_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHICS_INTERFACE_PROXY_HPP_
+#ifndef SKLAND_GUI_GLESV2_API_HPP_
+#define SKLAND_GUI_GLESV2_API_HPP_
 
-#include "skland/gui/abstract-gl-interface.hpp"
-
-#include "surface_private.hpp"
+#include "abstract-gr-api.hpp"
 
 namespace skland {
 namespace gui {
 
-struct AbstractGLInterface::Proxy {
+/**
+ * @ingroup gui
+ * @brief OpenGL ES V2
+ */
+class GLESV2API : public AbstractGRAPI {
 
-  static inline struct wl_surface *GetWaylandSurface(const Surface *surface) {
-    return surface->p_->wl_surface;
-  }
+ public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GLESV2API);
+
+  GLESV2API();
+
+  virtual ~GLESV2API();
+
+  virtual void SetViewportSize(int width, int height) final;
+
+  virtual void MakeCurrent() final;
+
+  virtual void SwapBuffers() final;
+
+ protected:
+
+  virtual void OnSetup(Surface *surface) final;
+
+  virtual void OnRelease(Surface *surface) final;
+
+ private:
+
+  struct Private;
+
+  void Destroy();
+
+  std::unique_ptr<Private> p_;
 
 };
 
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_INTERNAL_ABSTRACT_GRAPHICS_INTERFACE_PROXY_HPP_
+#endif // SKLAND_GUI_GLESV2_API_HPP_
