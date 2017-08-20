@@ -346,30 +346,20 @@ void Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
   _ASSERT((p_->minimal_size.width < p_->maximal_size.width) &&
       (p_->minimal_size.height < p_->maximal_size.height));
 
-  if ((new_size.width < p_->minimal_size.width) ||
-      (new_size.height < p_->minimal_size.height)) {
-    RequestSaveSize(false);
-    return;
-  }
+  Size size = new_size;
 
-  if ((new_size.width > p_->maximal_size.width) ||
-      (new_size.height > p_->maximal_size.height)) {
-    RequestSaveSize(false);
-    return;
-  }
+  if (size.width < p_->minimal_size.width) size.width = p_->minimal_size.width;
+  if (size.height < p_->minimal_size.height) size.height = p_->minimal_size.height;
 
-  if (old_size == new_size) {
-    RequestSaveSize(false);
-    return;
-  }
+  if (size.width > p_->maximal_size.width) size.width = p_->maximal_size.width;
+  if (size.height > p_->maximal_size.height) size.height = p_->maximal_size.height;
+
+  if (!RequestSaveSize(size)) return;
 
   p_->inhibit_update = true;
 
-  Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
   // surface size is changed, reset the pointer position and enter/leave widgets
   DispatchMouseLeaveEvent();
-
-  RequestSaveSize();
 }
 
 void Window::OnSaveSize(const Size &old_size, const Size &new_size) {

@@ -48,9 +48,7 @@ Slider::~Slider() {
 }
 
 void Slider::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-  if (old_geometry != new_geometry) {
-    RequestSaveGeometry();
-  }
+  RequestSaveGeometry(new_geometry);
 }
 
 void Slider::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {

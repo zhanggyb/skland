@@ -166,7 +166,7 @@ void AbstractButton::OnKeyUp(KeyEvent *event) {
 }
 
 void AbstractButton::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-  RequestSaveGeometry(old_geometry != new_geometry);
+  RequestSaveGeometry(new_geometry);
 }
 
 void AbstractButton::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {

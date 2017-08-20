@@ -89,7 +89,7 @@ void Label::SetFont(const graphic::Font &font) {
 }
 
 void Label::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-  RequestSaveGeometry(old_geometry != new_geometry);
+  RequestSaveGeometry(new_geometry);
 }
 
 void Label::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {

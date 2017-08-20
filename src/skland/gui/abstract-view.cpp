@@ -562,25 +562,30 @@ AbstractView *AbstractView::DispatchMouseEnterEvent(MouseEvent *event) {
   return view;
 }
 
-void AbstractView::RequestSaveGeometry(bool validate) {
-  if (!validate) {
+bool AbstractView::RequestSaveGeometry(const RectF &geometry) {
+  p_->geometry = geometry;
+
+  if (p_->last_geometry == p_->geometry) {
     p_->geometry_task.Unlink();
-    p_->geometry = p_->last_geometry;
-    return;
+    return false;
   }
 
-  if (p_->geometry_task.IsLinked()) return;
+  if (p_->geometry_task.IsLinked()) return true;
 
   if (nullptr != p_->parent) {
     _ASSERT(nullptr == p_->shell_view);
     p_->parent->OnRequestSaveGeometry(this);
+    if (p_->geometry_task.IsLinked()) return true;
   } else if (nullptr != p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
     p_->shell_view->OnRequestSaveGeometry(this);
+    if (p_->geometry_task.IsLinked()) return true;
   } else {
     core::Deque<Task> &deque = Application::GetTaskDeque();
     deque.PushBack(&p_->geometry_task);
   }
+
+  return true;
 }
 
 void AbstractView::TrackMouseMotion(MouseEvent *event) {

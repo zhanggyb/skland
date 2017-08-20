@@ -295,16 +295,19 @@ void AbstractShellView::OnViewDetached(AbstractView *view) {
 
 }
 
-void AbstractShellView::RequestSaveSize(bool validate) {
-  if (!validate) {
+bool AbstractShellView::RequestSaveSize(const Size &size) {
+  p_->size = size;
+
+  if (p_->last_size == p_->size) {
     p_->geometry_task.Unlink();
-    p_->size = p_->last_size;
-    return;
+    return false;
   }
 
-  if (p_->geometry_task.IsLinked()) return;
+  if (!p_->geometry_task.IsLinked()) {
+    Application::GetTaskDeque().PushBack(&p_->geometry_task);
+  }
 
-  Application::GetTaskDeque().PushBack(&p_->geometry_task);
+  return true;
 }
 
 void AbstractShellView::MoveWithMouse(MouseEvent *event) const {
@@ -493,6 +496,8 @@ void AbstractShellView::DropShadow(const Context &context) {
 void AbstractShellView::GeometryTask::Run() const {
   shell_view_->OnSaveSize(shell_view_->p_->last_size, shell_view_->p_->size);
   shell_view_->p_->last_size = shell_view_->p_->size;
+  Surface::Shell::Get(shell_view_->p_->shell_surface)->ResizeWindow(shell_view_->p_->size.width,
+                                                                    shell_view_->p_->size.height);  // Call xdg surface api
 }
 
 } // namespace gui

@@ -65,9 +65,7 @@ void AbstractShellView::Private::OnXdgToplevelConfigure(int width, int height, i
   }
 
   if (width > 0 && height > 0) {
-    size.width = width;
-    size.height = height;
-    owner->OnConfigureSize(last_size, size);
+    owner->OnConfigureSize(last_size, Size(width, height));
   }
 }
 

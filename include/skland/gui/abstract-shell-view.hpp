@@ -73,6 +73,12 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
     virtual ~GeometryTask() = default;
 
+    /**
+     * @brief Do the task to resize the shell view
+     *
+     * This method will call AbstractShellView::OnSaveSize(), record the last size and
+     * use the xdg shell api to set the window geometry.
+     */
     virtual void Run() const final;
 
    private:
@@ -247,11 +253,17 @@ SKLAND_EXPORT class AbstractShellView : public AbstractEventHandler {
 
   /**
    * @brief Schedule resize this shell view
-   * @param validate
-   *	- true: schedule resize this shell view in task deque
-   *	- false: cancel the scheduled resize task
+   * @param size The size this shell view should have
+   * @return
+   *    - true Schedule resize this shell view
+   *    - false Cancel the resize
+   *
+   * This method will schedule the geometry task and do the resize in the main loop, or cancel
+   * the geometry task if the size value is the same as the last saved one.
+   *
+   * The geometry task will call the OnSaveSize() later.
    */
-  void RequestSaveSize(bool validate = true);
+  bool RequestSaveSize(const Size &size);
 
   void MoveWithMouse(MouseEvent *event) const;
 

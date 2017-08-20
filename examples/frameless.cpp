@@ -45,7 +45,7 @@ class MainWidget : public AbstractView {
  protected:
 
   virtual void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
-    RequestSaveGeometry(old_geometry != new_geometry);
+    RequestSaveGeometry(new_geometry);
   }
 
   virtual void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) override {

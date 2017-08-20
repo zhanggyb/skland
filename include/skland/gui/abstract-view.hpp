@@ -583,7 +583,7 @@ SKLAND_EXPORT class AbstractView : public AbstractEventHandler {
    *	- true: schedule change the geometry in task deque
    *	- false: cancel the geometry task
    */
-  void RequestSaveGeometry(bool validate = true);
+  bool RequestSaveGeometry(const RectF& geometry);
 
   void TrackMouseMotion(MouseEvent *event);
 

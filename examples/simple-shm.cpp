@@ -52,7 +52,7 @@ class SpinningView : public AbstractView {
 
   void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
     if (!running_animation_)
-      RequestSaveGeometry(old_geometry != new_geometry);
+      RequestSaveGeometry(new_geometry);
   }
 
   void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) override {

@@ -82,8 +82,7 @@ void Dialog::OnShown() {
 }
 
 void Dialog::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  Surface::Shell::Get(GetShellSurface())->ResizeWindow(GetWidth(), GetHeight());  // Call xdg surface api
-  RequestSaveSize();
+  RequestSaveSize(new_size);
 }
 
 void Dialog::OnSaveSize(const Size &old_size, const Size &new_size) {

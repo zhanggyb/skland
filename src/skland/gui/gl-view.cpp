@@ -59,12 +59,12 @@ void GLView::OnRequestUpdate(AbstractView *view) {
 }
 
 void GLView::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-  RequestSaveGeometry(old_geometry != new_geometry);
+  RequestSaveGeometry(new_geometry);
 
   if (nullptr != gl_surface_) {
 //    if ((old_geometry.width() != new_geometry.width()) || (old_geometry.height() != new_geometry.height())) {
-      interface_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
-      OnResize((int) new_geometry.width(), (int) new_geometry.height());
+    interface_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
+    OnResize((int) new_geometry.width(), (int) new_geometry.height());
 //    }
   }
 }

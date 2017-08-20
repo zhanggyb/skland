@@ -229,28 +229,17 @@ void GLWindow::OnRequestUpdate(AbstractView *view) {
 }
 
 void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  if (new_size.width < 160) {
-    RequestSaveSize(false);
-    return;
-  }
+  Size size = new_size;
 
-  if (new_size.height < 120) {
-    RequestSaveSize(false);
-    return;
-  }
+  if (size.width < 160) size.width = 160;
+  if (size.height < 120) size.height = 120;
 
-  if (old_size == new_size) {
-    RequestSaveSize(false);
-    return;
-  }
-
-  Surface::Shell::Get(GetShellSurface())->ResizeWindow(new_size.width, new_size.height);  // Call xdg surface api
-
-  p_->gr_api->SetViewportSize(new_size.width, new_size.height);
-  OnResize(new_size.width, new_size.height);
+  if (!RequestSaveSize(size)) return;
 
   DispatchMouseLeaveEvent();
-  RequestSaveSize(true);
+
+  p_->gr_api->SetViewportSize(size.width, size.height);
+  OnResize(size.width, size.height);
 }
 
 void GLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
