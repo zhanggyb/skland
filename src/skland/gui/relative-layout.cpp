@@ -48,12 +48,12 @@ void RelativeLayout::OnLayout(int left, int top, int right, int bottom) {
 
   const AnchorGroup &right_group = GetAnchorGroup(kAlignRight);
   for (Anchor *anchor = right_group.first(); nullptr != anchor; anchor = anchor->next()) {
-    anchor->contrary()->group()->view()->SetRight(right - anchor->distance());
+    anchor->contrary()->group()->view()->SetRight(right + anchor->distance());
   }
 
   const AnchorGroup &bottom_group = GetAnchorGroup(kAlignBottom);
   for (Anchor *anchor = bottom_group.first(); nullptr != anchor; anchor = anchor->next()) {
-    anchor->contrary()->group()->view()->SetBottom(bottom - anchor->distance());
+    anchor->contrary()->group()->view()->SetBottom(bottom + anchor->distance());
   }
 }
 

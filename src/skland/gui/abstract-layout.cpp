@@ -89,7 +89,7 @@ void AbstractLayout::OnRequestSaveGeometry(AbstractView *view) {
 
 void AbstractLayout::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
 //  is_geometry_saved_ = true;
-  OnLayout(0, 0, GetWidth(), GetHeight());
+  OnLayout(0, 0, 0, 0);
 }
 
 void AbstractLayout::OnRequestUpdate(AbstractView *view) {

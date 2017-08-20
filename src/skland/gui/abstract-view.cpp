@@ -184,10 +184,9 @@ LayoutPolicy AbstractView::GetLayoutPolicyOnY() const {
 }
 
 void AbstractView::MoveTo(int x, int y) {
-  if (p_->geometry.x() == x && p_->geometry.y() == y) return;
-
-  p_->geometry.MoveTo(x, y);
-  OnConfigureGeometry(p_->last_geometry, p_->geometry);
+  RectF geometry(p_->geometry);
+  geometry.MoveTo(x, y);
+  OnConfigureGeometry(p_->last_geometry, geometry);
 }
 
 const core::Padding &AbstractView::GetPadding() const {
@@ -195,25 +194,9 @@ const core::Padding &AbstractView::GetPadding() const {
 }
 
 void AbstractView::Resize(int width, int height) {
-  if (p_->geometry.width() == width && p_->geometry.height() == height) return;
-
-  SizeI min;
-  min.width = GetMinimalWidth();
-  min.height = GetMinimalHeight();
-
-  SizeI max;
-  max.width = GetMaximalWidth();
-  max.height = GetMaximalHeight();
-
-  if (min.width > max.width || min.height > max.height) {
-    throw std::runtime_error("Error! Invalid minimal and maximal size!");
-  }
-
-  if (width < min.width || height < min.height) return;
-  if (width > max.width || height > max.height) return;
-
-  p_->geometry.Resize(width, height);
-  OnConfigureGeometry(p_->last_geometry, p_->geometry);
+  RectF geometry(p_->geometry);
+  geometry.Resize(width, height);
+  OnConfigureGeometry(p_->last_geometry, geometry);
 }
 
 int AbstractView::GetX() const {
@@ -232,17 +215,18 @@ int AbstractView::GetLeft() const {
 }
 
 void AbstractView::SetLeft(int left) {
-  if (nullptr != p_->parent) left += p_->parent->p_->geometry.left;
-
-  if (left == p_->geometry.left) return;
-
-  int width = static_cast<int>(p_->geometry.right) - left;
-  if ((width < p_->minimal_size.width) ||
-      (width > p_->maximal_size.width))
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    left += p_->parent->p_->geometry.left;
+  } else if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
+  } else {
     return;
+  }
 
-  p_->geometry.left = left;
-  OnConfigureGeometry(p_->last_geometry, p_->geometry);
+  RectF geometry(p_->geometry);
+  geometry.left = left;
+  OnConfigureGeometry(p_->last_geometry, geometry);
 }
 
 int AbstractView::GetTop() const {
@@ -253,17 +237,18 @@ int AbstractView::GetTop() const {
 }
 
 void AbstractView::SetTop(int top) {
-  if (nullptr != p_->parent) top += p_->parent->p_->geometry.top;
-
-  if (top == p_->geometry.top) return;
-
-  int height = static_cast<int>(p_->geometry.bottom) - top;
-  if ((height < p_->minimal_size.height) ||
-      (height > p_->maximal_size.height))
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    top += p_->parent->p_->geometry.top;
+  } else if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
+  } else {
     return;
+  }
 
-  p_->geometry.top = top;
-  OnConfigureGeometry(p_->last_geometry, p_->geometry);
+  RectF geometry(p_->geometry);
+  geometry.top = top;
+  OnConfigureGeometry(p_->last_geometry, geometry);
 }
 
 int AbstractView::GetRight() const {
@@ -271,17 +256,19 @@ int AbstractView::GetRight() const {
 }
 
 void AbstractView::SetRight(int right) {
-  if (nullptr != p_->parent) right += p_->parent->p_->geometry.left; // relative to parent
-
-  if (right == p_->geometry.right) return;
-
-  int width = right - static_cast<int>(p_->geometry.left);
-  if ((width < p_->minimal_size.width) ||
-      (width > p_->maximal_size.width))
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    right = p_->parent->p_->geometry.right - right;
+  } else if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
+    right = p_->shell_view->GetWidth() - right;
+  } else {
     return;
+  }
 
-  p_->geometry.right = right;
-  OnConfigureGeometry(p_->last_geometry, p_->geometry);
+  RectF geometry(p_->geometry);
+  geometry.right = right;
+  OnConfigureGeometry(p_->last_geometry, geometry);
 }
 
 int AbstractView::GetBottom() const {
@@ -289,17 +276,19 @@ int AbstractView::GetBottom() const {
 }
 
 void AbstractView::SetBottom(int bottom) {
-  if (nullptr != p_->parent) bottom += p_->parent->p_->geometry.top; // relative to parent
-
-  if (bottom == p_->geometry.bottom) return;
-
-  int height = bottom - static_cast<int>(p_->geometry.top);
-  if ((height < p_->minimal_size.height) ||
-      (height > p_->maximal_size.height))
+  if (nullptr != p_->parent) {
+    _ASSERT(nullptr == p_->shell_view);
+    bottom = p_->parent->p_->geometry.bottom - bottom;
+  } else if (nullptr != p_->shell_view) {
+    _ASSERT(nullptr == p_->parent);
+    bottom = p_->shell_view->GetHeight() - bottom;
+  } else {
     return;
+  }
 
-  p_->geometry.bottom = bottom;
-  OnConfigureGeometry(p_->last_geometry, p_->geometry);
+  RectF geometry(p_->geometry);
+  geometry.bottom = bottom;
+  OnConfigureGeometry(p_->last_geometry, geometry);
 }
 
 int AbstractView::GetWidth() const {
@@ -572,20 +561,22 @@ bool AbstractView::RequestSaveGeometry(const RectF &geometry) {
 
   if (p_->geometry_task.IsLinked()) return true;
 
+  bool ret = false;
   if (nullptr != p_->parent) {
     _ASSERT(nullptr == p_->shell_view);
     p_->parent->OnRequestSaveGeometry(this);
-    if (p_->geometry_task.IsLinked()) return true;
+    ret = p_->geometry_task.IsLinked();
   } else if (nullptr != p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
     p_->shell_view->OnRequestSaveGeometry(this);
-    if (p_->geometry_task.IsLinked()) return true;
+    ret = p_->geometry_task.IsLinked();
   } else {
     core::Deque<Task> &deque = Application::GetTaskDeque();
     deque.PushBack(&p_->geometry_task);
+    ret = true;
   }
 
-  return true;
+  return ret;
 }
 
 void AbstractView::TrackMouseMotion(MouseEvent *event) {

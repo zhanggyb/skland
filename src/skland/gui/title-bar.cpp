@@ -307,7 +307,11 @@ AbstractButton *TitleBar::GetButton(ButtonType button_type) const {
 }
 
 void TitleBar::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-  int new_y = (GetHeight() - close_button_->GetHeight()) / 2;
+  RequestSaveGeometry(new_geometry);
+}
+
+void TitleBar::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
+  int new_y = ((int) new_geometry.height() - close_button_->GetHeight()) / 2;
   int new_x = kButtonSpace;
   close_button_->MoveTo(new_x, new_y);
 
@@ -317,11 +321,9 @@ void TitleBar::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_g
   new_x += maximize_button_->GetWidth() + kButtonSpace;
   minimize_button_->MoveTo(new_x, new_y);
 
-  new_x = GetWidth() - kButtonSpace - fullscreen_button_->GetWidth();
+  new_x = (int) new_geometry.width() - kButtonSpace - fullscreen_button_->GetWidth();
   fullscreen_button_->MoveTo(new_x, new_y);
-}
 
-void TitleBar::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
   DispatchUpdate();
 }
 
