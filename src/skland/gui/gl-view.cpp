@@ -22,7 +22,7 @@
 #include "skland/gui/mouse-event.hpp"
 #include "skland/gui/key-event.hpp"
 #include "skland/gui/context.hpp"
-#include "skland/gui/abstract-gr-api.hpp"
+#include "skland/gui/abstract-rendering-api.hpp"
 #include "skland/gui/region.hpp"
 
 namespace skland {
@@ -34,34 +34,25 @@ GLView::GLView() {
 
 GLView::~GLView() {
   // Note: delete interface_ before destroying gl_surface_:
-  delete gr_api_;
+  delete rendering_api_;
   delete gl_surface_;
 }
 
-void GLView::SetGLInterface(AbstractGRAPI *interface) {
-  if (gr_api_ == interface) return;
+void GLView::SetRenderingInterface(AbstractRenderingAPI *api) {
+  if (rendering_api_ == api) return;
 
-  gr_api_ = interface;
+  rendering_api_ = api;
 
   if (nullptr != gl_surface_) {
-    gl_surface_->SetGRAPI(gr_api_);
+    gl_surface_->SetRenderingAPI(rendering_api_);
   }
-}
-
-void GLView::OnRequestUpdate(AbstractView *view) {
-//  if ((view == this) && (nullptr != gl_surface_)) {
-//    gl_surface_->Update();
-//    return;
-//  }
-
-  AbstractView::OnRequestUpdate(view);
 }
 
 void GLView::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
   if (!RequestSaveGeometry(new_geometry)) return;
 
-  if (nullptr != gl_surface_) {
-    gr_api_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
+  if ((nullptr != gl_surface_) && (nullptr != rendering_api_)) {
+    rendering_api_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
     OnResize((int) new_geometry.width(), (int) new_geometry.height());
   }
 }
@@ -100,36 +91,34 @@ void GLView::OnKeyUp(KeyEvent *event) {
 
 void GLView::OnDraw(const Context &context) {
   if (nullptr == gl_surface_) {
+    if (nullptr == rendering_api_) return;
+
     gl_surface_ = Surface::Sub::Create(context.surface(), this);
-    gl_surface_->SetGRAPI(gr_api_);
+    gl_surface_->SetRenderingAPI(rendering_api_);
 //    gl_surface_->SetCommitMode(Surface::kDesynchronized);
 
     Region region;
     gl_surface_->SetInputRegion(region);
 
-    gr_api_->SetViewportSize(GetWidth(), GetHeight());
+    rendering_api_->SetViewportSize(GetWidth(), GetHeight());
+    Surface::Sub::Get(gl_surface_)->SetWindowPosition(GetX(), GetY());
+
     callback_.Setup(*gl_surface_);
     OnInitialize();
+    gl_surface_->Commit();
   }
-
-  _ASSERT(nullptr != gl_surface_);
-  _ASSERT(gl_surface_->GetParent() == context.surface());
-  Surface::Sub::Get(gl_surface_)->SetWindowPosition(GetX(), GetY());
-  gl_surface_->Commit();
 }
 
 void GLView::OnRenderSurface(Surface *surface) {
-//  _ASSERT(gl_surface_ == surface);
-//  Surface::Sub::Get(gl_surface_)->SetWindowPosition(GetX(), GetY());
-//  gl_surface_->Commit();
+
 }
 
 void GLView::SwapBuffers() {
-  if (nullptr != gr_api_) gr_api_->SwapBuffers();
+  if (nullptr != rendering_api_) rendering_api_->SwapBuffers();
 }
 
 void GLView::MakeCurrent() {
-  if (nullptr != gr_api_) gr_api_->MakeCurrent();
+  if (nullptr != rendering_api_) rendering_api_->MakeCurrent();
 }
 
 void GLView::OnFrame(uint32_t serial) {

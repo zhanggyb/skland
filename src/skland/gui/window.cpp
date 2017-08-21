@@ -92,6 +92,8 @@ struct Window::Private : public core::Property<Window> {
 
   const Output *output = nullptr;
 
+  bool configuring_size = false;
+
   bool inhibit_update = true;
 
   void DrawFrame(const Context &context);
@@ -350,7 +352,14 @@ void Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
   if (size.width > p_->maximal_size.width) size.width = p_->maximal_size.width;
   if (size.height > p_->maximal_size.height) size.height = p_->maximal_size.height;
 
-  RequestSaveSize(size);
+  if (!RequestSaveSize(size)) return;
+
+  if (nullptr != p_->title_bar) {
+    p_->title_bar->Resize(size.width, TitleBar::kHeight);
+  }
+  if (nullptr != p_->content_view) {
+    p_->SetContentViewGeometry();
+  }
 }
 
 void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
@@ -410,11 +419,11 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
 
   if (nullptr != p_->title_bar) {
     DispatchUpdate(p_->title_bar);
-    p_->title_bar->Resize(new_size.width, TitleBar::kHeight);
+//    p_->title_bar->Resize(new_size.width, TitleBar::kHeight);
   }
   if (nullptr != p_->content_view) {
     DispatchUpdate(p_->content_view);
-    p_->SetContentViewGeometry();
+//    p_->SetContentViewGeometry();
   }
 }
 

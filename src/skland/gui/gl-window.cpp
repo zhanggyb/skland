@@ -70,7 +70,7 @@ struct GLWindow::Private : public core::Property<GLWindow> {
 
   Buffer frame_buffer;
 
-  AbstractGRAPI *gr_api = nullptr;
+  AbstractRenderingAPI *rendering_api = nullptr;
 
   Surface *gl_surface = nullptr;
 
@@ -190,7 +190,7 @@ GLWindow::GLWindow(int width, int height, const char *title)
 }
 
 GLWindow::~GLWindow() {
-  delete p_->gr_api;
+  delete p_->rendering_api;
   delete p_->gl_surface;
 }
 
@@ -215,9 +215,9 @@ void GLWindow::OnShown() {
   Region region;  // zero region
   p_->gl_surface->SetInputRegion(region);
 
-  p_->gr_api = new GLESV2API;  // Currently use GLES for demo
-  p_->gl_surface->SetGRAPI(p_->gr_api);
-  p_->gr_api->SetViewportSize(GetWidth(), GetHeight());
+  p_->rendering_api = new GLESV2API;  // Currently use GLES for demo
+  p_->gl_surface->SetRenderingAPI(p_->rendering_api);
+  p_->rendering_api->SetViewportSize(GetWidth(), GetHeight());
 
   Surface::Sub::Get(p_->gl_surface)->SetWindowPosition(0, 0);
 
@@ -236,7 +236,7 @@ void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
 
   if (!RequestSaveSize(size)) return;
 
-  p_->gr_api->SetViewportSize(size.width, size.height);
+  p_->rendering_api->SetViewportSize(size.width, size.height);
   OnResize(size.width, size.height);
 }
 
@@ -398,22 +398,22 @@ void GLWindow::OnResize(int /*width*/, int /*height*/) {
 }
 
 void GLWindow::OnRender() {
-  p_->gr_api->MakeCurrent();
+  p_->rendering_api->MakeCurrent();
 
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
   glFlush();
 
-  p_->gr_api->SwapBuffers();
+  p_->rendering_api->SwapBuffers();
 }
 
 bool GLWindow::MakeCurrent() {
-  p_->gr_api->MakeCurrent();
+  p_->rendering_api->MakeCurrent();
   return false;
 }
 
 void GLWindow::SwapBuffers() {
-  p_->gr_api->SwapBuffers();
+  p_->rendering_api->SwapBuffers();
 }
 
 } // namespace gui

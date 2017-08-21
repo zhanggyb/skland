@@ -25,21 +25,21 @@ namespace skland {
 namespace gui {
 
 class Surface;
-class AbstractGRAPI;
+class AbstractRenderingAPI;
 
 class GLView : public AbstractView {
 
  public:
 
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(GLView);
+
   GLView();
 
-  virtual ~GLView();
-
-  void SetGLInterface(AbstractGRAPI *interface);
+  void SetRenderingInterface(AbstractRenderingAPI *api);
 
  protected:
 
-  void OnRequestUpdate(AbstractView *view) final;
+  virtual ~GLView();
 
   void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
 
@@ -79,7 +79,7 @@ class GLView : public AbstractView {
 
   Surface *gl_surface_ = nullptr;
 
-  AbstractGRAPI *gr_api_ = nullptr;
+  AbstractRenderingAPI *rendering_api_ = nullptr;
 
   Callback callback_;
 

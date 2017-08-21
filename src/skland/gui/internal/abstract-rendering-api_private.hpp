@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_GR_API_PRIVATE_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_GR_API_PRIVATE_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_RENDERING_API_PRIVATE_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_RENDERING_API_PRIVATE_HPP_
 
-#include "skland/gui/abstract-gr-api.hpp"
+#include "skland/gui/abstract-rendering-api.hpp"
 
 #include "surface_private.hpp"
 
@@ -28,7 +28,7 @@ namespace gui {
  * @ingroup gui_intern
  * @brief Structure for private data in AbstractGPUInterface
  */
-struct AbstractGRAPI::Private {
+struct AbstractRenderingAPI::Private {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 

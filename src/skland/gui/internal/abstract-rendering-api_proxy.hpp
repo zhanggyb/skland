@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_GR_API_PROXY_HPP_
-#define SKLAND_GUI_INTERNAL_ABSTRACT_GR_API_PROXY_HPP_
+#ifndef SKLAND_GUI_INTERNAL_ABSTRACT_RENDERING_API_PROXY_HPP_
+#define SKLAND_GUI_INTERNAL_ABSTRACT_RENDERING_API_PROXY_HPP_
 
-#include "skland/gui/abstract-gr-api.hpp"
+#include "skland/gui/abstract-rendering-api.hpp"
 
 #include "surface_private.hpp"
 
 namespace skland {
 namespace gui {
 
-struct AbstractGRAPI::Proxy {
+struct AbstractRenderingAPI::Proxy {
 
   static inline struct wl_surface *GetWaylandSurface(const Surface *surface) {
     return surface->p_->wl_surface;

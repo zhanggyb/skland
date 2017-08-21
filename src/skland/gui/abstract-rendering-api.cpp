@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-#include "internal/abstract-gr-api_private.hpp"
+#include "internal/abstract-rendering-api_private.hpp"
 
 namespace skland {
 namespace gui {
 
-AbstractGRAPI::AbstractGRAPI() {
+AbstractRenderingAPI::AbstractRenderingAPI() {
 
 }
 
-AbstractGRAPI::~AbstractGRAPI() {
+AbstractRenderingAPI::~AbstractRenderingAPI() {
   destroyed_.Emit();
 }
 
-void AbstractGRAPI::Setup(Surface *surface) {
+void AbstractRenderingAPI::Setup(Surface *surface) {
   if (surface->p_->gr_api == this) return;
 
   if (nullptr != surface->p_->gr_api) {
-    AbstractGRAPI *orig = surface->p_->gr_api;
+    AbstractRenderingAPI *orig = surface->p_->gr_api;
     surface->p_->gr_api = nullptr;
     orig->OnRelease(surface);
   }
@@ -41,7 +41,7 @@ void AbstractGRAPI::Setup(Surface *surface) {
   OnSetup(surface);
 }
 
-void AbstractGRAPI::Release(Surface *surface) {
+void AbstractRenderingAPI::Release(Surface *surface) {
   if (surface->p_->gr_api != this) return;
 
   surface->p_->gr_api = nullptr;

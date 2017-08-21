@@ -18,7 +18,7 @@
 #include "internal/surface_shell_private.hpp"
 #include "internal/surface_shell_toplevel_private.hpp"
 #include "internal/surface_shell_popup_private.hpp"
-#include "internal/abstract-gr-api_private.hpp"
+#include "internal/abstract-rendering-api_private.hpp"
 
 #include "skland/core/assert.hpp"
 #include "skland/core/memory.hpp"
@@ -611,12 +611,12 @@ AbstractEventHandler *Surface::GetEventHandler() const {
   return p_->event_handler;
 }
 
-void Surface::SetGRAPI(AbstractGRAPI *interface) {
-  interface->Setup(this);
-  interface->destroyed().Connect(this, &Surface::OnGLInterfaceDestroyed);
+void Surface::SetRenderingAPI(AbstractRenderingAPI *api) {
+  api->Setup(this);
+  api->destroyed().Connect(this, &Surface::OnGLInterfaceDestroyed);
 }
 
-AbstractGRAPI *Surface::GetGRAPI() const {
+AbstractRenderingAPI *Surface::GetRenderingAPI() const {
   return p_->gr_api;
 }
 

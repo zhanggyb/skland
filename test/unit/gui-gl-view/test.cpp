@@ -62,7 +62,7 @@ class Triangle : public GLView {
  public:
 
   Triangle() {
-    SetGLInterface(new GLESV2API);
+    SetRenderingInterface(new GLESV2API);
   }
 
   virtual ~Triangle() {

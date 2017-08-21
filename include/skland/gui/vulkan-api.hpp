@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_VULKAN_API_HPP_
 #define SKLAND_GUI_VULKAN_API_HPP_
 
-#include "abstract-gr-api.hpp"
+#include "abstract-rendering-api.hpp"
 
 #include <vulkan/vulkan.hpp>
 
@@ -30,7 +30,7 @@ class Surface;
  * @ingroup gui
  * @brief Vulkan
  */
-class VulkanAPI : public AbstractGRAPI {
+class VulkanAPI : public AbstractRenderingAPI {
 
  public:
 

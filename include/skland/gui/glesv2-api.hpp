@@ -17,7 +17,7 @@
 #ifndef SKLAND_GUI_GLESV2_API_HPP_
 #define SKLAND_GUI_GLESV2_API_HPP_
 
-#include "abstract-gr-api.hpp"
+#include "abstract-rendering-api.hpp"
 
 namespace skland {
 namespace gui {
@@ -26,7 +26,7 @@ namespace gui {
  * @ingroup gui
  * @brief OpenGL ES V2
  */
-class GLESV2API : public AbstractGRAPI {
+class GLESV2API : public AbstractRenderingAPI {
 
  public:
 

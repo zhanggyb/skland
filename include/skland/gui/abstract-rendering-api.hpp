@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_ABSTRACT_GR_API_HPP_
-#define SKLAND_GUI_ABSTRACT_GR_API_HPP_
+#ifndef SKLAND_GUI_ABSTRACT_RENDERING_API_HPP_
+#define SKLAND_GUI_ABSTRACT_RENDERING_API_HPP_
 
 #include "skland/core/defines.hpp"
 #include "skland/core/sigcxx.hpp"
@@ -31,17 +31,17 @@ class Surface;
  * @ingroup gui
  * @brief The base class for graphics rendering API to render on a 3D surface
  */
-class AbstractGRAPI {
+class AbstractRenderingAPI {
 
   friend class Surface;
 
  public:
 
-  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractGRAPI);
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AbstractRenderingAPI);
 
-  AbstractGRAPI();
+  AbstractRenderingAPI();
 
-  virtual ~AbstractGRAPI();
+  virtual ~AbstractRenderingAPI();
 
   void Setup(Surface *surface);
 
@@ -74,4 +74,4 @@ class AbstractGRAPI {
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_ABSTRACT_GR_API_HPP_
+#endif // SKLAND_GUI_ABSTRACT_RENDERING_API_HPP_

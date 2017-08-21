@@ -34,7 +34,7 @@ class Buffer;
 class Output;
 class InputEvent;
 class Region;
-class AbstractGRAPI;
+class AbstractRenderingAPI;
 
 /**
  * @ingroup gui
@@ -78,7 +78,7 @@ class Surface : public core::Trackable {
   friend class Application;
   friend class Display;
   friend class Callback;
-  friend class AbstractGRAPI;
+  friend class AbstractRenderingAPI;
 
  public:
 
@@ -201,14 +201,14 @@ class Surface : public core::Trackable {
 
   /**
    * @brief Set the graphic library interface for this surface
-   * @param interface An allocated GLInterface object or nullptr to unset and
+   * @param api An allocated GLInterface object or nullptr to unset and
    * use shm back.
    *
    * @note The GLInterface will be deleted when the surface destroyed.
    */
-  void SetGRAPI(AbstractGRAPI *interface);
+  void SetRenderingAPI(AbstractRenderingAPI *api);
 
-  AbstractGRAPI *GetGRAPI() const;
+  AbstractRenderingAPI *GetRenderingAPI() const;
 
   const Margin &GetMargin() const;
 

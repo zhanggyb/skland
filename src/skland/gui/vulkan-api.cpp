@@ -18,13 +18,13 @@
 
 #include "internal/display_proxy.hpp"
 #include "internal/surface_private.hpp"
-#include "internal/abstract-gr-api_proxy.hpp"
+#include "internal/abstract-rendering-api_proxy.hpp"
 
 namespace skland {
 namespace gui {
 
 VulkanAPI::VulkanAPI()
-    : AbstractGRAPI() {
+    : AbstractRenderingAPI() {
 
 }
 

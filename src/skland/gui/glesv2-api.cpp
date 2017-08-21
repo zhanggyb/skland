@@ -19,7 +19,7 @@
 #include "skland/core/assert.hpp"
 #include "skland/core/memory.hpp"
 
-#include "internal/abstract-gr-api_proxy.hpp"
+#include "internal/abstract-rendering-api_proxy.hpp"
 #include "internal/display_proxy.hpp"
 
 #include <EGL/egl.h>
