@@ -53,8 +53,6 @@ SKLAND_EXPORT class AbstractLayout : public AbstractView {
   virtual void OnConfigureGeometry(const RectF &old_geometry,
                                    const RectF &new_geometry) final;
 
-  virtual void OnRequestSaveGeometry(AbstractView *view) override;
-
   virtual void OnSaveGeometry(const RectF &old_geometry,
                               const RectF &new_geometry) final;
 

@@ -41,8 +41,7 @@ using graphic::Paint;
 using graphic::Canvas;
 
 AbstractLayout::AbstractLayout(const Padding &padding)
-    : AbstractView(),
-      is_geometry_saved_(false) {
+    : is_geometry_saved_(false) {
   p_->padding = padding;
 }
 
@@ -78,18 +77,13 @@ void AbstractLayout::Layout() {
 }
 
 void AbstractLayout::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-//  is_geometry_saved_ = false;
-  RequestSaveGeometry(new_geometry);
-}
+  if (!RequestSaveGeometry(new_geometry)) return;
 
-void AbstractLayout::OnRequestSaveGeometry(AbstractView *view) {
-//  if (!is_geometry_saved_) return;
-  AbstractView::OnRequestSaveGeometry(view);
+  OnLayout(0, 0, 0, 0);
 }
 
 void AbstractLayout::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-//  is_geometry_saved_ = true;
-  OnLayout(0, 0, 0, 0);
+  // Do nothing in layout
 }
 
 void AbstractLayout::OnRequestUpdate(AbstractView *view) {

@@ -17,7 +17,9 @@
 #ifndef SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_
 #define SKLAND_GUI_INTERNAL_ABSTRACT_EVENT_HANDLER_PRIVATE_HPP_
 
-#include <skland/gui/abstract-event-handler.hpp>
+#include "skland/gui/abstract-event-handler.hpp"
+
+#include "skland/core/property.hpp"
 
 namespace skland {
 namespace gui {
@@ -26,15 +28,16 @@ namespace gui {
  * @ingroup gui_intern
  * @brief The structure for the private data in AbstractEventHandler
  */
-SKLAND_NO_EXPORT struct AbstractEventHandler::Private {
+struct AbstractEventHandler::Private : public core::Property<AbstractEventHandler> {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
 
   explicit Private(AbstractEventHandler *event_handler)
-      : mouse_task(event_handler),
+      : core::Property<AbstractEventHandler>(event_handler),
+        mouse_task(event_handler),
         mouse_motion_task(event_handler) {}
 
-  ~Private() = default;
+  ~Private() final = default;
 
   /**
    * @brief An event task to handle mouse enter/leave/button events

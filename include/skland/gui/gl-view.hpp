@@ -19,8 +19,6 @@
 
 #include "abstract-view.hpp"
 
-#include "callback.hpp"
-
 namespace skland {
 namespace gui {
 
@@ -35,7 +33,7 @@ class GLView : public AbstractView {
 
   GLView();
 
-  void SetRenderingInterface(AbstractRenderingAPI *api);
+  void SetRenderingAPI(AbstractRenderingAPI *api);
 
  protected:
 
@@ -75,13 +73,9 @@ class GLView : public AbstractView {
 
  private:
 
-  void OnFrame(uint32_t serial);
+  struct Private;
 
-  Surface *gl_surface_ = nullptr;
-
-  AbstractRenderingAPI *rendering_api_ = nullptr;
-
-  Callback callback_;
+  std::unique_ptr<Private> p_;
 
 };
 

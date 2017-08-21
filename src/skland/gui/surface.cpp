@@ -452,8 +452,8 @@ Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
 }
 
 Surface::~Surface() {
-  if (nullptr != p_->gr_api) {
-    p_->gr_api->Release(this);
+  if (nullptr != p_->rendering_api) {
+    p_->rendering_api->Release(this);
   }
 
 //  if (p_->egl)
@@ -479,7 +479,7 @@ void Surface::Attach(Buffer *buffer, int32_t x, int32_t y) {
 }
 
 void Surface::Commit() {
-  if (nullptr != p_->gr_api) {
+  if (nullptr != p_->rendering_api) {
     // GL surface does not use commit
     if (p_->commit_mode == kSynchronized) {
       Surface *main_surface = GetShellSurface();
@@ -617,7 +617,7 @@ void Surface::SetRenderingAPI(AbstractRenderingAPI *api) {
 }
 
 AbstractRenderingAPI *Surface::GetRenderingAPI() const {
-  return p_->gr_api;
+  return p_->rendering_api;
 }
 
 const Margin &Surface::GetMargin() const {
@@ -629,7 +629,7 @@ const Point &Surface::GetRelativePosition() const {
 }
 
 void Surface::OnGLInterfaceDestroyed(core::SLOT /* slot */) {
-  p_->gr_api = nullptr;
+  p_->rendering_api = nullptr;
 }
 
 void Surface::Clear() {

@@ -17,6 +17,8 @@
 #include "skland/gui/gl-view.hpp"
 
 #include "skland/core/assert.hpp"
+#include "skland/core/property.hpp"
+#include "skland/core/memory.hpp"
 
 #include "skland/gui/surface.hpp"
 #include "skland/gui/mouse-event.hpp"
@@ -24,35 +26,65 @@
 #include "skland/gui/context.hpp"
 #include "skland/gui/abstract-rendering-api.hpp"
 #include "skland/gui/region.hpp"
+#include "skland/gui/callback.hpp"
 
 namespace skland {
 namespace gui {
 
+struct GLView::Private : public core::Property<GLView> {
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Private);
+
+  explicit Private(GLView *owner)
+      : core::Property<GLView>(owner) {}
+
+  ~Private() final = default;
+
+  Surface *gl_surface = nullptr;
+
+  AbstractRenderingAPI *rendering_api = nullptr;
+
+  Callback callback;
+
+  void OnFrame(uint32_t serial);
+
+};
+
+void GLView::Private::OnFrame(uint32_t serial) {
+  callback.Setup(*gl_surface);
+  owner()->OnRender();
+  gl_surface->Commit();
+}
+
+// ------
+
 GLView::GLView() {
-  callback_.done().Set(this, &GLView::OnFrame);
+  p_ = core::make_unique<Private>(this);
+
+  p_->callback.done().Set(p_.get(), &GLView::Private::OnFrame);
 }
 
 GLView::~GLView() {
-  // Note: delete interface_ before destroying gl_surface_:
-  delete rendering_api_;
-  delete gl_surface_;
+  // Note: delete interface_ before destroying gl_surface:
+  delete p_->rendering_api;
+  delete p_->gl_surface;
 }
 
-void GLView::SetRenderingInterface(AbstractRenderingAPI *api) {
-  if (rendering_api_ == api) return;
+void GLView::SetRenderingAPI(AbstractRenderingAPI *api) {
+  if (p_->rendering_api == api) return;
 
-  rendering_api_ = api;
+  p_->rendering_api = api;
 
-  if (nullptr != gl_surface_) {
-    gl_surface_->SetRenderingAPI(rendering_api_);
+  if (nullptr != p_->gl_surface) {
+    p_->gl_surface->SetRenderingAPI(p_->rendering_api);
   }
 }
 
 void GLView::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
   if (!RequestSaveGeometry(new_geometry)) return;
 
-  if ((nullptr != gl_surface_) && (nullptr != rendering_api_)) {
-    rendering_api_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
+  if ((nullptr != p_->gl_surface) && (nullptr != p_->rendering_api)) {
+    p_->rendering_api->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
     OnResize((int) new_geometry.width(), (int) new_geometry.height());
   }
 }
@@ -90,22 +122,22 @@ void GLView::OnKeyUp(KeyEvent *event) {
 }
 
 void GLView::OnDraw(const Context &context) {
-  if (nullptr == gl_surface_) {
-    if (nullptr == rendering_api_) return;
+  if (nullptr == p_->rendering_api) return;
 
-    gl_surface_ = Surface::Sub::Create(context.surface(), this);
-    gl_surface_->SetRenderingAPI(rendering_api_);
-//    gl_surface_->SetCommitMode(Surface::kDesynchronized);
+  if (nullptr == p_->gl_surface) {
+    p_->gl_surface = Surface::Sub::Create(context.surface(), this);
+    p_->gl_surface->SetRenderingAPI(p_->rendering_api);
+//    gl_surface->SetCommitMode(Surface::kDesynchronized);
 
     Region region;
-    gl_surface_->SetInputRegion(region);
+    p_->gl_surface->SetInputRegion(region);
 
-    rendering_api_->SetViewportSize(GetWidth(), GetHeight());
-    Surface::Sub::Get(gl_surface_)->SetWindowPosition(GetX(), GetY());
+    p_->rendering_api->SetViewportSize(GetWidth(), GetHeight());
+    Surface::Sub::Get(p_->gl_surface)->SetWindowPosition(GetX(), GetY());
 
-    callback_.Setup(*gl_surface_);
+    p_->callback.Setup(*p_->gl_surface);
     OnInitialize();
-    gl_surface_->Commit();
+    p_->gl_surface->Commit();
   }
 }
 
@@ -114,17 +146,11 @@ void GLView::OnRenderSurface(Surface *surface) {
 }
 
 void GLView::SwapBuffers() {
-  if (nullptr != rendering_api_) rendering_api_->SwapBuffers();
+  if (nullptr != p_->rendering_api) p_->rendering_api->SwapBuffers();
 }
 
 void GLView::MakeCurrent() {
-  if (nullptr != rendering_api_) rendering_api_->MakeCurrent();
-}
-
-void GLView::OnFrame(uint32_t serial) {
-  callback_.Setup(*gl_surface_);
-  OnRender();
-  gl_surface_->Commit();
+  if (nullptr != p_->rendering_api) p_->rendering_api->MakeCurrent();
 }
 
 } // namespace gui

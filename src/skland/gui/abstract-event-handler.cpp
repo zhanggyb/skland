@@ -17,12 +17,13 @@
 #include "internal/abstract-view_private.hpp"
 #include "internal/abstract-event-handler_private.hpp"
 
+#include "skland/core/memory.hpp"
+
 namespace skland {
 namespace gui {
 
-AbstractEventHandler::AbstractEventHandler()
-    : Trackable() {
-  p_.reset(new Private(this));
+AbstractEventHandler::AbstractEventHandler() {
+  p_ = core::make_unique<Private>(this);
 }
 
 AbstractEventHandler::~AbstractEventHandler() {

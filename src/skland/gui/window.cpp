@@ -106,12 +106,12 @@ void Window::Private::DrawFrame(const Context &context) {
   context.canvas()->Clear();
 
   int scale = context.surface()->GetScale();
-  int width = owner->GetWidth() * scale;
-  int height = owner->GetHeight() * scale;
+  int width = owner()->GetWidth() * scale;
+  int height = owner()->GetHeight() * scale;
 
   Path path;
   RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, width, height);
-  bool drop_shadow = !(owner->IsMaximized() || owner->IsFullscreen());
+  bool drop_shadow = !(owner()->IsMaximized() || owner()->IsFullscreen());
   const Theme::Schema &window_schema = Theme::GetData().window;
   const Theme::Schema &title_bar_schema = Theme::GetData().title_bar;
   Shader shader;
@@ -131,7 +131,7 @@ void Window::Private::DrawFrame(const Context &context) {
     };
     path.AddRoundRect(geometry, radii);
     Canvas::ClipGuard guard(context.canvas(), path, ClipOperation::kClipDifference, true);
-    owner->DropShadow(context);
+    owner()->DropShadow(context);
   } else {
     path.AddRect(geometry);
   }
@@ -181,7 +181,7 @@ void Window::Private::DrawFrame(const Context &context) {
   }
 
   if (window_schema.active.foreground.shaded) {
-    points[1].y = owner->GetHeight();
+    points[1].y = owner()->GetHeight();
     shader = GradientShader::MakeLinear(points,
                                         window_schema.active.foreground.shaded_colors.data(),
                                         window_schema.active.foreground.shaded_positions.data(),
@@ -190,12 +190,12 @@ void Window::Private::DrawFrame(const Context &context) {
   } else {
     paint.SetColor(window_schema.active.foreground.color);
   }
-  context.canvas()->DrawRect(owner->GetContentGeometry() * scale, paint);
+  context.canvas()->DrawRect(owner()->GetContentGeometry() * scale, paint);
   context.canvas()->Flush();
 }
 
 void Window::Private::SetContentViewGeometry() {
-  const RectI geometry = owner->GetContentGeometry();
+  const RectI geometry = owner()->GetContentGeometry();
   content_view->MoveTo(geometry.x(), geometry.y());
   content_view->Resize(geometry.width(), geometry.height());
 }
@@ -670,42 +670,43 @@ void Window::OnLeaveOutput(const Surface *surface, const Output *output) {
 
 int Window::GetMouseLocation(const MouseEvent *event) const {
   int vlocation, hlocation, location;
-  int x = static_cast<int>(event->GetSurfaceXY().x),
-      y = static_cast<int>(event->GetSurfaceXY().y);
+  auto x = static_cast<int>(event->GetSurfaceXY().x);
+  auto y = static_cast<int>(event->GetSurfaceXY().y);
+  const Margin &shadow_margin = Theme::GetShadowMargin();
 
   // TODO: maximized or fullscreen
 
-  if (x < (Theme::GetShadowMargin().left - kResizingMargin.left))
-    hlocation = AbstractShellView::kExterior;
-  else if (x < Theme::GetShadowMargin().left + kResizingMargin.left)
-    hlocation = AbstractShellView::kResizeLeft;
-  else if (x < Theme::GetShadowMargin().left + GetWidth() - kResizingMargin.right)
-    hlocation = AbstractShellView::kInterior;
-  else if (x < Theme::GetShadowMargin().left + GetWidth() + kResizingMargin.right)
-    hlocation = AbstractShellView::kResizeRight;
+  if (x < (shadow_margin.left - kResizingMargin.left))
+    hlocation = kExterior;
+  else if (x < shadow_margin.left + kResizingMargin.left)
+    hlocation = kResizeLeft;
+  else if (x < shadow_margin.left + GetWidth() - kResizingMargin.right)
+    hlocation = kInterior;
+  else if (x < shadow_margin.left + GetWidth() + kResizingMargin.right)
+    hlocation = kResizeRight;
   else
-    hlocation = AbstractShellView::kExterior;
+    hlocation = kExterior;
 
-  if (y < (Theme::GetShadowMargin().top - kResizingMargin.top))
-    vlocation = AbstractShellView::kExterior;
-  else if (y < Theme::GetShadowMargin().top + kResizingMargin.top)
-    vlocation = AbstractShellView::kResizeTop;
-  else if (y < Theme::GetShadowMargin().top + GetHeight() - kResizingMargin.bottom)
-    vlocation = AbstractShellView::kInterior;
-  else if (y < Theme::GetShadowMargin().top + GetHeight() + kResizingMargin.bottom)
-    vlocation = AbstractShellView::kResizeBottom;
+  if (y < (shadow_margin.top - kResizingMargin.top))
+    vlocation = kExterior;
+  else if (y < shadow_margin.top + kResizingMargin.top)
+    vlocation = kResizeTop;
+  else if (y < shadow_margin.top + GetHeight() - kResizingMargin.bottom)
+    vlocation = kInterior;
+  else if (y < shadow_margin.top + GetHeight() + kResizingMargin.bottom)
+    vlocation = kResizeBottom;
   else
-    vlocation = AbstractShellView::kExterior;
+    vlocation = kExterior;
 
   location = vlocation | hlocation;
-  if (location & AbstractShellView::kExterior)
-    location = AbstractShellView::kExterior;
+  if (location & kExterior)
+    location = kExterior;
 
-  if (location == AbstractShellView::kInterior &&
-      y < Theme::GetShadowMargin().top + TitleBar::kHeight)
-    location = AbstractShellView::kTitleBar;
-  else if (location == AbstractShellView::kInterior)
-    location = AbstractShellView::kClientArea;
+  if (location == kInterior &&
+      y < shadow_margin.top + TitleBar::kHeight)
+    location = kTitleBar;
+  else if (location == kInterior)
+    location = kClientArea;
 
   return location;
 }
@@ -727,7 +728,7 @@ void Window::OnFullscreenButtonClicked(core::SLOT slot) {
     ToggleFullscreen(nullptr);
   } else {
     if (nullptr != p_->output)
-      p_->owner->ToggleFullscreen(p_->output);
+      p_->owner()->ToggleFullscreen(p_->output);
     else {
       const CompoundDeque &outputs = Display::GetOutputs();
       if (outputs.count() > 0) {

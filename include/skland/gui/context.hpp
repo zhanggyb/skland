@@ -36,16 +36,17 @@ class Context {
 
  public:
 
-  Context()
-      : surface_(nullptr), canvas_(nullptr) {}
+  using Canvas = graphic::Canvas;
 
-  Context(Surface *surface, graphic::Canvas *canvas)
+  Context() = default;
+
+  Context(Surface *surface, Canvas *canvas)
       : surface_(surface), canvas_(canvas) {}
 
   Context(const Context &other)
       : surface_(other.surface_), canvas_(other.canvas_) {}
 
-  ~Context() {}
+  ~Context() = default;
 
   Context &operator=(const Context &other) {
     surface_ = other.surface_;
@@ -57,14 +58,14 @@ class Context {
 
   void set_surface(Surface *surface) { surface_ = surface; }
 
-  graphic::Canvas *canvas() const { return canvas_; }
+  Canvas *canvas() const { return canvas_; }
 
-  void set_canvas(graphic::Canvas *canvas) { canvas_ = canvas; }
+  void set_canvas(Canvas *canvas) { canvas_ = canvas; }
 
  private:
 
-  Surface *surface_;
-  graphic::Canvas *canvas_;
+  Surface *surface_ = nullptr;
+  Canvas *canvas_ = nullptr;
 
 };
 

@@ -28,23 +28,23 @@ AbstractRenderingAPI::~AbstractRenderingAPI() {
 }
 
 void AbstractRenderingAPI::Setup(Surface *surface) {
-  if (surface->p_->gr_api == this) return;
+  if (surface->p_->rendering_api == this) return;
 
-  if (nullptr != surface->p_->gr_api) {
-    AbstractRenderingAPI *orig = surface->p_->gr_api;
-    surface->p_->gr_api = nullptr;
+  if (nullptr != surface->p_->rendering_api) {
+    AbstractRenderingAPI *orig = surface->p_->rendering_api;
+    surface->p_->rendering_api = nullptr;
     orig->OnRelease(surface);
   }
 
-  surface->p_->gr_api = this;
+  surface->p_->rendering_api = this;
 
   OnSetup(surface);
 }
 
 void AbstractRenderingAPI::Release(Surface *surface) {
-  if (surface->p_->gr_api != this) return;
+  if (surface->p_->rendering_api != this) return;
 
-  surface->p_->gr_api = nullptr;
+  surface->p_->rendering_api = nullptr;
   OnRelease(surface);
 }
 

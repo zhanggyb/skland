@@ -51,8 +51,6 @@ class GLWindow : public AbstractShellView {
 
   void OnShown() final;
 
-  void OnRequestUpdate(AbstractView *view) final;
-
   void OnConfigureSize(const Size &old_size, const Size &new_size) final;
 
   void OnSaveSize(const Size &old_size, const Size &new_size) final;

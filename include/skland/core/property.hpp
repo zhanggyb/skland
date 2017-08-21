@@ -79,7 +79,9 @@ namespace core {
  * variable.
  */
 template<typename T>
-struct Property {
+class Property {
+
+ public:
 
   Property() = delete;
   Property(const Property &) = delete;
@@ -88,11 +90,15 @@ struct Property {
   Property &operator=(Property &&) = delete;
 
   inline explicit Property(T *owner)
-      : owner(owner) {}
+      : owner_(owner) {}
 
   virtual ~Property() = default;
 
-  T *owner = nullptr;
+  T *owner() const { return owner_; }
+
+ private:
+
+  T *owner_ = nullptr;
 
 };
 

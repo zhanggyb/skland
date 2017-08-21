@@ -74,7 +74,7 @@ struct GLWindow::Private : public core::Property<GLWindow> {
 
   Surface *gl_surface = nullptr;
 
-  Callback frame_callback;
+  Callback callback;
 
   int GetMouseLocation(const MouseEvent *event) const;
 
@@ -91,9 +91,9 @@ void GLWindow::Private::DrawFrame(const Context &context) {
   canvas->Clear();
 
   Path path;
-  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, owner->GetWidth(), owner->GetHeight());
+  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, owner()->GetWidth(), owner()->GetHeight());
 
-  if ((!owner->IsMaximized()) || (!owner->IsFullscreen())) {
+  if ((!owner()->IsMaximized()) || (!owner()->IsFullscreen())) {
     // Drop shadow:
 //    float radii[] = {
 //        7.f, 7.f, // top-left
@@ -105,7 +105,7 @@ void GLWindow::Private::DrawFrame(const Context &context) {
     path.AddRect(geometry);
     canvas->Save();
     canvas->ClipPath(path, ClipOperation::kClipDifference, true);
-    owner->DropShadow(context);
+    owner()->DropShadow(context);
     canvas->Restore();
   } else {
     path.AddRect(geometry);
@@ -140,9 +140,9 @@ int GLWindow::Private::GetMouseLocation(const MouseEvent *event) const {
     hlocation = AbstractShellView::kExterior;
   else if (x < Theme::GetShadowMargin().left + kResizingMargin.left)
     hlocation = AbstractShellView::kResizeLeft;
-  else if (x < Theme::GetShadowMargin().left + owner->GetWidth() - kResizingMargin.right)
+  else if (x < Theme::GetShadowMargin().left + owner()->GetWidth() - kResizingMargin.right)
     hlocation = AbstractShellView::kInterior;
-  else if (x < Theme::GetShadowMargin().left + owner->GetWidth() + kResizingMargin.right)
+  else if (x < Theme::GetShadowMargin().left + owner()->GetWidth() + kResizingMargin.right)
     hlocation = AbstractShellView::kResizeRight;
   else
     hlocation = AbstractShellView::kExterior;
@@ -151,9 +151,9 @@ int GLWindow::Private::GetMouseLocation(const MouseEvent *event) const {
     vlocation = AbstractShellView::kExterior;
   else if (y < Theme::GetShadowMargin().top + kResizingMargin.top)
     vlocation = AbstractShellView::kResizeTop;
-  else if (y < Theme::GetShadowMargin().top + owner->GetHeight() - kResizingMargin.bottom)
+  else if (y < Theme::GetShadowMargin().top + owner()->GetHeight() - kResizingMargin.bottom)
     vlocation = AbstractShellView::kInterior;
-  else if (y < Theme::GetShadowMargin().top + owner->GetHeight() + kResizingMargin.bottom)
+  else if (y < Theme::GetShadowMargin().top + owner()->GetHeight() + kResizingMargin.bottom)
     vlocation = AbstractShellView::kResizeBottom;
   else
     vlocation = AbstractShellView::kExterior;
@@ -173,10 +173,12 @@ int GLWindow::Private::GetMouseLocation(const MouseEvent *event) const {
 }
 
 void GLWindow::Private::OnFrame(uint32_t serial) {
-  frame_callback.Setup(*gl_surface);
-  owner->OnRender();
+  callback.Setup(*gl_surface);
+  owner()->OnRender();
   gl_surface->Commit();
 }
+
+// ------------------
 
 GLWindow::GLWindow(const char *title)
     : GLWindow(400, 300, title) {
@@ -186,7 +188,7 @@ GLWindow::GLWindow(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
   p_ = core::make_unique<Private>(this);
 
-  p_->frame_callback.done().Set(p_.get(), &Private::OnFrame);
+  p_->callback.done().Set(p_.get(), &Private::OnFrame);
 }
 
 GLWindow::~GLWindow() {
@@ -221,11 +223,10 @@ void GLWindow::OnShown() {
 
   Surface::Sub::Get(p_->gl_surface)->SetWindowPosition(0, 0);
 
-  p_->gl_surface->Update();
-}
-
-void GLWindow::OnRequestUpdate(AbstractView *view) {
-
+  // p_->gl_surface->Update();
+  p_->callback.Setup(*p_->gl_surface);
+  OnInitialize();
+  p_->gl_surface->Commit();
 }
 
 void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
@@ -274,16 +275,10 @@ void GLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
 }
 
 void GLWindow::OnRenderSurface(Surface *surface) {
-  if (surface == p_->gl_surface) {
-    p_->frame_callback.Setup(*p_->gl_surface);
-    OnInitialize();
-    p_->gl_surface->Commit();
-    return;
-  }
-
   Surface *shell_surface = GetShellSurface();
   const Margin &margin = shell_surface->GetMargin();
-
+  _ASSERT(shell_surface == surface);
+  
   Canvas canvas((unsigned char *) p_->frame_buffer.GetData(),
                 p_->frame_buffer.GetSize().width,
                 p_->frame_buffer.GetSize().height);

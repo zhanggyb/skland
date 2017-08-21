@@ -78,13 +78,9 @@ class Buffer {
 
   const Size &GetSize() const;
 
-  SignalRef<> release() {
-    return release_;
-  }
+  SignalRef<> release() { return release_; }
 
-  SignalRef<> destroyed() {
-    return destroyed_;
-  }
+  SignalRef<> destroyed() { return destroyed_; }
 
  private:
 

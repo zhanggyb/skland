@@ -42,7 +42,7 @@ struct Surface::Private {
         below(nullptr),
         upper(nullptr),
         lower(nullptr),
-        gr_api(nullptr),
+        rendering_api(nullptr),
         render_task(surface),
         commit_task(surface) {
   }
@@ -91,7 +91,7 @@ struct Surface::Private {
    */
   Surface *lower;
 
-  AbstractRenderingAPI *gr_api;
+  AbstractRenderingAPI *rendering_api;
 
   union {
     void *placeholder;

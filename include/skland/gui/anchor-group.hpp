@@ -17,7 +17,8 @@
 #ifndef SKLAND_GUI_ANCHOR_GROUP_HPP_
 #define SKLAND_GUI_ANCHOR_GROUP_HPP_
 
-#include "../core/types.hpp"
+#include "skland/core/types.hpp"
+#include "skland/core/defines.hpp"
 
 namespace skland {
 namespace gui {
@@ -31,11 +32,10 @@ class Anchor;
  */
 class AnchorGroup {
 
-  AnchorGroup() = delete;
-  AnchorGroup(const AnchorGroup &) = delete;
-  AnchorGroup &operator=(const AnchorGroup &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(AnchorGroup);
+  AnchorGroup() = delete;
 
   AnchorGroup(AbstractView *view, Alignment align);
 
