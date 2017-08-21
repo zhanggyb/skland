@@ -23,16 +23,16 @@
 namespace skland {
 namespace gui {
 
-VulkanInterface::VulkanInterface()
+VulkanAPI::VulkanAPI()
     : AbstractGRAPI() {
 
 }
 
-VulkanInterface::~VulkanInterface() {
+VulkanAPI::~VulkanAPI() {
 
 }
 
-void VulkanInterface::OnSetup() {
+void VulkanAPI::OnSetup() {
   vk::WaylandSurfaceCreateInfoKHR info = {
       vk::WaylandSurfaceCreateFlagsKHR(),
       Display::Proxy::wl_display(),

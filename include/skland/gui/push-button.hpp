@@ -39,7 +39,7 @@ class PushButton : public AbstractButton {
 
   virtual ~PushButton();
 
-  virtual void OnDraw(const Context &context) override;
+  void OnDraw(const Context &context) override;
 
  private:
 

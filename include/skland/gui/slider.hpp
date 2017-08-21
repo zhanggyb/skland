@@ -35,37 +35,37 @@ class Slider : public AbstractSlider<int> {
 
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Slider);
 
-  Slider(Orientation orientation = kHorizontal);
+  explicit Slider(Orientation orientation = kHorizontal);
 
  protected:
 
   virtual ~Slider();
 
-  virtual void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
+  void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
 
-  virtual void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
+  void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) final;
 
-  virtual void OnMouseEnter(MouseEvent *event) final;
+  void OnMouseEnter(MouseEvent *event) final;
 
-  virtual void OnMouseLeave() final;
+  void OnMouseLeave() final;
 
-  virtual void OnMouseMove(MouseEvent *event) final;
+  void OnMouseMove(MouseEvent *event) final;
 
-  virtual void OnMouseDown(MouseEvent *event) final;
+  void OnMouseDown(MouseEvent *event) final;
 
-  virtual void OnMouseUp(MouseEvent *event) final;
+  void OnMouseUp(MouseEvent *event) final;
 
-  virtual void OnKeyDown(KeyEvent *event) final;
+  void OnKeyDown(KeyEvent *event) final;
 
-  virtual void OnKeyUp(KeyEvent *event) final;
+  void OnKeyUp(KeyEvent *event) final;
 
-  virtual void OnSetValue(const int &value) final;
+  void OnSetValue(const int &value) final;
 
-  virtual void OnSetMinimum(const int &minimum) final;
+  void OnSetMinimum(const int &minimum) final;
 
-  virtual void OnSetMaximum(const int &maximum) final;
+  void OnSetMaximum(const int &maximum) final;
 
-  virtual void OnDraw(const Context &context) override;
+  void OnDraw(const Context &context) override;
 
  private:
 

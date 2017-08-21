@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GUI_VULKAN_INTERFACE_HPP_
-#define SKLAND_GUI_VULKAN_INTERFACE_HPP_
+#ifndef SKLAND_GUI_VULKAN_API_HPP_
+#define SKLAND_GUI_VULKAN_API_HPP_
 
 #include "abstract-gr-api.hpp"
 
@@ -30,13 +30,13 @@ class Surface;
  * @ingroup gui
  * @brief Vulkan
  */
-class VulkanInterface : public AbstractGRAPI {
+class VulkanAPI : public AbstractGRAPI {
 
  public:
 
-  VulkanInterface();
+  VulkanAPI();
 
-  virtual ~VulkanInterface();
+  virtual ~VulkanAPI();
 
  protected:
 
@@ -51,4 +51,4 @@ class VulkanInterface : public AbstractGRAPI {
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_GUI_VULKAN_ENGINE_HPP_
+#endif // SKLAND_GUI_VULKAN_API_HPP_

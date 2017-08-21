@@ -236,8 +236,6 @@ void GLWindow::OnConfigureSize(const Size &old_size, const Size &new_size) {
 
   if (!RequestSaveSize(size)) return;
 
-  DispatchMouseLeaveEvent();
-
   p_->gr_api->SetViewportSize(size.width, size.height);
   OnResize(size.width, size.height);
 }
@@ -270,6 +268,9 @@ void GLWindow::OnSaveSize(const Size &old_size, const Size &new_size) {
   shell_surface->Attach(&p_->frame_buffer);
 
   shell_surface->Update();
+
+  // surface size is changed, reset the pointer position and enter/leave widgets
+  DispatchMouseLeaveEvent();
 }
 
 void GLWindow::OnRenderSurface(Surface *surface) {

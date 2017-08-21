@@ -75,27 +75,27 @@ class TitleBar final : public AbstractView {
    */
   virtual ~TitleBar();
 
-  virtual void OnConfigureGeometry(const RectF &old_geometry,
-                                   const RectF &new_geometry) override;
+  void OnConfigureGeometry(const RectF &old_geometry,
+                           const RectF &new_geometry) override;
 
-  virtual void OnSaveGeometry(const RectF &old_geometry,
-                              const RectF &new_geometry) override;
+  void OnSaveGeometry(const RectF &old_geometry,
+                      const RectF &new_geometry) override;
 
-  virtual void OnMouseEnter(MouseEvent *event) override;
+  void OnMouseEnter(MouseEvent *event) override;
 
-  virtual void OnMouseLeave() override;
+  void OnMouseLeave() override;
 
-  virtual void OnMouseMove(MouseEvent *event) override;
+  void OnMouseMove(MouseEvent *event) override;
 
-  virtual void OnMouseDown(MouseEvent *event) override;
+  void OnMouseDown(MouseEvent *event) override;
 
-  virtual void OnMouseUp(MouseEvent *event) override;
+  void OnMouseUp(MouseEvent *event) override;
 
-  virtual void OnKeyDown(KeyEvent *event) override;
+  void OnKeyDown(KeyEvent *event) override;
 
-  virtual void OnKeyUp(KeyEvent *event) override;
+  void OnKeyUp(KeyEvent *event) override;
 
-  virtual void OnDraw(const Context &context) override;
+  void OnDraw(const Context &context) override;
 
  private:
 

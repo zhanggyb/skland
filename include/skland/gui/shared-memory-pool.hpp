@@ -64,7 +64,7 @@ class SharedMemoryPool {
 
   static int CreateTempFile(char *tmpname);
 
-  struct wl_shm_pool* wl_shm_pool_;
+  struct wl_shm_pool *wl_shm_pool_;
 
   int32_t size_;
 

@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-#include <skland/gui/callback.hpp>
+#include "skland/gui/callback.hpp"
 
 #include "internal/display_private.hpp"
 #include "internal/surface_private.hpp"
+
+#include "skland/core/memory.hpp"
 
 namespace skland {
 namespace gui {
@@ -27,15 +29,14 @@ struct Callback::Private {
   Private(const Private &) = delete;
   Private &operator=(const Private &) = delete;
 
-  Private()
-      : wl_callback(nullptr) {}
+  Private() = default;
 
   ~Private() {
-    if (wl_callback) wl_callback_destroy(wl_callback);
+    if (nullptr != wl_callback) wl_callback_destroy(wl_callback);
   }
 
   void Destroy() {
-    if (wl_callback) {
+    if (nullptr != wl_callback) {
       wl_callback_destroy(wl_callback);
       wl_callback = nullptr;
     }
@@ -47,7 +48,7 @@ struct Callback::Private {
 
   static const struct wl_callback_listener kListener;
 
-  struct wl_callback *wl_callback;
+  struct wl_callback *wl_callback = nullptr;
 
 };
 
@@ -56,14 +57,14 @@ const struct wl_callback_listener Callback::Private::kListener = {
 };
 
 void Callback::Private::OnDone(void *data, struct wl_callback */*wl_callback*/, uint32_t callback_data) {
-  Callback *_this = static_cast<Callback *>(data);
+  auto *_this = static_cast<Callback *>(data);
   if (_this->done_) _this->done_(callback_data);
 }
 
 // -----
 
 Callback::Callback() {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 }
 
 Callback::Callback(const Display &display)

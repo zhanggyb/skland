@@ -526,7 +526,9 @@ void AbstractView::OnRequestSaveGeometry(AbstractView *view) {
     _ASSERT(nullptr == p_->shell_view);
     p_->parent->OnRequestSaveGeometry(view);
     return;
-  } else if (nullptr != p_->shell_view) {
+  }
+
+  if (nullptr != p_->shell_view) {
     _ASSERT(nullptr == p_->parent);
     p_->shell_view->OnRequestSaveGeometry(view);
   }
@@ -559,9 +561,10 @@ bool AbstractView::RequestSaveGeometry(const RectF &geometry) {
     return false;
   }
 
-  if (p_->geometry_task.IsLinked()) return true;
+  bool ret = true;
 
-  bool ret = false;
+  if (p_->geometry_task.IsLinked()) return ret;
+
   if (nullptr != p_->parent) {
     _ASSERT(nullptr == p_->shell_view);
     p_->parent->OnRequestSaveGeometry(this);
@@ -573,7 +576,6 @@ bool AbstractView::RequestSaveGeometry(const RectF &geometry) {
   } else {
     core::Deque<Task> &deque = Application::GetTaskDeque();
     deque.PushBack(&p_->geometry_task);
-    ret = true;
   }
 
   return ret;

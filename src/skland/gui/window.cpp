@@ -343,23 +343,14 @@ void Window::OnRequestUpdate(AbstractView *view) {
 }
 
 void Window::OnConfigureSize(const Size &old_size, const Size &new_size) {
-  _ASSERT((p_->minimal_size.width < p_->maximal_size.width) &&
-      (p_->minimal_size.height < p_->maximal_size.height));
-
   Size size = new_size;
 
   if (size.width < p_->minimal_size.width) size.width = p_->minimal_size.width;
   if (size.height < p_->minimal_size.height) size.height = p_->minimal_size.height;
-
   if (size.width > p_->maximal_size.width) size.width = p_->maximal_size.width;
   if (size.height > p_->maximal_size.height) size.height = p_->maximal_size.height;
 
-  if (!RequestSaveSize(size)) return;
-
-  p_->inhibit_update = true;
-
-  // surface size is changed, reset the pointer position and enter/leave widgets
-  DispatchMouseLeaveEvent();
+  RequestSaveSize(size);
 }
 
 void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
@@ -414,7 +405,9 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
   p_->widget_canvas->Clear();
   p_->widget_canvas->Flush();
 
-  p_->inhibit_update = false;
+  // surface size is changed, reset the pointer position and enter/leave widgets
+  DispatchMouseLeaveEvent();
+
   if (nullptr != p_->title_bar) {
     DispatchUpdate(p_->title_bar);
     p_->title_bar->Resize(new_size.width, TitleBar::kHeight);

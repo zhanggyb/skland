@@ -74,7 +74,7 @@ void AbstractLayout::RemoveView(AbstractView *view) {
 }
 
 void AbstractLayout::Layout() {
-  OnLayout(0, 0, GetWidth(), GetHeight());
+  OnLayout(0, 0, 0, 0);
 }
 
 void AbstractLayout::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {

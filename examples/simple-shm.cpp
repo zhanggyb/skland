@@ -42,7 +42,7 @@ class SpinningView : public AbstractView {
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(SpinningView);
 
   SpinningView() {
-    color_ = 0xFF4FBF4F;
+    color_ = 0xFF428BCA;
     frame_callback_.done().Set(this, &SpinningView::OnFrame);
   }
 
@@ -51,12 +51,11 @@ class SpinningView : public AbstractView {
  protected:
 
   void OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
-    if (!running_animation_)
-      RequestSaveGeometry(new_geometry);
+    RequestSaveGeometry(new_geometry);
   }
 
   void OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) override {
-    Update(old_geometry != new_geometry);
+    Update();
   }
 
   void OnMouseEnter(MouseEvent *event) override {
@@ -88,8 +87,6 @@ class SpinningView : public AbstractView {
   }
 
   void OnDraw(const Context &context) override {
-    if (!running_animation_) running_animation_ = true;
-
     angle_ += 5.f;
     if (angle_ > 360.f) angle_ = 0.f;
 
@@ -140,7 +137,6 @@ class SpinningView : public AbstractView {
   Callback frame_callback_;
   ColorF color_;
   float angle_ = 0.f;
-  bool running_animation_ = false;
 };
 
 int main(int argc, char *argv[]) {

@@ -34,38 +34,35 @@ GLView::GLView() {
 
 GLView::~GLView() {
   // Note: delete interface_ before destroying gl_surface_:
-  delete interface_;
+  delete gr_api_;
   delete gl_surface_;
 }
 
 void GLView::SetGLInterface(AbstractGRAPI *interface) {
-  if (interface_ == interface)
-    return;
+  if (gr_api_ == interface) return;
 
-  interface_ = interface;
+  gr_api_ = interface;
 
   if (nullptr != gl_surface_) {
-    gl_surface_->SetGRAPI(interface_);
+    gl_surface_->SetGRAPI(gr_api_);
   }
 }
 
 void GLView::OnRequestUpdate(AbstractView *view) {
-  if ((view == this) && (nullptr != gl_surface_)) {
-    gl_surface_->Update();
-    return;
-  }
+//  if ((view == this) && (nullptr != gl_surface_)) {
+//    gl_surface_->Update();
+//    return;
+//  }
 
   AbstractView::OnRequestUpdate(view);
 }
 
 void GLView::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-  RequestSaveGeometry(new_geometry);
+  if (!RequestSaveGeometry(new_geometry)) return;
 
   if (nullptr != gl_surface_) {
-//    if ((old_geometry.width() != new_geometry.width()) || (old_geometry.height() != new_geometry.height())) {
-    interface_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
+    gr_api_->SetViewportSize((int) new_geometry.width(), (int) new_geometry.height());
     OnResize((int) new_geometry.width(), (int) new_geometry.height());
-//    }
   }
 }
 
@@ -104,13 +101,13 @@ void GLView::OnKeyUp(KeyEvent *event) {
 void GLView::OnDraw(const Context &context) {
   if (nullptr == gl_surface_) {
     gl_surface_ = Surface::Sub::Create(context.surface(), this);
-    gl_surface_->SetGRAPI(interface_);
+    gl_surface_->SetGRAPI(gr_api_);
 //    gl_surface_->SetCommitMode(Surface::kDesynchronized);
 
     Region region;
     gl_surface_->SetInputRegion(region);
 
-    interface_->SetViewportSize(GetWidth(), GetHeight());
+    gr_api_->SetViewportSize(GetWidth(), GetHeight());
     callback_.Setup(*gl_surface_);
     OnInitialize();
   }
@@ -122,17 +119,17 @@ void GLView::OnDraw(const Context &context) {
 }
 
 void GLView::OnRenderSurface(Surface *surface) {
-  _ASSERT(gl_surface_ == surface);
-  Surface::Sub::Get(gl_surface_)->SetWindowPosition(GetX(), GetY());
-  gl_surface_->Commit();
+//  _ASSERT(gl_surface_ == surface);
+//  Surface::Sub::Get(gl_surface_)->SetWindowPosition(GetX(), GetY());
+//  gl_surface_->Commit();
 }
 
 void GLView::SwapBuffers() {
-  if (nullptr != interface_) interface_->SwapBuffers();
+  if (nullptr != gr_api_) gr_api_->SwapBuffers();
 }
 
 void GLView::MakeCurrent() {
-  if (nullptr != interface_) interface_->MakeCurrent();
+  if (nullptr != gr_api_) gr_api_->MakeCurrent();
 }
 
 void GLView::OnFrame(uint32_t serial) {

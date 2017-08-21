@@ -17,7 +17,8 @@
 #ifndef SKLAND_CALLBACK_HPP
 #define SKLAND_CALLBACK_HPP
 
-#include "../core/delegate.hpp"
+#include "skland/core/delegate.hpp"
+#include "skland/core/defines.hpp"
 
 #include <memory>
 
@@ -33,16 +34,21 @@ class Surface;
  */
 class Callback {
 
-  Callback(const Callback &) = delete;
-  Callback &operator=(const Callback &) = delete;
-
  public:
+
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Callback);
+
+  template<typename ReturnType, typename ... ParamTypes>
+  using DelegateRef = typename core::DelegateRef<ReturnType, ParamTypes...>;
+
+  template<typename ReturnType, typename ... ParamTypes>
+  using Delegate = typename core::Delegate<ReturnType, ParamTypes...>;
 
   Callback();
 
-  Callback(const Display &display);
+  explicit Callback(const Display &display);
 
-  Callback(const Surface &surface);
+  explicit Callback(const Surface &surface);
 
   ~Callback();
 
@@ -53,7 +59,7 @@ class Callback {
   /**
    * @brief A delegate to the 'done' event
    */
-  core::DelegateRef<void(uint32_t)> done() { return done_; }
+  DelegateRef<void(uint32_t)> done() { return done_; }
 
  private:
 
@@ -61,7 +67,7 @@ class Callback {
 
   std::unique_ptr<Private> p_;
 
-  core::Delegate<void(uint32_t)> done_;
+  Delegate<void(uint32_t)> done_;
 
 };
 

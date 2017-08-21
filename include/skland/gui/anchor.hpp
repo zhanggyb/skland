@@ -62,7 +62,7 @@ class Anchor {
 
  private:
 
-  Anchor(AbstractView *view);
+  explicit Anchor(AbstractView *view);
 
   Anchor *previous_;
   Anchor *next_;
