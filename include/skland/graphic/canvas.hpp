@@ -48,12 +48,14 @@ class Canvas {
 
   friend class Surface;
 
+ public:
+
+  using RectF = core::RectF;
+
   Canvas(const Canvas &) = delete;
   Canvas &operator=(const Canvas &) = delete;
 
- public:
-
-  class ClipGuard;
+  class LockGuard;
 
   static Canvas *CreateRasterDirect(int width,
                                     int height,
@@ -85,11 +87,11 @@ class Canvas {
 
   void DrawRect(const core::RectF &rect, const Paint &paint);
 
-  void DrawRoundRect(const core::RectF &rect, float rx, float ry, const Paint &paint);
+  void DrawRoundRect(const RectF &rect, float rx, float ry, const Paint &paint);
 
   void DrawCircle(float x, float y, float radius, const Paint &paint);
 
-  void DrawArc(const core::RectF &oval, float start_angle, float sweep_angle,
+  void DrawArc(const RectF &oval, float start_angle, float sweep_angle,
                bool use_center, const Paint &paint);
 
   void DrawPath(const Path &path, const Paint &paint);
@@ -119,9 +121,9 @@ class Canvas {
 
   void Clear(const core::ColorF &color);
 
-  void ClipRect(const core::RectF &rect, ClipOperation op, bool antialias = false);
+  void ClipRect(const RectF &rect, ClipOperation op, bool antialias = false);
 
-  void ClipRect(const core::RectF &rect, bool antialias = false);
+  void ClipRect(const RectF &rect, bool antialias = false);
 
   void ClipPath(const Path &path, ClipOperation op, bool antialias = false);
 
@@ -155,45 +157,79 @@ class Canvas {
 
 };
 
-class Canvas::ClipGuard {
-
-  ClipGuard() = delete;
-  ClipGuard(const ClipGuard &) = delete;
-  ClipGuard &operator=(const ClipGuard &) = delete;
+class Canvas::LockGuard {
 
  public:
 
-  ClipGuard(Canvas *canvas, const core::RectF &rect, bool antialias = false)
+  LockGuard() = delete;
+  LockGuard(const LockGuard &) = delete;
+  LockGuard &operator=(const LockGuard &) = delete;
+
+  explicit LockGuard(Canvas *canvas)
+      : canvas_(canvas) {}
+
+  LockGuard(Canvas *canvas, const RectF &rect, bool antialias = false)
       : canvas_(canvas) {
-    canvas_->Save();
-    canvas_->ClipRect(rect, antialias);
+    Lock(rect, antialias);
   }
 
-  ClipGuard(Canvas *canvas, const core::RectF &rect, ClipOperation op, bool antialias = false)
+  LockGuard(Canvas *canvas, const RectF &rect, ClipOperation op, bool antialias = false)
       : canvas_(canvas) {
+    Lock(rect, op, antialias);
+  }
+
+  LockGuard(Canvas *canvas, const Path &path, bool antialias = false)
+      : canvas_(canvas) {
+    Lock(path, antialias);
+  }
+
+  LockGuard(Canvas *canvas, const Path &path, ClipOperation op, bool antialias = false)
+      : canvas_(canvas) {
+    Lock(path, op, antialias);
+  }
+
+  ~LockGuard() {
+    while (count_ > 0) {
+      canvas_->Restore();
+      count_--;
+    }
+  }
+
+  void Lock(const RectF &rect, bool antilias = false) {
+    count_++;
+    canvas_->Save();
+    canvas_->ClipRect(rect, antilias);
+  }
+
+  void Lock(const RectF &rect, ClipOperation op, bool antialias = false) {
+    count_++;
     canvas_->Save();
     canvas_->ClipRect(rect, op, antialias);
   }
 
-  ClipGuard(Canvas *canvas, const Path &path, bool antialias = false)
-      : canvas_(canvas) {
+  void Lock(const Path &path, bool antialias = false) {
+    count_++;
     canvas_->Save();
     canvas_->ClipPath(path, antialias);
   }
 
-  ClipGuard(Canvas *canvas, const Path &path, ClipOperation op, bool antialias = false)
-      : canvas_(canvas) {
+  void Lock(const Path &path, ClipOperation op, bool antialias = false) {
+    count_++;
     canvas_->Save();
     canvas_->ClipPath(path, op, antialias);
   }
 
-  ~ClipGuard() {
+  void Unlock() {
+    if (count_ == 0) return;
+    count_--;
     canvas_->Restore();
   }
 
  private:
 
-  Canvas *canvas_;
+  Canvas *canvas_ = nullptr;
+
+  size_t count_ = 0;
 
 };
 

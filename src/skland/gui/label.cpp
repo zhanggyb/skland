@@ -131,7 +131,7 @@ void Label::OnDraw(const Context &context) {
 
   int scale = context.surface()->GetScale();
   const RectF rect = GetGeometry() * scale;
-  Canvas::ClipGuard guard(context.canvas(), rect);
+  Canvas::LockGuard guard(context.canvas(), rect);
 
   Paint paint;
   paint.SetColor(p_->background);

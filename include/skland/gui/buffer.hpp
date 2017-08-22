@@ -78,6 +78,10 @@ class Buffer {
 
   const Size &GetSize() const;
 
+  int GetWidth() const;
+
+  int GetHeight() const;
+
   SignalRef<> release() { return release_; }
 
   SignalRef<> destroyed() { return destroyed_; }

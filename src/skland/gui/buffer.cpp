@@ -101,5 +101,13 @@ const Size &Buffer::GetSize() const {
   return p_->size;
 }
 
+int Buffer::GetWidth() const {
+  return p_->size.width;
+}
+
+int Buffer::GetHeight() const {
+  return p_->size.height;
+}
+
 } // namespace gui
 } // namespace skland

@@ -77,7 +77,6 @@ struct Window::Private : public core::Property<Window> {
   Buffer frame_buffer;
 
   Buffer widget_buffer;
-  std::unique_ptr<Canvas> widget_canvas;
 
   /** The default title bar */
   TitleBar *title_bar = nullptr;
@@ -91,8 +90,6 @@ struct Window::Private : public core::Property<Window> {
   Size maximal_size;
 
   const Output *output = nullptr;
-
-  bool configuring_size = false;
 
   bool inhibit_update = true;
 
@@ -130,7 +127,7 @@ void Window::Private::DrawFrame(const Context &context) {
         4.f * scale, 4.f * scale  // bottom-left
     };
     path.AddRoundRect(geometry, radii);
-    Canvas::ClipGuard guard(context.canvas(), path, ClipOperation::kClipDifference, true);
+    Canvas::LockGuard guard(context.canvas(), path, ClipOperation::kClipDifference, true);
     owner()->DropShadow(context);
   } else {
     path.AddRect(geometry);
@@ -161,7 +158,7 @@ void Window::Private::DrawFrame(const Context &context) {
   }
 
   // Draw the client area:
-  Canvas::ClipGuard guard(context.canvas(), path, ClipOperation::kClipIntersect, true);
+  Canvas::LockGuard guard(context.canvas(), path, ClipOperation::kClipIntersect, true);
 
   paint.SetStyle(Paint::Style::kStyleFill);
   if (nullptr != title_bar) {
@@ -220,7 +217,7 @@ Window::Window(int width, int height, const char *title)
   p_->widget_surface->SetInputRegion(empty_region);
 
   // Create the default title bar:
-  TitleBar *titlebar = new TitleBar;
+  auto *titlebar = new TitleBar;
   p_->title_bar = titlebar;
   AttachView(p_->title_bar);
 
@@ -317,12 +314,12 @@ void Window::OnShown() {
                           width * 4 * height);
   p_->widget_surface->Attach(&p_->widget_buffer);
   p_->widget_surface->Update();
-  p_->widget_canvas.reset(Canvas::CreateRasterDirect(width, height,
-                                                     (unsigned char *) p_->widget_buffer.GetData()));
-  p_->widget_canvas->SetOrigin((float) margin.left * scale,
-                               (float) margin.top * scale);
-  p_->widget_canvas->Clear();
-  p_->widget_canvas->Flush();
+
+  Canvas canvas((unsigned char *) p_->widget_buffer.GetData(), width, height);
+//  p_->widget_canvas->SetOrigin((float) margin.left * scale,
+//                               (float) margin.top * scale);
+  canvas.Clear();
+  canvas.Flush();
 
   p_->inhibit_update = false;
 
@@ -407,12 +404,10 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
   p_->widget_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
   p_->widget_surface->Attach(&p_->widget_buffer);
   p_->widget_surface->Update();
-  p_->widget_canvas.reset(Canvas::CreateRasterDirect(width, height,
-                                                     (unsigned char *) p_->widget_buffer.GetData()));
-  p_->widget_canvas->SetOrigin(margin.left * scale,
-                               margin.top * scale);
-  p_->widget_canvas->Clear();
-  p_->widget_canvas->Flush();
+
+  Canvas canvas((unsigned char *) p_->widget_buffer.GetData(), width, height);
+  canvas.Clear();
+  canvas.Flush();
 
   // surface size is changed, reset the pointer position and enter/leave widgets
   DispatchMouseLeaveEvent();
@@ -444,7 +439,24 @@ void Window::OnRenderSurface(Surface *surface) {
 
   core::Deque<AbstractView::RedrawNode> &deque = surface->GetRedrawNodeDeque();
   core::Deque<AbstractView::RedrawNode>::Iterator it = deque.begin();
-  Context context(surface, p_->widget_canvas.get());
+  int scale = surface->GetScale();
+  float radii[] = {
+      7.5f * scale, 7.5f * scale, // top-left
+      7.5f * scale, 7.5f * scale, // top-right
+      4.5f * scale, 4.5f * scale, // bottom-right
+      4.5f * scale, 4.5f * scale  // bottom-left
+  };
+  Canvas canvas((unsigned char *) p_->widget_buffer.GetData(),
+                p_->widget_buffer.GetWidth(),
+                p_->widget_buffer.GetHeight());
+  canvas.SetOrigin((float) margin.left * surface->GetScale(),
+                   (float) margin.top * surface->GetScale());
+
+  Path path;
+  path.AddRoundRect(RectF(0, 0, GetWidth(), GetHeight()), radii);
+  Canvas::LockGuard guard(&canvas, path, ClipOperation::kClipIntersect, true);
+
+  Context context(surface, &canvas);
 
   AbstractView *view = nullptr;
   while (it != deque.end()) {
@@ -457,6 +469,8 @@ void Window::OnRenderSurface(Surface *surface) {
                     view->GetHeight());
     it = deque.begin();
   }
+
+  canvas.Flush();
   surface->Commit();
 }
 
