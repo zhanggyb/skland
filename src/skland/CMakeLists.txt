@@ -99,10 +99,11 @@ endif ()
 target_include_directories(skland
         PRIVATE "${SKIA_PUBLIC_INCLUDES}"
         PRIVATE "${PROJECT_BINARY_DIR}/deps/wayland-protocols/unstable/xdg-shell"
-        PRIVATE "${PROJECT_SOURCE_DIR}/include/skland")
+        PRIVATE "${PROJECT_SOURCE_DIR}/include/skland"
+        PRIVATE "${PROJECT_SOURCE_DIR}/third_party/oiio/src/include")
 
 if (LINUX)
-    target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client)
+    target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client OpenImageIO OpenImageIO_Util)
 else ()
     target_link_libraries(skland ${LIBS} skia)
 endif ()

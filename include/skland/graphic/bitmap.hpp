@@ -24,7 +24,7 @@ namespace skland {
 namespace graphic {
 
 /**
- * @ingroup graphic_intern
+ * @ingroup graphic
  * @brief A Bitmap class represents a raster bitmap.
  */
 class Bitmap {
@@ -33,6 +33,12 @@ class Bitmap {
 
  public:
 
+  /**
+   * @brief Default constructor
+   *
+   * The default constructor creates a bitmap with zero width and height, and no
+   * pixels. Its color type is set to unknown.
+   */
   Bitmap();
 
   Bitmap(const Bitmap &orig);
@@ -41,7 +47,15 @@ class Bitmap {
 
   ~Bitmap();
 
+  void AllocatePixels(const ImageInfo& info, size_t row_bytes);
+
+  void AllocatePixels(const ImageInfo& info);
+
+  void AllocateN32Pixels(int width, int height, bool is_opaque = false);
+  
   bool InstallPixels(const ImageInfo &info, void *pixels, size_t row_bytes);
+
+  void WriteToFile(const std::string &filename) const;
 
   int GetWidth() const;
 
@@ -55,7 +69,7 @@ class Bitmap {
 
   struct Private;
 
-  std::unique_ptr <Private> p_;
+  std::unique_ptr<Private> p_;
 
 };
 

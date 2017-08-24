@@ -17,15 +17,21 @@
 #include "internal/bitmap_private.hpp"
 #include "internal/image-info_private.hpp"
 
+#include "skland/core/memory.hpp"
+
+#include "OpenImageIO/imageio.h"
+
 namespace skland {
 namespace graphic {
 
 Bitmap::Bitmap() {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>(this);
 }
 
 Bitmap::Bitmap(const Bitmap &orig) {
-  p_.reset(new Private(orig.p_->sk_bitmap));
+  p_ = core::make_unique<Private>(this);
+
+  p_->sk_bitmap = orig.p_->sk_bitmap;
 }
 
 Bitmap &Bitmap::operator=(const Bitmap &other) {
@@ -44,6 +50,21 @@ bool Bitmap::InstallPixels(const ImageInfo &info, void *pixels, size_t row_bytes
                                                        static_cast<SkAlphaType >(info.alpha_type())),
                                      pixels,
                                      row_bytes);
+}
+
+void Bitmap::WriteToFile(const std::string &filename) const {
+  using OIIO::ImageOutput;
+  using OIIO::ImageSpec;
+  using OIIO::TypeDesc;
+
+  ImageOutput *out = ImageOutput::create(filename);
+  if (nullptr == out) return;
+
+  ImageSpec spec (p_->sk_bitmap.width(), p_->sk_bitmap.height(), 4, TypeDesc::UINT8);
+  out->open(filename, spec);
+  out->write_image(TypeDesc::UINT8, p_->sk_bitmap.getPixels());
+  out->close();
+  ImageOutput::destroy(out);
 }
 
 int Bitmap::GetWidth() const {

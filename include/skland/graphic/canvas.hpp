@@ -17,10 +17,12 @@
 #ifndef SKLAND_GRAPHIC_CANVAS_HPP_
 #define SKLAND_GRAPHIC_CANVAS_HPP_
 
-#include "../core/types.hpp"
-#include "../core/size.hpp"
-#include "../core/rect.hpp"
-#include "../core/color.hpp"
+#include "skland/core/types.hpp"
+#include "skland/core/size.hpp"
+#include "skland/core/rect.hpp"
+#include "skland/core/color.hpp"
+#include "skland/core/defines.hpp"
+#include "skland/core/deque.hpp"
 
 #include "clip-operation.hpp"
 
@@ -52,8 +54,7 @@ class Canvas {
 
   using RectF = core::RectF;
 
-  Canvas(const Canvas &) = delete;
-  Canvas &operator=(const Canvas &) = delete;
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(Canvas);
 
   class LockGuard;
 
@@ -70,7 +71,7 @@ class Canvas {
   Canvas(unsigned char *pixel, int width, int height,
          int format = kPixelFormatABGR8888);
 
-  Canvas(const Bitmap &bitmap);
+  explicit Canvas(const Bitmap &bitmap);
 
   ~Canvas();
 
@@ -149,11 +150,23 @@ class Canvas {
    * @brief Create a canvas object via a native SkCanvas
    * @param native
    */
-  Canvas(SkCanvas *native);
+  explicit Canvas(SkCanvas *native);
 
+  struct LockGuardNode;
   struct Private;
 
   std::unique_ptr<Private> p_;
+
+};
+
+struct Canvas::LockGuardNode : public core::BiNode {
+
+  LockGuardNode() = default;
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(LockGuardNode);
+
+  ~LockGuardNode() final = default;
+
+  int depth = 0;
 
 };
 
@@ -162,8 +175,7 @@ class Canvas::LockGuard {
  public:
 
   LockGuard() = delete;
-  LockGuard(const LockGuard &) = delete;
-  LockGuard &operator=(const LockGuard &) = delete;
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(LockGuard);
 
   explicit LockGuard(Canvas *canvas)
       : canvas_(canvas) {}
@@ -188,48 +200,23 @@ class Canvas::LockGuard {
     Lock(path, op, antialias);
   }
 
-  ~LockGuard() {
-    while (count_ > 0) {
-      canvas_->Restore();
-      count_--;
-    }
-  }
+  ~LockGuard();
 
-  void Lock(const RectF &rect, bool antilias = false) {
-    count_++;
-    canvas_->Save();
-    canvas_->ClipRect(rect, antilias);
-  }
+  void Lock(const RectF &rect, bool antilias = false);
 
-  void Lock(const RectF &rect, ClipOperation op, bool antialias = false) {
-    count_++;
-    canvas_->Save();
-    canvas_->ClipRect(rect, op, antialias);
-  }
+  void Lock(const RectF &rect, ClipOperation op, bool antialias = false);
 
-  void Lock(const Path &path, bool antialias = false) {
-    count_++;
-    canvas_->Save();
-    canvas_->ClipPath(path, antialias);
-  }
+  void Lock(const Path &path, bool antialias = false);
 
-  void Lock(const Path &path, ClipOperation op, bool antialias = false) {
-    count_++;
-    canvas_->Save();
-    canvas_->ClipPath(path, op, antialias);
-  }
+  void Lock(const Path &path, ClipOperation op, bool antialias = false);
 
-  void Unlock() {
-    if (count_ == 0) return;
-    count_--;
-    canvas_->Restore();
-  }
+  void Unlock();
 
  private:
 
   Canvas *canvas_ = nullptr;
 
-  size_t count_ = 0;
+  LockGuardNode node_;
 
 };
 

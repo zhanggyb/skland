@@ -120,8 +120,8 @@ class ImageInfo {
         color_type_(color_type),
         alpha_type_(alpha_type) {}
 
-  int width_;
-  int height_;
+  int width_ = 0;
+  int height_ = 0;
   ColorType color_type_;
   AlphaType alpha_type_;
 

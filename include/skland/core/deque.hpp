@@ -422,7 +422,7 @@ void Deque<T>::Clear() {
 
 template<typename T>
 T *Deque<T>::operator[](int index) const {
-  T *p = nullptr;
+  BiNode *p = nullptr;
 
   if (index >= 0) {
     p = first_.next_;
@@ -438,7 +438,7 @@ T *Deque<T>::operator[](int index) const {
     }
   }
 
-  return p;
+  return static_cast<T *>(p);
 }
 
 } // namespace core

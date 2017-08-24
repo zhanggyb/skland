@@ -19,6 +19,8 @@
 
 #include "skland/graphic/bitmap.hpp"
 
+#include "skland/core/property.hpp"
+
 #include "SkBitmap.h"
 
 namespace skland {
@@ -28,15 +30,12 @@ namespace graphic {
  * @ingroup graphic_intern
  * @brief The private structure used in Bitmap
  */
-struct Bitmap::Private {
+struct Bitmap::Private : public core::Property<Bitmap> {
 
-  Private()
-      : sk_bitmap() {}
+  explicit Private(Bitmap *owner)
+      : core::Property<Bitmap>(owner) {}
 
-  Private(const SkBitmap &src)
-      : sk_bitmap(src) {}
-
-  ~Private() {}
+  ~Private() final = default;
 
   SkBitmap sk_bitmap;
 
