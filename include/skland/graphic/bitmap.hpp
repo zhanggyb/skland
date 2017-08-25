@@ -47,12 +47,12 @@ class Bitmap {
 
   ~Bitmap();
 
-  void AllocatePixels(const ImageInfo& info, size_t row_bytes);
+  void AllocatePixels(const ImageInfo &info, size_t row_bytes);
 
-  void AllocatePixels(const ImageInfo& info);
+  void AllocatePixels(const ImageInfo &info);
 
   void AllocateN32Pixels(int width, int height, bool is_opaque = false);
-  
+
   bool InstallPixels(const ImageInfo &info, void *pixels, size_t row_bytes);
 
   void WriteToFile(const std::string &filename) const;

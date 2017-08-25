@@ -205,13 +205,13 @@ inline bool operator!=(const Color<T> &src, const Color<T> &dst) {
  * @ingroup core
  * @brief A typedef to color with float values
  */
-typedef core::Color<float> ColorF;
+typedef Color<float> ColorF;
 
 /**
  * @ingroup core
  * @brief A typedef to color with double values
  */
-typedef core::Color<double> ColorD;
+typedef Color<double> ColorD;
 
 } // namespace core
 } // namespace skland

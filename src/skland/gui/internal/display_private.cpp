@@ -187,7 +187,7 @@ void Display::Private::MakeSwapBufferNonBlock() const {
 }
 
 void Display::Private::OnFormat(void *data, struct wl_shm *shm, uint32_t format) {
-  Display *_this = static_cast<Display *>(data);
+  auto *_this = static_cast<Display *>(data);
   const char *text = nullptr;
 
   _this->p_->pixel_formats.insert(format);
@@ -207,7 +207,7 @@ void Display::Private::OnFormat(void *data, struct wl_shm *shm, uint32_t format)
     }
   }
 
-  fprintf(stderr, "Possible shmem format %s\n", text);
+  fprintf(stderr, "Possible shmem format %s - %d\n", text, format);
 }
 
 void Display::Private::OnError(void *data,
@@ -215,7 +215,7 @@ void Display::Private::OnError(void *data,
                                void *object_id,
                                uint32_t code,
                                const char *message) {
-  Display *_this = static_cast<Display *>(data);
+  auto *_this = static_cast<Display *>(data);
   const char *object_name = "Unknown object";
 
   if (_this->p_->wl_display == object_id) {
@@ -247,9 +247,9 @@ void Display::Private::OnGlobal(void *data,
                                 uint32_t id,
                                 const char *interface,
                                 uint32_t version) {
-  Display *_this = static_cast<Display *>(data);
+  auto *_this = static_cast<Display *>(data);
 
-  struct Global *global = new Global;
+  auto *global = new Global;
   global->id = id;
   global->interface = interface;
   global->version = version;
@@ -308,7 +308,7 @@ void Display::Private::OnGlobal(void *data,
 void Display::Private::OnGlobalRemove(void *data,
                                       struct wl_registry *registry,
                                       uint32_t name) {
-  Display *_this = static_cast<Display *>(data);
+  auto *_this = static_cast<Display *>(data);
 
   for (std::list<Global *>::iterator it = _this->p_->globals.begin(); it != _this->p_->globals.end();) {
     if ((*it)->id != name) {
@@ -328,7 +328,7 @@ void Display::Private::OnGlobalRemove(void *data,
 }
 
 void Display::Private::OnPing(void *data, struct zxdg_shell_v6 *zxdg_shell_v6, uint32_t serial) {
-  Display *_this = static_cast<Display *>(data);
+  auto *_this = static_cast<Display *>(data);
   zxdg_shell_v6_pong(_this->p_->xdg_shell, serial);
 }
 
