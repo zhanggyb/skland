@@ -233,7 +233,12 @@ SkCanvas *Canvas::GetSkCanvas() const {
 
 Canvas::LockGuard::~LockGuard() {
   if (node_.IsLinked()) {
-    canvas_->RestoreToCount(node_.depth);
+    core::Deque<LockGuardNode>::Iterator it = canvas_->p_->lock_guard_deque.rbegin();
+    while(it.element() != &node_) {
+      it.Remove();
+      it = canvas_->p_->lock_guard_deque.rbegin();
+    }
+    canvas_->p_->sk_canvas->restoreToCount(node_.depth);
   }
 }
 
@@ -276,6 +281,11 @@ void Canvas::LockGuard::Lock(const Path &path, ClipOperation op, bool antialias)
 void Canvas::LockGuard::Unlock() {
   if (!node_.IsLinked()) return;
 
+  core::Deque<LockGuardNode>::Iterator it = canvas_->p_->lock_guard_deque.rbegin();
+  while(it.element() != &node_) {
+    it.Remove();
+    it = canvas_->p_->lock_guard_deque.rbegin();
+  }
   canvas_->p_->sk_canvas->restoreToCount(node_.depth);
   node_.Unlink();
 }

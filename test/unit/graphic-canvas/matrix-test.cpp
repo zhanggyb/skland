@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "test.hpp"
+#include "matrix-test.hpp"
 
 #include "skland/core/color.hpp"
 #include "skland/core/rect.hpp"
@@ -30,15 +30,15 @@ static const int kWidth = 400;
 static const int kHeight = 300;
 static const std::string kFileNamePrefix("graphic_canvas_");
 
-Test::Test()
+MatrixTest::MatrixTest()
     : testing::Test() {
 }
 
-Test::~Test() {
+MatrixTest::~MatrixTest() {
 
 }
 
-TEST_F(Test, draw_rect_1) {
+TEST_F(MatrixTest, draw_rect_1) {
   Bitmap bitmap;
   bitmap.AllocateN32Pixels(kWidth, kHeight);
 
@@ -51,7 +51,7 @@ TEST_F(Test, draw_rect_1) {
   canvas.DrawRect(rect, paint);
   canvas.Flush();
 
-  std::string filename = kFileNamePrefix + "draw_rect_1.png";
+  std::string filename = kFileNamePrefix + "matrix_translate_1.png";
   bitmap.WriteToFile(filename);
 
   std::cout << std::endl
@@ -62,7 +62,7 @@ TEST_F(Test, draw_rect_1) {
   ASSERT_TRUE(true);
 }
 
-TEST_F(Test, lock_guard_1) {
+TEST_F(MatrixTest, lock_guard_1) {
   Bitmap bitmap;
   bitmap.AllocateN32Pixels(kWidth, kHeight);
 
@@ -83,7 +83,7 @@ TEST_F(Test, lock_guard_1) {
 
   canvas.Flush();
 
-  std::string filename = kFileNamePrefix + "lock_guard_1.png";
+  std::string filename = kFileNamePrefix + "matrix_scale_1.png";
   bitmap.WriteToFile(filename);
 
   std::cout << std::endl

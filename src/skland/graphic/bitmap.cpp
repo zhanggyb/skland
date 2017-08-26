@@ -98,8 +98,8 @@ void Bitmap::WriteToFile(const std::string &filename) const {
   ImageBuf bgra(spec, p_->sk_bitmap.getPixels());
   ImageBuf rgba;
 
-  const int chanel_order[4] = {2, 1, 0, 3};
-  channels(rgba, bgra, 4, chanel_order);
+  std::vector<int> channel_order = {2, 1, 0, 3};
+  channels(rgba, bgra, 4, channel_order.data());
 
   out->open(filename, spec);
 //  out->write_image(TypeDesc::UINT8, p_->sk_bitmap.getPixels());

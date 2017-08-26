@@ -7,10 +7,10 @@
 
 #include <gtest/gtest.h>
 
-class Test : public testing::Test {
+class MatrixTest : public testing::Test {
  public:
-  Test();
-  virtual ~Test();
+  MatrixTest();
+  virtual ~MatrixTest();
 
  protected:
   virtual void SetUp() {}
