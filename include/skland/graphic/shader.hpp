@@ -50,13 +50,13 @@ class Shader {
 
   Shader &operator=(const Shader &other);
 
-  operator bool() const;
+  explicit operator bool() const;
 
  protected:
 
   struct Private;
 
-  Shader(Private *p);
+  explicit Shader(Private *p);
 
  private:
 

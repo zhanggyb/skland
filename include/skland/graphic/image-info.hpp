@@ -75,27 +75,13 @@ class ImageInfo {
     return ImageInfo(width, height, kColorTypeBGRA8888, kAlphaTypePremul);
   }
 
-  ImageInfo()
-      : width_(0),
-        height_(0),
-        color_type_(kColorTypeUnknown),
-        alpha_type_(kAlphaTypeUnknown) {}
+  ImageInfo() = default;
 
-  ImageInfo(const ImageInfo &orig)
-      : width_(orig.width_),
-        height_(orig.height_),
-        color_type_(orig.color_type_),
-        alpha_type_(orig.alpha_type_) {}
+  ImageInfo(const ImageInfo &orig) = default;
 
-  ~ImageInfo() {}
+  ~ImageInfo() = default;
 
-  ImageInfo &operator=(const ImageInfo &other) {
-    width_ = other.width_;
-    height_ = other.height_;
-    color_type_ = other.color_type_;
-    alpha_type_ = other.alpha_type_;
-    return *this;
-  }
+  ImageInfo &operator=(const ImageInfo &other) = default;
 
   int width() const { return width_; }
 
@@ -120,10 +106,10 @@ class ImageInfo {
         color_type_(color_type),
         alpha_type_(alpha_type) {}
 
-  int width_;
-  int height_;
-  ColorType color_type_;
-  AlphaType alpha_type_;
+  int width_ = 0;
+  int height_ = 0;
+  ColorType color_type_ = kColorTypeUnknown;
+  AlphaType alpha_type_ = kAlphaTypeUnknown;
 
 };
 

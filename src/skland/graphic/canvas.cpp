@@ -16,6 +16,8 @@
 
 #include "internal/canvas_private.hpp"
 
+#include "skland/core/memory.hpp"
+
 #include <skland/graphic/paint.hpp>
 #include <skland/graphic/path.hpp>
 #include "skland/graphic/image-info.hpp"
@@ -49,7 +51,7 @@ Canvas *Canvas::CreateRasterDirect(int width, int height, unsigned char *pixels,
 }
 
 Canvas::Canvas() {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>();
 }
 
 Canvas::Canvas(unsigned char *pixel, int width, int height, int format) {
@@ -66,18 +68,19 @@ Canvas::Canvas(unsigned char *pixel, int width, int height, int format) {
     throw std::runtime_error("ERROR! Invalid bitmap format for Canvas!");
   }
 
-  p_.reset(new Private(bitmap));
+  p_ = core::make_unique<Private>(bitmap);
 }
 
 Canvas::Canvas(const Bitmap &bitmap) {
-  p_.reset(new Private(bitmap.p_->sk_bitmap));
+  p_ = core::make_unique<Private>(bitmap.p_->sk_bitmap);
 }
 
 Canvas::Canvas(SkCanvas *native) {
-  p_.reset(new Private(native));
+  p_ = core::make_unique<Private>(native);
 }
 
 Canvas::~Canvas() {
+
 }
 
 void Canvas::SetOrigin(float x, float y) {
@@ -189,7 +192,14 @@ void Canvas::Save() {
 }
 
 void Canvas::Restore() {
-  p_->sk_canvas->restore();
+  if (p_->lock_guard_deque.IsEmpty()) {
+    p_->sk_canvas->restore();
+    return;
+  }
+
+  if (p_->sk_canvas->getSaveCount() > p_->lock_guard_deque[-1]->depth) {
+    p_->sk_canvas->restore();
+  }
 }
 
 int Canvas::GetSaveCount() const {
@@ -197,7 +207,14 @@ int Canvas::GetSaveCount() const {
 }
 
 void Canvas::RestoreToCount(int save_count) {
-  p_->sk_canvas->restoreToCount(save_count);
+  if (p_->lock_guard_deque.IsEmpty()) {
+    p_->sk_canvas->restoreToCount(save_count);
+    return;
+  }
+
+  if (save_count > p_->lock_guard_deque[-1]->depth) {
+    p_->sk_canvas->restoreToCount(save_count);
+  }
 }
 
 void Canvas::Flush() {
@@ -210,6 +227,67 @@ const PointF &Canvas::GetOrigin() const {
 
 SkCanvas *Canvas::GetSkCanvas() const {
   return p_->sk_canvas;
+}
+
+// ----------
+
+Canvas::LockGuard::~LockGuard() {
+  if (node_.IsLinked()) {
+    core::Deque<LockGuardNode>::Iterator it = canvas_->p_->lock_guard_deque.rbegin();
+    while(it.element() != &node_) {
+      it.Remove();
+      it = canvas_->p_->lock_guard_deque.rbegin();
+    }
+    canvas_->p_->sk_canvas->restoreToCount(node_.depth);
+  }
+}
+
+void Canvas::LockGuard::Lock(const RectF &rect, bool antilias) {
+  if (node_.IsLinked()) return;
+
+  canvas_->p_->lock_guard_deque.PushBack(&node_);
+  node_.depth = canvas_->GetSaveCount();
+  canvas_->Save();
+  canvas_->ClipRect(rect, antilias);
+}
+
+void Canvas::LockGuard::Lock(const RectF &rect, ClipOperation op, bool antialias) {
+  if (node_.IsLinked()) return;
+
+  canvas_->p_->lock_guard_deque.PushBack(&node_);
+  node_.depth = canvas_->GetSaveCount();
+  canvas_->Save();
+  canvas_->ClipRect(rect, op, antialias);
+}
+
+void Canvas::LockGuard::Lock(const Path &path, bool antialias) {
+  if (node_.IsLinked()) return;
+
+  canvas_->p_->lock_guard_deque.PushBack(&node_);
+  node_.depth = canvas_->GetSaveCount();
+  canvas_->Save();
+  canvas_->ClipPath(path, antialias);
+}
+
+void Canvas::LockGuard::Lock(const Path &path, ClipOperation op, bool antialias) {
+  if (node_.IsLinked()) return;
+
+  canvas_->p_->lock_guard_deque.PushBack(&node_);
+  node_.depth = canvas_->GetSaveCount();
+  canvas_->Save();
+  canvas_->ClipPath(path, op, antialias);
+}
+
+void Canvas::LockGuard::Unlock() {
+  if (!node_.IsLinked()) return;
+
+  core::Deque<LockGuardNode>::Iterator it = canvas_->p_->lock_guard_deque.rbegin();
+  while(it.element() != &node_) {
+    it.Remove();
+    it = canvas_->p_->lock_guard_deque.rbegin();
+  }
+  canvas_->p_->sk_canvas->restoreToCount(node_.depth);
+  node_.Unlink();
 }
 
 } // namespace graphic

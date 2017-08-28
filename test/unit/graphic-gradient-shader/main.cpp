@@ -14,34 +14,9 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_GRAPHIC_INTERNAL_BITMAP_PRIVATE_HPP_
-#define SKLAND_GRAPHIC_INTERNAL_BITMAP_PRIVATE_HPP_
+#include <gtest/gtest.h>
 
-#include "skland/graphic/bitmap.hpp"
-
-#include "skland/core/property.hpp"
-
-#include "SkBitmap.h"
-
-namespace skland {
-namespace graphic {
-
-/**
- * @ingroup graphic_intern
- * @brief The private structure used in Bitmap
- */
-struct Bitmap::Private : public core::Property<Bitmap> {
-
-  explicit Private(Bitmap *owner)
-      : core::Property<Bitmap>(owner) {}
-
-  ~Private() final = default;
-
-  SkBitmap sk_bitmap;
-
-};
-
-} // namespace graphic
-} // namespace skland
-
-#endif // SKLAND_GRAPHIC_INTERNAL_BITMAP_PRIVATE_HPP_
+int main(int argc, char *argv[]) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

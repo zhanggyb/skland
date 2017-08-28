@@ -34,6 +34,8 @@ if (LINUX)
     # graphic
     add_subdirectory(graphic-font)
     add_subdirectory(graphic-font-style)
+    add_subdirectory(graphic-image-info)
+    add_subdirectory(graphic-gradient-shader)
     add_subdirectory(graphic-path)
     add_subdirectory(graphic-typeface)
     add_subdirectory(graphic-paint)

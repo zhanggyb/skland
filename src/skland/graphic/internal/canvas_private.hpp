@@ -21,6 +21,8 @@
 
 #include "bitmap_private.hpp"
 
+#include "skland/core/deque.hpp"
+
 #include "SkCanvas.h"
 
 namespace skland {
@@ -32,16 +34,14 @@ namespace graphic {
  */
 struct Canvas::Private {
 
-  Private()
-      : sk_canvas(nullptr) {
+  Private() {
     sk_canvas = new SkCanvas();
   }
 
-  Private(SkCanvas *canvas)
+  explicit Private(SkCanvas *canvas)
       : sk_canvas(canvas) {}
 
-  Private(const SkBitmap &bitmap)
-      : sk_canvas(nullptr) {
+  explicit Private(const SkBitmap &bitmap) {
     sk_canvas = new SkCanvas(bitmap);
   }
 
@@ -49,12 +49,16 @@ struct Canvas::Private {
     delete sk_canvas;
   }
 
-  SkCanvas *sk_canvas;
+  SkCanvas *sk_canvas = nullptr;
   core::PointF origin;
+
+  size_t lock_count = 0;
+
+  core::Deque<LockGuardNode> lock_guard_deque;
 
 };
 
-}
-}
+} // namespace graphic
+} // namespace skland
 
 #endif // SKLAND_GRAPHIC_INTERNAL_CANVAS_PRIVATE_HPP_

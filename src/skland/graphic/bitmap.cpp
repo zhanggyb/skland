@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
+#include <OpenImageIO/imagebuf.h>
 #include "internal/bitmap_private.hpp"
 #include "internal/image-info_private.hpp"
+
+#include "skland/core/memory.hpp"
+
+#include "OpenImageIO/imageio.h"
+#include "OpenImageIO/imagebufalgo.h"
 
 namespace skland {
 namespace graphic {
 
 Bitmap::Bitmap() {
-  p_.reset(new Private);
+  p_ = core::make_unique<Private>(this);
 }
 
 Bitmap::Bitmap(const Bitmap &orig) {
-  p_.reset(new Private(orig.p_->sk_bitmap));
+  p_ = core::make_unique<Private>(this);
+
+  p_->sk_bitmap = orig.p_->sk_bitmap;
 }
 
 Bitmap &Bitmap::operator=(const Bitmap &other) {
@@ -37,6 +45,17 @@ Bitmap::~Bitmap() {
 
 }
 
+void Bitmap::AllocatePixels(const ImageInfo &info) {
+  p_->sk_bitmap.allocPixels(SkImageInfo::Make(info.width(),
+                                              info.height(),
+                                              static_cast<SkColorType>(info.color_type()),
+                                              static_cast<SkAlphaType>(info.alpha_type())));
+}
+
+void Bitmap::AllocateN32Pixels(int width, int height, bool is_opaque) {
+  p_->sk_bitmap.allocN32Pixels(width, height, is_opaque);
+}
+
 bool Bitmap::InstallPixels(const ImageInfo &info, void *pixels, size_t row_bytes) {
   return p_->sk_bitmap.installPixels(SkImageInfo::Make(info.width(),
                                                        info.height(),
@@ -44,6 +63,51 @@ bool Bitmap::InstallPixels(const ImageInfo &info, void *pixels, size_t row_bytes
                                                        static_cast<SkAlphaType >(info.alpha_type())),
                                      pixels,
                                      row_bytes);
+}
+
+void Bitmap::WriteToFile(const std::string &filename) const {
+  using OIIO::ImageOutput;
+  using OIIO::ImageSpec;
+  using OIIO::TypeDesc;
+  using OIIO::ImageBuf;
+  using namespace OIIO::ImageBufAlgo;
+
+  ImageOutput *out = ImageOutput::create(filename);
+  if (nullptr == out) return;
+
+  TypeDesc::BASETYPE base_type = TypeDesc::UNKNOWN;
+  switch (p_->sk_bitmap.bytesPerPixel()) {
+    // TODO: other color type
+    case 4: {
+      base_type = TypeDesc::UINT8;
+      break;
+    }
+    default:break;
+  }
+
+  if (TypeDesc::UNKNOWN == base_type) {
+    fprintf(stderr, "Unkown image type!\n");
+    return;
+  }
+
+  // TODO: determine the number of channel
+
+  ImageSpec spec(p_->sk_bitmap.width(), p_->sk_bitmap.height(), 4, base_type);
+
+  // Use ImageBuf to convert BGRA to RGBA
+  ImageBuf bgra(spec, p_->sk_bitmap.getPixels());
+  ImageBuf rgba;
+
+  std::vector<int> channel_order = {2, 1, 0, 3};
+  channels(rgba, bgra, 4, channel_order.data());
+
+  out->open(filename, spec);
+//  out->write_image(TypeDesc::UINT8, p_->sk_bitmap.getPixels());
+
+  rgba.write(out);
+
+  out->close();
+  ImageOutput::destroy(out);
 }
 
 int Bitmap::GetWidth() const {
