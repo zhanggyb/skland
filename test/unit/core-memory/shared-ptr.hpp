@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef WAYLAND_TOOLKIT_TEST_HPP
-#define WAYLAND_TOOLKIT_TEST_HPP
+#ifndef SKLAND_TEST_CORE_MEMORY_SHARED_PTR_HPP_
+#define SKLAND_TEST_CORE_MEMORY_SHARED_PTR_HPP_
 
 #include <gtest/gtest.h>
 
-class Test : public testing::Test {
+class SharedPtrTest : public testing::Test {
  public:
-  Test();
-  virtual ~Test();
+  SharedPtrTest();
+  virtual ~SharedPtrTest();
 
  protected:
   virtual void SetUp() {}
   virtual void TearDown() {}
 };
 
-#endif //WAYLAND_TOOLKIT_TEST_HPP
+#endif //SKLAND_SHARED_PTR_HPP

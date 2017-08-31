@@ -19,14 +19,14 @@
 
 #include <gtest/gtest.h>
 
-class Test : public testing::Test {
+class SPCountedBaseTest : public testing::Test {
  public:
-  Test();
-  virtual ~Test();
+  SPCountedBaseTest();
+  virtual ~SPCountedBaseTest();
 
  protected:
   virtual void SetUp() {}
   virtual void TearDown() {}
 };
 
-#endif //WAYLAND_TOOLKIT_TEST_HPP
+#endif // SKLAND_TEST_CORE_MEMORY_SP_COUNTED_BASE_HPP_

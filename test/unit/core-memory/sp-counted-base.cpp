@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "test.hpp"
+#include "sp-counted-base.hpp"
 
 #include "skland/core/memory.hpp"
 
@@ -23,20 +23,35 @@
 using namespace skland;
 using namespace skland::core;
 
-Test::Test()
+SPCountedBaseTest::SPCountedBaseTest()
     : testing::Test() {
 }
 
-Test::~Test() {
+SPCountedBaseTest::~SPCountedBaseTest() {
 
 }
 
 /**
  * @brief Make sure have the same memory size
  */
-TEST_F(Test, memory_size_1) {
+TEST_F(SPCountedBaseTest, memory_size_1) {
   SkRefCntBase sk_base;
-  SPCountedBase<> base;
+  SPCountedBase base;
+
+  std::cout << sizeof(std::atomic_ulong) << std::endl;
+  std::cout << sizeof(size_t) << std::endl;
 
   ASSERT_TRUE(sizeof(sk_base) == sizeof(base));
+}
+
+TEST_F(SPCountedBaseTest, counter_1) {
+  std::atomic<SPCountedBase::Counter*> var(new SPCountedBase::Counter);
+
+//  std::cout << "fetch user_count: " << var.fetch_add(0) << std::endl;
+//  std::cout << "fetch weak_count: " << var.fetch_add(1) << std::endl;
+
+  std::cout << "use_count: " << var.load()->use_count << std::endl;
+  std::cout << "weak_count: " << var.load()->weak_count << std::endl;
+
+  ASSERT_TRUE(true);
 }
