@@ -17,6 +17,35 @@
 #ifndef SKLAND_CORE_DEFINES_HPP_
 #define SKLAND_CORE_DEFINES_HPP_
 
+#ifdef DEBUG
+
+//#ifdef __UNIX__
+#include <string.h>
+#define FILE_BASE_NAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+//#else
+//#include <string.h>
+//#define FILE_BASE_FILENAME (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
+//#endif
+
+#include <stdio.h>
+#define _DEBUG(fmt, args...) \
+    do { \
+        fprintf(stderr, "%s:%d:%s(): " fmt, FILE_BASE_NAME, __LINE__, __FUNCTION__, args); \
+    } while (false)
+
+#include <cassert>
+#define _ASSERT(expr) \
+  do { \
+    assert(expr); \
+  } while (false)
+
+#else // NOT DEBUG
+
+#define _DEBUG(fmt, args...) ((void)0)
+#define _ASSERT(expr) ((void)0)
+
+#endif // END DEBUG
+
 #define SKLAND_DISABLE_COPY_CONSTRUCTOR(CLASS) CLASS(const CLASS&) = delete
 #define SKLAND_DISABLE_COPY_ASSIGNMENT(CLASS) CLASS& operator=(const CLASS&) = delete
 #define SKLAND_DISABLE_MOVE_CONSTRUCTOR(CLASS) CLASS(CLASS&&) = delete

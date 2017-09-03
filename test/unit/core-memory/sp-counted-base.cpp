@@ -43,15 +43,3 @@ TEST_F(SPCountedBaseTest, memory_size_1) {
 
   ASSERT_TRUE(sizeof(sk_base) == sizeof(base));
 }
-
-TEST_F(SPCountedBaseTest, counter_1) {
-  std::atomic<SPCountedBase::Counter*> var(new SPCountedBase::Counter);
-
-//  std::cout << "fetch user_count: " << var.fetch_add(0) << std::endl;
-//  std::cout << "fetch weak_count: " << var.fetch_add(1) << std::endl;
-
-  std::cout << "use_count: " << var.load()->use_count << std::endl;
-  std::cout << "weak_count: " << var.load()->weak_count << std::endl;
-
-  ASSERT_TRUE(true);
-}

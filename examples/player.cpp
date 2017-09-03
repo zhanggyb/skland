@@ -17,33 +17,67 @@
 #include <skland/gui/application.hpp>
 //#include <skland/av/format.hpp>
 
-//#include <iostream>
+#include <iostream>
+
+#include "skland/core/memory.hpp"
+
+using namespace skland::core;
+
+class RefObject : public SPCountedBase {
+
+ public:
+
+  RefObject() {
+    std::cout << __func__ << std::endl;
+  }
+
+  virtual ~RefObject() {
+    std::cout << __func__ << std::endl;
+  }
+
+};
+
+class A;
+class B;
+
+class A : public SPCountedBase {
+ public:
+
+  A() {
+    _DEBUG("%s\n", __func__);
+  }
+
+  virtual ~A() {
+    _DEBUG("%s\n", __func__);
+  }
+
+  SharedPtr<B> b_;
+};
+
+class B : public SPCountedBase {
+ public:
+
+  B() {
+    _DEBUG("%s\n", __func__);
+  }
+
+  virtual ~B() {
+    _DEBUG("%s\n", __func__);
+  }
+
+  WeakPtr<A> a_;
+};
 
 int main(int argc, char *argv[]) {
-  using namespace skland;
-  using namespace skland::gui;
 
-  Application app(argc, argv);
-//  av::Format::RegisterAll();
-//
-//  std::string url = "file:";
-//  if (argc > 1) {
-//    url += argv[1];
-//  } else {
-//    url += "in.mp3";
-//  }
-//
-//  av::FormatContext context;
-//
-//  try {
-//    context.Open(url.c_str(), nullptr, nullptr);
-//    av::InputFormat f = context.iformat();
-//    std::cout << f.name() << std::endl;
-//    std::cout << f.long_name() << std::endl;
-//  } catch (const std::runtime_error &e) {
-//    std::cerr << e.what() << std::endl;
-//    app.Exit();
-//  }
+  SharedPtr<B> b(new B);
+  SharedPtr<A> a(new A);
 
-  return app.Run();
+  a->b_ = b;
+  b->a_ = a;
+
+  _DEBUG("a use_count: %ld, weak_count: %ld\n", a.use_count(), a.weak_count());
+  _DEBUG("b use_count: %ld, weak_count: %ld\n", b.use_count(), b.weak_count());
+
+  return 0;
 }

@@ -15,7 +15,7 @@
  */
 
 #include "skland/core/deque.hpp"
-#include "skland/core/assert.hpp"
+#include "skland/core/defines.hpp"
 
 namespace skland {
 namespace core {

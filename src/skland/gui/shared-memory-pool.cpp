@@ -16,8 +16,7 @@
 
 #include <skland/gui/shared-memory-pool.hpp>
 
-#include <skland/core/debug.hpp>
-#include <skland/core/assert.hpp>
+#include "skland/core/defines.hpp"
 
 #include <sys/mman.h>
 

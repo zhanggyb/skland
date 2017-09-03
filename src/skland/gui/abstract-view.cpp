@@ -16,8 +16,7 @@
 
 #include "internal/abstract-view_private.hpp"
 
-#include "skland/core/assert.hpp"
-#include "skland/core/debug.hpp"
+#include "skland/core/defines.hpp"
 #include "skland/core/memory.hpp"
 
 #include "skland/numerical/bit.hpp"

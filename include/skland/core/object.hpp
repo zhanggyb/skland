@@ -18,7 +18,7 @@
 #define SKLAND_CORE_OBJECT_HPP_
 
 #include "sigcxx.hpp"
-#include "assert.hpp"
+#include "defines.hpp"
 
 #include <string>
 

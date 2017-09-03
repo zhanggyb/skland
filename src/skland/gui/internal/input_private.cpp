@@ -16,7 +16,7 @@
 
 #include "input_private.hpp"
 
-#include <skland/core/assert.hpp>
+#include <skland/core/defines.hpp>
 
 #include <unistd.h>
 #include <sys/mman.h>

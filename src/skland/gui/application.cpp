@@ -23,7 +23,7 @@
 
 #include <iostream>
 
-#include <skland/core/debug.hpp>
+#include "skland/core/defines.hpp"
 
 #include <skland/gui/theme.hpp>
 

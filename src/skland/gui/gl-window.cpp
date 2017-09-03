@@ -16,7 +16,7 @@
 
 #include "skland/gui/gl-window.hpp"
 
-#include "skland/core/assert.hpp"
+#include "skland/core/defines.hpp"
 #include "skland/core/memory.hpp"
 #include "skland/core/property.hpp"
 

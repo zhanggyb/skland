@@ -17,8 +17,7 @@
 #include "display_private.hpp"
 #include "display_proxy.hpp"
 
-#include <skland/core/debug.hpp>
-#include <skland/core/assert.hpp>
+#include "skland/core/defines.hpp"
 
 #include <skland/gui/input.hpp>
 #include <skland/gui/output.hpp>

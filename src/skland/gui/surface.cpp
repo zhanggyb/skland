@@ -20,7 +20,7 @@
 #include "internal/surface_shell_popup_private.hpp"
 #include "internal/abstract-rendering-api_private.hpp"
 
-#include "skland/core/assert.hpp"
+#include "skland/core/defines.hpp"
 #include "skland/core/memory.hpp"
 
 #include "skland/gui/buffer.hpp"

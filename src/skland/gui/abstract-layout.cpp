@@ -27,7 +27,7 @@
 //#ifdef DEBUG
 #include <cstdlib>
 #include <skland/gui/timer.hpp>
-#include <skland/core/assert.hpp>
+#include <skland/core/defines.hpp>
 #include "skland/gui/context.hpp"
 //#endif
 

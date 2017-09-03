@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <skland/core/posix-timer.hpp>
-#include <skland/core/debug.hpp>
+#include "skland/core/posix-timer.hpp"
+#include "skland/core/defines.hpp"
 
 #include <errno.h>
 

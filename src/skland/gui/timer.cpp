@@ -23,7 +23,7 @@
 #include <unistd.h>
 #include <sys/epoll.h>
 
-#include <skland/core/debug.hpp>
+#include "skland/core/defines.hpp"
 
 namespace skland {
 namespace gui {

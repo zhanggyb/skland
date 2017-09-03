@@ -14,29 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_CORE_DEBUG_HPP_
-#define SKLAND_CORE_DEBUG_HPP_
+#ifndef SKLAND_TEST_CORE_WEAK_PTR_HPP_
+#define SKLAND_TEST_CORE_WEAK_PTR_HPP_
 
-#ifdef DEBUG
+#include <gtest/gtest.h>
 
-//#ifdef __UNIX__
-#include <string.h>
-#define FILE_BASE_NAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-//#else
-//#include <string.h>
-//#define FILE_BASE_FILENAME (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
-//#endif
+class WeakPtrTest : public testing::Test {
 
-#include <stdio.h>
-#define _DEBUG(fmt, args...) \
-    do { \
-        fprintf(stderr, "%s:%d:%s(): " fmt, FILE_BASE_NAME, __LINE__, __FUNCTION__, args); \
-    } while (0)
+ public:
 
-#else // NOT DEBUG
+  WeakPtrTest();
+  virtual ~WeakPtrTest();
 
-#define _DEBUG(fmt, args...) ((void)0)
+ protected:
 
-#endif // END DEBUG
+  virtual void SetUp() {}
+  virtual void TearDown() {}
 
-#endif // SKLAND_CORE_DEBUG_HPP_
+};
+
+#endif // SKLAND_TEST_CORE_WEAK_PTR_HPP_

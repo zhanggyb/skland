@@ -17,7 +17,7 @@
 #include <skland/av/format.hpp>
 #include <skland/av/dict.hpp>
 
-#include <skland/core/assert.hpp>
+#include "skland/core/defines.hpp"
 #include <stdexcept>
 
 namespace skland {

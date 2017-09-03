@@ -16,7 +16,7 @@
 
 #include "skland/gui/glesv2-api.hpp"
 
-#include "skland/core/assert.hpp"
+#include "skland/core/defines.hpp"
 #include "skland/core/memory.hpp"
 
 #include "internal/abstract-rendering-api_proxy.hpp"
