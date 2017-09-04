@@ -28,10 +28,29 @@ namespace core {
 /**
  * @ingroup core
  * @brief The base class for objects that may be shared by multiple objects.
- * @tparam T The type of reference count, must be int, int32_t, long, size_t etc.
  *
- * Though we can use std::shared_ptr to store any type of object, there still be situation
- * that we need to indicate what kind of object can be used in shared ptr.
+ * SPCountedBase is the base class to be used in SharedPtr and WeakPtr for
+ * implementing our custom reference counting smart pointer. Though we can use
+ * std::shared_ptr to store any type of object, there still be situation that we
+ * need to indicate what kind of object can be used in a shared pointer.
+ *
+ * You usually define your own sub class of SPCountedBase, create and contain an
+ * instance in a SharedPtr. Use WeakPtr to avoid curcular references in
+ * appropriate time.
+ *
+ * Each SPCountedBase object has a pointer to a Counter object which stores 2
+ * different counters:
+ *
+ *   - use_count: the number of SharedPtr instances pointing to this
+ *     SPCountedBase object
+ *
+ *   - weak_count: the number of WeakPtr instances pointing to this
+ *     SPCountedBase object
+ *
+ * A SPCountedBase object knows its reference status by checking the counters by
+ * use_count() or weak_count(). When a SPCountedBase object is created by new
+ * operator and not controled by any SharedPtr or WeakPtr, both use_count and
+ * weak_count are zero, in this case you can safely delete the instance.
  */
 class SPCountedBase {
 
@@ -62,8 +81,8 @@ class SPCountedBase {
     std::atomic_ulong use_count;
 
     /**
-     * @brief The number of WeakPtr instances pointing to the object,
-     * plus one if the "use_count" is still > 0
+     * @brief The number of WeakPtr instances pointing to the object, plus one
+     * if the "use_count" is still > 0
      */
     std::atomic_ulong weak_count;
 
@@ -74,7 +93,9 @@ class SPCountedBase {
 
   virtual ~SPCountedBase() {
     if (nullptr != counter_) {
-      _DEBUG("use_count: %ld, weak_count: %ld\n", counter_->use_count.load(), counter_->weak_count.load());
+      _DEBUG("use_count: %ld, weak_count: %ld\n",
+             counter_->use_count.load(),
+             counter_->weak_count.load());
     }
     delete counter_;
   }
@@ -86,7 +107,7 @@ class SPCountedBase {
   size_t weak_count() const {
     return counter_->weak_count.load();
   }
-  
+
  private:
 
   Counter *counter_;
@@ -268,7 +289,8 @@ class SharedPtr {
   }
 
   /**
-   * @brief Returns whether this shared pointer does not share ownership over its pointer with other.
+   * @brief Returns whether this shared pointer does not share ownership over
+   * its pointer with other.
    * @return
    */
   bool unique() const noexcept {
@@ -293,6 +315,11 @@ class SharedPtr {
 
 };
 
+/**
+ * @ingroup core
+ * @brief Weak ptr
+ * @tparam T
+ */
 template<typename T>
 class WeakPtr {
 
@@ -376,8 +403,19 @@ class WeakPtr {
     return nullptr == counter_ ? 0 : counter_->weak_count.load();
   }
 
+  /**
+   * @brief Returns a SharedPtr with the object preserved if it is not expired.
+   *
+   * When you try to obtain a SharedPtr by this method, the WeakPtr checks the
+   * "use count", and if it's > 0 returns a valid SharedPtr . If the "use count"
+   * was already zero you get an empty SharedPtr instance instead.
+   */
   SharedPtr<T> lock() const noexcept {
-    return SharedPtr<T>(ptr_);
+    if (counter_->use_count > 0) {
+      return SharedPtr<T>(ptr_);
+    }
+    
+    return SharedPtr<T>();
   }
 
  private:
