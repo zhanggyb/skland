@@ -44,7 +44,7 @@ struct GLESV2API::Private {
 };
 
 GLESV2API::GLESV2API() {
-  p_ = core::make_unique<Private>();
+  p_ = core::MakeUnique<Private>();
 }
 
 GLESV2API::~GLESV2API() {

@@ -51,7 +51,7 @@ Canvas *Canvas::CreateRasterDirect(int width, int height, unsigned char *pixels,
 }
 
 Canvas::Canvas() {
-  p_ = core::make_unique<Private>();
+  p_ = core::MakeUnique<Private>();
 }
 
 Canvas::Canvas(unsigned char *pixel, int width, int height, int format) {
@@ -68,15 +68,15 @@ Canvas::Canvas(unsigned char *pixel, int width, int height, int format) {
     throw std::runtime_error("ERROR! Invalid bitmap format for Canvas!");
   }
 
-  p_ = core::make_unique<Private>(bitmap);
+  p_ = core::MakeUnique<Private>(bitmap);
 }
 
 Canvas::Canvas(const Bitmap &bitmap) {
-  p_ = core::make_unique<Private>(bitmap.p_->sk_bitmap);
+  p_ = core::MakeUnique<Private>(bitmap.p_->sk_bitmap);
 }
 
 Canvas::Canvas(SkCanvas *native) {
-  p_ = core::make_unique<Private>(native);
+  p_ = core::MakeUnique<Private>(native);
 }
 
 Canvas::~Canvas() {

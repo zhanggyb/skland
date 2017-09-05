@@ -24,7 +24,7 @@
 namespace skland {
 namespace graphic {
 
-using core::make_unique;
+using core::MakeUnique;
 
 Surface *Surface::CreateRasterDirect(const ImageInfo &image_info, void *pixels, size_t row_bytes) {
   Surface *surface = new Surface();
@@ -45,7 +45,7 @@ Surface *Surface::CreateRasterDirect(const ImageInfo &image_info, void *pixels, 
 }
 
 Surface::Surface() {
-  p_ = make_unique<Private>();
+  p_ = MakeUnique<Private>();
 }
 
 Surface::~Surface() {

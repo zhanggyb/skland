@@ -62,7 +62,7 @@ Label::Label(const std::string &text)
 
 Label::Label(int width, int height, const std::string &text)
     : AbstractView(width, height) {
-  p_ = core::make_unique<Private>(text);
+  p_ = core::MakeUnique<Private>(text);
 }
 
 Label::~Label() {

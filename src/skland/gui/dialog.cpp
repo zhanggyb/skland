@@ -57,7 +57,7 @@ struct Dialog::Private {
 
 Dialog::Dialog(const char *title, AbstractShellView *parent)
     : AbstractShellView(title, parent) {
-  p_ = core::make_unique<Private>();
+  p_ = core::MakeUnique<Private>();
 }
 
 Dialog::~Dialog() {

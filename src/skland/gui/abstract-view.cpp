@@ -45,7 +45,7 @@ AbstractView::AbstractView()
 
 AbstractView::AbstractView(int width, int height)
     : AbstractEventHandler() {
-  p_ = core::make_unique<Private>(this);
+  p_ = core::MakeUnique<Private>(this);
   p_->geometry.Resize(width, height);
   p_->last_geometry.Resize(width, height);
 

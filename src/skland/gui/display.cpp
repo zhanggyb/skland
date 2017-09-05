@@ -33,7 +33,7 @@ using core::CompoundDeque;
 Display *Display::kDisplay = nullptr;
 
 Display::Display() {
-  p_ = core::make_unique<Private>();
+  p_ = core::MakeUnique<Private>();
   p_->cursors.resize(kCursorBlank, nullptr);
 }
 

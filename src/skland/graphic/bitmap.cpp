@@ -27,11 +27,11 @@ namespace skland {
 namespace graphic {
 
 Bitmap::Bitmap() {
-  p_ = core::make_unique<Private>(this);
+  p_ = core::MakeUnique<Private>(this);
 }
 
 Bitmap::Bitmap(const Bitmap &orig) {
-  p_ = core::make_unique<Private>(this);
+  p_ = core::MakeUnique<Private>(this);
 
   p_->sk_bitmap = orig.p_->sk_bitmap;
 }

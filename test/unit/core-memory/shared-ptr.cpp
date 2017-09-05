@@ -81,8 +81,8 @@ TEST_F(SharedPtrTest, move_assignment_1) {
 TEST_F(SharedPtrTest, reset_1) {
   SharedPtr<RefObject> ptr;
 
-  ptr.reset(new RefObject);
-  ptr.reset(new RefObject);
+  ptr.Reset(new RefObject);
+  ptr.Reset(new RefObject);
 
   ASSERT_TRUE(ptr->use_count() == 1);
 }
@@ -90,8 +90,8 @@ TEST_F(SharedPtrTest, reset_1) {
 TEST_F(SharedPtrTest, reset_2) {
   SharedPtr<RefObject> ptr;
 
-  ptr.reset(new RefObject);
-  ptr.reset(nullptr);
+  ptr.Reset(new RefObject);
+  ptr.Reset(nullptr);
 
   ASSERT_TRUE(!ptr);
 }
@@ -103,7 +103,7 @@ TEST_F(SharedPtrTest, swap_1) {
 
   SharedPtr<RefObject> shared_ptr3(shared_ptr1);
 
-  swap(shared_ptr1, shared_ptr2);
+  Swap(shared_ptr1, shared_ptr2);
 
   ASSERT_TRUE(shared_ptr1->use_count() == 1 && shared_ptr2->use_count() == 2);
 }
@@ -115,7 +115,7 @@ TEST_F(SharedPtrTest, swap_2) {
 
   SharedPtr<RefObject> shared_ptr3(shared_ptr1);
 
-  shared_ptr1.swap(shared_ptr2);
+  shared_ptr1.Swap(shared_ptr2);
 
   ASSERT_TRUE(shared_ptr1->use_count() == 1 && shared_ptr2->use_count() == 2);
 }
@@ -124,14 +124,14 @@ TEST_F(SharedPtrTest, unique_1) {
   SharedPtr<RefObject> shared_ptr1;
   SharedPtr<RefObject> shared_ptr2(new RefObject);
 
-  ASSERT_TRUE(!shared_ptr1.unique());
+  ASSERT_TRUE(!shared_ptr1.IsUnique());
   shared_ptr1 = shared_ptr2;
-  ASSERT_TRUE(!shared_ptr1.unique());
+  ASSERT_TRUE(!shared_ptr1.IsUnique());
 
   shared_ptr2 = nullptr;
 
   std::cout << shared_ptr1.use_count() << std::endl;
   std::cout << shared_ptr2.use_count() << std::endl;
 
-  ASSERT_TRUE(shared_ptr1.unique());
+  ASSERT_TRUE(shared_ptr1.IsUnique());
 }

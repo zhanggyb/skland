@@ -50,7 +50,10 @@ namespace core {
  * A SPCountedBase object knows its reference status by checking the counters by
  * use_count() or weak_count(). When a SPCountedBase object is created by new
  * operator and not controled by any SharedPtr or WeakPtr, both use_count and
- * weak_count are zero, in this case you can safely delete the instance.
+ * weak_count are zero, in this case you can safely delete the
+ * instance. Otherwise, it must be destroyed by a SharedPtr.
+ *
+ * A SPCountedBase object is non-copyable and non-movable.
  */
 class SPCountedBase {
 
@@ -62,17 +65,22 @@ class SPCountedBase {
 
  public:
 
-  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(SPCountedBase);
-
+  /**
+   * @brief A helper structure to store counters
+   */
   struct Counter {
 
     Counter()
         : use_count(0), weak_count(0) {
+#ifdef UNIT_TEST
       _DEBUG("%s\n", __func__);
+#endif  // UNIT_TEST
     }
 
     ~Counter() {
+#ifdef UNIT_TEST
       _DEBUG("%s\n", __func__);
+#endif  // UNIT_TEST
     }
 
     /**
@@ -88,22 +96,44 @@ class SPCountedBase {
 
   };
 
+  /**
+   * @brief Disable copy and move constructors
+   */
+  SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(SPCountedBase);
+
+  /**
+   * @brief Default constructor
+   */
   SPCountedBase()
       : counter_(new Counter) {}
 
+  /**
+   * @brief Destructor
+   *
+   * The destructor will try to delete the internal counter object, but in most
+   * cases it's deleted by SharedPtr or WeakPtr.
+   */
   virtual ~SPCountedBase() {
+#ifdef UNIT_TEST
     if (nullptr != counter_) {
       _DEBUG("use_count: %ld, weak_count: %ld\n",
              counter_->use_count.load(),
              counter_->weak_count.load());
     }
+#endif  // TEST
     delete counter_;
   }
 
+  /**
+   * @brief Get the use count
+   */
   size_t use_count() const {
     return counter_->use_count.load();
   }
 
+  /**
+   * @brief Get the weak count
+   */
   size_t weak_count() const {
     return counter_->weak_count.load();
   }
@@ -117,7 +147,7 @@ class SPCountedBase {
 /**
  * @ingroup core
  * @brief Shared pointer
- * @tparam T
+ * @tparam T Must be SPCountedBase or the sub class
  */
 template<typename T>
 class SharedPtr {
@@ -126,18 +156,33 @@ class SharedPtr {
   class WeakPtr;
 
   template<typename R>
-  friend void swap(SharedPtr<R> &src, SharedPtr<R> &dst);
+  friend void Swap(SharedPtr<R> &src, SharedPtr<R> &dst);
 
  public:
 
-  SharedPtr() = default;
+  /**
+   * @brief Default constructor
+   */
+  constexpr SharedPtr() noexcept = default;
 
-  explicit SharedPtr(T *obj) : ptr_(obj) {
+  /**
+   * @brief Constructor with an assigned SPCountedBase object
+   * @param[in] obj A SPCountedBase object, must not be nullptr
+   *
+   * This constructor will increase the use count of obj.
+   */
+  explicit SharedPtr(T *obj) noexcept
+      : ptr_(obj) {
     counter_ = ptr_->counter_;
     ++counter_->use_count;
   }
 
-  SharedPtr(const SharedPtr &orig)
+  /**
+   * @brief Copy constructor
+   *
+   * Increase the use count if the object in orig is not nullptr.
+   */
+  SharedPtr(const SharedPtr &orig) noexcept
       : ptr_(orig.ptr_) {
     if (nullptr != ptr_) {
       counter_ = ptr_->counter_;
@@ -155,6 +200,12 @@ class SharedPtr {
     orig.counter_ = nullptr;
   }
 
+  /**
+   * @brief Destructor
+   *
+   * When a SharedPtr object is destroyed, it will decrease the use count and
+   * delete the object it points to if use count == 0.
+   */
   ~SharedPtr() {
     if (nullptr != counter_) {
       _ASSERT((nullptr != ptr_) && (ptr_->counter_ == counter_));
@@ -163,7 +214,9 @@ class SharedPtr {
       if (0 == counter_->use_count) {
         ptr_->counter_ = nullptr; // set this value to avoid destroying the counter
 
-        // Important: avoid double delete counter_:
+        // Important: increase the weak count before delete the pointer, then
+        // decrease it to avoid double delete counter_ in cross-reference
+        // situation:
         ++counter_->weak_count;
         delete ptr_;
         --counter_->weak_count;
@@ -179,9 +232,12 @@ class SharedPtr {
    * @brief Copy assignment
    * @param other
    * @return
+   *
+   * The copy assignments adds the object as a shared owner of other's assets,
+   * increasing the use_count.
    */
   SharedPtr &operator=(const SharedPtr &other) noexcept {
-    reset(other.ptr_);
+    Reset(other.ptr_);
     return *this;
   }
 
@@ -198,8 +254,13 @@ class SharedPtr {
     return *this;
   }
 
+  /**
+   * @brief Assignment overloading
+   *
+   * Adds this object as a shared owner of obj, increasing the use_count.
+   */
   SharedPtr &operator=(T *obj) noexcept {
-    reset(obj);
+    Reset(obj);
     return *this;
   }
 
@@ -207,7 +268,7 @@ class SharedPtr {
    * @brief Swap content
    * @param other
    */
-  void swap(SharedPtr &other) noexcept {
+  void Swap(SharedPtr &other) noexcept {
     T *object = ptr_;
     SPCountedBase::Counter *counter = counter_;
 
@@ -222,7 +283,7 @@ class SharedPtr {
    * @brief Reset pointer
    * @param obj
    */
-  void reset(T *obj = nullptr) {
+  void Reset(T *obj = nullptr) noexcept {
     T *old_object = ptr_;
     SPCountedBase::Counter *old_counter = counter_;
 
@@ -256,7 +317,7 @@ class SharedPtr {
    * @brief Get pointer
    * @return
    */
-  T *get() const {
+  T *Get() const noexcept {
     return ptr_;
   }
 
@@ -264,7 +325,7 @@ class SharedPtr {
    * @brief Dereference object
    * @return
    */
-  T &operator*() const {
+  T &operator*() const noexcept {
     return *ptr_;
   }
 
@@ -272,18 +333,26 @@ class SharedPtr {
    * @brief Dereference object member
    * @return
    */
-  T *operator->() const {
+  T *operator->() const noexcept {
     return ptr_;
   }
 
   /**
-   * @brief Use count
+   * @brief Get the use count
    * @return
+   *
+   * Returns the number of SharedPtr objects that share ownership over the same
+   * pointer as this object (including it).
+   *
+   * If this is an empty SharedPtr, the function returns zero.
    */
   size_t use_count() const noexcept {
     return nullptr == counter_ ? 0 : counter_->use_count.load();
   }
 
+  /**
+   * @brief Get the weak count
+   */
   size_t weak_count() const noexcept {
     return nullptr == counter_ ? 0 : counter_->weak_count.load();
   }
@@ -293,11 +362,14 @@ class SharedPtr {
    * its pointer with other.
    * @return
    */
-  bool unique() const noexcept {
+  bool IsUnique() const noexcept {
     return 1 == use_count();
   }
 
-  explicit operator bool() const {
+  /**
+   * @brief bool operator
+   */
+  explicit operator bool() const noexcept {
     if (nullptr == ptr_) {
       _ASSERT(nullptr == counter_);
       return false;
@@ -323,22 +395,37 @@ class SharedPtr {
 template<typename T>
 class WeakPtr {
 
+  template<typename R>
+  friend void Swap(WeakPtr<R> &src, WeakPtr<R> &dst);
+
  public:
 
-  WeakPtr() = default;
+  /**
+   * @brief Default constructor
+   */
+  constexpr WeakPtr() noexcept = default;
 
-  WeakPtr(const WeakPtr &orig) {
+  /**
+   * @brief Copy constructor
+   */
+  WeakPtr(const WeakPtr &orig) noexcept {
     ptr_ = orig.ptr_;
     counter_ = orig.counter_;
     if (nullptr != counter_) ++counter_->weak_count;
   }
 
-  explicit WeakPtr(const SharedPtr<T> &orig) {
+  /**
+   * @brief Constructor by a SharedPtr
+   */
+  explicit WeakPtr(const SharedPtr<T> &orig) noexcept {
     ptr_ = orig.ptr_;
     counter_ = orig.counter_;
     if (nullptr != counter_) ++counter_->weak_count;
   }
 
+  /**
+   * @brief Destructor
+   */
   ~WeakPtr() {
     if (nullptr != counter_) {
       --counter_->weak_count;
@@ -348,7 +435,10 @@ class WeakPtr {
     }
   }
 
-  WeakPtr &operator=(const SharedPtr<T> &other) {
+  /**
+   * @brief Assignment from a SharedPtr
+   */
+  WeakPtr &operator=(const SharedPtr<T> &other) noexcept {
     SPCountedBase::Counter *old_counter = counter_;
 
     ptr_ = other.ptr_;
@@ -366,7 +456,10 @@ class WeakPtr {
     return *this;
   }
 
-  WeakPtr &operator=(const WeakPtr &other) {
+  /**
+   * @brief Copy assignment
+   */
+  WeakPtr &operator=(const WeakPtr &other) noexcept {
     SPCountedBase::Counter *old_counter = counter_;
 
     ptr_ = other.ptr_;
@@ -384,7 +477,10 @@ class WeakPtr {
     return *this;
   }
 
-  void reset() {
+  /**
+   * @brief Reset pointer
+   */
+  void Reset() noexcept {
     ptr_ = nullptr;
     if (nullptr != counter_) {
       --counter_->weak_count;
@@ -395,10 +491,16 @@ class WeakPtr {
     }
   }
 
+  /**
+   * @brief Get use count
+   */
   size_t use_count() const noexcept {
     return nullptr == counter_ ? 0 : counter_->use_count.load();
   }
 
+  /**
+   * @brief Get weak count
+   */
   size_t weak_count() const noexcept {
     return nullptr == counter_ ? 0 : counter_->weak_count.load();
   }
@@ -410,12 +512,25 @@ class WeakPtr {
    * "use count", and if it's > 0 returns a valid SharedPtr . If the "use count"
    * was already zero you get an empty SharedPtr instance instead.
    */
-  SharedPtr<T> lock() const noexcept {
+  SharedPtr<T> Lock() const noexcept {
     if (counter_->use_count > 0) {
       return SharedPtr<T>(ptr_);
     }
-    
+
     return SharedPtr<T>();
+  }
+
+  /**
+   * @brief Bool operator
+   * @return
+   */
+  explicit operator bool() const noexcept {
+    if (nullptr != counter_) {
+      _ASSERT(0 != counter_->use_count || 0 != counter_->weak_count);
+      return true;
+    }
+    
+    return false;
   }
 
  private:
@@ -434,20 +549,44 @@ class WeakPtr {
  * @param args list of arguments with which an instance of T will be constructed
  * @return std::unique_ptr of an instance of type T
  *
- * This template function is the same as std::make_unique in C++14
+ * @note This template function is the same as std::make_unique in C++14
  */
 template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args &&... args) {
+std::unique_ptr<T> MakeUnique(Args &&... args) {
   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
+/**
+ * @ingroup core
+ * @brief Constructs an object of tyep T and wraps it in a SharedPtr
+ */
 template<typename T, typename ... Args>
-SharedPtr<T> make_shared(Args &&... args) {
+SharedPtr<T> MakeShared(Args &&... args) {
   return SharedPtr<T>(new T(std::forward<Args>(args)...));
 };
 
+/**
+ * @ingroup core
+ * @brief Exchange content of SharedPtr objects
+ */
 template<typename T>
-void swap(SharedPtr<T> &src, SharedPtr<T> &dst) {
+void Swap(SharedPtr<T> &src, SharedPtr<T> &dst) {
+  T *object = src.ptr_;
+  SPCountedBase::Counter *counter = src.counter_;
+
+  src.ptr_ = dst.ptr_;
+  src.counter_ = dst.counter_;
+
+  dst.ptr_ = object;
+  dst.counter_ = counter;
+}
+
+/**
+ * @ingroup core
+ * @brief Exchange content of WeakPtr objects
+ */
+template<typename T>
+void Swap(WeakPtr<T> &src, WeakPtr<T> &dst) {
   T *object = src.ptr_;
   SPCountedBase::Counter *counter = src.counter_;
 

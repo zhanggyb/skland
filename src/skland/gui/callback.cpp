@@ -64,7 +64,7 @@ void Callback::Private::OnDone(void *data, struct wl_callback */*wl_callback*/, 
 // -----
 
 Callback::Callback() {
-  p_ = core::make_unique<Private>();
+  p_ = core::MakeUnique<Private>();
 }
 
 Callback::Callback(const Display &display)

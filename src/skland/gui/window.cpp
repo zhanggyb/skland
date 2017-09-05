@@ -205,7 +205,7 @@ Window::Window(const char *title)
 
 Window::Window(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
-  p_ = core::make_unique<Private>(this);
+  p_ = core::MakeUnique<Private>(this);
 
   Surface *shell_surface = GetShellSurface();
 

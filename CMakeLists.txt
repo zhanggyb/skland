@@ -203,6 +203,7 @@ if (LINUX)
 endif ()
 
 if (BUILD_UNIT_TEST)
+    add_definitions(-DUNIT_TEST)
     add_subdirectory(test)
 endif ()
 

@@ -53,7 +53,7 @@ AbstractShellView::AbstractShellView(int width,
                                      int height,
                                      const char *title,
                                      AbstractShellView *parent) {
-  p_ = core::make_unique<Private>(this);
+  p_ = core::MakeUnique<Private>(this);
   p_->size.width = width;
   p_->size.height = height;
   p_->last_size = p_->size;

@@ -23,7 +23,7 @@ namespace skland {
 namespace gui {
 
 AbstractEventHandler::AbstractEventHandler() {
-  p_ = core::make_unique<Private>(this);
+  p_ = core::MakeUnique<Private>(this);
 }
 
 AbstractEventHandler::~AbstractEventHandler() {

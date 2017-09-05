@@ -26,7 +26,7 @@ using Point = core::PointI;
 using Size = core::SizeI;
 
 Buffer::Buffer() {
-  p_ = core::make_unique<Private>();
+  p_ = core::MakeUnique<Private>();
 }
 
 Buffer::~Buffer() {

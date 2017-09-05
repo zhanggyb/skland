@@ -64,7 +64,7 @@ void Surface::Shell::AckConfigure(uint32_t serial) const {
 
 Surface::Shell::Shell(Surface *surface)
     : surface_(surface), parent_(nullptr) {
-  p_ = core::make_unique<Private>();
+  p_ = core::MakeUnique<Private>();
 
   _ASSERT(surface_);
   role_.placeholder = nullptr;
@@ -181,7 +181,7 @@ void Surface::Shell::Toplevel::SetMinimized() const {
 }
 
 Surface::Shell::Toplevel::Toplevel(Shell *shell_surface) {
-  p_ = core::make_unique<Private>();
+  p_ = core::MakeUnique<Private>();
 
   _ASSERT(nullptr != shell_surface);
   p_->shell = shell_surface;
@@ -208,7 +208,7 @@ Surface *Surface::Shell::Popup::Create(Shell *parent, AbstractEventHandler *view
 
 Surface::Shell::Popup::Popup(Shell *shell) {
   _ASSERT(nullptr != shell);
-  p_ = core::make_unique<Private>();
+  p_ = core::MakeUnique<Private>();
   p_->shell = shell;
   // TODO: initialize xdg_popup_
 }
@@ -444,7 +444,7 @@ core::Deque<Surface::CommitTask> Surface::kCommitTaskDeque;
 
 Surface::Surface(AbstractEventHandler *event_handler, const Margin &margin) {
   _ASSERT(nullptr != event_handler);
-  p_ = core::make_unique<Private>(this, event_handler, margin);
+  p_ = core::MakeUnique<Private>(this, event_handler, margin);
   p_->role.placeholder = nullptr;
 
   p_->wl_surface = wl_compositor_create_surface(Display::Proxy::wl_compositor());
