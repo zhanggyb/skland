@@ -163,8 +163,8 @@ void Canvas::ResetMatrix() {
   p_->sk_canvas->translate(p_->origin.x, p_->origin.y);
 }
 
-void Canvas::Clear(uint32_t color) {
-  p_->sk_canvas->clear(color);
+void Canvas::Clear(uint32_t argb) {
+  p_->sk_canvas->clear(argb);
 }
 
 void Canvas::Clear(const ColorF &color) {

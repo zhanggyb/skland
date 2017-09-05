@@ -18,38 +18,41 @@
 
 #include "internal/typeface_private.hpp"
 
+#include "skland/core/memory.hpp"
+
 namespace skland {
 namespace graphic {
 
 Font::Font(Typeface::Style style, float size, MaskType mask_type, uint32_t flags) {
-  p_.reset(new Private);
+  p_ = core::MakeUnique<Private>();
   sk_sp<SkTypeface> typeface = SkTypeface::MakeDefault((SkTypeface::Style) style);
   p_->sk_font = SkFont::Make(typeface, size, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const char *family_name, FontStyle font_style, float size, MaskType mask_type, uint32_t flags) {
-  p_.reset(new Private);
+  p_ = core::MakeUnique<Private>();
   sk_sp<SkTypeface> typeface = SkTypeface::MakeFromName(family_name, *reinterpret_cast<SkFontStyle *>(&font_style));
   p_->sk_font = SkFont::Make(typeface, size, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const Typeface &typeface, float size, MaskType mask_type, uint32_t flags) {
-  p_.reset(new Private);
+  p_ = core::MakeUnique<Private>();
   p_->sk_font = SkFont::Make(typeface.p_->sk_typeface, size, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const Typeface &typeface, float size, float scale_x, float skew_x, MaskType mask_type, uint32_t flags) {
-  p_.reset(new Private);
+  p_ = core::MakeUnique<Private>();
   p_->sk_font =
       SkFont::Make(typeface.p_->sk_typeface, size, scale_x, skew_x, (SkFont::MaskType) mask_type, flags);
 }
 
 Font::Font(const Font &other) {
-  p_.reset(new Private);
+  p_ = core::MakeUnique<Private>();
   p_->sk_font = other.p_->sk_font;
 }
 
 Font::~Font() {
+
 }
 
 Font &Font::operator=(const Font &other) {

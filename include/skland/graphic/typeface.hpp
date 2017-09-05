@@ -58,7 +58,7 @@ class Typeface {
     kEncodingUTF32
   };
 
-  Typeface(Style style = Style::kNormal);
+  explicit Typeface(Style style = Style::kNormal);
 
   Typeface(const char *family_name, FontStyle font_style);
 
@@ -71,15 +71,13 @@ class Typeface {
    * @param path
    * @param index
    */
-  Typeface(const char *path, int index = 0);
+  explicit Typeface(const char *path, int index = 0);
 
   ~Typeface();
 
   Typeface &operator=(const Typeface &other);
 
   FontStyle GetFontStyle() const;
-
-  Style GetStyle() const;
 
   bool IsBold() const;
 

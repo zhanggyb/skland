@@ -89,9 +89,9 @@ void Paint::SetStyle(Style style) {
 ColorF Paint::GetColor() const {
   uint32_t value = p_->sk_paint.getColor();
   return ColorF::FromUCharRGBA(SkToU8(SkColorGetR(value)),
-                              SkToU8(SkColorGetG(value)),
-                              SkToU8(SkColorGetB(value)),
-                              SkToU8(SkColorGetA(value)));
+                               SkToU8(SkColorGetG(value)),
+                               SkToU8(SkColorGetB(value)),
+                               SkToU8(SkColorGetA(value)));
 }
 
 void Paint::SetColor(uint32_t argb) {
@@ -114,8 +114,13 @@ void Paint::SetStrokeWidth(float width) {
 }
 
 void Paint::SetFont(const Font &font) {
-  SkTypeface *ptr = font.GetSkTypeface();
-  sk_sp<SkTypeface> typeface = SkTypeface::MakeFromTypeface(ptr, ptr->style());
+  SkTypeface *sk_typeface = font.GetSkTypeface();
+
+  int style = SkTypeface::kNormal;
+  if (sk_typeface->isBold()) style |= SkTypeface::kBold;
+  if (sk_typeface->isItalic()) style |= SkTypeface::kItalic;
+
+  sk_sp<SkTypeface> typeface = SkTypeface::MakeFromTypeface(sk_typeface, (SkTypeface::Style) style);
   p_->sk_paint.setTypeface(typeface);
 }
 

@@ -77,7 +77,7 @@ endforeach ()
 
 # Add assembly code in jumper module and remove *_lowp.cpp:
 list(APPEND SKIA_SOURCE_FILES ${SKIA_SOURCE_DIR}/src/jumper/SkJumper_generated.S)
-remove_srcs(${SKIA_SOURCE_DIR}/src/jumper/SkJumper_stages_lowp.cpp)
+# remove_srcs(${SKIA_SOURCE_DIR}/src/jumper/SkJumper_stages_lowp.cpp)
 
 # Remove OS-specific source files.
 if (NOT UNIX)

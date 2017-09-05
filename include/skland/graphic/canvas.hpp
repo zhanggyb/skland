@@ -118,7 +118,7 @@ class Canvas {
    */
   void ResetMatrix();
 
-  void Clear(uint32_t color = 0x0);
+  void Clear(uint32_t argb = 0x0);
 
   void Clear(const core::ColorF &color);
 

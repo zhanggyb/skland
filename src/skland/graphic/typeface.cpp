@@ -59,10 +59,6 @@ FontStyle Typeface::GetFontStyle() const {
   return FontStyle(p_->sk_typeface->fontStyle());
 }
 
-Typeface::Style Typeface::GetStyle() const {
-  return (Style) p_->sk_typeface->style();
-}
-
 bool Typeface::IsBold() const {
   return p_->sk_typeface->isBold();
 }

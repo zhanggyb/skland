@@ -1,15 +1,36 @@
-//
-// Created by zhanggyb on 16-9-19.
-//
+/*
+ * Copyright 2016 Freeman Zhang <zhanggyb@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include "test.hpp"
 
-#include <skland/core/color.hpp>
-#include <skland/graphic/paint.hpp>
-#include <SkPaint.h>
+#include "skland/core/color.hpp"
+#include "skland/graphic/paint.hpp"
+#include "skland/graphic/canvas.hpp"
+#include "skland/graphic/bitmap.hpp"
+#include "skland/graphic/font.hpp"
 
-using skland::core::ColorF;
-using skland::graphic::Paint;
+#include "SkPaint.h"
+
+using namespace skland;
+using namespace skland::core;
+using namespace skland::graphic;
+
+static const int kWidth = 400;
+static const int kHeight = 300;
+static const std::string kFileNamePrefix("graphic_paint_");
 
 Test::Test()
     : testing::Test() {
@@ -43,4 +64,50 @@ TEST_F(Test, constructor_1) {
   ret = paint.GetColor();
 
   ASSERT_TRUE(ret == blue);
+}
+
+TEST_F(Test, text_1) {
+  Bitmap bitmap;
+  bitmap.AllocateN32Pixels(kWidth, kHeight);
+
+  Canvas canvas(bitmap);
+  canvas.Clear(0xFFFFFFFF);
+
+  Paint paint1, paint2, paint3;
+  Font font("Noto Sans CJK SC", FontStyle(FontStyle::kWeightNormal), 24.f);
+
+  paint1.SetTextSize(64.f);
+  paint1.SetAntiAlias(true);
+  paint1.SetColor(ColorF::FromUCharRGBA(255, 0, 0));
+  paint1.SetFont(font);
+
+  paint2.SetTextSize(64.f);
+  paint2.SetAntiAlias(true);
+  paint2.SetColor(ColorF::FromUCharRGBA(0, 136, 0));
+  paint2.SetStyle(Paint::kStyleStroke);
+  paint2.SetStrokeWidth(3.f);
+  paint2.SetFont(font);
+
+  paint3.SetTextSize(64.f);
+  paint3.SetAntiAlias(true);
+  paint3.SetColor(ColorF::FromUCharRGBA(136, 136, 136));
+  paint3.SetTextScaleX(1.5f);
+  paint3.SetFont(font);
+
+  const char text[] = "Skia!";
+  canvas.DrawText(text, strlen(text), 20.f, 64.f, paint1);
+  canvas.DrawText(text, strlen(text), 20.f, 144.f, paint2);
+  canvas.DrawText(text, strlen(text), 20.f, 224.f, paint3);
+
+  canvas.Flush();
+
+  std::string filename = kFileNamePrefix + "text_1.png";
+  bitmap.WriteToFile(filename);
+
+  std::cout << std::endl
+            << "Check image file: " << filename
+            << std::endl
+            << std::endl;
+
+  ASSERT_TRUE(true);
 }

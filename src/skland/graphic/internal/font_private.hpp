@@ -30,9 +30,9 @@ namespace graphic {
  */
 struct Font::Private {
 
-  Private() {}
+  Private() = default;
 
-  Private(const sk_sp<SkFont> &font)
+  explicit Private(const sk_sp<SkFont> &font)
       : sk_font(font) {}
 
   Private(const Private &other)
