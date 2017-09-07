@@ -2,8 +2,8 @@
 // Created by zhanggyb on 16-9-19.
 //
 
-#ifndef SKLAND_TEST_CORE_MEMORY_SP_COUNTED_BASE_HPP_
-#define SKLAND_TEST_CORE_MEMORY_SP_COUNTED_BASE_HPP_
+#ifndef SKLAND_TEST_CORE_SIGCXX_TRACKABLE_HPP_
+#define SKLAND_TEST_CORE_SIGCXX_TRACKABLE_HPP_
 
 #include <gtest/gtest.h>
 

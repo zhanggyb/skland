@@ -21,6 +21,7 @@
 #include "skland/graphic/canvas.hpp"
 #include "skland/graphic/bitmap.hpp"
 #include "skland/graphic/font.hpp"
+#include "skland/graphic/gradient-shader.hpp"
 
 #include "SkPaint.h"
 
@@ -102,6 +103,81 @@ TEST_F(Test, text_1) {
   canvas.Flush();
 
   std::string filename = kFileNamePrefix + "text_1.png";
+  bitmap.WriteToFile(filename);
+
+  std::cout << std::endl
+            << "Check image file: " << filename
+            << std::endl
+            << std::endl;
+
+  ASSERT_TRUE(true);
+}
+
+TEST_F(Test, set_style_1) {
+  Bitmap bitmap;
+  bitmap.AllocateN32Pixels(kWidth, kHeight);
+
+  Canvas canvas(bitmap);
+  canvas.Clear(0xFFFFFFFF);
+
+  Paint paint1, paint2, paint3;
+  Font font("Noto Sans CJK SC", FontStyle(FontStyle::kWeightNormal), 24.f);
+
+  paint1.SetFont(font);
+
+  paint2.SetStyle(Paint::kStyleStroke);
+  paint2.SetStrokeWidth(3.f);
+
+  paint3.SetTextSize(80.f);
+  paint3.SetAntiAlias(true);
+  paint3.SetColor(ColorF(1.f, 0.f, 0.f));
+  paint3.SetFont(font);
+
+  canvas.DrawRect(RectF::MakeFromXYWH(10, 10, 60, 20), paint1);
+  canvas.DrawRect(RectF::MakeFromXYWH(80, 10, 60, 20), paint2);
+
+  paint2.SetStrokeWidth(5.f);
+  canvas.DrawOval(RectF::MakeFromXYWH(150, 10, 60, 20), paint2);
+
+  canvas.DrawText("SKIA", 4, 20.f, 120.f, paint3);
+  paint3.SetColor(ColorF(0.f, 0.f, 1.f));
+  canvas.DrawText("SKIA", 4, 20.f, 220.f, paint3);
+
+  canvas.Flush();
+
+  std::string filename = kFileNamePrefix + "set_style_1.png";
+  bitmap.WriteToFile(filename);
+
+  std::cout << std::endl
+            << "Check image file: " << filename
+            << std::endl
+            << std::endl;
+
+  ASSERT_TRUE(true);
+}
+
+
+TEST_F(Test, set_shader_1) {
+  Bitmap bitmap;
+  bitmap.AllocateN32Pixels(256, 256);
+
+  Canvas canvas(bitmap);
+  canvas.Clear(0xFFFFFFFF);
+
+  PointF points[2] = {
+      PointF(0.f, 0.f),
+      PointF(256.f, 256.f)
+  };
+  uint32_t colors[2] = {0xFF0000FF, 0xFFFFFF00};
+
+  Paint paint;
+  paint.SetShader(GradientShader::MakeLinear(points, colors, nullptr, 2, Shader::kTileModeClamp, 0, nullptr));
+
+  canvas.DrawPaint(paint);
+
+  canvas.Flush();
+
+  std::string filename = kFileNamePrefix + "set_shader_1.png";
   bitmap.WriteToFile(filename);
 
   std::cout << std::endl

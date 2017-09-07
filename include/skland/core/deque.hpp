@@ -86,8 +86,6 @@ class BiNode {
    */
   void Unlink();
 
- protected:
-
   /**
    * @brief Getter of previous node
    * @return

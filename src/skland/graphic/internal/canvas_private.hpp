@@ -34,22 +34,16 @@ namespace graphic {
  */
 struct Canvas::Private {
 
-  Private() {
-    sk_canvas = new SkCanvas();
+  Private() = default;
+
+  explicit Private(const SkBitmap &bitmap)
+      : sk_canvas(bitmap) {
   }
 
-  explicit Private(SkCanvas *canvas)
-      : sk_canvas(canvas) {}
+  ~Private() = default;
 
-  explicit Private(const SkBitmap &bitmap) {
-    sk_canvas = new SkCanvas(bitmap);
-  }
+  SkCanvas sk_canvas;
 
-  ~Private() {
-    delete sk_canvas;
-  }
-
-  SkCanvas *sk_canvas = nullptr;
   core::PointF origin;
 
   size_t lock_count = 0;

@@ -41,7 +41,7 @@ struct Vector2 {
   inline Vector2(const Vector2<R> &other)
       : x(T(other.x)), y(T(other.y)) {}
 
-  inline ~Vector2() {}
+  inline ~Vector2() = default;
 
   inline Vector2 &operator=(const Vector2 &other) {
     x = other.x;
@@ -83,6 +83,7 @@ struct Vector2 {
 
   union { T x, r, s; };
   union { T y, g, t; };
+
 };
 
 /**
@@ -153,7 +154,7 @@ struct Vector3 {
     return *this;
   }
 
-  inline ~Vector3() {}
+  inline ~Vector3() = default;
 
   union { T x, r, s; };
   union { T y, g, t; };
@@ -214,7 +215,7 @@ struct Vector4 {
     return *this;
   }
 
-  inline ~Vector4() {}
+  inline ~Vector4() = default;
 
   union { T x, r, s; };
   union { T y, g, t; };

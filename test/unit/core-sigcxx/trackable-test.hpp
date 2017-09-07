@@ -7,14 +7,20 @@
 
 #include <gtest/gtest.h>
 
-class Test : public testing::Test {
+class TrackableTest : public testing::Test {
+
  public:
-  Test();
-  virtual ~Test();
+
+  TrackableTest() {}
+
+  virtual ~TrackableTest() {}
 
  protected:
+
   virtual void SetUp() {}
+
   virtual void TearDown() {}
+
 };
 
-#endif //WAYLAND_TOOLKIT_TEST_HPP
+#endif // SKLAND_TEST_CORE_SIGCXX_TRACKABLE_HPP_

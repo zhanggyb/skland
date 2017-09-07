@@ -16,13 +16,14 @@
 
 #include "internal/shader_private.hpp"
 
-#include <skland/core/defines.hpp>
+#include "skland/core/defines.hpp"
+#include "skland/core/memory.hpp"
 
 namespace skland {
 namespace graphic {
 
 Shader::Shader() {
-  p_.reset(new Private);
+  p_ = core::MakeUnique<Private>();
 }
 
 Shader::Shader(Private *p)
@@ -31,7 +32,7 @@ Shader::Shader(Private *p)
 }
 
 Shader::Shader(const Shader &other) {
-  p_.reset(new Private(other.p_->sk_shader));
+  p_ = core::MakeUnique<Private>(other.p_->sk_shader);
 }
 
 Shader::~Shader() {

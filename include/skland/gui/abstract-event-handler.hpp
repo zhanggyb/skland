@@ -180,7 +180,7 @@ SKLAND_EXPORT class AbstractEventHandler : public core::Trackable {
    * @brief Disable this virtual method
    * @param token
    */
-  virtual void AuditDestroyingToken(core::details::Token */*token*/) final;
+  virtual void AuditDestroyingToken(core::detail::Token */*token*/) final;
 
  private:
 

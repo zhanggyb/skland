@@ -86,9 +86,11 @@ class Canvas {
 
   void DrawLine(float x0, float y0, float x1, float y1, const Paint &paint);
 
-  void DrawRect(const core::RectF &rect, const Paint &paint);
+  void DrawRect(const RectF &rect, const Paint &paint);
 
   void DrawRoundRect(const RectF &rect, float rx, float ry, const Paint &paint);
+
+  void DrawOval(const RectF &oval, const Paint &paint);
 
   void DrawCircle(float x, float y, float radius, const Paint &paint);
 
@@ -98,6 +100,8 @@ class Canvas {
   void DrawPath(const Path &path, const Paint &paint);
 
   void DrawText(const void *text, size_t byte_length, float x, float y, const Paint &paint);
+
+  void DrawPaint(const Paint &paint);
 
   void Translate(float dx, float dy);
 
@@ -132,6 +136,20 @@ class Canvas {
 
   void Save();
 
+  /**
+   * @brief Save clip and matrix on stack, creates layer
+   * @param bounds Hint to limit the size of the layer, may be nullptr
+   * @param paint Graphics state for layer, may be nullptr
+   */
+  void SaveLayer(const RectF *bounds, const Paint *paint);
+
+  /**
+   * @brief Save clip and matrix on stack, create layer
+   * @param bounds
+   * @param alpha
+   */
+  void SaveLayer(const RectF *bounds, unsigned char alpha);
+
   void Restore();
 
   int GetSaveCount() const;
@@ -145,12 +163,6 @@ class Canvas {
   SkCanvas *GetSkCanvas() const;
 
  private:
-
-  /**
-   * @brief Create a canvas object via a native SkCanvas
-   * @param native
-   */
-  explicit Canvas(SkCanvas *native);
 
   struct LockGuardNode;
   struct Private;

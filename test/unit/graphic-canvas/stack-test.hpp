@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_TEST_CORE_SIGCXX_TRACKABLE_HPP_
-#define SKLAND_TEST_CORE_SIGCXX_TRACKABLE_HPP_
+#ifndef SKLAND_STACK_TEST_HPP
+#define SKLAND_STACK_TEST_HPP
 
 #include <gtest/gtest.h>
 
-class Test : public testing::Test {
+class StackTest : public testing::Test {
  public:
-  Test();
-  virtual ~Test();
+  StackTest() {}
+  virtual ~StackTest() {}
 
  protected:
   virtual void SetUp() {}
   virtual void TearDown() {}
 };
 
-#endif //WAYLAND_TOOLKIT_TEST_HPP
+#endif //SKLAND_STACK_TEST_HPP

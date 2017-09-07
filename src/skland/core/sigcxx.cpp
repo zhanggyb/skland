@@ -29,15 +29,15 @@
 namespace skland {
 namespace core {
 
-namespace details {
+namespace detail {
 
 Binding::~Binding() {
   if (previous) previous->next = next;
   if (next) next->previous = previous;
 
-  if (trackable_object) {
-    if (nullptr == previous) trackable_object->first_binding_ = next;
-    if (nullptr == next) trackable_object->last_binding_ = previous;
+  if (trackable) {
+    if (nullptr == previous) trackable->first_binding_ = next;
+    if (nullptr == next) trackable->last_binding_ = previous;
   }
 
   if (token) {
@@ -50,12 +50,15 @@ Binding::~Binding() {
 }
 
 Token::~Token() {
-  if (trackable_object) trackable_object->AuditDestroyingToken(this);
+  if (trackable) trackable->AuditDestroyingToken(this);
 
-  if (slot) {
-    // This token is emitting
-    slot->token_ = next;
-    slot->skip_ = true;
+  _ASSERT(nullptr == slot_mark_head.previous());
+  Slot::Mark *mark = nullptr;
+  while (nullptr != slot_mark_head.next()) {
+    mark = static_cast<Slot::Mark *>(slot_mark_head.next());
+    mark->slot()->token_ = next;
+    mark->slot()->skip_ = true;
+    mark->Unlink();
   }
 
   if (previous) previous->next = next;
@@ -77,19 +80,22 @@ Trackable::~Trackable() {
 }
 
 void Trackable::UnbindSignal(SLOT slot) {
-  if (slot->token_->binding->trackable_object == this) {
-    details::Token *tmp = slot->token_;
-    slot->token_ = slot->token_->next;
-    slot->skip_ = true;
+  // TODO: test this method
 
-    tmp->slot = nullptr;
+  if (slot->token_->binding->trackable == this) {
+    detail::Token *tmp = slot->token_;
+//    slot->token_ = slot->token_->next;
+//    slot->skip_ = true;
+
+//    slot->running_node_.Unlink();
+//    tmp->slot = nullptr;
     delete tmp;
   }
 }
 
 void Trackable::UnbindAllSignals() {
-  details::Binding *tmp = nullptr;
-  details::Binding *it = last_binding_;
+  detail::Binding *tmp = nullptr;
+  detail::Binding *it = last_binding_;
 
   while (it) {
     tmp = it;
@@ -100,15 +106,15 @@ void Trackable::UnbindAllSignals() {
 
 std::size_t Trackable::CountSignalBindings() const {
   std::size_t count = 0;
-  for (details::Binding *it = first_binding_; it; it = it->next) {
+  for (detail::Binding *it = first_binding_; it; it = it->next) {
     count++;
   }
   return count;
 }
 
-void Trackable::PushBackBinding(details::Binding *node) {
+void Trackable::PushBackBinding(detail::Binding *node) {
 #ifdef DEBUG
-  assert(nullptr == node->trackable_object);
+  assert(nullptr == node->trackable);
 #endif
 
   if (last_binding_) {
@@ -123,12 +129,12 @@ void Trackable::PushBackBinding(details::Binding *node) {
   }
   last_binding_ = node;
   node->next = nullptr;
-  node->trackable_object = this;
+  node->trackable = this;
 }
 
-void Trackable::PushFrontBinding(details::Binding *node) {
+void Trackable::PushFrontBinding(detail::Binding *node) {
 #ifdef DEBUG
-  assert(nullptr == node->trackable_object);
+  assert(nullptr == node->trackable);
 #endif
 
   if (first_binding_) {
@@ -143,12 +149,12 @@ void Trackable::PushFrontBinding(details::Binding *node) {
   }
   first_binding_ = node;
   node->previous = nullptr;
-  node->trackable_object = this;
+  node->trackable = this;
 }
 
-void Trackable::InsertBinding(int index, details::Binding *node) {
+void Trackable::InsertBinding(int index, detail::Binding *node) {
 #ifdef DEBUG
-  assert(nullptr == node->trackable_object);
+  assert(nullptr == node->trackable);
 #endif
 
   if (nullptr == first_binding_) {
@@ -162,7 +168,7 @@ void Trackable::InsertBinding(int index, details::Binding *node) {
   } else {
     if (index >= 0) {
 
-      details::Binding *p = first_binding_;
+      detail::Binding *p = first_binding_;
 #ifdef DEBUG
       assert(p != nullptr);
 #endif
@@ -193,7 +199,7 @@ void Trackable::InsertBinding(int index, details::Binding *node) {
 
     } else {
 
-      details::Binding *p = last_binding_;
+      detail::Binding *p = last_binding_;
 #ifdef DEBUG
       assert(p);
 #endif
@@ -224,7 +230,7 @@ void Trackable::InsertBinding(int index, details::Binding *node) {
 
     }
   }
-  node->trackable_object = this;
+  node->trackable = this;
 }
 
 } // namespace core

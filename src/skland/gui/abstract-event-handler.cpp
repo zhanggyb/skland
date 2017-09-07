@@ -30,7 +30,7 @@ AbstractEventHandler::~AbstractEventHandler() {
 
 }
 
-void AbstractEventHandler::AuditDestroyingToken(core::details::Token */*token*/) {
+void AbstractEventHandler::AuditDestroyingToken(core::detail::Token */*token*/) {
 
 }
 
