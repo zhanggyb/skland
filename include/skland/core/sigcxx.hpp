@@ -67,19 +67,14 @@ class SignalToken;
  */
 struct Binding {
 
-  Binding()
-      : trackable(nullptr),
-        previous(nullptr),
-        next(nullptr),
-        token(nullptr) {
-  }
+  Binding() = default;
 
   ~Binding();
 
-  Trackable *trackable;
-  Binding *previous;
-  Binding *next;
-  Token *token;
+  Trackable *trackable = nullptr;
+  Binding *previous = nullptr;
+  Binding *next = nullptr;
+  Token *token = nullptr;
 
 };
 
@@ -88,19 +83,14 @@ struct Binding {
  */
 struct Token {
 
-  Token()
-      : trackable(nullptr),
-        previous(nullptr),
-        next(nullptr),
-        binding(nullptr) {
-  }
+  Token() = default;
 
   virtual ~Token();
 
-  Trackable *trackable;
-  Token *previous;
-  Token *next;
-  Binding *binding;
+  Trackable *trackable = nullptr;
+  Token *previous = nullptr;
+  Token *next = nullptr;
+  Binding *binding = nullptr;
 
   BiNode slot_mark_head;
 
@@ -111,10 +101,12 @@ class CallableToken : public Token {
 
  public:
 
-  CallableToken(const CallableToken &orig) = delete;
-  CallableToken &operator=(const CallableToken &other) = delete;
+  CallableToken(const CallableToken &) = delete;
+  CallableToken &operator=(const CallableToken &) = delete;
+  CallableToken(CallableToken &&) = delete;
+  CallableToken &operator=(CallableToken &&) = delete;
 
-  CallableToken() : Token() {}
+  CallableToken() = default;
 
   ~CallableToken() override = default;
 
@@ -130,12 +122,13 @@ class DelegateToken : public CallableToken<ParamTypes...> {
  public:
 
   DelegateToken() = delete;
-  DelegateToken(const DelegateToken &orig) = delete;
-  DelegateToken &operator=(const DelegateToken &other) = delete;
+  DelegateToken(const DelegateToken &) = delete;
+  DelegateToken &operator=(const DelegateToken &) = delete;
+  DelegateToken(DelegateToken &&) = delete;
+  DelegateToken &operator=(DelegateToken &&)= delete;
 
   explicit DelegateToken(const Delegate<void(ParamTypes...)> &d)
-      : CallableToken<ParamTypes...>(), delegate_(d) {
-  }
+      : CallableToken<ParamTypes...>(), delegate_(d) {}
 
   ~DelegateToken() final = default;
 
@@ -159,12 +152,13 @@ class SignalToken : public CallableToken<ParamTypes...> {
  public:
 
   SignalToken() = delete;
-  SignalToken(const SignalToken &orig) = delete;
-  SignalToken &operator=(const SignalToken &other) = delete;
+  SignalToken(const SignalToken &) = delete;
+  SignalToken &operator=(const SignalToken &) = delete;
+  SignalToken(SignalToken &&) = delete;
+  SignalToken &operator=(SignalToken &&) = delete;
 
   explicit SignalToken(Signal<ParamTypes...> &signal)
-      : CallableToken<ParamTypes...>(), signal_(&signal) {
-  }
+      : CallableToken<ParamTypes...>(), signal_(&signal) {}
 
   ~SignalToken() final = default;
 
@@ -191,22 +185,21 @@ class SignalToken : public CallableToken<ParamTypes...> {
  *
  * A Slot object is created and destroyed when a signal is being emitting.
  *
- * It has two main purpose:
+ * It has two main purposes:
  *   - Works as an iterator
  *   - The last parameter in a slot method
  *
  * A Signal holds a list of token to support multicast, when it's being
- * emitting, it create a simple Slot object and use it as an iterate and call
+ * emitting, it create a simple Slot object and use it as an iterater and call
  * each delegate (@ref Delegate) to the slot method or another signal.
  */
 class Slot {
 
   friend struct detail::Token;
+  friend class Trackable;
+
   template<typename ... ParamTypes> friend
   class Signal;
-  template<typename ... ParamTypes> friend
-  class detail::SignalToken;
-  friend class Trackable;
 
  public:
 
@@ -230,8 +223,10 @@ class Slot {
   };
 
   Slot() = delete;
-  Slot(const Slot &orig) = delete;
-  Slot &operator=(const Slot &other) = delete;
+  Slot(const Slot &) = delete;
+  Slot &operator=(const Slot &) = delete;
+  Slot(Slot &&) = delete;
+  Slot &operator=(Slot &&) = delete;
 
   /**
    * @brief Get the Signal object which is just calling this slot
@@ -251,10 +246,20 @@ class Slot {
 
  private:
 
-  explicit Slot(detail::Token *token = nullptr)
+  explicit Slot(detail::Token *token)
       : token_(token), skip_(false), mark_(this) {}
 
   ~Slot() = default;
+
+  Slot &operator++() {
+    token_ = token_->next;
+    return *this;
+  }
+
+  Slot &operator--() {
+    token_ = token_->previous;
+    return *this;
+  }
 
   detail::Token *token_;
 
@@ -272,20 +277,35 @@ class Trackable {
 
   friend struct detail::Binding;
   friend struct detail::Token;
+
   template<typename ... ParamTypes> friend
   class Signal;
 
  public:
 
-  Trackable()
-      : first_binding_(nullptr), last_binding_(nullptr) {
-  }
+  /**
+   * @brief Default constructor
+   */
+  Trackable() = default;
 
+  /**
+   * @brief Copy constructor
+   *
+   * Do nothing in copy constructor.
+   */
+  Trackable(const Trackable &) {}
+
+  /**
+   * @brief Destructor
+   */
   virtual ~Trackable();
 
-  Trackable(const Trackable &orig) {}
-
-  Trackable &operator=(const Trackable &orig) {
+  /**
+   * @brief Copy assignment
+   *
+   * Do nothing in copy assignment.
+   */
+  Trackable &operator=(const Trackable &) {
     return *this;
   }
 
@@ -293,12 +313,12 @@ class Trackable {
    * @brief Count connections to the given slot method
    */
   template<typename T, typename ... ParamTypes>
-  std::size_t CountSignalBindings(void (T::*method)(ParamTypes...)) const;
+  int CountSignalBindings(void (T::*method)(ParamTypes...)) const;
 
   /**
    * @brief Count all connections
    */
-  std::size_t CountSignalBindings() const;
+  int CountSignalBindings() const;
 
  protected:
 
@@ -355,8 +375,8 @@ class Trackable {
     trackable->InsertBinding(index, binding);
   }
 
-  detail::Binding *first_binding_;
-  detail::Binding *last_binding_;
+  detail::Binding *first_binding_ = nullptr;
+  detail::Binding *last_binding_ = nullptr;
 
 };
 
@@ -378,8 +398,8 @@ void Trackable::UnbindAllSignalsTo(void (T::*method)(ParamTypes...)) {
 }
 
 template<typename T, typename ... ParamTypes>
-size_t Trackable::CountSignalBindings(void (T::*method)(ParamTypes...)) const {
-  std::size_t count = 0;
+int Trackable::CountSignalBindings(void (T::*method)(ParamTypes...)) const {
+  int count = 0;
   detail::DelegateToken<ParamTypes...> *delegate_token = nullptr;
 
   for (detail::Binding *p = first_binding_; p; p = p->next) {
@@ -402,16 +422,14 @@ class Signal : public Trackable {
 
  public:
 
-  Signal(const Signal &orig) = delete;
-  Signal &operator=(const Signal &orig) = delete;
+  Signal(const Signal &) = delete;
+  Signal &operator=(const Signal &) = delete;
+  Signal(Signal &&) = delete;
+  Signal &operator=(Signal &&) = delete;
 
-  Signal()
-      : Trackable(),
-        first_token_(nullptr),
-        last_token_(nullptr) {
-  }
+  Signal() = default;
 
-  virtual ~Signal() final {
+  ~Signal() final {
     DisconnectAll();
   }
 
@@ -481,11 +499,11 @@ class Signal : public Trackable {
   bool IsConnectedTo(const Trackable *obj) const;
 
   template<typename T>
-  std::size_t CountConnections(T *obj, void (T::*method)(ParamTypes..., SLOT)) const;
+  int CountConnections(T *obj, void (T::*method)(ParamTypes..., SLOT)) const;
 
-  std::size_t CountConnections(const Signal<ParamTypes...> &other) const;
+  int CountConnections(const Signal<ParamTypes...> &other) const;
 
-  std::size_t CountConnections() const;
+  int CountConnections() const;
 
   void Emit(ParamTypes ... Args);
 
@@ -513,8 +531,8 @@ class Signal : public Trackable {
     return last_token_;
   }
 
-  detail::Token *first_token_;
-  detail::Token *last_token_;
+  detail::Token *first_token_ = nullptr;
+  detail::Token *last_token_ = nullptr;
 
 };
 
@@ -792,8 +810,8 @@ bool Signal<ParamTypes...>::IsConnectedTo(const Trackable *obj) const {
 
 template<typename ... ParamTypes>
 template<typename T>
-std::size_t Signal<ParamTypes...>::CountConnections(T *obj, void (T::*method)(ParamTypes..., SLOT)) const {
-  std::size_t count = 0;
+int Signal<ParamTypes...>::CountConnections(T *obj, void (T::*method)(ParamTypes..., SLOT)) const {
+  int count = 0;
   detail::DelegateToken<ParamTypes..., SLOT> *delegate_token = nullptr;
 
   for (detail::Token *it = first_token_; it; it = it->next) {
@@ -808,8 +826,8 @@ std::size_t Signal<ParamTypes...>::CountConnections(T *obj, void (T::*method)(Pa
 }
 
 template<typename ... ParamTypes>
-std::size_t Signal<ParamTypes...>::CountConnections(const Signal<ParamTypes...> &other) const {
-  std::size_t count = 0;
+int Signal<ParamTypes...>::CountConnections(const Signal<ParamTypes...> &other) const {
+  int count = 0;
   detail::SignalToken<ParamTypes...> *signal_token = nullptr;
 
   for (detail::Token *it = first_token_; it; it = it->next) {
@@ -824,8 +842,8 @@ std::size_t Signal<ParamTypes...>::CountConnections(const Signal<ParamTypes...> 
 }
 
 template<typename ... ParamTypes>
-std::size_t Signal<ParamTypes...>::CountConnections() const {
-  std::size_t count = 0;
+int Signal<ParamTypes...>::CountConnections() const {
+  int count = 0;
   for (detail::Token *it = first_token_; it; it = it->next) {
     count++;
   }
@@ -843,7 +861,7 @@ void Signal<ParamTypes...>::Emit(ParamTypes ... Args) {
     if (slot.skip_) {
       slot.skip_ = false;
     } else {
-      slot.token_ = slot.token_->next;
+      ++slot;
     }
   }
 }
@@ -1004,12 +1022,10 @@ class SignalRef {
   SignalRef &operator=(const SignalRef &) = delete;
 
   SignalRef(Signal<ParamTypes...> &signal)
-      : signal_(&signal) {
-  }
+      : signal_(&signal) {}
 
   SignalRef(const SignalRef &orig)
-      : signal_(orig.signal_) {
-  }
+      : signal_(orig.signal_) {}
 
   ~SignalRef() = default;
 
@@ -1062,19 +1078,19 @@ class SignalRef {
   }
 
   template<typename T>
-  std::size_t CountConnections(T *obj, void (T::*method)(ParamTypes..., SLOT)) const {
+  int CountConnections(T *obj, void (T::*method)(ParamTypes..., SLOT)) const {
     return signal_->CountConnections(obj, method);
   }
 
-  std::size_t CountConnections(const Signal<ParamTypes...> &signal) const {
+  int CountConnections(const Signal<ParamTypes...> &signal) const {
     return signal_->CountConnections(signal);
   }
 
-  std::size_t CountConnections() const {
+  int CountConnections() const {
     return signal_->CountConnections();
   }
 
-  std::size_t CountBindings() const {
+  int CountBindings() const {
     return signal_->CountSignalBindings();
   }
 

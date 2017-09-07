@@ -104,8 +104,8 @@ void Trackable::UnbindAllSignals() {
   }
 }
 
-std::size_t Trackable::CountSignalBindings() const {
-  std::size_t count = 0;
+int Trackable::CountSignalBindings() const {
+  int count = 0;
   for (detail::Binding *it = first_binding_; it; it = it->next) {
     count++;
   }
