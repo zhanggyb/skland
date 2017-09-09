@@ -69,14 +69,9 @@ struct Window::Private : public core::Property<Window> {
 
   ~Private() final = default;
 
-  /** The surface for rendering views in this window */
-  Surface *widget_surface = nullptr;
-
   SharedMemoryPool pool;
 
-  Buffer frame_buffer;
-
-  Buffer widget_buffer;
+  Buffer buffer;
 
   /** The default title bar */
   TitleBar *title_bar = nullptr;
@@ -91,104 +86,62 @@ struct Window::Private : public core::Property<Window> {
 
   const Output *output = nullptr;
 
+  bool redraw_all = true;
+
+  bool clear = false;
+
   bool inhibit_update = true;
 
-  void DrawFrame(const Context &context);
+  void DrawInner(const Path &path, const Context &context);
+
+  void DrawOutline(const Path &path, const Context &context);
+
+  void DrawShadow(const Path &path, const Context &context);
+
+  void RecursiveDraw(AbstractView *view, const Path &path, const Context &context);
 
   void SetContentViewGeometry();
 
 };
 
-void Window::Private::DrawFrame(const Context &context) {
-  context.canvas()->Clear();
-
-  int scale = context.surface()->GetScale();
-  int width = owner()->GetWidth() * scale;
-  int height = owner()->GetHeight() * scale;
-
-  Path path;
-  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, width, height);
-  bool drop_shadow = !(owner()->IsMaximized() || owner()->IsFullscreen());
+void Window::Private::DrawInner(const Path &path, const Context &context) {
   const Theme::Schema &window_schema = Theme::GetData().window;
-  const Theme::Schema &title_bar_schema = Theme::GetData().title_bar;
-  Shader shader;
-  PointF points[2];
-  points[0].x = 0.f;
-  points[0].y = 0.f;
-  points[1].x = 0.f;
-  points[1].y = height;
-
-  if (drop_shadow) {
-//    geometry = geometry.Inset(-0.5f * scale);
-    float radii[] = {
-        7.f * scale, 7.f * scale, // top-left
-        7.f * scale, 7.f * scale, // top-right
-        4.f * scale, 4.f * scale, // bottom-right
-        4.f * scale, 4.f * scale  // bottom-left
-    };
-    path.AddRoundRect(geometry, radii);
-    Canvas::LockGuard guard(context.canvas(), path, ClipOperation::kClipDifference, true);
-    owner()->DropShadow(context);
-  } else {
-    path.AddRect(geometry);
-  }
 
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  if (window_schema.active.background.shaded) {
-    shader = GradientShader::MakeLinear(points,
-                                        window_schema.active.background.shaded_colors.data(),
-                                        window_schema.active.background.shaded_positions.data(),
-                                        window_schema.active.background.shaded_count,
-                                        Shader::TileMode::kTileModeClamp);
-    paint.SetShader(shader);
-  } else {
-    paint.SetColor(window_schema.active.background.color);
-  }
+  paint.SetColor(window_schema.active.background.color);
   context.canvas()->DrawPath(path, paint);
-  paint.SetShader(Shader());  // Clear shader
+}
 
-  // Draw outline
-  if (drop_shadow) {
-    paint.SetColor(window_schema.inactive.outline.color);
-    paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetStrokeWidth(0.5f);
-    context.canvas()->DrawPath(path, paint);
-  }
+void Window::Private::DrawOutline(const Path &path, const Context &context) {
+  const Theme::Schema &window_schema = Theme::GetData().window;
+  Paint paint;
+  paint.SetAntiAlias(true);
+  paint.SetColor(window_schema.inactive.outline.color);
+  paint.SetStyle(Paint::Style::kStyleStroke);
+  paint.SetStrokeWidth(0.5f);
+  context.canvas()->DrawPath(path, paint);
+}
 
-  // Draw the client area:
-  Canvas::LockGuard guard(context.canvas(), path, ClipOperation::kClipIntersect, true);
+void Window::Private::DrawShadow(const Path &path, const Context &context) {
+  Canvas::LockGuard guard(context.canvas(), path, ClipOperation::kClipDifference, true);
+  context.canvas()->Clear();
+  owner()->DropShadow(context);
+}
 
-  paint.SetStyle(Paint::Style::kStyleFill);
-  if (nullptr != title_bar) {
-    if (title_bar_schema.active.background.shaded) {
-      points[1].y = TitleBar::kHeight * scale;
-      shader = GradientShader::MakeLinear(points,
-                                          title_bar_schema.active.background.shaded_colors.data(),
-                                          title_bar_schema.active.background.shaded_positions.data(),
-                                          title_bar_schema.active.background.shaded_count,
-                                          Shader::TileMode::kTileModeClamp);
-      paint.SetShader(shader);
-    } else {
-      paint.SetColor(title_bar_schema.active.background.color);
-    }
-    context.canvas()->DrawRect(title_bar->GetGeometry() * scale, paint);
-    paint.SetShader(Shader());  // Clear shader
-  }
+void Window::Private::RecursiveDraw(AbstractView *view, const Path &path, const Context &context) {
+  Canvas::LockGuard guard(context.canvas(), view->GetGeometry());
 
-  if (window_schema.active.foreground.shaded) {
-    points[1].y = owner()->GetHeight();
-    shader = GradientShader::MakeLinear(points,
-                                        window_schema.active.foreground.shaded_colors.data(),
-                                        window_schema.active.foreground.shaded_positions.data(),
-                                        window_schema.active.foreground.shaded_count,
-                                        Shader::TileMode::kTileModeClamp);
+  AbstractView *parent = view->GetParent();
+  if (nullptr != parent) {
+    RecursiveDraw(parent, path, context);
   } else {
-    paint.SetColor(window_schema.active.foreground.color);
+    context.canvas()->Clear();
+    DrawInner(path, context);
   }
-  context.canvas()->DrawRect(owner()->GetContentGeometry() * scale, paint);
-  context.canvas()->Flush();
+
+  Draw(view, context);
 }
 
 void Window::Private::SetContentViewGeometry() {
@@ -206,15 +159,6 @@ Window::Window(const char *title)
 Window::Window(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
   p_ = core::MakeUnique<Private>(this);
-
-  Surface *shell_surface = GetShellSurface();
-
-  // Create a sub surface for views in this window:
-  p_->widget_surface = Surface::Sub::Create(shell_surface, this, Theme::GetShadowMargin());
-  _ASSERT(p_->widget_surface->GetParent() == shell_surface);
-  _ASSERT(p_->widget_surface->GetSiblingBelow() == shell_surface);
-  Region empty_region;
-  p_->widget_surface->SetInputRegion(empty_region);
 
   // Create the default title bar:
   auto *titlebar = new TitleBar;
@@ -241,8 +185,6 @@ Window::Window(int width, int height, const char *title)
 Window::~Window() {
   if (nullptr != p_->content_view) p_->content_view->Destroy();
   if (nullptr != p_->title_bar) p_->title_bar->Destroy();
-
-  delete p_->widget_surface;
 }
 
 AbstractView *Window::GetTitleBar() const {
@@ -299,28 +241,14 @@ void Window::OnShown() {
   width += margin.lr() * scale;
   height += margin.tb() * scale;
 
-  int32_t pool_size = width * 4 * height * 2; // double buffer for 2 surfaces, not frameless
+  p_->pool.Setup(width * 4 * height);
 
-  p_->pool.Setup(pool_size);
-
-  p_->frame_buffer.Setup(p_->pool, width, height,
-                         width * 4, WL_SHM_FORMAT_ARGB8888);
-  shell_surface->Attach(&p_->frame_buffer);
+  p_->buffer.Setup(p_->pool, width, height,
+                   width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->buffer);
   shell_surface->Update();
 
-  p_->widget_surface->SetScale(scale);
-  p_->widget_buffer.Setup(p_->pool, width, height,
-                          width * 4, WL_SHM_FORMAT_ARGB8888,
-                          width * 4 * height);
-  p_->widget_surface->Attach(&p_->widget_buffer);
-  p_->widget_surface->Update();
-
-  Canvas canvas((unsigned char *) p_->widget_buffer.GetData(), width, height);
-//  p_->widget_canvas->SetOrigin((float) margin.left * scale,
-//                               (float) margin.top * scale);
-  canvas.Clear();
-  canvas.Flush();
-
+  p_->redraw_all = true;
   p_->inhibit_update = false;
 
   if (nullptr != p_->title_bar) {
@@ -336,7 +264,7 @@ void Window::OnShown() {
 void Window::OnRequestUpdate(AbstractView *view) {
   if (p_->inhibit_update) return;
 
-  Surface *surface = p_->widget_surface;
+  Surface *surface = GetShellSurface();
   surface->GetRedrawNodeDeque().PushBack(AbstractView::RedrawNode::Get(view));
   surface->Update();
 }
@@ -392,22 +320,13 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
   width += margin.lr() * scale;
   height += margin.tb() * scale;
 
-  int pool_size = width * 4 * height;
-  if (nullptr != p_->widget_surface) pool_size *= 2;
+  p_->pool.Setup(width * 4 * height);
 
-  p_->pool.Setup(pool_size);
-
-  p_->frame_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
-  shell_surface->Attach(&p_->frame_buffer);
+  p_->buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888);
+  shell_surface->Attach(&p_->buffer);
   shell_surface->Update();
 
-  p_->widget_buffer.Setup(p_->pool, width, height, width * 4, WL_SHM_FORMAT_ARGB8888, width * 4 * height);
-  p_->widget_surface->Attach(&p_->widget_buffer);
-  p_->widget_surface->Update();
-
-  Canvas canvas((unsigned char *) p_->widget_buffer.GetData(), width, height);
-  canvas.Clear();
-  canvas.Flush();
+  p_->redraw_all = true;
 
   // surface size is changed, reset the pointer position and enter/leave widgets
   DispatchMouseLeaveEvent();
@@ -425,53 +344,83 @@ void Window::OnSaveSize(const Size &old_size, const Size &new_size) {
 void Window::OnRenderSurface(Surface *surface) {
   const Margin &margin = surface->GetMargin();
 
-  if (surface == GetShellSurface()) {
-    Canvas canvas((unsigned char *) p_->frame_buffer.GetData(),
-                  p_->frame_buffer.GetSize().width,
-                  p_->frame_buffer.GetSize().height);
-    canvas.SetOrigin(margin.left, margin.top);
-    Context context(surface, &canvas);
-    p_->DrawFrame(context);
-    surface->Damage(0, 0, GetWidth() + margin.lr(), GetHeight() + margin.tb());
-    surface->Commit();
-    return;
-  }
-
-  core::Deque<AbstractView::RedrawNode> &deque = surface->GetRedrawNodeDeque();
-  core::Deque<AbstractView::RedrawNode>::Iterator it = deque.begin();
   int scale = surface->GetScale();
-  float radii[] = {
-      7.5f * scale, 7.5f * scale, // top-left
-      7.5f * scale, 7.5f * scale, // top-right
-      4.5f * scale, 4.5f * scale, // bottom-right
-      4.5f * scale, 4.5f * scale  // bottom-left
-  };
-  Canvas canvas((unsigned char *) p_->widget_buffer.GetData(),
-                p_->widget_buffer.GetWidth(),
-                p_->widget_buffer.GetHeight());
-  canvas.SetOrigin((float) margin.left * surface->GetScale(),
-                   (float) margin.top * surface->GetScale());
+  int pixel_width = GetWidth() * scale;
+  int pixel_height = GetHeight() * scale;
+  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, pixel_width, pixel_height);
+  bool draw_shadow = false;
 
-  Path path;
-  path.AddRoundRect(RectF(0, 0, GetWidth(), GetHeight()), radii);
-  Canvas::LockGuard guard(&canvas, path, ClipOperation::kClipIntersect, true);
-
+  Canvas canvas((unsigned char *) p_->buffer.GetData(),
+                p_->buffer.GetSize().width,
+                p_->buffer.GetSize().height);
+  canvas.SetOrigin(margin.left, margin.top);
+  if (p_->clear) {
+    canvas.Clear();
+    p_->clear = false;
+  }
   Context context(surface, &canvas);
 
-  AbstractView *view = nullptr;
-  while (it != deque.end()) {
-    view = it.element()->view();
-    it.Remove();
-    Draw(view, context);
-    surface->Damage(view->GetX() + margin.l,
-                    view->GetY() + margin.t,
-                    view->GetWidth(),
-                    view->GetHeight());
-    it = deque.begin();
+  std::vector<float> radii = {
+      7.f * scale, 7.f * scale, // top-left
+      7.f * scale, 7.f * scale, // top-right
+      4.f * scale, 4.f * scale, // bottom-right
+      4.f * scale, 4.f * scale  // bottom-left
+  };
+
+  Path path;
+  if (!(IsMaximized() || IsFullscreen())) {
+    path.AddRoundRect(geometry, radii.data());
+    draw_shadow = true;
+  } else {
+    path.AddRect(geometry);
   }
 
-  canvas.Flush();
-  surface->Commit();
+  if (p_->redraw_all) {
+    p_->redraw_all = false;
+
+    if (draw_shadow) p_->DrawShadow(path, context);
+
+    p_->DrawInner(path, context);
+//  p_->DrawOutline(path, context);
+
+    core::Deque<AbstractView::RedrawNode> &deque = surface->GetRedrawNodeDeque();
+    core::Deque<AbstractView::RedrawNode>::Iterator it = deque.begin();
+    AbstractView *view = nullptr;
+
+    Canvas::LockGuard guard(&canvas, path, ClipOperation::kClipIntersect, true);
+    while (it != deque.end()) {
+      view = it.element()->view();
+      it.Remove();
+      Draw(view, context);
+      it = deque.begin();
+    }
+
+    canvas.Flush();
+
+    surface->Damage(0, 0, GetWidth() + margin.lr(), GetHeight() + margin.tb());
+    surface->Commit();
+  } else {
+    core::Deque<AbstractView::RedrawNode> &deque = surface->GetRedrawNodeDeque();
+    core::Deque<AbstractView::RedrawNode>::Iterator it = deque.begin();
+    AbstractView *view = nullptr;
+
+    Canvas::LockGuard guard(&canvas, path, ClipOperation::kClipIntersect, true);
+
+    while (it != deque.end()) {
+      view = it.element()->view();
+      it.Remove();
+      p_->RecursiveDraw(view, path, context);
+      surface->Damage(view->GetX() + margin.l,
+                      view->GetY() + margin.t,
+                      view->GetWidth(),
+                      view->GetHeight());
+      it = deque.begin();
+    }
+
+    canvas.Flush();
+
+    surface->Commit();
+  }
 }
 
 void Window::OnMouseEnter(MouseEvent *event) {
@@ -636,6 +585,15 @@ void Window::OnKeyDown(KeyEvent *event) {
 
 void Window::OnFocus(bool focus) {
   GetShellSurface()->Update();
+  p_->redraw_all = true;
+  p_->clear = true;
+
+  if (nullptr != p_->title_bar) {
+    DispatchUpdate(p_->title_bar);
+  }
+  if (nullptr != p_->content_view) {
+    DispatchUpdate(p_->content_view);
+  }
 }
 
 void Window::OnViewAttached(AbstractView */*view*/) {
@@ -659,11 +617,7 @@ void Window::OnEnterOutput(const Surface *surface, const Output *output) {
 
   p_->output = output;
   Surface *shell_surface = GetShellSurface();
-  if (surface == shell_surface) {
-    shell_surface->SetScale(output->GetScale());
-  } else if (surface == p_->widget_surface) {
-    p_->widget_surface->SetScale(output->GetScale());
-  }
+  shell_surface->SetScale(output->GetScale());
 }
 
 void Window::OnLeaveOutput(const Surface *surface, const Output *output) {
@@ -679,7 +633,6 @@ void Window::OnLeaveOutput(const Surface *surface, const Output *output) {
   }
 
   GetShellSurface()->SetScale(scale);
-  if (nullptr != p_->widget_surface) p_->widget_surface->SetScale(scale);
 }
 
 int Window::GetMouseLocation(const MouseEvent *event) const {

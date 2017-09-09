@@ -43,10 +43,10 @@ class Theme {
 
   friend class Application;
 
+ public:
+
   Theme(const Theme &) = delete;
   Theme &operator=(const Theme &) = delete;
-
- public:
 
   using Margin = core::Margin;
 
@@ -54,31 +54,14 @@ class Theme {
 
     struct ShadedColor {
 
-      ShadedColor()
-          : shaded(false), shaded_count(0) {}
-
-      ~ShadedColor() {}
-
-      ShadedColor(const ShadedColor &orig)
-          : color(orig.color),
-            shaded(orig.shaded),
-            shaded_count(orig.shaded_count),
-            shaded_colors(orig.shaded_colors),
-            shaded_positions(orig.shaded_positions) {
-      }
-
-      ShadedColor &operator=(const ShadedColor &other) {
-        color = other.color;
-        shaded = other.shaded;
-        shaded_count = other.shaded_count;
-        shaded_colors = other.shaded_colors;
-        shaded_positions = other.shaded_positions;
-        return *this;
-      }
+      ShadedColor() = default;
+      ~ShadedColor() = default;
+      ShadedColor(const ShadedColor &) = default;
+      ShadedColor &operator=(const ShadedColor &) = default;
 
       core::ColorF color;
-      bool shaded;
-      int shaded_count;
+      bool shaded = false;
+      int shaded_count = 0;
       std::vector<uint32_t> shaded_colors;
       std::vector<float> shaded_positions;
 
@@ -86,23 +69,10 @@ class Theme {
 
     struct ShadedColorGroup {
 
-      ShadedColorGroup() {}
-
-      ~ShadedColorGroup() {}
-
-      ShadedColorGroup(const ShadedColorGroup &orig)
-          : foreground(orig.foreground),
-            background(orig.background),
-            outline(orig.outline) {
-      }
-
-      ShadedColorGroup &operator=(const ShadedColorGroup &other) {
-        foreground = other.foreground;
-        background = other.background;
-        outline = other.outline;
-        return *this;
-      }
-
+      ShadedColorGroup() = default;
+      ~ShadedColorGroup() = default;
+      ShadedColorGroup(const ShadedColorGroup &) = default;
+      ShadedColorGroup &operator=(const ShadedColorGroup &) = default;
       ShadedColor foreground;
       ShadedColor background;
       ShadedColor outline;
@@ -120,7 +90,7 @@ class Theme {
 
     }
 
-    ~Schema() {}
+    ~Schema() = default;
 
     // TODO: use image
 

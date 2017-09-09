@@ -49,7 +49,7 @@ class ThemeDark : public Theme {
 
     data().title_bar.highlight.background.color = data().title_bar.active.background.color + 55;
     data().title_bar.inactive.foreground.color = 0xFFAAAAAA;
-    data().title_bar.active.foreground.color = 0xFFBBBBBB;
+    data().title_bar.active.foreground.color = 0xFF999999;
     data().title_bar.highlight.foreground.color = data().title_bar.active.foreground.color + 55;
 
     data().button.inactive.outline.color = 0x7F000000;

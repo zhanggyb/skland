@@ -97,6 +97,26 @@ struct Color {
     return *this;
   }
 
+  Color &operator+=(short shade) {
+    using numerical::Clamp;
+
+    r = Clamp(r + shade / T(255.), T(0.), T(1.));
+    g = Clamp(g + shade / T(255.), T(0.), T(1.));
+    b = Clamp(b + shade / T(255.), T(0.), T(1.));
+
+    return *this;
+  }
+
+  Color &operator-=(short shade) {
+    using numerical::Clamp;
+
+    r = Clamp(r - shade / T(255.), T(0.), T(1.));
+    g = Clamp(g - shade / T(255.), T(0.), T(1.));
+    b = Clamp(b - shade / T(255.), T(0.), T(1.));
+
+    return *this;
+  }
+
   void ReverseRGB() {
     r = T(1.) - r;
     g = T(1.) - g;

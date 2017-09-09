@@ -73,7 +73,7 @@ class TitleBar final : public AbstractView {
   /**
    * @brief Destructor
    */
-  virtual ~TitleBar();
+  ~TitleBar() final = default;
 
   void OnConfigureGeometry(const RectF &old_geometry,
                            const RectF &new_geometry) override;

@@ -43,11 +43,11 @@ class TitleBar::Button : public AbstractButton {
 
   Button();
 
-  virtual ~Button();
+  ~Button() override = default;
 
  protected:
 
-  virtual void OnDraw(const Context &context) override;
+  void OnDraw(const Context &context) override;
 
  private:
 
@@ -58,24 +58,22 @@ TitleBar::Button::Button()
     : AbstractButton(kButtonSize, kButtonSize) {
 }
 
-TitleBar::Button::~Button() {
-
-}
-
 void TitleBar::Button::OnDraw(const Context &context) {
   // override in sub class
 }
 
 class TitleBar::CloseButton : public TitleBar::Button {
- public:
-  CloseButton()
-      : Button() {}
 
-  virtual  ~CloseButton() {}
+ public:
+
+  CloseButton() = default;
+
+  ~CloseButton() final = default;
 
  protected:
 
-  virtual void OnDraw(const Context &context) final;
+  void OnDraw(const Context &context) final;
+
 };
 
 void TitleBar::CloseButton::OnDraw(const Context &context) {
@@ -85,28 +83,26 @@ void TitleBar::CloseButton::OnDraw(const Context &context) {
 
   Canvas::LockGuard guard(canvas, rect * scale);
 
-  canvas->Clear();
   canvas->Scale(scale, scale);
 
   Paint paint;
   paint.SetAntiAlias(true);
+  core::ColorF background = 0xFFDD6666;
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetData().title_bar.highlight.foreground.color);
-      paint.SetStyle(Paint::Style::kStyleFill);
-      canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
-      paint.Reset();
-      paint.SetAntiAlias(true);
+      background -= 45;
+    } else {
+      background += 35;
     }
-
-    paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
-    paint.SetStrokeWidth(1.f);
-    canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+  paint.SetStyle(Paint::Style::kStyleFill);
+  paint.SetColor(background);
+  canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
+
+//  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+  paint.SetColor(0xFFDDDDDD);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 3.f, rect.center_y() - 3.f,
                    rect.center_x() + 3.f, rect.center_y() + 3.f,
@@ -117,15 +113,17 @@ void TitleBar::CloseButton::OnDraw(const Context &context) {
 }
 
 class TitleBar::MaximizeButton : public TitleBar::Button {
- public:
-  MaximizeButton()
-      : Button() {}
 
-  virtual  ~MaximizeButton() {}
+ public:
+
+  MaximizeButton() = default;
+
+  ~MaximizeButton() final = default;
 
  protected:
 
-  virtual void OnDraw(const Context &context) final;
+  void OnDraw(const Context &context) final;
+
 };
 
 void TitleBar::MaximizeButton::OnDraw(const Context &context) {
@@ -135,7 +133,6 @@ void TitleBar::MaximizeButton::OnDraw(const Context &context) {
 
   Canvas::LockGuard guard(canvas, rect * scale);
 
-  canvas->Clear();
   canvas->Scale(scale, scale);
 
   Paint paint;
@@ -167,15 +164,17 @@ void TitleBar::MaximizeButton::OnDraw(const Context &context) {
 }
 
 class TitleBar::MinimizeButton : public TitleBar::Button {
- public:
-  MinimizeButton()
-      : Button() {}
 
-  virtual  ~MinimizeButton() {}
+ public:
+
+  MinimizeButton() = default;
+
+  ~MinimizeButton() final = default;
 
  protected:
 
-  virtual void OnDraw(const Context &context) final;
+  void OnDraw(const Context &context) final;
+
 };
 
 void TitleBar::MinimizeButton::OnDraw(const Context &context) {
@@ -185,7 +184,6 @@ void TitleBar::MinimizeButton::OnDraw(const Context &context) {
 
   Canvas::LockGuard guard(canvas, rect * scale);
 
-  canvas->Clear();
   canvas->Scale(scale, scale);
 
   Paint paint;
@@ -214,15 +212,16 @@ void TitleBar::MinimizeButton::OnDraw(const Context &context) {
 }
 
 class TitleBar::FullscreenButton : public TitleBar::Button {
- public:
-  FullscreenButton()
-      : Button() {}
 
-  virtual  ~FullscreenButton() {}
+ public:
+
+  FullscreenButton() = default;
+
+  ~FullscreenButton() final = default;
 
  protected:
 
-  virtual void OnDraw(const Context &context) final;
+  void OnDraw(const Context &context) final;
 };
 
 void TitleBar::FullscreenButton::OnDraw(const Context &context) {
@@ -232,7 +231,6 @@ void TitleBar::FullscreenButton::OnDraw(const Context &context) {
 
   Canvas::LockGuard guard(canvas, rect * scale);
 
-  canvas->Clear();
   canvas->Scale(scale, scale);
 
   Paint paint;
@@ -287,10 +285,6 @@ TitleBar::TitleBar()
   PushBackChild(close_button_);
 }
 
-TitleBar::~TitleBar() {
-
-}
-
 void TitleBar::SetTitle(const std::string &title) {
   title_ = title;
   Update();
@@ -311,18 +305,24 @@ void TitleBar::OnConfigureGeometry(const RectF &old_geometry, const RectF &new_g
 }
 
 void TitleBar::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geometry) {
-  int new_y = ((int) new_geometry.height() - close_button_->GetHeight()) / 2;
-  int new_x = kButtonSpace;
-  close_button_->MoveTo(new_x, new_y);
+  int y = ((int) new_geometry.height() - close_button_->GetHeight()) / 2;
+  int x = kButtonSpace;
+  close_button_->MoveTo(x, y);
 
-  new_x += close_button_->GetWidth() + kButtonSpace;
-  maximize_button_->MoveTo(new_x, new_y);
+//  new_x += close_button_->GetWidth() + kButtonSpace;
+//  maximize_button_->MoveTo(new_x, new_y);
+//
+//  new_x += maximize_button_->GetWidth() + kButtonSpace;
+//  minimize_button_->MoveTo(new_x, new_y);
 
-  new_x += maximize_button_->GetWidth() + kButtonSpace;
-  minimize_button_->MoveTo(new_x, new_y);
+  x = (int) new_geometry.width() - kButtonSpace - fullscreen_button_->GetWidth();
+  fullscreen_button_->MoveTo(x, y);
 
-  new_x = (int) new_geometry.width() - kButtonSpace - fullscreen_button_->GetWidth();
-  fullscreen_button_->MoveTo(new_x, new_y);
+  x -= maximize_button_->GetWidth() + kButtonSpace;
+  maximize_button_->MoveTo(x, y);
+
+  x -= minimize_button_->GetWidth() + kButtonSpace;
+  minimize_button_->MoveTo(x, y);
 
   DispatchUpdate();
 }
@@ -358,11 +358,15 @@ void TitleBar::OnKeyUp(KeyEvent *event) {
 void TitleBar::OnDraw(const Context &context) {
   int scale = context.surface()->GetScale();
   Paint paint;
-  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
   paint.SetAntiAlias(true);
   paint.SetStyle(Paint::kStyleFill);
   paint.SetFont(font_);
   paint.SetTextSize(font_.GetSize() * scale);
+
+//  paint.SetColor(core::ColorF::ReverseRGBFrom(Theme::GetData().title_bar.active.foreground.color));
+//  context.canvas()->DrawRect(GetGeometry(), paint);
+
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
 
   float text_width = paint.MeasureText(title_.c_str(), title_.length());
 
