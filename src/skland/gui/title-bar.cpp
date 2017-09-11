@@ -140,7 +140,7 @@ void TitleBar::MaximizeButton::OnDraw(const Context &context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetData().title_bar.highlight.foreground.color);
+      paint.SetColor(Theme::GetData().title_bar.highlight.foreground.colors[0]);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -148,12 +148,12 @@ void TitleBar::MaximizeButton::OnDraw(const Context &context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+    paint.SetColor(Theme::GetData().title_bar.active.foreground.colors[0]);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.colors[0]);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
@@ -191,7 +191,7 @@ void TitleBar::MinimizeButton::OnDraw(const Context &context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetData().title_bar.highlight.foreground.color);
+      paint.SetColor(Theme::GetData().title_bar.highlight.foreground.colors[0]);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -199,12 +199,12 @@ void TitleBar::MinimizeButton::OnDraw(const Context &context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+    paint.SetColor(Theme::GetData().title_bar.active.foreground.colors[0]);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.colors[0]);
   paint.SetStrokeWidth(1.5f);
   canvas->DrawLine(rect.center_x() - 4.f, rect.center_y(),
                    rect.center_x() + 4.f, rect.center_y(),
@@ -238,7 +238,7 @@ void TitleBar::FullscreenButton::OnDraw(const Context &context) {
 
   if (IsHovered()) {
     if (IsPressed()) {
-      paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+      paint.SetColor(Theme::GetData().title_bar.active.foreground.colors[0]);
       paint.SetStyle(Paint::Style::kStyleFill);
       canvas->DrawCircle(rect.center_x(), rect.center_y(), 7.f, paint);
       paint.Reset();
@@ -246,12 +246,12 @@ void TitleBar::FullscreenButton::OnDraw(const Context &context) {
     }
 
     paint.SetStyle(Paint::Style::kStyleStroke);
-    paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+    paint.SetColor(Theme::GetData().title_bar.active.foreground.colors[0]);
     paint.SetStrokeWidth(1.f);
     canvas->DrawCircle(rect.center_x(), rect.center_y(), 6.5f, paint);
   }
 
-  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.colors[0]);
   paint.SetStyle(Paint::Style::kStyleFill);
 
   Path path;
@@ -323,8 +323,6 @@ void TitleBar::OnSaveGeometry(const RectF &old_geometry, const RectF &new_geomet
 
   x -= minimize_button_->GetWidth() + kButtonSpace;
   minimize_button_->MoveTo(x, y);
-
-  DispatchUpdate();
 }
 
 void TitleBar::OnMouseEnter(MouseEvent *event) {
@@ -363,10 +361,10 @@ void TitleBar::OnDraw(const Context &context) {
   paint.SetFont(font_);
   paint.SetTextSize(font_.GetSize() * scale);
 
-//  paint.SetColor(core::ColorF::ReverseRGBFrom(Theme::GetData().title_bar.active.foreground.color));
+//  paint.SetColor(0xFF7F1F1F);
 //  context.canvas()->DrawRect(GetGeometry(), paint);
 
-  paint.SetColor(Theme::GetData().title_bar.active.foreground.color);
+  paint.SetColor(Theme::GetData().title_bar.active.foreground.colors[0]);
 
   float text_width = paint.MeasureText(title_.c_str(), title_.length());
 

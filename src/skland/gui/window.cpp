@@ -92,53 +92,117 @@ struct Window::Private : public core::Property<Window> {
 
   bool inhibit_update = true;
 
-  void DrawInner(const Path &path, const Context &context);
+  void DrawInner(const Context &context);
 
-  void DrawOutline(const Path &path, const Context &context);
+  void DrawOutline(const Context &context);
 
-  void DrawShadow(const Path &path, const Context &context);
+  void DrawShadow(const Context &context);
 
-  void RecursiveDraw(AbstractView *view, const Path &path, const Context &context);
+  void RecursiveDraw(AbstractView *view, const Context &context);
 
   void SetContentViewGeometry();
 
+  static std::vector<float> kOutlineRadii;
+
 };
 
-void Window::Private::DrawInner(const Path &path, const Context &context) {
+std::vector<float> Window::Private::kOutlineRadii = {
+    7.f, 7.f, // top-left
+    7.f, 7.f, // top-right
+    4.f, 4.f, // bottom-right
+    4.f, 4.f  // bottom-left
+};
+
+void Window::Private::DrawInner(const Context &context) {
+  int scale = context.surface()->GetScale();
+  int pixel_width = owner()->GetWidth() * scale;
+  int pixel_height = owner()->GetHeight() * scale;
+  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, pixel_width, pixel_height);
+  std::vector<float> radii = {
+      kOutlineRadii[0] * scale, kOutlineRadii[1] * scale, // top-left
+      kOutlineRadii[2] * scale, kOutlineRadii[3] * scale, // top-right
+      kOutlineRadii[4] * scale, kOutlineRadii[5] * scale, // bottom-right
+      kOutlineRadii[6] * scale, kOutlineRadii[7] * scale  // bottom-left
+  };
+  Path path;
+  if (owner()->IsMaximized() || owner()->IsFullscreen()) {
+    path.AddRect(geometry);
+  } else {
+    path.AddRoundRect(geometry, radii.data());
+  }
+
   const Theme::Schema &window_schema = Theme::GetData().window;
 
   // Fill color:
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(window_schema.active.background.color);
+  paint.SetColor(window_schema.active.background.colors[0]);
+
+  Canvas::LockGuard guard(context.canvas(), path, ClipOperation::kClipIntersect, true);
   context.canvas()->DrawPath(path, paint);
 }
 
-void Window::Private::DrawOutline(const Path &path, const Context &context) {
+void Window::Private::DrawOutline(const Context &context) {
+  if (owner()->IsMaximized() || owner()->IsFullscreen()) return;
+
+  int scale = context.surface()->GetScale();
+  int pixel_width = owner()->GetWidth() * scale;
+  int pixel_height = owner()->GetHeight() * scale;
+  RectF geometry = RectF::MakeFromXYWH(0.5f, 0.5f, pixel_width - 1.f, pixel_height - 1.f);
+  std::vector<float> radii = {
+      kOutlineRadii[0] * scale, kOutlineRadii[1] * scale, // top-left
+      kOutlineRadii[2] * scale, kOutlineRadii[3] * scale, // top-right
+      kOutlineRadii[4] * scale, kOutlineRadii[5] * scale, // bottom-right
+      kOutlineRadii[6] * scale, kOutlineRadii[7] * scale  // bottom-left
+  };
+  Path path;
+  if (owner()->IsMaximized() || owner()->IsFullscreen()) {
+    path.AddRect(geometry);
+  } else {
+    path.AddRoundRect(geometry, radii.data());
+  }
+
   const Theme::Schema &window_schema = Theme::GetData().window;
   Paint paint;
   paint.SetAntiAlias(true);
-  paint.SetColor(window_schema.inactive.outline.color);
+  paint.SetColor(window_schema.inactive.outline.colors[0]);
   paint.SetStyle(Paint::Style::kStyleStroke);
-  paint.SetStrokeWidth(0.5f);
+  paint.SetStrokeWidth(.2f);
+
+  // FIXME: this function draws a white circle at bottom corners.
   context.canvas()->DrawPath(path, paint);
 }
 
-void Window::Private::DrawShadow(const Path &path, const Context &context) {
+void Window::Private::DrawShadow(const Context &context) {
+  if (owner()->IsMaximized() || owner()->IsFullscreen()) return;
+
+  int scale = context.surface()->GetScale();
+  int pixel_width = owner()->GetWidth() * scale;
+  int pixel_height = owner()->GetHeight() * scale;
+  RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, pixel_width, pixel_height);
+  std::vector<float> radii = {
+      kOutlineRadii[0] * scale, kOutlineRadii[1] * scale, // top-left
+      kOutlineRadii[2] * scale, kOutlineRadii[3] * scale, // top-right
+      kOutlineRadii[4] * scale, kOutlineRadii[5] * scale, // bottom-right
+      kOutlineRadii[6] * scale, kOutlineRadii[7] * scale  // bottom-left
+  };
+  Path path;
+  path.AddRoundRect(geometry, radii.data());
+
   Canvas::LockGuard guard(context.canvas(), path, ClipOperation::kClipDifference, true);
   context.canvas()->Clear();
   owner()->DropShadow(context);
 }
 
-void Window::Private::RecursiveDraw(AbstractView *view, const Path &path, const Context &context) {
+void Window::Private::RecursiveDraw(AbstractView *view, const Context &context) {
   Canvas::LockGuard guard(context.canvas(), view->GetGeometry());
 
   AbstractView *parent = view->GetParent();
   if (nullptr != parent) {
-    RecursiveDraw(parent, path, context);
+    RecursiveDraw(parent, context);
   } else {
     context.canvas()->Clear();
-    DrawInner(path, context);
+    DrawInner(context);
   }
 
   Draw(view, context);
@@ -348,7 +412,6 @@ void Window::OnRenderSurface(Surface *surface) {
   int pixel_width = GetWidth() * scale;
   int pixel_height = GetHeight() * scale;
   RectF geometry = RectF::MakeFromXYWH(0.f, 0.f, pixel_width, pixel_height);
-  bool draw_shadow = false;
 
   Canvas canvas((unsigned char *) p_->buffer.GetData(),
                 p_->buffer.GetSize().width,
@@ -361,16 +424,15 @@ void Window::OnRenderSurface(Surface *surface) {
   Context context(surface, &canvas);
 
   std::vector<float> radii = {
-      7.f * scale, 7.f * scale, // top-left
-      7.f * scale, 7.f * scale, // top-right
-      4.f * scale, 4.f * scale, // bottom-right
-      4.f * scale, 4.f * scale  // bottom-left
+      Private::kOutlineRadii[0] * scale, Private::kOutlineRadii[1] * scale, // top-left
+      Private::kOutlineRadii[2] * scale, Private::kOutlineRadii[3] * scale, // top-right
+      Private::kOutlineRadii[4] * scale, Private::kOutlineRadii[5] * scale, // bottom-right
+      Private::kOutlineRadii[6] * scale, Private::kOutlineRadii[7] * scale  // bottom-left
   };
 
   Path path;
   if (!(IsMaximized() || IsFullscreen())) {
     path.AddRoundRect(geometry, radii.data());
-    draw_shadow = true;
   } else {
     path.AddRect(geometry);
   }
@@ -378,16 +440,16 @@ void Window::OnRenderSurface(Surface *surface) {
   if (p_->redraw_all) {
     p_->redraw_all = false;
 
-    if (draw_shadow) p_->DrawShadow(path, context);
-
-    p_->DrawInner(path, context);
-//  p_->DrawOutline(path, context);
+    p_->DrawShadow(context);
+    p_->DrawInner(context);
+    p_->DrawOutline(context);
 
     core::Deque<AbstractView::RedrawNode> &deque = surface->GetRedrawNodeDeque();
     core::Deque<AbstractView::RedrawNode>::Iterator it = deque.begin();
     AbstractView *view = nullptr;
 
     Canvas::LockGuard guard(&canvas, path, ClipOperation::kClipIntersect, true);
+
     while (it != deque.end()) {
       view = it.element()->view();
       it.Remove();
@@ -409,7 +471,7 @@ void Window::OnRenderSurface(Surface *surface) {
     while (it != deque.end()) {
       view = it.element()->view();
       it.Remove();
-      p_->RecursiveDraw(view, path, context);
+      p_->RecursiveDraw(view, context);
       surface->Damage(view->GetX() + margin.l,
                       view->GetY() + margin.t,
                       view->GetWidth(),

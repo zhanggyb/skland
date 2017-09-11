@@ -56,11 +56,11 @@ Theme::Data::Data()
 
 }
 
-Shader Theme::Helper::GradientShader::MakeLinear(const PointF *points, const Schema::ShadedColor &color) {
+Shader Theme::Helper::GradientShader::MakeLinear(const PointF *points, const Attribute &color) {
   return skland::graphic::GradientShader::MakeLinear(points,
-                                                     color.shaded_colors.data(),
-                                                     color.shaded_positions.data(),
-                                                     color.shaded_count,
+                                                     color.colors.data(),
+                                                     color.color_positions.data(),
+                                                     color.colors.size(),
                                                      Shader::TileMode::kTileModeClamp);
 }
 

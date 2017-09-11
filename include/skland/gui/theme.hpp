@@ -36,7 +36,7 @@ typedef void *(*ThemeCreateHandle)();
 typedef void(*ThemeDestroyHandle)(void *p);
 
 /**
- * @ingroup stock
+ * @ingroup gui
  * @brief The global theme manager
  */
 class Theme {
@@ -45,6 +45,8 @@ class Theme {
 
  public:
 
+  using ColorF = core::ColorF;
+
   Theme(const Theme &) = delete;
   Theme &operator=(const Theme &) = delete;
 
@@ -52,41 +54,31 @@ class Theme {
 
   struct Schema {
 
-    struct ShadedColor {
+    struct Style {
 
-      ShadedColor() = default;
-      ~ShadedColor() = default;
-      ShadedColor(const ShadedColor &) = default;
-      ShadedColor &operator=(const ShadedColor &) = default;
+      struct Attribute {
 
-      core::ColorF color;
-      bool shaded = false;
-      int shaded_count = 0;
-      std::vector<uint32_t> shaded_colors;
-      std::vector<float> shaded_positions;
+        Attribute(size_t color_count = 1, size_t pos_count = 0)
+            : colors(color_count), color_positions(pos_count) {}
 
-    };
+        std::vector<ColorF> colors;
+        std::vector<float> color_positions;
 
-    struct ShadedColorGroup {
+      };
 
-      ShadedColorGroup() = default;
-      ~ShadedColorGroup() = default;
-      ShadedColorGroup(const ShadedColorGroup &) = default;
-      ShadedColorGroup &operator=(const ShadedColorGroup &) = default;
-      ShadedColor foreground;
-      ShadedColor background;
-      ShadedColor outline;
-
+      Attribute foreground;
+      Attribute background;
+      Attribute outline;
     };
 
     Schema() {
 
-      active.foreground.color = 0xFF000000; // black
-      active.background.color = 0xFFFFFFFF; // white
-      active.outline.color = 0xFF000000;  // black
+      active.foreground.colors[0] = 0xFF000000; // black
+      active.background.colors[0] = 0xFFFFFFFF; // white
+      active.outline.colors[0] = 0xFF000000;  // black
 
       inactive = active;
-      highlight = highlight;
+      highlight = active;
 
     }
 
@@ -94,9 +86,9 @@ class Theme {
 
     // TODO: use image
 
-    ShadedColorGroup active;
-    ShadedColorGroup inactive;
-    ShadedColorGroup highlight;
+    Style active;
+    Style inactive;
+    Style highlight;
 
   };
 
@@ -122,7 +114,9 @@ class Theme {
 
     struct GradientShader {
 
-      static graphic::Shader MakeLinear(const core::PointF points[2], const Schema::ShadedColor &color);
+      using Attribute = Schema::Style::Attribute;
+
+      static graphic::Shader MakeLinear(const core::PointF points[2], const Attribute &color);
 
     };
 

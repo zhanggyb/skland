@@ -42,7 +42,7 @@ class SpinningView : public AbstractView {
   SKLAND_DECLARE_NONCOPYABLE_AND_NONMOVALE(SpinningView);
 
   SpinningView() {
-    color_ = 0xFF428BCA;
+    color_ = 0xFF60CC60;
     frame_callback_.done().Set(this, &SpinningView::OnFrame);
   }
 
@@ -109,6 +109,8 @@ class SpinningView : public AbstractView {
 
     Paint paint;
     paint.SetAntiAlias(true);
+
+    Canvas::LockGuard guard(context.canvas(), rect);
 
     paint.SetColor(color_);
     paint.SetStyle(Paint::Style::kStyleFill);
