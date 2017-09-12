@@ -6,4 +6,4 @@
 	url = https://github.com/wayland-project/wayland-protocols.git
 [submodule "third_party/oiio"]
 	path = third_party/oiio
-	url = https://github.com/OpenImageIO/oiio.git
+	url = https://github.com/zhanggyb/oiio.git
