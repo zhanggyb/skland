@@ -23,10 +23,12 @@ set(VERSION_PATCH 1 CACHE STRING "Project patch version number.")
 mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules/")
+include(cmake/file_list_remove.cmake)
 
 option(BUILD_UNIT_TEST "Build unit test code" OFF)
 option(BUILD_SHARED_LIBRARY "Build shared library" OFF)
 option(TRACE "Turn trace mode on/off" ON)   # Turn on in development stage
+option(VERBOSE "Turn verbose mode on/off" OFF)
 
 # ----------------------------------------------------------------------------
 # System check
@@ -38,6 +40,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(LINUX TRUE)
     set(UNIX TRUE)
+    add_definitions(-D__linux__)
 else ()
     message(FATAL_ERROR "Unsupported system!")
 endif ()
@@ -66,13 +69,13 @@ endif ()
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDEBUG)
-    set(CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
+    set(CMAKE_CXX_FLAGS "-g -Wall -std=c++14")
 else ()
-    set(CMAKE_CXX_FLAGS "-O3 -std=c++11")
+    set(CMAKE_CXX_FLAGS "-O3 -std=c++14")
 endif ()
 
 if (TRACE)

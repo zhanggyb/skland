@@ -13,6 +13,7 @@
 # limitations under the License.
 
 add_subdirectory(skia)
+#add_subdirectory(chromium)
 
 if (LINUX)
     add_subdirectory(wayland-protocols)

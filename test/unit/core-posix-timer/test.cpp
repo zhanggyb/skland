@@ -23,7 +23,7 @@ class Response {
   Response()
       : count_(10) {
     timer_.SetInterval(1000);
-    timer_.expire().Set(this, &Response::OnTimeout);
+    timer_.expire().Bind(this, &Response::OnTimeout);
   }
 
   ~Response() {}

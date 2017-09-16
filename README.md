@@ -14,8 +14,9 @@ function as you expect.**
 [Wayland](https://wayland.freedesktop.org), originally for my own
 purpose.
 
-![Example Windows In Fedora
- 25](https://github.com/zhanggyb/skland-doc-images/blob/master/screenshots/examples.png)
+<!-- ![Example Windows In Fedora
+25](https://github.com/zhanggyb/skland-doc-images/blob/master/screenshots/examples.png)
+-->
 
 ## Build the source code
 

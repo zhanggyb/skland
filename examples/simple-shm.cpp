@@ -43,7 +43,7 @@ class SpinningView : public AbstractView {
 
   SpinningView() {
     color_ = 0xFF60CC60;
-    frame_callback_.done().Set(this, &SpinningView::OnFrame);
+    frame_callback_.done().Bind(this, &SpinningView::OnFrame);
   }
 
   ~SpinningView() override = default;

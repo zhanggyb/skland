@@ -61,7 +61,7 @@ void GLView::Private::OnFrame(uint32_t serial) {
 GLView::GLView() {
   p_ = core::MakeUnique<Private>(this);
 
-  p_->callback.done().Set(p_.get(), &GLView::Private::OnFrame);
+  p_->callback.done().Bind(p_.get(), &GLView::Private::OnFrame);
 }
 
 GLView::~GLView() {

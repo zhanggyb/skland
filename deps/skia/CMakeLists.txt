@@ -1,11 +1,10 @@
 #
-# CMakeLists to build static/shared skia library
+# CMakeLists to build static/shared skia library from source code in third_party/skia
 #
 
-enable_language(ASM)
-
-# To first approximation, the Skia library comprises all .cpp files under src/.
-file(GLOB_RECURSE SKIA_SOURCE_FILES ${SKIA_SOURCE_DIR}/src/*.cpp)
+# -----------------------------------------------------------------------------------------
+# Functions used in this file
+# -----------------------------------------------------------------------------------------
 
 function(find_include_dirs out)
     file(GLOB_RECURSE headers ${ARGN})
@@ -17,6 +16,17 @@ function(find_include_dirs out)
     set(${out} ${include_dirs} PARENT_SCOPE)
 endfunction()
 
+function(remove_srcs)
+    file(GLOB_RECURSE to_remove ${ARGN})
+    list(REMOVE_ITEM SKIA_SOURCE_FILES ${to_remove})
+    set(SKIA_SOURCE_FILES ${SKIA_SOURCE_FILES} PARENT_SCOPE)
+endfunction()
+
+enable_language(ASM)    # There're ASM code in Skia
+
+# To first approximation, the Skia library comprises all .cpp files under src/.
+file(GLOB_RECURSE SKIA_SOURCE_FILES ${SKIA_SOURCE_DIR}/src/*.cpp)
+
 # We need src/ directories and include/private on our path when building Skia.
 # Users should be able to use Skia with only include/ directories that are not include/private.
 find_include_dirs(SKIA_PRIVATE_HEADER_FILES ${SKIA_SOURCE_DIR}/src/*.h ${SKIA_SOURCE_DIR}/include/private/*.h)
@@ -24,7 +34,7 @@ find_include_dirs(SKIA_PUBLIC_HEADER_FILES ${SKIA_SOURCE_DIR}/include/*.h)
 list(REMOVE_ITEM SKIA_PUBLIC_HEADER_FILES ${SKIA_PRIVATE_HEADER_FILES})  # Easiest way to exclude private.
 file(GLOB default_include_config "${SKIA_SOURCE_DIR}/include/config")
 list(REMOVE_ITEM SKIA_PUBLIC_HEADER_FILES ${default_include_config})
-set(userconfig_directory ${CMAKE_BINARY_DIR}/include)
+set(userconfig_directory ${PROJECT_BINARY_DIR}/include)
 list(APPEND SKIA_PUBLIC_HEADER_FILES ${userconfig_directory})
 
 # These guys are third_party but provided by a Skia checkout.
@@ -39,13 +49,6 @@ file(GLOB libpng_srcs ${SKIA_SOURCE_DIR}/third_party/libpng/*.c)
 foreach (src ${libpng_srcs})
     list(APPEND SKIA_SOURCE_FILES ${src})
 endforeach ()
-
-
-function(remove_srcs)
-    file(GLOB_RECURSE to_remove ${ARGN})
-    list(REMOVE_ITEM SKIA_SOURCE_FILES ${to_remove})
-    set(SKIA_SOURCE_FILES ${SKIA_SOURCE_FILES} PARENT_SCOPE)
-endfunction()
 
 # This file is empty and is only used to trick GYP.
 remove_srcs(${SKIA_SOURCE_DIR}/src/core/SkForceCPlusPlusLinking.cpp)

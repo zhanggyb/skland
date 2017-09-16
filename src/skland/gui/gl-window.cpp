@@ -188,7 +188,7 @@ GLWindow::GLWindow(int width, int height, const char *title)
     : AbstractShellView(width, height, title, nullptr) {
   p_ = core::MakeUnique<Private>(this);
 
-  p_->callback.done().Set(p_.get(), &Private::OnFrame);
+  p_->callback.done().Bind(p_.get(), &Private::OnFrame);
 }
 
 GLWindow::~GLWindow() {

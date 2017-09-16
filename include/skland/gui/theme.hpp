@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef SKLAND_STOCK_THEME_HPP_
-#define SKLAND_STOCK_THEME_HPP_
+#ifndef SKLAND_GUI_THEME_HPP_
+#define SKLAND_GUI_THEME_HPP_
 
 #include "skland/core/color.hpp"
 #include "skland/core/margin.hpp"
@@ -196,4 +196,4 @@ class Theme {
 } // namespace gui
 } // namespace skland
 
-#endif // SKLAND_STOCK_THEME_HPP_
+#endif // SKLAND_GUI_THEME_HPP_

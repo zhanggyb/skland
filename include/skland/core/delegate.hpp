@@ -103,8 +103,8 @@ class Delegate<ReturnType(ParamTypes...)> {
    * @return A delegate object
    */
   template<typename T>
-  static inline Delegate FromMethod(T *object_ptr,
-                                    ReturnType (T::*method)(ParamTypes...)) {
+  static inline Delegate Make(T *object_ptr,
+                              ReturnType (T::*method)(ParamTypes...)) {
     typedef ReturnType (T::*TMethod)(ParamTypes...);
 
     Delegate d;
@@ -123,8 +123,8 @@ class Delegate<ReturnType(ParamTypes...)> {
    * @return A delegate object
    */
   template<typename T>
-  static inline Delegate FromMethod(T *object_ptr,
-                                    ReturnType (T::*method)(ParamTypes...) const) {
+  static inline Delegate Make(T *object_ptr,
+                              ReturnType (T::*method)(ParamTypes...) const) {
     typedef ReturnType (T::*TMethod)(ParamTypes...) const;
 
     Delegate d;
@@ -141,7 +141,7 @@ class Delegate<ReturnType(ParamTypes...)> {
    * Create an empty delegate object, which cannot be called by operator() or
    * Invoke(), and the bool operator returns false.
    */
-  Delegate() {}
+  Delegate() = default;
 
   /**
    * @brief Constructor to create a delegate by given object and method
@@ -183,7 +183,7 @@ class Delegate<ReturnType(ParamTypes...)> {
   /**
    * @brief Destructor
    */
-  ~Delegate() {}
+  ~Delegate() = default;
 
   /**
    * @brief Reset this delegate
@@ -219,7 +219,7 @@ class Delegate<ReturnType(ParamTypes...)> {
    * @brief Bool operator
    * @return True if pointer to a method is set, false otherwise
    */
-  operator bool() const {
+  explicit operator bool() const {
     return (nullptr != data_.object_pointer) && (nullptr != data_.method_stub) && (nullptr != data_.method_pointer);
   }
 
@@ -323,10 +323,10 @@ inline bool operator>(const Delegate<ReturnType(ParamTypes...)> &src,
 template<typename ReturnType, typename ... ParamTypes>
 class DelegateRef<ReturnType(ParamTypes...)> {
 
+ public:
+
   DelegateRef() = delete;
   DelegateRef &operator=(const DelegateRef &) = delete;
-
- public:
 
   DelegateRef(Delegate<ReturnType(ParamTypes...)> &delegate)
       : delegate_(&delegate) {}
@@ -334,7 +334,7 @@ class DelegateRef<ReturnType(ParamTypes...)> {
   DelegateRef(const DelegateRef &orig)
       : delegate_(orig.delegate_) {}
 
-  ~DelegateRef() {}
+  ~DelegateRef() = default;
 
   DelegateRef &operator=(Delegate<ReturnType(ParamTypes...)> &delegate) {
     delegate_ = &delegate;
@@ -342,13 +342,13 @@ class DelegateRef<ReturnType(ParamTypes...)> {
   }
 
   template<typename T>
-  void Set(T *obj, ReturnType (T::*method)(ParamTypes...)) {
-    *delegate_ = Delegate<ReturnType(ParamTypes...)>::template FromMethod<T>(obj, method);
+  void Bind(T *obj, ReturnType (T::*method)(ParamTypes...)) {
+    *delegate_ = Delegate<ReturnType(ParamTypes...)>::template Make<T>(obj, method);
   }
 
   template<typename T>
-  void Set(T *obj, ReturnType (T::*method)(ParamTypes...) const) {
-    *delegate_ = Delegate<ReturnType(ParamTypes...)>::template FromMethod<T>(obj, method);
+  void Bind(T *obj, ReturnType (T::*method)(ParamTypes...) const) {
+    *delegate_ = Delegate<ReturnType(ParamTypes...)>::template Make<T>(obj, method);
   }
 
   void Reset() {
@@ -365,8 +365,8 @@ class DelegateRef<ReturnType(ParamTypes...)> {
     return delegate_->Equal(obj, method);
   }
 
-  operator bool() const {
-    return (*delegate_);
+  explicit operator bool() const {
+    return delegate_->operator bool();
   }
 
  private:
