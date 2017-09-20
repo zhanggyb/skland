@@ -12,8 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(gtest/include)
+# set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-add_subdirectory(gtest)
-add_subdirectory(skland)
+# gui
+add_subdirectory(idle-task)
+add_subdirectory(display)
+add_subdirectory(application)
+add_subdirectory(window)
+add_subdirectory(dialog)
+add_subdirectory(timer)
+# add_subdirectory(gui-main-window)
+add_subdirectory(slider)
+add_subdirectory(gl-view)
+add_subdirectory(linear-layout)
+add_subdirectory(relative-layout)
 

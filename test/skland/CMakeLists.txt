@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(gtest/include)
+# set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-add_subdirectory(gtest)
-add_subdirectory(skland)
-
+# core module
+add_subdirectory(core)
+add_subdirectory(graphic)
+add_subdirectory(gui)

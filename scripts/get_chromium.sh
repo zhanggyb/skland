@@ -19,10 +19,13 @@ cd ${CHROMIUM_SOURCE_DIR}
 #pwd
 #echo $PATH
 
-# Use the fetch command in depot_tools
-fetch --nohooks chromium
-
-# If the dir exists, use 'gclient sync --nohooks' instead
+if [ ! -f .gclient ]; then
+    # Use the fetch command in depot_tools
+    fetch --nohooks chromium
+else
+    # If the dir exists, use 'gclient sync --nohooks' instead
+    gclient sync --nohooks
+fi
 
 # Currently NOT needed: Once you've run ''install-build-deps' at least once, you
 # can now run the Chromium-specific hooks, which will download additional

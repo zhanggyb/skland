@@ -12,8 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(gtest/include)
+# set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-add_subdirectory(gtest)
-add_subdirectory(skland)
+# graphic
+add_subdirectory(font)
+add_subdirectory(font-style)
+add_subdirectory(image-info)
+add_subdirectory(gradient-shader)
+add_subdirectory(path)
+add_subdirectory(typeface)
+add_subdirectory(paint)
+add_subdirectory(canvas)
 

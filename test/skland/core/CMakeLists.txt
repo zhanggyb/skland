@@ -12,8 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(gtest/include)
+# set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-add_subdirectory(gtest)
-add_subdirectory(skland)
-
+# core module
+add_subdirectory(delegate)
+add_subdirectory(sigcxx)
+add_subdirectory(margin)
+add_subdirectory(rect)
+add_subdirectory(color)
+add_subdirectory(memory)
+add_subdirectory(object)
+add_subdirectory(vectors)
+add_subdirectory(deque)
+add_subdirectory(compound-deque)
+add_subdirectory(trace)
+add_subdirectory(posix-timer)
