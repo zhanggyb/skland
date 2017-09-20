@@ -24,6 +24,18 @@ endfunction()
 
 enable_language(ASM)    # There're ASM code in Skia
 
+# These variables will be passed and changed in sub directories
+list(APPEND SKIA_HEADERS "")    # public headers
+list(APPEND SKIA_SOURCES "")    # private header and source files
+
+add_subdirectory(src)
+
+# message(STATUS "SKIA_HEADERS: ${SKIA_HEADERS}")
+# message(STATUS "SKIA_SOURCES: ${SKIA_SOURCES}")
+
+# ------------------------------------------------------------------------------------------------------
+
+
 # To first approximation, the Skia library comprises all .cpp files under src/.
 file(GLOB_RECURSE SKIA_SOURCE_FILES ${SKIA_SOURCE_DIR}/src/*.cpp)
 

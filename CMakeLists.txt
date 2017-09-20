@@ -165,6 +165,7 @@ endif ()
 # ----------------------------------------------------------------------------
 
 # Set global varaibles to use native SKIA apis:
+set(SKIA_DIR ${PROJECT_SOURCE_DIR}/third_party/skia)
 set(SKIA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/third_party/skia)
 list(APPEND SKIA_PUBLIC_INCLUDES
         "${SKIA_SOURCE_DIR}/include/android"
