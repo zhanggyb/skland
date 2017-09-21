@@ -6,6 +6,10 @@ file(GLOB CHROMIUM_BASE_HEADERS "${CHROMIUM_BASE_DIR}/*.h")
 file(GLOB CHROMIUM_BASE_SOURCES "${CHROMIUM_BASE_DIR}/*.cc")
 
 # Remove sources for other platform or unit test:
+file_list_remove(CHROMIUM_BASE_HEADERS GLOB "${CHROMIUM_BASE_DIR}/*_win.h")
+file_list_remove(CHROMIUM_BASE_HEADERS GLOB "${CHROMIUM_BASE_DIR}/*_mac.h")
+file_list_remove(CHROMIUM_BASE_HEADERS GLOB "${CHROMIUM_BASE_DIR}/*_android.h")
+
 file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_unittest.cc")
 file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_win.cc")
 file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_nacl.cc")
@@ -22,7 +26,7 @@ add_subdirectory(files)
 #add_subdirectory(i18n) # TODO: fix compile error
 add_subdirectory(json)
 add_subdirectory(memory)
-#add_subdirectory(message_loop) # TODO: fix compile error
+add_subdirectory(message_loop)
 add_subdirectory(metrics)
 add_subdirectory(nix)
 add_subdirectory(numerics)
@@ -40,14 +44,9 @@ add_subdirectory(threading)
 add_subdirectory(time)
 add_subdirectory(timer)
 
-include_directories(${CHROMIUM_SOURCE_DIR}/third_party/icu/source/common/)
+include_directories(BEFORE ${CHROMIUM_SOURCE_DIR}/third_party/icu/source/common/)
 
 add_library(chromium_base ${CHROMIUM_BASE_HEADERS} ${CHROMIUM_BASE_SOURCES})
-#target_link_libraries(chromium_base
-#        PRIVATE chromium_base_allocator
-#        # PRIVATE chromium_base_containers  # header file only
-#        PRIVATE chromium_base_time
-#        )
 
 # Generate files before build chromium_base:
 
