@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-add_custom_target(tikz
-        ALL
-        WORKING_DIRECTORY "${SkLand_BINARY_DIR}/doc/latex")
+add_custom_target(
+        tikz
+#        ALL
+        WORKING_DIRECTORY "${SkLand_BINARY_DIR}/doc/latex"
+)
 
 # -----------------------------------------------------------------------------
 # signal_slot:
@@ -33,7 +35,7 @@ add_custom_command(
 add_custom_command(
         TARGET tikz
         COMMAND "${PDFLATEX_COMPILER}"
-        ARGS "-shell-escape" "signal_slot"
+        ARGS "-shell-escape" "signal_slot" "1>/dev/null" "2>&1"
         DEPENDS "${LATEX_BINARY_DIR}/signal_slot.tex"
         WORKING_DIRECTORY "${LATEX_BINARY_DIR}"
         COMMENT "${PDFLATEX_COMPILER} ${LATEX_BINARY_DIR}/signal_slot.tex")
@@ -49,7 +51,7 @@ add_custom_command(
 add_custom_command(
         TARGET tikz
         COMMAND "${PDFLATEX_COMPILER}"
-        ARGS "-shell-escape" "main_loop"
+        ARGS "-shell-escape" "main_loop" "1>/dev/null" "2>&1"
         DEPENDS "${LATEX_BINARY_DIR}/main_loop.tex"
         WORKING_DIRECTORY "${LATEX_BINARY_DIR}"
         COMMENT "${PDFLATEX_COMPILER} ${LATEX_BINARY_DIR}/main_loop.tex")

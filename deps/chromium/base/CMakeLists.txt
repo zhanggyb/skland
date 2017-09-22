@@ -46,7 +46,22 @@ add_subdirectory(timer)
 
 include_directories(BEFORE ${CHROMIUM_SOURCE_DIR}/third_party/icu/source/common/)
 
+add_definitions(-DU_USING_ICU_NAMESPACE=0)
+add_definitions(-DU_ENABLE_DYLOAD=0)
+add_definitions(-DU_COMMON_IMPLEMENTATION)
+add_definitions(-DU_STATIC_IMPLEMENTATION)
+add_definitions(-DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_STATIC)
+add_definitions(-DUCHAR_TYPE=char16_t)
+
 add_library(chromium_base ${CHROMIUM_BASE_HEADERS} ${CHROMIUM_BASE_SOURCES})
+target_include_directories(
+        chromium_base
+        PRIVATE "${CHROMIUM_SOURCE_DIR}/third_party/icu/source/common/"
+        PRIVATE "${CHROMIUM_SOURCE_DIR}/third_party/ced/src"
+)
+
+# FIXME: fail to compile without this cflag:
+target_compile_options(chromium_base PRIVATE "-fpermissive")
 
 # Generate files before build chromium_base:
 
@@ -61,34 +76,50 @@ add_custom_command(
         POST_BUILD
         COMMAND mkdir -p "${CHROMIUM_GEN_DIR}/base"
         WORKING_DIRECTORY "${CHROMIUM_BINARY_DIR}"
-        COMMENT "Create directory for chromium base: ${CHROMIUM_GEN_DIR}/base"
+        COMMENT "Create ${CHROMIUM_GEN_DIR}/base"
         VERBATIM
 )
 
+# The chromium build system will generate some header files in 'gen/base/' dir.
+# The following custom commands do the same thing, bug ugly.
+
+set(DEFINITION_CONTENT "--flags ENABLE_LOCATION_SOURCE=true ENABLE_PROFILING=false CAN_UNWIND_WITH_FRAME_POINTERS=true")
+set(SCRIPT "${CHROMIUM_SOURCE_DIR}/build/write_buildflag_header.py")
+set(TMPFILE "${CHROMIUM_BINARY_DIR}/base/debugging_flags.rsp")
 add_custom_command(
         TARGET chromium_base_generate_headers
         POST_BUILD
         COMMAND mkdir -p "${CHROMIUM_GEN_DIR}/base/debug"
+        COMMAND echo "${DEFINITION_CONTENT}" > "${TMPFILE}"
+        COMMAND python "${SCRIPT}" --output base/debug/debugging_flags.h --rulename //base$:debugging_flags --gen-dir "${CHROMIUM_GEN_DIR}" --definitions "${TMPFILE}"
+        COMMAND rm -f "${TMPFILE}"
         WORKING_DIRECTORY "${CHROMIUM_BINARY_DIR}"
-        COMMENT "Create directory for chromium base: ${CHROMIUM_GEN_DIR}/base/debug"
+        COMMENT "Generate ${CHROMIUM_GEN_DIR}/base/debug/debugging_flags.h"
         VERBATIM
 )
 
+set(DEFINITION_CONTENT "--flags USE_ALLOCATOR_SHIM=true")
+set(SCRIPT "${CHROMIUM_SOURCE_DIR}/build/write_buildflag_header.py")
+set(TMPFILE "${CHROMIUM_BINARY_DIR}/base/features.rsp")
 add_custom_command(
         TARGET chromium_base_generate_headers
         POST_BUILD
         COMMAND mkdir -p "${CHROMIUM_GEN_DIR}/base/allocator"
+        COMMAND echo "${DEFINITION_CONTENT}" > "${TMPFILE}"
+        COMMAND python "${SCRIPT}" --output base/allocator/features.h --rulename //base/allocator$:features --gen-dir "${CHROMIUM_GEN_DIR}" --definitions "${TMPFILE}"
+        COMMAND rm -f "${TMPFILE}"
         WORKING_DIRECTORY "${CHROMIUM_BINARY_DIR}"
-        COMMENT "Create directory for chromium base: ${CHROMIUM_GEN_DIR}/base/allocator"
+        COMMENT "Generate ${CHROMIUM_GEN_DIR}/base/allocator/features.h"
         VERBATIM
 )
 
+set(SCRIPT "${CHROMIUM_SOURCE_DIR}/build/write_build_date_header.py")
 add_custom_command(
         TARGET chromium_base_generate_headers
         POST_BUILD
         COMMAND "${CHROMIUM_SOURCE_DIR}/build/write_build_date_header.py" "${CHROMIUM_GEN_DIR}/base/generated_build_date.h" default
         WORKING_DIRECTORY "${CHROMIUM_BINARY_DIR}"
-        COMMENT "Generate ${CHROMIUM_GEN_DIR}/base/generated_build_date.h by build/write_build_date_header.py"
+        COMMENT "Generate ${CHROMIUM_GEN_DIR}/base/generated_build_date.h"
         VERBATIM
 )
 
@@ -112,3 +143,4 @@ add_custom_command(
 
 # use add_custom_target instead and add_dependencies to make the gen target depend on it
 add_dependencies(chromium_base chromium_base_generate_headers)
+

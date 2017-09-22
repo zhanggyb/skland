@@ -13,6 +13,18 @@
 # limitations under the License.
 
 add_subdirectory(skia)
+
+set(CHROMIUM_SOURCE_DIR "${PROJECT_SOURCE_DIR}/third_party/chromium/src")
+set(CHROMIUM_BINARY_DIR "${PROJECT_BINARY_DIR}/deps/chromium")
+set(CHROMIUM_GEN_DIR "${CHROMIUM_BINARY_DIR}/gen")
+
+#set(CHROMIUM_SOURCE_DIR "${PROJECT_SOURCE_DIR}/third_party/chromium/src" CACHE STRING "Chromium source dir")
+#set(CHROMIUM_BINARY_DIR "${PROJECT_BINARY_DIR}/deps/chromium" CACHE STRING "Chromium build dir")
+#set(CHROMIUM_GEN_DIR "${CHROMIUM_BINARY_DIR}/gen" CACHE STRING "Chromium gen dir")
+
+include_directories(${CHROMIUM_SOURCE_DIR})
+include_directories(${CHROMIUM_GEN_DIR})
+
 add_subdirectory(chromium)
 
 if (LINUX)
