@@ -29,6 +29,7 @@ option(BUILD_UNIT_TEST "Build unit test code" OFF)
 option(BUILD_SHARED_LIBRARY "Build shared library" OFF)
 option(TRACE "Turn trace mode on/off" ON)   # Turn on in development stage
 option(VERBOSE "Turn verbose mode on/off" OFF)
+option(CHECKOUT_CHROMIUM "Checkout chromium source code" OFF)
 
 # ----------------------------------------------------------------------------
 # System check
@@ -184,22 +185,7 @@ list(APPEND SKIA_PUBLIC_INCLUDES
 
 add_subdirectory(doc)
 add_subdirectory(deps)
-
-# Set default options for OpenImageIO:
-set(OIIO_BUILD_TOOLS OFF CACHE BOOL "Do not build tools")
-set(OIIO_BUILD_TESTS OFF CACHE BOOL "Do not build tests")
-set(USE_QT OFF CACHE BOOL "Do not use Qt")
-set(USE_FIELD3D OFF CACHE BOOL "Do not use Field3D")
-set(USE_FFMPEG OFF CACHE BOOL "Do not use FFMPEG")
-set(USE_PYTHON OFF CACHE BOOL "Do not use python")
-set(USE_PYTHON3 OFF CACHE BOOL "Do not use python3")
-set(USE_NUKE OFF CACHE BOOL "Do not use nuke")
-set(USE_LIBRAW OFF CACHE BOOL "Do not use libraw")
-set(USE_DICOM OFF CACHE BOOL "Do not use dicom")
-set(BUILDSTATIC ON CACHE BOOL "Build static library")
-include_directories(BEFORE third_party/oiio/src/include)   # Avoid using the old OIIO installed in system
-add_subdirectory(third_party/oiio)
-
+add_subdirectory(third_party)
 add_subdirectory(src)
 
 if (LINUX)
@@ -240,3 +226,11 @@ else()
     endif ()
 endif()
 message(STATUS "")
+
+if (CHECKOUT_CHROMIUM)
+    message("Sync chromium source code, you can interrupt this by <Ctrl> + C.")
+    execute_process(
+        COMMAND "${PROJECT_SOURCE_DIR}/scripts/get_chromium.sh"
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    )
+endif()

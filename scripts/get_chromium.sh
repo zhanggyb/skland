@@ -7,6 +7,15 @@ PROJECT_PATH="${PROJECT_PATH%/*}"
 DEPOT_TOOLS_SOURCE_DIR="${PROJECT_PATH}/third_party/depot_tools"
 CHROMIUM_SOURCE_DIR="${PROJECT_PATH}/third_party/chromium"
 
+echo -n "Checkout or sync chromium source code to ${CHROMIUM_SOURCE_DIR}?(y/n) "
+read answer
+
+if [ ${answer} = 'y' -o ${answer} = 'Y' ]; then
+    echo -n
+else
+    exit 0
+fi
+
 if [ ! -d ${CHROMIUM_SOURCE_DIR} ]; then
 	echo "${CHROMIUM_SOURCE_DIR} does not exist, create this folder"
 	mkdir -p ${CHROMIUM_SOURCE_DIR}

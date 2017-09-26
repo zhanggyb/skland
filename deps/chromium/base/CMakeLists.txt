@@ -1,4 +1,16 @@
-# deps/chromium/base
+# Copyright 2016 Freeman Zhang <zhanggyb@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 set(CHROMIUM_BASE_DIR "${CHROMIUM_SOURCE_DIR}/base")
 
@@ -23,7 +35,7 @@ add_subdirectory(allocator)
 add_subdirectory(containers)
 add_subdirectory(debug)
 add_subdirectory(files)
-#add_subdirectory(i18n) # TODO: fix compile error
+add_subdirectory(i18n) # TODO: fix compile error
 add_subdirectory(json)
 add_subdirectory(memory)
 add_subdirectory(message_loop)
@@ -43,8 +55,6 @@ add_subdirectory(trace_event)
 add_subdirectory(threading)
 add_subdirectory(time)
 add_subdirectory(timer)
-
-include_directories(BEFORE ${CHROMIUM_SOURCE_DIR}/third_party/icu/source/common/)
 
 add_definitions(-DU_USING_ICU_NAMESPACE=0)
 add_definitions(-DU_ENABLE_DYLOAD=0)
@@ -80,8 +90,8 @@ add_custom_command(
         VERBATIM
 )
 
-# The chromium build system will generate some header files in 'gen/base/' dir.
-# The following custom commands do the same thing, bug ugly.
+# The chromium build system generates some header files in 'gen/base/' dir.
+# The following custom commands do the same thing, though ugly.
 
 set(DEFINITION_CONTENT "--flags ENABLE_LOCATION_SOURCE=true ENABLE_PROFILING=false CAN_UNWIND_WITH_FRAME_POINTERS=true")
 set(SCRIPT "${CHROMIUM_SOURCE_DIR}/build/write_buildflag_header.py")
