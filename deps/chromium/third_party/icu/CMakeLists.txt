@@ -22,43 +22,29 @@ file(GLOB ICUI18N_HEADERS "${CHROMIUM_THIRD_PARTY_ICU_SOURCE_DIR}/source/i18n/*.
 file(GLOB ICUI18N_SOURCES "${CHROMIUM_THIRD_PARTY_ICU_SOURCE_DIR}/source/i18n/*.cpp")
 file(GLOB ICUI18N_PUBLIC_HEADERS "${CHROMIUM_THIRD_PARTY_ICU_SOURCE_DIR}/source/i18n/unicode/*.h")
 
-add_definitions(-DU_USING_ICU_NAMESPACE=0)
-add_definitions(-DU_ENABLE_DYLOAD=0)
-add_definitions(-DU_COMMON_IMPLEMENTATION)
-add_definitions(-DU_I18N_IMPLEMENTATION)
-add_definitions(-DU_STATIC_IMPLEMENTATION)
-add_definitions(-DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_STATIC)
-add_definitions(-DUCHAR_TYPE=char16_t)  # Note: we use char16_t when building 'icu' but uint16_t in 'base'
-
 add_library(
-        chromium_third_party_icu_common
+        chromium_third_party_icu
         ${ICUUC_HEADERS}
         ${ICUUC_SOURCES}
         ${ICUUC_PUBLIC_HEADERS}
-)
-
-target_compile_options(
-        chromium_third_party_icu_common
-        PRIVATE "-Wno-unused-function"
-        PRIVATE "-Wno-deprecated-declarations"
-        PRIVATE "-Wno-unused-but-set-variable"
-)
-
-target_include_directories(
-        chromium_third_party_icu_common
-        BEFORE
-        PRIVATE "${CHROMIUM_THIRD_PARTY_ICU_SOURCE_DIR}/source/common/"
-)
-
-add_library(
-        chromium_third_party_icu_i18n
         ${ICUI18N_HEADERS}
         ${ICUI18N_SOURCES}
         ${ICUI18N_PUBLIC_HEADERS}
 )
 
+target_compile_definitions(
+        chromium_third_party_icu
+        PRIVATE "-DU_USING_ICU_NAMESPACE=0"
+        PRIVATE "-DU_ENABLE_DYLOAD=0"
+        PRIVATE "-DU_COMMON_IMPLEMENTATION"
+        PRIVATE "-DU_I18N_IMPLEMENTATION"
+        PRIVATE "-DU_STATIC_IMPLEMENTATION"
+        PRIVATE "-DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_STATIC"
+        PRIVATE "-DUCHAR_TYPE=char16_t"  # Note: we use char16_t when building 'icu' but uint16_t in 'base'
+)
+
 target_compile_options(
-        chromium_third_party_icu_i18n
+        chromium_third_party_icu
         PRIVATE "-Wno-misleading-indentation"
         PRIVATE "-Wno-unused-function"
         PRIVATE "-Wno-deprecated-declarations"
@@ -66,8 +52,9 @@ target_compile_options(
 )
 
 target_include_directories(
-        chromium_third_party_icu_i18n
+        chromium_third_party_icu
         BEFORE
         PRIVATE "${CHROMIUM_THIRD_PARTY_ICU_SOURCE_DIR}/source/common/"
         PRIVATE "${CHROMIUM_THIRD_PARTY_ICU_SOURCE_DIR}/source/i18n/"
 )
+

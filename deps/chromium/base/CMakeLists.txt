@@ -73,8 +73,7 @@ target_include_directories(
 )
 target_link_libraries(
         chromium_base
-        PRIVATE chromium_third_party_icu_common
-        PRIVATE chromium_third_party_icu_i18n
+        PRIVATE chromium_third_party_icu
 )
 
 # Generate files before build chromium_base:
