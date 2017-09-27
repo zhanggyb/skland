@@ -103,7 +103,17 @@ target_include_directories(skland
         PRIVATE "${PROJECT_SOURCE_DIR}/third_party/oiio/src/include")
 
 if (LINUX)
-    target_link_libraries(skland rt ${LIBS} wayland-cursor skia xdg-shell-unstable-v6-client OpenImageIO OpenImageIO_Util)
+    target_link_libraries(
+            skland
+            rt
+            ${LIBS}
+            wayland-cursor
+            skia
+            xdg-shell-unstable-v6-client
+            OpenImageIO
+            OpenImageIO_Util
+            chromium_base
+    )
 else ()
     target_link_libraries(skland ${LIBS} skia)
 endif ()

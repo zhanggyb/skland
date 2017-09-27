@@ -20,9 +20,18 @@ file(GLOB CHROMIUM_NET_SOURCES "${CHROMIUM_NET_DIR}/*.cc")
 add_subdirectory(base)
 add_subdirectory(cert)
 add_subdirectory(socket)
+add_subdirectory(ssl)
+add_subdirectory(websockets)
 
-add_library(chromium_net ${CHROMIUM_NET_HEADERS} ${CHROMIUM_NET_SOURCES})
+add_library(
+        chromium_net
+        ${CHROMIUM_NET_HEADERS}
+        ${CHROMIUM_NET_SOURCES}
+)
+
 target_include_directories(
         chromium_net
+        PRIVATE "${CHROMIUM_SOURCE_DIR}/build/linux/debian_jessie_amd64-sysroot/usr/include/nss"
+        PRIVATE "${CHROMIUM_SOURCE_DIR}/build/linux/debian_jessie_amd64-sysroot/usr/include/nspr"
         PRIVATE "${CHROMIUM_SOURCE_DIR}/third_party/boringssl/src/include"
 )

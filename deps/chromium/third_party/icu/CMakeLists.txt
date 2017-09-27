@@ -24,11 +24,11 @@ file(GLOB ICUI18N_PUBLIC_HEADERS "${CHROMIUM_THIRD_PARTY_ICU_SOURCE_DIR}/source/
 
 add_definitions(-DU_USING_ICU_NAMESPACE=0)
 add_definitions(-DU_ENABLE_DYLOAD=0)
-#add_definitions(-DU_COMMON_IMPLEMENTATION)
+add_definitions(-DU_COMMON_IMPLEMENTATION)
+add_definitions(-DU_I18N_IMPLEMENTATION)
 add_definitions(-DU_STATIC_IMPLEMENTATION)
 add_definitions(-DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_STATIC)
-add_definitions(-DUCHAR_TYPE=char16_t)
-add_definitions(-DU_I18N_IMPLEMENTATION)
+add_definitions(-DUCHAR_TYPE=char16_t)  # Note: we use char16_t when building 'icu' but uint16_t in 'base'
 
 add_library(
         chromium_third_party_icu_common
@@ -60,6 +60,9 @@ add_library(
 target_compile_options(
         chromium_third_party_icu_i18n
         PRIVATE "-Wno-misleading-indentation"
+        PRIVATE "-Wno-unused-function"
+        PRIVATE "-Wno-deprecated-declarations"
+        PRIVATE "-Wno-unused-but-set-variable"
 )
 
 target_include_directories(

@@ -60,6 +60,7 @@ add_subdirectory(timer)
 add_definitions(-DU_USING_ICU_NAMESPACE=0)
 add_definitions(-DU_ENABLE_DYLOAD=0)
 #add_definitions(-DU_COMMON_IMPLEMENTATION)
+#add_definitions(-DU_I18N_IMPLEMENTATION)
 add_definitions(-DU_STATIC_IMPLEMENTATION)
 add_definitions(-DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_STATIC)
 add_definitions(-DUCHAR_TYPE=uint16_t)
@@ -69,6 +70,11 @@ target_include_directories(
         chromium_base
         PRIVATE "${CHROMIUM_SOURCE_DIR}/third_party/icu/source/common/"
         PRIVATE "${CHROMIUM_SOURCE_DIR}/third_party/ced/src"
+)
+target_link_libraries(
+        chromium_base
+        PRIVATE chromium_third_party_icu_common
+        PRIVATE chromium_third_party_icu_i18n
 )
 
 # Generate files before build chromium_base:
@@ -150,5 +156,8 @@ add_custom_command(
 #)
 
 # use add_custom_target instead and add_dependencies to make the gen target depend on it
-add_dependencies(chromium_base chromium_base_generate_headers)
+add_dependencies(
+        chromium_base
+        chromium_base_generate_headers
+)
 
