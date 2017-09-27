@@ -38,8 +38,9 @@
 #    set(CHROMIUM_GEN_DIR "${CHROMIUM_BINARY_DIR}/gen")
 #endif ()
 
-add_subdirectory(base)
 add_subdirectory(third_party)
+add_subdirectory(base)
+add_subdirectory(net)
 
 add_custom_target(
         chromium
