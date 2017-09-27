@@ -24,7 +24,7 @@ file(GLOB ICUI18N_PUBLIC_HEADERS "${CHROMIUM_THIRD_PARTY_ICU_SOURCE_DIR}/source/
 
 add_definitions(-DU_USING_ICU_NAMESPACE=0)
 add_definitions(-DU_ENABLE_DYLOAD=0)
-add_definitions(-DU_COMMON_IMPLEMENTATION)
+#add_definitions(-DU_COMMON_IMPLEMENTATION)
 add_definitions(-DU_STATIC_IMPLEMENTATION)
 add_definitions(-DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_STATIC)
 add_definitions(-DUCHAR_TYPE=char16_t)

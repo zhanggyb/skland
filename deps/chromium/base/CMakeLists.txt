@@ -56,12 +56,13 @@ add_subdirectory(threading)
 add_subdirectory(time)
 add_subdirectory(timer)
 
+# TODO: use a global variable for these definitions as they are also used when building icu
 add_definitions(-DU_USING_ICU_NAMESPACE=0)
 add_definitions(-DU_ENABLE_DYLOAD=0)
-add_definitions(-DU_COMMON_IMPLEMENTATION)
+#add_definitions(-DU_COMMON_IMPLEMENTATION)
 add_definitions(-DU_STATIC_IMPLEMENTATION)
 add_definitions(-DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_STATIC)
-add_definitions(-DUCHAR_TYPE=char16_t)
+add_definitions(-DUCHAR_TYPE=uint16_t)
 
 add_library(chromium_base ${CHROMIUM_BASE_HEADERS} ${CHROMIUM_BASE_SOURCES})
 target_include_directories(
@@ -69,9 +70,6 @@ target_include_directories(
         PRIVATE "${CHROMIUM_SOURCE_DIR}/third_party/icu/source/common/"
         PRIVATE "${CHROMIUM_SOURCE_DIR}/third_party/ced/src"
 )
-
-# FIXME: fail to compile without this cflag:
-target_compile_options(chromium_base PRIVATE "-fpermissive")
 
 # Generate files before build chromium_base:
 
