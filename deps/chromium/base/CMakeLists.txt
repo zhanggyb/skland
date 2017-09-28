@@ -18,18 +18,18 @@ file(GLOB CHROMIUM_BASE_HEADERS "${CHROMIUM_BASE_DIR}/*.h")
 file(GLOB CHROMIUM_BASE_SOURCES "${CHROMIUM_BASE_DIR}/*.cc")
 
 # Remove sources for other platform or unit test:
-file_list_remove(CHROMIUM_BASE_HEADERS GLOB "${CHROMIUM_BASE_DIR}/*_win.h")
-file_list_remove(CHROMIUM_BASE_HEADERS GLOB "${CHROMIUM_BASE_DIR}/*_mac.h")
-file_list_remove(CHROMIUM_BASE_HEADERS GLOB "${CHROMIUM_BASE_DIR}/*_android.h")
+remove_file(CHROMIUM_BASE_HEADERS GLOB "${CHROMIUM_BASE_DIR}/*_win.h")
+remove_file(CHROMIUM_BASE_HEADERS GLOB "${CHROMIUM_BASE_DIR}/*_mac.h")
+remove_file(CHROMIUM_BASE_HEADERS GLOB "${CHROMIUM_BASE_DIR}/*_android.h")
 
-file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_unittest.cc")
-file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_win.cc")
-file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_nacl.cc")
-file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_android.cc")
-file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_chromeos.cc")
-file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_freebsd.cc")
-file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_openbsd.cc")
-file_list_remove(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_fuchsia.cc")
+remove_file(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_unittest.cc")
+remove_file(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_win.cc")
+remove_file(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_nacl.cc")
+remove_file(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_android.cc")
+remove_file(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_chromeos.cc")
+remove_file(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_freebsd.cc")
+remove_file(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_openbsd.cc")
+remove_file(CHROMIUM_BASE_SOURCES GLOB "${CHROMIUM_BASE_DIR}/*_fuchsia.cc")
 
 add_subdirectory(allocator)
 add_subdirectory(containers)
@@ -95,6 +95,7 @@ add_custom_command(
 
 # The chromium build system generates some header files in 'gen/base/' dir.
 # The following custom commands do the same thing, though ugly.
+# TODO: move these commands to configure stage.
 
 set(DEFINITION_CONTENT "--flags ENABLE_LOCATION_SOURCE=true ENABLE_PROFILING=false CAN_UNWIND_WITH_FRAME_POINTERS=true")
 set(SCRIPT "${CHROMIUM_SOURCE_DIR}/build/write_buildflag_header.py")

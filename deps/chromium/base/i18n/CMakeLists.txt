@@ -18,8 +18,8 @@ file(GLOB CHROMIUM_BASE_I18N_HEADERS "${CHROMIUM_BASE_I18N_DIR}/*.h")
 file(GLOB CHROMIUM_BASE_I18N_SOURCES "${CHROMIUM_BASE_I18N_DIR}/*.cc")
 
 # Remove sources for other platform or unit test:
-file_list_remove(CHROMIUM_BASE_I18N_SOURCES GLOB "${CHROMIUM_BASE_I18N_DIR}/*_unittest.cc")
-file_list_remove(CHROMIUM_BASE_I18N_SOURCES GLOB "${CHROMIUM_BASE_I18N_DIR}/*_perftest.cc")
+remove_file(CHROMIUM_BASE_I18N_SOURCES GLOB "${CHROMIUM_BASE_I18N_DIR}/*_unittest.cc")
+remove_file(CHROMIUM_BASE_I18N_SOURCES GLOB "${CHROMIUM_BASE_I18N_DIR}/*_perftest.cc")
 
 #file_list_remove(CHROMIUM_BASE_I18N_SOURCES GLOB "${CHROMIUM_BASE_I18N_DIR}/file_util_icu.cc")
 #file_list_remove(CHROMIUM_BASE_I18N_SOURCES GLOB "${CHROMIUM_BASE_I18N_DIR}/message_formatter.cc")

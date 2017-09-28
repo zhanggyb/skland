@@ -6,8 +6,8 @@ file(GLOB CHROMIUM_BASE_JSON_HEADERS "${CHROMIUM_BASE_JSON_DIR}/*.h")
 file(GLOB CHROMIUM_BASE_JSON_SOURCES "${CHROMIUM_BASE_JSON_DIR}/*.cc")
 
 # Remove sources for other platform or unit test:
-file_list_remove(CHROMIUM_BASE_JSON_SOURCES GLOB "${CHROMIUM_BASE_JSON_DIR}/*_unittest.cc")
-file_list_remove(CHROMIUM_BASE_JSON_SOURCES GLOB "${CHROMIUM_BASE_JSON_DIR}/*_perftest.cc")
+remove_file(CHROMIUM_BASE_JSON_SOURCES GLOB "${CHROMIUM_BASE_JSON_DIR}/*_unittest.cc")
+remove_file(CHROMIUM_BASE_JSON_SOURCES GLOB "${CHROMIUM_BASE_JSON_DIR}/*_perftest.cc")
 #file_list_remove(CHROMIUM_BASE_JSON_SOURCES GLOB "${CHROMIUM_BASE_JSON_DIR}/*_mac.cc")
 #file_list_remove(CHROMIUM_BASE_JSON_SOURCES GLOB "${CHROMIUM_BASE_JSON_DIR}/*_win.cc")
 #file_list_remove(CHROMIUM_BASE_JSON_SOURCES GLOB "${CHROMIUM_BASE_JSON_DIR}/*_fuchsia.cc")

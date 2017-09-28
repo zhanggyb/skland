@@ -6,7 +6,7 @@ file(GLOB CHROMIUM_BASE_TASK_HEADERS "${CHROMIUM_BASE_TASK_DIR}/*.h")
 file(GLOB CHROMIUM_BASE_TASK_SOURCES "${CHROMIUM_BASE_TASK_DIR}/*.cc")
 
 # Remove sources for other platform or unit test:
-file_list_remove(CHROMIUM_BASE_TASK_SOURCES GLOB "${CHROMIUM_BASE_TASK_DIR}/*_unittest.cc")
+remove_file(CHROMIUM_BASE_TASK_SOURCES GLOB "${CHROMIUM_BASE_TASK_DIR}/*_unittest.cc")
 #file_list_remove(CHROMIUM_BASE_TASK_SOURCES GLOB "${CHROMIUM_BASE_TASK_DIR}/*_mac.cc")
 #file_list_remove(CHROMIUM_BASE_TASK_SOURCES GLOB "${CHROMIUM_BASE_TASK_DIR}/*_win.cc")
 #file_list_remove(CHROMIUM_BASE_TASK_SOURCES GLOB "${CHROMIUM_BASE_TASK_DIR}/*_fuchsia.cc")

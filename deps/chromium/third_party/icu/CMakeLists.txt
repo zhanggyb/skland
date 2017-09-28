@@ -40,7 +40,7 @@ target_compile_definitions(
         PRIVATE "-DU_I18N_IMPLEMENTATION"
         PRIVATE "-DU_STATIC_IMPLEMENTATION"
         PRIVATE "-DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_STATIC"
-        PRIVATE "-DUCHAR_TYPE=char16_t"  # Note: we use char16_t when building 'icu' but uint16_t in 'base'
+#        PRIVATE "-DUCHAR_TYPE=char16_t"  # Note: we use char16_t when building 'icu' but uint16_t in 'base'
 )
 
 target_compile_options(

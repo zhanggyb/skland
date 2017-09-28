@@ -18,19 +18,19 @@ file(GLOB CHROMIUM_NET_BASE_HEADERS "${CHROMIUM_NET_BASE_DIR}/*.h")
 file(GLOB CHROMIUM_NET_BASE_SOURCES "${CHROMIUM_NET_BASE_DIR}/*.cc")
 
 # Remove headers for other platform or unit test:
-file_list_remove(CHROMIUM_NET_BASE_HEADERS GLOB "${CHROMIUM_NET_BASE_DIR}/*_win.h")
+remove_file(CHROMIUM_NET_BASE_HEADERS GLOB "${CHROMIUM_NET_BASE_DIR}/*_win.h")
 
 # Remove sources for other platform or unit test:
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_unittest.cc")
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_test.cc")
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_test_util.cc")
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_perftest.cc")
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/test_*.cc")
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_win.cc")
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/winsock_*.cc")
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_mac.cc")
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_android.cc")
-file_list_remove(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_fuchsia.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_unittest.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_test.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_test_util.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_perftest.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/test_*.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_win.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/winsock_*.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_mac.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_android.cc")
+remove_file(CHROMIUM_NET_BASE_SOURCES GLOB "${CHROMIUM_NET_BASE_DIR}/*_fuchsia.cc")
 
 
 list(APPEND CHROMIUM_NET_HEADERS ${CHROMIUM_NET_BASE_HEADERS})

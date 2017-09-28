@@ -23,7 +23,7 @@ set(VERSION_PATCH 1 CACHE STRING "Project patch version number.")
 mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules/")
-include(cmake/file_list_remove.cmake)
+include(cmake/functions.cmake)
 
 option(BUILD_UNIT_TEST "Build unit test code" OFF)
 option(BUILD_SHARED_LIBRARY "Build shared library" OFF)
