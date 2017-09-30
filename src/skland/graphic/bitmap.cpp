@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-#include <OpenImageIO/imagebuf.h>
 #include "internal/bitmap_private.hpp"
 #include "internal/image-info_private.hpp"
 
-#include "skland/core/memory.hpp"
-
 #include "OpenImageIO/imageio.h"
 #include "OpenImageIO/imagebufalgo.h"
+#include "OpenImageIO/imagebuf.h"
 
 namespace skland {
 namespace graphic {
 
 Bitmap::Bitmap() {
-  p_ = core::MakeUnique<Private>(this);
+  p_ = std::make_unique<Private>(this);
 }
 
 Bitmap::Bitmap(const Bitmap &orig) {
-  p_ = core::MakeUnique<Private>(this);
+  p_ = std::make_unique<Private>(this);
 
   p_->sk_bitmap = orig.p_->sk_bitmap;
 }

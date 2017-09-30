@@ -1,5 +1,4 @@
-SkLand
-======
+# SkLand
 
 **Warning: This project is still very much a work in progress and
 under heavy development. Support cannot be guaranteed and it may not
@@ -7,7 +6,7 @@ function as you expect.**
 
 ----
 
-## What is SkLand?
+## What is SkLand
 
 **SkLand** is a simple C++ GUI toolkit for Linux only, based on
 [Google Skia](https://skia.org) and

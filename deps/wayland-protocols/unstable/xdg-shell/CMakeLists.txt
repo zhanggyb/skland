@@ -17,28 +17,43 @@ set(XDG_SHELL_V6_CLIENT_HEADER "xdg-shell-unstable-v6-client-protocol.h")
 set(XDG_SHELL_V6_SERVER_HEADER "xdg-shell-unstable-v6-server-protocol.h")
 set(XDG_SHELL_V6_SOURCE "xdg-shell-unstable-v6-protocol.c")
 
-#execute_process(
-#        COMMAND ${WAYLAND_SCANNER} client-header ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_CLIENT_HEADER}
-#        COMMAND ${WAYLAND_SCANNER} server-header ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_SERVER_HEADER}
-#        COMMAND ${WAYLAND_SCANNER} code ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_SOURCE}
-#        WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-
-add_custom_target(
-        xdg_shell_generate_protocol
+message(STATUS "Generate XDG shell v6 protocol:")
+execute_process(
         COMMAND ${WAYLAND_SCANNER} client-header ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_CLIENT_HEADER}
         COMMAND ${WAYLAND_SCANNER} server-header ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_SERVER_HEADER}
         COMMAND ${WAYLAND_SCANNER} code ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_SOURCE}
-        DEPENDS ${XDG_SHELL_V6_XML}
-        COMMENT "Generate xdg shell v6 protocol source files"
-        VERBATIM
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 )
 
-add_library(xdg-shell-unstable-v6-client
-        ${XDG_SHELL_V6_CLIENT_HEADER}
-        ${XDG_SHELL_V6_SOURCE})
-set_source_files_properties(${XDG_SHELL_V6_CLIENT_HEADER} PROPERTIES
-        GENERATED TRUE)
-set_source_files_properties(${XDG_SHELL_V6_SOURCE} PROPERTIES
-        GENERATED TRUE)
+#add_custom_target(
+#        xdg_shell_generate_protocol
+#        COMMAND ${WAYLAND_SCANNER} client-header ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_CLIENT_HEADER}
+#        COMMAND ${WAYLAND_SCANNER} server-header ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_SERVER_HEADER}
+#        COMMAND ${WAYLAND_SCANNER} code ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_SOURCE}
+#        DEPENDS ${XDG_SHELL_V6_XML}
+#        COMMENT "Generate xdg shell v6 protocol source files"
+#        VERBATIM
+#)
 
-add_dependencies(xdg-shell-unstable-v6-client xdg_shell_generate_protocol)
+add_library(
+        xdg-shell-unstable-v6-client
+        ${XDG_SHELL_V6_CLIENT_HEADER}
+        ${XDG_SHELL_V6_SOURCE}
+)
+
+set_source_files_properties(
+        ${XDG_SHELL_V6_CLIENT_HEADER}
+        PROPERTIES
+        GENERATED TRUE
+)
+
+set_source_files_properties(
+        ${XDG_SHELL_V6_SOURCE}
+        PROPERTIES
+        GENERATED TRUE
+)
+
+#add_dependencies(
+#        xdg-shell-unstable-v6-client
+#        xdg_shell_generate_protocol
+#)

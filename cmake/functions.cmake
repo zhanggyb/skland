@@ -13,11 +13,19 @@
 # limitations under the License.
 
 # Set global variable
+# 
+# Usage:
+#   global_set(<variable> [arg1 arg2 ...])
+#
 function(global_set name)
     set_property(GLOBAL PROPERTY "${name}_property" ${ARGN})
 endfunction()
 
 # Get global variable
+# 
+# Usage:
+#   global_get(<variable>)
+#
 function(global_get name)
     get_property(temp GLOBAL PROPERTY "${name}_property")
     set(${name} ${temp} PARENT_SCOPE)
