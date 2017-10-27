@@ -121,8 +121,6 @@ if (LINUX)
             PUBLIC wayland-cursor
             PRIVATE skia
             PRIVATE xdg-shell-unstable-v6-client
-            PRIVATE OpenImageIO
-            PRIVATE OpenImageIO_Util
             PRIVATE chromium_base
     )
 else ()

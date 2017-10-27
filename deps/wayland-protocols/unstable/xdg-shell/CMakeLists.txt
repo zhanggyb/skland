@@ -22,7 +22,13 @@ execute_process(
         COMMAND ${WAYLAND_SCANNER} client-header ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_CLIENT_HEADER}
         COMMAND ${WAYLAND_SCANNER} server-header ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_SERVER_HEADER}
         COMMAND ${WAYLAND_SCANNER} code ${XDG_SHELL_V6_XML} ${XDG_SHELL_V6_SOURCE}
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+add_library(
+        xdg-shell-unstable-v6-client
+        ${XDG_SHELL_V6_CLIENT_HEADER}
+        ${XDG_SHELL_V6_SOURCE}
 )
 
 #add_custom_target(
@@ -35,23 +41,17 @@ execute_process(
 #        VERBATIM
 #)
 
-add_library(
-        xdg-shell-unstable-v6-client
-        ${XDG_SHELL_V6_CLIENT_HEADER}
-        ${XDG_SHELL_V6_SOURCE}
-)
-
-set_source_files_properties(
-        ${XDG_SHELL_V6_CLIENT_HEADER}
-        PROPERTIES
-        GENERATED TRUE
-)
-
-set_source_files_properties(
-        ${XDG_SHELL_V6_SOURCE}
-        PROPERTIES
-        GENERATED TRUE
-)
+#set_source_files_properties(
+#        ${XDG_SHELL_V6_CLIENT_HEADER}
+#        PROPERTIES
+#        GENERATED TRUE
+#)
+#
+#set_source_files_properties(
+#        ${XDG_SHELL_V6_SOURCE}
+#        PROPERTIES
+#        GENERATED TRUE
+#)
 
 #add_dependencies(
 #        xdg-shell-unstable-v6-client

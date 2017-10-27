@@ -148,6 +148,12 @@ endif ()
 #    set(LIBS ${LIBS} ${FFMPEG_LIBRARIES})
 #endif ()
 
+find_package(OpenImageIO REQUIRED)
+if (OPENIMAGEIO_FOUND)
+    include_directories(${OPENIMAGEIO_INCLUDE_DIR})
+    set(LIBS ${LIBS} ${OPENIMAGEIO_LIBRARY})
+endif ()
+
 find_library(DL_LIBRARY "dl")
 set(LIBS ${LIBS} ${DL_LIBRARY})
 
@@ -200,14 +206,19 @@ endif ()
 # ----------------------------------------------------------------------------
 # Generate config.hpp
 # ----------------------------------------------------------------------------
-configure_file("${PROJECT_SOURCE_DIR}/include/skland/config.hpp.in"
-        "${PROJECT_SOURCE_DIR}/include/skland/config.hpp" @ONLY)
+configure_file(
+        "${PROJECT_SOURCE_DIR}/include/skland/config.hpp.in"
+        "${PROJECT_SOURCE_DIR}/include/skland/config.hpp" @ONLY
+)
 
 # ----------------------------------------------------------------------------
 # Installation:
 # ----------------------------------------------------------------------------
 
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/skland" DESTINATION include)
+install(
+        DIRECTORY "${PROJECT_SOURCE_DIR}/include/skland"
+        DESTINATION include
+)
 # TODO: exclude "config.hpp.in"
 
 
@@ -219,18 +230,18 @@ message(STATUS "")
 if (APPLE)
     message(STATUS "  Only \'core\' and \'graphic\' modules will be built on macOS for unit test.")
 else()
-    message(STATUS "  Install path: ${CMAKE_INSTALL_PREFIX}")
-    message(STATUS "  Use Wayland client library: ${WAYLAND_CLIENT_LIBRARIES}")
-    if (EGL_FOUND)
-        message(STATUS "  Use EGL library: ${EGL_LIBRARIES}")
-    endif ()
+message(STATUS "  Install path: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "  Use Wayland client library: ${WAYLAND_CLIENT_LIBRARIES}")
+if (EGL_FOUND)
+message(STATUS "  Use EGL library: ${EGL_LIBRARIES}")
+endif ()
 endif()
 message(STATUS "")
 
 if (CHECKOUT_CHROMIUM)
-    message("Sync chromium source code, you can interrupt this by <Ctrl> + C.")
-    execute_process(
-        COMMAND "${PROJECT_SOURCE_DIR}/scripts/get_chromium.sh"
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-    )
+message("Sync chromium source code, you can interrupt this by <Ctrl> + C.")
+execute_process(
+COMMAND "${PROJECT_SOURCE_DIR}/scripts/get_chromium.sh"
+WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+)
 endif()
